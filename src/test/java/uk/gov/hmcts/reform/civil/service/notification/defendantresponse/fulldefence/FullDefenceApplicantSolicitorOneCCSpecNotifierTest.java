@@ -90,7 +90,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1DQ(new Respondent1DQ())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .build();
 
@@ -181,7 +181,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM)
-            .respondent1DQ(Respondent1DQ.builder().build())
+            .respondent1DQ(new Respondent1DQ())
             .applicant1Represented(YesOrNo.YES)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)

@@ -951,69 +951,64 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent1DQWithFixedRecoverableCosts() {
-        respondent1DQ = respondent1DQ.toBuilder()
-            .respondent1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .build()).build();
+        respondent1DQ = respondent1DQ.copy()
+            .setRespondent1DQFixedRecoverableCosts(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason"));
         return this;
     }
 
     public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate(Document document) {
-        respondent1DQ = respondent1DQ.toBuilder()
-            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .frcSupportingDocument(document)
-                .build()).build();
+        respondent1DQ = respondent1DQ.copy()
+            .setRespondent1DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason")
+                .setFrcSupportingDocument(document));
         return this;
     }
 
     public CaseDataBuilder respondent1DQWithFixedRecoverableCostsIntermediate() {
-        respondent1DQ = respondent1DQ.toBuilder()
-            .respondent1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .frcSupportingDocument(
+        respondent1DQ = respondent1DQ.copy()
+            .setRespondent1DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason")
+                .setFrcSupportingDocument(
                     DocumentBuilder.builder()
-                        .documentName("frc-doc1").build())
-                .build()).build();
+                        .documentName("frc-doc1").build()));
         return this;
     }
 
     public CaseDataBuilder respondent1DQ() {
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQHearingSupport(HearingSupport.builder()
-                .supportRequirements(YES)
-                .supportRequirementsAdditional("Additional support needed")
-                .requirements(List.of()).build())
-            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent1DQExperts(new Experts().setExpertRequired(NO))
+            .setRespondent1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent1DQHearingSupport(new HearingSupport()
+                .setSupportRequirements(YES)
+                .setSupportRequirementsAdditional("Additional support needed")
+                .setRequirements(List.of()))
+            .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent1DQLanguage(new WelshLanguageRequirements())
+            .setRespondent1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .setRespondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
@@ -1023,92 +1018,84 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent1DQWithoutSotAndExperts() {
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent1DQLanguage(new WelshLanguageRequirements())
+            .setRespondent1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
     public CaseDataBuilder respondent1DQWithLocation() {
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent1DQExperts(Experts.builder().expertRequired(NO).build())
-            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("444")
-                .responseCourtName("Court name 444")
-                .reasonForHearingAtSpecificCourt("Reason of Respondent 1 to choose court")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent1DQExperts(new Experts().setExpertRequired(NO))
+            .setRespondent1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent1DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("444")
+                .setResponseCourtName("Court name 444")
+                .setReasonForHearingAtSpecificCourt("Reason of Respondent 1 to choose court")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setRespondent1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent1DQLanguage(new WelshLanguageRequirements())
+            .setRespondent1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .setRespondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
     public CaseDataBuilder respondent1DQWithLocationAndWithoutExperts() {
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent1DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("444")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .respondent1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent1DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent1DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("444")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setRespondent1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent1DQLanguage(new WelshLanguageRequirements())
+            .setRespondent1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent1DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .setRespondent1DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
@@ -1117,10 +1104,11 @@ public class CaseDataBuilder {
             .date(LocalDate.now().plusDays(1))
             .unavailableDateType(SINGLE_DATE)
             .build();
-        this.respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
+        this.respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(wrapElements(List.of(unavailableDate))));
         return this;
     }
 
@@ -1130,10 +1118,11 @@ public class CaseDataBuilder {
             .toDate(LocalDate.now().plusDays(2))
             .unavailableDateType(UnavailableDateType.DATE_RANGE)
             .build();
-        this.respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
+        this.respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQHearing(new Hearing()
+                .setHearingLength(MORE_THAN_DAY)
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(wrapElements(List.of(unavailableDate))));
         return this;
     }
 
@@ -1143,10 +1132,11 @@ public class CaseDataBuilder {
             .toDate(LocalDate.now().plusDays(2))
             .unavailableDateType(UnavailableDateType.DATE_RANGE)
             .build();
-        this.respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
+        this.respondent2DQ = new Respondent2DQ()
+            .setRespondent2DQHearing(new Hearing()
+                .setHearingLength(MORE_THAN_DAY)
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(wrapElements(List.of(unavailableDate))));
         return this;
     }
 
@@ -1156,10 +1146,11 @@ public class CaseDataBuilder {
             .toDate(LocalDate.now().plusDays(2))
             .unavailableDateType(UnavailableDateType.DATE_RANGE)
             .build();
-        this.applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQHearing(Hearing.builder().hearingLength(MORE_THAN_DAY).unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
+        this.applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQHearing(new Hearing()
+                .setHearingLength(MORE_THAN_DAY)
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(wrapElements(List.of(unavailableDate))));
         return this;
     }
 
@@ -1168,128 +1159,119 @@ public class CaseDataBuilder {
             .date(LocalDate.now().plusDays(1))
             .unavailableDateType(SINGLE_DATE)
             .build();
-        this.applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(YES)
-                .unavailableDates(wrapElements(List.of(unavailableDate))).build())
-            .build();
+        this.applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(wrapElements(List.of(unavailableDate))));
         return this;
     }
 
     public CaseDataBuilder respondent2DQWithLocation() {
-        respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
-            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent2DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("444")
-                .responseCourtName("Court name 444")
-                .reasonForHearingAtSpecificCourt("Reason of Respondent 2 to choose court")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent2DQ = new Respondent2DQ()
+            .setRespondent2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent2DQExperts(new Experts().setExpertRequired(NO))
+            .setRespondent2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent2DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("444")
+                .setResponseCourtName("Court name 444")
+                .setReasonForHearingAtSpecificCourt("Reason of Respondent 2 to choose court")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent2DQLanguage(new WelshLanguageRequirements())
+            .setRespondent2DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .setRespondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
     public CaseDataBuilder respondent2DQWithLocationAndWithoutExperts() {
-        respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent2DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("444")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
-            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build())
-            .build();
+        respondent2DQ = new Respondent2DQ()
+            .setRespondent2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent2DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("444")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent2DQLanguage(new WelshLanguageRequirements())
+            .setRespondent2DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent2DQStatementOfTruth(StatementOfTruth.builder().name("John Doe").role("Solicitor").build())
+            .setRespondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant1-directions.pdf").build());
         return this;
     }
 
     public CaseDataBuilder respondent2DQWithFixedRecoverableCosts() {
-        respondent2DQ = respondent2DQ.toBuilder()
-            .respondent2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .build()).build();
+        respondent2DQ = respondent2DQ.copy()
+            .setRespondent2DQFixedRecoverableCosts(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason"));
         return this;
     }
 
     public CaseDataBuilder respondent2DQWithFixedRecoverableCostsIntermediate() {
-        respondent2DQ = respondent2DQ.toBuilder()
-            .respondent2DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .frcSupportingDocument(
+        respondent2DQ = respondent2DQ.copy()
+            .setRespondent2DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason")
+                .setFrcSupportingDocument(
                     DocumentBuilder.builder()
-                        .documentName("frc-doc1").build())
-                .build()).build();
+                        .documentName("frc-doc1").build()));
         return this;
     }
 
     public CaseDataBuilder respondent2DQ() {
-        respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent2DQExperts(Experts.builder().expertRequired(NO).build())
-            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
-            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
-            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
-            .build();
+        respondent2DQ = new Respondent2DQ()
+            .setRespondent2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent2DQExperts(new Experts().setExpertRequired(NO))
+            .setRespondent2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent2DQRequestedCourt(new RequestedCourt())
+            .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent2DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent2DQLanguage(new WelshLanguageRequirements())
+            .setRespondent2DQStatementOfTruth(StatementOfTruth.builder().name("Jane Doe").role("Solicitor").build())
+            .setRespondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build());
         return this;
     }
 
@@ -1299,58 +1281,54 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent2DQWithoutSotAndExperts() {
-        respondent2DQ = Respondent2DQ.builder()
-            .respondent2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("CONFIRM"))
-                .oneMonthStayRequested(YES)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .respondent2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .respondent2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .respondent2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .respondent2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .respondent2DQRequestedCourt(RequestedCourt.builder().build())
-            .respondent2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .respondent2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .respondent2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .respondent2DQLanguage(WelshLanguageRequirements.builder().build())
-            .respondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build())
-            .build();
+        respondent2DQ = new Respondent2DQ()
+            .setRespondent2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("CONFIRM"))
+                .setOneMonthStayRequested(YES)
+                .setReactionProtocolCompliedWith(YES))
+            .setRespondent2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setRespondent2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setRespondent2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setRespondent2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setRespondent2DQRequestedCourt(new RequestedCourt())
+            .setRespondent2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setRespondent2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setRespondent2DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setRespondent2DQLanguage(new WelshLanguageRequirements())
+            .setRespondent2DQDraftDirections(DocumentBuilder.builder().documentName("defendant2-directions.pdf").build());
         return this;
     }
 
     public CaseDataBuilder applicant1DQ() {
-        applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("OTHER"))
-                .oneMonthStayRequested(NO)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
-            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder().build())
-            .applicant1DQHearingSupport(HearingSupport.builder()
-                .supportRequirements(YES)
-                .supportRequirementsAdditional("Additional support needed")
-                .requirements(List.of()).build())
-            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("OTHER"))
+                .setOneMonthStayRequested(NO)
+                .setReactionProtocolCompliedWith(YES))
+            .setApplicant1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setApplicant1DQExperts(new Experts().setExpertRequired(NO))
+            .setApplicant1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setApplicant1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setApplicant1DQRequestedCourt(new RequestedCourt())
+            .setApplicant1DQHearingSupport(new HearingSupport()
+                .setSupportRequirements(YES)
+                .setSupportRequirementsAdditional("Additional support needed")
+                .setRequirements(List.of()))
+            .setApplicant1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setApplicant1DQLanguage(new WelshLanguageRequirements())
+            .setApplicant1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setApplicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build());
         return this;
     }
 
@@ -1360,131 +1338,124 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder applicant1DQWithExperts() {
-        var applicant1DQBuilder = applicant1DQ != null
-            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
-        applicant1DQBuilder.applicant1DQExperts(
-            uk.gov.hmcts.reform.civil.model.dq.Experts.builder()
-                .expertRequired(YES)
-                .expertReportsSent(ExpertReportsSent.NO)
-                .jointExpertSuitable(NO)
-                .details(
-                    wrapElements(uk.gov.hmcts.reform.civil.model.dq.Expert.builder()
-                        .firstName("Expert")
-                        .lastName("One")
-                        .phoneNumber("01482764322")
-                        .emailAddress("fast.claim.expert1@example.com")
-                        .whyRequired("Good reasons")
-                        .fieldOfExpertise("Some field")
-                        .estimatedCost(BigDecimal.valueOf(10000))
-                        .build()
+        Applicant1DQ updatedApplicant1DQ = applicant1DQ != null
+            ? applicant1DQ.copy() : applicant1DQ().build().getApplicant1DQ().copy();
+        updatedApplicant1DQ.setApplicant1DQExperts(
+            new uk.gov.hmcts.reform.civil.model.dq.Experts()
+                .setExpertRequired(YES)
+                .setExpertReportsSent(ExpertReportsSent.NO)
+                .setJointExpertSuitable(NO)
+                .setDetails(
+                    wrapElements(new uk.gov.hmcts.reform.civil.model.dq.Expert()
+                        .setFirstName("Expert")
+                        .setLastName("One")
+                        .setPhoneNumber("01482764322")
+                        .setEmailAddress("fast.claim.expert1@example.com")
+                        .setWhyRequired("Good reasons")
+                        .setFieldOfExpertise("Some field")
+                        .setEstimatedCost(BigDecimal.valueOf(10000))
                     )
                 )
-                .build()
         );
 
-        applicant1DQ = applicant1DQBuilder.build();
+        applicant1DQ = updatedApplicant1DQ;
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithWitnesses() {
-        var applicant1DQBuilder = applicant1DQ != null
-            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
-        applicant1DQBuilder.applicant1DQWitnesses(
-            Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Witness")
-                        .lastName("One")
-                        .phoneNumber("01482764322")
-                        .emailAddress("witness.one@example.com")
-                        .reasonForWitness("Saw something")
-                        .build()))
-                .build());
+        Applicant1DQ updatedApplicant1DQ = applicant1DQ != null
+            ? applicant1DQ.copy() : applicant1DQ().build().getApplicant1DQ().copy();
+        updatedApplicant1DQ.setApplicant1DQWitnesses(
+            new Witnesses()
+                .setWitnessesToAppear(YES)
+                .setDetails(wrapElements(
+                    new Witness()
+                        .setFirstName("Witness")
+                        .setLastName("One")
+                        .setPhoneNumber("01482764322")
+                        .setEmailAddress("witness.one@example.com")
+                        .setReasonForWitness("Saw something")
+                )));
 
-        applicant1DQ = applicant1DQBuilder.build();
+        applicant1DQ = updatedApplicant1DQ;
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithHearingSupport() {
-        var applicant1DQBuilder = applicant1DQ != null
-            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+        Applicant1DQ updatedApplicant1DQ = applicant1DQ != null
+            ? applicant1DQ.copy() : applicant1DQ().build().getApplicant1DQ().copy();
 
-        applicant1DQBuilder.applicant1DQHearingSupport(
-            HearingSupport.builder()
-                .supportRequirements(YES)
-                .supportRequirementsAdditional("Support requirements works!!!")
-                .build()
-        ).build();
+        updatedApplicant1DQ.setApplicant1DQHearingSupport(
+            new HearingSupport()
+                .setSupportRequirements(YES)
+                .setSupportRequirementsAdditional("Support requirements works!!!")
+        );
 
-        applicant1DQ = applicant1DQBuilder.build();
+        applicant1DQ = updatedApplicant1DQ;
         return this;
     }
 
     public CaseDataBuilder respondent1DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
-        var respondent1DQBuilder = this.respondent1DQ != null
-            ? this.respondent1DQ.toBuilder() : respondent1DQ().build().getRespondent1DQ().toBuilder();
+        Respondent1DQ updatedRespondent1DQ = this.respondent1DQ != null
+            ? this.respondent1DQ.copy() : respondent1DQ().build().getRespondent1DQ().copy();
         ExpertDetails expertDetails = experts != null
             ? experts
-            : (ExpertDetails.builder()
-            .expertName("Mr Expert Defendant")
-            .firstName("Expert")
-            .lastName("Defendant")
-            .phoneNumber("07123456789")
-            .emailAddress("test@email.com")
-            .fieldofExpertise("Roofing")
-            .estimatedCost(new BigDecimal(434))
-            .build());
+            : new ExpertDetails()
+                .setExpertName("Mr Expert Defendant")
+                .setFirstName("Expert")
+                .setLastName("Defendant")
+                .setPhoneNumber("07123456789")
+                .setEmailAddress("test@email.com")
+                .setFieldofExpertise("Roofing")
+                .setEstimatedCost(new BigDecimal(434));
 
-        respondent1DQBuilder.respondToClaimExperts(expertDetails).build();
-        respondent1DQ = respondent1DQBuilder.build();
+        updatedRespondent1DQ.setRespondToClaimExperts(expertDetails);
+        respondent1DQ = updatedRespondent1DQ;
 
         this.responseClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
         return this;
     }
 
     public CaseDataBuilder respondent2DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
-        var respondent2DQBuilder = this.respondent2DQ != null
-            ? this.respondent2DQ.toBuilder() : respondent2DQ().build().getRespondent2DQ().toBuilder();
+        Respondent2DQ updatedRespondent2DQ = this.respondent2DQ != null
+            ? this.respondent2DQ.copy() : respondent2DQ().build().getRespondent2DQ().copy();
         ExpertDetails expertDetails = experts != null
             ? experts
-            : (ExpertDetails.builder()
-            .expertName("Mr Expert Defendant")
-            .firstName("Expert")
-            .lastName("Defendant")
-            .phoneNumber("07123456789")
-            .emailAddress("test@email.com")
-            .fieldofExpertise("Roofing")
-            .estimatedCost(new BigDecimal(434))
-            .build());
+            : new ExpertDetails()
+                .setExpertName("Mr Expert Defendant")
+                .setFirstName("Expert")
+                .setLastName("Defendant")
+                .setPhoneNumber("07123456789")
+                .setEmailAddress("test@email.com")
+                .setFieldofExpertise("Roofing")
+                .setEstimatedCost(new BigDecimal(434));
 
-        respondent2DQBuilder.respondToClaimExperts2(expertDetails).build();
-        respondent2DQ = respondent2DQBuilder.build();
+        updatedRespondent2DQ.setRespondToClaimExperts2(expertDetails);
+        respondent2DQ = updatedRespondent2DQ;
 
         this.responseClaimExpertSpecRequired2(expertsRequired != null ? expertsRequired : YES);
         return this;
     }
 
     public CaseDataBuilder applicant1DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
-        var applicant1DQBuilder = applicant1DQ != null
-            ? applicant1DQ.toBuilder() : applicant1DQ().build().getApplicant1DQ().toBuilder();
+        Applicant1DQ updatedApplicant1DQ = applicant1DQ != null
+            ? applicant1DQ.copy() : applicant1DQ().build().getApplicant1DQ().copy();
 
         ExpertDetails expertDetails = experts != null
             ? experts
-            : (ExpertDetails.builder()
-            .expertName("Mr Expert Defendant")
-            .firstName("Expert")
-            .lastName("Defendant")
-            .phoneNumber("07123456789")
-            .emailAddress("test@email.com")
-            .fieldofExpertise("Roofing")
-            .estimatedCost(new BigDecimal(434))
-            .build());
+            : new ExpertDetails()
+                .setExpertName("Mr Expert Defendant")
+                .setFirstName("Expert")
+                .setLastName("Defendant")
+                .setPhoneNumber("07123456789")
+                .setEmailAddress("test@email.com")
+                .setFieldofExpertise("Roofing")
+                .setEstimatedCost(new BigDecimal(434));
 
-        applicant1DQBuilder.applicant1RespondToClaimExperts(expertDetails).build();
+        updatedApplicant1DQ.setApplicant1RespondToClaimExperts(expertDetails);
         this.applicant1ClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
-        applicant1DQ = applicant1DQBuilder.build();
+        applicant1DQ = updatedApplicant1DQ;
         return this;
     }
 
@@ -1493,191 +1464,175 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder applicant2DQSmallClaimExperts(ExpertDetails experts, YesOrNo expertsRequired) {
-        var applicant2DQBuilder = applicant2DQ != null
-            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
+        Applicant2DQ updatedApplicant2DQ = applicant2DQ != null
+            ? applicant2DQ.copy() : applicant2DQ().build().getApplicant2DQ().copy();
 
         ExpertDetails expertDetails = experts != null
             ? experts
-            : (ExpertDetails.builder()
-            .expertName("Mr Expert Defendant")
-            .firstName("Expert")
-            .lastName("Defendant")
-            .phoneNumber("07123456789")
-            .emailAddress("test@email.com")
-            .fieldofExpertise("Roofing")
-            .estimatedCost(new BigDecimal(434))
-            .build());
+            : new ExpertDetails()
+                .setExpertName("Mr Expert Defendant")
+                .setFirstName("Expert")
+                .setLastName("Defendant")
+                .setPhoneNumber("07123456789")
+                .setEmailAddress("test@email.com")
+                .setFieldofExpertise("Roofing")
+                .setEstimatedCost(new BigDecimal(434));
 
-        applicant2DQBuilder.applicant2RespondToClaimExperts(expertDetails).build();
+        updatedApplicant2DQ.setApplicant2RespondToClaimExperts(expertDetails);
         this.applicantMPClaimExpertSpecRequired(expertsRequired != null ? expertsRequired : YES);
 
-        applicant2DQ = applicant2DQBuilder.build();
+        applicant2DQ = updatedApplicant2DQ;
         return this;
     }
 
     public CaseDataBuilder noApplicant2DQSmallClaimExperts() {
-        var applicant2DQBuilder = applicant2DQ != null
-            ? applicant2DQ.toBuilder() : applicant2DQ().build().getApplicant2DQ().toBuilder();
-        applicant2DQ = applicant2DQBuilder
-            .applicant2DQExperts(Experts.builder().expertRequired(NO).build()
-            ).build();
+        Applicant2DQ updatedApplicant2DQ = applicant2DQ != null
+            ? applicant2DQ.copy() : applicant2DQ().build().getApplicant2DQ().copy();
+        applicant2DQ = updatedApplicant2DQ
+            .setApplicant2DQExperts(new Experts().setExpertRequired(NO));
         this.applicantMPClaimExpertSpecRequired(NO);
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithLocation() {
-        applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("OTHER"))
-                .oneMonthStayRequested(NO)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .applicant1DQExperts(Experts.builder().expertRequired(NO).build())
-            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("court4")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("00000").setRegion("dummy region")
-                    ).build())
-            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("OTHER"))
+                .setOneMonthStayRequested(NO)
+                .setReactionProtocolCompliedWith(YES))
+            .setApplicant1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setApplicant1DQExperts(new Experts().setExpertRequired(NO))
+            .setApplicant1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setApplicant1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setApplicant1DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("court4")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("00000").setRegion("dummy region")))
+            .setApplicant1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setApplicant1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setApplicant1DQLanguage(new WelshLanguageRequirements())
+            .setApplicant1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setApplicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build());
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithFixedRecoverableCosts() {
-        applicant1DQ = applicant1DQ.toBuilder()
-            .applicant1DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .build()).build();
+        applicant1DQ = applicant1DQ.copy()
+            .setApplicant1DQFixedRecoverableCosts(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason"));
         return this;
     }
 
     public CaseDataBuilder applicant2DQWithFixedRecoverableCosts() {
-        applicant2DQ = applicant2DQ.toBuilder()
-            .applicant2DQFixedRecoverableCosts(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .build()).build();
+        applicant2DQ = applicant2DQ.copy()
+            .setApplicant2DQFixedRecoverableCosts(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason"));
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithFixedRecoverableCostsIntermediate() {
-        applicant1DQ = applicant1DQ.toBuilder()
-            .applicant1DQFixedRecoverableCostsIntermediate(FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .band(BAND_1)
-                .complexityBandingAgreed(YES)
-                .reasons("Good reason")
-                .frcSupportingDocument(
+        applicant1DQ = applicant1DQ.copy()
+            .setApplicant1DQFixedRecoverableCostsIntermediate(new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setBand(BAND_1)
+                .setComplexityBandingAgreed(YES)
+                .setReasons("Good reason")
+                .setFrcSupportingDocument(
                     DocumentBuilder.builder()
-                        .documentName("frc-doc1").build())
-                .build()).build();
+                        .documentName("frc-doc1").build()));
         return this;
     }
 
     public CaseDataBuilder applicant1DQWithLocationWithoutExperts() {
-        applicant1DQ = Applicant1DQ.builder()
-            .applicant1DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("OTHER"))
-                .oneMonthStayRequested(NO)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .applicant1DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .applicant1DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .applicant1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant1DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant1DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("court4")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .applicant1DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .applicant1DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant1DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant1DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .applicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant1DQ = new Applicant1DQ()
+            .setApplicant1DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("OTHER"))
+                .setOneMonthStayRequested(NO)
+                .setReactionProtocolCompliedWith(YES))
+            .setApplicant1DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setApplicant1DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setApplicant1DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setApplicant1DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("court4")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setApplicant1DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setApplicant1DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setApplicant1DQLanguage(new WelshLanguageRequirements())
+            .setApplicant1DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setApplicant1DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build());
         return this;
     }
 
     public CaseDataBuilder applicant2DQWithLocation() {
-        applicant2DQ = Applicant2DQ.builder()
-            .applicant2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("OTHER"))
-                .oneMonthStayRequested(NO)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .applicant2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .applicant2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .applicant2DQExperts(Experts.builder().expertRequired(NO).build())
-            .applicant2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant2DQRequestedCourt(RequestedCourt.builder()
-                .responseCourtCode("court4")
-                .caseLocation(new CaseLocationCivil()
-                    .setBaseLocation("dummy base").setRegion("dummy region")
-                    ).build())
-            .applicant2DQHearingSupport(HearingSupport.builder().requirements(List.of()).build())
-            .applicant2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant2DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant2DQVulnerabilityQuestions(VulnerabilityQuestions.builder()
-                .vulnerabilityAdjustmentsRequired(NO).build())
-            .applicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant2DQ = new Applicant2DQ()
+            .setApplicant2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("OTHER"))
+                .setOneMonthStayRequested(NO)
+                .setReactionProtocolCompliedWith(YES))
+            .setApplicant2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setApplicant2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setApplicant2DQExperts(new Experts().setExpertRequired(NO))
+            .setApplicant2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setApplicant2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setApplicant2DQRequestedCourt(new RequestedCourt()
+                .setResponseCourtCode("court4")
+                .setCaseLocation(new CaseLocationCivil()
+                                     .setBaseLocation("dummy base").setRegion("dummy region")))
+            .setApplicant2DQHearingSupport(new HearingSupport().setRequirements(List.of()))
+            .setApplicant2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setApplicant2DQLanguage(new WelshLanguageRequirements())
+            .setApplicant2DQVulnerabilityQuestions(new VulnerabilityQuestions()
+                .setVulnerabilityAdjustmentsRequired(NO))
+            .setApplicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build());
         return this;
     }
 
     public CaseDataBuilder applicant2DQ() {
-        applicant2DQ = Applicant2DQ.builder()
-            .applicant2DQFileDirectionsQuestionnaire(FileDirectionsQuestionnaire.builder()
-                .explainedToClient(List.of("OTHER"))
-                .oneMonthStayRequested(NO)
-                .reactionProtocolCompliedWith(YES)
-                .build())
-            .applicant2DQDisclosureOfElectronicDocuments(DisclosureOfElectronicDocuments.builder()
-                .reachedAgreement(YES)
-                .build())
-            .applicant2DQDisclosureOfNonElectronicDocuments(DisclosureOfNonElectronicDocuments.builder()
-                .directionsForDisclosureProposed(NO)
-                .build())
-            .applicant2DQExperts(Experts.builder().expertRequired(NO).build())
-            .applicant2DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-            .applicant2DQHearing(Hearing.builder().hearingLength(ONE_DAY).unavailableDatesRequired(NO).build())
-            .applicant2DQRequestedCourt(RequestedCourt.builder().build())
-            .applicant2DQHearingSupport(HearingSupport.builder()
-                .supportRequirements(YES)
-                .supportRequirementsAdditional("Additional support needed")
-                .requirements(List.of()).build())
-            .applicant2DQFurtherInformation(FurtherInformation.builder().futureApplications(NO).build())
-            .applicant2DQLanguage(WelshLanguageRequirements.builder().build())
-            .applicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build())
-            .build();
+        applicant2DQ = new Applicant2DQ()
+            .setApplicant2DQFileDirectionsQuestionnaire(new FileDirectionsQuestionnaire()
+                .setExplainedToClient(List.of("OTHER"))
+                .setOneMonthStayRequested(NO)
+                .setReactionProtocolCompliedWith(YES))
+            .setApplicant2DQDisclosureOfElectronicDocuments(new DisclosureOfElectronicDocuments()
+                .setReachedAgreement(YES))
+            .setApplicant2DQDisclosureOfNonElectronicDocuments(new DisclosureOfNonElectronicDocuments()
+                .setDirectionsForDisclosureProposed(NO))
+            .setApplicant2DQExperts(new Experts().setExpertRequired(NO))
+            .setApplicant2DQWitnesses(new Witnesses().setWitnessesToAppear(NO))
+            .setApplicant2DQHearing(new Hearing()
+                .setHearingLength(ONE_DAY)
+                .setUnavailableDatesRequired(NO))
+            .setApplicant2DQRequestedCourt(new RequestedCourt())
+            .setApplicant2DQHearingSupport(new HearingSupport()
+                .setSupportRequirements(YES)
+                .setSupportRequirementsAdditional("Additional support needed")
+                .setRequirements(List.of()))
+            .setApplicant2DQFurtherInformation(new FurtherInformation().setFutureApplications(NO))
+            .setApplicant2DQLanguage(new WelshLanguageRequirements())
+            .setApplicant2DQStatementOfTruth(StatementOfTruth.builder().name("Bob Jones").role("Solicitor").build());
         return this;
     }
 
@@ -2540,31 +2495,26 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDraftMock() {
         CaseDataBuilder caseDataBuilder = atStateClaimDraft();
         caseDataBuilder.caseManagementLocation(new CaseLocationCivil().setRegion("2").setBaseLocation("41112"));
-        caseDataBuilder.applicant1DQ(Applicant1DQ.builder()
-                                         .applicant1DQRequestedCourt(RequestedCourt.builder().responseCourtCode("court4")
-                                                                         .caseLocation(new CaseLocationCivil()
-                                                                                           .setBaseLocation("dummy base").setRegion(
-                                                                                 "dummy region")
-                                                                                           )
-                                                                         .responseCourtName("testCourt")
-                                                                         .responseCourtCode("0000")
-                                                                         .reasonForHearingAtSpecificCourt("reason")
-                                                                         .otherPartyPreferredSite("site")
-                                                                         .build())
-                                         .build());
-        caseDataBuilder.respondent1DQ(Respondent1DQ.builder()
-                                          .respondent1DQRequestedCourt(RequestedCourt.builder().responseCourtCode(
-                                                  "court4")
-                                                                           .caseLocation(new CaseLocationCivil()
-                                                                                             .setBaseLocation("dummy base").setRegion(
-                                                                                   "dummy region")
-                                                                                             )
-                                                                           .responseCourtName("testCourt")
-                                                                           .responseCourtCode("0000")
-                                                                           .reasonForHearingAtSpecificCourt("reason")
-                                                                           .otherPartyPreferredSite("site")
-                                                                           .build())
-                                          .build());
+        caseDataBuilder.applicant1DQ(new Applicant1DQ()
+                                         .setApplicant1DQRequestedCourt(new RequestedCourt()
+                                                                         .setResponseCourtCode("court4")
+                                                                         .setCaseLocation(new CaseLocationCivil()
+                                                                                              .setBaseLocation("dummy base")
+                                                                                              .setRegion("dummy region"))
+                                                                         .setResponseCourtName("testCourt")
+                                                                         .setResponseCourtCode("0000")
+                                                                         .setReasonForHearingAtSpecificCourt("reason")
+                                                                         .setOtherPartyPreferredSite("site")));
+        caseDataBuilder.respondent1DQ(new Respondent1DQ()
+                                          .setRespondent1DQRequestedCourt(new RequestedCourt()
+                                                                           .setResponseCourtCode("court4")
+                                                                           .setCaseLocation(new CaseLocationCivil()
+                                                                                                .setBaseLocation("dummy base")
+                                                                                                .setRegion("dummy region"))
+                                                                           .setResponseCourtName("testCourt")
+                                                                           .setResponseCourtCode("0000")
+                                                                           .setReasonForHearingAtSpecificCourt("reason")
+                                                                           .setOtherPartyPreferredSite("site")));
         return caseDataBuilder;
     }
 
@@ -3903,22 +3853,21 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceWithHearingSupport() {
         atStateRespondentRespondToClaim(RespondentResponseType.FULL_DEFENCE);
-        respondent1DQ = Respondent1DQ.builder()
-            .respondent1DQRequestedCourt(
-                RequestedCourt.builder()
-                    .responseCourtCode("121")
-                    .reasonForHearingAtSpecificCourt("test")
-                    .caseLocation(new CaseLocationCivil()
-                        .setRegion("2")
-                        .setBaseLocation("000000")
-                        ).build())
-            .respondent1DQHearingSupport(HearingSupport.builder()
-                .requirements(List.of(SupportRequirements.values()))
-                .languageToBeInterpreted("English")
-                .signLanguageRequired("Spanish")
-                .otherSupport("other support")
-                .supportRequirements(YES)
-                .supportRequirementsAdditional("additional support").build()).build();
+        respondent1DQ = new Respondent1DQ()
+            .setRespondent1DQRequestedCourt(
+                new RequestedCourt()
+                    .setResponseCourtCode("121")
+                    .setReasonForHearingAtSpecificCourt("test")
+                    .setCaseLocation(new CaseLocationCivil()
+                                         .setRegion("2")
+                                         .setBaseLocation("000000")))
+            .setRespondent1DQHearingSupport(new HearingSupport()
+                .setRequirements(List.of(SupportRequirements.values()))
+                .setLanguageToBeInterpreted("English")
+                .setSignLanguageRequired("Spanish")
+                .setOtherSupport("other support")
+                .setSupportRequirements(YES)
+                .setSupportRequirementsAdditional("additional support"));
         respondent1ClaimResponseDocument = ResponseDocument.builder()
             .file(DocumentBuilder.builder().documentName("defendant1-defence.pdf").build())
             .build();
@@ -6702,26 +6651,21 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addApplicant1ExpertsAndWitnesses() {
-        this.applicant1DQ = applicant1DQ.toBuilder()
-            .applicant1DQExperts(Experts.builder()
-                .expertRequired(YES)
-                .details(wrapElements(
-                    Expert.builder()
-                        .firstName("Applicant")
-                        .lastName("Expert")
-                        .build()
-                ))
-                .build())
-            .applicant1DQWitnesses(Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Applicant")
-                        .lastName("Witness")
-                        .build()
-                ))
-                .build())
-            .build();
+        this.applicant1DQ = applicant1DQ.copy()
+            .setApplicant1DQExperts(new Experts()
+                .setExpertRequired(YES)
+                .setDetails(wrapElements(
+                    new Expert()
+                        .setFirstName("Applicant")
+                        .setLastName("Expert")
+                )))
+            .setApplicant1DQWitnesses(new Witnesses()
+                .setWitnessesToAppear(YES)
+                .setDetails(wrapElements(
+                    new Witness()
+                        .setFirstName("Applicant")
+                        .setLastName("Witness")
+                )));
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
             .partyID("app-1-expert-party-id")
             .firstName("Applicant")
@@ -6736,26 +6680,21 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addApplicant2ExpertsAndWitnesses() {
-        this.applicant2DQ = applicant2DQ.toBuilder()
-            .applicant2DQExperts(Experts.builder()
-                .expertRequired(YES)
-                .details(wrapElements(
-                    Expert.builder()
-                        .firstName("Applicant Two")
-                        .lastName("Expert")
-                        .build()
-                ))
-                .build())
-            .applicant2DQWitnesses(Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Applicant Two")
-                        .lastName("Witness")
-                        .build()
-                ))
-                .build())
-            .build();
+        this.applicant2DQ = applicant2DQ.copy()
+            .setApplicant2DQExperts(new Experts()
+                .setExpertRequired(YES)
+                .setDetails(wrapElements(
+                    new Expert()
+                        .setFirstName("Applicant Two")
+                        .setLastName("Expert")
+                )))
+            .setApplicant2DQWitnesses(new Witnesses()
+                .setWitnessesToAppear(YES)
+                .setDetails(wrapElements(
+                    new Witness()
+                        .setFirstName("Applicant Two")
+                        .setLastName("Witness")
+                )));
         this.applicantExperts = wrapElements(PartyFlagStructure.builder()
             .partyID("app-2-expert-party-id")
             .firstName("Applicant Two")
@@ -6770,26 +6709,21 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addRespondent1ExpertsAndWitnesses() {
-        this.respondent1DQ = respondent1DQ.toBuilder()
-            .respondent1DQExperts(Experts.builder()
-                .expertRequired(YES)
-                .details(wrapElements(
-                    Expert.builder()
-                        .firstName("Respondent")
-                        .lastName("Expert")
-                        .build()
-                ))
-                .build())
-            .respondent1DQWitnesses(Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Respondent")
-                        .lastName("Witness")
-                        .build()
-                ))
-                .build())
-            .build();
+        this.respondent1DQ = respondent1DQ.copy()
+            .setRespondent1DQExperts(new Experts()
+                .setExpertRequired(YES)
+                .setDetails(wrapElements(
+                    new Expert()
+                        .setFirstName("Respondent")
+                        .setLastName("Expert")
+                )))
+            .setRespondent1DQWitnesses(new Witnesses()
+                .setWitnessesToAppear(YES)
+                .setDetails(wrapElements(
+                    new Witness()
+                        .setFirstName("Respondent")
+                        .setLastName("Witness")
+                )));
         this.respondent1Experts = wrapElements(PartyFlagStructure.builder()
             .partyID("res-1-expert-party-id")
             .firstName("Respondent")
@@ -6804,26 +6738,21 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addRespondent2ExpertsAndWitnesses() {
-        this.respondent2DQ = respondent2DQ.toBuilder()
-            .respondent2DQExperts(Experts.builder()
-                .expertRequired(YES)
-                .details(wrapElements(
-                    Expert.builder()
-                        .firstName("Respondent Two")
-                        .lastName("Expert")
-                        .build()
-                ))
-                .build())
-            .respondent2DQWitnesses(Witnesses.builder()
-                .witnessesToAppear(YES)
-                .details(wrapElements(
-                    Witness.builder()
-                        .firstName("Respondent Two")
-                        .lastName("Witness")
-                        .build()
-                ))
-                .build())
-            .build();
+        this.respondent2DQ = respondent2DQ.copy()
+            .setRespondent2DQExperts(new Experts()
+                .setExpertRequired(YES)
+                .setDetails(wrapElements(
+                    new Expert()
+                        .setFirstName("Respondent Two")
+                        .setLastName("Expert")
+                )))
+            .setRespondent2DQWitnesses(new Witnesses()
+                .setWitnessesToAppear(YES)
+                .setDetails(wrapElements(
+                    new Witness()
+                        .setFirstName("Respondent Two")
+                        .setLastName("Witness")
+                )));
         this.respondent2Experts = wrapElements(PartyFlagStructure.builder()
             .partyID("res-2-expert-party-id")
             .firstName("Respondent Two")
@@ -7363,8 +7292,7 @@ public class CaseDataBuilder {
         atStateClaimNotified();
         this.trialHearingWitnessOfFactDJ = new TrialHearingWitnessOfFact()
             .setInput2("-3")
-            .setInput3("-3")
-            ;
+            .setInput3("-3");
 
         return this;
     }

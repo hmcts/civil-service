@@ -12,11 +12,9 @@ class ReasonMoneyTemplateDataTest {
 
     @Test
     void shouldNotThrowException() {
-        RecurringIncomeLRspec item = RecurringIncomeLRspec
-            .builder()
-            .type(IncomeTypeLRspec.UNIVERSAL_CREDIT)
-            .frequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-            .build();
+        RecurringIncomeLRspec item = new RecurringIncomeLRspec()
+            .setType(IncomeTypeLRspec.UNIVERSAL_CREDIT)
+            .setFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH);
 
         assertDoesNotThrow(() -> ReasonMoneyTemplateData.toReasonMoneyTemplateData(item));
     }
