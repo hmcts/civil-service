@@ -37,8 +37,8 @@ public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGe
                 .orElse(null);
 
             //CoS journey doesnt have notify both option
-            return YES.equals(caseData.getDefendant1LIPAtClaimIssued()) ||
-                notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+            return YES.equals(caseData.getDefendant1LIPAtClaimIssued())
+                || notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
         }
         return false;
     }

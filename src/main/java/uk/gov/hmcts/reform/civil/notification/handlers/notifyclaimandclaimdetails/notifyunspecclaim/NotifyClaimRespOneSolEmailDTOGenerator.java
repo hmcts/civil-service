@@ -45,8 +45,8 @@ public class NotifyClaimRespOneSolEmailDTOGenerator extends RespSolOneEmailDTOGe
 
         if (isOneVTwoTwoLegalRep(caseData)) {
             //CoS journey doesnt have notify both option
-            return YES.equals(caseData.getDefendant2LIPAtClaimIssued()) ||
-                notifyClaimHelper
+            return YES.equals(caseData.getDefendant2LIPAtClaimIssued())
+                || notifyClaimHelper
                 .checkIfThisDefendantToBeNotified(caseData, respondentName);
         }
 
