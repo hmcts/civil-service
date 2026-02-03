@@ -134,7 +134,6 @@ java:
             CREATE DATABASE "cft_task_db_replica" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "emstitch" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "org_role_mapping" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
@@ -327,36 +326,6 @@ ccd:
           disabled: true
       keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
-  am-role-assignment-service:
-    java:
-      devmemoryRequests: 2048Mi
-      devcpuRequests: 2000m
-      devmemoryLimits: 4096Mi
-      devcpuLimits: 4000m
-      imagePullPolicy: Always
-      image: hmctspublic.azurecr.io/am/role-assignment-service:latest
-      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
-      environment:
-        RELEASE_REVISION: "{{ .Release.Revision }}"
-        ROLE_ASSIGNMENT_DB_HOST: ${SERVICE_NAME}-postgresql
-        ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}
-        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
-        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
-        ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES: ccd_gw,am_role_assignment_service,am_org_role_mapping_service,wa_task_management_api,wa_task_configuration_api,xui_webapp,aac_manage_case_assignment,ccd_data,wa_workflow_api,wa_task_monitor,wa_case_event_handler,iac,hmc_cft_hearing_service,ccd_case_disposer,sscs,fis_hmc_api,et_cos,civil_service,civil_general_applications
-        RUN_LD_ON_STARTUP: false
-      keyVaults:
-        am:
-          secrets:
-            - name: am-role-assignment-service-s2s-secret
-              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
-            - name: app-insights-connection-string
-              alias: app-insights-connection-string
-            - name: role-assignment-service-IDAM-CLIENT-SECRET
-              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
-            - name: role-assignment-service-IDAM-ADMIN-SECRET
-              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
-            - name: role-assignment-service-LD-SDK-KEY
-              alias: LD_SDK_KEY
   postgresql:
     persistence:
       enabled: false

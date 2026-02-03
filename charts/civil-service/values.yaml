@@ -6,8 +6,6 @@ camunda-bpm:
   enabled: false
 aac-manage-case-assignment:
   enabled: false
-am-org-role-mapping-service:
-  enabled: false
 ccd:
   enabled: false
 ccd-case-document-am-api:
