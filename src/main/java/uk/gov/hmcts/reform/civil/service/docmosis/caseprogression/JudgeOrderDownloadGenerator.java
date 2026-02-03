@@ -107,45 +107,42 @@ public class JudgeOrderDownloadGenerator extends JudgeFinalOrderGenerator implem
 
     public JudgeFinalOrderForm getBlankAfterHearing(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .orderAfterHearingDate(getOrderAfterHearingDateText(caseData))
-            .build();
+            .setOrderAfterHearingDate(getOrderAfterHearingDateText(caseData));
     }
 
     public JudgeFinalOrderForm getBlankBeforeHearing(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .claimTrack(caseData.getFinalOrderAllocateToTrack())
-            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
-            .build();
+            .setClaimTrack(caseData.getFinalOrderAllocateToTrack())
+            .setTrackAndComplexityBandText(getTrackAndComplexityText(caseData));
     }
 
     public JudgeFinalOrderForm getFixDateCcmc(CaseData caseData, String authorisation) {
-        return getBaseTemplateData(caseData, authorisation).build();
+        return getBaseTemplateData(caseData, authorisation);
     }
 
     public JudgeFinalOrderForm getFixDateCmc(CaseData caseData, String authorisation) {
         return getBaseTemplateData(caseData, authorisation)
-            .claimTrack(caseData.getFinalOrderAllocateToTrack())
-            .trackAndComplexityBandText(getTrackAndComplexityText(caseData))
-            .build();
+            .setClaimTrack(caseData.getFinalOrderAllocateToTrack())
+            .setTrackAndComplexityBandText(getTrackAndComplexityText(caseData));
     }
 
-    private JudgeFinalOrderForm.JudgeFinalOrderFormBuilder getBaseTemplateData(CaseData caseData,
-                                                                               String authorisation) {
+    private JudgeFinalOrderForm getBaseTemplateData(CaseData caseData,
+                                                    String authorisation) {
         UserDetails userDetails = userService.getUserDetails(authorisation);
         LocationRefData caseManagementLocationDetails = documentHearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
 
-        return JudgeFinalOrderForm.builder()
-            .judgeNameTitle(userDetails.getFullName())
-            .courtName(caseManagementLocationDetails.getExternalShortName())
-            .caseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
-            .claimant1Name(caseData.getApplicant1().getPartyName())
-            .claimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
-            .defendant1Name(caseData.getRespondent1().getPartyName())
-            .defendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
-            .claimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
-            .defendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
-            .dateNowPlus7(LocalDate.now().plusDays(7).format(formatter));
+        return new JudgeFinalOrderForm()
+            .setJudgeNameTitle(userDetails.getFullName())
+            .setCourtName(caseManagementLocationDetails.getExternalShortName())
+            .setCaseNumber(nonNull(caseData.getCcdCaseReference()) ? caseData.getCcdCaseReference().toString() : null)
+            .setClaimant1Name(caseData.getApplicant1().getPartyName())
+            .setClaimant2Name(nonNull(caseData.getApplicant2()) ? caseData.getApplicant2().getPartyName() : null)
+            .setDefendant1Name(caseData.getRespondent1().getPartyName())
+            .setDefendant2Name(nonNull(caseData.getRespondent2()) ? caseData.getRespondent2().getPartyName() : null)
+            .setClaimantNum(nonNull(caseData.getApplicant2()) ? "Claimant 1" : "Claimant")
+            .setDefendantNum(nonNull(caseData.getRespondent2()) ? "Defendant 1" : "Defendant")
+            .setDateNowPlus7(LocalDate.now().plusDays(7).format(formatter));
     }
 
     public String getTrackAndComplexityText(CaseData caseData) {

@@ -77,14 +77,9 @@ public class SettlementAgreementFormMapperTest {
                 .totalClaimAmount(new BigDecimal(150000))
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
                 .submittedDate(SUBMITTED_DATE)
-                .caseDataLiP(CaseDataLiP.builder()
-                        .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                .builder()
-                                .build())
-                        .respondent1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                .builder()
-                                .build())
-                        .build())
+                .caseDataLiP(new CaseDataLiP()
+                        .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails())
+                        .setRespondent1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()))
                 .build();
         return caseData;
     }
