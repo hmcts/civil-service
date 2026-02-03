@@ -53,11 +53,11 @@ public class HearingDetailsGroupTest {
 
         LocationRefData caseManagementLocationDetails = LocationRefData.builder().build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
 
-        builder = hearingDetailsPopulator.populateHearingDetails(builder, caseData, caseManagementLocationDetails);
+        form = hearingDetailsPopulator.populateHearingDetails(form, caseData, caseManagementLocationDetails);
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
 
         assertEquals("1 hour", result.getFurtherHearingLength());
         assertEquals(datesToAvoid, result.getDatesToAvoid());

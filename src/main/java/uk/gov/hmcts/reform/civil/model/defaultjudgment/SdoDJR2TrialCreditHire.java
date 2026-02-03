@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 
 import jakarta.validation.constraints.Future;
@@ -11,9 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class SdoDJR2TrialCreditHire {
 
     private String input1;
