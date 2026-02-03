@@ -112,10 +112,9 @@ class CertificateOfDebtGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                         .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.BOTH.toString())))
             .build();
 
         CaseDocument caseDoc = certificateOfDebtGenerator.generateDoc(caseData, BEARER_TOKEN, CERTIFICATE_OF_DEBT_PAYMENT_WELSH);

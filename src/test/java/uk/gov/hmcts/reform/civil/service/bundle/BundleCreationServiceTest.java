@@ -117,20 +117,18 @@ class BundleCreationServiceTest {
 
     private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 testUrl)
-                                                                                    .documentFileName(testFileName).build()).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                             testUrl)
+                                                                                         .documentFileName(testFileName).build())));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(testUrl)
-                                                                            .documentFileName(testFileName).build()).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl(testUrl)
+                                                                                .documentFileName(testFileName).build())));
         return expertEvidenceDocs;
     }
 

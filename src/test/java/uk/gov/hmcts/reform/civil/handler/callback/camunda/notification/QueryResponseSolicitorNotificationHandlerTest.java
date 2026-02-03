@@ -696,8 +696,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             caseData = caseData.toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
-                .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-                    RespondentLiPResponse.builder().respondent1ResponseLanguage(Language.BOTH.toString()).build()).build())
+                .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+                    new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

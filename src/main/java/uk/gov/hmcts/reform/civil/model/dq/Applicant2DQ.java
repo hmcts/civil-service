@@ -2,19 +2,19 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Applicant2DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant2DQFileDirectionsQuestionnaire;
@@ -180,5 +180,30 @@ public class Applicant2DQ implements DQ {
     @Override
     public DocumentsToBeConsidered getDocumentsToBeConsidered() {
         return null;
+    }
+
+    public Applicant2DQ copy() {
+        return new Applicant2DQ()
+            .setApplicant2DQFileDirectionsQuestionnaire(applicant2DQFileDirectionsQuestionnaire)
+            .setApplicant2DQFixedRecoverableCosts(applicant2DQFixedRecoverableCosts)
+            .setApplicant2DQFixedRecoverableCostsIntermediate(applicant2DQFixedRecoverableCostsIntermediate)
+            .setApplicant2DQDisclosureOfElectronicDocuments(applicant2DQDisclosureOfElectronicDocuments)
+            .setApplicant2DQDisclosureOfNonElectronicDocuments(applicant2DQDisclosureOfNonElectronicDocuments)
+            .setApplicant2DQDisclosureReport(applicant2DQDisclosureReport)
+            .setApplicant2DQExperts(applicant2DQExperts)
+            .setApplicant2RespondToClaimExperts(applicant2RespondToClaimExperts)
+            .setApplicant2DQWitnesses(applicant2DQWitnesses)
+            .setApplicant2DQHearing(applicant2DQHearing)
+            .setApplicant2DQSmallClaimHearing(applicant2DQSmallClaimHearing)
+            .setApplicant2DQDraftDirections(applicant2DQDraftDirections)
+            .setApplicant2DQRequestedCourt(applicant2DQRequestedCourt)
+            .setApplicant2DQHearingSupport(applicant2DQHearingSupport)
+            .setApplicant2DQFurtherInformation(applicant2DQFurtherInformation)
+            .setApplicant2DQLanguage(applicant2DQLanguage)
+            .setApplicant2DQLanguageLRspec(applicant2DQLanguageLRspec)
+            .setApplicant2DQRemoteHearingLRspec(applicant2DQRemoteHearingLRspec)
+            .setApplicant2DQStatementOfTruth(applicant2DQStatementOfTruth)
+            .setApplicant2DQVulnerabilityQuestions(applicant2DQVulnerabilityQuestions)
+            .setRemoteHearing(remoteHearing);
     }
 }

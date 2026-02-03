@@ -54,7 +54,7 @@ public class HearingsService {
                 roleAssignmentUrl,
                 hearingId);
         } catch (FeignException e) {
-            log.error("Failed to retrieve patries notified with Id: %s from HMC", hearingId);
+            log.error("Failed to retrieve patries notified with Id: {} from HMC", hearingId);
             throw new HmcException(e);
         }
     }
