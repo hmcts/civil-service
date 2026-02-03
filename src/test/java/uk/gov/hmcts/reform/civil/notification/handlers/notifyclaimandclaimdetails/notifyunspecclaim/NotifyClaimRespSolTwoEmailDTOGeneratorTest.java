@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -122,6 +123,24 @@ class NotifyClaimRespSolTwoEmailDTOGeneratorTest {
             boolean result = generator.getShouldNotify(caseData);
 
             assertFalse(result);
+        }
+    }
+
+    @Test
+    void shouldReturnTrueWhenMultipartyWithFirstDefendantIsLip() {
+        Party respondent2 = mock(Party.class);
+        when(respondent2.getPartyName()).thenReturn("respondent 2 name");
+
+        when(caseData.isRespondentTwoSolicitorRegistered()).thenReturn(true);
+        when(caseData.getRespondent2()).thenReturn(respondent2);
+        when(caseData.getDefendant1LIPAtClaimIssued()).thenReturn(YesOrNo.YES);
+
+        try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
+            scenario.when(() -> MultiPartyScenario.isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
+
+            boolean result = generator.getShouldNotify(caseData);
+
+            assertTrue(result);
         }
     }
 }
