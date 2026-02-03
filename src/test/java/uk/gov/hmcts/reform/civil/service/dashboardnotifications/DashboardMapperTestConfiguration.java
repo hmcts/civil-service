@@ -14,11 +14,25 @@ import org.springframework.context.annotation.FilterType;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.dismisscase.*"),
         @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.amendrestitchbundle.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.trialarrangements.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.bundlecreation.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.claimsettled.*"),
+        @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.evidenceuploaded.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.courtofficerorder.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.trialreadycheck.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.trialreadycheck.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.createlipclaim.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.decisionoutcome.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.defendantresponse.*")
     }
 )
 public class DashboardMapperTestConfiguration {
