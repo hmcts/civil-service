@@ -152,7 +152,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaRespondentTwoLip(NO)
                 .isGaRespondentOneLip(NO)
                 .parentClaimantIsApplicant(YES)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(NO).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(NO))
                 .isMultiParty(NO)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
@@ -253,7 +253,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaRespondentTwoLip(NO)
                 .isGaRespondentOneLip(NO)
                 .parentClaimantIsApplicant(YES)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(NO).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(NO))
                 .isMultiParty(NO)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
@@ -302,9 +302,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
             GeneralApplicationCaseData updatedCaseDate = GeneralApplicationCaseData.builder()
                 .parentClaimantIsApplicant(YES)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(YES).build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForGa(YES).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YES))
                 .isMultiParty(NO)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
@@ -354,10 +354,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
             GeneralApplicationCaseData updatedCaseDate = GeneralApplicationCaseData.builder()
                 .parentClaimantIsApplicant(YES)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(YES).build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForGa(NO)
-                                              .hwfOutstandingFeePaymentDoneForGa(List.of("Yes")).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(NO)
+                                              .setHwfOutstandingFeePaymentDoneForGa(List.of("Yes")))
                 .isMultiParty(NO)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
@@ -409,7 +409,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaRespondentTwoLip(YES)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(YES).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
                 .isMultiParty(NO)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
@@ -463,7 +463,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaApplicantLip(YES)
                 .generalAppType(GAApplicationType.builder().types(types).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(hwf).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(hwf))
                 .build();
 
             CaseDetails caseDetails = CaseDetails
@@ -485,9 +485,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaApplicantLip(YES)
                 .generalAppType(GAApplicationType.builder().types(types).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(YES).build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForGa(YES).build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(YES))
                 .build();
 
             CaseDetails caseDetails = CaseDetails
@@ -509,11 +509,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isGaApplicantLip(YES)
                 .generalAppType(GAApplicationType.builder().types(types).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFee(YES).build())
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails.builder()
-                                              .hwfFullRemissionGrantedForGa(NO)
-                                              .hwfOutstandingFeePaymentDoneForGa(List.of("Yes"))
-                                              .build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(NO)
+                                              .setHwfOutstandingFeePaymentDoneForGa(List.of("Yes")))
                 .build();
 
             CaseDetails caseDetails = CaseDetails

@@ -105,100 +105,100 @@ public class SdoGeneratorService {
     static final String RESPONDENT_2 = "respondent2";
 
     private SdoDocumentFormDisposal getTemplateDataDisposal(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        var sdoDocumentBuilder = SdoDocumentFormDisposal.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
+        var sdoDocumentBuilder = new SdoDocumentFormDisposal()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(
                 SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(
                 SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .disposalHearingJudgesRecital(caseData.getDisposalHearingJudgesRecital())
-            .disposalHearingDisclosureOfDocuments(caseData.getDisposalHearingDisclosureOfDocuments())
-            .disposalHearingWitnessOfFact(caseData.getDisposalHearingWitnessOfFact())
-            .disposalHearingMedicalEvidence(caseData.getDisposalHearingMedicalEvidence())
-            .disposalHearingQuestionsToExperts(caseData.getDisposalHearingQuestionsToExperts())
-            .disposalHearingSchedulesOfLoss(caseData.getDisposalHearingSchedulesOfLoss())
-            .disposalHearingFinalDisposalHearing(caseData.getDisposalHearingFinalDisposalHearing())
-            .disposalHearingFinalDisposalHearingTime(
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setDisposalHearingJudgesRecital(caseData.getDisposalHearingJudgesRecital())
+            .setDisposalHearingDisclosureOfDocuments(caseData.getDisposalHearingDisclosureOfDocuments())
+            .setDisposalHearingWitnessOfFact(caseData.getDisposalHearingWitnessOfFact())
+            .setDisposalHearingMedicalEvidence(caseData.getDisposalHearingMedicalEvidence())
+            .setDisposalHearingQuestionsToExperts(caseData.getDisposalHearingQuestionsToExperts())
+            .setDisposalHearingSchedulesOfLoss(caseData.getDisposalHearingSchedulesOfLoss())
+            .setDisposalHearingFinalDisposalHearing(caseData.getDisposalHearingFinalDisposalHearing())
+            .setDisposalHearingFinalDisposalHearingTime(
                 SdoHelper.getDisposalHearingFinalDisposalHearingTimeLabel(caseData)
             )
-            .disposalHearingMethod(caseData.getDisposalHearingMethod())
-            .disposalHearingMethodInPerson(caseData.getDisposalHearingMethodInPerson())
-            .disposalHearingMethodTelephoneHearing(
+            .setDisposalHearingMethod(caseData.getDisposalHearingMethod())
+            .setDisposalHearingMethodInPerson(caseData.getDisposalHearingMethodInPerson())
+            .setDisposalHearingMethodTelephoneHearing(
                 SdoHelper.getDisposalHearingMethodTelephoneHearingLabel(caseData)
             )
-            .disposalHearingMethodVideoConferenceHearing(
+            .setDisposalHearingMethodVideoConferenceHearing(
                 SdoHelper.getDisposalHearingMethodVideoConferenceHearingLabel(caseData)
             )
-            .disposalHearingBundle(caseData.getDisposalHearingBundle())
-            .disposalHearingBundleTypeText(
+            .setDisposalHearingBundle(caseData.getDisposalHearingBundle())
+            .setDisposalHearingBundleTypeText(
                 SdoHelper.getDisposalHearingBundleTypeText(caseData)
             )
-            .hasNewDirections(
+            .setHasNewDirections(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingAddNewDirections")
             )
-            .disposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
-            .disposalHearingNotes(caseData.getDisposalHearingNotes())
-            .disposalHearingDisclosureOfDocumentsToggle(
+            .setDisposalHearingAddNewDirections(caseData.getDisposalHearingAddNewDirections())
+            .setDisposalHearingNotes(caseData.getDisposalHearingNotes())
+            .setDisposalHearingDisclosureOfDocumentsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingDisclosureOfDocumentsToggle")
             )
-            .disposalHearingWitnessOfFactToggle(
+            .setDisposalHearingWitnessOfFactToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingWitnessOfFactToggle")
             )
-            .disposalHearingMedicalEvidenceToggle(
+            .setDisposalHearingMedicalEvidenceToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingMedicalEvidenceToggle")
             )
-            .disposalHearingQuestionsToExpertsToggle(
+            .setDisposalHearingQuestionsToExpertsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingQuestionsToExpertsToggle")
             )
-            .disposalHearingSchedulesOfLossToggle(
+            .setDisposalHearingSchedulesOfLossToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingSchedulesOfLossToggle")
             )
-            .disposalHearingFinalDisposalHearingToggle(
+            .setDisposalHearingFinalDisposalHearingToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingFinalDisposalHearingToggle")
             )
-            .disposalHearingMethodToggle(
+            .setDisposalHearingMethodToggle(
                 // SNI-5142
                 true
             )
-            .disposalHearingBundleToggle(
+            .setDisposalHearingBundleToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingBundleToggle")
             )
-            .disposalHearingClaimSettlingToggle(
+            .setDisposalHearingClaimSettlingToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingClaimSettlingToggle")
             )
-            .disposalHearingCostsToggle(
+            .setDisposalHearingCostsToggle(
                 SdoHelper.hasDisposalVariable(caseData, "disposalHearingCostsToggle")
             );
 
         sdoDocumentBuilder
-            .disposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
-            .disposalHearingTime(caseData.getDisposalHearingHearingTime());
+            .setDisposalOrderWithoutHearing(caseData.getDisposalOrderWithoutHearing())
+            .setDisposalHearingTime(caseData.getDisposalHearingHearingTime());
         Optional.ofNullable(caseData.getDisposalHearingHearingTime())
             .map(DisposalHearingHearingTime::getTime)
             .map(DisposalHearingFinalDisposalHearingTimeEstimate::getLabel)
-            .ifPresent(sdoDocumentBuilder::disposalHearingTimeEstimate);
+            .ifPresent(sdoDocumentBuilder::setDisposalHearingTimeEstimate);
 
         Optional.ofNullable(caseData.getDisposalHearingHearingTime())
             .filter(hearingTime -> DisposalHearingFinalDisposalHearingTimeEstimate.OTHER.equals(hearingTime.getTime()))
                 .ifPresent(hearingTime -> sdoDocumentBuilder
-                    .disposalHearingTimeEstimate(
+                    .setDisposalHearingTimeEstimate(
                         String.format("%s hours %s minutes",
                                       hearingTime.getOtherHours(),
                                       hearingTime.getOtherMinutes())
                     ));
 
-        sdoDocumentBuilder.hearingLocation(
+        sdoDocumentBuilder.setHearingLocation(
             locationHelper.getHearingLocation(
                 Optional.ofNullable(caseData.getDisposalHearingMethodInPerson())
                     .map(DynamicList::getValue)
@@ -207,127 +207,127 @@ public class SdoGeneratorService {
                 caseData,
                 authorisation
             ))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         sdoDocumentBuilder
-            .hasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
-            .welshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
+            .setHasDisposalWelshToggle(caseData.getSdoR2DisposalHearingUseOfWelshToggle() != null)
+            .setWelshLanguageDescription(caseData.getSdoR2DisposalHearingUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2DisposalHearingUseOfWelshLanguage().getDescription() : null);
 
-        SdoDocumentFormDisposal sdoDocumentFormDisposal = sdoDocumentBuilder.build();
+        SdoDocumentFormDisposal sdoDocumentFormDisposal = sdoDocumentBuilder;
         log.info("Disposal SDO template data: {} for caseId {}", sdoDocumentFormDisposal, caseData.getCcdCaseReference());
         return sdoDocumentFormDisposal;
     }
 
     private SdoDocumentFormFast getTemplateDataFast(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean hasPpi = SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPPI");
-        var sdoDocumentFormBuilder = SdoDocumentFormFast.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
+        var sdoDocumentFormBuilder = new SdoDocumentFormFast()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(
                 SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(
                 SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .fastClaims(caseData.getFastClaims())
-            .hasBuildingDispute(
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setClaimsTrack(caseData.getClaimsTrack())
+            .setFastClaims(caseData.getFastClaims())
+            .setHasBuildingDispute(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimBuildingDispute")
             )
-            .hasClinicalNegligence(
+            .setHasClinicalNegligence(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimClinicalNegligence")
             )
-            .hasSdoR2CreditHire(
+            .setHasSdoR2CreditHire(
                 (SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimCreditHire"))
             )
-            .hasSdoR2CreditHireDetails(
+            .setHasSdoR2CreditHireDetails(
                 (nonNull(caseData.getSdoR2FastTrackCreditHire()) && (caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle() != null)
                     && caseData.getSdoR2FastTrackCreditHire().getDetailsShowToggle()
                     .equals(List.of(AddOrRemoveToggle.ADD)))
             )
-            .hasEmployersLiability(
+            .setHasEmployersLiability(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimEmployersLiability")
             )
-            .hasHousingDisrepair(
+            .setHasHousingDisrepair(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimHousingDisrepair")
             )
-            .hasPersonalInjury(
+            .setHasPersonalInjury(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimPersonalInjury")
             )
-            .hasRoadTrafficAccident(
+            .setHasRoadTrafficAccident(
                 SdoHelper.hasFastAdditionalDirections(caseData, "fastClaimRoadTrafficAccident")
             )
-            .hasPaymentProtectionInsurance(hasPpi)
-            .fastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
-            .fastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
-            .fastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
-            .fastTrackTrial(caseData.getFastTrackTrial())
-            .fastTrackMethod(caseData.getFastTrackMethod())
-            .fastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
-            .fastTrackMethodTelephoneHearing(
+            .setHasPaymentProtectionInsurance(hasPpi)
+            .setFastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
+            .setFastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
+            .setFastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
+            .setFastTrackTrial(caseData.getFastTrackTrial())
+            .setFastTrackMethod(caseData.getFastTrackMethod())
+            .setFastTrackMethodInPerson(caseData.getFastTrackMethodInPerson())
+            .setFastTrackMethodTelephoneHearing(
                 SdoHelper.getFastTrackMethodTelephoneHearingLabel(caseData)
             )
-            .fastTrackMethodVideoConferenceHearing(
+            .setFastTrackMethodVideoConferenceHearing(
                 SdoHelper.getFastTrackMethodVideoConferenceHearingLabel(caseData)
             )
-            .fastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
-            .fastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            .fastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
-            .fastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
-            .fastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
-            .fastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
-            .hasNewDirections(
+            .setFastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
+            .setFastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
+            .setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            .setFastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
+            .setFastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
+            .setFastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
+            .setHasNewDirections(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackAddNewDirections")
             )
-            .fastTrackAddNewDirections(caseData.getFastTrackAddNewDirections())
-            .fastTrackNotes(caseData.getFastTrackNotes())
-            .fastTrackTrialDateToToggle(
+            .setFastTrackAddNewDirections(caseData.getFastTrackAddNewDirections())
+            .setFastTrackNotes(caseData.getFastTrackNotes())
+            .setFastTrackTrialDateToToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialDateToToggle"))
-            .fastTrackAltDisputeResolutionToggle(
+            .setFastTrackAltDisputeResolutionToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackAltDisputeResolutionToggle")
             )
-            .fastTrackVariationOfDirectionsToggle(
+            .setFastTrackVariationOfDirectionsToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackVariationOfDirectionsToggle")
             )
-            .fastTrackSettlementToggle(
+            .setFastTrackSettlementToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackSettlementToggle")
             )
-            .fastTrackDisclosureOfDocumentsToggle(
+            .setFastTrackDisclosureOfDocumentsToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackDisclosureOfDocumentsToggle")
             )
-            .fastTrackWitnessOfFactToggle(
+            .setFastTrackWitnessOfFactToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackWitnessOfFactToggle")
             )
-            .fastTrackSchedulesOfLossToggle(
+            .setFastTrackSchedulesOfLossToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackSchedulesOfLossToggle")
             )
-            .fastTrackCostsToggle(
+            .setFastTrackCostsToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackCostsToggle")
             )
-            .fastTrackTrialToggle(
+            .setFastTrackTrialToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialToggle")
             )
             // SNI-5142
-            .fastTrackMethodToggle(true)
-            .fastTrackAllocation(getFastTrackAllocation(caseData))
-            .showBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
+            .setFastTrackMethodToggle(true)
+            .setFastTrackAllocation(getFastTrackAllocation(caseData))
+            .setShowBundleInfo(SdoHelper.hasFastTrackVariable(caseData, "fastTrackTrialBundleToggle"));
 
         sdoDocumentFormBuilder
-            .fastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
-            .fastTrackHearingTime(caseData.getFastTrackHearingTime())
-            .fastTrackHearingTimeEstimate(SdoHelper.getFastClaimsHearingTimeLabel(caseData));
+            .setFastTrackOrderWithoutJudgement(caseData.getFastTrackOrderWithoutJudgement())
+            .setFastTrackHearingTime(caseData.getFastTrackHearingTime())
+            .setFastTrackHearingTimeEstimate(SdoHelper.getFastClaimsHearingTimeLabel(caseData));
 
         sdoDocumentFormBuilder
-            .hearingLocation(locationHelper.getHearingLocation(
+            .setHearingLocation(locationHelper.getHearingLocation(
                 Optional.ofNullable(caseData.getFastTrackMethodInPerson())
                     .map(DynamicList::getValue)
                     .map(DynamicListElement::getLabel)
@@ -335,94 +335,94 @@ public class SdoGeneratorService {
                 caseData,
                 authorisation
             ))
-            .caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+            .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        sdoDocumentFormBuilder.fastTrackWelshLanguageToggle(
+        sdoDocumentFormBuilder.setFastTrackWelshLanguageToggle(
                 SdoHelper.hasFastTrackVariable(caseData, "sdoR2FastTrackUseOfWelshToggle"))
-            .welshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
+            .setWelshLanguageDescription(caseData.getSdoR2FastTrackUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2FastTrackUseOfWelshLanguage().getDescription() : null);
         sdoDocumentFormBuilder.showPenalNotice(SdoHelper.hasFastTrackVariable(caseData, "fastTrackPenalNoticeToggle"))
             .penalNoticeText(caseData.getFastTrackPenalNotice());
-        sdoDocumentFormBuilder.sdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
-            .sdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+        sdoDocumentFormBuilder.setSdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
+            .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
 
-        return sdoDocumentFormBuilder.build();
+        return sdoDocumentFormBuilder;
     }
 
     private SdoDocumentFormFastNihl getTemplateDataFastNihl(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
-        SdoDocumentFormFastNihl.SdoDocumentFormFastNihlBuilder sdoNihlDocumentFormBuilder = SdoDocumentFormFastNihl.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
+        SdoDocumentFormFastNihl sdoNihlDocumentFormBuilder = new SdoDocumentFormFastNihl()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(
                 SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(
                 SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .fastClaims(caseData.getFastClaims())
-            .sdoFastTrackJudgesRecital(caseData.getSdoFastTrackJudgesRecital())
-            .sdoR2DisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocuments())
-            .sdoR2WitnessesOfFact(caseData.getSdoR2WitnessesOfFact())
-            .sdoR2ExpertEvidence(caseData.getSdoR2ExpertEvidence())
-            .sdoR2AddendumReport(caseData.getSdoR2AddendumReport())
-            .sdoR2FurtherAudiogram(caseData.getSdoR2FurtherAudiogram())
-            .sdoR2QuestionsClaimantExpert(caseData.getSdoR2QuestionsClaimantExpert())
-            .sdoR2PermissionToRelyOnExpert(caseData.getSdoR2PermissionToRelyOnExpert())
-            .sdoR2EvidenceAcousticEngineer(caseData.getSdoR2EvidenceAcousticEngineer())
-            .sdoR2QuestionsToEntExpert(caseData.getSdoR2QuestionsToEntExpert())
-            .sdoR2ScheduleOfLoss(caseData.getSdoR2ScheduleOfLoss())
-            .sdoR2UploadOfDocuments(caseData.getSdoR2UploadOfDocuments())
-            .sdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
-            .sdoR2Trial(caseData.getSdoR2Trial())
-            .sdoR2ImportantNotesTxt(caseData.getSdoR2ImportantNotesTxt())
-            .sdoR2ImportantNotesDate(caseData.getSdoR2ImportantNotesDate())
-            .hasAltDisputeResolution(caseData.getSdoAltDisputeResolution().getIncludeInOrderToggle() != null)
-            .hasVariationOfDirections(caseData.getSdoVariationOfDirections().getIncludeInOrderToggle() != null)
-            .hasSettlement(caseData.getSdoR2Settlement()
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setClaimsTrack(caseData.getClaimsTrack())
+            .setFastClaims(caseData.getFastClaims())
+            .setSdoFastTrackJudgesRecital(caseData.getSdoFastTrackJudgesRecital())
+            .setSdoR2DisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocuments())
+            .setSdoR2WitnessesOfFact(caseData.getSdoR2WitnessesOfFact())
+            .setSdoR2ExpertEvidence(caseData.getSdoR2ExpertEvidence())
+            .setSdoR2AddendumReport(caseData.getSdoR2AddendumReport())
+            .setSdoR2FurtherAudiogram(caseData.getSdoR2FurtherAudiogram())
+            .setSdoR2QuestionsClaimantExpert(caseData.getSdoR2QuestionsClaimantExpert())
+            .setSdoR2PermissionToRelyOnExpert(caseData.getSdoR2PermissionToRelyOnExpert())
+            .setSdoR2EvidenceAcousticEngineer(caseData.getSdoR2EvidenceAcousticEngineer())
+            .setSdoR2QuestionsToEntExpert(caseData.getSdoR2QuestionsToEntExpert())
+            .setSdoR2ScheduleOfLoss(caseData.getSdoR2ScheduleOfLoss())
+            .setSdoR2UploadOfDocuments(caseData.getSdoR2UploadOfDocuments())
+            .setSdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
+            .setSdoR2Trial(caseData.getSdoR2Trial())
+            .setSdoR2ImportantNotesTxt(caseData.getSdoR2ImportantNotesTxt())
+            .setSdoR2ImportantNotesDate(caseData.getSdoR2ImportantNotesDate())
+            .setHasAltDisputeResolution(caseData.getSdoAltDisputeResolution().getIncludeInOrderToggle() != null)
+            .setHasVariationOfDirections(caseData.getSdoVariationOfDirections().getIncludeInOrderToggle() != null)
+            .setHasSettlement(caseData.getSdoR2Settlement()
                                .getIncludeInOrderToggle() != null)
-            .hasDisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocumentsToggle() != null)
-            .hasWitnessOfFact(caseData.getSdoR2SeparatorWitnessesOfFactToggle() != null)
-            .hasRestrictWitness(SdoHelper.isRestrictWitnessNihl(caseData))
-            .hasRestrictPages(SdoHelper.isRestrictPagesNihl(caseData))
-            .hasExpertEvidence(caseData.getSdoR2SeparatorExpertEvidenceToggle() != null)
-            .hasAddendumReport(caseData.getSdoR2SeparatorAddendumReportToggle() != null)
-            .hasFurtherAudiogram(caseData.getSdoR2SeparatorFurtherAudiogramToggle() != null)
-            .hasQuestionsOfClaimantExpert(caseData.getSdoR2SeparatorQuestionsClaimantExpertToggle() != null)
-            .isApplicationToRelyOnFurther(SdoHelper.isApplicationToRelyOnFurtherNihl(caseData))
-            .hasPermissionFromENT(caseData.getSdoR2SeparatorPermissionToRelyOnExpertToggle() != null)
-            .hasEvidenceFromAcousticEngineer(caseData.getSdoR2SeparatorEvidenceAcousticEngineerToggle() != null)
-            .hasQuestionsToENTAfterReport(caseData.getSdoR2SeparatorQuestionsToEntExpertToggle() != null)
-            .hasScheduleOfLoss(caseData.getSdoR2ScheduleOfLossToggle() != null)
-            .hasClaimForPecuniaryLoss(SdoHelper.isClaimForPecuniaryLossNihl(caseData))
-            .hasUploadDocuments(caseData.getSdoR2SeparatorUploadOfDocumentsToggle() != null)
-            .hasSdoTrial(caseData.getSdoR2TrialToggle() != null)
-            .hasNewDirections(caseData.getSdoR2AddNewDirection() != null)
-            .sdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
-            .hasSdoR2TrialWindow(caseData.getSdoR2TrialToggle() != null
+            .setHasDisclosureOfDocuments(caseData.getSdoR2DisclosureOfDocumentsToggle() != null)
+            .setHasWitnessOfFact(caseData.getSdoR2SeparatorWitnessesOfFactToggle() != null)
+            .setHasRestrictWitness(SdoHelper.isRestrictWitnessNihl(caseData))
+            .setHasRestrictPages(SdoHelper.isRestrictPagesNihl(caseData))
+            .setHasExpertEvidence(caseData.getSdoR2SeparatorExpertEvidenceToggle() != null)
+            .setHasAddendumReport(caseData.getSdoR2SeparatorAddendumReportToggle() != null)
+            .setHasFurtherAudiogram(caseData.getSdoR2SeparatorFurtherAudiogramToggle() != null)
+            .setHasQuestionsOfClaimantExpert(caseData.getSdoR2SeparatorQuestionsClaimantExpertToggle() != null)
+            .setIsApplicationToRelyOnFurther(SdoHelper.isApplicationToRelyOnFurtherNihl(caseData))
+            .setHasPermissionFromENT(caseData.getSdoR2SeparatorPermissionToRelyOnExpertToggle() != null)
+            .setHasEvidenceFromAcousticEngineer(caseData.getSdoR2SeparatorEvidenceAcousticEngineerToggle() != null)
+            .setHasQuestionsToENTAfterReport(caseData.getSdoR2SeparatorQuestionsToEntExpertToggle() != null)
+            .setHasScheduleOfLoss(caseData.getSdoR2ScheduleOfLossToggle() != null)
+            .setHasClaimForPecuniaryLoss(SdoHelper.isClaimForPecuniaryLossNihl(caseData))
+            .setHasUploadDocuments(caseData.getSdoR2SeparatorUploadOfDocumentsToggle() != null)
+            .setHasSdoTrial(caseData.getSdoR2TrialToggle() != null)
+            .setHasNewDirections(caseData.getSdoR2AddNewDirection() != null)
+            .setSdoR2AddNewDirection(caseData.getSdoR2AddNewDirection())
+            .setHasSdoR2TrialWindow(caseData.getSdoR2TrialToggle() != null
                                      && TrialOnRadioOptions.TRIAL_WINDOW.equals(
                 caseData.getSdoR2Trial().getTrialOnOptions()))
-            .sdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
-            .sdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
-            .hasSdoR2TrialPhysicalBundleParty(caseData.getSdoR2Trial() != null
+            .setSdoTrialHearingTimeAllocated(SdoHelper.getSdoTrialHearingTimeAllocated(caseData))
+            .setSdoTrialMethodOfHearing(SdoHelper.getSdoTrialMethodOfHearing(caseData))
+            .setHasSdoR2TrialPhysicalBundleParty(caseData.getSdoR2Trial() != null
                                                   && PhysicalTrialBundleOptions.PARTY.equals(
                 caseData.getSdoR2Trial().getPhysicalBundleOptions()))
-            .physicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
-            .hasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
-            .welshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
+            .setPhysicalBundlePartyTxt(SdoHelper.getPhysicalTrialTextNihl(caseData))
+            .setHasNihlWelshLangToggle(caseData.getSdoR2NihlUseOfWelshIncludeInOrderToggle() != null)
+            .setWelshLanguageDescription(caseData.getSdoR2NihlUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2NihlUseOfWelshLanguage().getDescription() : null);
 
         if (caseData.getSdoR2Trial() != null) {
             sdoNihlDocumentFormBuilder
-                .hearingLocation(locationHelper.getHearingLocation(
+                .setHearingLocation(locationHelper.getHearingLocation(
                     Optional.ofNullable(SdoHelper.getHearingLocationNihl(caseData))
                         .map(DynamicList::getValue)
                         .map(DynamicListElement::getLabel)
@@ -431,94 +431,94 @@ public class SdoGeneratorService {
                     authorisation
                 ));
         }
-        sdoNihlDocumentFormBuilder.caseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
+        sdoNihlDocumentFormBuilder.setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        return sdoNihlDocumentFormBuilder.build();
+        return sdoNihlDocumentFormBuilder;
     }
 
     private SdoDocumentFormSmall getTemplateDataSmall(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
         boolean hasPpi = SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimPPI");
-        SdoDocumentFormSmall.SdoDocumentFormSmallBuilder sdoDocumentFormBuilder = SdoDocumentFormSmall.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
+        SdoDocumentFormSmall sdoDocumentFormBuilder = new SdoDocumentFormSmall()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(
                 SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(
                 SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
-            .respondent2(caseData.getRespondent2())
-            .drawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
-            .drawDirectionsOrder(caseData.getDrawDirectionsOrder())
-            .claimsTrack(caseData.getClaimsTrack())
-            .smallClaims(caseData.getSmallClaims())
-            .hasCreditHire(
+            .setRespondent2(caseData.getRespondent2())
+            .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
+            .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
+            .setClaimsTrack(caseData.getClaimsTrack())
+            .setSmallClaims(caseData.getSmallClaims())
+            .setHasCreditHire(
                 SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimCreditHire")
             )
-            .hasRoadTrafficAccident(
+            .setHasRoadTrafficAccident(
                 SdoHelper.hasSmallAdditionalDirections(caseData, "smallClaimRoadTrafficAccident")
             )
-            .hasPaymentProtectionInsurance(hasPpi)
-            .smallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
-            .smallClaimsHearing(caseData.getSmallClaimsHearing())
-            .smallClaimsHearingTime(
+            .setHasPaymentProtectionInsurance(hasPpi)
+            .setSmallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
+            .setSmallClaimsHearing(caseData.getSmallClaimsHearing())
+            .setSmallClaimsHearingTime(
                 SdoHelper.getSmallClaimsHearingTimeLabel(caseData)
             )
             // CIV-5514: smallClaimsMethodInPerson, smallClaimsMethodTelephoneHearing and
             // smallClaimsMethodVideoConferenceHearing can be removed after HNL is live
-            .smallClaimsMethod(caseData.getSmallClaimsMethod())
-            .smallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
-            .smallClaimsMethodTelephoneHearing(
+            .setSmallClaimsMethod(caseData.getSmallClaimsMethod())
+            .setSmallClaimsMethodInPerson(caseData.getSmallClaimsMethodInPerson())
+            .setSmallClaimsMethodTelephoneHearing(
                 SdoHelper.getSmallClaimsMethodTelephoneHearingLabel(caseData)
             )
-            .smallClaimsMethodVideoConferenceHearing(
+            .setSmallClaimsMethodVideoConferenceHearing(
                 SdoHelper.getSmallClaimsMethodVideoConferenceHearingLabel(caseData)
             )
-            .smallClaimsDocuments(caseData.getSmallClaimsDocuments())
-            .smallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
-            .smallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
-            .smallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
-            .hasNewDirections(
+            .setSmallClaimsDocuments(caseData.getSmallClaimsDocuments())
+            .setSmallClaimsCreditHire(caseData.getSmallClaimsCreditHire())
+            .setSmallClaimsRoadTrafficAccident(caseData.getSmallClaimsRoadTrafficAccident())
+            .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
+            .setHasNewDirections(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsAddNewDirections")
             )
-            .smallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
-            .smallClaimsNotes(caseData.getSmallClaimsNotes())
-            .smallClaimsHearingToggle(
+            .setSmallClaimsAddNewDirections(caseData.getSmallClaimsAddNewDirections())
+            .setSmallClaimsNotes(caseData.getSmallClaimsNotes())
+            .setSmallClaimsHearingToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsHearingToggle")
             )
             // SNI-5142
-            .smallClaimsMethodToggle(true)
-            .smallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationText(caseData))
-            .smallClaimsDocumentsToggle(
+            .setSmallClaimsMethodToggle(true)
+            .setSmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationText(caseData))
+            .setSmallClaimsDocumentsToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsDocumentsToggle")
             )
-            .smallClaimsWitnessStatementToggle(
+            .setSmallClaimsWitnessStatementToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsWitnessStatementToggle")
             )
-            .smallClaimsNumberOfWitnessesToggle(
+            .setSmallClaimsNumberOfWitnessesToggle(
                 SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsNumberOfWitnessesToggle")
             )
-            .smallClaimsMediationSectionToggle(
+            .setSmallClaimsMediationSectionToggle(
                 SdoHelper.showCarmMediationSection(caseData, carmEnabled)
             )
-            .caseAccessCategory(caseData.getCaseAccessCategory().toString())
-            .carmEnabled(carmEnabled);
+            .setCaseAccessCategory(caseData.getCaseAccessCategory().toString())
+            .setCarmEnabled(carmEnabled);
 
-        sdoDocumentFormBuilder.smallClaimsFlightDelayToggle(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
-            .smallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
-            .smallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
-            .welshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
+        sdoDocumentFormBuilder.setSmallClaimsFlightDelayToggle(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsFlightDelayToggle"))
+            .setSmallClaimsFlightDelay(caseData.getSmallClaimsFlightDelay())
+            .setSmallClaimsWelshLanguageToggle(SdoHelper.hasSmallClaimsVariable(caseData, "sdoR2SmallClaimsUseOfWelshToggle"))
+            .setWelshLanguageDescription(caseData.getSdoR2SmallClaimsUseOfWelshLanguage() != null ? caseData.getSdoR2SmallClaimsUseOfWelshLanguage().getDescription() : null)
+            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
             .showPenalNotice(SdoHelper.hasSmallClaimsVariable(caseData, "smallClaimsPenalNoticeToggle"))
             .penalNoticeText(caseData.getSmallClaimsPenalNotice());
 
-        sdoDocumentFormBuilder.hearingLocation(
+        sdoDocumentFormBuilder.setHearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(caseData.getSmallClaimsMethodInPerson())
                         .map(DynamicList::getValue)
@@ -527,59 +527,58 @@ public class SdoGeneratorService {
                     caseData,
                     authorisation
                 ))
-            .caseManagementLocation(
+            .setCaseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation));
 
-        return sdoDocumentFormBuilder
-            .build();
+        return sdoDocumentFormBuilder;
     }
 
     private SdoDocumentFormSmallDrh getTemplateDataSmallDrh(CaseData caseData, String judgeName, boolean isJudge, String authorisation) { //TODO Change to suit SDO R2 DRH
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
-        SdoDocumentFormSmallDrh.SdoDocumentFormSmallDrhBuilder sdoDocumentFormBuilderDrh = SdoDocumentFormSmallDrh.builder()
-            .writtenByJudge(isJudge)
-            .currentDate(LocalDate.now())
-            .judgeName(judgeName)
-            .caseNumber(caseData.getLegacyCaseReference())
-            .applicant1(caseData.getApplicant1())
-            .hasApplicant2(
+        SdoDocumentFormSmallDrh sdoDocumentFormBuilderDrh = new SdoDocumentFormSmallDrh()
+            .setWrittenByJudge(isJudge)
+            .setCurrentDate(LocalDate.now())
+            .setJudgeName(judgeName)
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1(caseData.getApplicant1())
+            .setHasApplicant2(
                 SdoHelper.hasSharedVariable(caseData, APPLICANT_2)
             )
-            .applicant2(caseData.getApplicant2())
-            .respondent1(caseData.getRespondent1())
-            .hasRespondent2(
+            .setApplicant2(caseData.getApplicant2())
+            .setRespondent1(caseData.getRespondent1())
+            .setHasRespondent2(
                 SdoHelper.hasSharedVariable(caseData, RESPONDENT_2)
             )
-            .respondent2(caseData.getRespondent2())
-            .hasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
-            .hasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
-            .hasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
-            .hasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
-            .hasDRHWelshLangToggle(caseData.getSdoR2DrhUseOfWelshIncludeInOrderToggle() != null)
-            .hasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
-            .hasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
-            .sdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
-            .sdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
-            .sdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
-            .sdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
-            .sdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
-            .sdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
-            .smallClaimsMethod(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData))
-            .hearingTime(SdoHelper.getSdoR2HearingTime(caseData))
-            .sdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
-            .sdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
-            .welshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
+            .setRespondent2(caseData.getRespondent2())
+            .setHasPaymentProtectionInsurance(caseData.getSdoR2SmallClaimsPPIToggle() != null)
+            .setHasHearingToggle(caseData.getSdoR2SmallClaimsHearingToggle() != null)
+            .setHasWitnessStatement(caseData.getSdoR2SmallClaimsWitnessStatements() != null)
+            .setHasUploadDocToggle(caseData.getSdoR2SmallClaimsUploadDocToggle() != null)
+            .setHasDRHWelshLangToggle(caseData.getSdoR2DrhUseOfWelshIncludeInOrderToggle() != null)
+            .setHasSdoR2HearingTrialWindow(SdoHelper.hasSdoR2HearingTrialWindow(caseData))
+            .setHasNewDirections(caseData.getSdoR2SmallClaimsAddNewDirection() != null)
+            .setSdoR2SmallClaimsPhysicalTrialBundleTxt(SdoHelper.getSdoR2SmallClaimsPhysicalTrialBundleTxt(caseData))
+            .setSdoR2SmallClaimsJudgesRecital(caseData.getSdoR2SmallClaimsJudgesRecital())
+            .setSdoR2SmallClaimsHearing(caseData.getSdoR2SmallClaimsHearing())
+            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatements())
+            .setSdoR2SmallClaimsPPI(caseData.getSdoR2SmallClaimsPPI())
+            .setSdoR2SmallClaimsUploadDoc(caseData.getSdoR2SmallClaimsUploadDoc())
+            .setSmallClaimsMethod(SdoHelper.getSdoR2SmallClaimsHearingMethod(caseData))
+            .setHearingTime(SdoHelper.getSdoR2HearingTime(caseData))
+            .setSdoR2SmallClaimsImpNotes(caseData.getSdoR2SmallClaimsImpNotes())
+            .setSdoR2SmallClaimsAddNewDirection(caseData.getSdoR2SmallClaimsAddNewDirection())
+            .setWelshLanguageDescription(caseData.getSdoR2DrhUseOfWelshLanguage() != null
                                           ? caseData.getSdoR2DrhUseOfWelshLanguage().getDescription() : null)
-            .carmEnabled(carmEnabled)
-            .sdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
-            .caseManagementLocation(
+            .setCarmEnabled(carmEnabled)
+            .setSdoR2SmallClaimMediationSectionInput(SdoHelper.getSmallClaimsMediationTextDRH(caseData))
+            .setCaseManagementLocation(
                 locationHelper.getHearingLocation(null, caseData, authorisation))
-            .sdoR2SmallClaimsMediationSectionToggle(
+            .setSdoR2SmallClaimsMediationSectionToggle(
                 SdoHelper.showCarmMediationSectionDRH(caseData, carmEnabled)
             );
 
         if (caseData.getSdoR2SmallClaimsHearing() != null) {
-            sdoDocumentFormBuilderDrh.hearingLocation(
+            sdoDocumentFormBuilderDrh.setHearingLocation(
                 locationHelper.getHearingLocation(
                     Optional.ofNullable(SdoHelper.getHearingLocationDrh(caseData))
                         .map(DynamicList::getValue)
@@ -591,8 +590,7 @@ public class SdoGeneratorService {
 
         }
 
-        return sdoDocumentFormBuilderDrh
-            .build();
+        return sdoDocumentFormBuilderDrh;
     }
 
 }

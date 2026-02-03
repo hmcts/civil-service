@@ -29,10 +29,10 @@ public class ClaimantRequestedJudgeToMakeNewPlanScenarioTest extends DashboardBa
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder().applicant1ChoosesHowToProceed(
-                                 ChooseHowToProceed.REQUEST_A_CCJ).claimantResponseOnCourtDecision(
-                                 ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE).build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1ChoosesHowToProceed(
+                                 ChooseHowToProceed.REQUEST_A_CCJ).setClaimantResponseOnCourtDecision(
+                                 ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)))
             .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr")
                             .individualFirstName("Claimant").build())
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName(
