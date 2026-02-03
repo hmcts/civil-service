@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
+import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
@@ -23,6 +25,7 @@ import java.math.BigDecimal;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,6 +43,9 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @MockBean
     AuthTokenGenerator authTokenGenerator;
+
+    @SpyBean
+    PaymentRequestUpdateCallbackService requestUpdateCallbackService;
 
     @BeforeEach
     void bareMinimumToMakeAPositiveRequest() {
@@ -98,8 +104,10 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
-        // Given: a CCD call will throw an exception
-        given(coreCaseDataApi.startEventForCaseWorker(any(), any(), any(), any(), any(), any(), any())).willThrow(RuntimeException.class);
+        // Given: the callback processing throws an unexpected exception
+        doThrow(new RuntimeException("Unexpected error"))
+            .when(requestUpdateCallbackService)
+            .processCallback(any(), any());
 
         // When: I call the /service-request-update URL
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
