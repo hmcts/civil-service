@@ -1,20 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.dj;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 
 import java.util.List;
 
-@Getter
-@Builder(toBuilder = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 @SuppressWarnings({"java:S1104", "java:S1170"}) // Suppressing Sonar warnings for Lombok-generated fields
 public class DefaultJudgmentForm implements MappableObject {
 
@@ -59,4 +57,34 @@ public class DefaultJudgmentForm implements MappableObject {
     private String currentDateInWelsh;
     private String welshPayByDate;
     private String welshRepaymentDate;
+
+    public DefaultJudgmentForm copy() {
+        return new DefaultJudgmentForm()
+            .setCaseNumber(this.caseNumber)
+            .setApplicant(this.applicant)
+            .setApplicantDetails(this.applicantDetails)
+            .setApplicantReference(this.applicantReference)
+            .setFormText(this.formText)
+            .setClaimantLR(this.claimantLR)
+            .setRespondent(this.respondent)
+            .setRespondentReference(this.respondentReference)
+            .setRespondent1Name(this.respondent1Name)
+            .setRespondent2Name(this.respondent2Name)
+            .setRespondent1Ref(this.respondent1Ref)
+            .setRespondent2Ref(this.respondent2Ref)
+            .setDebt(this.debt)
+            .setCosts(this.costs)
+            .setTotalCost(this.totalCost)
+            .setPaymentPlan(this.paymentPlan)
+            .setPayByDate(this.payByDate)
+            .setRepaymentFrequency(this.repaymentFrequency)
+            .setRepaymentDate(this.repaymentDate)
+            .setPaymentStr(this.paymentStr)
+            .setInstallmentAmount(this.installmentAmount)
+            .setWelshRepaymentFrequency(this.welshRepaymentFrequency)
+            .setWelshPaymentStr(this.welshPaymentStr)
+            .setCurrentDateInWelsh(this.currentDateInWelsh)
+            .setWelshPayByDate(this.welshPayByDate)
+            .setWelshRepaymentDate(this.welshRepaymentDate);
+    }
 }
