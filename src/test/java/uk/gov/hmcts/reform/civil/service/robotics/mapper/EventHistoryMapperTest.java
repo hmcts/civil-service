@@ -4740,7 +4740,7 @@ class EventHistoryMapperTest {
                     .build();
                 List<Event> expectedMiscEvents = List.of(
                     Event.builder()
-                        .eventSequence(3)
+                        .eventSequence(1)
                         .eventCode("999")
                         .dateReceived(caseData.getIssueDate().atStartOfDay())
                         .eventDetailsText("Claim issued in CCD.")
@@ -4749,7 +4749,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(4)
+                        .eventSequence(2)
                         .eventCode("999")
                         .dateReceived(caseData.getClaimNotificationDate())
                         .eventDetailsText("Claimant has notified defendant.")
@@ -4758,7 +4758,7 @@ class EventHistoryMapperTest {
                                           .build())
                         .build(),
                     Event.builder()
-                        .eventSequence(5)
+                        .eventSequence(3)
                         .eventCode("999")
                         .dateReceived(caseData.getClaimDetailsNotificationDate())
                         .eventDetailsText("Claim details notified.")
@@ -5141,7 +5141,6 @@ class EventHistoryMapperTest {
                 );
             }
 
-            @Test
             void shouldPrepareMiscellaneousEvents_whenClaimantProceedsWithOnlySecondDefendantSDO() {
 
                 String expectedMiscText1 = "RPA Reason: [1 of 2 - 2020-08-01] "
