@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.PaymentRequestUpdateCallbackService;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
@@ -114,18 +114,22 @@ class ServiceRequestUpdateCallbackControllerTest extends BaseIntegrationTest {
 
     @Test
     public void whenServiceRequestUpdateRequestButUnexpectedErrorOccurs_thenHttp5xx() throws Exception {
-        // Get the real service bean
-        CoreCaseDataService realService = applicationContext.getBean(CoreCaseDataService.class);
+        // Get the real PaymentRequestUpdateCallbackService bean (not CoreCaseDataService)
+        PaymentRequestUpdateCallbackService realService =
+            applicationContext.getBean(PaymentRequestUpdateCallbackService.class);
 
         // Create a spy on it
-        CoreCaseDataService spyService = spy(realService);
+        PaymentRequestUpdateCallbackService spyService = spy(realService);
 
+        // Simulate an exception when processCallback is called
         doThrow(new RuntimeException("Simulated CCD failure"))
-            .when(spyService).submitUpdate(any(), any());
+            .when(spyService).processCallback(any(), any());
 
+        // Inject the spy into the controller
         Object controller = applicationContext.getBean("serviceRequestUpdateCallbackController");
-        ReflectionTestUtils.setField(controller, "coreCaseDataService", spyService);
+        ReflectionTestUtils.setField(controller, "requestUpdateCallbackService", spyService);
 
+        // Perform the PUT request
         doPut(buildServiceDto(), PAYMENT_CALLBACK_URL, "")
             .andExpect(status().is5xxServerError());
     }
