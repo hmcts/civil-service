@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -26,7 +24,6 @@ public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGe
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
         properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
         return properties;
     }
@@ -38,9 +35,7 @@ public class NotifyClaimRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGe
                 .map(Party::getPartyName)
                 .orElse(null);
 
-            //CoS journey doesnt have notify both option
-            return YES.equals(caseData.getDefendant1LIPAtClaimIssued())
-                || notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
+            return notifyClaimHelper.checkIfThisDefendantToBeNotified(caseData, respondentName);
         }
         return false;
     }

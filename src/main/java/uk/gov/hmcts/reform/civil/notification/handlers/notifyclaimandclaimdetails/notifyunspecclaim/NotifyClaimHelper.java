@@ -12,8 +12,10 @@ import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_DETAILS_NOTIFICATION_DEADLINE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.NOTIFY_BOTH;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
 @Component
 @AllArgsConstructor
@@ -29,6 +31,7 @@ public class NotifyClaimHelper {
 
     public Map<String, String> retrieveCustomProperties(CaseData caseData) {
         return Map.of(
+            RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()),
             CLAIM_DETAILS_NOTIFICATION_DEADLINE,
             formatLocalDate(caseData
                                 .getClaimDetailsNotificationDeadline()
