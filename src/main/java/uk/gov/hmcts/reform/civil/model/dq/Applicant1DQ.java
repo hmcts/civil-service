@@ -2,19 +2,19 @@ package uk.gov.hmcts.reform.civil.model.dq;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.DeterWithoutHearing;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Applicant1DQ implements DQ {
 
     private FileDirectionsQuestionnaire applicant1DQFileDirectionsQuestionnaire;
@@ -158,12 +158,11 @@ public class Applicant1DQ implements DQ {
     public RequestedCourt getRequestedCourt() {
 
         if (applicant1DQRequestedCourt != null) {
-            return RequestedCourt.builder()
-                .responseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
-                .reasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
-                .caseLocation(applicant1DQRequestedCourt.getCaseLocation())
-                .responseCourtLocations(applicant1DQRequestedCourt.getResponseCourtLocations())
-                .build();
+            return new RequestedCourt()
+                .setResponseCourtCode(applicant1DQRequestedCourt.getResponseCourtCode())
+                .setReasonForHearingAtSpecificCourt(applicant1DQRequestedCourt.getReasonForHearingAtSpecificCourt())
+                .setCaseLocation(applicant1DQRequestedCourt.getCaseLocation())
+                .setResponseCourtLocations(applicant1DQRequestedCourt.getResponseCourtLocations());
         }
         return null;
     }
@@ -214,5 +213,36 @@ public class Applicant1DQ implements DQ {
     @JsonProperty("applicant1DQDefendantDocumentsToBeConsidered")
     public DocumentsToBeConsidered getDocumentsToBeConsidered() {
         return applicant1DQDefendantDocumentsToBeConsidered;
+    }
+
+    public Applicant1DQ copy() {
+        return new Applicant1DQ()
+            .setApplicant1DQFileDirectionsQuestionnaire(applicant1DQFileDirectionsQuestionnaire)
+            .setApplicant1DQFixedRecoverableCosts(applicant1DQFixedRecoverableCosts)
+            .setApplicant1DQFixedRecoverableCostsIntermediate(applicant1DQFixedRecoverableCostsIntermediate)
+            .setApplicant1DQDisclosureOfElectronicDocuments(applicant1DQDisclosureOfElectronicDocuments)
+            .setSpecApplicant1DQDisclosureOfElectronicDocuments(specApplicant1DQDisclosureOfElectronicDocuments)
+            .setApplicant1DQDisclosureOfNonElectronicDocuments(applicant1DQDisclosureOfNonElectronicDocuments)
+            .setSpecApplicant1DQDisclosureOfNonElectronicDocuments(specApplicant1DQDisclosureOfNonElectronicDocuments)
+            .setApplicant1DQDisclosureReport(applicant1DQDisclosureReport)
+            .setApplicant1DQExperts(applicant1DQExperts)
+            .setApplicant1RespondToClaimExperts(applicant1RespondToClaimExperts)
+            .setApplicant1DQWitnesses(applicant1DQWitnesses)
+            .setApplicant1DQHearing(applicant1DQHearing)
+            .setApplicant1DQHearingLRspec(applicant1DQHearingLRspec)
+            .setApplicant1DQSmallClaimHearing(applicant1DQSmallClaimHearing)
+            .setApplicant1DQDraftDirections(applicant1DQDraftDirections)
+            .setApplicant1DQRequestedCourt(applicant1DQRequestedCourt)
+            .setApplicant1DQHearingSupport(applicant1DQHearingSupport)
+            .setApplicant1DQFurtherInformation(applicant1DQFurtherInformation)
+            .setApplicant1DQLanguage(applicant1DQLanguage)
+            .setApplicant1DQRemoteHearingLRspec(applicant1DQRemoteHearingLRspec)
+            .setApplicant1DQStatementOfTruth(applicant1DQStatementOfTruth)
+            .setApplicant1DQVulnerabilityQuestions(applicant1DQVulnerabilityQuestions)
+            .setApplicant1DQFutureApplications(applicant1DQFutureApplications)
+            .setApplicant1DQLanguageLRspec(applicant1DQLanguageLRspec)
+            .setApplicant1DQDefendantDocumentsToBeConsidered(applicant1DQDefendantDocumentsToBeConsidered)
+            .setDeterWithoutHearing(deterWithoutHearing)
+            .setRemoteHearing(remoteHearing);
     }
 }
