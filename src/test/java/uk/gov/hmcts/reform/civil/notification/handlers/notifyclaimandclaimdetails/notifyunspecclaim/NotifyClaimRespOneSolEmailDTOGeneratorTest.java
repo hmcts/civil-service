@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.RESPONDENT_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyClaimRespOneSolEmailDTOGeneratorTest {
@@ -57,16 +59,24 @@ class NotifyClaimRespOneSolEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldAddCustomPropertiesFromHelper() {
+    void shouldAddCustomPropertiesFromHelper_andRespondentName() {
         Map<String, String> baseProps = new HashMap<>();
         Map<String, String> customProps = Map.of("key", "value");
 
+        Party respondent = mock(Party.class);
+        when(caseData.getRespondent1()).thenReturn(respondent);
         when(notifyClaimHelper.retrieveCustomProperties(caseData)).thenReturn(customProps);
 
-        Map<String, String> result = generator.addCustomProperties(baseProps, caseData);
+        try (MockedStatic<PartyUtils> partyUtils = mockStatic(PartyUtils.class)) {
+            partyUtils.when(() -> PartyUtils.getPartyNameBasedOnType(respondent))
+                .thenReturn("John Doe");
 
-        assertEquals(1, result.size());
-        assertEquals("value", result.get("key"));
+            Map<String, String> result = generator.addCustomProperties(baseProps, caseData);
+
+            assertEquals(2, result.size());
+            assertEquals("value", result.get("key"));
+            assertEquals("John Doe", result.get(RESPONDENT_NAME));
+        }
     }
 
     @Test
