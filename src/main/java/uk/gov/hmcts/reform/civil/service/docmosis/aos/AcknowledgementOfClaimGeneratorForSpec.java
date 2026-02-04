@@ -44,27 +44,27 @@ public class AcknowledgementOfClaimGeneratorForSpec
 
     @Override
     public AcknowledgementOfClaimFormForSpec getTemplateData(CaseData caseData) {
-        return AcknowledgementOfClaimFormForSpec.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData))
-            .issueDate(caseData.getIssueDate())
-            .responseDeadline(caseData.getRespondent1ResponseDeadline().toLocalDate())
-            .submittedOn(caseData.getSubmittedDate().toLocalDate())
-            .respondent(prepareRespondent(caseData))
-            .build();
+        return new AcknowledgementOfClaimFormForSpec(
+            "[userImage:courtseal.PNG]",
+            DocmosisTemplateDataUtils.toCaseName.apply(caseData),
+            caseData.getLegacyCaseReference(),
+            DocmosisTemplateDataUtils.fetchSolicitorReferences(caseData),
+            caseData.getIssueDate(),
+            caseData.getSubmittedDate().toLocalDate(),
+            caseData.getRespondent1ResponseDeadline().toLocalDate(),
+            prepareRespondent(caseData)
+        );
     }
 
     private Party prepareRespondent(CaseData caseData) {
         var respondent = caseData.getRespondent1();
-        return Party.builder()
-            .name(respondent.getPartyName())
-            .primaryAddress(respondent.getPrimaryAddress())
-            .representative(representativeService.getRespondent1Representative(caseData))
-            .litigationFriendName(
+        return new Party()
+            .setName(respondent.getPartyName())
+            .setPrimaryAddress(respondent.getPrimaryAddress())
+            .setRepresentative(representativeService.getRespondent1Representative(caseData))
+            .setLitigationFriendName(
                 ofNullable(caseData.getRespondent1LitigationFriend())
                     .map(LitigationFriend::getFullName)
-                    .orElse(""))
-            .build();
+                    .orElse(""));
     }
 }
