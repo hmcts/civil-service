@@ -30,11 +30,11 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETER
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -109,35 +109,35 @@ public class JudgmentByDeterminationDocGenerator {
 
     private JudgmentByDeterminationDocForm getJudgmentByDeterminationDocForm(CaseData caseData, String partyType) {
 
-        JudgmentByDeterminationDocForm.JudgmentByDeterminationDocFormBuilder builder = JudgmentByDeterminationDocForm.builder();
+        JudgmentByDeterminationDocForm docForm = new JudgmentByDeterminationDocForm();
         BigDecimal orderAmount =
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountOrdered()));
         BigDecimal costs =
             MonetaryConversions.penniesToPounds(JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered()));
-        builder
-            .costs(costs.toString())
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .debt(orderAmount.toString())
-            .formText("No response,")
-            .applicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .respondent(getRespondentLROrLipDetails(caseData, partyType))
-            .totalCost(orderAmount.add(costs).setScale(2).toString())
-            .applicantReference(getApplicantSolicitorRef(caseData))
-            .respondentReference(getRespondent1SolicitorRef(caseData))
-            .respondent1Name(caseData.getRespondent1().getPartyName())
-            .respondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
-            .respondent1Ref(getRespondent1SolicitorRef(caseData))
-            .respondent2Ref(getRespondent2SolicitorRef(caseData))
-            .claimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .applicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .paymentPlan(caseData.getJoPaymentPlan().getType().name())
-            .paymentStr(getInstallmentFreqStr(caseData))
-            .installmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
-                                   : getInstallmentAmount(caseData.getJoInstalmentDetails()))
-            .payByDate(getPayByDate(caseData))
-            .repaymentFrequency(getInstallmentFreqStr(caseData))
-            .repaymentDate(getRepaymentDate(caseData));
-        return builder.build();
+        docForm
+            .setCosts(costs.toString())
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setDebt(orderAmount.toString())
+            .setFormText("No response,")
+            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
+            .setTotalCost(orderAmount.add(costs).setScale(2).toString())
+            .setApplicantReference(getApplicantSolicitorRef(caseData))
+            .setRespondentReference(getRespondent1SolicitorRef(caseData))
+            .setRespondent1Name(caseData.getRespondent1().getPartyName())
+            .setRespondent2Name(Objects.isNull(caseData.getRespondent2()) ? null : caseData.getRespondent2().getPartyName())
+            .setRespondent1Ref(getRespondent1SolicitorRef(caseData))
+            .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
+            .setClaimantLR(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .setApplicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
+            .setPaymentPlan(caseData.getJoPaymentPlan().getType().name())
+            .setPaymentStr(getInstallmentFreqStr(caseData))
+            .setInstallmentAmount(Objects.isNull(caseData.getJoInstalmentDetails()) ? null
+                                      : getInstallmentAmount(caseData.getJoInstalmentDetails()))
+            .setPayByDate(getPayByDate(caseData))
+            .setRepaymentFrequency(getInstallmentFreqStr(caseData))
+            .setRepaymentDate(getRepaymentDate(caseData));
+        return docForm;
     }
 
     @Nullable

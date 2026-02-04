@@ -68,11 +68,11 @@ class HmcDataUtilsTest {
         LocalDateTime now = LocalDateTime.now();
 
         var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
-            .responseReceivedDateTime(now.minusDays(3)).build();
+            .responseReceivedDateTime(now.minusDays(3)).requestVersion(1).build();
         var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
-            .responseReceivedDateTime(now.minusDays(2)).build();
+            .responseReceivedDateTime(now.minusDays(2)).requestVersion(2).build();
         var expected = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
-            .responseReceivedDateTime(now.minusDays(1)).build();
+            .responseReceivedDateTime(now.minusDays(1)).requestVersion(3).build();
 
         PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
             .responses(List.of(res1, expected, res2))
@@ -81,6 +81,35 @@ class HmcDataUtilsTest {
         PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingNoticeDetails(partiesNotified);
 
         assertEquals(result, expected);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenEmptyList_ReturnsNull() {
+        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder().responses(List.of()).build();
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 1);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getHearingResponseForRequestVersion_WhenNonEmptyList_ReturnsLatestResponse() {
+        LocalDateTime now = LocalDateTime.now();
+
+        var res1 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-3").build())
+            .responseReceivedDateTime(now.minusDays(3)).requestVersion(1).build();
+        var res2 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-2").build())
+            .responseReceivedDateTime(now.minusDays(2)).requestVersion(3).build();
+        var res3 = PartiesNotifiedResponse.builder().serviceData(PartiesNotifiedServiceData.builder().hearingLocation("loc-1").build())
+            .responseReceivedDateTime(now.minusDays(1)).requestVersion(2).build();
+
+        PartiesNotifiedResponses partiesNotified = PartiesNotifiedResponses.builder()
+            .responses(List.of(res3, res1, res2))
+            .build();
+
+        PartiesNotifiedResponse result = HmcDataUtils.getLatestHearingResponseForRequestVersion(partiesNotified, 3);
+
+        assertEquals(result, res2);
     }
 
     @Test
@@ -234,12 +263,15 @@ class HmcDataUtilsTest {
 
         var result = HmcDataUtils.getHearingDaysText(hearing, isWelsh);
 
-        assertEquals(result, isWelsh ? "23 Rhagfyr 2023 am 10:00 am 3 awr\n" +
-            "24 Rhagfyr 2023 am 14:00 am 2 awr\n" +
-            "25 Rhagfyr 2023 am 10:00 am 6 awr"
-            : "23 December 2023 at 10:00 for 3 hours\n" +
-            "24 December 2023 at 14:00 for 2 hours\n" +
-            "25 December 2023 at 10:00 for 6 hours");
+        assertEquals(result, isWelsh ? """
+            23 Rhagfyr 2023 am 10:00 am 3 awr
+            24 Rhagfyr 2023 am 14:00 am 2 awr
+            25 Rhagfyr 2023 am 10:00 am 6 awr"""
+            : """
+            23 December 2023 at 10:00 for 3 hours
+            24 December 2023 at 14:00 for 2 hours
+            25 December 2023 at 10:00 for 6 hours"""
+        );
     }
 
     @Test
@@ -1764,9 +1796,8 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicant1DQLanguageIsNull() {
             // Given
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(null)
-                .build();
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(null);
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
@@ -1781,12 +1812,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenDocumentsIsEnglish() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.ENGLISH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
@@ -1801,12 +1830,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
@@ -1821,12 +1848,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsBoth() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ applicant1DQ = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Applicant1DQ applicant1DQ = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .applicant1DQ(applicant1DQ)
                 .build();
@@ -1859,9 +1884,8 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenRespondent1DQLanguageIsNull() {
             // Given
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(null)
-                .build();
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(null);
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
@@ -1876,12 +1900,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenDocumentsIsEnglish() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.ENGLISH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.ENGLISH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
@@ -1896,12 +1918,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
@@ -1916,12 +1936,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenDocumentsIsBoth() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
             CaseData caseData = CaseData.builder()
                 .respondent1DQ(respondent1DQ)
                 .build();
@@ -1957,12 +1975,10 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenApplicantNoRepAndClaimantDQDocumentsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.BOTH)
-                .build();
-            Applicant1DQ dq = Applicant1DQ.builder()
-                .applicant1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.BOTH);
+            Applicant1DQ dq = new Applicant1DQ()
+                .setApplicant1DQLanguage(req);
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)
@@ -1983,11 +1999,9 @@ class HmcDataUtilsTest {
         void shouldReturnTrue_whenRespondentNoRepAndRespondentResponseBilingual() {
             // Given
             // -> isRespondentResponseBilingual() = true si "BOTH" o "WELSH"
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("BOTH") // => true
-                                            .build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("BOTH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.YES)
@@ -2005,18 +2019,15 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnTrue_whenRespondentNoRepAndDefendantDQDocumentsWelsh() {
             // Given
-            WelshLanguageRequirements req = WelshLanguageRequirements.builder()
-                .documents(Language.WELSH)
-                .build();
-            Respondent1DQ respondent1DQ = Respondent1DQ.builder()
-                .respondent1DQLanguage(req)
-                .build();
+            WelshLanguageRequirements req = new WelshLanguageRequirements()
+                .setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ()
+                .setRespondent1DQLanguage(req);
 
             // -> isRespondentResponseBilingual() = false (ej: "ENGLISH")
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.YES)
@@ -2051,10 +2062,9 @@ class HmcDataUtilsTest {
         @Test
         void shouldReturnFalse_whenApplicantNoRepButNotBilingualNotDQ_andRespondentNoRepButNotBilingualNotDQ() {
             // Given
-            CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-                .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                            .respondent1ResponseLanguage("ENGLISH").build())
-                .build();
+            CaseDataLiP caseDataLiP = new CaseDataLiP()
+                .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                            .setRespondent1ResponseLanguage("ENGLISH"));
 
             CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)

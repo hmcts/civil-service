@@ -40,8 +40,8 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-            RespondentLiPResponse.builder().respondent1ResponseLanguage(WELSH.toString()).build()).build()).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+            new RespondentLiPResponse().setRespondent1ResponseLanguage(WELSH.toString()))).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getNotifyDefendantTranslatedDocumentUploaded()).thenReturn(expectedTemplateId);
@@ -53,8 +53,8 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvokedAndBilingual() {
-        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-            RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build()).build();
+        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+            new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString()))).build();
         String expectedTemplateId = "template-id";
 
         when(notificationsProperties.getRespondent1LipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
@@ -66,8 +66,8 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNoEmailOperation_whenDefendantGetTemplateNocDisabledClaimantBilingual() {
-        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-            RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build())
+        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+            new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString())))
             .claimantBilingualLanguagePreference(WELSH.toString()).build();
         when(featureToggleService.isDefendantNoCOnlineForCase(caseData)).thenReturn(false);
 
@@ -78,8 +78,8 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnNoEmailOperation_whenDefendantGetTemplateIsInvokedAndClaimantBilingualAndProceedNoPartAdmit() {
-        CaseData caseData = CaseData.builder().caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(
-                RespondentLiPResponse.builder().respondent1ResponseLanguage(ENGLISH.toString()).build()).build())
+        CaseData caseData = CaseData.builder().caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
+                new RespondentLiPResponse().setRespondent1ResponseLanguage(ENGLISH.toString())))
             .claimantBilingualLanguagePreference(WELSH.toString())
             .applicant1ProceedWithClaim(YesOrNo.YES)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
