@@ -44,7 +44,7 @@ public class BulkPrintService {
      * @param filenames a list of file names associated with the letter, optional
      * @return a response from the bulk print service containing details of the letter sent
      */
-    @Retryable(retryFor = { RuntimeException.class},
+    @Retryable(retryFor = {RuntimeException.class},
         maxAttempts = 5,
         backoff = @Backoff(delay = 1000, multiplier = 2))
     public SendLetterResponse printLetter(byte[] letterContent, String claimId,
