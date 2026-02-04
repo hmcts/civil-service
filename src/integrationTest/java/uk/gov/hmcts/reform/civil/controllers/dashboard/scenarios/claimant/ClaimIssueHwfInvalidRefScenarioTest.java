@@ -29,7 +29,7 @@ public class ClaimIssueHwfInvalidRefScenarioTest extends DashboardBaseIntegratio
             .toBuilder()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(INVALID_HWF_REFERENCE).build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(INVALID_HWF_REFERENCE))
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 

@@ -43,11 +43,9 @@ class GenerateHearingNoticeHMCDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectTemplateId_whenDefendantIsBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                         .build())
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.BOTH.toString())))
             .build();
 
         String expectedTemplate = "welsh-template-id";
@@ -62,11 +60,9 @@ class GenerateHearingNoticeHMCDefendantEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectTemplateId_whenDefendantIsNotBilingual() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder()
-                             .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                         .respondent1ResponseLanguage(Language.ENGLISH.toString())
-                                                         .build())
-                             .build())
+            .caseDataLip(new CaseDataLiP()
+                             .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                         .setRespondent1ResponseLanguage(Language.ENGLISH.toString())))
             .build();
 
         String expectedTemplate = "english-template-id";

@@ -68,7 +68,7 @@ public class SettlementAgreementFormGeneratorTest {
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .build();
 
-        when(settlementAgreementFormMapper.buildFormData(caseData)).thenReturn(SettlementAgreementForm.builder().build());
+        when(settlementAgreementFormMapper.buildFormData(caseData)).thenReturn(new SettlementAgreementForm());
 
         CaseDocument actual = generator.generate(caseData, BEARER_TOKEN);
 

@@ -679,6 +679,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
             .isCcmccLocation(application.getIsCcmccLocation())
             .caseManagementLocation(application.getCaseManagementLocation())
+            .generalAppSubmittedDateGAspec(application.getGeneralAppSubmittedDateGAspec())
             .build();
     }
 
@@ -819,9 +820,9 @@ public class GeneralApplicationCaseDataBuilder {
             .freeFormRecitalText("abcd")
             .freeFormOrderedText("abcd")
             .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
-            .orderOnCourtInitiative(FreeFormOrderValues.builder()
-                                        .onInitiativeSelectionTextArea("abcd")
-                                        .onInitiativeSelectionDate(now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues()
+                                        .setOnInitiativeSelectionTextArea("abcd")
+                                        .setOnInitiativeSelectionDate(now()))
             .createdDate(SUBMITTED_DATE_TIME)
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }

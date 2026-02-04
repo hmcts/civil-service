@@ -159,7 +159,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerLipTest e
                 .applicant1Represented(YES)
                 .responseClaimTrack(SMALL_CLAIM.name())
                 .applicant1ProceedWithClaim(NO)
-                .caseDataLip(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()).build())
+                .caseDataLip(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")))
                 .build().toBuilder()
                 .defenceRouteRequired(DISPUTES_THE_CLAIM)
                 .build();

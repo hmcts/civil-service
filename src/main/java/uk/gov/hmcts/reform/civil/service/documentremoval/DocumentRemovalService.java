@@ -126,19 +126,17 @@ public class DocumentRemovalService {
             String docId = documentUrlAsArray[documentUrlAsArray.length - 1];
 
             documentsCollection.add(
-                DocumentToKeepCollection.builder()
-                    .value(DocumentToKeep.builder()
-                        .documentId(docId)
-                        .caseDocumentToKeep(CaseDocumentToKeep.builder()
+                new DocumentToKeepCollection()
+                    .setValue(new DocumentToKeep()
+                        .setDocumentId(docId)
+                        .setCaseDocumentToKeep(CaseDocumentToKeep.builder()
                             .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim())
                             .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
                             .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
                             .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
                             .build())
-                        .uploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                        .systemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim()))
-                        .build())
-                    .build());
+                        .setUploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
+                        .setSystemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim()))));
         }
 
         documentsCollection.sort(Comparator.comparing(

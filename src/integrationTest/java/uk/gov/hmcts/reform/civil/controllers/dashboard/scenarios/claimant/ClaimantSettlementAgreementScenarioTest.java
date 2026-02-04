@@ -28,9 +28,9 @@ public class ClaimantSettlementAgreementScenarioTest extends DashboardBaseIntegr
         LocalDateTime respondent1SettlementDeadline = LocalDateTime.now();
 
         String caseId = "12346789";
-        CaseDataLiP caseDataLiP = CaseDataLiP.builder()
-            .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                       .applicant1SignedSettlementAgreement(YesOrNo.YES).build()).build();
+        CaseDataLiP caseDataLiP = new CaseDataLiP()
+            .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                       .setApplicant1SignedSettlementAgreement(YesOrNo.YES));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimantFullDefence().build()
             .toBuilder()
