@@ -1524,13 +1524,12 @@ class DirectionsQuestionnaireGeneratorTest {
                 return new Witnesses()
                     .setWitnessesToAppear(YES)
                     .setDetails(List.of(
-                        Witness.builder()
-                            .firstName("Witness")
-                            .lastName("One")
-                            .phoneNumber("01482764322")
-                            .emailAddress("witness.one@example.com")
-                            .reasonForWitness("Saw something")
-                            .build()));
+                        new Witness()
+                            .setFirstName("Witness")
+                            .setLastName("One")
+                            .setPhoneNumber("01482764322")
+                            .setEmailAddress("witness.one@example.com")
+                            .setReasonForWitness("Saw something")));
             }
         }
     }
@@ -2676,13 +2675,12 @@ class DirectionsQuestionnaireGeneratorTest {
 
         @Test
         void whenIntermediateClaim_shouldUseFixedRecoverableCosts_ClaimantDQ() {
-            FixedRecoverableCosts frcIntermediate = FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .frcSupportingDocument(Document.builder().build())
-                .complexityBandingAgreed(YES)
-                .band(ComplexityBand.BAND_1)
-                .reasons("Reasoning")
-                .build();
+            FixedRecoverableCosts frcIntermediate = new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setFrcSupportingDocument(Document.builder().build())
+                .setComplexityBandingAgreed(YES)
+                .setBand(ComplexityBand.BAND_1)
+                .setReasons("Reasoning");
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
