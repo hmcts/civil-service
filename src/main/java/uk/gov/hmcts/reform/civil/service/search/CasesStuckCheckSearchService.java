@@ -54,7 +54,7 @@ public class CasesStuckCheckSearchService {
         return new Query(
             boolQuery()
                 .must(rangeQuery("last_modified").gt(pastDaysExpression).lt(timeNow))
-                .mustNot(termQuery("data.businessProcess.status.keyword", "finished")),
+                .mustNot(termQuery("data.businessProcess.status.keyword", "finished").caseInsensitive(true)),
             List.of("reference"),
             startIndex
         );

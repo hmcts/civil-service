@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -18,11 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineSDONotDrawn;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineAfterNotSuitableForSdo;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineByStaffAfterClaimantResponseBeforeSDO;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.FullDefenceProceedTransitionBuilder.takenOfflineByStaffAfterSDO;
 
 @ExtendWith(MockitoExtension.class)
 public class FullDefenceProceedTransitionBuilderTest {
@@ -58,7 +54,7 @@ public class FullDefenceProceedTransitionBuilderTest {
             .takenOfflineByStaff()
             .build();
 
-        assertTrue(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeSdo).test(caseData));
     }
 
     @Test
@@ -69,7 +65,7 @@ public class FullDefenceProceedTransitionBuilderTest {
             .build().toBuilder()
             .drawDirectionsOrderRequired(YES).build();
 
-        assertFalse(takenOfflineByStaffAfterClaimantResponseBeforeSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeSdo).test(caseData));
     }
 
     @Test
@@ -77,9 +73,10 @@ public class FullDefenceProceedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
-        assertFalse(takenOfflineSDONotDrawn.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
-        assertTrue(takenOfflineByStaffAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdo).test(caseData));
     }
 
     @Test
@@ -88,9 +85,10 @@ public class FullDefenceProceedTransitionBuilderTest {
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
             .takenOfflineByStaff()
             .build();
-        assertFalse(takenOfflineSDONotDrawn.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
-        assertTrue(takenOfflineAfterNotSuitableForSdo.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate().and(TakenOfflinePredicate.sdoNotDrawn).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.afterSdoNotSuitable).test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

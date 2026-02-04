@@ -679,6 +679,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
             .isCcmccLocation(application.getIsCcmccLocation())
             .caseManagementLocation(application.getCaseManagementLocation())
+            .generalAppSubmittedDateGAspec(application.getGeneralAppSubmittedDateGAspec())
             .build();
     }
 
