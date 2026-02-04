@@ -172,8 +172,7 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                     .setPrimaryAddress(applicant2.getPrimaryAddress())
                     .setLitigationFriendName(litigationFriend2 != null ? litigationFriend2.getFirstName() + " "
                         + litigationFriend2.getLastName() : "")
-                    .representative(applicantRepresentative)
-                    .build());
+                    .setRepresentative(applicantRepresentative));
         }
 
         return applicantParties;
