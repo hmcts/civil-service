@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.notifyclaimandclaimdetai
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
@@ -42,12 +43,17 @@ class NotifyClaimHelperTest {
         LocalDateTime deadline = LocalDateTime.of(2025, 6, 1, 0, 0);
 
         CaseData caseData = CaseData.builder()
+            .respondent1(Party.builder()
+                             .individualTitle("Mr")
+                             .individualFirstName("John").individualLastName("Doe")
+                             .type(Party.Type.INDIVIDUAL).build())
             .claimDetailsNotificationDeadline(deadline)
             .build();
 
         Map<String, String> props = notifyClaimHelper.retrieveCustomProperties(caseData);
 
-        assertEquals(1, props.size());
+        assertEquals(2, props.size());
+        assertEquals("Mr John Doe", props.get("defendantName"));
         assertEquals("1 June 2025", props.get("claimDetailsNotificationDeadline")); // depends on DATE pattern
     }
 
