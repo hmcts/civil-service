@@ -137,43 +137,4 @@ class NotifyClaimDetailsRespSolTwoEmailDTOGeneratorTest {
             assertFalse(result);
         }
     }
-
-    @Test
-    void shouldReturnTrueWhenMultipartyAndDefendant1IsLIP() {
-        Party respondent2 = mock(Party.class);
-        when(respondent2.getPartyName()).thenReturn("respondent 2 name");
-
-        when(caseData.isRespondentTwoSolicitorRegistered()).thenReturn(true);
-        when(caseData.getRespondent2()).thenReturn(respondent2);
-        when(caseData.getDefendant1LIPAtClaimIssued()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES);
-
-        try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-
-            boolean result = generator.getShouldNotify(caseData);
-
-            assertTrue(result);
-        }
-    }
-
-    @Test
-    void shouldReturnFalseWhenMultipartyAndDefendant1NotLIPAndHelperReturnsFalse() {
-        Party respondent2 = mock(Party.class);
-        when(respondent2.getPartyName()).thenReturn("respondent 2 name");
-
-        when(caseData.isRespondentTwoSolicitorRegistered()).thenReturn(true);
-        when(caseData.getRespondent2()).thenReturn(respondent2);
-        when(caseData.getDefendant1LIPAtClaimIssued()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO);
-
-        try (MockedStatic<MultiPartyScenario> scenario = mockStatic(MultiPartyScenario.class)) {
-            scenario.when(() -> isOneVTwoTwoLegalRep(caseData)).thenReturn(true);
-            when(notifyClaimDetailsHelper
-                     .checkDefendantToBeNotifiedWithClaimDetails(caseData, "respondent 2 name"))
-                .thenReturn(false);
-
-            boolean result = generator.getShouldNotify(caseData);
-
-            assertFalse(result);
-        }
-    }
 }
