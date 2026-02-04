@@ -349,16 +349,15 @@ class JudgeFinalOrderGeneratorTest {
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.COSTS_IN_THE_CASE)
             .assistedOrderMakeAnOrderForCosts(null)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder().makeAnOrderForCostsList(null).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails())
             .publicFundingCostsProtection(NO)
             // Appeal section
             .finalOrderAppealToggle(null)
             // initiative or without notice section
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
-                                              .ownInitiativeText("own initiative test")
-                                              .ownInitiativeDate(LocalDate.now())
-                                              .build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails()
+                                              .setOwnInitiativeText("own initiative test")
+                                              .setOwnInitiativeDate(LocalDate.now()))
             .finalOrderGiveReasonsYesNo(NO)
             .caseManagementLocation(caseManagementLocation)
             .build();
@@ -386,47 +385,45 @@ class JudgeFinalOrderGeneratorTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
-                LocalDate.now()).build()).build())
+            .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders().setSingleDate(
+                LocalDate.now())))
             // Papers considered
             .finalOrderJudgePapers(null)
             // judge heard from section
-            .finalOrderRepresentation(FinalOrderRepresentation.builder()
-                                          .typeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
-                                          .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
-                                                                              .builder().detailsRepresentationText("Test").build()).build())
+            .finalOrderRepresentation(new FinalOrderRepresentation()
+                                          .setTypeRepresentationList(FinalOrderRepresentationList.OTHER_REPRESENTATION)
+                                          .setTypeRepresentationOtherComplex(new ClaimantAndDefendantHeard()
+                                                                              .setDetailsRepresentationText("Test")))
             // Order made on court's own initiative section
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeDate(LocalDate.now()).build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails().setOwnInitiativeDate(LocalDate.now()))
             // Further hearing section
             .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                 .alternativeHearingList(null)
-                                                 .hearingMethodList(IN_PERSON).build())
+            .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                 .setAlternativeHearingList(null)
+                                                 .setHearingMethodList(IN_PERSON))
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsYesOrNo(YES)
-                                                  .assistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
-                                                  .makeAnOrderForCostsList(COSTS)
-                                                  .assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(10000L))
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
-                                                  .assistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT).build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsYesOrNo(YES)
+                                                  .setAssistedOrderAssessmentSecondDropdownList1(INDEMNITY_BASIS)
+                                                  .setAssistedOrderAssessmentSecondDropdownList2(CostEnums.YES)
+                                                  .setMakeAnOrderForCostsList(COSTS)
+                                                  .setAssistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(10000L))
+                                                  .setMakeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .setAssistedOrderClaimantDefendantFirstDropdown(SUBJECT_DETAILED_ASSESSMENT))
             .publicFundingCostsProtection(YES)
             // Appeal section
-            .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .applicationList(ApplicationAppealList.REFUSED)
-                                         .appealRefusedDropdown(AppealGrantedRefused.builder()
-                                                                    .circuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
-                                                                    .appealChoiceSecondDropdownA(AppealChoiceSecondDropdown.builder()
-                                                                                                     .build()).build()).build())
+            .finalOrderAppealComplex(new FinalOrderAppeal()
+                                         .setApplicationList(ApplicationAppealList.REFUSED)
+                                         .setAppealRefusedDropdown(new AppealGrantedRefused()
+                                                                    .setCircuitOrHighCourtListRefuse(ApplicationAppealList.CIRCUIT_COURT)
+                                                                    .setAppealChoiceSecondDropdownA(new AppealChoiceSecondDropdown())))
             // initiative or without notice section
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder()
-                                              .ownInitiativeText("own initiative test")
-                                              .ownInitiativeDate(LocalDate.now())
-                                              .build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails()
+                                              .setOwnInitiativeText("own initiative test")
+                                              .setOwnInitiativeDate(LocalDate.now()))
             .caseManagementLocation(caseManagementLocation)
             .build();
 
@@ -460,8 +457,8 @@ class JudgeFinalOrderGeneratorTest {
             .caseManagementLocation(caseManagementLocation)
             .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
             // Order made section
-            .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder().singleDate(
-                LocalDate.now()).build()).build())
+            .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders().setSingleDate(
+                LocalDate.now())))
             //Papers considered
             .finalOrderJudgePapers(
                 finalOrdersJudgePapersList)
@@ -471,46 +468,43 @@ class JudgeFinalOrderGeneratorTest {
             .respondent2SameLegalRepresentative(YES)
             .applicant2(PartyBuilder.builder().individual().build())
             .addApplicant2(YES)
-            .finalOrderRepresentation(FinalOrderRepresentation.builder()
-                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
-                                          .typeRepresentationComplex(ClaimantAndDefendantHeard.builder().build()).build())
+            .finalOrderRepresentation(new FinalOrderRepresentation()
+                                          .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                          .setTypeRepresentationComplex(new ClaimantAndDefendantHeard()))
             // recitals section
             .finalOrderRecitals(toggleList)
-            .finalOrderRecitalsRecorded(FinalOrderRecitalsRecorded.builder().text("Test").build())
+            .finalOrderRecitalsRecorded(new FinalOrderRecitalsRecorded().setText("Test"))
             // further hearing section
             .finalOrderFurtherHearingToggle(toggleList)
-            .finalOrderFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                 .alternativeHearingList(dynamicList)
-                                                 .hearingMethodList(IN_PERSON)
-                                                 .hearingNotesText("test hearing notes")
-                                                 .datesToAvoidDateDropdown(DatesFinalOrders.builder().datesToAvoidDates(LocalDate.now())
-                                                                               .build()).build())
+            .finalOrderFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                 .setAlternativeHearingList(dynamicList)
+                                                 .setHearingMethodList(IN_PERSON)
+                                                 .setHearingNotesText("test hearing notes")
+                                                 .setDatesToAvoidDateDropdown(new DatesFinalOrders().setDatesToAvoidDates(LocalDate.now())))
             // Costs section
             .assistedOrderCostList(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCostDetails.builder()
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
-                                                  .assistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
-                                                  .makeAnOrderForCostsList(COSTS)
-                                                  .assistedOrderClaimantDefendantFirstDropdown(COSTS)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L))
-                                                  .makeAnOrderForCostsYesOrNo(YesOrNo.YES).build())
-            .assistedOrderCostsReserved(AssistedOrderCostDetails.builder().detailsRepresentationText("Test").build())
-            .finalOrderGiveReasonsComplex(AssistedOrderReasons.builder().reasonsText("Test").build())
-            .assistedOrderCostsBespoke(AssistedOrderCostDetails.builder().besPokeCostDetailsText("Test").build())
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCostDetails()
+                                                  .setMakeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                  .setAssistedOrderAssessmentSecondDropdownList2(CostEnums.NO)
+                                                  .setMakeAnOrderForCostsList(COSTS)
+                                                  .setAssistedOrderClaimantDefendantFirstDropdown(COSTS)
+                                                  .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(10000L))
+                                                  .setMakeAnOrderForCostsYesOrNo(YesOrNo.YES))
+            .assistedOrderCostsReserved(new AssistedOrderCostDetails().setDetailsRepresentationText("Test"))
+            .finalOrderGiveReasonsComplex(new AssistedOrderReasons().setReasonsText("Test"))
+            .assistedOrderCostsBespoke(new AssistedOrderCostDetails().setBesPokeCostDetailsText("Test"))
             .publicFundingCostsProtection(YES)
             // Appeal section
-            .finalOrderAppealComplex(FinalOrderAppeal.builder()
-                                         .applicationList(ApplicationAppealList.GRANTED)
-                                         .appealGrantedDropdown(AppealGrantedRefused.builder()
-                                                                    .circuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
-                                                                    .appealChoiceSecondDropdownB(AppealChoiceSecondDropdown.builder()
-                                                                                                     .build()).build()).build())
+            .finalOrderAppealComplex(new FinalOrderAppeal()
+                                         .setApplicationList(ApplicationAppealList.GRANTED)
+                                         .setAppealGrantedDropdown(new AppealGrantedRefused()
+                                                                    .setCircuitOrHighCourtList(ApplicationAppealList.HIGH_COURT)
+                                                                    .setAppealChoiceSecondDropdownB(new AppealChoiceSecondDropdown())))
             // initiative or without notice section
             .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
-            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder()
-                                                      .withOutNoticeText("without notice test")
-                                                      .withOutNoticeDate(LocalDate.now())
-                                                      .build())
+            .orderMadeOnDetailsOrderWithoutNotice(new OrderMadeOnDetailsOrderWithoutNotice()
+                                                      .setWithOutNoticeText("without notice test")
+                                                      .setWithOutNoticeDate(LocalDate.now()))
             .hearingLocation(DynamicList.builder()
                                  .value(DynamicListElement.dynamicElement("hearing-location")).build())
             .build();
@@ -527,14 +521,14 @@ class JudgeFinalOrderGeneratorTest {
     void testGetInitiativeTextWithoutNotice() {
         CaseData caseDataInitiative = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .orderMadeOnDetailsList(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("test initiative text").build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails().setOwnInitiativeText("test initiative text"))
             .build();
         String responseInitiative = generator.getInitiativeOrWithoutNotice(caseDataInitiative);
         assertEquals("test initiative text", responseInitiative);
 
         CaseData caseDataWithoutNotice = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .orderMadeOnDetailsList(OrderMadeOnTypes.WITHOUT_NOTICE)
-            .orderMadeOnDetailsOrderWithoutNotice(OrderMadeOnDetailsOrderWithoutNotice.builder().withOutNoticeText("test without notice text").build())
+            .orderMadeOnDetailsOrderWithoutNotice(new OrderMadeOnDetailsOrderWithoutNotice().setWithOutNoticeText("test without notice text"))
             .build();
         String responseWithoutNotice = generator.getInitiativeOrWithoutNotice(caseDataWithoutNotice);
         assertEquals("test without notice text", responseWithoutNotice);

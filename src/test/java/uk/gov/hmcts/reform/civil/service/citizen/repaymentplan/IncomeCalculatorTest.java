@@ -102,21 +102,18 @@ class IncomeCalculatorTest {
     private static List<Element<RecurringIncomeLRspec>> createRecurringIncomeWithPositiveAndNegativeAmount() {
         return
             wrapElements(
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(10000))
-                    .frequency(ONCE_TWO_WEEKS)
-                    .type(JOB)
-                    .build(),
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(-6000))
-                    .frequency(ONCE_TWO_WEEKS)
-                    .type(JOB)
-                    .build(),
-                RecurringIncomeLRspec.builder()
-                    .amount(new BigDecimal(150000))
-                    .frequency(ONCE_THREE_WEEKS)
-                    .type(JOB)
-                    .build()
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(10000))
+                    .setFrequency(ONCE_TWO_WEEKS)
+                    .setType(JOB),
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(-6000))
+                    .setFrequency(ONCE_TWO_WEEKS)
+                    .setType(JOB),
+                new RecurringIncomeLRspec()
+                    .setAmount(new BigDecimal(150000))
+                    .setFrequency(ONCE_THREE_WEEKS)
+                    .setType(JOB)
             );
     }
 
