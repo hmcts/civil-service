@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.time.LocalDateTime;
@@ -25,12 +26,6 @@ import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.FULL_DEFENC
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseType.PART_ADMISSION;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.notificationAcknowledged;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.respondentTimeExtension;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.AllResponsesReceivedTransitionBuilder.fullAdmission;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.AllResponsesReceivedTransitionBuilder.fullDefence;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.AllResponsesReceivedTransitionBuilder.getPredicateForResponseType;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.AllResponsesReceivedTransitionBuilder.partAdmission;
 
 @ExtendWith(MockitoExtension.class)
 public class AllResponsesReceivedTransitionBuilderTest {
@@ -76,7 +71,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotifyClaimDetails()
             .build();
 
-        assertTrue(fullDefence.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -85,8 +80,8 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .build();
 
-        Predicate<CaseData> predicate = fullDefence
-            .and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE)
+            .and(not(ResponsePredicate.notificationAcknowledged.or(ResponsePredicate.respondentTimeExtension)));
         assertFalse(predicate.test(caseData));
     }
 
@@ -96,8 +91,8 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateTwoRespondentsFullDefenceAfterNotificationAcknowledgement().build().toBuilder()
             .build();
 
-        Predicate<CaseData> predicate = fullDefence
-            .and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE)
+            .and(not(ResponsePredicate.notificationAcknowledged.or(ResponsePredicate.respondentTimeExtension)));
         assertFalse(predicate.test(caseData));
     }
 
@@ -107,8 +102,9 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotifyClaimDetails()
             .build();
 
-        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
-            fullDefence);
+        Predicate<CaseData> predicate = ResponsePredicate.respondentTimeExtension
+            .and(not(ResponsePredicate.notificationAcknowledged))
+            .and(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE));
         assertFalse(predicate.test(caseData));
     }
 
@@ -118,8 +114,9 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterAcknowledgementTimeExtension()
             .build();
 
-        Predicate<CaseData> predicate = respondentTimeExtension.and(not(notificationAcknowledged)).and(
-            fullDefence);
+        Predicate<CaseData> predicate = ResponsePredicate.respondentTimeExtension
+            .and(not(ResponsePredicate.notificationAcknowledged))
+            .and(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE));
         assertFalse(predicate.test(caseData));
     }
 
@@ -129,8 +126,9 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotifyClaimDetailsTimeExtension()
             .build();
 
-        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
-            fullDefence);
+        Predicate<CaseData> predicate = ResponsePredicate.notificationAcknowledged
+            .and(not(ResponsePredicate.respondentTimeExtension))
+            .and(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE));
         assertFalse(predicate.test(caseData));
     }
 
@@ -140,8 +138,9 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
             .build();
 
-        Predicate<CaseData> predicate = notificationAcknowledged.and(not(respondentTimeExtension)).and(
-            fullDefence);
+        Predicate<CaseData> predicate = ResponsePredicate.notificationAcknowledged
+            .and(not(ResponsePredicate.respondentTimeExtension))
+            .and(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE));
         assertTrue(predicate.test(caseData));
     }
 
@@ -153,7 +152,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -164,7 +163,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -175,7 +174,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
             .build();
 
-        assertTrue(fullDefence.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -186,7 +185,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondentResponseIsSame(YES)
             .build();
 
-        assertTrue(fullDefence.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -197,7 +196,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondentResponseIsSame(NO)
             .build();
 
-        assertTrue(fullDefence.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -208,7 +207,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondentResponseIsSame(NO)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -217,7 +216,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullDefenceAfterNotifyClaimDetails()
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -227,7 +226,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseTypeToApplicant2(FULL_DEFENCE)
             .build();
 
-        assertTrue(fullDefence.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -237,21 +236,21 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseTypeToApplicant2(PART_ADMISSION)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtStateClosed() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDiscontinued().build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtStateCaseProceedsInCaseman() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaff().build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -261,7 +260,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateFullAdmission_1v2_BothRespondentSolicitorsSubmitFullAdmissionResponse()
             .build();
 
-        assertTrue(fullAdmission.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
 
     @Test
@@ -271,14 +270,14 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ResponseDate(LocalDateTime.now())
             .build();
 
-        assertTrue(fullAdmission.test(caseData));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenNoDefendantResponse() {
         CaseData caseData = CaseData.builder().build();
 
-        assertFalse(fullAdmission.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
 
     @Test
@@ -287,8 +286,8 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullAdmissionAfterNotifyDetails()
             .build();
 
-        Predicate<CaseData> predicate =
-            fullAdmission.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION)
+            .and(not(ResponsePredicate.notificationAcknowledged.or(ResponsePredicate.respondentTimeExtension)));
         assertTrue(predicate.test(caseData));
     }
 
@@ -298,8 +297,8 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullAdmissionAfterAcknowledgementTimeExtension()
             .build();
 
-        Predicate<CaseData> predicate =
-            fullAdmission.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION)
+            .and(not(ResponsePredicate.notificationAcknowledged.or(ResponsePredicate.respondentTimeExtension)));
         assertFalse(predicate.test(caseData));
     }
 
@@ -309,8 +308,8 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .atStateRespondentFullAdmissionAfterNotificationAcknowledged()
             .build();
 
-        Predicate<CaseData> predicate =
-            fullAdmission.and(not(notificationAcknowledged.or(respondentTimeExtension)));
+        Predicate<CaseData> predicate = ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION)
+            .and(not(ResponsePredicate.notificationAcknowledged.or(ResponsePredicate.respondentTimeExtension)));
         assertFalse(predicate.test(caseData));
     }
 
@@ -321,7 +320,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -331,7 +330,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
 
-        assertFalse(fullDefence.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     @Test
@@ -341,7 +340,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.FULL_ADMISSION)
             .build();
 
-        assertFalse(fullAdmission.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
 
     @Test
@@ -351,7 +350,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
 
-        assertFalse(fullAdmission.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_ADMISSION).test(caseData));
     }
 
     @Test
@@ -361,7 +360,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.PART_ADMISSION)
             .build();
 
-        assertFalse(partAdmission.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.PART_ADMISSION).test(caseData));
     }
 
     @Test
@@ -371,7 +370,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
             .build();
 
-        assertFalse(partAdmission.test(caseData));
+        assertFalse(ResponsePredicate.isType(RespondentResponseType.PART_ADMISSION).test(caseData));
     }
 
     @Test
@@ -383,7 +382,7 @@ public class AllResponsesReceivedTransitionBuilderTest {
             .respondentResponseIsSame(YES)
             .build();
 
-        assertTrue(getPredicateForResponseType(caseData, RespondentResponseType.FULL_DEFENCE));
+        assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

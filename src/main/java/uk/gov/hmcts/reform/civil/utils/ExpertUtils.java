@@ -27,11 +27,11 @@ public class ExpertUtils {
         List<Expert> expertList = unwrapElements(experts.getDetails());
         List<Element<Expert>> updatedExpertDetails = new ArrayList<>();
         for (Expert expert : expertList) {
-            updatedExpertDetails.addAll(wrapElements(expert.toBuilder()
-                .eventAdded(eventAdded)
-                .dateAdded(dateAdded).build()));
+            updatedExpertDetails.addAll(wrapElements(expert.copy()
+                .setEventAdded(eventAdded)
+                .setDateAdded(dateAdded)));
         }
-        return experts.toBuilder().details(updatedExpertDetails).build();
+        return experts.copy().setDetails(updatedExpertDetails);
     }
 
     public static void addEventAndDateAddedToRespondentExperts(CaseData caseData) {
@@ -46,20 +46,19 @@ public class ExpertUtils {
                 caseData.getRespondent1ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            caseData.setRespondent1DQ(caseData.getRespondent1DQ().toBuilder()
-                                          .respondent1DQExperts(updatedRespondent1Experts).build());
+            caseData.setRespondent1DQ(caseData.getRespondent1DQ().copy()
+                                          .setRespondent1DQExperts(updatedRespondent1Experts));
 
             // copy in respondent2 for 1v2SS single response
             if (caseData.getRespondent2() != null
                 && YES.equals(caseData.getRespondent2SameLegalRepresentative())
                 && YES.equals(caseData.getRespondentResponseIsSame())) {
                 if (caseData.getRespondent2DQ() == null) {
-                    caseData.setRespondent2DQ(Respondent2DQ.builder()
-                                                  .respondent2DQExperts(updatedRespondent1Experts)
-                                                  .build());
+                    caseData.setRespondent2DQ(new Respondent2DQ()
+                                                  .setRespondent2DQExperts(updatedRespondent1Experts));
                 } else {
-                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                                  .respondent2DQExperts(updatedRespondent1Experts).build());
+                    caseData.setRespondent2DQ(caseData.getRespondent2DQ().copy()
+                                                  .setRespondent2DQExperts(updatedRespondent1Experts));
                 }
             }
         }
@@ -75,8 +74,8 @@ public class ExpertUtils {
                 caseData.getRespondent2ResponseDate().toLocalDate(),
                 DEFENDANT_RESPONSE_EVENT.getValue()
             );
-            caseData.setRespondent2DQ(caseData.getRespondent2DQ().toBuilder()
-                                          .respondent2DQExperts(updatedRespondent2Experts).build());
+            caseData.setRespondent2DQ(caseData.getRespondent2DQ().copy()
+                                          .setRespondent2DQExperts(updatedRespondent2Experts));
         }
     }
 
@@ -92,8 +91,8 @@ public class ExpertUtils {
                 caseData.getApplicant1ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            caseData.setApplicant1DQ(caseData.getApplicant1DQ().toBuilder()
-                                         .applicant1DQExperts(updatedApplicant1Experts).build());
+            caseData.setApplicant1DQ(caseData.getApplicant1DQ().copy()
+                                         .setApplicant1DQExperts(updatedApplicant1Experts));
 
             // copy in applicant 2 for single response
             if (caseData.getApplicant2() != null
@@ -101,12 +100,11 @@ public class ExpertUtils {
                 && YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1()))
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1()))) {
                 if (caseData.getApplicant2DQ() == null) {
-                    caseData.setApplicant2DQ(Applicant2DQ.builder()
-                                             .applicant2DQExperts(updatedApplicant1Experts)
-                                             .build());
+                    caseData.setApplicant2DQ(new Applicant2DQ()
+                                             .setApplicant2DQExperts(updatedApplicant1Experts));
                 } else {
-                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                             .applicant2DQExperts(updatedApplicant1Experts).build());
+                    caseData.setApplicant2DQ(caseData.getApplicant2DQ().copy()
+                                             .setApplicant2DQExperts(updatedApplicant1Experts));
                 }
             }
         }
@@ -122,8 +120,8 @@ public class ExpertUtils {
                 caseData.getApplicant2ResponseDate().toLocalDate(),
                 CLAIMANT_INTENTION_EVENT.getValue()
             );
-            caseData.setApplicant2DQ(caseData.getApplicant2DQ().toBuilder()
-                                         .applicant2DQExperts(updatedApplicant2Experts).build());
+            caseData.setApplicant2DQ(caseData.getApplicant2DQ().copy()
+                                         .setApplicant2DQExperts(updatedApplicant2Experts));
         }
     }
 }

@@ -44,11 +44,10 @@ class RequestedCourtForClaimDetailsTabTest {
 
     @BeforeEach
     void setUp() {
-        requestedCourt = RequestedCourt.builder()
-            .responseCourtCode("121")
-            .caseLocation(new CaseLocationCivil().setBaseLocation("00002"))
-            .reasonForHearingAtSpecificCourt("Close to home")
-            .build();
+        requestedCourt = new RequestedCourt()
+            .setResponseCourtCode("121")
+            .setCaseLocation(new CaseLocationCivil().setBaseLocation("00002"))
+            .setReasonForHearingAtSpecificCourt("Close to home");
         locations = List.of(
             LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
                 .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
@@ -65,10 +64,9 @@ class RequestedCourtForClaimDetailsTabTest {
         // Given
         CaseData caseData = CaseData.builder().build();
         caseData.setRespondent1DQ(
-            Respondent1DQ.builder()
-                .respondent1DQRequestedCourt(null)
-                .respondent1DQRemoteHearingLRspec(null)
-                .build()
+            new Respondent1DQ()
+                .setRespondent1DQRequestedCourt(null)
+                .setRespondent1DQRemoteHearingLRspec(null)
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -93,13 +91,11 @@ class RequestedCourtForClaimDetailsTabTest {
         CaseData caseData = CaseData.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         caseData.setApplicant1DQ(
-            Applicant1DQ.builder()
-                .applicant1DQRequestedCourt(requestedCourt)
-                .remoteHearing(RemoteHearing.builder()
-                                   .remoteHearingRequested(YES)
-                                   .reasonForRemoteHearing("Outside scares me")
-                                   .build())
-                .build()
+            new Applicant1DQ()
+                .setApplicant1DQRequestedCourt(requestedCourt)
+                .setRemoteHearing(new RemoteHearing()
+                                      .setRemoteHearingRequested(YES)
+                                      .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -124,13 +120,11 @@ class RequestedCourtForClaimDetailsTabTest {
         CaseData caseData = CaseData.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
         caseData.setApplicant1DQ(
-            Applicant1DQ.builder()
-                .applicant1DQRequestedCourt(requestedCourt)
-                .applicant1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                     .remoteHearingRequested(YES)
-                                                     .reasonForRemoteHearing("Outside scares me")
-                                                     .build())
-                .build()
+            new Applicant1DQ()
+                .setApplicant1DQRequestedCourt(requestedCourt)
+                .setApplicant1DQRemoteHearingLRspec(new RemoteHearingLRspec()
+                                                        .setRemoteHearingRequested(YES)
+                                                        .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -154,13 +148,11 @@ class RequestedCourtForClaimDetailsTabTest {
         // Given
         CaseData caseData = CaseData.builder().build();
         caseData.setRespondent1DQ(
-            Respondent1DQ.builder()
-                .respondent1DQRequestedCourt(requestedCourt)
-                .respondent1DQRemoteHearing(RemoteHearing.builder()
-                                                .remoteHearingRequested(YES)
-                                                .reasonForRemoteHearing("Outside scares me")
-                                                .build())
-                .build()
+            new Respondent1DQ()
+                .setRespondent1DQRequestedCourt(requestedCourt)
+                .setRespondent1DQRemoteHearing(new RemoteHearing()
+                                                   .setRemoteHearingRequested(YES)
+                                                   .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -184,13 +176,11 @@ class RequestedCourtForClaimDetailsTabTest {
         // Given
         CaseData caseData = CaseData.builder().build();
         caseData.setRespondent2DQ(
-            Respondent2DQ.builder()
-                .respondent2DQRequestedCourt(requestedCourt)
-                .respondent2DQRemoteHearing(RemoteHearing.builder()
-                                                .remoteHearingRequested(YES)
-                                                .reasonForRemoteHearing("Outside scares me")
-                                                .build())
-                .build()
+            new Respondent2DQ()
+                .setRespondent2DQRequestedCourt(requestedCourt)
+                .setRespondent2DQRemoteHearing(new RemoteHearing()
+                                                   .setRemoteHearingRequested(YES)
+                                                   .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -214,13 +204,11 @@ class RequestedCourtForClaimDetailsTabTest {
         // Given
         CaseData caseData = CaseData.builder().build();
         caseData.setRespondent1DQ(
-            Respondent1DQ.builder()
-                .respondent1DQRequestedCourt(requestedCourt)
-                .respondent1DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                      .remoteHearingRequested(YES)
-                                                      .reasonForRemoteHearing("Outside scares me")
-                                                      .build())
-                .build()
+            new Respondent1DQ()
+                .setRespondent1DQRequestedCourt(requestedCourt)
+                .setRespondent1DQRemoteHearingLRspec(new RemoteHearingLRspec()
+                                                         .setRemoteHearingRequested(YES)
+                                                         .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
@@ -244,13 +232,11 @@ class RequestedCourtForClaimDetailsTabTest {
         // Given
         CaseData caseData = CaseData.builder().build();
         caseData.setRespondent2DQ(
-            Respondent2DQ.builder()
-                .respondent2DQRequestedCourt(requestedCourt)
-                .respondent2DQRemoteHearingLRspec(RemoteHearingLRspec.builder()
-                                                      .remoteHearingRequested(YES)
-                                                      .reasonForRemoteHearing("Outside scares me")
-                                                      .build())
-                .build()
+            new Respondent2DQ()
+                .setRespondent2DQRequestedCourt(requestedCourt)
+                .setRespondent2DQRemoteHearingLRspec(new RemoteHearingLRspec()
+                                                         .setRemoteHearingRequested(YES)
+                                                         .setReasonForRemoteHearing("Outside scares me"))
         );
 
         CallbackParams callbackParams = CallbackParams.builder()

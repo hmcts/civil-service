@@ -20,6 +20,7 @@ import java.util.List;
 public class GADraftForm implements MappableObject {
 
     private String claimNumber;
+    private final String applicationId;
     private String claimantName;
     private String defendantName;
     private String claimantReference;
@@ -29,6 +30,12 @@ public class GADraftForm implements MappableObject {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate date;
 
+    /*
+   Payment date will be issue Date
+    */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate issueDate;
     private String applicantPartyName;
     private YesOrNo hasAgreed;
     private YesOrNo isWithNotice;
@@ -128,4 +135,7 @@ public class GADraftForm implements MappableObject {
     private Boolean isResp2OtherSupportExists;
     private Boolean isCasePastDueDate;
     private YesOrNo isLipCase;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
+    private final LocalDate submittedDate;
 }
