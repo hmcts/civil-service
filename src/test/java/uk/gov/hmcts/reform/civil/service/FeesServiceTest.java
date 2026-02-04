@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
@@ -38,6 +39,9 @@ class FeesServiceTest {
     @Mock
     private FeesConfiguration feesConfiguration;
 
+    @Mock
+    private OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
+
     @InjectMocks
     private FeesService feesService;
 
@@ -54,6 +58,9 @@ class FeesServiceTest {
         given(feesConfiguration.getChannel()).willReturn(CHANNEL);
         given(feesConfiguration.getEvent()).willReturn(EVENT);
         given(feesConfiguration.getHearingEvent()).willReturn(HEARING_EVENT);
+
+        given(feesClient.lookupOtherRemedyFees(any(OtherRemedyFeesConfiguration.class), any()))
+            .willReturn(feeLookupResponse);
     }
 
     @Test
@@ -69,6 +76,22 @@ class FeesServiceTest {
         Fee feeDto = feesService.getFeeDataByClaimValue(claimValue);
 
         verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
+        assertThat(feeDto).isEqualTo(expectedFeeDto);
+    }
+
+    @Test
+    void shouldReturnFeeDataForOtherRemedy_whenValidClaimValue() {
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(5000));
+
+        Fee expectedFeeDto = new Fee();
+        expectedFeeDto.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        expectedFeeDto.setCode("test_fee_code");
+        expectedFeeDto.setVersion("1");
+
+        Fee feeDto = feesService.getFeeDataForOtherRemedy(claimValue);
+
+        verify(feesClient).lookupOtherRemedyFees(otherRemedyFeesConfiguration, new BigDecimal("50.00"));
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 

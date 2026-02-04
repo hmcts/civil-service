@@ -5772,6 +5772,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setClaimTypeToOtherRemedy() {
+        this.claimTypeUnSpec = ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimTypeToHousingDisrepair() {
+        this.claimTypeUnSpec = ClaimTypeUnspec.HOUSING_DISREPAIR;
+        return this;
+    }
+
     public CaseDataBuilder setClaimNotificationDate() {
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         return this;
