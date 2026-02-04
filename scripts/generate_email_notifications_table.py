@@ -518,6 +518,40 @@ def load_dashboard_scenarios() -> Dict[str, str]:
     return mapping
 
 
+def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
+    if not definition_root or not definition_root.exists():
+        return {}
+    case_event_root = definition_root / "CaseEvent"
+    if not case_event_root.exists():
+        return {}
+    names: Dict[str, tuple[int, str]] = {}
+    for path in sorted(case_event_root.rglob("*.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(data, list):
+            continue
+        priority = 2
+        path_str = str(path).replace("\\", "/")
+        if "/CaseEvent/User/" in path_str:
+            priority = 0
+        elif "/CaseEvent/Camunda/" in path_str:
+            priority = 1
+        for entry in data:
+            if not isinstance(entry, dict):
+                continue
+            event_id = entry.get("ID")
+            name = entry.get("Name")
+            if not event_id or not name:
+                continue
+            existing = names.get(event_id)
+            if existing and existing[0] <= priority:
+                continue
+            names[event_id] = (priority, str(name))
+    return {event_id: name for event_id, (_, name) in names.items()}
+
+
 def load_template_paths() -> Dict[str, Dict[str, str]]:
     template_map = {}
     if not TEMPLATE_DIR.exists():
@@ -680,8 +714,12 @@ def extends_dashboard_callback(index: SourceIndex, class_name: str,
         'DashboardCallbackHandler',
         'CaseProgressionDashboardCallbackHandler',
         'DashboardWithParamsCallbackHandler',
-        'OrderCallbackHandler'
+        'OrderCallbackHandler',
+        'DashboardJudgementOnlineCallbackHandler'
     }
+    if base == 'CallbackHandler' and 'dashboardnotifications' in str(java_class.path):
+        cache[class_name] = True
+        return True
     if base in dashboard_bases:
         cache[class_name] = True
         return True
@@ -1035,7 +1073,15 @@ def render_combined_markdown(rows: List[Dict[str, object]], notify_service_id: O
     return '\n'.join(lines)
 
 
-def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optional[str]) -> str:
+def build_filter_label(event_id: str, bpmn_label: Optional[str], ccd_label: Optional[str]) -> str:
+    base = ccd_label or bpmn_label or event_id
+    if base == event_id:
+        return event_id
+    return f"{base} ({event_id})"
+
+
+def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optional[str],
+                         ccd_event_names: Optional[Dict[str, str]] = None) -> str:
     header = [
         "CCD event(s)",
         "Camunda task",
@@ -1052,7 +1098,12 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
             if event_id in ('—', ''):
                 continue
             event_map.setdefault(event_id, label)
-    unique_events = sorted(event_map.items(), key=lambda item: (item[1] or item[0]).lower())
+    ccd_event_names = ccd_event_names or {}
+    unique_events = []
+    for event_id, label in event_map.items():
+        display_label = build_filter_label(event_id, label, ccd_event_names.get(event_id))
+        unique_events.append((event_id, display_label))
+    unique_events = sorted(unique_events, key=lambda item: (item[1] or item[0]).lower())
     lines = [
         "<!DOCTYPE html>",
         "<html lang='en'>",
@@ -1159,9 +1210,13 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
 
 
 def main(argv: Optional[List[str]] = None) -> int:
+    default_ccd_root = (REPO_ROOT / '..' / 'civil-ccd-definition' / 'ccd-definition').resolve()
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
     parser.add_argument('--bpmn-root', default=str((REPO_ROOT / '..' / 'civil-camunda-bpmn-definition').resolve()),
                         help='Path to civil-camunda-bpmn-definition project (default: sibling directory).')
+    parser.add_argument('--ccd-definition-root',
+                        default=str(default_ccd_root) if default_ccd_root.exists() else '',
+                        help='Path to civil-ccd-definition/ccd-definition (default: sibling directory if present).')
     parser.add_argument('--output', default=str(REPO_ROOT / 'docs' / 'email-notifications.md'),
                         help='Output markdown file path.')
     parser.add_argument('--notify-service-id', default=os.environ.get('NOTIFY_SERVICE_ID')
@@ -1196,7 +1251,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"Wrote {len(filtered_rows)} combined rows to {output_path}")
     html_output = (args.html_output or '').strip()
     if html_output:
-        html_markup = render_combined_html(filtered_rows, args.notify_service_id)
+        ccd_root = Path(args.ccd_definition_root) if args.ccd_definition_root else None
+        ccd_event_names = load_ccd_event_names(ccd_root) if ccd_root else {}
+        html_markup = render_combined_html(filtered_rows, args.notify_service_id, ccd_event_names)
         html_path = Path(html_output)
         html_path.write_text(html_markup + "\n", encoding="utf-8")
         print(f"Wrote interactive HTML table to {html_path}")
