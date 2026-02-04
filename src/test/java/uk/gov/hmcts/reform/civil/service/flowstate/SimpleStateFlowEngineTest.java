@@ -35,6 +35,9 @@ import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -55,8 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
@@ -3833,9 +3835,9 @@ class SimpleStateFlowEngineTest {
             caseData.setRespondent1ResponseDate(LocalDateTime.now());
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
             caseData.setRespondentResponseIsSame(YES);
-            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
+            assertThat(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION).test(caseData))
                 .isTrue();
-            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
+            assertThat(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec).test(caseData))
                 .isFalse();
         }
 
