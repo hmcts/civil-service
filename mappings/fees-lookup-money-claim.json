@@ -20,8 +20,8 @@
     "jsonBody": {
       "code": "FEE0443",
       "description": "Civil Court fees - Money Claims Online - Claim Amount - 500.01 up to 1000 GBP",
-      "version": 3,
-      "fee_amount": 70.00
+      "version": 1,
+      "fee_amount": 80.00
     }
   }
 }

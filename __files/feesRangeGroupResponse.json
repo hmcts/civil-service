@@ -24,7 +24,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -49,7 +49,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -77,16 +77,16 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
-    "max_range": 10000,
-    "min_range": 5000.01,
+    "max_range": 100,
+    "min_range": 100,
     "range_unit": "GBP",
     "service_type": {
       "name": "civil money claims"
     },
-    "unspecified_claim_amount": false
+    "unspecified_claim_amount": true
   },
   {
     "applicant_type": {
@@ -110,7 +110,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -132,7 +132,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -157,7 +157,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 300,
@@ -190,7 +190,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -212,7 +212,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -237,7 +237,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 500,
@@ -270,7 +270,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -292,7 +292,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -317,7 +317,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 1000,
@@ -350,7 +350,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -372,7 +372,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -397,7 +397,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 1500,
@@ -430,7 +430,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -452,7 +452,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -477,7 +477,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 3000,
@@ -510,7 +510,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -532,7 +532,7 @@
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -557,7 +557,7 @@
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "max_range": 5000,
@@ -579,18 +579,21 @@
     "current_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 5000.01 up to 10000 GBP",
       "direction": "enhanced",
-      "percentage_amount": {
-        "percentage": 5
+      "flat_amount": {
+        "amount": 455
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1i",
+      "percentage_amount": {
+        "percentage": 5
+      },
+      "si_ref_id": "1.1g",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -601,18 +604,21 @@
       {
         "approvedBy": "39907",
         "author": "124756",
-        "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
+        "description": "Civil Court fees - Money Claims - Claim Amount - 5000.01 up to 10000 GBP",
         "direction": "enhanced",
-        "percentage_amount": {
-          "percentage": 5
+        "flat_amount": {
+          "amount": 455
         },
         "memo_line": "RECEIPT OF FEES - Civil issue money",
         "natural_account_code": "4481102133",
-        "si_ref_id": "1.1i",
+        "percentage_amount": {
+          "percentage": 5
+        },
+        "si_ref_id": "1.1g",
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -626,22 +632,25 @@
     "matching_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 5000.01 up to 10000 GBP",
       "direction": "enhanced",
-      "percentage_amount": {
-        "percentage": 5
+      "flat_amount": {
+        "amount": 455
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1i",
+      "percentage_amount": {
+        "percentage": 5
+      },
+      "si_ref_id": "1.1g",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
-    "max_range": 200000,
-    "min_range": 10000.01,
+    "max_range": 10000,
+    "min_range": 5000.01,
     "range_unit": "GBP",
     "service_type": {
       "name": "civil money claims"
@@ -659,18 +668,18 @@
     "current_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
       "direction": "enhanced",
-      "flat_amount": {
-        "amount": 10000
+      "percentage_amount": {
+        "percentage": 5
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1j",
+      "si_ref_id": "1.1h",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -681,18 +690,18 @@
       {
         "approvedBy": "39907",
         "author": "124756",
-        "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
+        "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
         "direction": "enhanced",
-        "flat_amount": {
-          "amount": 10000
+        "percentage_amount": {
+          "percentage": 5
         },
         "memo_line": "RECEIPT OF FEES - Civil issue money",
         "natural_account_code": "4481102133",
-        "si_ref_id": "1.1j",
+        "si_ref_id": "1.1h",
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -706,22 +715,22 @@
     "matching_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP",
       "direction": "enhanced",
-      "flat_amount": {
-        "amount": 10000
+      "percentage_amount": {
+        "percentage": 5
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1j",
+      "si_ref_id": "1.1h",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
-    "max_range": 999999999,
-    "min_range": 200000.01,
+    "max_range": 200000,
+    "min_range": 10000.01,
     "range_unit": "GBP",
     "service_type": {
       "name": "civil money claims"
@@ -739,18 +748,18 @@
     "current_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Unspecified claim amount",
+      "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
       "direction": "enhanced",
       "flat_amount": {
         "amount": 10000
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1k",
+      "si_ref_id": "1.1i",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
     "event_type": {
@@ -761,18 +770,18 @@
       {
         "approvedBy": "39907",
         "author": "124756",
-        "description": "Civil Court fees - Money Claims - Unspecified claim amount",
+        "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
         "direction": "enhanced",
         "flat_amount": {
           "amount": 10000
         },
         "memo_line": "RECEIPT OF FEES - Civil issue money",
         "natural_account_code": "4481102133",
-        "si_ref_id": "1.1k",
+        "si_ref_id": "1.1i",
         "status": "approved",
         "statutory_instrument": "2014 No 874",
         "valid_from": "2015-03-09",
-        "valid_to": "2099-12-31",
+        "valid_to": "2022-03-09",
         "version": 2
       }
     ],
@@ -786,26 +795,26 @@
     "matching_version": {
       "approvedBy": "39907",
       "author": "124756",
-      "description": "Civil Court fees - Money Claims - Unspecified claim amount",
+      "description": "Civil Court fees - Money Claims - Claim Amount - above 200000 GBP",
       "direction": "enhanced",
       "flat_amount": {
         "amount": 10000
       },
       "memo_line": "RECEIPT OF FEES - Civil issue money",
       "natural_account_code": "4481102133",
-      "si_ref_id": "1.1k",
+      "si_ref_id": "1.1i",
       "status": "approved",
       "statutory_instrument": "2014 No 874",
       "valid_from": "2015-03-09",
-      "valid_to": "2099-12-31",
+      "valid_to": "2022-03-09",
       "version": 2
     },
-    "max_range": null,
-    "min_range": null,
+    "max_range": 999999999,
+    "min_range": 200000.01,
     "range_unit": "GBP",
     "service_type": {
       "name": "civil money claims"
     },
-    "unspecified_claim_amount": true
+    "unspecified_claim_amount": false
   }
 ]

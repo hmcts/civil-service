@@ -20,8 +20,8 @@
     "jsonBody": {
       "code": "FEE0446",
       "description": "Application (Without notice or by consent)",
-      "version": 2,
-      "fee_amount": 119.00
+      "version": 1,
+      "fee_amount": 110.00
     }
   }
 }

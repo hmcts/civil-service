@@ -21,8 +21,8 @@
     "jsonBody": {
       "code": "FEE0444",
       "description": "Civil Court fees - Money Claims - Claim Amount",
-      "version": 3,
-      "fee_amount": 70.00
+      "version": 1,
+      "fee_amount": 90.00
     }
   }
 }

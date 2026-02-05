@@ -20,8 +20,8 @@
     "jsonBody": {
       "code": "FEE0445",
       "description": "Application (On notice)",
-      "version": 2,
-      "fee_amount": 303.00
+      "version": 1,
+      "fee_amount": 100.00
     }
   }
 }
