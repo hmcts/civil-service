@@ -1,9 +1,8 @@
 java:
   applicationPort: 4000
-  releaseNameOverride: ${SERVICE_NAME}-civil-service
-  image: hmctspublic.azurecr.io/civil/service:${CIVIL_SERVICE_IMAGE}
+  image: ${IMAGE_NAME}
   imagePullPolicy: Always
-  ingressHost: ${SERVICE_NAME}-civil-service.preview.platform.hmcts.net
+  ingressHost: ${SERVICE_NAME}.preview.platform.hmcts.net
   devcpuRequests: 1000m
   devmemoryRequests: 2048Mi
   devmemoryLimits: 4096Mi
@@ -74,8 +73,6 @@ java:
     FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SEND_LETTER_URL: http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    CUI_URL: https://${SERVICE_FQDN}
-    CUI_URL_RESPOND_TO_CLAIM: https://${SERVICE_FQDN}/first-contact/start
     CLAIM_STORE_URL: http://cmc-claim-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_JRD_URL: http://rd-judicial-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -97,8 +94,8 @@ java:
     POLLING_EVENT_EMITTER_ENABLED: false
     DOCUMENT_MANAGEMENT_SECURED: true
     STITCHING_API_ENABLED: false
-    SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}-civil-service.preview.platform.hmcts.net/service-request-update
-    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}-civil-service.preview.platform.hmcts.net/service-request-update-claim-issued
+    SERVICE_REQUEST_UPDATE: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    SERVICE_REQUEST_UPDATE_CLAIM_ISSUED: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update-claim-issued
     CIVIL_S2S_AUTHORISED_SERVICES: payment_app,ccd_data,civil_service,civil-citizen-ui,civil_general_applications
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
@@ -108,8 +105,8 @@ java:
     FEIGN_CLIENT_CONFIG_REMOTERUNTIMESERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEEXTERNALTASKSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
     FEIGN_CLIENT_CONFIG_REMOTEREPOSITORYSERVICE_URL: http://${SERVICE_NAME}-camunda/engine-rest/
-    PAY_CALLBACK_URL: https://${SERVICE_NAME}-civil-service.preview.platform.hmcts.net/service-request-update
-    DASHBOARD_API_URL: http://${SERVICE_NAME}-civil-service
+    PAY_CALLBACK_URL: https://${SERVICE_NAME}.preview.platform.hmcts.net/service-request-update
+    DASHBOARD_API_URL: http://${SERVICE_NAME}
     RELEASE_REVISION: "{{ .Release.Revision }}"
     GA_S2S_AUTHORISED_SERVICES: payment_app,ccd_data,civil_service
 
