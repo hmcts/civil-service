@@ -22,7 +22,7 @@ public class HwFFeeTypeUtilTest {
         // Arrange
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
                                                                      .calculatedAmountInPence(BigDecimal.valueOf(180))
                                                                      .code("FEE123").build()).build())
@@ -41,11 +41,11 @@ public class HwFFeeTypeUtilTest {
         // Arrange
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
-                .generalAppHelpWithFees(HelpWithFees.builder().build())
+                .generalAppHelpWithFees(new HelpWithFees())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
                                                                  .calculatedAmountInPence(BigDecimal.valueOf(180))
                                                                  .code("FEE123").build()).build())
-            .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
+            .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
             .build();
 
         // Act
@@ -106,10 +106,9 @@ public class HwFFeeTypeUtilTest {
     @Test
     void should_updateHwfReferenceNumber() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .feePaymentOutcomeDetails(FeePaymentOutcomeDetails
-                        .builder()
-                        .hwfNumberAvailable(YesOrNo.YES)
-                        .hwfNumberForFeePaymentOutcome("hwf").build())
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                        .setHwfNumberAvailable(YesOrNo.YES)
+                        .setHwfNumberForFeePaymentOutcome("hwf"))
                 .build();
         GeneralApplicationCaseData updatedCaseData = HwFFeeTypeUtil.updateHwfReferenceNumber(caseData);
         assertThat(updatedCaseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())

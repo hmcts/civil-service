@@ -29,12 +29,10 @@ public class CCJRequestedClaimantAcceptsCourtDecisionTest extends DashboardBaseI
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                    .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                    .claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
-                    .build())
-                .build())
+            .caseDataLiP(new CaseDataLiP()
+                .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                    .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                    .setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)))
             .build();
 
         handler.handle(callbackParams(caseData));

@@ -2,17 +2,17 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import uk.gov.hmcts.reform.civil.enums.MediationDecision;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class ClaimantMediationLip {
 
     private MediationDecision hasAgreedFreeMediation;
