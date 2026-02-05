@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
@@ -45,9 +44,7 @@ public class NotifyClaimDetailsRespSolTwoEmailDTOGenerator extends RespSolTwoEma
                 .map(Party::getPartyName)
                 .orElse(null);
 
-            //CoS journey doesnt have notify both option
-            return YES.equals(caseData.getDefendant1LIPAtClaimIssued())
-                || notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, respondentName);
+            return notifyClaimDetailsHelper.checkDefendantToBeNotifiedWithClaimDetails(caseData, respondentName);
         }
         return false;
     }
