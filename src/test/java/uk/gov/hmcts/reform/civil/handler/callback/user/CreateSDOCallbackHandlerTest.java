@@ -131,8 +131,10 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlOrderService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
@@ -211,6 +213,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate.FIVE_HOURS;
 import static uk.gov.hmcts.reform.civil.enums.sdo.TrialOnRadioOptions.OPEN_DATE;
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_DATE_MUST_BE_IN_THE_FUTURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
@@ -241,6 +244,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoFastTrackSpecialistDirectionsService.class,
     SdoSmallClaimsOrderDefaultsService.class,
     SdoSmallClaimsNarrativeService.class,
+    SdoSmallClaimsDirectionsService.class,
+    SdoFastTrackDirectionsService.class,
     SdoExpertEvidenceFieldsService.class,
     SdoDisclosureOfDocumentsFieldsService.class,
     SdoJudgementDeductionService.class,

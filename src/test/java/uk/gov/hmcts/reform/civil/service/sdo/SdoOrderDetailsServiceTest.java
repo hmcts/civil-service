@@ -34,11 +34,16 @@ class SdoOrderDetailsServiceTest {
     @Mock
     private SdoCaseClassificationService caseClassificationService;
 
+    @Mock
+    private SdoSmallClaimsDirectionsService smallClaimsDirectionsService;
+    @Mock
+    private SdoFastTrackDirectionsService fastTrackDirectionsService;
+
     private SdoOrderDetailsService service;
 
     @BeforeEach
     void setUp() {
-        service = new SdoOrderDetailsService(caseClassificationService);
+        service = new SdoOrderDetailsService(caseClassificationService, smallClaimsDirectionsService, fastTrackDirectionsService);
     }
 
     @Test
