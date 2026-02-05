@@ -189,16 +189,19 @@ ccd:
     userProfile:
       enabled: false
   global:
+    ccdStitchUrl: http://${SERVICE_NAME}-emstitch
     ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
     ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
-    ccdStitchUrl: http://${SERVICE_NAME}-emstitch
-    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store-api
     ccdUserProfileUrl: http://ccd-user-profile-api-aat.service.core-compute-aat.internal
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
-    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    postgresUsername: hmcts
+    postgresPassword: ${POSTGRES_PASSWORD}
     postgresSecret: postgres
+    postgresHostname: ${SERVICE_NAME}-postgresql
+    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
 
   am-role-assignment-service:
     java:
