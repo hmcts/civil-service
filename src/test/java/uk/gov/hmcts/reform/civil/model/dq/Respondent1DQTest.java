@@ -40,22 +40,21 @@ class Respondent1DQTest extends DQTest {
     }
 
     private Respondent1DQ buildRespondent1Dq() {
-        return Respondent1DQ.builder()
-            .respondent1DQDisclosureOfElectronicDocuments(disclosureOfElectronicDocuments())
-            .respondent1DQDisclosureOfNonElectronicDocuments(disclosureOfNonElectronicDocuments())
-            .respondent1DQDisclosureReport(disclosureReport())
-            .respondent1DQDraftDirections(draftDirections())
-            .respondent1DQExperts(experts())
-            .respondent1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire())
-            .respondent1DQFurtherInformation(furtherInformation())
-            .respondent1DQHearing(hearing())
-            .respondent1DQHearingSupport(hearingSupport())
-            .respondent1DQRequestedCourt(requestedCourt())
-            .respondent1DQStatementOfTruth(statementOfTruth())
-            .respondent1DQWitnesses(witnesses())
-            .respondent1DQLanguage(welshLanguageRequirements())
-            .respondent1DQVulnerabilityQuestions(vulnerabilityQuestions())
-            .build();
+        return new Respondent1DQ()
+            .setRespondent1DQDisclosureOfElectronicDocuments(disclosureOfElectronicDocuments())
+            .setRespondent1DQDisclosureOfNonElectronicDocuments(disclosureOfNonElectronicDocuments())
+            .setRespondent1DQDisclosureReport(disclosureReport())
+            .setRespondent1DQDraftDirections(draftDirections())
+            .setRespondent1DQExperts(experts())
+            .setRespondent1DQFileDirectionsQuestionnaire(fileDirectionsQuestionnaire())
+            .setRespondent1DQFurtherInformation(furtherInformation())
+            .setRespondent1DQHearing(hearing())
+            .setRespondent1DQHearingSupport(hearingSupport())
+            .setRespondent1DQRequestedCourt(requestedCourt())
+            .setRespondent1DQStatementOfTruth(statementOfTruth())
+            .setRespondent1DQWitnesses(witnesses())
+            .setRespondent1DQLanguage(welshLanguageRequirements())
+            .setRespondent1DQVulnerabilityQuestions(vulnerabilityQuestions());
     }
 
     @Nested
@@ -64,11 +63,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldRemoveDetails_whenNoExpertsRequired() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQExperts(dq.getExperts().toBuilder()
-                                          .expertRequired(NO)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQExperts(dq.getExperts().copy()
+                                             .setExpertRequired(NO));
 
             assertThat(dq.getExperts().getDetails()).isNull();
         }
@@ -76,11 +73,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldNotRemoveDetails_whenExpertsRequired() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQExperts(dq.getExperts().toBuilder()
-                                          .expertRequired(YES)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQExperts(dq.getExperts().copy()
+                                             .setExpertRequired(YES));
 
             assertThat(dq.getExperts()).isEqualTo(experts());
         }
@@ -88,9 +83,8 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenExpertsIsNull() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQExperts(null)
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQExperts(null);
 
             assertThat(dq.getExperts()).isNull();
         }
@@ -102,11 +96,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldRemoveDetails_whenNoWitnessesToAppear() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
-                                            .witnessesToAppear(NO)
-                                            .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQWitnesses(dq.getWitnesses().copy()
+                                               .setWitnessesToAppear(NO));
 
             assertThat(dq.getWitnesses().getDetails()).isNull();
         }
@@ -114,11 +106,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldNotRemoveDetails_whenWitnessesToAppear() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQWitnesses(dq.getWitnesses().toBuilder()
-                                            .witnessesToAppear(YES)
-                                            .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQWitnesses(dq.getWitnesses().copy()
+                                               .setWitnessesToAppear(YES));
 
             assertThat(dq.getWitnesses()).isEqualTo(witnesses());
         }
@@ -126,9 +116,8 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenWitnessesIsNull() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQWitnesses(null)
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQWitnesses(null);
 
             assertThat(dq.getWitnesses()).isNull();
         }
@@ -140,11 +129,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldRemoveUnavailableDates_whenNoUnavailableDatesRequired() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQHearing(dq.getHearing().toBuilder()
-                                          .unavailableDatesRequired(NO)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQHearing(dq.getHearing().copy()
+                                             .setUnavailableDatesRequired(NO));
 
             assertThat(dq.getHearing().getUnavailableDates()).isNull();
         }
@@ -152,11 +139,9 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldNotRemoveUnavailableDates_whenUnavailableDatesRequired() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQHearing(dq.getHearing().toBuilder()
-                                          .unavailableDatesRequired(YES)
-                                          .build())
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQHearing(dq.getHearing().copy()
+                                             .setUnavailableDatesRequired(YES));
 
             assertThat(dq.getHearing().getUnavailableDates()).isEqualTo(hearing().getUnavailableDates());
         }
@@ -164,9 +149,8 @@ class Respondent1DQTest extends DQTest {
         @Test
         void shouldReturnNull_whenUnavailableDatesIsNull() {
             Respondent1DQ dq = buildRespondent1Dq();
-            dq = dq.toBuilder()
-                .respondent1DQHearing(null)
-                .build();
+            dq = dq.copy()
+                .setRespondent1DQHearing(null);
 
             assertThat(dq.getHearing()).isNull();
         }
@@ -189,16 +173,15 @@ class Respondent1DQTest extends DQTest {
                     .build()
             ).map(ElementUtils::element).toList();
 
-            Hearing hearing = buildRespondent1Dq().toBuilder()
-                .respondent1DQHearing(null)
-                .respondent1DQHearingFastClaim(Hearing.builder()
-                                                   .hearingLength(length)
-                                                   .hearingLengthDays(lengthDays)
-                                                   .hearingLengthHours(lengthHours)
-                                                   .unavailableDatesRequired(hasUnavailableDates)
-                                                   .unavailableDates(lrDates)
-                                                   .build())
-                .build().getHearing();
+            Hearing hearing = buildRespondent1Dq().copy()
+                .setRespondent1DQHearing(null)
+                .setRespondent1DQHearingFastClaim(new Hearing()
+                                                      .setHearingLength(length)
+                                                      .setHearingLengthDays(lengthDays)
+                                                      .setHearingLengthHours(lengthHours)
+                                                      .setUnavailableDatesRequired(hasUnavailableDates)
+                                                      .setUnavailableDates(lrDates))
+                .getHearing();
 
             assertThat(hearing.getHearingLength()).isEqualTo(length);
             assertThat(hearing.getHearingLengthDays()).isEqualTo(lengthDays);
@@ -229,13 +212,12 @@ class Respondent1DQTest extends DQTest {
                     .build()
             ).map(ElementUtils::element).toList();
 
-            Hearing hearing = buildRespondent1Dq().toBuilder()
-                .respondent1DQHearing(null)
-                .respondent1DQHearingSmallClaim(SmallClaimHearing.builder()
-                                                   .unavailableDatesRequired(hasUnavailableDates)
-                                                   .smallClaimUnavailableDate(lrDates)
-                                                   .build())
-                .build().getHearing();
+            Hearing hearing = buildRespondent1Dq().copy()
+                .setRespondent1DQHearing(null)
+                .setRespondent1DQHearingSmallClaim(new SmallClaimHearing()
+                                                       .setUnavailableDatesRequired(hasUnavailableDates)
+                                                       .setSmallClaimUnavailableDate(lrDates))
+                .getHearing();
 
             assertThat(hearing.getUnavailableDatesRequired()).isEqualTo(hasUnavailableDates);
             for (int i = 0; i < hearing.getUnavailableDates().size(); i++) {
@@ -256,13 +238,12 @@ class Respondent1DQTest extends DQTest {
         void build_whenRespondToCourtLocation() {
             String reason = "reason";
             String courtCode = "123";
-            RequestedCourt court = buildRespondent1Dq().toBuilder()
-                .respondent1DQRequestedCourt(null)
-                .respondToCourtLocation(RequestedCourt.builder()
-                                            .responseCourtCode(courtCode)
-                                            .reasonForHearingAtSpecificCourt(reason)
-                                            .build())
-                .build().getRequestedCourt();
+            RequestedCourt court = buildRespondent1Dq().copy()
+                .setRespondent1DQRequestedCourt(null)
+                .setRespondToCourtLocation(new RequestedCourt()
+                                               .setResponseCourtCode(courtCode)
+                                               .setReasonForHearingAtSpecificCourt(reason))
+                .getRequestedCourt();
 
             assertThat(court.getResponseCourtCode()).isEqualTo(courtCode);
             assertThat(court.getReasonForHearingAtSpecificCourt()).isEqualTo(reason);

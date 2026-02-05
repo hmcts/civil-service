@@ -57,8 +57,9 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
         }
 
         List<String> recipients = getRecipientsList(caseData);
+        List<String> bulkPrintFileNames = List.of(setAsideLetterCaseDocument.getDocumentLink().getDocumentFileName());
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients);
+                caseData.getLegacyCaseReference(), SET_ASIDE_JUDGMENT_LETTER, recipients, bulkPrintFileNames);
         return letterContent;
     }
 
@@ -74,14 +75,12 @@ public class SetAsideJudgmentInErrorLiPLetterGenerator {
     }
 
     public SetAsideJudgmentInErrorLiPDefendantLetter getTemplateData(CaseData caseData) {
-        return SetAsideJudgmentInErrorLiPDefendantLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .claimantName(caseData.getApplicant1().getPartyName())
-            .defendant(caseData.getRespondent1())
-            .letterIssueDate(LocalDate.now())
-            .issueDate(getJudgmentIssueDate(caseData))
-            .build();
+        return new SetAsideJudgmentInErrorLiPDefendantLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setClaimantName(caseData.getApplicant1().getPartyName())
+            .setDefendant(caseData.getRespondent1())
+            .setLetterIssueDate(LocalDate.now())
+            .setIssueDate(getJudgmentIssueDate(caseData));
     }
 
     private LocalDate getJudgmentIssueDate(CaseData caseData) {

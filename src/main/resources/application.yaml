@@ -26,6 +26,9 @@ spring:
     cache-names: userInfoCache, accessTokenCache
     caffeine:
       spec: expireAfterWrite=3600s
+  jpa:
+    properties:
+      hibernate.query.mutation_strategy: org.hibernate.query.sqm.mutation.internal.inline.InlineMutationStrategy
   datasource:
     driverClassName: org.postgresql.Driver
     username: ${CMC_DB_USERNAME:-}
@@ -123,6 +126,7 @@ genApp:
     keywords:
       withNotice: GAOnNotice
       consentedOrWithoutNotice: GeneralAppWithoutNotice
+      uncloakFee: HACFOOnNotice
       appnToVaryOrSuspend: AppnToVaryOrSuspend
       certificateOfSatisfaction: CoS
   lrd:
@@ -140,6 +144,9 @@ pin-in-post:
     url: ${CUI_URL_RESPOND_TO_CLAIM:http://localhost:3001/first-contact/start}
   cui-front-end:
     url: ${CUI_URL:http://localhost:3001}
+
+cui-front-end:
+  url: ${CUI_URL:http://localhost:3001}
 
 ocmc:
   client:
@@ -207,6 +214,7 @@ civil:
 core_case_data:
   api:
     url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
+    readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
 role-assignment-service:
   api:
     url: ${ROLE_ASSIGNMENT_URL:http://localhost:4096}
@@ -227,7 +235,7 @@ rtl:
 
 dashboard:
   api:
-    url: http://localhost:4000
+    url: ${CIVIL_SERVICE_URL:http://localhost:4000}
 
 migration:
   batchsize: 100
@@ -251,6 +259,8 @@ notifications:
   lipContactEmail: "Email: contactocmc@justice.gov.uk"
   raiseQueryLipWelsh: "I gysylltu â’r llys, dewiswch ‘contact or apply to the court’ ar eich dangosfwrdd."
   lipContactEmailWelsh: "E-bost: ymholiadaucymraeg@justice.gov.uk"
+  specContact: "Email: contactocmc@justice.gov.uk"
+  welshContact: "E-bost: ymholiadaucymraeg@justice.gov.uk"
   breathingSpaceEnterApplicantEmailTemplate: "bb4bc8ea-273b-4303-bc0a-d3121f78a4d8"
   breathingSpaceEnterDefendantEmailTemplate: "a32f5713-fc3b-4250-972f-84da7bd4e9b0"
   breathingSpaceLiftedApplicantEmailTemplate: "50740783-fc24-49bb-a49f-48fcd3213e06"
@@ -521,6 +531,40 @@ notifications:
   partAdmitPayImmediatelyAgreedClaimant: "c8f80d91-5f4f-4396-9955-6c5da13a818b"
   partAdmitPayImmediatelyAgreedDefendant: "d653484b-2e1d-4e65-bea5-b58f23a3f242"
 
+  generalApplicationRespondentEmailTemplate: "c83fad1f-5405-4c4a-b3c4-cc783abe9e27"
+  urgentGeneralAppRespondentEmailTemplate: "d89ef119-8f99-49f2-a7b8-359e5a2a17fa"
+  withNoticeUpdateRespondentEmailTemplate: "ff069e62-aaad-4f5d-9711-ad3df545050b"
+  writtenRepConcurrentRepresentationApplicantEmailTemplate: "e5d77436-4744-482b-9e54-45415902caa2"
+  writtenRepConcurrentRepresentationRespondentEmailTemplate: "22702ecd-10b3-4a05-badb-226f637f655d"
+  writtenRepSequentialRepresentationApplicantEmailTemplate: "17f414a0-ddf1-4953-a6a2-9a711c38818a"
+  writtenRepSequentialRepresentationRespondentEmailTemplate: "a01c1914-4188-4156-a190-d31ca468f8ad"
+  judgeListsForHearingApplicantEmailTemplate: "25b5c79e-aa39-48f7-ba0a-10eb52e8c716"
+  judgeListsForHearingRespondentEmailTemplate: "6df96e87-c913-4fb3-9753-f71888f2254b"
+  judgeForApprovedCaseApplicantEmailTemplate: "1656c5ed-b721-4b48-ba52-3e3d02f51835"
+  judgeForApproveRespondentEmailTemplate: "f40c5560-1c98-43c8-9365-ac787ab6503d"
+  judgeDismissesOrderApplicantEmailTemplate: "c69826ce-59a6-4e30-a6bd-28b5418560dd"
+  judgeDismissesOrderRespondentEmailTemplate: "ac6169db-60ac-4a24-87a9-a92748a52ee5"
+  judgeForDirectionOrderApplicantEmailTemplate: "c5037f93-42ac-4c1c-9b59-6f2556305d22"
+  judgeForDirectionOrderRespondentEmailTemplate: "59e5a5cd-cfd2-4abf-a696-88d238095d6e"
+  judgeRequestForInformationApplicantEmailTemplate: "423ef342-f0fc-43dd-8e3e-c51ec05984db"
+  judgeRequestForInformationRespondentEmailTemplate: "b3d6d4f7-22d0-4083-bb17-0e681d2c7cf0"
+  judgeFreeFormOrderApplicantEmailTemplate: "c5037f93-42ac-4c1c-9b59-6f2556305d22"
+  judgeFreeFormOrderRespondentEmailTemplate: "59e5a5cd-cfd2-4abf-a696-88d238095d6e"
+  judgeUncloakApplicationEmailTemplate: "0e5297c4-7b3f-49f8-a03d-272b10058c3d"
+  judgeApproveOrderToStrikeOutDamages: "882d4194-8dfe-4b1c-a9a7-dfe4e32ffd24"
+  judgeApproveOrderToStrikeOutOCMC: "5bdc28b5-6aa9-4e01-a3c6-7a73bbe22347"
+  hearingNoticeTemplate: "3b99ac55-c033-4c2a-8b05-2916ca1afb0c"
+
+  lipGeneralAppRespondentEmailTemplate: "e88fa6cb-d012-4f0f-b0a0-68d5e07e6632"
+  lipGeneralAppRespondentEmailTemplateInWelsh: "dd60b122-462a-4d6d-91eb-9ef551871640"
+  lipGeneralAppApplicantEmailTemplate: "de6b386e-fcad-466d-a5ca-84931c1fe15a"
+  lipGeneralAppApplicantEmailTemplateInWelsh: "a1a529e2-2c28-4c76-8633-af338dfa6f8c"
+  notifyApplicantForHwfPaymentOutcome: "de6b386e-fcad-466d-a5ca-84931c1fe15a"
+  notifyApplicantLiPTranslatedDocumentUploadedWhenParentCaseInBilingual: "a1a529e2-2c28-4c76-8633-af338dfa6f8c"
+  notifyRespondentLiPTranslatedDocumentUploadedWhenParentCaseInBilingual: "dd60b122-462a-4d6d-91eb-9ef551871640"
+  notifyApplicantForNoRemission: "29c666fe-3ac8-4871-9d16-f44f68de1684"
+  notifyLRTranslatedDocumentUploaded: "979ea25b-1de8-4158-9c04-d22b957fe562"
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
 
@@ -528,6 +572,10 @@ os-postcode-lookup:
   url: https://api.os.uk/search/names/v1/find
   key: ${OS_POSTCODE_LOOKUP_API_KEY:}
   offline-mode: false
+
+print:
+  service:
+    enabled: true
 
 stitching:
   api:
@@ -592,7 +640,7 @@ azure:
     application-insights:
       instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
-appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:dummy}
+appinsights-connection-string: ${APPLICATIONINSIGHTS_CONNECTION_STRING:}
 
 async:
   handler:
@@ -619,7 +667,6 @@ feign:
         loggerLevel: full
       core-case-data-api:
         loggerLevel: full
-        readTimeout: ${REST_TEMPLATE_TIMEOUT:30000}
       document-management-metadata-download-api:
         loggerLevel: full
 
@@ -640,6 +687,10 @@ spring:
     username: ${CMC_DB_USERNAME:ccd}
     password: ${CMC_DB_PASSWORD:ccd}
     url: jdbc:postgresql://${CMC_DB_HOST:localhost}:${CMC_DB_PORT:5050}/${CMC_DB_NAME:cmc}
+
+print:
+  service:
+    enabled: false
 
 fees:
   api:
@@ -745,12 +796,12 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       naming:
-        physical-strategy: com.vladmihalcea.hibernate.type.util.CamelCaseToSnakeCaseNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     properties:
       hibernate:
         show_sql: false
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
     baselineOnMigrate: true
@@ -762,6 +813,10 @@ spring:
 management:
   endpoints:
     enabled-by-default: false
+
+print:
+  service:
+    enabled: true
 
 cmc-claim-store:
   api:

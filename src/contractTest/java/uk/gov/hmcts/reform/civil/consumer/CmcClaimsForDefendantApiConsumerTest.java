@@ -26,8 +26,8 @@ import static uk.gov.hmcts.reform.civil.consumer.CmcConsumerTestUtil.buildBundle
 import static uk.gov.hmcts.reform.cmc.model.ClaimState.OPEN;
 
 @PactTestFor(providerName = "cmc_defendant")
-@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6668")
-@MockServerConfig(hostInterface = "localhost", port = "6668")
+@TestPropertySource(properties = "cmc-claim-store.api.url=http://localhost:6673")
+@MockServerConfig(hostInterface = "localhost", port = "6673")
 public class CmcClaimsForDefendantApiConsumerTest extends BaseContractTest {
 
     public static final String ENDPOINT = "/claims/defendant/";

@@ -10,6 +10,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CaseAccessDataStoreApi;
+import uk.gov.hmcts.reform.ccd.client.CaseAssignmentApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRolesResource;
 import uk.gov.hmcts.reform.ccd.model.AddCaseAssignedUserRolesRequest;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRole;
 import uk.gov.hmcts.reform.ccd.model.CaseAssignedUserRoleWithOrganisation;
@@ -22,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -49,6 +54,9 @@ class CoreCaseUserServiceTest {
 
     @MockBean
     private CaseAccessDataStoreApi caseAccessDataStoreApi;
+
+    @MockBean
+    private CaseAssignmentApi caseAssignmentApi;
 
     @MockBean
     private UserService userService;
@@ -281,8 +289,29 @@ class CoreCaseUserServiceTest {
 
             List<String> caseRoles = service.getUserCaseRoles(CASE_ID, USER_ID);
 
-            assertThat(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
-            assertThat(!caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+            assertTrue(caseRoles.contains("[RESPONDENTSOLICITORONE]"));
+            assertFalse(caseRoles.contains("[RESPONDENTSOLICITORTWO]"));
+        }
+
+        @Test
+        void shouldReturnUserRoles_getUserRoles() {
+            CaseAssignmentUserRolesResource caseAssignedUserRolesResource = CaseAssignmentUserRolesResource.builder()
+                .caseAssignmentUserRoles(List.of(
+                    CaseAssignmentUserRole.builder()
+                        .userId(USER_ID)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                        .build(),
+                    CaseAssignmentUserRole.builder()
+                        .userId(USER_ID2)
+                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                        .build()
+                ))
+                .build();
+
+            when(caseAssignmentApi.getUserRoles(CAA_USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, List.of(CASE_ID)))
+                .thenReturn(caseAssignedUserRolesResource);
+
+            assertThat(service.getUserRoles(CASE_ID).getCaseAssignmentUserRoles()).hasSize(2);
         }
     }
 }

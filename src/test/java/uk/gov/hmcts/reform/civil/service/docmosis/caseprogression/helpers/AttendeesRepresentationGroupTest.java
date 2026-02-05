@@ -42,10 +42,8 @@ public class AttendeesRepresentationGroupTest {
         when(defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, false)).thenReturn("Defendant 1 attends");
         when(defendantAttendsOrRepresentedTextBuilder.defendantBuilder(caseData, true)).thenReturn("Defendant 2 attends");
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = attendeesRepresentationPopulator.populateAttendeesDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = attendeesRepresentationPopulator.populateAttendeesDetails(form, caseData);
         Assertions.assertEquals("Claimant 1 attends", form.getClaimantAttendsOrRepresented());
         Assertions.assertEquals("Claimant 2 attends", form.getClaimantTwoAttendsOrRepresented());
         Assertions.assertEquals("Defendant 1 attends", form.getDefendantAttendsOrRepresented());
@@ -58,10 +56,8 @@ public class AttendeesRepresentationGroupTest {
         Party applicant1 = PartyBuilder.builder().company().build();
         CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).build();
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder();
-        builder = attendeesRepresentationPopulator.populateAttendeesDetails(builder, caseData);
-
-        JudgeFinalOrderForm form = builder.build();
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm();
+        form = attendeesRepresentationPopulator.populateAttendeesDetails(form, caseData);
         Assertions.assertNull(form.getClaimantTwoAttendsOrRepresented());
     }
 
@@ -80,10 +76,10 @@ public class AttendeesRepresentationGroupTest {
     void shouldReturnCorrectOtherRepresentedText_WhenDetailsArePresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged().build().toBuilder()
-            .finalOrderRepresentation(FinalOrderRepresentation.builder()
-                                          .typeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
-                                          .typeRepresentationOtherComplex(ClaimantAndDefendantHeard
-                                                                              .builder().detailsRepresentationText("Test").build()).build())
+            .finalOrderRepresentation(new FinalOrderRepresentation()
+                                          .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
+                                          .setTypeRepresentationOtherComplex(new ClaimantAndDefendantHeard()
+                                                                              .setDetailsRepresentationText("Test")))
             .build();
 
         String result = attendeesRepresentationPopulator.getOtherRepresentedText(caseData);

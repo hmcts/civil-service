@@ -5,9 +5,10 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolTwoEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
 
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.isOneVTwoTwoLegalRep;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimIssuedTransitionBuilder.claimNotified;
 
 @Component
 public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -32,6 +33,8 @@ public class CaseProceedsInCasemanRespSolTwoEmailDTOGenerator extends RespSolTwo
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return claimNotified.test(caseData) && isOneVTwoTwoLegalRep(caseData) ? Boolean.TRUE : Boolean.FALSE;
+        return ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth).test(caseData)
+            && isOneVTwoTwoLegalRep(caseData)
+            ? Boolean.TRUE : Boolean.FALSE;
     }
 }

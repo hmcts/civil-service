@@ -48,9 +48,9 @@ public class InterlocutoryJudgementDocGeneratorTest {
 
         //Given
         CaseData caseData = CaseData.builder().build();
-        InterlocutoryJudgementDoc interlocutoryJudgementDoc = InterlocutoryJudgementDoc.builder().build();
+        InterlocutoryJudgementDoc interlocutoryJudgementDoc = new InterlocutoryJudgementDoc();
         given(mapper.toInterlocutoryJudgementDoc(any())).willReturn(interlocutoryJudgementDoc);
-        DocmosisDocument docmosisDocument = DocmosisDocument.builder().build();
+        DocmosisDocument docmosisDocument = new DocmosisDocument();
 
         given(documentGeneratorService.generateDocmosisDocument(
             any(InterlocutoryJudgementDoc.class),

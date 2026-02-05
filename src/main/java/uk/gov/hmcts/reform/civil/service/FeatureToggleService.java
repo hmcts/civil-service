@@ -3,14 +3,16 @@ package uk.gov.hmcts.reform.civil.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.launchdarkly.FeatureToggleApi;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LipPredicate;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.caseContainsLiP;
+import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowPredicate.caseContainsLiPGa;
 import static uk.gov.hmcts.reform.civil.utils.JudgeReallocatedClaimTrack.judgeReallocatedTrackOrAlreadyMinti;
 
 @Slf4j
@@ -130,8 +132,15 @@ public class FeatureToggleService {
 
     // if deleting this, also handle isQMPdfGeneratorEnabled() below
     public boolean isPublicQueryManagementEnabled(CaseData caseData) {
-        if (caseContainsLiP.test(caseData)) {
+        if (LipPredicate.caseContainsLiP.test(caseData)) {
             return isLipQueryManagementEnabled(caseData);
+        }
+        return true;
+    }
+
+    public boolean isPublicQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        if (caseContainsLiPGa.test(caseData)) {
+            return isLipQueryManagementEnabledGa(caseData);
         }
         return true;
     }
@@ -147,6 +156,16 @@ public class FeatureToggleService {
     public boolean isLipQueryManagementEnabled(CaseData caseData) {
         ZoneId zoneId = ZoneId.systemDefault();
         long epoch = caseData.getSubmittedDate().atZone(zoneId).toEpochSecond();
+        return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
+    }
+
+    public boolean isLipQueryManagementEnabledGa(GeneralApplicationCaseData caseData) {
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDateTime mainCaseSubmittedDate = caseData.getMainCaseSubmittedDate();
+        if (mainCaseSubmittedDate == null) {
+            return false;
+        }
+        long epoch = mainCaseSubmittedDate.atZone(zoneId).toEpochSecond();
         return featureToggleApi.isFeatureEnabledForDate("cui-query-management", epoch, false);
     }
 

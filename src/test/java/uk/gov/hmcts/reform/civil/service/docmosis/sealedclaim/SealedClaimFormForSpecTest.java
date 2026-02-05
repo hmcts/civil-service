@@ -28,13 +28,12 @@ public class SealedClaimFormForSpecTest {
 
     @Test
     public void serializesAsExpectedByDocmosis() throws JsonProcessingException {
-        SealedClaimFormForSpec form = SealedClaimFormForSpec.builder()
-            .timeline(Collections.singletonList(
+        SealedClaimFormForSpec form = new SealedClaimFormForSpec()
+            .setTimeline(Collections.singletonList(
                 new TimelineEventDetailsDocmosis(
                     objectMapper.readerFor(TimelineOfEventDetails.class).readValue(eventAsJson)
                 )
-            ))
-            .build();
+            ));
         @SuppressWarnings({"rawtypes", "unchecked"}) Object serialized = ((Map<String, Object>)
             ((List) form.toMap(objectMapper).get("timeline"))
                 .get(0)).get("timelineDate");

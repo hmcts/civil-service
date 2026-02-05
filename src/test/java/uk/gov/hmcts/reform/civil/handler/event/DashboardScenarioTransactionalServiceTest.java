@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;

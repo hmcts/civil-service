@@ -14,11 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
@@ -37,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
@@ -215,6 +218,116 @@ class NoOngoingBusinessProcessAspectTest {
                     .businessProcess(BusinessProcess.builder().status(status).build())
                     .build()
             );
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+    }
+
+    @Nested
+    class GeneralApplicationUserEventTests {
+
+        @Test
+        @SneakyThrows
+        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess() {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            when(proceedingJoinPoint.proceed()).thenReturn(response);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder().build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .build();
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+
+        @SneakyThrows
+        @ParameterizedTest
+        @NullSource
+        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.INCLUDE)
+        void shouldProceedToMethodInvocation_whenBusinessProcessStatusIsNullOrFinished(BusinessProcessStatus status) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            when(proceedingJoinPoint.proceed()).thenReturn(response);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .build();
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+
+        @SneakyThrows
+        @ParameterizedTest
+        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
+        void shouldNotProceedToMethodInvocation_whenOngoingBusinessProcess(BusinessProcessStatus status) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder()
+                .errors(List.of(ERROR_MESSAGE))
+                .build();
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .build();
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint, never()).proceed();
+        }
+
+        @SneakyThrows
+        @ParameterizedTest
+        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
+        void shouldProceedToMethodInvocation_whenOngoingBusinessProcessOnSubmittedCallback(BusinessProcessStatus status
+        ) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            when(proceedingJoinPoint.proceed()).thenReturn(response);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(SUBMITTED, GeneralApplicationCaseDataBuilder.builder()
+                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .build();
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+    }
+
+    @Nested
+    class CamundaEvent {
+
+        @ParameterizedTest
+        @EnumSource(value = CaseEvent.class, names = {"INITIATE_GENERAL_APPLICATION", "APPLICATION_PROCEEDS_IN_HERITAGE"})
+        @SneakyThrows
+        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess(CaseEvent event) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            when(proceedingJoinPoint.proceed()).thenReturn(response);
+
+            CallbackParams callbackParams = CallbackParamsBuilder.builder()
+                .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder().build())
+                .isGeneralApplicationCase(true)
+                .request(CallbackRequest.builder().eventId(event.name()).build())
+                .build();
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
 

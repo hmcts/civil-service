@@ -23,10 +23,15 @@ import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
+
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
 @Tag(name = "Callback Controller")
 @Slf4j
@@ -61,20 +66,29 @@ public class CallbackController {
         final CaseDetails caseDetails = callback.getCaseDetails();
         final CaseDetails caseDetailsBefore = callback.getCaseDetailsBefore();
         final Long caseId = caseDetails.getId();
+        final boolean generalApplicationCaseType = isGeneralApplication(caseDetails);
 
         MDC.put("caseId", Objects.toString(caseId, ""));
-        log.info("Received callback from CCD, caseId: {}, caseIdBefore: {}, eventId: {}, callback type: {}, page id: {}, version: {}",
-                 caseId,  caseDetailsBefore == null ? null : caseDetailsBefore.getId(), callback.getEventId(), callbackType, pageId, version
+        log.info("Received callback from CCD, caseId: {}, caseIdBefore: {}, caseType: {}, eventId: {}, callback type: {}, page id: {}, version: {}",
+                 caseId,
+                 caseDetailsBefore == null ? null : caseDetailsBefore.getId(),
+                 caseDetails.getCaseTypeId(),
+                 callback.getEventId(),
+                 callbackType,
+                 pageId,
+                 version
         );
 
         CallbackParams callbackParams = CallbackParams.builder()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
-            .params(java.util.Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
             .version(version.orElse(null))
             .pageId(pageId.orElse(null))
-            .caseData(caseDetailsConverter.toCaseData(caseDetails))
-            .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toCaseData(caseDetailsBefore) : null)
+            .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
+            .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
+            .isGeneralApplicationCaseType(generalApplicationCaseType)
+            .isCivilCaseType(!generalApplicationCaseType)
             .build();
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);

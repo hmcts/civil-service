@@ -91,9 +91,8 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .certOfSC(CertOfSC.builder()
-                                    .defendantFinalPaymentDate(markedPaymentDate)
-                                    .build())
+            .certOfSC(new CertOfSC()
+                                    .setDefendantFinalPaymentDate(markedPaymentDate))
             .activeJudgment(activeJudgementWithoutPayment)
             .build();
 
@@ -126,9 +125,8 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
 
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .certOfSC(CertOfSC.builder()
-                                    .defendantFinalPaymentDate(markedPaymentDate)
-                                    .build())
+            .certOfSC(new CertOfSC()
+                                    .setDefendantFinalPaymentDate(markedPaymentDate))
             .activeJudgment(activeJudgementWithoutPayment)
             .build();
 

@@ -64,8 +64,8 @@ class  SealedClaimFormGeneratorForSpecTest {
         .documentType(SEALED_CLAIM)
         .build();
 
-    private final Representative representative1 = Representative.builder().organisationName("test org").build();
-    private final Representative representative2 = Representative.builder().organisationName("test org2").build();
+    private final Representative representative1 = new Representative().setOrganisationName("test org");
+    private final Representative representative2 = new Representative().setOrganisationName("test org2");
 
     @InjectMocks
     private SealedClaimFormGeneratorForSpec sealedClaimFormGenerator;
@@ -91,18 +91,17 @@ class  SealedClaimFormGeneratorForSpecTest {
     }
 
     private Representative getRepresentative() {
-        return Representative.builder()
-            .organisationName("MiguelSpooner")
-            .dxAddress("DX 751Newport")
-            .organisationName("DBE Law")
-            .emailAddress("jim.smith@slatergordon.com")
-            .serviceAddress(Address.builder()
-                                .addressLine1("AdmiralHouse")
-                                .addressLine2("Queensway")
-                                .postTown("Newport")
-                                .postCode("NP204AG")
-                                .build())
-            .build();
+        return new Representative()
+            .setOrganisationName("MiguelSpooner")
+            .setDxAddress("DX 751Newport")
+            .setOrganisationName("DBE Law")
+            .setEmailAddress("jim.smith@slatergordon.com")
+            .setServiceAddress(Address.builder()
+                                   .addressLine1("AdmiralHouse")
+                                   .addressLine2("Queensway")
+                                   .postTown("Newport")
+                                   .postCode("NP204AG")
+                                   .build());
     }
 
     @Test

@@ -5,11 +5,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.PaymentPredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.paymentSuccessful;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -20,6 +19,7 @@ public class ClaimIssuedPaymentFailedTransitionBuilder extends MidTransitionBuil
     }
 
     protected void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions).onlyWhen(paymentSuccessful, transitions);
+        this.moveTo(FlowState.Main.CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions)
+            .onlyWhen(PaymentPredicate.successful, transitions);
     }
 }
