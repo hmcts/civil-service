@@ -1,17 +1,19 @@
 package uk.gov.hmcts.reform.civil.model.docmosis;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Builder(toBuilder = true)
-@Getter
-@EqualsAndHashCode
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class InterlocutoryJudgementDoc implements MappableObject {
 
     private String claimNumber;

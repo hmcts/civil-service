@@ -36,7 +36,7 @@ public class HearingFeeHwfRejectedScenarioTest extends DashboardBaseIntegrationT
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.NO_REMISSION_HWF).build())
+            .hearingHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.NO_REMISSION_HWF))
             .hearingDueDate(LocalDate.of(2024, 4, 4))
             .hwfFeeType(FeeType.HEARING)
             .build();

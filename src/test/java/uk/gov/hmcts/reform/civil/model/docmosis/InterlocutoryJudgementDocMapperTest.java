@@ -179,12 +179,9 @@ public class InterlocutoryJudgementDocMapperTest {
         //Given
         caseData = getCaseData();
         caseData = caseData.toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1RejectedRepaymentReason("Rejected in test")
-                                                        .build())
-
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1RejectedRepaymentReason("Rejected in test")))
             .build();
 
         // When
@@ -195,18 +192,17 @@ public class InterlocutoryJudgementDocMapperTest {
     }
 
     private static InterlocutoryJudgementDoc getInterlocutoryJudgementDoc() {
-        return InterlocutoryJudgementDoc.builder()
-            .claimIssueDate(ISSUE_DATE)
-            .claimNumber(CLAIM_NUMBER)
-            .claimantRequestRepaymentBy("Immediately")
-            .claimantResponseSubmitDateTime(CLAIMANT_RESPONSE_DATE_TIME)
-            .claimantResponseToDefendantAdmission("I accept part admission")
-            .courtDecisionRepaymentBy("By a set date")
-            .courtDecisionRepaymentLastDateBy(LocalDate.of(2024, 10, 10))
-            .formalisePaymentBy(REFER_TO_JUDGE)
-            .formattedDisposableIncome("-£100.98")
-            .rejectionReason("Rejected")
-            .build();
+        return new InterlocutoryJudgementDoc()
+            .setClaimIssueDate(ISSUE_DATE)
+            .setClaimNumber(CLAIM_NUMBER)
+            .setClaimantRequestRepaymentBy("Immediately")
+            .setClaimantResponseSubmitDateTime(CLAIMANT_RESPONSE_DATE_TIME)
+            .setClaimantResponseToDefendantAdmission("I accept part admission")
+            .setCourtDecisionRepaymentBy("By a set date")
+            .setCourtDecisionRepaymentLastDateBy(LocalDate.of(2024, 10, 10))
+            .setFormalisePaymentBy(REFER_TO_JUDGE)
+            .setFormattedDisposableIncome("-£100.98")
+            .setRejectionReason("Rejected");
     }
 
     private static CaseData getCaseData() {
@@ -217,11 +213,9 @@ public class InterlocutoryJudgementDocMapperTest {
             .applicant1ResponseDate(CLAIMANT_RESPONSE_DATE_TIME)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1RejectedRepaymentReason("Rejected")
-                                                        .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1RejectedRepaymentReason("Rejected")))
             .build();
     }
 

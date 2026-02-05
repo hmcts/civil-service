@@ -389,6 +389,7 @@ public class GeneralApplicationCaseData extends BaseCaseData implements Mappable
     private YesOrNo bilingualHint;
     private YesOrNo applicantBilingualLanguagePreference;
     private YesOrNo respondentBilingualLanguagePreference;
+    private LocalDateTime generalAppSubmittedDateGAspec;
 
     @JsonIgnore
     public boolean isHWFTypeApplication() {

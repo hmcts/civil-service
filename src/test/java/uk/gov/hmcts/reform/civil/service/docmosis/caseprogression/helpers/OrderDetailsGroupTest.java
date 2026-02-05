@@ -30,29 +30,29 @@ public class OrderDetailsGroupTest {
     @Test
     void shouldPopulateOrderDetails_WhenAllFieldsArePresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .orderOnCourtInitiative(FreeFormOrderValues.builder().onInitiativeSelectionTextArea("On initiative text").onInitiativeSelectionDate(
-                LocalDate.now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues().setOnInitiativeSelectionTextArea("On initiative text")
+                                     .setOnInitiativeSelectionDate(LocalDate.now()))
             .freeFormRecordedTextArea("Recorded text")
             .freeFormOrderedTextArea("Ordered text")
-            .orderMadeOnDetailsOrderCourt(OrderMadeOnDetails.builder().ownInitiativeText("On initiative text").build())
-            .orderWithoutNotice(FreeFormOrderValues.builder().withoutNoticeSelectionTextArea("Without notice text")
-                                    .withoutNoticeSelectionDate(LocalDate.now()).build())
+            .orderMadeOnDetailsOrderCourt(new OrderMadeOnDetails().setOwnInitiativeText("On initiative text"))
+            .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("Without notice text")
+                               .setWithoutNoticeSelectionDate(LocalDate.now()))
             .build();
         String freeFormRecordedText = "Recorded text";
         String freeFormOrderedText = "Ordered text";
 
-        JudgeFinalOrderForm.JudgeFinalOrderFormBuilder builder = JudgeFinalOrderForm.builder()
-            .freeFormOrderedText("Ordered Text")
-            .freeFormRecordedText("Recorded text");
+        JudgeFinalOrderForm form = new JudgeFinalOrderForm()
+            .setFreeFormOrderedText("Ordered Text")
+            .setFreeFormRecordedText("Recorded text");
 
-        builder = orderDetailsPopulator.populateOrderDetails(builder, caseData);
+        form = orderDetailsPopulator.populateOrderDetails(form, caseData);
 
         String onInitiativeText = "On initiative text";
         LocalDate onInitiativeDate = LocalDate.now();
         String withoutNoticeText = "Without notice text";
         LocalDate withoutNoticeDate = LocalDate.now();
 
-        JudgeFinalOrderForm result = builder.build();
+        JudgeFinalOrderForm result = form;
         Assertions.assertEquals(freeFormRecordedText, result.getFreeFormRecordedText());
         Assertions.assertEquals(freeFormOrderedText, result.getFreeFormOrderedText());
         Assertions.assertEquals(onInitiativeText, result.getOnInitiativeSelectionText());
@@ -72,43 +72,39 @@ public class OrderDetailsGroupTest {
         return Stream.of(
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().singleDateSelection(DatesFinalOrders.builder()
-                                                                                            .singleDate(LocalDate.of(
+                    .finalOrderDateHeardComplex(new OrderMade().setSingleDateSelection(new DatesFinalOrders()
+                                                                                            .setSingleDate(LocalDate.of(
                                                                                                 2023,
                                                                                                 9,
                                                                                                 15
-                                                                                            ))
-                                                                                            .build()).build()).build(),
+                                                                                            )))).build(),
                 "on 15 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().dateRangeSelection(DatesFinalOrders.builder()
-                                                                                           .dateRangeFrom(LocalDate.of(
+                    .finalOrderDateHeardComplex(new OrderMade().setDateRangeSelection(new DatesFinalOrders()
+                                                                                           .setDateRangeFrom(LocalDate.of(
                                                                                                2023,
                                                                                                9,
                                                                                                13
                                                                                            ))
-                                                                                           .dateRangeTo(LocalDate.of(
+                                                                                           .setDateRangeTo(LocalDate.of(
                                                                                                2023,
                                                                                                9,
                                                                                                14
-                                                                                           ))
-                                                                                           .build()).build()).build(),
+                                                                                           )))).build(),
                 "between 13 September 2023 and 14 September 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(DatesFinalOrders.builder()
-                                                                                              .bespokeRangeTextArea(
-                                                                                                  "date between 12 feb 2023, and 14 feb 2023")
-                                                                                              .build()).build()).build(),
+                    .finalOrderDateHeardComplex(new OrderMade().setBespokeRangeSelection(new DatesFinalOrders()
+                                                                                              .setBespokeRangeTextArea(
+                                                                                                  "date between 12 feb 2023, and 14 feb 2023"))).build(),
                 "on date between 12 feb 2023, and 14 feb 2023"
             ),
             Arguments.of(
                 CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                    .finalOrderDateHeardComplex(OrderMade.builder().bespokeRangeSelection(null)
-                                                    .build()).build(),
+                    .finalOrderDateHeardComplex(new OrderMade().setBespokeRangeSelection(null)).build(),
                 null
             )
         );

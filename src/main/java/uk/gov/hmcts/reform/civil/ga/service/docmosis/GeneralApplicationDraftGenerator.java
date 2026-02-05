@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.ga.model.docmosis.GADraftForm;
 import uk.gov.hmcts.reform.civil.ga.model.docmosis.UnavailableDates;
@@ -63,6 +64,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
 
         GADraftForm.GADraftFormBuilder gaDraftFormBuilder =
             GADraftForm.builder()
+                .applicationId(caseData.getCcdCaseReference().toString())
                 .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .claimantName(claimantName)
                 .defendantName(defendantName)
@@ -119,6 +121,8 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                 .role(caseData.getGeneralAppStatementOfTruth() != null && caseData
                     .getGeneralAppStatementOfTruth().getRole() != null ? caseData
                     .getGeneralAppStatementOfTruth().getRole() : null)
+                .submittedDate(caseData.getGeneralAppSubmittedDateGAspec().toLocalDate())
+                .issueDate(getPaymentDate(caseData))
                 .date(LocalDate.now());
 
         if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() >= ONE_V_ONE) {
@@ -196,6 +200,14 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         }
 
         return gaDraftFormBuilder.build();
+    }
+
+    private LocalDate getPaymentDate(GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        if (generalAppPBADetails != null && generalAppPBADetails.getPaymentSuccessfulDate() != null) {
+            return generalAppPBADetails.getPaymentSuccessfulDate().toLocalDate();
+        }
+        return caseData.getGeneralAppSubmittedDateGAspec().toLocalDate();
     }
 
     private YesOrNo isWithNoticeApplication(GeneralApplicationCaseData caseData) {
@@ -338,6 +350,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
     public CaseDocument generate(GeneralApplicationCaseData caseData, String authorisation) {
         try {
             GADraftForm templateData = getTemplateData(caseData);
+            log.info("Generate general application draft for caseId: {} and Submitted Date {}", caseData.getCcdCaseReference(), templateData.getSubmittedDate());
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate();
 
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
