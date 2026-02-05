@@ -37,7 +37,7 @@ public class FinalOrderDefendantDashboardService extends DashboardScenarioServic
     @Override
     protected String getScenario(CaseData caseData) {
 
-        dashboardTasksHelper.makeTasksInactiveForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
         final String scenario;
 

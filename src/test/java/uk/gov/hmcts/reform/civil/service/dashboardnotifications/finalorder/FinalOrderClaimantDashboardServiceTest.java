@@ -63,7 +63,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
 
     @Test
@@ -87,7 +87,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
 
     @Test
@@ -102,7 +102,7 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
 
     @Test
@@ -118,7 +118,7 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
 
     @Test
@@ -135,6 +135,6 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
     }
 }

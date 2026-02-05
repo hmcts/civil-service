@@ -54,7 +54,7 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
 
         if (dashboardDecisionHelper.isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
-            dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+            dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
             selectedScenario = SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         } else if (dashboardDecisionHelper.isCarmApplicableCase(caseData)
             && dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(caseData)
@@ -68,7 +68,7 @@ public class CreateSdoClaimantDashboardService extends DashboardScenarioService 
         } else if (dashboardDecisionHelper.isSDODrawnPreCPRelease(caseData)) {
             selectedScenario = SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         } else {
-            dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+            dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
             selectedScenario = SCENARIO_AAA6_CP_ORDER_MADE_CLAIMANT.getScenario();
         }
 

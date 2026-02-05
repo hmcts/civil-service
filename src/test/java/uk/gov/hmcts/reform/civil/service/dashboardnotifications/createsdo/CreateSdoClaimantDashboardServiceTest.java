@@ -87,7 +87,7 @@ class CreateSdoClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -107,7 +107,7 @@ class CreateSdoClaimantDashboardServiceTest {
         createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -126,7 +126,7 @@ class CreateSdoClaimantDashboardServiceTest {
         createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -145,7 +145,7 @@ class CreateSdoClaimantDashboardServiceTest {
         createSdoClaimantDashboardService.notifySdoCreated(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -280,7 +280,7 @@ class CreateSdoClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test
@@ -314,7 +314,7 @@ class CreateSdoClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).makeTasksInactiveForClaimant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData);
     }
 
     @Test

@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,8 @@ class DashboardTasksHelperTest {
     private TaskListService taskListService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private DashboardNotificationService dashboardNotificationService;
 
     @InjectMocks
     private DashboardTasksHelper dashboardTasksHelper;
@@ -33,27 +36,33 @@ class DashboardTasksHelperTest {
         CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
-        dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             CCD_REFERENCE.toString(),
             "CLAIMANT",
             "Applications"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "CLAIMANT");
     }
 
     @Test
-    void shouldMakeTasksInactiveForClaimantWhenNoWhitelistOrCuiGaNro() {
+    void shouldDeleteNotificationAndInactiveTasksForClaimantWhenNoWhitelistOrCuiGaNro() {
         CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
         when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
 
-        dashboardTasksHelper.makeTasksInactiveForClaimant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForClaimant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             CCD_REFERENCE.toString(),
             "CLAIMANT"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "CLAIMANT");
     }
 
     @Test
@@ -62,13 +71,16 @@ class DashboardTasksHelperTest {
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
         when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
 
-        dashboardTasksHelper.makeTasksInactiveForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             CCD_REFERENCE.toString(),
             "DEFENDANT",
             "Applications"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "DEFENDANT");
     }
 
     @Test
@@ -76,27 +88,33 @@ class DashboardTasksHelperTest {
         CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(true);
 
-        dashboardTasksHelper.makeTasksInactiveForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             CCD_REFERENCE.toString(),
             "DEFENDANT",
             "Applications"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "DEFENDANT");
     }
 
     @Test
-    void shouldMakeTasksInactiveForDefendantWhenNoWhitelistOrCuiGaNro() {
+    void shouldDeleteNotificationAndInactiveTasksForDefendantWhenNoWhitelistOrCuiGaNro() {
         CaseData caseData = caseData(BASE_LOCATION, CCD_REFERENCE);
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
         when(featureToggleService.isCuiGaNroEnabled()).thenReturn(false);
 
-        dashboardTasksHelper.makeTasksInactiveForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
             CCD_REFERENCE.toString(),
             "DEFENDANT"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "DEFENDANT");
     }
 
     @Test
@@ -105,21 +123,22 @@ class DashboardTasksHelperTest {
         when(featureToggleService.isLocationWhiteListed(BASE_LOCATION)).thenReturn(false);
         when(featureToggleService.isCuiGaNroEnabled()).thenReturn(true);
 
-        dashboardTasksHelper.makeTasksInactiveForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
 
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             CCD_REFERENCE.toString(),
             "DEFENDANT",
             "Applications"
         );
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
+            CCD_REFERENCE.toString(),
+            "DEFENDANT");
     }
 
     private CaseData caseData(String baseLocation, Long ccdCaseReference) {
         return new CaseDataBuilder()
             .ccdCaseReference(ccdCaseReference)
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation(baseLocation)
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(baseLocation))
             .build();
     }
 }
