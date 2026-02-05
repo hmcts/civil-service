@@ -27,8 +27,8 @@ public class DefendantAcceptSettlementAgreementDefendantScenarioTest extends Das
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build()
             .toBuilder()
             .caseDataLiP(
-                CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES
-                ).build()
+                new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES
+                )
             )
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

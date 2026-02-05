@@ -83,11 +83,10 @@ class ExpenditureCalculatorTest {
     }
 
     private List<Element<RecurringExpenseLRspec>> createExpensesList() {
-        return wrapElements(RecurringExpenseLRspec.builder()
-                                .amount(new BigDecimal(20000))
-                                .frequency(ONCE_TWO_WEEKS)
-                                .type(MORTGAGE)
-                                .build());
+        return wrapElements(new RecurringExpenseLRspec()
+                                .setAmount(new BigDecimal(20000))
+                                .setFrequency(ONCE_TWO_WEEKS)
+                                .setType(MORTGAGE));
     }
 
     private Respondent1DebtLRspec createDebtsWithoutCreditCard() {
