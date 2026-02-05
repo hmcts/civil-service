@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - Fast Track Hearing",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "civil" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "hearing" },
+      "keyword": { "equalTo": "FastTrackHrg" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0441",
+      "description": "Civil Court fees - Hearing fees - Fast track",
+      "version": 1,
+      "fee_amount": 546.00
+    }
+  }
+}

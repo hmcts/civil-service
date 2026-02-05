@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - Multi Track Hearing",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "civil" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "hearing" },
+      "keyword": { "equalTo": "MultiTrackHrg" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0442",
+      "description": "Civil Court fees - Hearing fees - Multi track",
+      "version": 1,
+      "fee_amount": 1090.00
+    }
+  }
+}
