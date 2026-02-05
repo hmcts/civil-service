@@ -166,7 +166,7 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
-    setCivilServiceUrls("civil-citizen-ui-pr-${CHANGE_ID}")
+    setCivilServiceUrls("civil-service-pr-${CHANGE_ID}")
     retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
@@ -261,13 +261,13 @@ def setCivilServiceUrls(suffix){
     env.CIVIL_GENERAL_APPLICATIONS_URL="https://civil-service-staging.aat.platform.hmcts.net"
     env.AAC_API_URL="https://civil-service-manage-case-assignment-staging.aat.platform.hmcts.net"
   } else {
-    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-citizen-ui-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_DATA_STORE_URL = "https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_URL="https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL="https://civil-citizen-ui-pr-${CHANGE_ID}-civil-service.preview.platform.hmcts.net"
-    env.CIVIL_GENERAL_APPLICATIONS_URL="https://civil-citizen-ui-pr-${CHANGE_ID}-civil-service.preview.platform.hmcts.net"
-    env.AAC_API_URL="https://manage-case-assignment-civil-citizen-ui-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-civil-citizen-ui-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CIVIL_SERVICE_URL="https://civil-service-pr-${CHANGE_ID}-civil-service.preview.platform.hmcts.net"
+    env.CIVIL_GENERAL_APPLICATIONS_URL="https://civil-service-pr-${CHANGE_ID}-civil-service.preview.platform.hmcts.net"
+    env.AAC_API_URL="https://manage-case-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-civil-service-ui-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   }
   env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
