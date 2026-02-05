@@ -1,0 +1,48 @@
+{
+  "name": "Fees API - Health Check",
+  "request": {
+    "method": "GET",
+    "urlPath": "/health"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "UP",
+      "components": {
+        "db": {
+          "status": "UP",
+          "details": {
+            "database": "PostgreSQL",
+            "validationQuery": "isValid()"
+          }
+        },
+        "diskSpace": {
+          "status": "UP",
+          "details": {
+            "total": 133003395072,
+            "free": 26513068032,
+            "threshold": 10485760,
+            "path": "/opt/app/.",
+            "exists": true
+          }
+        },
+        "livenessState": {
+          "status": "UP"
+        },
+        "ping": {
+          "status": "UP"
+        },
+        "readinessState": {
+          "status": "UP"
+        }
+      },
+      "groups": [
+        "liveness",
+        "readiness"
+      ]
+    }
+  }
+}
