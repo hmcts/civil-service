@@ -47,7 +47,7 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSDOrderDj
+                callbackKey(ABOUT_TO_SUBMIT), this::notifyClaimantSDOrderDj
         );
     }
 
@@ -59,15 +59,15 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     private CallbackResponse notifyClaimantSDOrderDj(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         notificationService.sendMail(
-            caseData.isApplicant1NotRepresented()
-                ? caseData.getClaimantUserDetails().getEmail()
-                : caseData.getApplicantSolicitor1UserDetails().getEmail(),
-            notificationsProperties.getStandardDirectionOrderDJTemplate(),
-            addProperties(caseData),
-            String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
+                caseData.isApplicant1NotRepresented()
+                        ? caseData.getClaimantUserDetails().getEmail()
+                        : caseData.getApplicantSolicitor1UserDetails().getEmail(),
+                notificationsProperties.getStandardDirectionOrderDJTemplate(),
+                addProperties(caseData),
+                String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference()));
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseData.toMap(objectMapper))
-            .build();
+                .data(caseData.toMap(objectMapper))
+                .build();
     }
 
     @Override
@@ -78,21 +78,21 @@ public class StandardDirectionOrderDJClaimantNotificationHandler extends Callbac
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
         HashMap<String, String> properties = new HashMap<>(Map.of(
-            LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
-            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-            CASEMAN_REF, caseData.getLegacyCaseReference()
+                LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
+                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+                CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                          featureToggleService.isPublicQueryManagementEnabled(caseData));
+                featureToggleService.isPublicQueryManagementEnabled(caseData));
         return properties;
     }
 
     private String getLegalOrganizationName(final CaseData caseData) {
         if (nonNull(caseData.getApplicant1OrganisationPolicy().getOrganisation())) {
             Optional<Organisation> organisation = organisationService
-                .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
-                                          .getOrganisation().getOrganisationID());
+                    .findOrganisationById(caseData.getApplicant1OrganisationPolicy()
+                            .getOrganisation().getOrganisationID());
             if (organisation.isPresent()) {
                 return organisation.get().getName();
             }

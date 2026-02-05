@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECON
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     RequestReconsiderationGeneratorService.class,
+    SdoCaseClassificationService.class,
     JacksonAutoConfiguration.class
 })
 class RequestReconsiderationGeneratorServiceTest {
