@@ -99,8 +99,10 @@ class DefendantSignSettlementAgreementDefendantDashboardServiceTest {
     }
 
     private CaseData baseCaseData(YesOrNo settlementDecision, YesOrNo respondentRepresented) {
+        CaseDataLiP caseDataLip = new CaseDataLiP();
+        caseDataLip.setRespondentSignSettlementAgreement(settlementDecision);
         return CaseDataBuilder.builder()
-            .caseDataLip(CaseDataLiP.builder().respondentSignSettlementAgreement(settlementDecision).build())
+            .caseDataLip(caseDataLip)
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(respondentRepresented)
             .ccdCaseReference(4567L)
