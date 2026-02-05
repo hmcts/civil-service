@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.helper;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,10 +23,14 @@ public class DashboardNotificationHelper {
 
     private final FeatureToggleService featureToggleService;
     private final SimpleStateFlowEngine simpleStateFlowEngine;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
-    public DashboardNotificationHelper(FeatureToggleService featureToggleService, SimpleStateFlowEngine simpleStateFlowEngine) {
+    public DashboardNotificationHelper(FeatureToggleService featureToggleService,
+                                       SimpleStateFlowEngine simpleStateFlowEngine,
+                                       SdoCaseClassificationService sdoCaseClassificationService) {
         this.featureToggleService = featureToggleService;
         this.simpleStateFlowEngine = simpleStateFlowEngine;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     public boolean hasUploadDocuments(CaseData caseData) {
@@ -74,7 +78,7 @@ public class DashboardNotificationHelper {
     }
 
     public boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 
     private AllocatedTrack getPreviousAllocatedTrack(CaseData caseData) {

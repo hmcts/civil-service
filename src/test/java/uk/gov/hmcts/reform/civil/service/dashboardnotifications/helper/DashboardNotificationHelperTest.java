@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions;
 import uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason;
-import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Mediation;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -20,6 +19,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 
 import java.math.BigDecimal;
@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.DecisionOnRequestReconsiderationOptions.CREATE_SDO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +43,9 @@ class DashboardNotificationHelperTest {
 
     @Mock
     private SimpleStateFlowEngine simpleStateFlowEngine;
+
+    @Mock
+    private SdoCaseClassificationService sdoCaseClassificationService;
 
     @InjectMocks
     private DashboardNotificationHelper dashboardDecisionHelper;
@@ -369,9 +371,9 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnTrue_whenFastTrackAndTrialReadyApplicantIsNull() {
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
             caseData.setTrialReadyApplicant(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
             assertTrue(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
         }
@@ -379,9 +381,9 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnFalse_whenNotFastTrackAndTrialReadyApplicantIsNull() {
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
             caseData.setTrialReadyApplicant(null);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
 
             assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
         }
@@ -389,9 +391,9 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnFalse_whenFastTrackAndTrialReadyApplicantIsSet() {
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setDrawDirectionsOrderRequired(NO);
-            caseData.setClaimsTrack(ClaimsTrack.fastTrack);
             caseData.setTrialReadyApplicant(YES);
+
+            when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
             assertFalse(dashboardDecisionHelper.isOrderMadeFastTrackTrialNotResponded(caseData));
         }
