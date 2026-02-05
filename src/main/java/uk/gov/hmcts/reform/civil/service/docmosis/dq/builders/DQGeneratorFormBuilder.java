@@ -83,26 +83,26 @@ public class DQGeneratorFormBuilder {
     static final String ORGANISATION_NAME = "Organisation name";
 
     @NotNull
-    public DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder getDirectionsQuestionnaireFormBuilder(CaseData caseData, String authorisation) {
+    public DirectionsQuestionnaireForm getDirectionsQuestionnaireForm(CaseData caseData, String authorisation) {
         boolean claimantResponseLRspec = isClaimantResponse(caseData)
             && SPEC_CLAIM.equals(caseData.getCaseAccessCategory());
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder()
-            .caseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .solicitorReferences(DocmosisTemplateDataUtils
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm()
+            .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference())
+            .setSolicitorReferences(DocmosisTemplateDataUtils
                                      .fetchSolicitorReferences(caseData))
-            .respondents(respondentsForDQGeneratorTask.getRespondents(caseData, null))
-            .applicants(claimantResponseLRspec ? getApplicants(caseData) : null)
-            .allocatedTrack(getClaimTrack(caseData));
+            .setRespondents(respondentsForDQGeneratorTask.getRespondents(caseData, null))
+            .setApplicants(claimantResponseLRspec ? getApplicants(caseData) : null)
+            .setAllocatedTrack(getClaimTrack(caseData));
 
         if (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
-            builder.statementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
+            form.setStatementOfTruthText(createStatementOfTruthText(isRespondentState(caseData)));
         }
-        DQ dq = getDQAndSetSubmittedOn(builder, caseData);
+        DQ dq = getDQAndSetSubmittedOn(form, caseData);
 
         if (!claimantResponseLRspec) {
-            setApplicantsForDQGenerator.setApplicants(builder, caseData);
+            setApplicantsForDQGenerator.setApplicants(form, caseData);
         }
 
         Witnesses witnesses = respondentTemplateForDQGenerator.getWitnesses(dq);
@@ -120,41 +120,41 @@ public class DQGeneratorFormBuilder {
             specAndSmallClaim = true;
         }
 
-        builder.fileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
-            .fixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(
+        form.setFileDirectionsQuestionnaire(dq.getFileDirectionQuestionnaire())
+            .setFixedRecoverableCosts(FixedRecoverableCostsSection.from(INTERMEDIATE_CLAIM.toString().equals(getClaimTrack(
                 caseData))
                                                                          ? dq.getFixedRecoverableCostsIntermediate()
                                                                          : dq.getFixedRecoverableCosts()))
-            .disclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                  ? dq.getDisclosureOfElectronicDocuments() : dq.getSpecDisclosureOfElectronicDocuments())
-            .disclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            .setDisclosureOfNonElectronicDocuments(UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                     ? dq.getDisclosureOfNonElectronicDocuments() : dq.getSpecDisclosureOfNonElectronicDocuments())
-            .deterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
-            .deterWithoutHearingWhyNot(getDeterWithoutHearing(
+            .setDeterWithoutHearingYesNo(getDeterWithoutHearing(caseData, dq))
+            .setDeterWithoutHearingWhyNot(getDeterWithoutHearing(
                 caseData,
                 dq
             ) != null && dq.getDeterWithoutHearing().getDeterWithoutHearingYesNo().equals(NO)
                                            ? dq.getDeterWithoutHearing().getDeterWithoutHearingWhyNot() : null)
-            .experts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(
+            .setExperts(!specAndSmallClaim ? respondentTemplateForDQGenerator.getExperts(dq) : respondentTemplateForDQGenerator.getSmallClaimExperts(
                 dq,
                 caseData,
                 null
             ))
-            .witnesses(witnesses)
-            .witnessesIncludingDefendants(witnessesIncludingDefendants)
-            .hearing(getHearing(dq))
+            .setWitnesses(witnesses)
+            .setWitnessesIncludingDefendants(witnessesIncludingDefendants)
+            .setHearing(getHearing(dq))
             //Remove hearingSupport after hnl released
-            .hearingSupport(respondentTemplateForDQGenerator.getHearingSupport(dq))
-            .support(dq.getHearingSupport())
-            .furtherInformation(getFurtherInformation(dq, caseData))
-            .welshLanguageRequirements(respondentTemplateForDQGenerator.getWelshLanguageRequirements(dq))
-            .statementOfTruth(dq.getStatementOfTruth())
-            .disclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
-            .vulnerabilityQuestions(dq.getVulnerabilityQuestions())
-            .requestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation));
+            .setHearingSupport(respondentTemplateForDQGenerator.getHearingSupport(dq))
+            .setSupport(dq.getHearingSupport())
+            .setFurtherInformation(getFurtherInformation(dq, caseData))
+            .setWelshLanguageRequirements(respondentTemplateForDQGenerator.getWelshLanguageRequirements(dq))
+            .setStatementOfTruth(dq.getStatementOfTruth())
+            .setDisclosureReport(shouldDisplayDisclosureReport(caseData) ? dq.getDisclosureReport() : null)
+            .setVulnerabilityQuestions(dq.getVulnerabilityQuestions())
+            .setRequestedCourt(respondentTemplateForDQGenerator.getRequestedCourt(dq, authorisation));
 
-        setRepresentativeOrganisationName(builder, caseData);
-        return builder;
+        setRepresentativeOrganisationName(form, caseData);
+        return form;
     }
 
     public static boolean isClaimantResponse(CaseData caseData) {
@@ -175,46 +175,41 @@ public class DQGeneratorFormBuilder {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
             && TWO_V_ONE.equals(getMultiPartyScenario(caseData))) {
             return List.of(
-                Party.builder()
-                    .name(applicant.getPartyName())
-                    .emailAddress(caseData.getApplicant1().getPartyEmail())
-                    .phoneNumber(caseData.getApplicant1().getPartyPhone())
-                    .primaryAddress(applicant.getPrimaryAddress())
-                    .representative(respondentRepresentative)
-                    .litigationFriendName(
+                new Party()
+                    .setName(applicant.getPartyName())
+                    .setEmailAddress(caseData.getApplicant1().getPartyEmail())
+                    .setPhoneNumber(caseData.getApplicant1().getPartyPhone())
+                    .setPrimaryAddress(applicant.getPrimaryAddress())
+                    .setRepresentative(respondentRepresentative)
+                    .setLitigationFriendName(
                         ofNullable(litigationFriend)
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .legalRepHeading(legalRepHeading)
-                    .build(),
-                Party.builder()
-                    .name(applicant2.getPartyName())
-                    .emailAddress(caseData.getApplicant2().getPartyEmail())
-                    .phoneNumber(caseData.getApplicant2().getPartyPhone())
-                    .primaryAddress(applicant2.getPrimaryAddress())
-                    .representative(respondentRepresentative)
-                    .litigationFriendName(
+                    .setLegalRepHeading(legalRepHeading),
+                new Party()
+                    .setName(applicant2.getPartyName())
+                    .setEmailAddress(caseData.getApplicant2().getPartyEmail())
+                    .setPhoneNumber(caseData.getApplicant2().getPartyPhone())
+                    .setPrimaryAddress(applicant2.getPrimaryAddress())
+                    .setRepresentative(respondentRepresentative)
+                    .setLitigationFriendName(
                         ofNullable(litigationFriend)
                             .map(LitigationFriend::getFullName)
                             .orElse(""))
-                    .legalRepHeading(legalRepHeading)
-                    .build()
+                    .setLegalRepHeading(legalRepHeading)
             );
         }
-        return List.of(Party.builder()
-                           .name(applicant.getPartyName())
-                           .emailAddress(applicant.getPartyEmail())
-                           .phoneNumber(applicant.getPartyPhone())
-                           .primaryAddress(applicant.getPrimaryAddress())
-                           .representative(respondentRepresentative)
-                           .litigationFriendName(
+        return List.of(new Party()
+                           .setName(applicant.getPartyName())
+                           .setEmailAddress(applicant.getPartyEmail())
+                           .setPhoneNumber(applicant.getPartyPhone())
+                           .setPrimaryAddress(applicant.getPrimaryAddress())
+                           .setRepresentative(respondentRepresentative)
+                           .setLitigationFriendName(
                                ofNullable(litigationFriend)
                                    .map(LitigationFriend::getFullName)
                                    .orElse(""))
-                           .phoneNumber(applicant.getPartyPhone())
-                           .emailAddress(applicant.getPartyEmail())
-                           .legalRepHeading(legalRepHeading)
-                           .build());
+                           .setLegalRepHeading(legalRepHeading));
     }
 
     private String getClaimTrack(CaseData caseData) {
@@ -274,43 +269,43 @@ public class DQGeneratorFormBuilder {
             || PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA.fullName().equals(state);
     }
 
-    private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+    private DQ getDQAndSetSubmittedOn(DirectionsQuestionnaireForm form,
                                       CaseData caseData) {
         if (isClaimantResponse(caseData)) {
             if (onlyApplicant2IsProceeding(caseData)) {
-                builder.submittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
+                form.setSubmittedOn(caseData.getApplicant2ResponseDate().toLocalDate());
                 return caseData.getApplicant2DQ();
             } else {
-                builder.submittedOn(caseData.getApplicant1ResponseDate().toLocalDate());
+                form.setSubmittedOn(caseData.getApplicant1ResponseDate().toLocalDate());
                 return caseData.getApplicant1DQ();
             }
         } else {
             if (isRespondent2(caseData)) {
-                builder.submittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
+                form.setSubmittedOn(caseData.getRespondent2ResponseDate().toLocalDate());
                 return caseData.getRespondent2DQ();
             } else {
-                builder.submittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
+                form.setSubmittedOn(caseData.getRespondent1ResponseDate().toLocalDate());
                 return caseData.getRespondent1DQ();
             }
         }
     }
 
-    private void setRepresentativeOrganisationName(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+    private void setRepresentativeOrganisationName(DirectionsQuestionnaireForm form,
                                                    CaseData caseData) {
         String businessProcess = Optional.ofNullable(caseData.getBusinessProcess())
             .map(BusinessProcess::getCamundaEvent)
             .orElse(null);
 
         if (StringUtils.equals(businessProcess, "CLAIMANT_RESPONSE")) {
-            setOrgNameFromParties(builder, Collections.singletonList(builder.build().getApplicant()));
+            setOrgNameFromParties(form, Collections.singletonList(form.getApplicant()));
         } else if (StringUtils.equals(businessProcess, "CLAIMANT_RESPONSE_SPEC")) {
-            setOrgNameFromParties(builder, builder.build().getApplicants());
+            setOrgNameFromParties(form, form.getApplicants());
         } else if (StringUtils.equalsAny(businessProcess, "DEFENDANT_RESPONSE", "DEFENDANT_RESPONSE_SPEC")) {
-            setOrgNameFromParties(builder, builder.build().getRespondents());
+            setOrgNameFromParties(form, form.getRespondents());
         }
     }
 
-    private void setOrgNameFromParties(DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder,
+    private void setOrgNameFromParties(DirectionsQuestionnaireForm form,
                                        List<Party> parties) {
         Optional.ofNullable(parties)
             .filter(p -> !p.isEmpty())
@@ -318,7 +313,7 @@ public class DQGeneratorFormBuilder {
             .map(Party::getRepresentative)
             .map(Representative::getOrganisationName)
             .filter(StringUtils::isNotBlank)
-            .ifPresent(builder::representativeOrganisationName);
+            .ifPresent(form::setRepresentativeOrganisationName);
     }
 
     private int countWitnessesIncludingDefendant(Witnesses witnesses, CaseData caseData) {
@@ -390,11 +385,10 @@ public class DQGeneratorFormBuilder {
     private Hearing getHearing(DQ dq) {
         var hearing = dq.getHearing();
         if (hearing != null) {
-            return Hearing.builder()
-                .hearingLength(respondentTemplateForDQGenerator.getHearingLength(dq))
-                .unavailableDatesRequired(hearing.getUnavailableDatesRequired())
-                .unavailableDates(unwrapElements(hearing.getUnavailableDates()))
-                .build();
+            return new Hearing()
+                .setHearingLength(respondentTemplateForDQGenerator.getHearingLength(dq))
+                .setUnavailableDatesRequired(hearing.getUnavailableDatesRequired())
+                .setUnavailableDates(unwrapElements(hearing.getUnavailableDates()));
         } else {
             return null;
         }

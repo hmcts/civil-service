@@ -48,7 +48,7 @@ properties([
                                                   'https://civil-citizen-ui-pr-{PR_NUMBER}-civil-service.preview.platform.hmcts.net',
                                                 ],
       description: 'The URL of civil service'),
-    choice(name: 'AAC_API_URL', choices: [ 
+    choice(name: 'AAC_API_URL', choices: [
                                             'http://aac-manage-case-assignment-aat.service.core-compute-aat.internal',
                                             'http://aac-manage-case-assignment-demo.service.core-compute-demo.internal',
                                             'https://manage-case-assignment-civil-ccd-pr-{PR_NUMBER}.preview.platform.hmcts.net',
@@ -135,14 +135,15 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
+  env.FT_TYPE = "CIVIL_FT"
   env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
   ])
   loadVaultSecrets(secrets)
 
-  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean();
-  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean();
+  boolean forceGreenBuild = env.FORCE_GREEN_BUILD.toBoolean()
+  boolean runPrevFailedAndNotExecutedTestFiles = env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES.toBoolean()
 
   //enableMutationTest()
   if(!runPrevFailedAndNotExecutedTestFiles && !forceGreenBuild) {
@@ -159,7 +160,7 @@ withNightlyPipeline(type, product, component) {
   if(!forceGreenBuild) {
     afterAlways('DependencyCheckNightly') {
       sh """
-        ./bin/pull-latest-ccd-files.sh ${ccdBranch}
+        ./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
       """
       yarnBuilder.yarn('install-dependencies')
     }

@@ -71,52 +71,52 @@ public class HearingDetailsMapperTest {
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndRegionInCaseManagementLocationNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().caseManagementLocation(
-            CaseLocationCivil.builder().build()).build();
+            new CaseLocationCivil()).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndRegionNotWales() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().caseManagementLocation(
-            CaseLocationCivil.builder().region("2").build()).build();
+            new CaseLocationCivil().setRegion("2")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInRespondent1DQNull() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(Respondent1DQ.builder().build())
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(new Respondent1DQ())
             .build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInRespondent2DQNull() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
-            .respondent2DQ(Respondent2DQ.builder().build()).build();
+            .respondent2DQ(new Respondent2DQ()).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInApplicant1DQNull() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
-            .respondent2DQ(respondent2DQ).applicant1DQ(Applicant1DQ.builder().build()).build();
+            .respondent2DQ(respondent2DQ).applicant1DQ(new Applicant1DQ()).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isFalse();
     }
 
     @Test
     void shouldReturnFalse_whenHearingInWelshFlagInvokedAndWelshLanguageRequirementsInDQsNotWelsh() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ)
             .build();
@@ -125,150 +125,150 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForApplicantDQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent2DQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent1DQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsWelshForRespondent1And2DQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndAllWelshLanguageRequirementsIsWelshForAllDQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsBothForRespondent1DQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsIsBothForRespondent1And2DQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndLanguageRequirementIsBothForAllDQ() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo1() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnTrue_whenHearingInWelshFlagInvokedAndRegionIsWalesAndWelshLanguageRequirementsInAnyDQBothAndWelshCombo2() {
-        Respondent1DQ respondent1DQ = Respondent1DQ.builder().respondent1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.BOTH).build()).build();
-        Respondent2DQ respondent2DQ = Respondent2DQ.builder().respondent2DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.WELSH).build()).build();
-        Applicant1DQ applicant1DQ = Applicant1DQ.builder().applicant1DQLanguage(
-            WelshLanguageRequirements.builder().court(Language.ENGLISH).build()).build();
+        Respondent1DQ respondent1DQ = new Respondent1DQ().setRespondent1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.BOTH));
+        Respondent2DQ respondent2DQ = new Respondent2DQ().setRespondent2DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.WELSH));
+        Applicant1DQ applicant1DQ = new Applicant1DQ().setApplicant1DQLanguage(
+            new WelshLanguageRequirements().setCourt(Language.ENGLISH));
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().respondent1DQ(respondent1DQ)
             .respondent2DQ(respondent2DQ).applicant1DQ(applicant1DQ).caseManagementLocation(
-                CaseLocationCivil.builder().region("7").build()).build();
+                new CaseLocationCivil().setRegion("7")).build();
         assertThat(HearingDetailsMapper.getHearingInWelshFlag(caseData)).isTrue();
     }
 
     @Test
     void shouldReturnObjectList_whenHearingLocationsInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("12345")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("12345")
+                                        )
             .build();
 
         List<HearingLocationModel> expected = List.of(HearingLocationModel.builder()
@@ -328,14 +328,13 @@ public class HearingDetailsMapperTest {
     void getFacilitiesRequired_shouldReturnList_whenDetainedIndividualFlagExists() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
             .withRespondent1Flags(wrapElements(
-                FlagDetail.builder()
-                    .name("Detained individual")
-                    .flagComment("comment")
-                    .flagCode("PF0019")
-                    .hearingRelevant(YES)
-                    .status("Active")
-                    .build()))
-            .build();
+                new FlagDetail()
+                    .setName("Detained individual")
+                    .setFlagComment("comment")
+                    .setFlagCode("PF0019")
+                    .setHearingRelevant(YES)
+                    .setStatus("Active"))
+            ).build();
         assertThat(HearingDetailsMapper.getFacilitiesRequired(caseData)).isEqualTo(List.of("11"));
     }
 
@@ -346,32 +345,26 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment for evidence")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment for evidence")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("other flag")
-                                           .flagCode("PF0010")
-                                           .flagComment("flag comment")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
-                        .build()
-                )
-                .build();
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("other flag")
+                                           .setFlagCode("PF0010")
+                                           .setFlagComment("flag comment")
+                                           .setStatus("Active")
+                                   ))))
+                        .build()).build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
                 "Audio/Video Evidence: flag comment for evidence");
@@ -382,29 +375,26 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
                                    )))
-                                   .build())
+                        )
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment two")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment two")
+                                           .setStatus("Active")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -418,28 +408,24 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Audio/Video Evidence")
-                                           .flagCode("PF0014")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Audio/Video Evidence")
+                                           .setFlagCode("PF0014")
+                                           .setStatus("Active")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -453,29 +439,25 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 1")
-                                           .flagCode("PF0012")
-                                           .flagComment("flag comment one")
-                                           .status("Active")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 1")
+                                           .setFlagCode("PF0012")
+                                           .setFlagComment("flag comment one")
+                                           .setStatus("Active")
+                                   ))))
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 2")
-                                           .flagCode("PF0010")
-                                           .status("Active")
-                                           .flagComment("flag comment two")
-                                           .build()
-                                   )))
-                                   .build())
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 2")
+                                           .setFlagCode("PF0010")
+                                           .setStatus("Active")
+                                           .setFlagComment("flag comment two")
+                                   ))))
                         .build()
                 )
                 .build();
@@ -488,33 +470,30 @@ public class HearingDetailsMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 1")
-                                           .flagCode("PF0014")
-                                           .flagComment(
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 1")
+                                           .setFlagCode("PF0014")
+                                           .setFlagComment(
                                                "flag comment one flag comment one flag comment one flag comment one " +
                                                    "flag comment one flag comment one flag comment one")
-                                           .status("Active")
-                                           .build()
+                                           .setStatus("Active")
                                    )))
-                                   .build())
+                        )
                         .build())
                 .respondent1(
                     Party.builder()
-                        .flags(Flags.builder()
-                                   .details(wrapElements(List.of(
-                                       FlagDetail.builder()
-                                           .name("Other 2")
-                                           .flagCode("PF0014")
-                                           .status("Active")
-                                           .flagComment(
+                        .flags(new Flags()
+                                   .setDetails(wrapElements(List.of(
+                                       new FlagDetail()
+                                           .setName("Other 2")
+                                           .setFlagCode("PF0014")
+                                           .setStatus("Active")
+                                           .setFlagComment(
                                                "flag comment two flag comment two flag comment two flag comment two " +
                                                    "flag comment two flag comment two flag comment two")
-                                           .build()
-                                   )))
-                                   .build())
+                                   ))))
                         .build()
                 )
                 .build();

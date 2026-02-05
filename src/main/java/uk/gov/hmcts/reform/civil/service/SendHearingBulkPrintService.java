@@ -81,8 +81,10 @@ public class SendHearingBulkPrintService {
             letterContent = coverLetterAppendService.makeDocumentMailable(caseData, authorisation, recipient, documentType,
                                                                           caseDocuments.toArray(new CaseDocument[0]));
             List<String> recipients = List.of(recipient.getPartyName());
+            List<String> bulkPrintFileNames = new ArrayList<>();
+            caseDocuments.forEach(document -> bulkPrintFileNames.add(document.getDocumentLink().getDocumentFileName()));
             bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                         caseData.getLegacyCaseReference(), letterType, recipients);
+                                         caseData.getLegacyCaseReference(), letterType, recipients, bulkPrintFileNames);
 
         }
     }

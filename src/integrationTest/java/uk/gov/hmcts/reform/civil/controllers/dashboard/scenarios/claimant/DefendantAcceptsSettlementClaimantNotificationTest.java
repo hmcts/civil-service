@@ -23,7 +23,7 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends Dashboar
 
         String caseId = "123467891212";
         CaseData caseData = CaseData.builder()
-            .caseDataLiP(CaseDataLiP.builder().respondentSignSettlementAgreement(YesOrNo.YES).build())
+            .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES))
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())

@@ -374,10 +374,10 @@ class ManageContactInformationUtilsTest {
 
     @Test
     void shouldMapExpertsToUpdatePartyDetailsForm() {
-        Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
-        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
-            .phoneNumber("1").emailAddress("email").partyID("id2").build();
-        Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
+        Expert expert1 = new Expert().setFirstName("First").setLastName("Name").setPartyID("id").setEventAdded("event");
+        Expert expert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
+            .setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
+        Experts experts = new Experts().setDetails(wrapElements(expert1, expert2));
         UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
             .partyId("id").build();
         UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
@@ -393,10 +393,10 @@ class ManageContactInformationUtilsTest {
 
     @Test
     void shouldMapWitnessesToUpdatePartyDetailsForm() {
-        Witness witness1 = Witness.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event").build();
-        Witness witness2 = Witness.builder().firstName("Second").lastName("expert").reasonForWitness("reason")
-            .phoneNumber("1").emailAddress("email").partyID("id2").build();
-        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+        Witness witness1 = new Witness().setFirstName("First").setLastName("Name").setPartyID("id").setEventAdded("event");
+        Witness witness2 = new Witness().setFirstName("Second").setLastName("expert").setReasonForWitness("reason")
+            .setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
+        Witnesses witnesses = new Witnesses().setDetails(wrapElements(witness1, witness2));
         UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
             .partyId("id").build();
         UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
@@ -419,18 +419,18 @@ class ManageContactInformationUtilsTest {
 
         LocalDate date = LocalDate.of(2020, 3, 20);
 
-        Expert expert1 = Expert.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event")
-            .dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
-        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
-            .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Expert expert1 = new Expert().setFirstName("First").setLastName("Name").setPartyID("id").setEventAdded("event")
+            .setDateAdded(date).setEstimatedCost(BigDecimal.valueOf(10000));
+        Expert expert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
+            .setEventAdded("event").setDateAdded(date).setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
 
         @Test
         void shouldEditExperts() {
-            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John").partyID("id")
-                .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
-            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
-                .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("expertemail").partyID("id2").build();
-            Experts experts = Experts.builder().details(wrapElements(expert1, expert2)).build();
+            Expert expectedExpert1 = new Expert().setFirstName("Lewis").setLastName("John").setPartyID("id")
+                .setEventAdded("event").setDateAdded(date).setEstimatedCost(BigDecimal.valueOf(10000));
+            Expert expectedExpert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
+                .setEventAdded("event").setDateAdded(date).setPhoneNumber("1").setEmailAddress("expertemail").setPartyID("id2");
+            Experts experts = new Experts().setDetails(wrapElements(expert1, expert2));
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
@@ -438,15 +438,13 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldAddExperts() {
-            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(PARTY_ID)
-                .build();
-            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
-                .emailAddress("expertemail")
-                .partyID(PARTY_ID)
-                .build();
+            Expert expectedExpert1 = new Expert().setFirstName("Lewis").setLastName("John")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
+                .setPartyID(PARTY_ID);
+            Expert expectedExpert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now()).setPhoneNumber("1")
+                .setEmailAddress("expertemail")
+                .setPartyID(PARTY_ID);
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(null, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
@@ -454,15 +452,14 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldAddExpertsWithExistingExperts() {
-            Expert expectedExpert1 = Expert.builder().firstName("Lewis").lastName("John").partyID("id")
-                .eventAdded("event").dateAdded(date).estimatedCost(BigDecimal.valueOf(10000)).build();
-            Expert expectedExpert2 = Expert.builder().firstName("Second").lastName("expert").fieldOfExpertise("field")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
-                .emailAddress("expertemail")
-                .partyID(PARTY_ID)
-                .build();
+            Expert expectedExpert1 = new Expert().setFirstName("Lewis").setLastName("John").setPartyID("id")
+                .setEventAdded("event").setDateAdded(date).setEstimatedCost(BigDecimal.valueOf(10000));
+            Expert expectedExpert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now()).setPhoneNumber("1")
+                .setEmailAddress("expertemail")
+                .setPartyID(PARTY_ID);
 
-            Experts experts = Experts.builder().details(wrapElements(expert1)).build();
+            Experts experts = new Experts().setDetails(wrapElements(expert1));
 
             assertThat(mapUpdatePartyDetailsFormToDQExperts(experts, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedExpert1, expectedExpert2));
@@ -478,21 +475,21 @@ class ManageContactInformationUtilsTest {
 
         LocalDate date = LocalDate.of(2020, 3, 20);
 
-        Witness witness1 = Witness.builder().firstName("First").lastName("Name").partyID("id").eventAdded("event")
-            .dateAdded(date).reasonForWitness("reason").build();
-        Witness witness2 = Witness.builder().firstName("Second").lastName("expert").eventAdded("event")
-            .dateAdded(date).phoneNumber("1").emailAddress("email").partyID("id2").build();
+        Witness witness1 = new Witness().setFirstName("First").setLastName("Name").setPartyID("id").setEventAdded("event")
+            .setDateAdded(date).setReasonForWitness("reason");
+        Witness witness2 = new Witness().setFirstName("Second").setLastName("expert").setEventAdded("event")
+            .setDateAdded(date).setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
 
-        Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1, witness2)).build();
+        Witnesses witnesses = new Witnesses().setDetails(wrapElements(witness1, witness2));
 
         @Test
         void shouldEditWitnesses() {
-            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
-                .eventAdded("event").dateAdded(date).reasonForWitness("reason").partyID("id").build();
+            Witness expectedWitness1 = new Witness().setFirstName("Lewis").setLastName("John")
+                .setEventAdded("event").setDateAdded(date).setReasonForWitness("reason").setPartyID("id");
 
-            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
-                .eventAdded("event").dateAdded(date).phoneNumber("1").emailAddress("witnessemail")
-                .partyID("id2").build();
+            Witness expectedWitness2 = new Witness().setFirstName("Second").setLastName("witness")
+                .setEventAdded("event").setDateAdded(date).setPhoneNumber("1").setEmailAddress("witnessemail")
+                .setPartyID("id2");
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
@@ -500,13 +497,13 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldAddWitnesses() {
-            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(PARTY_ID).build();
-            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
-                .emailAddress("witnessemail")
-                .partyID(PARTY_ID).build();
+            Witness expectedWitness1 = new Witness().setFirstName("Lewis").setLastName("John")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
+                .setPartyID(PARTY_ID);
+            Witness expectedWitness2 = new Witness().setFirstName("Second").setLastName("witness")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now()).setPhoneNumber("1")
+                .setEmailAddress("witnessemail")
+                .setPartyID(PARTY_ID);
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(null, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
@@ -520,15 +517,14 @@ class ManageContactInformationUtilsTest {
 
         @Test
         void shouldAddWitnessesWithExistingWitnesses() {
-            Witness expectedWitness1 = Witness.builder().firstName("Lewis").lastName("John").partyID("id")
-                .reasonForWitness("reason").eventAdded("event").dateAdded(date).build();
-            Witness expectedWitness2 = Witness.builder().firstName("Second").lastName("witness")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now()).phoneNumber("1")
-                .emailAddress("witnessemail")
-                .partyID(PARTY_ID)
-                .build();
+            Witness expectedWitness1 = new Witness().setFirstName("Lewis").setLastName("John").setPartyID("id")
+                .setReasonForWitness("reason").setEventAdded("event").setDateAdded(date);
+            Witness expectedWitness2 = new Witness().setFirstName("Second").setLastName("witness")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now()).setPhoneNumber("1")
+                .setEmailAddress("witnessemail")
+                .setPartyID(PARTY_ID);
 
-            Witnesses witnesses = Witnesses.builder().details(wrapElements(witness1)).build();
+            Witnesses witnesses = new Witnesses().setDetails(wrapElements(witness1));
 
             assertThat(mapUpdatePartyDetailsFormToDQWitnesses(witnesses, wrapElements(party, party2)))
                 .isEqualTo(wrapElements(expectedWitness1, expectedWitness2));
@@ -1108,9 +1104,8 @@ class ManageContactInformationUtilsTest {
             .lastName(prefix + "-lastname")
             .email(prefix + "-individual@example.com")
             .phone(prefix + "-07867654543")
-            .flags(Flags.builder()
-                       .roleOnCase(prefix + "-role")
-                       .build())
+            .flags(new Flags()
+                       .setRoleOnCase(prefix + "-role"))
             .build();
     }
 }

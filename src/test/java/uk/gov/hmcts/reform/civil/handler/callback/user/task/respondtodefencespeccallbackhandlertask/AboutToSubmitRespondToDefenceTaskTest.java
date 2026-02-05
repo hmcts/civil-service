@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.helpers.judgmentsonline.JudgmentByAdmissionOnli
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.ResponseDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.dq.ExpertDetails;
@@ -371,6 +372,42 @@ class AboutToSubmitRespondToDefenceTaskTest {
         assertNotNull(response);
         CaseData caseData1 = getCaseData(response);
         assertThat(caseData1.getRespondToClaimAdmitPartLRspec().getWhenWillThisAmountBePaid()).isNotNull();
+    }
+
+    @Test
+    void shouldSetApplicant1DefenceResponseDocumentCategory() {
+        // Given
+        Document document = Document.builder()
+            .documentUrl("http://dm-store/documents/123")
+            .documentBinaryUrl("http://dm-store/documents/123/binary")
+            .documentFileName("defence-response.pdf")
+            .build();
+
+        ResponseDocument responseDocument = ResponseDocument.builder()
+            .file(document)
+            .build();
+
+        CaseData caseData = CaseData.builder()
+            .applicant1DefenceResponseDocumentSpec(responseDocument)
+            .build();
+
+        caseData.setApplicant1DefenceResponseDocumentSpec(responseDocument);
+
+        // When
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) task.execute(callbackParams(caseData));
+
+        // Then
+        assertNotNull(response);
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> responseDocumentData =
+            (Map<String, Object>) response.getData().get("applicant1DefenceResponseDocumentSpec");
+        assertThat(responseDocumentData).isNotNull();
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> file = (Map<String, Object>) responseDocumentData.get("file");
+        assertThat(file.get("categoryID")).isEqualTo("directionsQuestionnaire");
     }
 
     private CaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

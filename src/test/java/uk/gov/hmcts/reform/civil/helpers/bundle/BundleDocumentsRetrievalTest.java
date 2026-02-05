@@ -75,10 +75,9 @@ class BundleDocumentsRetrievalTest {
             "14 Apr 2024 00:00:00"
         );
 
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertDocument(documentTest)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
         listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
@@ -115,11 +114,10 @@ class BundleDocumentsRetrievalTest {
             "14 Apr 2024 00:00:00"
         );
 
-        UploadEvidenceExpert uploadEvidenceExpert = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertOptionOtherParty("James Gordon")
-            .expertDocument(documentTest)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertOptionOtherParty("James Gordon")
+            .setExpertDocument(documentTest);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
         listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert).build());
@@ -161,10 +159,9 @@ class BundleDocumentsRetrievalTest {
 
         Document documentTest1 = new Document("testUrl1", "binUrl1", "Name1", "hash1", null, "14 Apr 2024 00:00:00");
 
-        UploadEvidenceExpert uploadEvidenceExpert1 = UploadEvidenceExpert.builder()
-            .expertOptionName("Expert1")
-            .expertDocument(documentTest1)
-            .build();
+        UploadEvidenceExpert uploadEvidenceExpert1 = new UploadEvidenceExpert()
+            .setExpertOptionName("Expert1")
+            .setExpertDocument(documentTest1);
 
         List<Element<UploadEvidenceExpert>> listOfDocs = new ArrayList<>();
         listOfDocs.add(Element.<UploadEvidenceExpert>builder().value(uploadEvidenceExpert1).build());

@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -19,10 +19,10 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.SpecifiedParty;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@Accessors(chain = true)
 public class SealedClaimResponseFormForSpec implements MappableObject {
 
     private String referenceNumber;

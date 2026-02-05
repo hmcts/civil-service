@@ -191,10 +191,10 @@ public class ClaimantResponseUtilsTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
-            .caseDataLiP(CaseDataLiP.builder().helpWithFees(HelpWithFees.builder().helpWithFee(YesOrNo.YES).build()).build())
+            .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES)))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .fixedCosts(FixedCosts.builder().claimFixedCosts(YesOrNo.NO).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().outstandingFeeInPounds(BigDecimal.valueOf(100)).build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(100)))
             .build();
 
         BigDecimal actualOutput = claimantResponseUtils.getDefendantAdmittedAmount(caseData);

@@ -76,11 +76,10 @@ public class CaseFlagUtils {
     }
 
     public static Flags createFlags(String flagsPartyName, String roleOnCase) {
-        return Flags.builder()
-            .partyName(flagsPartyName)
-            .roleOnCase(roleOnCase)
-            .details(List.of())
-            .build();
+        return new Flags()
+            .setPartyName(flagsPartyName)
+            .setRoleOnCase(roleOnCase)
+            .setDetails(List.of());
     }
 
     private static PartyFlagStructure createPartiesCaseFlagsField(String partyId, String firstName, String lastName,
@@ -331,12 +330,15 @@ public class CaseFlagUtils {
                                                  .flags(createFlags(formattedPartyNameForFlags, roleOnCase)).build()));
                 } else {
                     // existing party with flags so just update the name
+                    Flags existingFlags = partyFlagStructure.getFlags();
+                    Flags updatedFlags = new Flags()
+                        .setPartyName(formattedPartyNameForFlags)
+                        .setRoleOnCase(existingFlags != null ? existingFlags.getRoleOnCase() : null)
+                        .setDetails(existingFlags != null ? existingFlags.getDetails() : null);
                     updatedList.add(
                         partyFlagStructure
                             .toBuilder()
-                            .flags(partyFlagStructure.getFlags().toBuilder()
-                                       .partyName(formattedPartyNameForFlags)
-                                       .build()).build());
+                            .flags(updatedFlags).build());
                 }
             }
             return wrapElements(updatedList);
@@ -345,17 +347,29 @@ public class CaseFlagUtils {
     }
 
     private static Party updatePartyNameForFlags(Party party) {
-        return party.toBuilder().flags(party.getFlags().toBuilder()
-                                           .partyName(party.getPartyName())
-                                           .build()).build();
+        Flags existingFlags = party.getFlags();
+        Flags updatedFlags = existingFlags != null
+            ? new Flags()
+                .setPartyName(party.getPartyName())
+                .setRoleOnCase(existingFlags.getRoleOnCase())
+                .setDetails(existingFlags.getDetails())
+            : createFlags(party.getPartyName(), null);
+        return party.toBuilder().flags(updatedFlags).build();
     }
 
     private static LitigationFriend updatePartyNameForLitigationFriendFlags(LitigationFriend litigationFriend) {
+        Flags existingFlags = litigationFriend.getFlags();
+        String partyName = litigationFriend.getFullName() != null
+            ? litigationFriend.getFullName()
+            : formattedPartyNameForFlags(litigationFriend.getFirstName(), litigationFriend.getLastName());
+        Flags updatedFlags = existingFlags != null
+            ? new Flags()
+                .setPartyName(partyName)
+                .setRoleOnCase(existingFlags.getRoleOnCase())
+                .setDetails(existingFlags.getDetails())
+            : createFlags(partyName, null);
         return litigationFriend.toBuilder()
-            .flags(litigationFriend.getFlags().toBuilder()
-                       .partyName(litigationFriend.getFullName() != null ? litigationFriend.getFullName()
-                                      : formattedPartyNameForFlags(litigationFriend.getFirstName(), litigationFriend.getLastName()))
-                       .build()).build();
+            .flags(updatedFlags).build();
     }
 
     public static List<FlagDetail> getAllCaseFlags(CaseData caseData) {

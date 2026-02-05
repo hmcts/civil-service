@@ -45,12 +45,12 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
         CaseDocument englishDoc = generateLetter(
             caseData, auth, SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER);
         CaseDocument settleClaimDoc = englishDoc;
-
+        List<String> bulkPrintFileNames = new ArrayList<>();
         if (isBilingual(caseData)) {
             final CaseDocument welshDoc = generateLetter(
                 caseData, auth, SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER_WELSH);
 
-            List<DocumentMetaData> documentMetaDataList = appendCoverToDocument(englishDoc, welshDoc);
+            List<DocumentMetaData> documentMetaDataList = appendCoverToDocument(bulkPrintFileNames, englishDoc, welshDoc);
 
             log.info("Calling civil stitch service to combine bilingual settle claim marked paid in full lip defendant letter for caseId {}", caseId);
             CaseDocument stitchedCaseDocument = civilStitchService.generateStitchedCaseDocument(
@@ -63,6 +63,8 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
 
             log.info("Bilingual settle claim marked paid in full generated {}  for caseId {}", stitchedCaseDocument, caseId);
             settleClaimDoc = stitchedCaseDocument;
+        } else {
+            bulkPrintFileNames.add(settleClaimDoc.getDocumentLink().getDocumentFileName());
         }
 
         String errorMessage = "Failed getting welsh settle claim marked paid in full letter for caseId {}";
@@ -70,13 +72,13 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
 
         List<String> recipients = getRecipientsList(caseData);
         bulkPrintService.printLetter(letterContent, caseData.getLegacyCaseReference(),
-                                     caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER_TITLE, recipients);
+                                     caseData.getLegacyCaseReference(), SETTLE_CLAIM_PAID_IN_FULL_LETTER_TITLE,
+                                     recipients, bulkPrintFileNames);
     }
 
     private CaseDocument generateLetter(CaseData caseData, String authorisation, DocmosisTemplates template) {
         DocmosisDocument settleClaimPaidInFullLetter = documentGeneratorService.generateDocmosisDocument(getTemplateData(caseData), template);
-
-        CaseDocument document =  documentManagementService.uploadDocument(
+        return documentManagementService.uploadDocument(
             authorisation,
             new PDF(
                 SETTLE_CLAIM_MARKED_PAID_IN_FULL_LIP_DEFENDANT_LETTER.getDocumentTitle(),
@@ -84,7 +86,6 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
                 SETTLE_CLAIM_PAID_IN_FULL_LETTER
             )
         );
-        return document;
     }
 
     private List<String> getRecipientsList(CaseData caseData) {
@@ -92,34 +93,37 @@ public class SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator {
     }
 
     public SettleClaimMarkedPaidInFullDefendantLiPLetter getTemplateData(CaseData caseData) {
-        return SettleClaimMarkedPaidInFullDefendantLiPLetter
-            .builder()
-            .claimReferenceNumber(caseData.getLegacyCaseReference())
-            .letterIssueDate(LocalDate.now())
-            .letterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))
-            .defendantLipName(caseData.getRespondent1().getPartyName())
-            .addressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
-            .addressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
-            .addressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
-            .postCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
-            .dateOfEvent(LocalDate.now())
-            .dateOfEventWelsh(formatDateInWelsh(LocalDate.now(), false))
-            .build();
+        return new SettleClaimMarkedPaidInFullDefendantLiPLetter()
+            .setClaimReferenceNumber(caseData.getLegacyCaseReference())
+            .setLetterIssueDate(LocalDate.now())
+            .setLetterIssueDateWelsh(formatDateInWelsh(LocalDate.now(), false))
+            .setDefendantLipName(caseData.getRespondent1().getPartyName())
+            .setAddressLine1(caseData.getRespondent1().getPrimaryAddress().getAddressLine1())
+            .setAddressLine2(caseData.getRespondent1().getPrimaryAddress().getAddressLine2())
+            .setAddressLine3(caseData.getRespondent1().getPrimaryAddress().getAddressLine3())
+            .setPostCode(caseData.getRespondent1().getPrimaryAddress().getPostCode())
+            .setDateOfEvent(LocalDate.now())
+            .setDateOfEventWelsh(formatDateInWelsh(LocalDate.now(), false));
     }
 
-    private List<DocumentMetaData> appendCoverToDocument(CaseDocument coverLetter, CaseDocument... caseDocuments) {
+    private List<DocumentMetaData> appendCoverToDocument(List<String> bulkPrintFileNames,
+                                                         CaseDocument coverLetter,
+                                                         CaseDocument... caseDocuments) {
         List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
-
-        documentMetaDataList.add(new DocumentMetaData(coverLetter.getDocumentLink(),
-                                                      "Welsh letter",
-                                                      LocalDate.now().toString()));
-
-        Arrays.stream(caseDocuments).forEach(caseDocument -> documentMetaDataList.add(new DocumentMetaData(
-            caseDocument.getDocumentLink(),
-            "Welsh letter to attach",
+        documentMetaDataList.add(new DocumentMetaData(
+            coverLetter.getDocumentLink(),
+            "Welsh letter",
             LocalDate.now().toString()
-        )));
-
+        ));
+        bulkPrintFileNames.add(coverLetter.getDocumentLink().getDocumentFileName());
+        Arrays.stream(caseDocuments).forEach(caseDocument -> {
+            documentMetaDataList.add(new DocumentMetaData(
+                caseDocument.getDocumentLink(),
+                "Welsh letter to attach",
+                LocalDate.now().toString()
+            ));
+            bulkPrintFileNames.add(caseDocument.getDocumentLink().getDocumentFileName());
+        });
         return documentMetaDataList;
     }
 
