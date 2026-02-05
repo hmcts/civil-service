@@ -19,18 +19,16 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 abstract class DQTest {
 
     protected DisclosureOfNonElectronicDocuments disclosureOfNonElectronicDocuments() {
-        return DisclosureOfNonElectronicDocuments.builder()
-            .directionsForDisclosureProposed(YES)
-            .standardDirectionsRequired(YES)
-            .bespokeDirections("non electronic documents")
-            .build();
+        return new DisclosureOfNonElectronicDocuments()
+            .setDirectionsForDisclosureProposed(YES)
+            .setStandardDirectionsRequired(YES)
+            .setBespokeDirections("non electronic documents");
     }
 
     protected Witnesses witnesses() {
-        return Witnesses.builder()
-            .witnessesToAppear(YES)
-            .details(wrapElements(Witness.builder().name("John Smith").reasonForWitness("reason").build()))
-            .build();
+        return new Witnesses()
+            .setWitnessesToAppear(YES)
+            .setDetails(wrapElements(new Witness().setName("John Smith").setReasonForWitness("reason")));
     }
 
     protected StatementOfTruth statementOfTruth() {
@@ -41,71 +39,68 @@ abstract class DQTest {
     }
 
     protected RequestedCourt requestedCourt() {
-        return RequestedCourt.builder()
-            .responseCourtCode("343")
-            .reasonForHearingAtSpecificCourt("reason for court")
-            .build();
+        return new RequestedCourt()
+            .setResponseCourtCode("343")
+            .setReasonForHearingAtSpecificCourt("reason for court");
     }
 
     protected HearingSupport hearingSupport() {
-        return HearingSupport.builder()
-            .requirements(List.of(SupportRequirements.values()))
-            .languageToBeInterpreted("English")
-            .signLanguageRequired("Spanish")
-            .otherSupport("other support")
-            .supportRequirements(YES)
-            .supportRequirementsAdditional("additional support")
-            .build();
+        return new HearingSupport()
+            .setRequirements(List.of(SupportRequirements.values()))
+            .setLanguageToBeInterpreted("English")
+            .setSignLanguageRequired("Spanish")
+            .setOtherSupport("other support")
+            .setSupportRequirements(YES)
+            .setSupportRequirementsAdditional("additional support");
     }
 
     protected Hearing hearing() {
-        return Hearing.builder()
-            .hearingLength(HearingLength.LESS_THAN_DAY)
-            .hearingLengthHours("1")
-            .unavailableDatesRequired(YES)
-            .unavailableDates(wrapElements(UnavailableDate.builder().who("John Smith").date(LocalDate.now()).build()))
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setWho("John Smith");
+        unavailableDate.setDate(LocalDate.now());
+        return new Hearing()
+            .setHearingLength(HearingLength.LESS_THAN_DAY)
+            .setHearingLengthHours("1")
+            .setUnavailableDatesRequired(YES)
+            .setUnavailableDates(wrapElements(unavailableDate));
     }
 
     protected Hearing hearingLRspec() {
-        return Hearing.builder()
-            .hearingLength(HearingLength.LESS_THAN_DAY)
-            .hearingLengthHours("1")
-            .unavailableDatesRequired(YES)
-            .unavailableDates(
-                wrapElements(UnavailableDate.builder().who("John Smith").date(LocalDate.now()).build()))
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate();
+        unavailableDate.setWho("John Smith");
+        unavailableDate.setDate(LocalDate.now());
+        return new Hearing()
+            .setHearingLength(HearingLength.LESS_THAN_DAY)
+            .setHearingLengthHours("1")
+            .setUnavailableDatesRequired(YES)
+            .setUnavailableDates(wrapElements(unavailableDate));
     }
 
     protected FurtherInformation furtherInformation() {
-        return FurtherInformation.builder()
-            .futureApplications(YES)
-            .otherInformationForJudge("Other information")
-            .reasonForFutureApplications("Reason for future applications")
-            .build();
+        return new FurtherInformation()
+            .setFutureApplications(YES)
+            .setOtherInformationForJudge("Other information")
+            .setReasonForFutureApplications("Reason for future applications");
     }
 
     protected FileDirectionsQuestionnaire fileDirectionsQuestionnaire() {
-        return FileDirectionsQuestionnaire.builder()
-            .explainedToClient(List.of("yes"))
-            .oneMonthStayRequested(YES)
-            .reactionProtocolCompliedWith(YesOrNo.NO)
-            .reactionProtocolNotCompliedWithReason("Not complied with reason")
-            .build();
+        return new FileDirectionsQuestionnaire()
+            .setExplainedToClient(List.of("yes"))
+            .setOneMonthStayRequested(YES)
+            .setReactionProtocolCompliedWith(YesOrNo.NO)
+            .setReactionProtocolNotCompliedWithReason("Not complied with reason");
     }
 
     protected Experts experts() {
-        return Experts.builder()
-            .expertRequired(YES)
-            .expertReportsSent(ExpertReportsSent.YES)
-            .jointExpertSuitable(YES)
-            .details(wrapElements(Expert.builder()
-                                      .name("John Smith")
-                                      .fieldOfExpertise("Science")
-                                      .estimatedCost(BigDecimal.ONE)
-                                      .whyRequired("Reason")
-                                      .build()))
-            .build();
+        return new Experts()
+            .setExpertRequired(YES)
+            .setExpertReportsSent(ExpertReportsSent.YES)
+            .setJointExpertSuitable(YES)
+            .setDetails(wrapElements(new Expert()
+                                         .setName("John Smith")
+                                         .setFieldOfExpertise("Science")
+                                         .setEstimatedCost(BigDecimal.ONE)
+                                         .setWhyRequired("Reason")));
     }
 
     protected Document draftDirections() {
@@ -117,33 +112,29 @@ abstract class DQTest {
     }
 
     protected DisclosureReport disclosureReport() {
-        return DisclosureReport.builder()
-            .disclosureFormFiledAndServed(YES)
-            .disclosureProposalAgreed(YES)
-            .draftOrderNumber("order number")
-            .build();
+        return new DisclosureReport()
+            .setDisclosureFormFiledAndServed(YES)
+            .setDisclosureProposalAgreed(YES)
+            .setDraftOrderNumber("order number");
     }
 
     protected DisclosureOfElectronicDocuments disclosureOfElectronicDocuments() {
-        return DisclosureOfElectronicDocuments.builder()
-            .agreementLikely(YES)
-            .reachedAgreement(YesOrNo.NO)
-            .reasonForNoAgreement("reason")
-            .build();
+        return new DisclosureOfElectronicDocuments()
+            .setAgreementLikely(YES)
+            .setReachedAgreement(YesOrNo.NO)
+            .setReasonForNoAgreement("reason");
     }
 
     protected WelshLanguageRequirements welshLanguageRequirements() {
-        return WelshLanguageRequirements.builder()
-            .court(Language.WELSH)
-            .documents(Language.WELSH)
-            .evidence(Language.WELSH)
-            .build();
+        return new WelshLanguageRequirements()
+            .setCourt(Language.WELSH)
+            .setDocuments(Language.WELSH)
+            .setEvidence(Language.WELSH);
     }
 
     protected VulnerabilityQuestions vulnerabilityQuestions() {
-        return VulnerabilityQuestions.builder()
-            .vulnerabilityAdjustmentsRequired(YES)
-            .vulnerabilityAdjustments("required adjustments")
-            .build();
+        return new VulnerabilityQuestions()
+            .setVulnerabilityAdjustmentsRequired(YES)
+            .setVulnerabilityAdjustments("required adjustments");
     }
 }

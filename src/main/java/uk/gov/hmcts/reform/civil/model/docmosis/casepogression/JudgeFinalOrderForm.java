@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.casepogression;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.caseprogression.OrderOnCourtsList;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
@@ -11,9 +13,11 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import java.time.LocalDate;
 
 @Getter
-@Builder
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class JudgeFinalOrderForm implements MappableObject {
 
     private String caseNumber;

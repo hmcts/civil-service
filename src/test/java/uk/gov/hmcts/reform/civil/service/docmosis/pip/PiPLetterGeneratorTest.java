@@ -32,9 +32,11 @@ import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -89,17 +91,16 @@ class PiPLetterGeneratorTest {
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
     private static final String PIN = "1234789";
     private static final String CUI_URL = "CUI response url";
-    private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
-        .pin(PIN)
-        .ccdCaseNumber("1234123412341234")
-        .claimantName(CLAIMANT_FULL_NAME)
-        .claimReferenceNumber(CLAIM_REFERENCE)
-        .issueDate(LocalDate.now())
-        .defendant(DEFENDANT)
-        .responseDeadline(RESPONSE_DEADLINE.toLocalDate())
-        .totalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
-        .respondToClaimUrl(CUI_URL)
-        .build();
+    private static final PiPLetter LETTER_TEMPLATE_DATA = new PiPLetter()
+        .setPin(PIN)
+        .setCcdCaseNumber("1234123412341234")
+        .setClaimantName(CLAIMANT_FULL_NAME)
+        .setClaimReferenceNumber(CLAIM_REFERENCE)
+        .setIssueDate(LocalDate.now())
+        .setDefendant(DEFENDANT)
+        .setResponseDeadline(RESPONSE_DEADLINE.toLocalDate())
+        .setTotalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
+        .setRespondToClaimUrl(CUI_URL);
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private List<DocumentMetaData> specClaimTimelineDocuments;
@@ -113,7 +114,7 @@ class PiPLetterGeneratorTest {
                                                              anyString())).thenReturn(buildStitchedDocument());
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+            .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(buildClaimFormDocument().getDocumentLink(), "PiP Letter", LocalDate.now().toString()),
@@ -125,27 +126,30 @@ class PiPLetterGeneratorTest {
     void shouldGenerateAndDownloadLetterSuccessfully() {
         // Given
         CaseData caseData = buildCaseData(YesOrNo.NO, null);
-
+        List<String> filenames = new ArrayList<>();
         // When
-        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
+        byte[] downloadedLetter = piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN, filenames);
 
         // Then
         assertThat(downloadedLetter).isEqualTo(STITCHED_DOC_BYTES);
         verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
+        assertEquals(2, filenames.size());
     }
 
     @Test
     void shouldGenerateClaimFormWithClaimTimeLineDocs_whenUploadedByApplicant() {
         // Given
         CaseData caseData = buildCaseData(YES, setupParticularsOfClaimDocs());
+        List<String> filenames = new ArrayList<>();
 
         // When
-        piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN);
+        piPLetterGenerator.downloadLetter(caseData, BEARER_TOKEN, filenames);
 
         // Then
         verify(documentGeneratorService).generateDocmosisDocument(LETTER_TEMPLATE_DATA, PIN_IN_THE_POST_LETTER);
         verify(civilStitchService).generateStitchedCaseDocument(eq(specClaimTimelineDocuments),
                                                                 anyString(), anyLong(), eq(PIP_LETTER), anyString());
+        assertEquals(2, filenames.size());
     }
 
     private CaseData buildCaseData(YesOrNo respondent1Represented, ServedDocumentFiles servedDocumentFiles) {

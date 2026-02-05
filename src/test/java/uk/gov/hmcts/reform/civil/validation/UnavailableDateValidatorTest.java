@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.model.dq.SmallClaimHearing;
 
 import java.time.LocalDate;
 import java.util.List;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,10 +120,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now()).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When  // Then
             assertThat(validator.validate(hearing)).isEmpty();
         }
@@ -135,10 +134,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().plusYears(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When  // Then
             assertThat(validator.validate(hearing))
                 .containsExactly("Dates must be within the next 12 months.");
@@ -152,10 +150,9 @@ class UnavailableDateValidatorTest {
                 .fromDate(LocalDate.now().plusYears(5))
                 .toDate(LocalDate.now().plusMonths(2)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validate(hearing))
@@ -170,10 +167,9 @@ class UnavailableDateValidatorTest {
                 .fromDate(LocalDate.now().plusMonths(5))
                 .toDate(LocalDate.now().plusYears(4)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validate(hearing))
@@ -187,10 +183,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().minusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When  // Then
             assertThat(validator.validate(hearing))
                 .containsExactly("Unavailable Date cannot be past date");
@@ -204,10 +199,9 @@ class UnavailableDateValidatorTest {
                 .fromDate(LocalDate.now().minusDays(5))
                 .toDate(LocalDate.now().plusDays(2)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validate(hearing))
@@ -222,10 +216,9 @@ class UnavailableDateValidatorTest {
                 .toDate(LocalDate.now().minusDays(5))
                 .fromDate(LocalDate.now().plusMonths(2)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validate(hearing))
@@ -235,9 +228,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenRequiredButNullDates() {
             // Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES);
             // When  // Then
             assertThat(validator.validate(hearing)).containsExactly("Details of unavailable date required");
         }
@@ -245,10 +237,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenRequiredButEmptyDates() {
             // Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(emptyList())
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(emptyList());
             // When  // Then
             assertThat(validator.validate(hearing)).containsExactly("Details of unavailable date required");
         }
@@ -256,9 +247,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnNoError_whenNotRequiredAndNoDates() {
             // Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(NO)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(NO);
             // When  // Then
             assertThat(validator.validate(hearing)).isEmpty();
         }
@@ -270,10 +260,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().minusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .unavailableDates(unavailableDates)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES)
+                .setUnavailableDates(unavailableDates);
             // When  // Then
             assertThat(validator.validateFastClaimHearing(hearing))
                 .containsExactly("Unavailable Date cannot be past date");
@@ -282,9 +271,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenHearingLRSpecValidatesDatesAndFastClaimIsNull() {
             // Given
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(YES)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(YES);
             // When  // Then
             assertThat(validator.validateFastClaimHearing(hearing))
                 .containsExactly("Details of unavailable date required");
@@ -302,9 +290,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnEmptyList_whenHearingNoUnAvailableDates() {
             // Given: Hearing with No Unavailable Dates
-            Hearing hearing = Hearing.builder()
-                .unavailableDatesRequired(NO)
-                .build();
+            Hearing hearing = new Hearing()
+                .setUnavailableDatesRequired(NO);
             // When: Validate is called
             // Then: It should not return validation error message
             assertThat(validator.validateFastClaimHearing(hearing))
@@ -314,8 +301,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndSmallClaimHearingIsNull() {
             // Given
-            SmallClaimHearing smallClaimHearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES).build();
+            SmallClaimHearing smallClaimHearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES);
             // When  // Then
             assertThat(validator.validateSmallClaimsHearing(smallClaimHearing))
                 .containsExactly("Details of unavailable date required");
@@ -328,10 +315,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE)
                 .date(LocalDate.now().minusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When  // Then
             assertThat(validator.validateSmallClaimsHearing(hearing))
                 .containsExactly("Unavailable Date cannot be past date");
@@ -343,10 +329,9 @@ class UnavailableDateValidatorTest {
             UnavailableDate unavailableDate = UnavailableDate.builder()
                 .unavailableDateType(UnavailableDateType.SINGLE_DATE).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When  // Then
             assertThat(validator.validateSmallClaimsHearing(hearing))
                 .containsExactly("Details of unavailable date required");
@@ -358,10 +343,9 @@ class UnavailableDateValidatorTest {
             UnavailableDate unavailableDate = UnavailableDate.builder()
                 .unavailableDateType(UnavailableDateType.DATE_RANGE).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When  // Then
             assertThat(validator.validateSmallClaimsHearing(hearing))
                 .containsExactly("Details of unavailable date required");
@@ -375,10 +359,9 @@ class UnavailableDateValidatorTest {
                 .fromDate(LocalDate.now().plusDays(5))
                 .toDate(LocalDate.now().plusDays(4)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When  // Then
             assertThat(validator.validateSmallClaimsHearing(hearing))
                 .containsExactly("From Date should be less than To Date");
@@ -392,10 +375,9 @@ class UnavailableDateValidatorTest {
                 .fromDate(LocalDate.now().plusDays(4))
                 .toDate(LocalDate.now().plusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When: Validate is called
             // Then: It should not return any errors
             assertThat(validator.validateSmallClaimsHearing(hearing))
@@ -409,10 +391,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.DATE_RANGE)
                 .fromDate(LocalDate.now().plusDays(5)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validateSmallClaimsHearing(hearing))
@@ -426,10 +407,9 @@ class UnavailableDateValidatorTest {
                 .unavailableDateType(UnavailableDateType.DATE_RANGE)
                 .toDate(LocalDate.now().plusDays(4)).build();
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(YES)
-                .smallClaimUnavailableDate(unavailableDates)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(YES)
+                .setSmallClaimUnavailableDate(unavailableDates);
             // When: Validate is called
             // Then: It should return validation error message
             assertThat(validator.validateSmallClaimsHearing(hearing))
@@ -439,9 +419,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnEmptyErrorList_whenNoUnavailableDates() {
             // Given: SmallClaimHearing with No Unavailable Dates
-            SmallClaimHearing hearing = SmallClaimHearing.builder()
-                .unavailableDatesRequired(NO)
-                .build();
+            SmallClaimHearing hearing = new SmallClaimHearing()
+                .setUnavailableDatesRequired(NO);
             // When: Validate is called
             // Then: It should not return validation error message
             assertThat(validator.validateSmallClaimsHearing(hearing))

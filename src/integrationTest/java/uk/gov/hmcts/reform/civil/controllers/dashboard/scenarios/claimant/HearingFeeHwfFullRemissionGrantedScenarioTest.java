@@ -34,7 +34,7 @@ public class HearingFeeHwfFullRemissionGrantedScenarioTest extends DashboardBase
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .hearingHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .hearingHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF))
             .hwfFeeType(FeeType.HEARING)
             .build();
 

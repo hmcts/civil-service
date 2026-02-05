@@ -29,7 +29,7 @@ public class ClaimIssueHwfNumUpdatedScenarioTest extends DashboardBaseIntegratio
             .toBuilder()
             .applicant1Represented(YesOrNo.NO)
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER).build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER))
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
 

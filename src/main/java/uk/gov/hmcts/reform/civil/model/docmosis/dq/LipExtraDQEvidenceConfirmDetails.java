@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.dq;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.citizenui.EvidenceConfirmDetails;
 
 import java.util.Optional;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class LipExtraDQEvidenceConfirmDetails {
 
     private String firstName;
@@ -22,13 +26,12 @@ public class LipExtraDQEvidenceConfirmDetails {
         Optional<EvidenceConfirmDetails> evidenceConfirmDetails) {
         if (evidenceConfirmDetails.isPresent()) {
             EvidenceConfirmDetails confirmDetails = evidenceConfirmDetails.get();
-            return LipExtraDQEvidenceConfirmDetails.builder()
-                .firstName(confirmDetails.getFirstName())
-                .lastName(confirmDetails.getLastName())
-                .email(confirmDetails.getEmail())
-                .phone(confirmDetails.getPhone())
-                .jobTitle(confirmDetails.getJobTitle())
-                .build();
+            return new LipExtraDQEvidenceConfirmDetails()
+                .setFirstName(confirmDetails.getFirstName())
+                .setLastName(confirmDetails.getLastName())
+                .setEmail(confirmDetails.getEmail())
+                .setPhone(confirmDetails.getPhone())
+                .setJobTitle(confirmDetails.getJobTitle());
         }
         return null;
     }

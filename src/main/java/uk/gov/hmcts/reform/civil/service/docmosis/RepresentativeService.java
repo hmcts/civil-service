@@ -57,7 +57,7 @@ public class RepresentativeService {
         }
         return ofNullable(caseData.getRespondentSolicitor1OrganisationDetails())
             .map(Representative::fromSolicitorOrganisationDetails)
-            .orElse(Representative.builder().build());
+            .orElse(new Representative());
     }
 
     public Representative getRespondent2Representative(CaseData caseData) {
@@ -88,12 +88,12 @@ public class RepresentativeService {
         }
         return ofNullable(caseData.getRespondentSolicitor2OrganisationDetails())
             .map(Representative::fromSolicitorOrganisationDetails)
-            .orElse(Representative.builder().build());
+            .orElse(new Representative());
     }
 
     public Representative getApplicantRepresentative(CaseData caseData) {
         if (caseData.isApplicantNotRepresented()) {
-            return Representative.builder().build();
+            return new Representative();
         }
         // all applicants share solicitor
         var organisationId = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();

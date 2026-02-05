@@ -65,10 +65,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
             .applicantPreferredCourt("127")
             .applicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                              .region("4")
-                              .baseLocation("000000")
-                              .build())
+            .caseLocation(new CaseLocationCivil()
+                              .setRegion("4")
+                              .setBaseLocation("000000")
+                              )
             .build();
         applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;

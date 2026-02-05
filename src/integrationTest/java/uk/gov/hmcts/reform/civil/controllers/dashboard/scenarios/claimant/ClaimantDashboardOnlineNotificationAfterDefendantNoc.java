@@ -33,7 +33,7 @@ public class ClaimantDashboardOnlineNotificationAfterDefendantNoc extends Dashbo
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
-            .claimIssuedHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF).build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.YES)

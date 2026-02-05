@@ -70,35 +70,31 @@ class QueryDocumentTest {
 
         QueryDocument result = QueryDocument.from(CASE_ID, messageThread);
 
-        assertEquals(QueryDocument.builder()
-                         .referenceNumber(CASE_ID)
-                         .messages(List.of(
-                             DocumentQueryMessage.builder()
-                                 .id(INITIAL_QUERY.getId())
-                                 .messageType("Query")
-                                 .name(INITIAL_QUERY.getName())
-                                 .subject(INITIAL_QUERY.getSubject())
-                                 .hearingDate("15-03-2025")
-                                 .createdOn("15-01-2025 12:00")
-                                 .isHearingRelated(INITIAL_QUERY.getIsHearingRelated())
-                                 .attachments(INITIAL_QUERY.getAttachments())
-                                 .build(),
-                             DocumentQueryMessage.builder()
-                                 .id(QUERY_RESPONSE.getId())
-                                 .messageType("Caseworker response")
-                                 .name("Caseworker")
-                                 .createdOn("16-01-2025 12:00")
-                                 .attachments(QUERY_RESPONSE.getAttachments())
-                                 .build(),
-                             DocumentQueryMessage.builder()
-                                 .id(QUERY_FOLLOWUP.getId())
-                                 .messageType("Follow up")
-                                 .name(QUERY_FOLLOWUP.getName())
-                                 .createdOn("17-01-2025 12:00")
-                                 .attachments(QUERY_FOLLOWUP.getAttachments())
-                                 .build()
-                         ))
-                         .build(), result);
+        assertEquals(new QueryDocument()
+                         .setReferenceNumber(CASE_ID)
+                         .setMessages(List.of(
+                             new DocumentQueryMessage()
+                                 .setId(INITIAL_QUERY.getId())
+                                 .setMessageType("Query")
+                                 .setName(INITIAL_QUERY.getName())
+                                 .setSubject(INITIAL_QUERY.getSubject())
+                                 .setHearingDate("15-03-2025")
+                                 .setCreatedOn("15-01-2025 12:00")
+                                 .setIsHearingRelated(INITIAL_QUERY.getIsHearingRelated())
+                                 .setAttachments(INITIAL_QUERY.getAttachments()),
+                             new DocumentQueryMessage()
+                                 .setId(QUERY_RESPONSE.getId())
+                                 .setMessageType("Caseworker response")
+                                 .setName("Caseworker")
+                                 .setCreatedOn("16-01-2025 12:00")
+                                 .setAttachments(QUERY_RESPONSE.getAttachments()),
+                             new DocumentQueryMessage()
+                                 .setId(QUERY_FOLLOWUP.getId())
+                                 .setMessageType("Follow up")
+                                 .setName(QUERY_FOLLOWUP.getName())
+                                 .setCreatedOn("17-01-2025 12:00")
+                                 .setAttachments(QUERY_FOLLOWUP.getAttachments())
+                         )), result);
 
     }
 

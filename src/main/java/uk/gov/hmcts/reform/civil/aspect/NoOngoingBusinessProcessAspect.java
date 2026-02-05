@@ -86,6 +86,7 @@ public class NoOngoingBusinessProcessAspect {
 
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
+            || caseEvent.equals(CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE)
             || caseData.hasNoOngoingBusinessProcess()) {
             return joinPoint.proceed();
         }
