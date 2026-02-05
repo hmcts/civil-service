@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring', version: '3.51.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
