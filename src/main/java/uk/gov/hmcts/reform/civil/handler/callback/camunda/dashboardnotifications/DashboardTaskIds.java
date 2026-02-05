@@ -20,4 +20,5 @@ public final class DashboardTaskIds {
     public static final String MOVE_TO_DECISION_OUTCOME = "GenerateDashboardNotificationsDecisionOutcome";
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
+    public static final String DJ_NON_DIVERGENT = "GenerateDashboardNotificationsDjNonDivergent";
 }
