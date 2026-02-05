@@ -57,6 +57,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+            log.info("Start Event {} for caseId {} activityId {}", variables.getCaseEvent(), caseId, externalTask.getActivityId());
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
@@ -73,6 +74,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 flowState,
                 startEventData
             );
+            log.info("Submit Event {} for caseId {}", startEventResponse.getEventId(), caseId);
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
             return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {

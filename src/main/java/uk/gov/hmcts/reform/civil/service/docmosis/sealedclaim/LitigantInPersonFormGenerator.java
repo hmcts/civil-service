@@ -39,9 +39,8 @@ public class LitigantInPersonFormGenerator implements TemplateDataGenerator<Liti
 
     @Override
     public LitigantInPersonForm getTemplateData(CaseData caseData) {
-        return LitigantInPersonForm.builder()
-            .ccdCaseReference(formatCcdCaseReference(caseData))
-            .referenceNumber(caseData.getLegacyCaseReference())
-            .build();
+        return new LitigantInPersonForm()
+            .setCcdCaseReference(formatCcdCaseReference(caseData))
+            .setReferenceNumber(caseData.getLegacyCaseReference());
     }
 }

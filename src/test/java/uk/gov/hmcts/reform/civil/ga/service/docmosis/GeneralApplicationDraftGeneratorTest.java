@@ -58,6 +58,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -131,7 +132,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class),
                                                                   eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
-        assertThat(templateData.getIsCasePastDueDate()).isEqualTo(true);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
     }
 
     @Test
@@ -159,7 +160,10 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         );
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
-        assertThat(templateData.getIsCasePastDueDate()).isEqualTo(true);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
+        assertNotNull(templateData.getSubmittedDate());
+        assertNotNull(templateData.getIssueDate());
+        assertEquals(String.valueOf(CHILD_CCD_REF), templateData.getApplicationId());
     }
 
     @Test
@@ -337,7 +341,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                  YesOrNo addRespondent) {
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-        DynamicListElement location1 = DynamicListElement.builder()
+        DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         return GeneralApplicationCaseData.builder()
             .claimant1PartyName("Test Claimant1 Name")
@@ -353,7 +357,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
+                                                                        .listItems(List.of(location2))
                                                                         .value(location1).build())
                                           .vulnerabilityQuestionsYesOrNo(YES)
                                           .vulnerabilityQuestion("dummy2")
@@ -383,6 +387,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
 
@@ -411,7 +416,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     }
 
     private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
-        DynamicListElement location1 = DynamicListElement.builder()
+        DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
@@ -429,15 +434,17 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                    .serviceReqReference(CUSTOMER_REFERENCE)
+                    .paymentSuccessfulDate(LocalDateTime.now())
+                    .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
+                                                                        .listItems(List.of(location2))
+                                                                        .value(location2).build())
                                           .vulnerabilityQuestionsYesOrNo(YES)
                                           .vulnerabilityQuestion("dummy2")
                                           .generalAppUnavailableDates(appUnavailabilityDates)
@@ -451,12 +458,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
 
     private GeneralApplication getGeneralApplicationWithDeadlineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
-        DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
                                                .unavailableTrialDateTo(LocalDate.now().plusDays(2))
@@ -497,6 +503,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
             .build();

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
@@ -16,14 +16,13 @@ import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
 import java.time.LocalDate;
 
 @Getter
-@Builder
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
+@Accessors(chain = true)
 public class AcknowledgementOfClaimFormForSpec implements MappableObject {
 
     @JsonProperty("courtseal")
-    @Builder.Default
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
     private String referenceNumber;

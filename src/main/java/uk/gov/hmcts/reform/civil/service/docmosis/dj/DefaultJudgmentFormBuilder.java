@@ -17,9 +17,11 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
 
     @Autowired
-    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator, JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                      OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
+                                      JudgmentAmountsCalculator judgmentAmountsCalculator,
+                                      OrganisationService organisationService,
+                                      DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
@@ -42,21 +44,21 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
                 .getRespondentSolicitor1Reference() : null;
         }
 
-        return DefaultJudgmentForm.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .formText("No response,")
-            .applicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
-            .respondent(getPartyDetails(respondent))
-            .claimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
+        return new DefaultJudgmentForm()
+            .setCaseNumber(caseData.getLegacyCaseReference())
+            .setFormText("No response,")
+            .setApplicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setRespondent(getPartyDetails(respondent))
+            .setClaimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
             )
-            .debt(debtAmount.toString())
-            .costs(cost.toString())
-            .totalCost(debtAmount.add(cost).setScale(2).toString())
-            .applicantReference(Objects.isNull(caseData.getSolicitorReferences())
+            .setDebt(debtAmount.toString())
+            .setCosts(cost.toString())
+            .setTotalCost(debtAmount.add(cost).setScale(2).toString())
+            .setApplicantReference(Objects.isNull(caseData.getSolicitorReferences())
                 ? null : caseData.getSolicitorReferences()
                 .getApplicantSolicitor1Reference())
-            .respondentReference(Objects.isNull(caseData.getSolicitorReferences())
-                ? null : respReference).build();
+            .setRespondentReference(Objects.isNull(caseData.getSolicitorReferences())
+                ? null : respReference);
     }
 
 }

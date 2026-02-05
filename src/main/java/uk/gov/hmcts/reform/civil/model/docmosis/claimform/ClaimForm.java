@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.civil.model.docmosis.claimform;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.ClaimAmountBreakupDetails;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
@@ -19,9 +21,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Builder
 @Getter
+@Setter
 @EqualsAndHashCode
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ClaimForm implements MappableObject {
 
     private String claimNumber;

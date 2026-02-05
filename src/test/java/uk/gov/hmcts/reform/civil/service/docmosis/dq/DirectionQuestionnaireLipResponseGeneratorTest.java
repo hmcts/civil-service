@@ -96,61 +96,54 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
     @Test
     void shouldGenerateTemplateDataForIntermediateTrack() {
         //Given
-        FixedRecoverableCosts fixedRecoverableCosts = FixedRecoverableCosts.builder()
-            .isSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
-            .complexityBandingAgreed(YesOrNo.YES)
-            .band(ComplexityBand.BAND_1)
-            .reasons("reasons")
-            .build();
+        FixedRecoverableCosts fixedRecoverableCosts = new FixedRecoverableCosts()
+            .setIsSubjectToFixedRecoverableCostRegime(YesOrNo.YES)
+            .setComplexityBandingAgreed(YesOrNo.YES)
+            .setBand(ComplexityBand.BAND_1)
+            .setReasons("reasons");
         given(caseData.getApplicant1()).willReturn(Party.builder()
                                                        .partyName("app1")
                                                        .type(Party.Type.COMPANY)
                                                        .build());
         given(caseData.getRespondent1()).willReturn(Party.builder()
-                                                       .partyName("res1")
-                                                       .type(Party.Type.COMPANY)
-                                                       .build());
+                                                        .partyName("res1")
+                                                        .type(Party.Type.COMPANY)
+                                                        .build());
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.INTERMEDIATE_CLAIM.name());
-        given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
-                                                         .respondent1DQFixedRecoverableCostsIntermediate(
+        given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
+                                                         .setRespondent1DQFixedRecoverableCostsIntermediate(
                                                              fixedRecoverableCosts)
-                                                         .specRespondent1DQDisclosureOfElectronicDocuments(
-                                                             DisclosureOfElectronicDocuments.builder()
-                                                                 .reachedAgreement(YesOrNo.YES)
-                                                                 .build()
+                                                         .setSpecRespondent1DQDisclosureOfElectronicDocuments(
+                                                             new DisclosureOfElectronicDocuments()
+                                                                 .setReachedAgreement(YesOrNo.YES)
                                                          )
-                                                         .specRespondent1DQDisclosureOfNonElectronicDocuments(
-                                                             DisclosureOfNonElectronicDocuments.builder()
-                                                                 .bespokeDirections("directions")
-                                                                 .build()
+                                                         .setSpecRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                             new DisclosureOfNonElectronicDocuments()
+                                                                 .setBespokeDirections("directions")
                                                          )
-                                                         .respondent1DQClaimantDocumentsToBeConsidered(
-                                                             DocumentsToBeConsidered.builder()
-                                                                 .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                 .details("details")
-                                                                 .build())
-                                                         .build());
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+                                                         .setRespondent1DQClaimantDocumentsToBeConsidered(
+                                                             new DocumentsToBeConsidered()
+                                                                 .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                 .setDetails("details")));
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
         //Then
         assertThat(templateData.getAllocatedTrack()).isEqualTo("INTERMEDIATE_CLAIM");
         assertThat(templateData.getFixedRecoverableCosts()).isEqualTo(FixedRecoverableCostsSection.from(fixedRecoverableCosts));
-        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(DisclosureOfElectronicDocuments.builder()
-                                                                                    .reachedAgreement(YesOrNo.YES)
-                                                                                    .build());
-        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
-                                                                                       .bespokeDirections("directions")
-                                                                                       .build());
-        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                                            .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                            .details("details")
-                                                                            .sectionHeading("Claimants documents to be considered")
-                                                                            .question("Are there any documents the claimants have that you want the court to consider?")
-                                                                            .build());
+        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(new DisclosureOfElectronicDocuments()
+                                                                                    .setReachedAgreement(YesOrNo.YES));
+        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(new DisclosureOfNonElectronicDocuments()
+                                                                                       .setBespokeDirections("directions"));
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(new DocumentsToBeConsideredSection(
+            YesOrNo.YES,
+            "details",
+            "Claimants documents to be considered",
+            "Are there any documents the claimants have that you want the court to consider?"
+        ));
     }
 
     @Test
@@ -164,42 +157,36 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
                                                         .type(Party.Type.COMPANY)
                                                         .build());
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.MULTI_CLAIM.name());
-        given(caseData.getRespondent1DQ()).willReturn(Respondent1DQ.builder()
-                                                          .specRespondent1DQDisclosureOfElectronicDocuments(
-                                                              DisclosureOfElectronicDocuments.builder()
-                                                                  .reachedAgreement(YesOrNo.YES)
-                                                                  .build()
+        given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
+                                                          .setSpecRespondent1DQDisclosureOfElectronicDocuments(
+                                                              new DisclosureOfElectronicDocuments()
+                                                                  .setReachedAgreement(YesOrNo.YES)
                                                           )
-                                                          .specRespondent1DQDisclosureOfNonElectronicDocuments(
-                                                              DisclosureOfNonElectronicDocuments.builder()
-                                                                  .bespokeDirections("directions")
-                                                                  .build()
+                                                          .setSpecRespondent1DQDisclosureOfNonElectronicDocuments(
+                                                              new DisclosureOfNonElectronicDocuments()
+                                                                  .setBespokeDirections("directions")
                                                           )
-                                                          .respondent1DQClaimantDocumentsToBeConsidered(
-                                                              DocumentsToBeConsidered.builder()
-                                                                  .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                  .details("details")
-                                                                  .build())
-                                                          .build());
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder formBuilder = DirectionsQuestionnaireForm.builder();
-        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireFormBuilder(any(CaseData.class), anyString()))
-            .thenReturn(formBuilder);
+                                                          .setRespondent1DQClaimantDocumentsToBeConsidered(
+                                                              new DocumentsToBeConsidered()
+                                                                  .setHasDocumentsToBeConsidered(YesOrNo.YES)
+                                                                  .setDetails("details")));
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
+        when(dqGeneratorFormBuilder.getDirectionsQuestionnaireForm(any(CaseData.class), anyString()))
+            .thenReturn(form);
         //When
         DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, AUTH);
 
         //Then
         assertThat(templateData.getAllocatedTrack()).isEqualTo("MULTI_CLAIM");
-        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(DisclosureOfElectronicDocuments.builder()
-                                                                                    .reachedAgreement(YesOrNo.YES)
-                                                                                    .build());
-        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(DisclosureOfNonElectronicDocuments.builder()
-                                                                                       .bespokeDirections("directions")
-                                                                                       .build());
-        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(DocumentsToBeConsideredSection.builder()
-                                                                            .hasDocumentsToBeConsidered(YesOrNo.YES)
-                                                                            .details("details")
-                                                                            .sectionHeading("Claimants documents to be considered")
-                                                                            .question("Are there any documents the claimants have that you want the court to consider?")
-                                                                            .build());
+        assertThat(templateData.getDisclosureOfElectronicDocuments()).isEqualTo(new DisclosureOfElectronicDocuments()
+                                                                                    .setReachedAgreement(YesOrNo.YES));
+        assertThat(templateData.getDisclosureOfNonElectronicDocuments()).isEqualTo(new DisclosureOfNonElectronicDocuments()
+                                                                                       .setBespokeDirections("directions"));
+        assertThat(templateData.getDocumentsToBeConsidered()).isEqualTo(new DocumentsToBeConsideredSection(
+            YesOrNo.YES,
+            "details",
+            "Claimants documents to be considered",
+            "Are there any documents the claimants have that you want the court to consider?"
+        ));
     }
 }
