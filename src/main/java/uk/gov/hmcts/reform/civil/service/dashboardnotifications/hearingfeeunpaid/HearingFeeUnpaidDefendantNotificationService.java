@@ -4,10 +4,10 @@ import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT;
 
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
@@ -19,14 +19,17 @@ public class HearingFeeUnpaidDefendantNotificationService extends DashboardScena
 
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public HearingFeeUnpaidDefendantNotificationService(DashboardScenariosService dashboardScenariosService,
                                                         DashboardNotificationService dashboardNotificationService,
                                                         DashboardNotificationsParamsMapper mapper,
-                                                        TaskListService taskListService) {
+                                                        TaskListService taskListService,
+                                                        SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper);
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     public void notifyHearingFeeUnpaid(CaseData caseData, String authToken) {
@@ -35,7 +38,7 @@ public class HearingFeeUnpaidDefendantNotificationService extends DashboardScena
 
     @Override
     public String getScenario(CaseData caseData) {
-        return isNull(caseData.getTrialReadyRespondent1())  && SdoHelper.isFastTrack(caseData)
+        return isNull(caseData.getTrialReadyRespondent1()) && sdoCaseClassificationService.isFastTrack(caseData)
             ? SCENARIO_AAA6_HEARING_FEE_UNPAID_DEFENDANT.getScenario()
             : SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_DEFENDANT.getScenario();
     }

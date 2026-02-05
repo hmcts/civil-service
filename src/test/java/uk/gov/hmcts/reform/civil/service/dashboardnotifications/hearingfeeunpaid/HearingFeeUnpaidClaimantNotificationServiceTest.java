@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -37,6 +38,8 @@ class HearingFeeUnpaidClaimantNotificationServiceTest {
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private SdoCaseClassificationService sdoCaseClassificationService;
 
     @InjectMocks
     private HearingFeeUnpaidClaimantNotificationService service;
@@ -54,6 +57,8 @@ class HearingFeeUnpaidClaimantNotificationServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setTrialReadyApplicant(null);
+
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
         service.notifyHearingFeeUnpaid(caseData, AUTH_TOKEN);
 
@@ -95,6 +100,8 @@ class HearingFeeUnpaidClaimantNotificationServiceTest {
         caseData.setTrialReadyApplicant(null);
         caseData.setCcdCaseReference(1234L);
 
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
+
         service.notifyHearingFeeUnpaid(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(CCD_REF, CLAIMANT);
@@ -114,6 +121,8 @@ class HearingFeeUnpaidClaimantNotificationServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setTrialReadyApplicant(null);
+
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
         service.notifyHearingFeeUnpaid(caseData, AUTH_TOKEN);
 
