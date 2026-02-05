@@ -3,30 +3,23 @@ package uk.gov.hmcts.reform.civil.stateflow.transitions;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimantPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.LanguagePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.NotificationPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.counterClaimSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondWithDQAndGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.fullDefenceSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.onlyInitialRespondentResponseLangIsBilingual;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.partAdmissionSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
@@ -53,98 +46,62 @@ public class ClaimIssuedTransitionBuilder extends MidTransitionBuilder {
 
     @Override
     void setUpTransitions(List<Transition> transitions) {
-        this.moveTo(CLAIM_NOTIFIED, transitions).onlyWhen(claimNotified, transitions)
-            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions).onlyWhen(takenOfflineByStaffAfterClaimIssue, transitions)
-            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions).onlyWhen(takenOfflineAfterClaimNotified, transitions)
-            .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions).onlyWhen(pastClaimNotificationDeadline, transitions)
-            .moveTo(CONTACT_DETAILS_CHANGE, transitions).onlyWhen(contactDetailsChange, transitions)
+        this.moveTo(CLAIM_NOTIFIED, transitions)
+            .onlyWhen(ClaimPredicate.isSpec.negate().and(NotificationPredicate.hasClaimNotifiedToBoth), transitions)
+
+            .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
+            .onlyWhen(TakenOfflinePredicate.byStaff.and(ClaimPredicate.afterIssued), transitions)
+
+            .moveTo(TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, transitions)
+            .onlyWhen(TakenOfflinePredicate.afterClaimNotified, transitions)
+
+            .moveTo(PAST_CLAIM_NOTIFICATION_DEADLINE_AWAITING_CAMUNDA, transitions)
+            .onlyWhen(DismissedPredicate.pastClaimNotificationDeadline, transitions)
+
+            .moveTo(CONTACT_DETAILS_CHANGE, transitions)
+            .onlyWhen(ClaimantPredicate.correspondenceAddressNotRequired, transitions)
             .set(flags -> flags.put(FlowFlag.CONTACT_DETAILS_CHANGE.name(), true), transitions)
+
             .moveTo(RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL, transitions)
-            .onlyWhen(onlyInitialRespondentResponseLangIsBilingual.and(not(contactDetailsChange)), transitions)
+            .onlyWhen(LanguagePredicate.onlyInitialResponseIsBilingual
+                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired)), transitions)
             .set(flags -> flags.put(FlowFlag.RESPONDENT_RESPONSE_LANGUAGE_IS_BILINGUAL.name(), true), transitions)
-            .moveTo(FULL_DEFENCE, transitions).onlyWhen(fullDefenceSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual))
-                .and(not(pastClaimNotificationDeadline)), transitions)
+
+            .moveTo(FULL_DEFENCE, transitions)
+            .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE)
+                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
+                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual))
+                  .and(not(DismissedPredicate.pastClaimNotificationDeadline)), transitions)
+
             .moveTo(PART_ADMISSION, transitions)
-            .onlyWhen(partAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.PART_ADMISSION)
+                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
+                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(FULL_ADMISSION, transitions)
-            .onlyWhen(fullAdmissionSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION)
+                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
+                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(COUNTER_CLAIM, transitions)
-            .onlyWhen(counterClaimSpec.and(not(contactDetailsChange)).and(not(onlyInitialRespondentResponseLangIsBilingual)), transitions)
+            .onlyWhen(ResponsePredicate.isType(RespondentResponseTypeSpec.COUNTER_CLAIM)
+                  .and(not(ClaimantPredicate.correspondenceAddressNotRequired))
+                  .and(not(LanguagePredicate.onlyInitialResponseIsBilingual)), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED, transitions)
-            .onlyWhen(awaitingResponsesFullDefenceReceivedSpec.and(specClaim), transitions)
+            .onlyWhen(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(AWAITING_RESPONSES_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(awaitingResponsesFullAdmitReceivedSpec.and(specClaim), transitions)
+            .onlyWhen(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED, transitions)
-            .onlyWhen(awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(specClaim), transitions)
+            .onlyWhen(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, transitions)
-            .onlyWhen(divergentRespondWithDQAndGoOfflineSpec.and(specClaim), transitions)
+            .onlyWhen(DivergencePredicate.divergentRespondWithDQAndGoOfflineSpec.and(ClaimPredicate.isSpec), transitions)
+
             .moveTo(DIVERGENT_RESPOND_GO_OFFLINE, transitions)
-            .onlyWhen(divergentRespondGoOfflineSpec.and(specClaim), transitions);
+            .onlyWhen(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec), transitions);
     }
 
-    public static final Predicate<CaseData> claimNotified = caseData ->
-        !SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-            && caseData.getClaimNotificationDate() != null
-            && (caseData.getDefendantSolicitorNotifyClaimOptions() == null
-            || "Both".equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel()));
-
-    public static final Predicate<CaseData> takenOfflineAfterClaimNotified = caseData ->
-        caseData.getClaimNotificationDate() != null
-            && caseData.getDefendantSolicitorNotifyClaimOptions() != null
-            && !"Both".equals(caseData.getDefendantSolicitorNotifyClaimOptions().getValue().getLabel());
-
-    public static final Predicate<CaseData> takenOfflineByStaffAfterClaimIssue = caseData ->
-        // In case of SPEC claim ClaimNotificationDate will be set even when the case is issued
-        // In case of UNSPEC ClaimNotificationDate will be set only after notification step
-        caseData.getTakenOfflineByStaffDate() != null
-            && caseData.getClaimDetailsNotificationDate() == null
-            && caseData.getRespondent1AcknowledgeNotificationDate() == null
-            && caseData.getRespondent1ResponseDate() == null
-            && caseData.getClaimNotificationDeadline() != null
-            && caseData.getClaimNotificationDeadline().isAfter(LocalDateTime.now())
-            && ((SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.getClaimNotificationDate() != null)
-            || (!SPEC_CLAIM.equals(caseData.getCaseAccessCategory()) && caseData.getClaimNotificationDate() == null));
-
-    public static final Predicate<CaseData> pastClaimNotificationDeadline = caseData ->
-        caseData.getClaimNotificationDeadline() != null
-            && caseData.getClaimNotificationDeadline().isBefore(LocalDateTime.now())
-            && caseData.getClaimNotificationDate() == null;
-
-    public static final Predicate<CaseData> awaitingResponsesFullDefenceReceivedSpec = caseData -> {
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
-            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-            && RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
-    };
-
-    public static final Predicate<CaseData> awaitingResponsesFullAdmitReceivedSpec = caseData -> {
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
-            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-            && RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
-    };
-
-    public static final Predicate<CaseData> awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec = caseData -> {
-        MultiPartyScenario scenario = getMultiPartyScenario(caseData);
-        return scenario == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP
-            && ((caseData.getRespondent1ClaimResponseTypeForSpec() != null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() == null
-            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent1ClaimResponseTypeForSpec())
-            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent1ClaimResponseTypeForSpec()))
-            || (caseData.getRespondent1ClaimResponseTypeForSpec() == null
-            && caseData.getRespondent2ClaimResponseTypeForSpec() != null
-            && !RespondentResponseTypeSpec.FULL_DEFENCE.equals(caseData.getRespondent2ClaimResponseTypeForSpec())
-            && !RespondentResponseTypeSpec.FULL_ADMISSION.equals(caseData.getRespondent2ClaimResponseTypeForSpec())));
-    };
-
-    public static final Predicate<CaseData> contactDetailsChange = caseData ->
-        NO.equals(caseData.getSpecAoSApplicantCorrespondenceAddressRequired());
 }

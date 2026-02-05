@@ -886,20 +886,19 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
         @BeforeEach
         void setup() {
             party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name").build();
-            dqExpert = Expert.builder().partyID("id").firstName("dq").lastName("dq").build();
-            expectedExpert1 = dqExpert.builder().firstName("First").lastName("Name")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(PARTY_ID)
-                .build();
+            dqExpert = new Expert().setPartyID("id").setFirstName("dq").setLastName("dq");
+            expectedExpert1 = dqExpert.copy().setFirstName("First").setLastName("Name")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
+                .setPartyID(PARTY_ID);
             expectedExpertFlags = PartyFlagStructure.builder()
                 .partyID(PARTY_ID)
                 .firstName("First")
                 .lastName("Name")
                 .build();
-            dqWitness = Witness.builder().firstName("dq").lastName("dq").partyID("id").build();
-            expectedWitness1 = Witness.builder().firstName("First").lastName("Name")
-                .eventAdded("Manage Contact Information Event").dateAdded(LocalDate.now())
-                .partyID(PARTY_ID).build();
+            dqWitness = new Witness().setFirstName("dq").setLastName("dq").setPartyID("id");
+            expectedWitness1 = new Witness().setFirstName("First").setLastName("Name")
+                .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
+                .setPartyID(PARTY_ID);
             expectedWitnessFlags = PartyFlagStructure.builder()
                 .partyID(PARTY_ID)
                 .firstName("First")
@@ -1604,9 +1603,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1632,9 +1630,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1660,9 +1657,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQExperts(Experts.builder().build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQExperts(new Experts()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1688,9 +1684,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_TWO_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                       .build())
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1719,12 +1714,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                      .build())
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
+                    .applicant2DQ(new Applicant2DQ()
+                                      .setApplicant2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1754,12 +1747,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQExperts(Experts.builder().details(wrapElements(dqExpert)).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQExperts(new Experts().setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1787,9 +1778,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_TWO_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQExperts(Experts.builder().build())
-                                       .build())
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQExperts(new Experts()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1818,12 +1808,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                      .build())
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
+                    .applicant2DQ(new Applicant2DQ()
+                                      .setApplicant2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1849,12 +1837,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1880,9 +1866,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                       .build())
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1911,12 +1896,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                      .build())
-                    .applicant2DQ(Applicant2DQ.builder()
-                                      .applicant2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
+                    .applicant2DQ(new Applicant2DQ()
+                                      .setApplicant2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1947,12 +1930,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(dqWitness)).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(dqWitness))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1981,9 +1962,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder().build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2009,9 +1989,8 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_TWO_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQWitnesses(Witnesses.builder().build())
-                                       .build())
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQWitnesses(new Witnesses()))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2037,11 +2016,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(wrapElements(party))
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQExperts(Experts.builder()
-                                                               .expertRequired(NO)
-                                                               .build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQExperts(new Experts()
+                                                               .setExpertRequired(NO)))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2067,11 +2044,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(CLAIMANT_ONE_EXPERTS_ID)
                                            .updateExpertsDetailsForm(null)
                                            .build())
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQExperts(Experts.builder()
-                                                               .expertRequired(YES)
-                                                               .details(wrapElements(dqExpert)).build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQExperts(new Experts()
+                                                               .setExpertRequired(YES)
+                                                               .setDetails(wrapElements(dqExpert))))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2096,9 +2072,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(wrapElements(party))
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder().witnessesToAppear(NO).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses()
+                                                                   .setWitnessesToAppear(NO)))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2125,11 +2101,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .partyChosenId(DEFENDANT_ONE_WITNESSES_ID)
                                            .updateWitnessesDetailsForm(null)
                                            .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder()
-                                                                   .details(wrapElements(dqWitness))
-                                                                   .witnessesToAppear(YES).build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses()
+                                                                   .setDetails(wrapElements(dqWitness))
+                                                                   .setWitnessesToAppear(YES)))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -2723,21 +2698,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
             void shouldPopulateExperts(String partyChosenId) {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-                Expert expert = Expert.builder().firstName("First").lastName("Name").partyID("id").build();
+                Expert expert = new Expert().setFirstName("First").setLastName("Name").setPartyID("id");
                 UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
                     .partyId("id").build();
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQExperts(Experts.builder().details(wrapElements(expert)).build())
-                                      .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQExperts(Experts.builder().details(wrapElements(expert)).build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQExperts(Experts.builder().details(wrapElements(expert)).build())
-                                       .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQExperts(new Experts().setDetails(wrapElements(expert))))
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQExperts(new Experts().setDetails(wrapElements(expert))))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQExperts(new Experts().setDetails(wrapElements(expert))))
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
@@ -2760,19 +2732,17 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ValueSource(strings = {CLAIMANT_ONE_EXPERTS_ID, DEFENDANT_ONE_EXPERTS_ID, DEFENDANT_TWO_EXPERTS_ID})
             void shouldNotPopulateExpertsIfEmpty(String partyChosenId) {
                 when(userService.getUserInfo(anyString())).thenReturn(ADMIN_USER);
-                Expert expert = Expert.builder().firstName("First").lastName("Name").partyID("id").build();
+                Expert expert = new Expert().setFirstName("First").setLastName("Name").setPartyID("id");
                 UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
                     .partyId("id").build();
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .applicant1DQ(null)
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQExperts(Experts.builder().build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQExperts(Experts.builder().build())
-                                       .build())
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQExperts(new Experts()))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQExperts(new Experts()))
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
@@ -2795,21 +2765,18 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_WITNESSES_ID, DEFENDANT_ONE_WITNESSES_ID, DEFENDANT_TWO_WITNESSES_ID})
             void shouldPopulateWitnesses(String partyChosenId) {
-                Witness witness = Witness.builder().firstName("First").lastName("Name").partyID("id").build();
+                Witness witness = new Witness().setFirstName("First").setLastName("Name").setPartyID("id");
                 UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
                     .partyId("id").build();
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQWitnesses(Witnesses.builder().details(wrapElements(witness)).build())
-                                      .build())
-                    .respondent1DQ(Respondent1DQ.builder()
-                                       .respondent1DQWitnesses(Witnesses.builder().details(wrapElements(witness)).build())
-                                       .build())
-                    .respondent2DQ(Respondent2DQ.builder()
-                                       .respondent2DQWitnesses(Witnesses.builder().details(wrapElements(witness)).build())
-                                       .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQWitnesses(new Witnesses().setDetails(wrapElements(witness))))
+                    .respondent1DQ(new Respondent1DQ()
+                                       .setRespondent1DQWitnesses(new Witnesses().setDetails(wrapElements(witness))))
+                    .respondent2DQ(new Respondent2DQ()
+                                       .setRespondent2DQWitnesses(new Witnesses().setDetails(wrapElements(witness))))
                     .updateDetailsForm(UpdateDetailsForm.builder()
                                            .partyChosen(DynamicList.builder()
                                                             .value(DynamicListElement.builder()
@@ -2831,15 +2798,14 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_WITNESSES_ID, DEFENDANT_ONE_WITNESSES_ID, DEFENDANT_TWO_WITNESSES_ID})
             void shouldNotPopulateWitnessesIfEmpty(String partyChosenId) {
-                Witness witness = Witness.builder().firstName("First").lastName("Name").partyID("id").build();
+                Witness witness = new Witness().setFirstName("First").setLastName("Name").setPartyID("id");
                 UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
                     .partyId("id").build();
                 List<Element<UpdatePartyDetailsForm>> form = wrapElements(party);
 
                 CaseData caseData = CaseDataBuilder.builder()
-                    .applicant1DQ(Applicant1DQ.builder()
-                                      .applicant1DQWitnesses(Witnesses.builder().build())
-                                      .build())
+                    .applicant1DQ(new Applicant1DQ()
+                                      .setApplicant1DQWitnesses(new Witnesses()))
                     .respondent1DQ(null)
                     .respondent2DQ(null)
                     .updateDetailsForm(UpdateDetailsForm.builder()

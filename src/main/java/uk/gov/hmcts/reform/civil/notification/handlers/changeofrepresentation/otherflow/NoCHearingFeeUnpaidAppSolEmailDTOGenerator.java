@@ -5,11 +5,11 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.HearingPredicate;
 
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.isInHearingReadiness;
 
 @Component
 @AllArgsConstructor
@@ -20,7 +20,7 @@ public class NoCHearingFeeUnpaidAppSolEmailDTOGenerator extends EmailDTOGenerato
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return isInHearingReadiness.test(caseData)
+        return HearingPredicate.isInReadiness.test(caseData)
             && !noCHelper.isHearingFeePaid(caseData)
             && nonNull(caseData.getHearingFee());
     }

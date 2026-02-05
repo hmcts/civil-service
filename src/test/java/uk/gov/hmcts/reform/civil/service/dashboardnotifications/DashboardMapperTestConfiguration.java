@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 
 @Configuration
 @ComponentScan(
@@ -34,8 +36,15 @@ import org.springframework.context.annotation.FilterType;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.decisionoutcome.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.defendantresponse.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.defendantresponse.*"),
+        @Filter(type = FilterType.REGEX,
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.claimissue.*")
     }
 )
 public class DashboardMapperTestConfiguration {
+
+    @Bean
+    public SdoCaseClassificationService sdoCaseClassificationService() {
+        return new SdoCaseClassificationService();
+    }
 }
