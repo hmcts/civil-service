@@ -1,0 +1,16 @@
+{
+  "name": "Fees API - Health Liveness",
+  "request": {
+    "method": "GET",
+    "urlPath": "/health/liveness"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "UP"
+    }
+  }
+}

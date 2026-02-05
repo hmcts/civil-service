@@ -1,0 +1,16 @@
+{
+  "name": "Fees API - Actuator Health Liveness",
+  "request": {
+    "method": "GET",
+    "urlPath": "/actuator/health/liveness"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "UP"
+    }
+  }
+}
