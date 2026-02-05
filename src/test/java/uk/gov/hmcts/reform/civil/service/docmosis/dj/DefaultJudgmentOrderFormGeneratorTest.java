@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,11 +21,9 @@ import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
@@ -38,7 +35,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DEFAULT_JUDGMENT_SDO_ORDER;
@@ -72,13 +68,13 @@ class DefaultJudgmentOrderFormGeneratorTest {
     private DocumentGeneratorService documentGeneratorService;
 
     @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
-    private DocumentHearingLocationHelper documentHearingLocationHelper;
+    private DjDisposalTemplateService djDisposalTemplateService;
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private DjTrialTemplateService djTrialTemplateService;
 
     @Autowired
     private DefaultJudgmentOrderFormGenerator generator;
@@ -93,6 +89,10 @@ class DefaultJudgmentOrderFormGeneratorTest {
                                                                      .forename("Judge")
                                                                      .surname("Dredd")
                                                                      .roles(Collections.emptyList()).build());
+        when(djDisposalTemplateService.buildTemplate(any(), anyString()))
+            .thenReturn(new DefaultJudgmentSDOOrderForm());
+        when(djTrialTemplateService.buildTemplate(any(), anyString()))
+            .thenReturn(new DefaultJudgmentSDOOrderForm());
     }
 
     @Test
@@ -178,9 +178,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
             .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
         LocationRefData locationRefData = LocationRefData.builder().build();
-        Mockito.when(documentHearingLocationHelper.getHearingLocation(
-            nullable(String.class), eq(caseData), eq(BEARER_TOKEN)
-        )).thenReturn(locationRefData);
+        when(djDisposalTemplateService.buildTemplate(eq(caseData), eq(BEARER_TOKEN)))
+            .thenReturn(new DefaultJudgmentSDOOrderForm().setHearingLocation(locationRefData));
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         assertThat(caseDocument).isNotNull();
@@ -261,6 +260,8 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
     @Nested
     class GetDisposalHearingBundleTypeText {
+        private final DjBundleFieldService bundleFieldService = new DjBundleFieldService();
+
         @Test
         void shouldReturnText_whenAllThreeTypesSelected() {
             List<DisposalHearingBundleType> disposalHearingBundleTypes = List.of(
@@ -284,7 +285,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 + " / an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -308,7 +309,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / an electronic bundle of digital documents";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -332,7 +333,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             String expectedText = "an indexed bundle of documents, with each page clearly numbered"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -356,7 +357,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             String expectedText = "an electronic bundle of digital documents"
                 + " / a case summary containing no more than 500 words";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -378,7 +379,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
             String expectedText = "an indexed bundle of documents, with each page clearly numbered";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -400,7 +401,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
             String expectedText = "an electronic bundle of digital documents";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -422,7 +423,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
 
             String expectedText = "a case summary containing no more than 500 words";
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo(expectedText);
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo(expectedText);
         }
 
         @Test
@@ -431,7 +432,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
                 .atStateClaimDraft()
                 .build();
 
-            assertThat(DefaultJudgmentOrderFormGenerator.fillTypeBundleInfo(caseData)).isEqualTo("");
+            assertThat(bundleFieldService.buildBundleInfo(caseData)).isEqualTo("");
         }
     }
 

@@ -10,20 +10,15 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentForm;
-import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshDocumentService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_CLAIMANT_WELSH;
-import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_SPEC_DEFENDANT;
 
 @Component
 @Slf4j
@@ -34,7 +29,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
     private final DocumentGeneratorService documentGeneratorService;
     private final AssignCategoryId assignCategoryId;
     private final NonDivergentSpecDefaultJudgementFormBuilder nonDivergentSpecDefaultJudgementFormBuilder;
-    private final CivilStitchService civilStitchService;
+    private final DjWelshDocumentService djWelshDocumentService;
     private static final String APPLICANT_1 = "applicant1";
     private static final String APPLICANT_2 = "applicant2";
     private static final String RESPONDENT_1 = "respondent1";
@@ -42,14 +37,6 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
 
     private String getFileName(CaseData caseData, DocmosisTemplates docmosisTemplate) {
         return String.format(docmosisTemplate.getDocumentTitle(), caseData.getLegacyCaseReference());
-    }
-
-    private DocmosisTemplates getDocmosisTemplate(String event, boolean isWelsh) {
-        if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name())) {
-            return isWelsh ? N121_SPEC_CLAIMANT_WELSH : N121_SPEC_CLAIMANT;
-        } else {
-            return N121_SPEC_DEFENDANT;
-        }
     }
 
     public List<CaseDocument> generateNonDivergentDocs(CaseData caseData, String authorisation, String event) {
@@ -76,7 +63,7 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
         for (int i = 0; i < defaultJudgmentForms.size(); i++) {
             DefaultJudgmentForm defaultJudgmentForm = defaultJudgmentForms.get(i);
             DocumentType documentType = getDocumentTypeBasedOnEvent(i, event);
-            DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, false);
+            DocmosisTemplates docmosisTemplate = djWelshDocumentService.getDocmosisTemplate(event, false);
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
                 docmosisTemplate);
             CaseDocument engDocument = documentManagementService.uploadDocument(
@@ -87,58 +74,18 @@ public class NonDivergentSpecDefaultJudgmentFormGenerator {
                     documentType
                 )
             );
-            CaseDocument uploadedDocument = engDocument;
-            if (event.equals(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()) && caseData.isClaimantBilingual()) {
-                uploadedDocument = null;
-                CaseDocument welshCaseDoc = createWelshDocument(defaultJudgmentForm, authorisation, caseData, event, documentType);
-                List<DocumentMetaData> documentMetaDataList = appendWelshDocToDocument(engDocument, welshCaseDoc);
-                Long caseId = caseData.getCcdCaseReference();
-                uploadedDocument = civilStitchService.generateStitchedCaseDocument(
-                    documentMetaDataList,
-                    welshCaseDoc.getDocumentName(),
-                    caseId,
-                    documentType,
-                    authorisation
-                );
-            }
+            CaseDocument uploadedDocument = djWelshDocumentService.attachWelshDocumentIfRequired(
+                defaultJudgmentForm,
+                caseData,
+                authorisation,
+                event,
+                documentType,
+                engDocument
+            );
             assignCategoryId.assignCategoryIdToCaseDocument(uploadedDocument, "judgments");
             caseDocuments.add(uploadedDocument);
         }
         return caseDocuments;
-    }
-
-    private CaseDocument createWelshDocument(DefaultJudgmentForm defaultJudgmentForm,
-                                 String authorisation, CaseData caseData, String event, DocumentType documentType) {
-
-        DocmosisTemplates docmosisTemplate = getDocmosisTemplate(event, true);
-        DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(defaultJudgmentForm,
-                                                                                              docmosisTemplate);
-        return documentManagementService.uploadDocument(
-            authorisation,
-            new PDF(
-                getFileName(caseData, docmosisTemplate),
-                docmosisDocument.getBytes(),
-                documentType
-            )
-        );
-    }
-
-    private List<DocumentMetaData> appendWelshDocToDocument(CaseDocument englishDoc, CaseDocument welshDocument) {
-        List<DocumentMetaData> documentMetaDataList = new ArrayList<>();
-
-        documentMetaDataList.add(new DocumentMetaData(
-            englishDoc.getDocumentLink(),
-            "English Document",
-            LocalDate.now().toString()
-        ));
-
-        documentMetaDataList.add(new DocumentMetaData(
-            welshDocument.getDocumentLink(),
-            "Welsh Doc to attach",
-            LocalDate.now().toString()
-        ));
-
-        return documentMetaDataList;
     }
 
     private DocumentType getDocumentTypeBasedOnEvent(int i, String event) {

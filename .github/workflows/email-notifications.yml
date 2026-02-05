@@ -27,7 +27,13 @@ jobs:
           repository: hmcts/civil-camunda-bpmn-definition
           path: ../civil-camunda-bpmn-definition
           fetch-depth: 0
+      - name: Checkout civil-ccd-definition
+        uses: actions/checkout@v4
+        with:
+          repository: hmcts/civil-ccd-definition
+          path: ../civil-ccd-definition
+          fetch-depth: 0
       - name: Generate email notifications table
-        run: scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition
+        run: scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition --ccd-definition-root ../civil-ccd-definition/ccd-definition
       - name: Verify docs are in sync
         run: git diff --exit-code docs/email-notifications.md docs/email-notifications.html

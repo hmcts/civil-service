@@ -48,6 +48,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
     NonImmediatePaymentTypeDefaultJudgmentFormBuilder.class,
     JudgmentAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
+    DjWelshTextService.class,
     JacksonAutoConfiguration.class
 })
 class DefaultJudgmentFormGeneratorTest {
