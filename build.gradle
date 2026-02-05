@@ -111,7 +111,7 @@ allprojects {
     }
     imports {
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.6'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.23.0"
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.24.1"
     }
   }
 
@@ -430,8 +430,8 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.57.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.16'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.57.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.17'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
