@@ -16,8 +16,9 @@ public class NonImmediatePaymentTypeDefaultJudgmentFormBuilder extends DefaultJu
     @Autowired
     public NonImmediatePaymentTypeDefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
                                                              JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                                             OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+                                                             OrganisationService organisationService,
+                                                             DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,

@@ -17,9 +17,11 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
 
     @Autowired
-    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator, JudgmentAmountsCalculator judgmentAmountsCalculator,
-                                      OrganisationService organisationService) {
-        super(interestCalculator, judgmentAmountsCalculator, organisationService);
+    public DefaultJudgmentFormBuilder(InterestCalculator interestCalculator,
+                                      JudgmentAmountsCalculator judgmentAmountsCalculator,
+                                      OrganisationService organisationService,
+                                      DjWelshTextService djWelshTextService) {
+        super(interestCalculator, judgmentAmountsCalculator, organisationService, djWelshTextService);
     }
 
     public DefaultJudgmentForm getDefaultJudgmentForm(CaseData caseData,
