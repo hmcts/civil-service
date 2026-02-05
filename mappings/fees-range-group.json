@@ -1,0 +1,84 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees",
+    "queryParameters": {
+      "feeVersionStatus": {
+        "equalTo": "approved"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      {
+        "applicant_type": { "name": "all" },
+        "channel_type": { "name": "default" },
+        "code": "FEE0209",
+        "current_version": {
+          "approvedBy": "39907",
+          "author": "124756",
+          "description": "Counter Claim - 5000.01 up to 10000 GBP",
+          "direction": "enhanced",
+          "flat_amount": { "amount": 455 },
+          "memo_line": "RECEIPT OF FEES - Civil issue money",
+          "natural_account_code": "4481102133",
+          "percentage_amount": { "percentage": 5 },
+          "si_ref_id": "1.1h",
+          "status": "approved",
+          "statutory_instrument": "2014 No 874",
+          "valid_from": "2015-03-09",
+          "valid_to": "2022-03-09",
+          "version": 2
+        },
+        "event_type": { "name": "issue" },
+        "fee_type": "FEETYPE",
+        "fee_versions": [
+          {
+            "approvedBy": "39907",
+            "author": "124756",
+            "description": "Counter Claim - 5000.01 up to 10000 GBP",
+            "direction": "enhanced",
+            "flat_amount": { "amount": 455 },
+            "memo_line": "RECEIPT OF FEES - Civil issue money",
+            "natural_account_code": "4481102133",
+            "percentage_amount": { "percentage": 5 },
+            "si_ref_id": "1.1h",
+            "status": "approved",
+            "statutory_instrument": "2014 No 874",
+            "valid_from": "2015-03-09",
+            "valid_to": "2022-03-09",
+            "version": 2
+          }
+        ],
+        "jurisdiction1": { "name": "civil" },
+        "jurisdiction2": { "name": "county court" },
+        "keyword": "MoneyClaim",
+        "matching_version": {
+          "approvedBy": "39907",
+          "author": "124756",
+          "description": "Counter Claim - 5000.01 up to 10000 GBP",
+          "direction": "enhanced",
+          "flat_amount": { "amount": 455 },
+          "memo_line": "RECEIPT OF FEES - Civil issue money",
+          "natural_account_code": "4481102133",
+          "percentage_amount": { "percentage": 5 },
+          "si_ref_id": "1.1h",
+          "status": "approved",
+          "statutory_instrument": "2014 No 874",
+          "valid_from": "2015-03-09",
+          "valid_to": "2022-03-09",
+          "version": 2
+        },
+        "max_range": 100,
+        "min_range": 100,
+        "range_unit": "GBP",
+        "service_type": { "name": "civil money claims" },
+        "unspecified_claim_amount": true
+      }
+    ]
+  }
+}
