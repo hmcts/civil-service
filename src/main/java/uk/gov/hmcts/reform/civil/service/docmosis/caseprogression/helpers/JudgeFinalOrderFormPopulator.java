@@ -24,34 +24,34 @@ public class JudgeFinalOrderFormPopulator {
                                                       LocationRefData caseManagementLocationDetails,
                                                       UserDetails userDetails) {
 
-        var finalOrderFormBuilder = JudgeFinalOrderForm.builder();
+        var finalOrderForm = new JudgeFinalOrderForm();
         String hearingLocationText = getHearingLocationText(caseData, caseManagementLocationDetails);
 
-        judgeCourtDetailsPopulator.populateJudgeCourtDetails(finalOrderFormBuilder, userDetails,
+        judgeCourtDetailsPopulator.populateJudgeCourtDetails(finalOrderForm, userDetails,
                                                              caseManagementLocationDetails, hearingLocationText);
-        caseInfoPopulator.populateCaseInfo(finalOrderFormBuilder, caseData);
-        costDetailsPopulator.populateCostsDetails(finalOrderFormBuilder, caseData);
-        appealInitiativePopulator.populateAppealDetails(finalOrderFormBuilder, caseData);
-        appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(finalOrderFormBuilder, caseData);
-        attendeesRepresentationPopulator.populateAttendeesDetails(finalOrderFormBuilder, caseData);
-        orderDetailsPopulator.populateAssistedOrderDetails(finalOrderFormBuilder, caseData);
-        hearingDetailsPopulator.populateHearingDetails(finalOrderFormBuilder, caseData, caseManagementLocationDetails);
+        caseInfoPopulator.populateCaseInfo(finalOrderForm, caseData);
+        costDetailsPopulator.populateCostsDetails(finalOrderForm, caseData);
+        appealInitiativePopulator.populateAppealDetails(finalOrderForm, caseData);
+        appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(finalOrderForm, caseData);
+        attendeesRepresentationPopulator.populateAttendeesDetails(finalOrderForm, caseData);
+        orderDetailsPopulator.populateAssistedOrderDetails(finalOrderForm, caseData);
+        hearingDetailsPopulator.populateHearingDetails(finalOrderForm, caseData, caseManagementLocationDetails);
 
-        return finalOrderFormBuilder.build();
+        return finalOrderForm;
     }
 
     public JudgeFinalOrderForm populateFreeFormOrder(CaseData caseData,
                                                      LocationRefData caseManagementLocationDetails,
                                                      UserDetails userDetails) {
-        var orderFormBuilder = JudgeFinalOrderForm.builder();
+        var orderForm = new JudgeFinalOrderForm();
         String hearingLocationText = getHearingLocationText(caseData, caseManagementLocationDetails);
 
-        caseInfoPopulator.populateCaseInfo(orderFormBuilder, caseData);
-        orderDetailsPopulator.populateOrderDetails(orderFormBuilder, caseData);
-        judgeCourtDetailsPopulator.populateJudgeCourtDetails(orderFormBuilder, userDetails,
+        caseInfoPopulator.populateCaseInfo(orderForm, caseData);
+        orderDetailsPopulator.populateOrderDetails(orderForm, caseData);
+        judgeCourtDetailsPopulator.populateJudgeCourtDetails(orderForm, userDetails,
                                                              caseManagementLocationDetails, hearingLocationText);
 
-        return orderFormBuilder.build();
+        return orderForm;
     }
 
     private String getHearingLocationText(CaseData caseData,

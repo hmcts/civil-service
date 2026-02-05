@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
@@ -28,15 +27,13 @@ import uk.gov.hmcts.reform.civil.model.dq.VulnerabilityQuestions;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Builder(toBuilder = true)
+@Data
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@NoArgsConstructor
+@Accessors(chain = true)
 public class DirectionsQuestionnaireForm implements MappableObject {
 
     @JsonProperty("courtseal")
-    @Builder.Default
     private String courtSeal = "[userImage:courtseal.PNG]"; //NOSONAR
     private String caseName;
     private String referenceNumber;
@@ -76,4 +73,45 @@ public class DirectionsQuestionnaireForm implements MappableObject {
     private String lipStatementOfTruthName;
     private DocumentsToBeConsideredSection documentsToBeConsidered;
     private String representativeOrganisationName;
+
+    public DirectionsQuestionnaireForm copy() {
+        return new DirectionsQuestionnaireForm()
+            .setCourtSeal(this.courtSeal)
+            .setCaseName(this.caseName)
+            .setReferenceNumber(this.referenceNumber)
+            .setSolicitorReferences(this.solicitorReferences)
+            .setSubmittedOn(this.submittedOn)
+            .setApplicant(this.applicant)
+            .setApplicant2(this.applicant2)
+            .setRespondents(this.respondents)
+            .setApplicants(this.applicants)
+            .setFileDirectionsQuestionnaire(this.fileDirectionsQuestionnaire)
+            .setFixedRecoverableCosts(this.fixedRecoverableCosts)
+            .setDisclosureOfElectronicDocuments(this.disclosureOfElectronicDocuments)
+            .setDisclosureOfNonElectronicDocuments(this.disclosureOfNonElectronicDocuments)
+            .setDeterWithoutHearingYesNo(this.deterWithoutHearingYesNo)
+            .setDeterWithoutHearingWhyNot(this.deterWithoutHearingWhyNot)
+            .setExperts(this.experts)
+            .setWitnesses(this.witnesses)
+            .setWitnessesIncludingDefendants(this.witnessesIncludingDefendants)
+            .setHearing(this.hearing)
+            .setHearingSupport(this.hearingSupport)
+            .setSupport(this.support)
+            .setFurtherInformation(this.furtherInformation)
+            .setWelshLanguageRequirements(this.welshLanguageRequirements)
+            .setStatementOfTruth(this.statementOfTruth)
+            .setAllocatedTrack(this.allocatedTrack)
+            .setDisclosureReport(this.disclosureReport)
+            .setRequestedCourt(this.requestedCourt)
+            .setVulnerabilityQuestions(this.vulnerabilityQuestions)
+            .setStatementOfTruthText(this.statementOfTruthText)
+            .setRespondent1LiPCorrespondenceAddress(this.respondent1LiPCorrespondenceAddress)
+            .setApplicant1LiPCorrespondenceAddress(this.applicant1LiPCorrespondenceAddress)
+            .setLipExperts(this.lipExperts)
+            .setLipExtraDQ(this.lipExtraDQ)
+            .setHearingLipSupportRequirements(this.hearingLipSupportRequirements)
+            .setLipStatementOfTruthName(this.lipStatementOfTruthName)
+            .setDocumentsToBeConsidered(this.documentsToBeConsidered)
+            .setRepresentativeOrganisationName(this.representativeOrganisationName);
+    }
 }

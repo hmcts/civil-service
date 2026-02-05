@@ -30,11 +30,9 @@ public class ClaimantRejectsRepaymentCourtPlanDefendantScenarioTest extends Dash
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder().applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                         .claimantResponseOnCourtDecision(
-                                                                             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)
-                                                                         .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP().setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                         .setClaimantResponseOnCourtDecision(
+                                                                             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)))
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .build();
 

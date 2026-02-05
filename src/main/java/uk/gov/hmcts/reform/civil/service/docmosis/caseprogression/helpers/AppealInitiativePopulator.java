@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.OrderMadeOnTypes;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
-import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm.JudgeFinalOrderFormBuilder;
 
 import java.time.LocalDate;
 
@@ -18,18 +17,18 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList.
 @Component
 public class AppealInitiativePopulator {
 
-    public JudgeFinalOrderForm.JudgeFinalOrderFormBuilder populateAppealDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        return builder.claimantOrDefendantAppeal(getAppealFor(caseData))
-            .appealGranted(isAppealGranted(caseData))
-            .tableAorB(circuitOrHighCourt(caseData))
-            .appealDate(getAppealDate(caseData));
+    public JudgeFinalOrderForm populateAppealDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        return form.setClaimantOrDefendantAppeal(getAppealFor(caseData))
+            .setAppealGranted(isAppealGranted(caseData))
+            .setTableAorB(circuitOrHighCourt(caseData))
+            .setAppealDate(getAppealDate(caseData));
     }
 
-    public JudgeFinalOrderFormBuilder populateInitiativeOrWithoutNoticeDetails(JudgeFinalOrderFormBuilder builder, CaseData caseData) {
-        return builder.showInitiativeOrWithoutNotice(getInitiativeOrWithoutNotice(caseData))
-            .initiativeDate(getInitiativeDate(caseData))
-            .withoutNoticeDate(getWithoutNoticeDate(caseData))
-            .reasonsText(getReasonsText(caseData));
+    public JudgeFinalOrderForm populateInitiativeOrWithoutNoticeDetails(JudgeFinalOrderForm form, CaseData caseData) {
+        return form.setShowInitiativeOrWithoutNotice(getInitiativeOrWithoutNotice(caseData))
+            .setInitiativeDate(getInitiativeDate(caseData))
+            .setWithoutNoticeDate(getWithoutNoticeDate(caseData))
+            .setReasonsText(getReasonsText(caseData));
     }
 
     public String getAppealFor(CaseData caseData) {

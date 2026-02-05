@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Data
-@Builder (toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class Witness {
 
     private String partyID;
@@ -23,4 +23,17 @@ public class Witness {
     private String reasonForWitness;
     private String eventAdded;
     private LocalDate dateAdded;
+
+    public Witness copy() {
+        return new Witness()
+            .setPartyID(partyID)
+            .setName(name)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setEmailAddress(emailAddress)
+            .setPhoneNumber(phoneNumber)
+            .setReasonForWitness(reasonForWitness)
+            .setEventAdded(eventAdded)
+            .setDateAdded(dateAdded);
+    }
 }

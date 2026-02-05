@@ -55,7 +55,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
             .gaHwfDetails(HelpWithFeesDetails.builder()
                                .remissionAmount(BigDecimal.valueOf(500))
                                .build())
-            .generalAppHelpWithFees(HelpWithFees.builder().build()).build();
+            .generalAppHelpWithFees(new HelpWithFees()).build();
         CallbackParams params = callbackParamsOf(caseData, CaseEvent.NO_REMISSION_HWF_GA, CallbackType.ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

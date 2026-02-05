@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -17,8 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.ClaimDetailsNotifiedTransitionBuilder.takenOfflineSDONotDrawnAfterClaimDetailsNotified;
 
 @ExtendWith(MockitoExtension.class)
 public class ClaimDetailsNotifiedTransitionBuilderTest {
@@ -57,8 +56,9 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+                        .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -66,15 +66,16 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_ONE, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDO_insteadOfSDONotDrawnAfterClaimDetailsNotified() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate()
+                       .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -82,8 +83,9 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+                        .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -91,15 +93,16 @@ public class ClaimDetailsNotifiedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAfterSDO_insteadOfSDONotDrawnAfterClaimDetailsNotified_in1v2Scenario() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterClaimDetailsNotified.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn.and(TakenOfflinePredicate.afterClaimNotifiedNoAckNoResponseNoExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate()
+                       .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

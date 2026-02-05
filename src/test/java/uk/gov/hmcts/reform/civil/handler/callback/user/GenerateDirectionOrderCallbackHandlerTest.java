@@ -13,14 +13,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.ByteArrayResource;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DownloadedDocumentResponse;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
@@ -58,7 +56,6 @@ import uk.gov.hmcts.reform.civil.model.finalorders.OrderAfterHearingDateType;
 import uk.gov.hmcts.reform.civil.model.finalorders.OrderMade;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDocumentBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
@@ -153,13 +150,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         + " Standard Direction Order (SDO) otherwise use Not suitable for SDO.";
     public static final String NOT_ALLOWED_FOR_TRACK = "The Make an order event is not available for Small Claims and Fast Track cases until the track has"
         + " been allocated. You must use the Standard Direction Order (SDO) to proceed.";
-    private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final byte[] bytes = {116, 101, 115, 116};
-    private static final CaseDocumentBuilder CASE_DOCUMENT = CaseDocumentBuilder.builder()
-        .documentType(JUDGE_FINAL_ORDER);
-    private static final DownloadedDocumentResponse downloadedDocumentResponse =
-        new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
-                                       "application/pdf");
 
     @Mock
     private LocationReferenceDataService locationRefDataService;
@@ -179,14 +169,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         .setUploadTimestamp((LocalDateTime.now()).toString())
         .setDocumentUrl("fake-url");
 
-    private static final LocationRefData locationRefDataAfterSdo =   LocationRefData.builder().siteName("SiteName after Sdo")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
-
-    private static final DynamicList SMALL_CLAIMS_OPTIONS = fromList(List.of(
-        BLANK_TEMPLATE_AFTER_HEARING.getLabel(), BLANK_TEMPLATE_BEFORE_HEARING.getLabel()));
+    private static final LocationRefData locationRefDataAfterSdo = buildLocationRefDataAfterSdo();
 
     private static final DynamicList FAST_INT_OPTIONS = fromList(List.of(
         BLANK_TEMPLATE_AFTER_HEARING.getLabel(), BLANK_TEMPLATE_BEFORE_HEARING.getLabel(), FIX_DATE_CMC.getLabel()));
@@ -254,9 +237,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -273,9 +254,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
@@ -294,9 +273,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -313,9 +290,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -333,9 +308,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -352,9 +325,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -371,9 +342,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -391,9 +360,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                     .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -471,9 +438,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -494,9 +459,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -517,9 +480,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -540,9 +501,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderIntermediateTrackComplexityBand(new FinalOrdersComplexityBand()
                                                                .setAssignComplexityBand(YES)
                                                                .setBand(ComplexityBand.BAND_1))
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
@@ -600,7 +559,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            locations.add(locationRefDataWithCourtNameRegion());
             when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             String advancedDate = LocalDate.now().plusDays(14).toString();
@@ -697,7 +656,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+            locations.add(locationRefDataWithCourtNameRegion());
             when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
@@ -1110,9 +1069,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldNotGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used after a hearing").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -1126,9 +1083,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldGenerateTemplateBeforeHearing_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used before a hearing/box work").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used before a hearing/box work"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -1143,9 +1098,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldGenerateTemplateFixDateForCCMC_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Fix a date for CCMC").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Fix a date for CCMC"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -1160,9 +1113,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldGenerateTemplateFixDateForCMC_onMidEventCallback() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Fix a date for CMC").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Fix a date for CMC"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             // When
@@ -1182,9 +1133,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldGenerateAfterHearingTemplateBeforeHearingDate_onMidEventCallback_noDateValidationErrors() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used after a hearing").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.SINGLE_DATE)
                                            .setDate(LocalDate.now().minusDays(2))
@@ -1203,9 +1152,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldReturnError_whenSingleDateIsInFuture() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used after a hearing").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.SINGLE_DATE)
                                            .setDate(LocalDate.now().plusDays(2))
@@ -1222,9 +1169,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldReturnError_whenDateRangeDatesAreInFuture() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used after a hearing").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.DATE_RANGE)
                                            .setFromDate(LocalDate.now().plusDays(2))
@@ -1242,9 +1187,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         void shouldReturnError_whenFromDateIsAfterToDate() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label("Blank template to be used after a hearing").build())
-                                                       .build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel("Blank template to be used after a hearing"))
                 .orderAfterHearingDate(new OrderAfterHearingDate()
                                            .setDateType(OrderAfterHearingDateType.DATE_RANGE)
                                            .setFromDate(LocalDate.now().minusDays(2))
@@ -1706,7 +1649,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         @Test
         void shouldReturnErrorNoAlternateCourtSelected_onMidEventCallback() {
             // Given
-            DynamicList hearingLocation = DynamicList.builder().value(DynamicListElement.builder().code("OTHER_LOCATION").build()).build();
+            DynamicList hearingLocation = dynamicListWithCode();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(List.of(FinalOrderToggle.SHOW))
@@ -1862,9 +1805,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_AFTER_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_AFTER_HEARING.getLabel()))
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
                 .build();
@@ -1891,9 +1832,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
             finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .finalOrderDownloadTemplateOptions(DynamicList.builder()
-                                                       .value(DynamicListElement.builder().label(BLANK_TEMPLATE_BEFORE_HEARING.getLabel()).build()
-                                                                  ).build())
+                .finalOrderDownloadTemplateOptions(dynamicListWithLabel(BLANK_TEMPLATE_BEFORE_HEARING.getLabel()))
                 .finalOrderDocumentCollection(finalCaseDocuments)
                 .uploadOrderDocumentFromTemplate(uploadedDocument)
                 .build();
@@ -2034,7 +1973,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
                 .finalOrderDocument(finalOrder)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             // When
@@ -2055,7 +1994,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -2077,7 +2016,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -2104,7 +2043,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .responseClaimTrack(AllocatedTrack.SMALL_CLAIM.name())
@@ -2132,7 +2071,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -2160,7 +2099,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -2193,7 +2132,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                             .setBaseLocation("111"))
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -2227,7 +2166,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                             .setBaseLocation("111"))
                 .finalOrderSelection(FinalOrderSelection.FREE_FORM_ORDER)
                 .finalOrderFurtherHearingToggle(toggle)
-                .hearingNotes(HearingNotes.builder().notes("preexisting hearing notes").build())
+                .hearingNotes(hearingNotes())
                 .finalOrderDocument(finalOrder)
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
                 .allocatedTrack(AllocatedTrack.SMALL_CLAIM)
@@ -2368,6 +2307,48 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                           .confirmationBody(confirmationBody)
             );
         }
+    }
+
+    private static LocationRefData buildLocationRefDataAfterSdo() {
+        LocationRefData location = new LocationRefData();
+        location.setSiteName("SiteName after Sdo");
+        location.setCourtAddress("1");
+        location.setPostcode("1");
+        location.setCourtName("Court Name example");
+        location.setRegion("Region");
+        location.setRegionId("2");
+        location.setCourtVenueId("666");
+        location.setCourtTypeId("10");
+        location.setCourtLocationCode("121");
+        location.setEpimmsId("000000");
+        return location;
+    }
+
+    private static LocationRefData locationRefDataWithCourtNameRegion() {
+        LocationRefData location = new LocationRefData();
+        location.setCourtName("Court Name");
+        location.setRegion("Region");
+        return location;
+    }
+
+    private static DynamicList dynamicListWithLabel(String label) {
+        DynamicListElement element = new DynamicListElement();
+        element.setLabel(label);
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        return list;
+    }
+
+    private static DynamicList dynamicListWithCode() {
+        DynamicListElement element = new DynamicListElement();
+        element.setCode("OTHER_LOCATION");
+        DynamicList list = new DynamicList();
+        list.setValue(element);
+        return list;
+    }
+
+    private static HearingNotes hearingNotes() {
+        return new HearingNotes().setNotes("preexisting hearing notes");
     }
 
     @Test

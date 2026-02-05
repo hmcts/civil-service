@@ -31,13 +31,6 @@ public non-sealed interface LipPredicate extends CaseDataPredicate {
 
     @BusinessRule(
         group = "Lip",
-        summary = "Claimant agreed to mediation",
-        description = "Claimant has opted into free mediation"
-    )
-    Predicate<CaseData> agreedToMediation = CaseDataPredicate.Claimant.agreedToMediation;
-
-    @BusinessRule(
-        group = "Lip",
         summary = "Translated response document uploaded",
         description = "A translated response document has been uploaded"
     )
@@ -90,6 +83,14 @@ public non-sealed interface LipPredicate extends CaseDataPredicate {
         description = "At least one party (applicant or respondent) is a litigant-in-person"
     )
     Predicate<CaseData> caseContainsLiP = CaseDataPredicate.Lip.caseContainsLiP;
+
+    @BusinessRule(
+        group = "Lip",
+        summary = "Certificate of service enabled",
+        description = "True when at least one litigant-in-person (LiP) defendant is flagged as 'at claim issued' (either " +
+            "`defendant1LIPAtClaimIssued` or `defendant2LIPAtClaimIssued` = Yes)."
+    )
+    Predicate<CaseData> certificateOfServiceEnabled = CaseDataPredicate.Lip.isClaimIssued;
 
     @BusinessRule(
         group = "Lip",

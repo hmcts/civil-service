@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -41,11 +40,10 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WR
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_RESPONDENT_TRANSLATED;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL;
 
-@Accessors(chain = true)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@AllArgsConstructor
+@Accessors(chain = true)
 public class TranslatedDocument {
 
     private Document file;
@@ -114,5 +112,21 @@ public class TranslatedDocument {
             default:
                 throw new DocumentUploadException("No document file type found for Translated document");
         }
+    }
+
+    public static TranslatedDocument builder() {
+        return new TranslatedDocument();
+    }
+
+    public TranslatedDocument documentType(TranslatedDocumentType documentType) {
+        return setDocumentType(documentType);
+    }
+
+    public TranslatedDocument file(Document file) {
+        return setFile(file);
+    }
+
+    public TranslatedDocument build() {
+        return this;
     }
 }
