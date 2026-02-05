@@ -70,8 +70,10 @@ public class StandardDirectionOrderDJClaimantNotificationHandlerTest extends Bas
         @BeforeEach
         void setup() {
             when(notificationsProperties.getStandardDirectionOrderDJTemplate()).thenReturn("template-id-sdo");
+            Organisation organisation = new Organisation();
+            organisation.setName("Test Org Name");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                    .thenReturn(Optional.of(organisation));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -91,10 +93,10 @@ public class StandardDirectionOrderDJClaimantNotificationHandlerTest extends Bas
             handler.handle(params);
 
             verify(notificationService).sendMail(
-                "applicantsolicitor@example.com",
-                "template-id-sdo",
-                getNotificationDataMap(),
-                "sdo-dj-order-notification-claimant-000DC001"
+                    "applicantsolicitor@example.com",
+                    "template-id-sdo",
+                    getNotificationDataMap(),
+                    "sdo-dj-order-notification-claimant-000DC001"
             );
         }
 

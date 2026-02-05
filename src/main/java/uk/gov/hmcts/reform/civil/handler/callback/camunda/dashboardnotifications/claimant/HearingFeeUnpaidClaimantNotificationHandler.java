@@ -4,10 +4,10 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.CaseProgressionDashboardCallbackHandler;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -24,13 +24,16 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CaseProgression
     private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FOR_HEARING_FEE_UNPAID_FOR_CLAIMANT1);
     public static final String TASK_ID = "CreateHearingFeeUnpaidDashboardNotificationsForClaimant";
     private final DashboardNotificationService dashboardNotificationService;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public HearingFeeUnpaidClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                        DashboardNotificationsParamsMapper mapper,
                                                        FeatureToggleService featureToggleService,
-                                                       DashboardNotificationService dashboardNotificationService) {
+                                                       DashboardNotificationService dashboardNotificationService,
+                                                       SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService);
         this.dashboardNotificationService = dashboardNotificationService;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class HearingFeeUnpaidClaimantNotificationHandler extends CaseProgression
 
     @Override
     public String getScenario(CaseData caseData) {
-        return isNull(caseData.getTrialReadyApplicant()) && SdoHelper.isFastTrack(caseData)
+        return isNull(caseData.getTrialReadyApplicant()) && sdoCaseClassificationService.isFastTrack(caseData)
             ? SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT.getScenario()
             : SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT.getScenario();
     }
