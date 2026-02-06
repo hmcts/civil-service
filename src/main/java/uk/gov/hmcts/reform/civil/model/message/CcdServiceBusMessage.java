@@ -3,13 +3,11 @@ package uk.gov.hmcts.reform.civil.model.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.Builder;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageState;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Builder
 @SuppressWarnings("PMD.ExcessiveParameterList")
 public class CcdServiceBusMessage implements Serializable {
 

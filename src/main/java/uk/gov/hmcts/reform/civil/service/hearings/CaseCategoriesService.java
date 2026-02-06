@@ -52,11 +52,11 @@ public class CaseCategoriesService {
                 categoryKey)).collect(toSingleton());
             log.info("Category found: parentKey={}, key={}", categoryResult.getParentKey(), categoryResult.getKey());
 
-            return CaseCategoryModel.builder()
-                .categoryParent(categoryResult.getParentKey())
-                .categoryType(getCategoryTypeFromResult(categoryResult))
-                .categoryValue(categoryResult.getKey())
-                .build();
+            CaseCategoryModel caseCategoryModel = new CaseCategoryModel();
+            caseCategoryModel.setCategoryParent(categoryResult.getParentKey());
+            caseCategoryModel.setCategoryType(getCategoryTypeFromResult(categoryResult));
+            caseCategoryModel.setCategoryValue(categoryResult.getKey());
+            return caseCategoryModel;
         }
         return null;
     }

@@ -63,19 +63,19 @@ class MediationPredicateTest {
 
         @Test
         void should_return_true_when_any_contact_info_present_applicant1() {
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
         }
 
         @Test
         void should_return_true_when_any_contact_info_present_respondent1() {
-            when(caseData.getResp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
         }
 
         @Test
         void should_return_true_when_any_contact_info_present_respondent2() {
-            when(caseData.getResp2MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp2MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
         }
 
@@ -115,7 +115,7 @@ class MediationPredicateTest {
 
         @Test
         void should_return_true_when_case_is_spec_small_claims_with_contact_info_and_r1_represented_and_applicant1_not_unrepresented() {
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getResponseClaimTrack()).thenReturn(SMALL_CLAIM.name());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
@@ -126,7 +126,7 @@ class MediationPredicateTest {
 
         @Test
         void should_return_false_when_missing_any_condition_e_g_not_small_claims() {
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             // Not small claims track
             when(caseData.getResponseClaimTrack()).thenReturn("FAST_CLAIM");
@@ -170,7 +170,7 @@ class MediationPredicateTest {
             // claimant has not agreed to mediation
             when(caseData.hasClaimantAgreedToFreeMediation()).thenReturn(false);
             // CARM applicable (LR path)
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getResponseClaimTrack()).thenReturn(SMALL_CLAIM.name());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
@@ -185,7 +185,7 @@ class MediationPredicateTest {
         void should_return_false_when_taken_offline_by_staff() {
             when(caseData.isClaimantNotSettlePartAdmitClaim()).thenReturn(true);
             when(caseData.hasClaimantAgreedToFreeMediation()).thenReturn(false);
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation(null, null, null, null));
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
             when(caseData.getResponseClaimTrack()).thenReturn(SMALL_CLAIM.name());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
