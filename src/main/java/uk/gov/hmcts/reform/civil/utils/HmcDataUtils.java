@@ -80,6 +80,17 @@ public class HmcDataUtils {
             .orElse(null);
     }
 
+    public static PartiesNotifiedResponse getLatestHearingResponseForRequestVersion(
+        PartiesNotifiedResponses partiesNotified, int requestVersion) {
+
+        return Optional.ofNullable(partiesNotified.getResponses())
+            .orElse(List.of())
+            .stream()
+            .filter(r -> r.getRequestVersion() == requestVersion)
+            .max(Comparator.comparing(PartiesNotifiedResponse::getResponseReceivedDateTime))
+            .orElse(null);
+    }
+
     /**
      * Return true whenever the Notify Nearing Parties flow needs to be rerun:
      * 1. If service data or days is null, it could be the first time this hearing

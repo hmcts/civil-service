@@ -10,32 +10,34 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
+import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.model.docmosis.GADraftForm;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
-import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
-import uk.gov.hmcts.reform.civil.ga.model.docmosis.GADraftForm;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDateGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
-import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUnavailabilityDates;
@@ -43,9 +45,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
-import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -58,6 +58,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -131,13 +132,13 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class),
                                                                   eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
-        assertThat(templateData.getIsCasePastDueDate()).isEqualTo(true);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
     }
 
     @Test
     void shouldGenerateApplicationDraftDocumentWithNoticeButRespondentNotRespondedOnTime() {
         GeneralApplicationCaseData caseData = getSampleGeneralAppCaseDataWithDeadLineReached(NO, YES);
-
+        caseData.setGeneralAppSubmittedDateGAspec(null);
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_APPLICATION_DRAFT)))
             .thenReturn(new DocmosisDocument(GENERAL_APPLICATION_DRAFT.getDocumentTitle(), bytes));
 
@@ -149,8 +150,10 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         refMap.put("respondentSolicitor1Reference", "resp1ref");
         Map<String, Object> caseDataContent = new HashMap<>();
         caseDataContent.put("solicitorReferences", refMap);
+        caseDataContent.put("generalAppSubmittedDateGAspec", LocalDateTime.now());
         CaseDetails parentCaseDetails = CaseDetails.builder().data(caseDataContent).build();
         when(coreCaseDataService.getCase(PARENT_CCD_REF)).thenReturn(parentCaseDetails);
+
         generalApplicationDraftGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
@@ -159,7 +162,10 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         );
         verify(documentGeneratorService).generateDocmosisDocument(any(GADraftForm.class), eq(GENERAL_APPLICATION_DRAFT));
         var templateData = generalApplicationDraftGenerator.getTemplateData(caseData);
-        assertThat(templateData.getIsCasePastDueDate()).isEqualTo(true);
+        assertThat(templateData.getIsCasePastDueDate()).isTrue();
+        assertNotNull(templateData.getSubmittedDate());
+        assertNotNull(templateData.getIssueDate());
+        assertEquals(String.valueOf(CHILD_CCD_REF), templateData.getApplicationId());
     }
 
     @Test
@@ -337,7 +343,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                  YesOrNo addRespondent) {
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-        DynamicListElement location1 = DynamicListElement.builder()
+        DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         return GeneralApplicationCaseData.builder()
             .claimant1PartyName("Test Claimant1 Name")
@@ -353,7 +359,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
+                                                                        .listItems(List.of(location2))
                                                                         .value(location1).build())
                                           .vulnerabilityQuestionsYesOrNo(YES)
                                           .vulnerabilityQuestion("dummy2")
@@ -383,6 +389,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
 
@@ -411,7 +418,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     }
 
     private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
-        DynamicListElement location1 = DynamicListElement.builder()
+        DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
@@ -429,15 +436,17 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                    .serviceReqReference(CUSTOMER_REFERENCE)
+                    .paymentSuccessfulDate(LocalDateTime.now())
+                    .build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
-                                                                        .listItems(List.of(location1))
-                                                                        .value(location1).build())
+                                                                        .listItems(List.of(location2))
+                                                                        .value(location2).build())
                                           .vulnerabilityQuestionsYesOrNo(YES)
                                           .vulnerabilityQuestion("dummy2")
                                           .generalAppUnavailableDates(appUnavailabilityDates)
@@ -451,12 +460,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
 
     private GeneralApplication getGeneralApplicationWithDeadlineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
-        DynamicListElement location1 = DynamicListElement.builder()
-            .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
                                                .unavailableTrialDateTo(LocalDate.now().plusDays(2))
@@ -497,6 +505,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
+            .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(PARENT_CCD_REF.toString()).build())
             .build();

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.dq.DocumentsToBeConsidered;
 
 @Data
@@ -21,6 +22,17 @@ public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
     private String sectionHeading;
     private String question;
 
+    public DocumentsToBeConsideredSection(
+        YesOrNo hasDocumentsToBeConsidered,
+        String details,
+        String sectionHeading,
+        String question
+    ) {
+        super(hasDocumentsToBeConsidered, details);
+        this.sectionHeading = sectionHeading;
+        this.question = question;
+    }
+
     public static DocumentsToBeConsideredSection from(DocumentsToBeConsidered documentsToBeConsidered, boolean isDefendantSection) {
         if (documentsToBeConsidered == null) {
             return null;
@@ -31,11 +43,11 @@ public class DocumentsToBeConsideredSection extends DocumentsToBeConsidered {
         String question = isDefendantSection ? String.format(QUESTION_FORMAT, CLAIMANTS.toLowerCase())
             : String.format(QUESTION_FORMAT, DEFENDANTS.toLowerCase());
 
-        DocumentsToBeConsideredSection section = new DocumentsToBeConsideredSection();
-        section.setHasDocumentsToBeConsidered(documentsToBeConsidered.getHasDocumentsToBeConsidered());
-        section.setDetails(documentsToBeConsidered.getDetails());
-        section.setSectionHeading(sectionHeading);
-        section.setQuestion(question);
-        return section;
+        return new DocumentsToBeConsideredSection(
+            documentsToBeConsidered.getHasDocumentsToBeConsidered(),
+            documentsToBeConsidered.getDetails(),
+            sectionHeading,
+            question
+        );
     }
 }

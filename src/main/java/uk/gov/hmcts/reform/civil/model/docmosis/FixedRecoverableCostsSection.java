@@ -5,27 +5,43 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.ComplexityBand;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
 public class FixedRecoverableCostsSection extends FixedRecoverableCosts {
 
     private String bandText;
 
-    public static FixedRecoverableCostsSection from(uk.gov.hmcts.reform.civil.model.dq.FixedRecoverableCosts fixedrecoverableCosts) {
+    public FixedRecoverableCostsSection(
+        YesOrNo isSubjectToFixedRecoverableCostRegime,
+        ComplexityBand band,
+        YesOrNo complexityBandingAgreed,
+        String reasons,
+        Document frcSupportingDocument,
+        String bandText
+    ) {
+        super(isSubjectToFixedRecoverableCostRegime, band, complexityBandingAgreed, reasons, frcSupportingDocument);
+        this.bandText = bandText;
+    }
+
+    public static FixedRecoverableCostsSection from(FixedRecoverableCosts fixedrecoverableCosts) {
         if (fixedrecoverableCosts == null) {
             return null;
         }
-        FixedRecoverableCostsSection section = new FixedRecoverableCostsSection();
-        section.setIsSubjectToFixedRecoverableCostRegime(fixedrecoverableCosts.getIsSubjectToFixedRecoverableCostRegime());
-        section.setComplexityBandingAgreed(fixedrecoverableCosts.getComplexityBandingAgreed());
-        section.setBand(fixedrecoverableCosts.getBand());
-        section.setBandText(fixedrecoverableCosts.getBand() != null ? fixedrecoverableCosts.getBand().getLabel() : null);
-        section.setReasons(fixedrecoverableCosts.getReasons());
-        return section;
+        return new FixedRecoverableCostsSection(
+            fixedrecoverableCosts.getIsSubjectToFixedRecoverableCostRegime(),
+            fixedrecoverableCosts.getBand(),
+            fixedrecoverableCosts.getComplexityBandingAgreed(),
+            fixedrecoverableCosts.getReasons(),
+            fixedrecoverableCosts.getFrcSupportingDocument(),
+            fixedrecoverableCosts.getBand() != null ? fixedrecoverableCosts.getBand().getLabel() : null
+        );
     }
 }
