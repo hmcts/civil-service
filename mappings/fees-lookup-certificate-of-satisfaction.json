@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - Certificate of Satisfaction",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "other" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "civil" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "miscellaneous" },
+      "keyword": { "equalTo": "CoS" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0448",
+      "description": "Certificate of satisfaction or cancellation",
+      "version": 1,
+      "fee_amount": 15.00
+    }
+  }
+}

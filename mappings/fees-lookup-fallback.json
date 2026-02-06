@@ -1,0 +1,20 @@
+{
+  "name": "Fee Lookup - Catch-all fallback",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0999",
+      "description": "Default fee (WireMock fallback)",
+      "version": 1,
+      "fee_amount": 100.00
+    }
+  }
+}
