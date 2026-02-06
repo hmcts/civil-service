@@ -26,7 +26,8 @@ java:
     HMC_API_URL: http://${SERVICE_NAME}-wiremock
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-${SERVICE_FQDN}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -237,7 +238,8 @@ ccd:
         CCD_MULTIPARTY_LOG_LEVEL: DEBUG
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE,queryManagementRaiseQuery,queryManagementRespondQuery
-        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+        ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+        ASSIGN_ROLES_ON_STARTUP: true
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
