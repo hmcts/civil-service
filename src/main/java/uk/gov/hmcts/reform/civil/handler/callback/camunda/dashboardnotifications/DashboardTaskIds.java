@@ -21,5 +21,6 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
+    public static final String GA_APPLICATION_SUBMITTED = "GenerateDashboardNotificationsGaApplicationSubmitted";
     public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
 }
