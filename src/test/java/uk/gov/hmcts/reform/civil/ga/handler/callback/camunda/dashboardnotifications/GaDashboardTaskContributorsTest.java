@@ -15,6 +15,9 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotificati
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionRespondentDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.translateddocument.TranslatedDocumentApplicantDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.translateddocument.TranslatedDocumentDashboardTaskContributor;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.translateddocument.TranslatedDocumentRespondentDashboardTask;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardCaseType;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContribution;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
@@ -66,6 +69,14 @@ class GaDashboardTaskContributorsTest {
                     mock(FinalOrderRespondentDashboardTask.class)
                 ),
                 DashboardTaskIds.GA_FINAL_ORDER,
+                2
+            ),
+            new ContributorSpec(
+                new TranslatedDocumentDashboardTaskContributor(
+                    mock(TranslatedDocumentApplicantDashboardTask.class),
+                    mock(TranslatedDocumentRespondentDashboardTask.class)
+                ),
+                DashboardTaskIds.GA_TRANSLATED_DOCUMENT,
                 2
             )
         );
