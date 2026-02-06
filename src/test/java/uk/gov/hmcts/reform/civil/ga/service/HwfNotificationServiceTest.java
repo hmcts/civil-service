@@ -127,8 +127,8 @@ public class HwfNotificationServiceTest {
             .applicantPartyName(APPLICANT)
             .claimant1PartyName(CLAIMANT)
             .defendant1PartyName(DEFENDANT)
-            .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
-                    HWF_REFERENCE).build())
+            .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
+                    HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
@@ -147,8 +147,8 @@ public class HwfNotificationServiceTest {
             .applicantPartyName(APPLICANT)
             .claimant1PartyName(CLAIMANT)
             .defendant1PartyName(DEFENDANT)
-            .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber(
-                    HWF_REFERENCE).build())
+            .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
+                    HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                     .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
                     .build())
@@ -157,9 +157,7 @@ public class HwfNotificationServiceTest {
 
     private static final GeneralApplicationCaseData  CIVIL_WELSH_CLA = GeneralApplicationCaseData.builder().claimantBilingualLanguagePreference("WELSH").build();
     private static final GeneralApplicationCaseData  CIVIL_WELSH_DEF = GeneralApplicationCaseData.builder()
-        .respondent1LiPResponse(
-        RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
-    ).build();
+        .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")).build();
 
     @BeforeEach
     void setup() {
@@ -208,10 +206,10 @@ public class HwfNotificationServiceTest {
                 .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
-                .helpWithFeesMoreInformationGa(HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(NOW)
-                        .hwFMoreInfoRequiredDocuments(
-                                getMoreInformationDocumentList()).build())
+                .helpWithFeesMoreInformationGa(new HelpWithFeesMoreInformation()
+                        .setHwFMoreInfoDocumentDate(NOW)
+                        .setHwFMoreInfoRequiredDocuments(
+                                getMoreInformationDocumentList()))
                 .parentCaseReference(GA_REFERENCE)
                 .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
@@ -237,10 +235,10 @@ public class HwfNotificationServiceTest {
             .parentCaseReference(GA_REFERENCE)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
-            .helpWithFeesMoreInformationGa(HelpWithFeesMoreInformation.builder()
-                                               .hwFMoreInfoDocumentDate(NOW)
-                                               .hwFMoreInfoRequiredDocuments(
-                                                   getMoreInformationDocumentList()).build())
+            .helpWithFeesMoreInformationGa(new HelpWithFeesMoreInformation()
+                                               .setHwFMoreInfoDocumentDate(NOW)
+                                               .setHwFMoreInfoRequiredDocuments(
+                                                   getMoreInformationDocumentList()))
             .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
@@ -262,10 +260,10 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
                 .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
-                .helpWithFeesMoreInformationAdditional(HelpWithFeesMoreInformation.builder()
-                        .hwFMoreInfoDocumentDate(NOW)
-                        .hwFMoreInfoRequiredDocuments(
-                                getMoreInformationDocumentList()).build())
+                .helpWithFeesMoreInformationAdditional(new HelpWithFeesMoreInformation()
+                        .setHwFMoreInfoDocumentDate(NOW)
+                        .setHwFMoreInfoRequiredDocuments(
+                                getMoreInformationDocumentList()))
                 .parentCaseReference(GA_REFERENCE)
                 .isGaApplicantLip(YesOrNo.YES)
                 .additionalHwfDetails(hwfeeDetails).build();
@@ -294,10 +292,10 @@ public class HwfNotificationServiceTest {
             .parentClaimantIsApplicant(YesOrNo.NO)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
-            .helpWithFeesMoreInformationAdditional(HelpWithFeesMoreInformation.builder()
-                                                       .hwFMoreInfoDocumentDate(NOW)
-                                                       .hwFMoreInfoRequiredDocuments(
-                                                           getMoreInformationDocumentList()).build())
+            .helpWithFeesMoreInformationAdditional(new HelpWithFeesMoreInformation()
+                                                       .setHwFMoreInfoDocumentDate(NOW)
+                                                       .setHwFMoreInfoRequiredDocuments(
+                                                           getMoreInformationDocumentList()))
             .additionalHwfDetails(hwfeeDetails).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);

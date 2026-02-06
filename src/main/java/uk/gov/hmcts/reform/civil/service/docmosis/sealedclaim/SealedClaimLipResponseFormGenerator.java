@@ -39,21 +39,19 @@ public class SealedClaimLipResponseFormGenerator implements TemplateDataGenerato
         log.info("Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
         BigDecimal admittedAmount = interestCalculator.claimAmountPlusInterestToDate(caseData)
             .setScale(2, RoundingMode.UNNECESSARY);
-        SealedClaimLipResponseForm.SealedClaimLipResponseFormBuilder responseFormBuilder =
-            SealedClaimLipResponseForm.toTemplate(caseData, admittedAmount).toBuilder();
+        SealedClaimLipResponseForm responseForm =
+            SealedClaimLipResponseForm.toTemplate(caseData, admittedAmount).copy();
         if (featureToggleService.isCarmEnabledForCase(caseData)) {
             log.info("If Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            responseFormBuilder.checkCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
-                    .defendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
-                    .defendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
-                    .defendant1MediationEmail(getDefendant1MediationEmail(caseData))
-                    .defendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
-                    .defendant1UnavailableDatesList(getDefendant1FromDateUnavailableList(caseData));
-            return responseFormBuilder.build();
-        } else {
-            log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
-            return  responseFormBuilder.build();
+            responseForm.setCheckCarmToggle(featureToggleService.isCarmEnabledForCase(caseData))
+                .setDefendant1MediationCompanyName(getDefendant1MediationCompanyName(caseData))
+                .setDefendant1MediationContactNumber(getDefendant1MediationContactNumber(caseData))
+                .setDefendant1MediationEmail(getDefendant1MediationEmail(caseData))
+                .setDefendant1MediationUnavailableDatesExists(checkDefendant1MediationHasUnavailabilityDates(caseData))
+                .setDefendant1UnavailableDatesList(getDefendant1FromDateUnavailableList(caseData));
         }
+        log.info("Else Generating sealed claim lip response form for caseId {}", caseData.getCcdCaseReference());
+        return responseForm;
     }
 
     private List<Element<UnavailableDate>> getDefendant1FromDateUnavailableList(CaseData caseData) {

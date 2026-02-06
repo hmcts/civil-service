@@ -81,7 +81,7 @@ public class HearingFormGeneratorTest {
         .documentName(fileName_application)
         .documentType(DEFAULT_JUDGMENT)
         .build();
-    private static final CaseLocationCivil caseManagementLocation = CaseLocationCivil.builder().baseLocation("000000").build();
+    private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
     private static LocationRefData locationRefData = LocationRefData.builder()
         .siteName("SiteName")
         .externalShortName("ExternalShortName")
@@ -281,7 +281,7 @@ public class HearingFormGeneratorTest {
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
                          PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null, "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         null, FeePaymentOutcomeDetails.builder().hwfFullRemissionGrantedForHearingFee(YesOrNo.YES).build(), "DO_NOT_SHOW"),
+                         null, new FeePaymentOutcomeDetails().setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES), "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
                          PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,

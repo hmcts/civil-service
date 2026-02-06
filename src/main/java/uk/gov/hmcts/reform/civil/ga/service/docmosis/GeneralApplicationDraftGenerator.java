@@ -1,28 +1,32 @@
 package uk.gov.hmcts.reform.civil.ga.service.docmosis;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
+import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
 import uk.gov.hmcts.reform.civil.ga.model.docmosis.GADraftForm;
 import uk.gov.hmcts.reform.civil.ga.model.docmosis.UnavailableDates;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
-import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
-import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.model.docmosis.DocmosisDocument;
+import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
+import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.TemplateDataGenerator;
-import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,6 +53,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
     private final DocumentGeneratorService documentGeneratorService;
     private final ListGeneratorService listGeneratorService;
     private final CoreCaseDataService coreCaseDataService;
+    private final ObjectMapper objectMapper;
     private static final int ONE_V_ONE = 1;
     private static final int ONE_V_TWO = 2;
     private final GaForLipService gaForLipService;
@@ -63,6 +68,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
 
         GADraftForm.GADraftFormBuilder gaDraftFormBuilder =
             GADraftForm.builder()
+                .applicationId(caseData.getCcdCaseReference().toString())
                 .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
                 .claimantName(claimantName)
                 .defendantName(defendantName)
@@ -119,6 +125,8 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
                 .role(caseData.getGeneralAppStatementOfTruth() != null && caseData
                     .getGeneralAppStatementOfTruth().getRole() != null ? caseData
                     .getGeneralAppStatementOfTruth().getRole() : null)
+                .submittedDate(getSubmittedDate(civilMainCase, caseData.getGeneralAppSubmittedDateGAspec()))
+                .issueDate(getPaymentDate(civilMainCase, caseData))
                 .date(LocalDate.now());
 
         if (caseData.getRespondentsResponses() != null && caseData.getRespondentsResponses().size() >= ONE_V_ONE) {
@@ -196,6 +204,26 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
         }
 
         return gaDraftFormBuilder.build();
+    }
+
+    private LocalDate getPaymentDate(CaseDetails civilMainCase, GeneralApplicationCaseData caseData) {
+        GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails();
+        if (generalAppPBADetails != null && generalAppPBADetails.getPaymentSuccessfulDate() != null) {
+            return generalAppPBADetails.getPaymentSuccessfulDate().toLocalDate();
+        }
+        return getSubmittedDate(civilMainCase, caseData.getGeneralAppSubmittedDateGAspec());
+    }
+
+    private LocalDate getSubmittedDate(CaseDetails civilMainCase, LocalDateTime generalAppSubmittedDate) {
+        if (generalAppSubmittedDate != null) {
+            return generalAppSubmittedDate.toLocalDate();
+        } else if (nonNull(civilMainCase.getData().get("generalAppSubmittedDateGAspec"))) {
+            objectMapper.registerModule(new JavaTimeModule());
+            LocalDateTime submittedDate = objectMapper.convertValue(civilMainCase.getData().get("generalAppSubmittedDateGAspec"), new TypeReference<>() {
+            });
+            return submittedDate.toLocalDate();
+        }
+        return null;
     }
 
     private YesOrNo isWithNoticeApplication(GeneralApplicationCaseData caseData) {
@@ -338,6 +366,7 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
     public CaseDocument generate(GeneralApplicationCaseData caseData, String authorisation) {
         try {
             GADraftForm templateData = getTemplateData(caseData);
+            log.info("Generate general application draft for caseId: {} and Submitted Date {}", caseData.getCcdCaseReference(), templateData.getSubmittedDate());
             DocmosisTemplates docmosisTemplate = getDocmosisTemplate();
 
             DocmosisDocument docmosisDocument = documentGeneratorService.generateDocmosisDocument(
