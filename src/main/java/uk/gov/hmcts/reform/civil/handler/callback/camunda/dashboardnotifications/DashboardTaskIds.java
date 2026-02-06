@@ -14,6 +14,7 @@ public final class DashboardTaskIds {
     public static final String BUNDLE_CREATION = "GenerateDashboardNotificationsBundleCreation";
     public static final String CLAIM_SETTLED = "GenerateDashboardNotificationsClaimSettled";
     public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
+    public static final String MEDIATION_UNSUCCESSFUL = "GenerateDashboardNotificationsMediationUnsuccessful";
     public static final String TRAIL_READY_CHECK = "GenerateDashboardNotificationsTrailReadyCheck";
     public static final String DECISION_RECONSIDERATION = "GenerateDashboardNotificationsDecisionReconsideration";
     public static final String COURT_OFFICER_ORDER = "GenerateDashboardNotificationsCourtOfficerOrder";
