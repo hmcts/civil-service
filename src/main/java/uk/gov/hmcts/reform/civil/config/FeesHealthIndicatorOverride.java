@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.config;
 
-import com.azure.core.http.rest.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
