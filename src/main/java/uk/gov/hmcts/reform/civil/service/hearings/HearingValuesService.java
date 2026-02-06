@@ -205,39 +205,39 @@ public class HearingValuesService {
         String baseUrl = manageCaseBaseUrlConfiguration.getManageCaseBaseUrl();
         String hmctsServiceID = getHmctsServiceID(caseData, paymentsConfiguration);
 
-        return ServiceHearingValuesModel.builder()
-            .hmctsServiceID(hmctsServiceID)
-            .hmctsInternalCaseName(getHmctsInternalCaseName(caseData))
-            .publicCaseName(getPublicCaseName(caseData))
-            .caseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData))
-            .caseCategories(getCaseCategories(caseData, caseCategoriesService, authToken))
-            .caseDeepLink(caseIdForDeepLink != null ? getCaseDeepLink(caseIdForDeepLink, baseUrl) : null)
-            .caseRestrictedFlag(getCaseRestrictedFlag())
-            .externalCaseReference(getExternalCaseReference())
-            .caseManagementLocationCode(getCaseManagementLocationCode(caseData))
-            .caseSLAStartDate(getCaseSLAStartDate(caseData))
-            .autoListFlag(getAutoListFlag())
-            .hearingType(getHearingType())
-            .hearingWindow(getHearingWindow())
-            .duration(getDuration())
-            .hearingPriorityType(getHearingPriorityType())
-            .numberOfPhysicalAttendees(getNumberOfPhysicalAttendees())
-            .hearingInWelshFlag(getHearingInWelshFlag(caseData))
-            .hearingLocations(getHearingLocations(caseData))
-            .facilitiesRequired(getFacilitiesRequired(caseData))
-            .listingComments(getListingComments(caseData))
-            .hearingRequester(getHearingRequester())
-            .privateHearingRequiredFlag(getPrivateHearingRequiredFlag())
-            .caseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData))
-            .panelRequirements(getPanelRequirements())
-            .leadJudgeContractType(getLeadJudgeContractType())
-            .judiciary(getJudiciary())
-            .hearingIsLinkedFlag(getHearingIsLinkedFlag())
-            .parties(buildPartyObjectForHearingPayload(caseData, organisationService))
-            .screenFlow(getScreenFlow())
-            .vocabulary(getVocabulary())
-            .hearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService))
-            .caseFlags(getCaseFlags(caseData))
-            .build();
+        ServiceHearingValuesModel serviceHearingValuesModel = new ServiceHearingValuesModel();
+        serviceHearingValuesModel.setHmctsServiceID(hmctsServiceID);
+        serviceHearingValuesModel.setHmctsInternalCaseName(getHmctsInternalCaseName(caseData));
+        serviceHearingValuesModel.setPublicCaseName(getPublicCaseName(caseData));
+        serviceHearingValuesModel.setCaseAdditionalSecurityFlag(getCaseAdditionalSecurityFlag(caseData));
+        serviceHearingValuesModel.setCaseCategories(getCaseCategories(caseData, caseCategoriesService, authToken));
+        serviceHearingValuesModel.setCaseDeepLink(caseIdForDeepLink != null ? getCaseDeepLink(caseIdForDeepLink, baseUrl) : null);
+        serviceHearingValuesModel.setCaseRestrictedFlag(getCaseRestrictedFlag());
+        serviceHearingValuesModel.setExternalCaseReference(getExternalCaseReference());
+        serviceHearingValuesModel.setCaseManagementLocationCode(getCaseManagementLocationCode(caseData));
+        serviceHearingValuesModel.setCaseSLAStartDate(getCaseSLAStartDate(caseData));
+        serviceHearingValuesModel.setAutoListFlag(getAutoListFlag());
+        serviceHearingValuesModel.setHearingType(getHearingType());
+        serviceHearingValuesModel.setHearingWindow(getHearingWindow());
+        serviceHearingValuesModel.setDuration(getDuration());
+        serviceHearingValuesModel.setHearingPriorityType(getHearingPriorityType());
+        serviceHearingValuesModel.setNumberOfPhysicalAttendees(getNumberOfPhysicalAttendees());
+        serviceHearingValuesModel.setHearingInWelshFlag(getHearingInWelshFlag(caseData));
+        serviceHearingValuesModel.setHearingLocations(getHearingLocations(caseData));
+        serviceHearingValuesModel.setFacilitiesRequired(getFacilitiesRequired(caseData));
+        serviceHearingValuesModel.setListingComments(getListingComments(caseData));
+        serviceHearingValuesModel.setHearingRequester(getHearingRequester());
+        serviceHearingValuesModel.setPrivateHearingRequiredFlag(getPrivateHearingRequiredFlag());
+        serviceHearingValuesModel.setCaseInterpreterRequiredFlag(hasCaseInterpreterRequiredFlag(caseData));
+        serviceHearingValuesModel.setPanelRequirements(getPanelRequirements());
+        serviceHearingValuesModel.setLeadJudgeContractType(getLeadJudgeContractType());
+        serviceHearingValuesModel.setJudiciary(getJudiciary());
+        serviceHearingValuesModel.setHearingIsLinkedFlag(getHearingIsLinkedFlag());
+        serviceHearingValuesModel.setParties(buildPartyObjectForHearingPayload(caseData, organisationService));
+        serviceHearingValuesModel.setScreenFlow(getScreenFlow());
+        serviceHearingValuesModel.setVocabulary(getVocabulary());
+        serviceHearingValuesModel.setHearingChannels(getHearingChannels(authToken, hmctsServiceID, caseData, categoryService));
+        serviceHearingValuesModel.setCaseFlags(getCaseFlags(caseData));
+        return serviceHearingValuesModel;
     }
 }

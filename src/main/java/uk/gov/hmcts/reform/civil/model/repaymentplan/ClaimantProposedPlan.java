@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.model.repaymentplan;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
@@ -17,7 +16,6 @@ import static uk.gov.hmcts.reform.civil.utils.MonetaryConversions.penniesToPound
 import static uk.gov.hmcts.reform.civil.utils.PaymentFrequencyCalculator.calculatePaymentPerMonth;
 
 @Data
-@Builder
 public class ClaimantProposedPlan {
 
     private RepaymentPlanLRspec repaymentPlanLRspec;

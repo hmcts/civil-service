@@ -30,13 +30,18 @@ public abstract class JudgmentOnlineMapper {
     private final Time time;
 
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
-        JudgmentDetails activeJudgment = isNull(caseData.getActiveJudgment()) ? JudgmentDetails.builder()
-            .judgmentId(getNextJudgmentId(caseData)).build() : caseData.getActiveJudgment();
-        return activeJudgment.toBuilder()
-            .isJointJudgment(YesOrNo.YES)
-            .lastUpdateTimeStamp(LocalDateTime.now())
-            .courtLocation(caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation().getBaseLocation() : null)
-            .build();
+        JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (isNull(activeJudgment)) {
+            activeJudgment = new JudgmentDetails();
+            activeJudgment.setJudgmentId(getNextJudgmentId(caseData));
+            caseData.setActiveJudgment(activeJudgment);
+        }
+        activeJudgment.setIsJointJudgment(YesOrNo.YES);
+        activeJudgment.setLastUpdateTimeStamp(LocalDateTime.now());
+        activeJudgment.setCourtLocation(caseData.getCaseManagementLocation() != null
+            ? caseData.getCaseManagementLocation().getBaseLocation()
+            : null);
+        return activeJudgment;
     }
 
     public void moveToHistoricJudgment(CaseData caseData) {

@@ -31,17 +31,16 @@ public class EditJudgmentOnlineMapper extends JudgmentOnlineMapper {
         );
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
         if (activeJudgment != null) {
-            activeJudgment = activeJudgment.toBuilder()
-                .state(getJudgmentState(caseData))
-                .instalmentDetails(caseData.getJoInstalmentDetails())
-                .paymentPlan(caseData.getJoPaymentPlan())
-                .isRegisterWithRTL(getIsRegisterWithRtl(activeJudgment, caseData.getJoIsRegisteredWithRTL()))
-                .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL(), activeJudgment.getRtlState()))
-                .issueDate(caseData.getJoOrderMadeDate())
-                .orderedAmount(orderAmount.toString())
-                .costs(costs.toString())
-                .totalAmount(orderAmount.add(costs).add(claimFeeAmount).toString())
-                .build();
+            activeJudgment
+                .setState(getJudgmentState(caseData))
+                .setInstalmentDetails(caseData.getJoInstalmentDetails())
+                .setPaymentPlan(caseData.getJoPaymentPlan())
+                .setIsRegisterWithRTL(getIsRegisterWithRtl(activeJudgment, caseData.getJoIsRegisteredWithRTL()))
+                .setRtlState(getRtlState(caseData.getJoIsRegisteredWithRTL(), activeJudgment.getRtlState()))
+                .setIssueDate(caseData.getJoOrderMadeDate())
+                .setOrderedAmount(orderAmount.toString())
+                .setCosts(costs.toString())
+                .setTotalAmount(orderAmount.add(costs).add(claimFeeAmount).toString());
             super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
         }
 

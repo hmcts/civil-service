@@ -47,29 +47,27 @@ class CjesServiceTest {
 
     @Test
     void sendJudgment_shouldUseActiveJudgment_whenIsActiveJudgementIsTrue() {
-        String caseId = String.valueOf(System.currentTimeMillis());
-        String legacyCcdReference = "reference";
-        LocalDateTime now = LocalDateTime.now();
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123.45")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .build();
-
-        JudgmentDetailsCJES judgmentDetailsCJES = JudgmentDetailsCJES.builder()
-            .serviceId("123")
-            .build();
+        JudgmentDetailsCJES judgmentDetailsCJES = new JudgmentDetailsCJES();
+        judgmentDetailsCJES.setServiceId("123");
 
         when(cjesMapper.toJudgmentDetailsCJES(any(CaseData.class), any(Boolean.class)))
             .thenReturn(judgmentDetailsCJES);
         when(featureToggleService.isCjesServiceAvailable()).thenReturn(true);
         when(cjesApiClient.sendJudgmentDetailsCJES(any(JudgmentDetailsCJES.class))).thenReturn(null);
+
+        LocalDateTime now = LocalDateTime.now();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setJudgmentId(123)
+            .setLastUpdateTimeStamp(now)
+            .setCourtLocation("123456")
+            .setTotalAmount("123.45")
+            .setIssueDate(now.toLocalDate())
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setCancelDate(now.toLocalDate())
+            .setDefendant1Name("Defendant 1")
+            .setDefendant1Dob(LocalDate.of(1980, 1, 1));
+        String caseId = String.valueOf(System.currentTimeMillis());
+        String legacyCcdReference = "reference";
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)

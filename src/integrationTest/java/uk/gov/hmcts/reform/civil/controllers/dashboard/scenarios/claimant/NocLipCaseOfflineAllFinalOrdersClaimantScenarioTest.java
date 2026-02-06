@@ -38,7 +38,9 @@ public class NocLipCaseOfflineAllFinalOrdersClaimantScenarioTest extends Dashboa
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder().judgmentId(123).state(JudgmentState.ISSUED).build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setJudgmentId(123)
+            .setState(JudgmentState.ISSUED);
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build()
             .toBuilder()

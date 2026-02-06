@@ -64,12 +64,18 @@ class AddCaseNoteMessageHandlerTest {
         when(caseDetailsConverter.toCaseData(eq(details))).thenReturn(data);
         when(userService.getAccessToken(any(), any())).thenReturn(ACCESS_TOKEN);
 
-        CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(CASE_ID)
-            .eventId(ADD_CASE_NOTE.name())
-            .jurisdictionId("Civil")
-            .caseTypeId("CIVIL")
-            .build();
+        CcdEventMessage ccdEventMessage = new CcdEventMessage(
+            null,
+            null,
+            CASE_ID,
+            "Civil",
+            "CIVIL",
+            ADD_CASE_NOTE.name(),
+            null,
+            null,
+            null,
+            null
+        );
 
         Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 
@@ -88,12 +94,18 @@ class AddCaseNoteMessageHandlerTest {
         doThrow(new NotificationException(new RuntimeException("error")))
             .when(roboticsNotifier).notifyRobotics(data, ACCESS_TOKEN);
 
-        CcdEventMessage ccdEventMessage = CcdEventMessage.builder()
-            .caseId(CASE_ID)
-            .eventId(ADD_CASE_NOTE.name())
-            .jurisdictionId("Civil")
-            .caseTypeId("CIVIL")
-            .build();
+        CcdEventMessage ccdEventMessage = new CcdEventMessage(
+            null,
+            null,
+            CASE_ID,
+            "Civil",
+            "CIVIL",
+            ADD_CASE_NOTE.name(),
+            null,
+            null,
+            null,
+            null
+        );
 
         Result result = addCaseNoteMessageHandler.handle(ccdEventMessage);
 

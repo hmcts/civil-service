@@ -30,10 +30,9 @@ public class CoScNotificationForCasePaidInFullGenerateCertificateDefendantScenar
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)
             .certOfSC(new CertOfSC().setDefendantFinalPaymentDate(LocalDate.now().plusDays(10)))
-            .activeJudgment(JudgmentDetails.builder()
-                .state(JudgmentState.ISSUED)
-                                .fullyPaymentMadeDate(LocalDate.now())
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                .setState(JudgmentState.ISSUED)
+                .setFullyPaymentMadeDate(LocalDate.now()))
             .build();
 
         handler.handle(callbackParams(caseData));
