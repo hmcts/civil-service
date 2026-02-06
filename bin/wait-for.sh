@@ -6,7 +6,6 @@ selected_service=${@}
 
 echo "params: ${selected_service}"
 echo "CIVIL_SERVICE_URL: ${CIVIL_SERVICE_URL}"
-echo "CIVIL_GENERAL_APPLICATIONS_URL: ${CIVIL_GENERAL_APPLICATIONS_URL}"
 echo "URL: ${URL}"
 
 service_base_urls=${CIVIL_SERVICE_URL}
