@@ -49,6 +49,7 @@ public final class DashboardTaskIds {
     public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
     public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
     public static final String GA_APPLICATION_SUBMITTED = "GenerateDashboardNotificationsGaApplicationSubmitted";
+    public static final String GA_HWF_OUTCOME = "GenerateDashboardNotificationsGaHwfOutcome";
     public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
 
 }
