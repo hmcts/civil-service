@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentFormBuilder;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshDocumentService;
+import uk.gov.hmcts.reform.civil.service.docmosis.dj.DjWelshTextService;
 import uk.gov.hmcts.reform.civil.service.docmosis.dj.JudgmentAmountsCalculator;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
@@ -62,6 +64,8 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
     NonDivergentSpecDefaultJudgementFormBuilder.class,
     JudgmentAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
+    DjWelshTextService.class,
+    DjWelshDocumentService.class,
     JacksonAutoConfiguration.class
 })
 class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
