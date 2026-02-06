@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationissued.ApplicationIssuedApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationissued.ApplicationIssuedDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationissued.ApplicationIssuedRespondentDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedApplicantDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedDashboardTaskContributor;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedRespondentDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionRespondentDashboardTask;
@@ -35,6 +38,14 @@ class GaDashboardTaskContributorsTest {
                     mock(MakeDecisionRespondentDashboardTask.class)
                 ),
                 DashboardTaskIds.GA_MAKE_DECISION,
+                2
+            ),
+            new ContributorSpec(
+                new ApplicationSubmittedDashboardTaskContributor(
+                    mock(ApplicationSubmittedApplicantDashboardTask.class),
+                    mock(ApplicationSubmittedRespondentDashboardTask.class)
+                ),
+                DashboardTaskIds.GA_APPLICATION_SUBMITTED,
                 2
             )
         );
