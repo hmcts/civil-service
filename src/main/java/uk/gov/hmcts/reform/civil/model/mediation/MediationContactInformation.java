@@ -3,8 +3,12 @@ package uk.gov.hmcts.reform.civil.model.mediation;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Data
+@NoArgsConstructor
+@Accessors(chain = true)
 public class MediationContactInformation {
 
     private String firstName;

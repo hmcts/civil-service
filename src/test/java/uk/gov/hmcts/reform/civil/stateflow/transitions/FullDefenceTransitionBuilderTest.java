@@ -181,7 +181,7 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .app1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -194,7 +194,7 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -207,7 +207,7 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .resp2MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -220,7 +220,7 @@ public class FullDefenceTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -232,7 +232,7 @@ public class FullDefenceTransitionBuilderTest {
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -682,7 +682,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCase() {
         CaseData caseData = CaseData.builder()
-            .app1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -691,7 +691,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant1() {
         CaseData caseData = CaseData.builder()
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -700,7 +700,7 @@ public class FullDefenceTransitionBuilderTest {
     @Test
     void shouldReturnTrue_whenGetCarmEnabledForCaseDefendant2() {
         CaseData caseData = CaseData.builder()
-            .resp2MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));

@@ -344,7 +344,7 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .app1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -357,7 +357,7 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -370,7 +370,7 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .resp2MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -384,7 +384,7 @@ class PartAdmissionTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .respondent1Represented(NO)
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -398,7 +398,7 @@ class PartAdmissionTransitionBuilderTest {
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
             .applicant1Represented(NO)
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -411,7 +411,7 @@ class PartAdmissionTransitionBuilderTest {
             .setClaimTypeToSpecClaim()
             .build().toBuilder()
             .responseClaimTrack(FAST_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -423,7 +423,7 @@ class PartAdmissionTransitionBuilderTest {
             .atState2v1Applicant1NotProceedApplicant2Proceeds()
             .build().toBuilder()
             .responseClaimTrack(SMALL_CLAIM.name())
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertFalse(MediationPredicate.isCarmApplicableCase.test(caseData));
@@ -486,7 +486,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .build().toBuilder()
-            .app1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .app1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -497,7 +497,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .build().toBuilder()
-            .resp1MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp1MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
@@ -508,7 +508,7 @@ class PartAdmissionTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .build().toBuilder()
-            .resp2MediationContactInfo(new MediationContactInformation("name", null, null, null))
+            .resp2MediationContactInfo(new MediationContactInformation().setFirstName("name"))
             .build();
 
         assertTrue(MediationPredicate.isCarmEnabledForCase.test(caseData));
