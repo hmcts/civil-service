@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.config;
 
+import com.azure.core.http.rest.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
@@ -7,6 +8,7 @@ import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -30,8 +32,11 @@ public class FeesHealthIndicatorOverride {
             }
             try {
                 RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getForEntity(feesApiUrl + "/health", String.class);
-                return Health.up().withDetail("fees-api", "Available").build();
+                ResponseEntity<String> response = restTemplate.getForEntity(feesApiUrl + "/health", String.class);
+                return Health.up()
+                    .withDetail("fees-api", "Available")
+                    .withDetail("response", response.getBody())
+                    .build();
             } catch (Exception ex) {
                 log.error("Error checking fees-api health", ex);
                 return Health.down().withDetail("fees-api", ex.getMessage()).build();
