@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.callback.MultiCaseTypeCallbackHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DASHBOARD_NOTIFICATIO
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DashboardNotificationHandler extends CallbackHandler {
+public class DashboardNotificationHandler extends CallbackHandler implements MultiCaseTypeCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(DASHBOARD_NOTIFICATION_EVENT);
 
@@ -32,6 +33,9 @@ public class DashboardNotificationHandler extends CallbackHandler {
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
+        if (callbackParams.isGeneralApplicationCaseType()) {
+            return callbackParams.getGeneralApplicationCaseData().getBusinessProcess().getActivityId();
+        }
         return callbackParams.getCaseData().getBusinessProcess().getActivityId();
     }
 
@@ -42,14 +46,14 @@ public class DashboardNotificationHandler extends CallbackHandler {
 
     private CallbackResponse dispatchNotifications(CallbackParams callbackParams) {
         String activityId = camundaActivityId(callbackParams);
-        List<DashboardWorkflowTask> workflows = registry.workflowsFor(activityId);
+        DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
+        List<DashboardWorkflowTask> workflows = registry.workflowsFor(activityId, context.caseType());
 
         if (workflows.isEmpty()) {
             log.warn("No dashboard notification handlers registered for activity {}", activityId);
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
 
-        DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
         workflows.forEach(task -> task.execute(context));
         return AboutToStartOrSubmitCallbackResponse.builder().build();
     }
