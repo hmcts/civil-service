@@ -238,6 +238,10 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_12
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -3121,16 +3125,7 @@ public class CaseDataBuilder {
             .setInput2("If either party considers that the time estimates is"
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
-            .setInput3("Not more than seven nor less than three clear days before "
-                + "the trial, the claimant must file at court and serve an"
-                + "indexed and paginated bundle of documents which complies"
-                + " with the requirements of Rule 39.5 Civil "
-                + "Procedure Rules"
-                + " and Practice Direction 39A. The parties must "
-                + "endeavour to agree the contents of the "
-                + "bundle before it is filed. "
-                + "The bundle will include a case summary"
-                + " and a chronology.")
+            .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
             .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         return this;
     }
@@ -3139,12 +3134,9 @@ public class CaseDataBuilder {
         disposalHearingBundleDJ = new DisposalHearingBundleDJ()
             .setInput("The claimant must lodge at court at least 7 "
                 + "days before the disposal")
-            .setType(List.of(DisposalHearingBundleType.DOCUMENTS))
-            ;
+            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         disposalHearingFinalDisposalHearingDJ = new DisposalHearingFinalDisposalHearingDJ()
-            .setInput("This claim be listed for final "
-                + "disposal before a Judge on the first "
-                + "available date after.")
+            .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .setDate(LocalDate.now().plusWeeks(16))
             .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
         return this;
@@ -7289,8 +7281,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
         atStateClaimNotified();
         this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .relatedClaimsInput(" ")
-            .legalDocumentsInput(" ")
+            .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
+            .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
             .build();
 
         return this;
