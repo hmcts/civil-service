@@ -63,20 +63,19 @@ def secrets = [
   'rpx-${env}': [
     secret('mc-idam-client-secret', 'IDAM_CLIENT_SECRET'),
   ],
-  's2s-${env}'  : [
+  's2s-${env}': [
     secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
     secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
-    secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET')
+    secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+    secret('microservicekey-xui-webapp', 'XUI_S2S_SECRET')
   ],
-  'ccd-${env}'  : [
+  'ccd-${env}': [
     secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_IDAM_CLIENT_SECRET'),
-    secret('ccd-api-gateway-oauth2-client-secret', 'CCD_API_GATEWAY_OAUTH2_CLIENT_SECRET'),
     secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
     secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
-    secret('idam-data-store-client-secret', 'IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
-    secret('idam-data-store-system-user-username', 'IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
-    secret('idam-data-store-system-user-password', 'IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
-    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_KEY')
+    secret('idam-data-store-client-secret','IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+    secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+    secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD')
   ],
   'civil-${env}': [
     secret('case-document-am-api-s2s-secret', 'CASE_DOCUMENT_AM_API_S2S_SECRET'),
@@ -85,16 +84,17 @@ def secrets = [
     secret('ccd-importer-password', 'CCD_CONFIGURER_IMPORTER_PASSWORD'),
     secret('postgres-user', 'POSTGRES_USER'),
     secret('postgres-password', 'POSTGRES_PASSWORD'),
-    secret('default-password', 'DEFAULT_PASSWORD'),
-    secret('judge-default-password', 'JUDGE_DEFAULT_PASSWORD'),
-    secret('iac-default-password', 'IAC_DEFAULT_PASSWORD'),
-    secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
-    secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS'),
-    secret('wlu-default-password','WLU_DEFAULT_PASSWORD'),
+    secret('citizen-ui-test-username', 'CITIZEN_USERNAME'),
     secret('citizen-ui-test-password', 'CITIZEN_PASSWORD'),
-    secret('civil-judge-password', 'JUDGE_PASSWORD')
+    secret('civil-judge-password', 'JUDGE_PASSWORD'),
+    secret('system-update-user-password', 'SYSTEM_USER_PASSWORD'),
+    secret('wlu-default-password','WLU_DEFAULT_PASSWORD')
   ],
-  'aac-${env}'  : [
+  'civil-cui-${env}': [
+    secret('playwright-service-url', 'PLAYWRIGHT_SERVICE_URL'),
+    secret('playwright-token', 'PLAYWRIGHT_SERVICE_ACCESS_TOKEN'),
+  ],
+  'aac-${env}': [
     secret('idam-mca-client-secret', 'IDAM_MCA_CLIENT_SECRET'),
     secret('idam-mca-system-user-username', 'IDAM_CAA_USERNAME'),
     secret('idam-mca-system-user-password', 'IDAM_CAA_PASSWORD'),
@@ -102,7 +102,7 @@ def secrets = [
     secret('idam-noc-approver-password', 'IDAM_NOC_APPROVER_PASSWORD'),
     secret('aac-manage-case-s2s-secret', 'MANAGE_CASE_S2S_KEY'),
     secret('notify-mca-api-key-secret', 'NOTIFY_MCA_API_KEY')
-  ],
+  ]
 ]
 
 // Vars for Kubernetes
@@ -166,8 +166,6 @@ withPipeline(type, product, component) {
 
   before('smoketest:preview') {
     env.FT_TYPE = getFunctionalTestsType()
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     setCivilServiceUrls("civil-service-pr-${CHANGE_ID}")
     retry(3) {
@@ -233,8 +231,6 @@ withPipeline(type, product, component) {
     """
     setCivilServiceUrls("aat");
     env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.DM_STORE_URL = "http://dm-store-aat.service.core-compute-aat.internal"
     yarnBuilder.yarn('install-dependencies')
   }
