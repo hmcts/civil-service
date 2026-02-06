@@ -52,7 +52,8 @@ class DashboardNotificationHandlerTest {
 
     @Test
     void shouldDispatchToRegisteredHandlers() {
-        when(registry.workflowsFor(TASK_ID)).thenReturn(List.of(handlerOne, handlerTwo));
+        when(registry.workflowsFor(TASK_ID, DashboardCaseType.CIVIL))
+            .thenReturn(List.of(handlerOne, handlerTwo));
 
         handler.handle(callbackParams);
 
@@ -62,11 +63,11 @@ class DashboardNotificationHandlerTest {
 
     @Test
     void shouldNotFailWhenNoHandlersRegistered() {
-        when(registry.workflowsFor(TASK_ID)).thenReturn(List.of());
+        when(registry.workflowsFor(TASK_ID, DashboardCaseType.CIVIL)).thenReturn(List.of());
 
         handler.handle(callbackParams);
 
-        verify(registry).workflowsFor(TASK_ID);
+        verify(registry).workflowsFor(TASK_ID, DashboardCaseType.CIVIL);
         verifyNoInteractions(handlerOne, handlerTwo);
     }
 }
