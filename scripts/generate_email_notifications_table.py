@@ -315,7 +315,8 @@ def collect_templates(index: SourceIndex, class_name: str, notifications: Dict[s
     for getter in sorted(templates):
         prop = getter[0].lower() + getter[1:]
         result.append({
-            "id": notifications.get(prop)
+            "id": notifications.get(prop),
+            "name": prop
         })
     return result
 
@@ -407,7 +408,7 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         for generator in generators:
             templates = collect_templates(index, generator, notifications)
             if not templates:
-                templates = [{"id": None}]
+                templates = [{"id": None, "name": None}]
             for tpl in templates:
                 rows.append({
                     "event": event,
@@ -416,6 +417,7 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "party": describe_party(index, generator),
                     "generator": generator,
                     "template_id": tpl['id'] or '—',
+                    "template_name": tpl.get('name'),
                     "bpmn_files": bpmn_files or ['—'],
                     "ccd_events": ccd_display or ['—'],
                     "ccd_event_ids": ccd_ids
@@ -435,7 +437,7 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         task_ids = extract_task_ids_including_base(index, class_name) or ['UNKNOWN']
         templates = collect_templates(index, class_name, notifications)
         if not templates:
-            templates = [{"id": None}]
+            templates = [{"id": None, "name": None}]
         party = infer_party_from_class(java_class)
         for task_id in task_ids:
             bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
@@ -451,6 +453,7 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
                     "party": party,
                     "generator": class_name,
                     "template_id": tpl['id'] or '—',
+                    "template_name": tpl.get('name'),
                     "bpmn_files": bpmn_files or ['—'],
                     "ccd_events": ccd_display or ['—'],
                     "ccd_event_ids": ccd_ids
@@ -1015,7 +1018,12 @@ def combine_rows(email_rows: List[Dict[str, object]], dashboard_rows: List[Dict[
         templates = []
         template_id = row['template_id']
         if template_id not in ('—', ''):
-            templates.append({'label': template_id, 'gov_id': template_id})
+            template_name = row.get('template_name')
+            if template_name and template_name != template_id:
+                label = f"{template_name} ({template_id})"
+            else:
+                label = template_id
+            templates.append({'label': label, 'gov_id': template_id})
         combined.append({
             'ccd_events': row['ccd_events'],
             'ccd_event_ids': row['ccd_event_ids'],
@@ -1077,6 +1085,10 @@ def build_filter_label(event_id: str, bpmn_label: Optional[str], ccd_label: Opti
     base = ccd_label or bpmn_label or event_id
     if base == event_id:
         return event_id
+    normalized = base.strip()
+    suffix = f"({event_id})"
+    if normalized.endswith(suffix):
+        return base
     return f"{base} ({event_id})"
 
 

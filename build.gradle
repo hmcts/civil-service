@@ -27,7 +27,7 @@ def versions = [
   lombok            : '1.18.38',
   camunda           : '7.20.0',
   testcontainers    : '1.21.3',
-  pdfbox            : '3.0.5',
+  pdfbox            : '3.0.6',
   tika              : '3.2.3'
 ]
 
@@ -110,8 +110,8 @@ allprojects {
 
     }
     imports {
-      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
-      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.23.0"
+      mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.6'
+      mavenBom "com.azure.spring:spring-cloud-azure-dependencies:5.24.1"
     }
   }
 
@@ -430,8 +430,8 @@ dependencies {
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
 
-  implementation group: 'com.azure', name: 'azure-core', version: '1.57.0'
-  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.16'
+  implementation group: 'com.azure', name: 'azure-core', version: '1.57.1'
+  implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.17.17'
 
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
@@ -458,7 +458,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured'
-  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+  testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
 
   testImplementation group: 'org.springframework.statemachine', name: 'spring-statemachine-test', version: versions.springStatemachine
   testImplementation 'com.github.hmcts:fortify-client:1.4.9:all'

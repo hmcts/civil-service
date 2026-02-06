@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.callback.OrderCallbackHandler;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -51,18 +51,21 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     public static final String GA = "Applications";
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 FeatureToggleService featureToggleService, ObjectMapper objectMapper,
                                                 WorkingDayIndicator workingDayIndicator,
                                                 DashboardNotificationService dashboardNotificationService,
-                                                TaskListService taskListService) {
+                                                TaskListService taskListService,
+                                                SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper, featureToggleService, workingDayIndicator);
         this.objectMapper = objectMapper;
         this.workingDayIndicator = workingDayIndicator;
         this.dashboardNotificationService = dashboardNotificationService;
         this.taskListService = taskListService;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     @Override
@@ -183,7 +186,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     }
 
     private boolean isOrderMadeFastTrackTrialNotResponded(CaseData caseData) {
-        return SdoHelper.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
+        return sdoCaseClassificationService.isFastTrack(caseData) && isNull(caseData.getTrialReadyApplicant());
     }
 
     private void deleteNotificationAndInactiveTasks(CaseData caseData) {
