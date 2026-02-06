@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.ClaimsTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -31,6 +32,8 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
     private DashboardScenariosService dashboardScenariosService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private SdoCaseClassificationService sdoCaseClassificationService;
 
     @InjectMocks
     private TrialReadyNotificationDefendantDashboardService service;
@@ -48,6 +51,8 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setTrialReadyRespondent1(null);
+
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
         service.notifyTrialReadyNotification(caseData, AUTH_TOKEN);
 
@@ -82,6 +87,8 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderSmallClaims(YesOrNo.NO);
         caseData.setTrialReadyRespondent1(null);
 
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
+
         service.notifyTrialReadyNotification(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
@@ -95,6 +102,8 @@ class TrialReadyNotificationDefendantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.fastTrack);
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
+
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
         service.notifyTrialReadyNotification(caseData, AUTH_TOKEN);
 
