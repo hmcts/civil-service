@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.config;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.actuate.health.Health;
@@ -16,7 +15,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
@@ -59,9 +57,11 @@ class FeesHealthIndicatorOverrideTest {
         String healthResponse = "{\"status\":\"UP\"}";
         ReflectionTestUtils.setField(feesHealthIndicatorOverride, "feesApiUrl", feesApiUrl);
 
-        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(RestTemplate.class,
+        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(
+            RestTemplate.class,
             (mock, context) -> when(mock.getForEntity(eq(feesApiUrl + "/health"), eq(String.class)))
-                .thenReturn(new ResponseEntity<>(healthResponse, HttpStatus.OK)))) {
+                .thenReturn(new ResponseEntity<>(healthResponse, HttpStatus.OK))
+        )) {
 
             HealthIndicator healthIndicator = feesHealthIndicatorOverride.feesHealthIndicator();
             Health health = healthIndicator.health();
@@ -78,9 +78,11 @@ class FeesHealthIndicatorOverrideTest {
         String errorMessage = "Connection refused";
         ReflectionTestUtils.setField(feesHealthIndicatorOverride, "feesApiUrl", feesApiUrl);
 
-        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(RestTemplate.class,
+        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(
+            RestTemplate.class,
             (mock, context) -> when(mock.getForEntity(eq(feesApiUrl + "/health"), eq(String.class)))
-                .thenThrow(new RestClientException(errorMessage)))) {
+                .thenThrow(new RestClientException(errorMessage))
+        )) {
 
             HealthIndicator healthIndicator = feesHealthIndicatorOverride.feesHealthIndicator();
             Health health = healthIndicator.health();
@@ -95,9 +97,11 @@ class FeesHealthIndicatorOverrideTest {
         String feesApiUrl = "http://localhost:6666";
         ReflectionTestUtils.setField(feesHealthIndicatorOverride, "feesApiUrl", feesApiUrl);
 
-        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(RestTemplate.class,
+        try (MockedConstruction<RestTemplate> mockedRestTemplate = mockConstruction(
+            RestTemplate.class,
             (mock, context) -> when(mock.getForEntity(eq(feesApiUrl + "/health"), eq(String.class)))
-                .thenThrow(new RestClientException("503 Service Unavailable")))) {
+                .thenThrow(new RestClientException("503 Service Unavailable"))
+        )) {
 
             HealthIndicator healthIndicator = feesHealthIndicatorOverride.feesHealthIndicator();
             Health health = healthIndicator.health();
