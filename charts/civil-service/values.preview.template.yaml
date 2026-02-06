@@ -179,8 +179,6 @@ ccd:
       enabled: false
     postgresql:
       enabled: false
-    ras:
-      enabled: false
     userProfileImporter:
       enabled: false
     userProfile:
@@ -196,6 +194,9 @@ ccd:
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     postgresSecret: postgres
+    postgresUsername: hmcts
+    postgresPassword: ${POSTGRES_PASSWORD}
+    postgresHostname: ${SERVICE_NAME}-postgresql
 
   ccd-api-gateway-web:
     nodejs:
@@ -266,6 +267,35 @@ ccd:
           disabled: true
       keyVaults: []
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
+
+  aac-manage-case-assignment:
+    enabled: true
+    java:
+      disableKeyVaults: true
+      ingressHost: manage-case-assignment-${SERVICE_NAME}.preview.platform.hmcts.net
+      imagePullPolicy: Always
+      releaseNameOverride: ${SERVICE_NAME}-aac-manage-case-assignment
+      image: hmctspublic.azurecr.io/aac/manage-case-assignment:latest
+      environment:
+        IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+        IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+        OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
+        S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+        MCA_DS_PROXY_URLS_ALLOWED_LIST: /searchCases.*,/internal/searchCases.*,/internal/cases.*
+        MCA_DEF_STORE_PROXY_URLS_ALLOWED_LIST: /api/display/challenge-questions.*
+        MANAGE_CASE_S2S_AUTHORISED_SERVICES: xui_webapp,ccd_data,fpl_case_service,divorce_frontend,divorce_ccd_submission,finrem_case_orchestration,civil_service,civil_general_applications
+        CCD_DATA_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        CCD_DEFINITION_STORE_API_BASE_URL: http://${SERVICE_NAME}-ccd-definition-store-api
+        PRD_HOST: http://rd-professional-api-aat.service.core-compute-aat.internal
+        IDAM_CAA_USERNAME: ${IDAM_CAA_USERNAME}
+        IDAM_CAA_PASSWORD: ${IDAM_CAA_PASSWORD}
+        IDAM_CLIENT_SECRET: ${IDAM_MCA_CLIENT_SECRET}
+        MANAGE_CASE_S2S_KEY: ${MANAGE_CASE_S2S_KEY}
+        IDAM_NOC_APPROVER_USERNAME: ${IDAM_NOC_APPROVER_USERNAME}
+        IDAM_NOC_APPROVER_PASSWORD: ${IDAM_NOC_APPROVER_PASSWORD}
+        NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
+      autoscaling:
+        enabled: false
 
   postgresql:
     persistence:
