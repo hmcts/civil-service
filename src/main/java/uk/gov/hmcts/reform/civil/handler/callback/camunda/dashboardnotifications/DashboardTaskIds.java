@@ -26,5 +26,6 @@ public final class DashboardTaskIds {
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
     public static final String HEARING_SCHEDULED_HMC = "GenerateDashboardNotificationsHearingScheduledHmc";
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
+    public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
     public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
 }
