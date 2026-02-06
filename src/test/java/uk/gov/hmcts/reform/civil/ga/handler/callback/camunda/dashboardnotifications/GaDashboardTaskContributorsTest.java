@@ -7,6 +7,9 @@ import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotificati
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.applicationsubmitted.ApplicationSubmittedRespondentDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.FinalOrderApplicantDashboardTask;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.FinalOrderDashboardTaskContributor;
+import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.finalorder.FinalOrderRespondentDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.hwf.HwfOutcomeApplicantDashboardTask;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.hwf.HwfOutcomeDashboardTaskContributor;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications.makedecision.MakeDecisionApplicantDashboardTask;
@@ -56,6 +59,14 @@ class GaDashboardTaskContributorsTest {
                 ),
                 DashboardTaskIds.GA_HWF_OUTCOME,
                 1
+            ),
+            new ContributorSpec(
+                new FinalOrderDashboardTaskContributor(
+                    mock(FinalOrderApplicantDashboardTask.class),
+                    mock(FinalOrderRespondentDashboardTask.class)
+                ),
+                DashboardTaskIds.GA_FINAL_ORDER,
+                2
             )
         );
 
