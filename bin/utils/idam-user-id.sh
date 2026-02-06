@@ -7,6 +7,6 @@
 ## Returns a valid IDAM user id for the given token
 
 USER_TOKEN=${1}
-echo "debugging! USER_TOKEN- ${USER_TOKEN}"
-echo "debugging!! IDAM_API_URL- ${IDAM_API_URL}"
+echo "\n\ndebugging! USER_TOKEN- ${USER_TOKEN}"
+echo "\n\ndebugging!! IDAM_API_URL- ${IDAM_API_URL}"
 curl --silent -v --show-error -X GET "${IDAM_API_URL}/details" -H "accept: application/json" -H "authorization: Bearer ${USER_TOKEN}" | jq -r .id
