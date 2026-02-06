@@ -22,7 +22,7 @@ class CaseTypeHandlerKeyFactoryTest {
             .isGeneralApplicationCaseType(false)
             .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build());
 
-        final String handlerKey = factory.createHandlerKey(callbackParams);
+        final String handlerKey = factory.createDispatchKey(callbackParams);
         assertEquals(CREATE_CLAIM.name(), handlerKey);
     }
 
@@ -33,25 +33,41 @@ class CaseTypeHandlerKeyFactoryTest {
             .isGeneralApplicationCaseType(true)
             .request(CallbackRequest.builder().eventId(RESPOND_TO_APPLICATION.name()).build());
 
-        final String handlerKey = factory.createHandlerKey(callbackParams);
+        final String handlerKey = factory.createDispatchKey(callbackParams);
 
         assertEquals(expectedHandlerKey, handlerKey);
     }
 
     @Test
     void shouldCreateCivilCaseHandlerKeyGivenCallbackHandlerAndCaseEventForCivil() {
-        final String handlerKey = factory.createHandlerKey(new CivilCallbackHandler(), CREATE_CLAIM);
-        assertEquals(CREATE_CLAIM.name(), handlerKey);
+        final List<String> handlerKeys = factory.createRegistrationKeys(new CivilCallbackHandler(), CREATE_CLAIM);
+        assertEquals(List.of(CREATE_CLAIM.name()), handlerKeys);
     }
 
     @Test
     void shouldCreateGeneralApplicationCaseHandlerKeyGivenCallbackHandlerAndCaseEventForGeneralApplication() {
         final String expectedHandlerKey = GENERALAPPLICATION_CASE_TYPE + "-" + RESPOND_TO_APPLICATION.name();
-        final String handlerKey = factory.createHandlerKey(
+        final List<String> handlerKeys = factory.createRegistrationKeys(
             new GaCallbackHandler(),
             RESPOND_TO_APPLICATION
         );
-        assertEquals(expectedHandlerKey, handlerKey);
+        assertEquals(List.of(expectedHandlerKey), handlerKeys);
+    }
+
+    @Test
+    void shouldCreateBothCaseHandlerKeysForMultiCaseHandler() {
+        final List<String> handlerKeys = factory.createRegistrationKeys(
+            new MultiCaseCallbackHandler(),
+            CREATE_CLAIM
+        );
+
+        assertEquals(
+            List.of(
+                CREATE_CLAIM.name(),
+                GENERALAPPLICATION_CASE_TYPE + "-" + CREATE_CLAIM.name()
+            ),
+            handlerKeys
+        );
     }
 
     private static class CivilCallbackHandler extends CallbackHandler {
@@ -68,6 +84,19 @@ class CaseTypeHandlerKeyFactoryTest {
     }
 
     private static class GaCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
+
+        @Override
+        protected Map<String, Callback> callbacks() {
+            return Map.of();
+        }
+
+        @Override
+        public List<CaseEvent> handledEvents() {
+            return List.of();
+        }
+    }
+
+    private static class MultiCaseCallbackHandler extends CallbackHandler implements MultiCaseTypeCallbackHandler {
 
         @Override
         protected Map<String, Callback> callbacks() {
