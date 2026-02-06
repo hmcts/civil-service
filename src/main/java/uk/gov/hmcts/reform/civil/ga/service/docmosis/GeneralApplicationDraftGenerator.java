@@ -222,7 +222,6 @@ public class GeneralApplicationDraftGenerator implements TemplateDataGenerator<G
             LocalDateTime submittedDate = objectMapper.convertValue(civilMainCase.getData().get("generalAppSubmittedDateGAspec"), new TypeReference<>() {
             });
             return submittedDate.toLocalDate();
-
         }
         return null;
     }
