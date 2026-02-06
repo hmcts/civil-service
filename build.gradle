@@ -152,6 +152,15 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
 }
 
+tasks.withType(Test) {
+  useJUnitPlatform()
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  jvmArgs '-Xshare:off'
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
+
 test {
   failFast = true
 }
@@ -610,7 +619,7 @@ tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
   // Pipeline-stable settings with JaCoCo enabled
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  maxParallelForks = 2
   forkEvery = 50
 
   // Keep within typical Jenkins container limits
