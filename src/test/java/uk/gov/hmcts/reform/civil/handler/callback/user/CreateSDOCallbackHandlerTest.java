@@ -447,6 +447,10 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
                 categorySearchResult));
 
+            CaseLocationCivil civil = new CaseLocationCivil();
+            civil.setRegion("1");
+            civil.setBaseLocation("214320");
+
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .reasonForTransfer("Court Closed")
@@ -455,12 +459,12 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                           .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
                                                           .label("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
                                                           .build()).build())
-                .caseManagementLocation(CaseLocationCivil.builder().region("1").baseLocation("214320").build())
+                .caseManagementLocation(civil)
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
 
             CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
-            CaseDocument order = createCaseDocument("url");
+            CaseDocument order = createCaseDocument();
             when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

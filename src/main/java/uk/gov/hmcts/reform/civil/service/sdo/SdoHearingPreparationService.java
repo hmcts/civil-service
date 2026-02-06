@@ -100,11 +100,23 @@ public class SdoHearingPreparationService {
         CaseData caseData
     ) {
         List<LocationRefData> locationRefDataList = sdoLocationService.fetchHearingLocations(authToken);
-        DynamicList locationsList = sdoLocationService.buildLocationList(
-            preferredCourt.orElse(null),
-            false,
-            locationRefDataList
-        );
+        DynamicList locationsList;
+        if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setCaseLocation(caseData.getCaseManagementLocation());
+            Optional<RequestedCourt> optionalRequestedCourt = Optional.of(requestedCourt);
+            locationsList = sdoLocationService.buildLocationList(
+                optionalRequestedCourt.orElse(null),
+                false,
+                locationRefDataList
+            );
+        } else {
+            locationsList = sdoLocationService.buildLocationList(
+                preferredCourt.orElse(null),
+                false,
+                locationRefDataList
+            );
+        }
         caseData.setDisposalHearingMethodInPerson(locationsList);
         caseData.setFastTrackMethodInPerson(locationsList);
         caseData.setSmallClaimsMethodInPerson(locationsList);
