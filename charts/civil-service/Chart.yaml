@@ -15,7 +15,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: ccd.enabled
   - name: xui-webapp
-    version: 1.0.31
+    version: 1.0.40
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: xui-webapp.enabled
   - name: idam-pr
