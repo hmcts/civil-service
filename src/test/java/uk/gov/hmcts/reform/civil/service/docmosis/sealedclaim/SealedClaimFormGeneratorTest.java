@@ -43,6 +43,8 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SEALED_CLAIM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_OTHER_REMEDY;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseName;
 
 @ExtendWith(SpringExtension.class)
@@ -167,6 +169,93 @@ class SealedClaimFormGeneratorTest {
             any(SealedClaimForm.class),
             eq(N1_MULTIPARTY_SAME_SOL)
         );
+    }
+
+    @Nested
+    class OtherRemedy {
+        @Test
+        void shouldGenerateSealedClaimForm_when1V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_OTHER_REMEDY)))
+                .thenReturn(new DocmosisDocument(N1_OTHER_REMEDY.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1_OTHER_REMEDY));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2DifferentSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_OTHER_REMEDY)))
+                .thenReturn(new DocmosisDocument(N1_OTHER_REMEDY.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1_OTHER_REMEDY));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when2V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoApplicants().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY)
+            );
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2SameSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY)
+            );
+        }
     }
 
     private Representative getRepresentative() {

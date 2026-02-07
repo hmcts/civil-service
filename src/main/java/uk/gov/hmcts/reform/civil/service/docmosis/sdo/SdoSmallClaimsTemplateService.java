@@ -35,6 +35,7 @@ public class SdoSmallClaimsTemplateService {
         String authorisation
     ) {
         boolean carmEnabled = featureToggleService.isCarmEnabledForCase(caseData);
+        boolean hasPpi = hasAdditionalDirection(caseData, SmallTrack.smallClaimPPI);
         SdoDocumentFormSmall template = new SdoDocumentFormSmall()
             .setWrittenByJudge(isJudge)
             .setCurrentDate(LocalDate.now())
@@ -52,6 +53,8 @@ public class SdoSmallClaimsTemplateService {
             .setSmallClaims(caseData.getSmallClaims())
             .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
             .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
+            .setHasPaymentProtectionInsurance(hasPpi)
+            .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)
             .setSmallClaimsJudgesRecital(caseData.getSmallClaimsJudgesRecital())
             .setSmallClaimsHearing(caseData.getSmallClaimsHearing())
             .setSmallClaimsHearingTime(smallClaimsTemplateFieldService.getHearingTimeLabel(caseData))
@@ -86,7 +89,9 @@ public class SdoSmallClaimsTemplateService {
                     .map(SdoR2WelshLanguageUsage::getDescription)
                     .orElse(null)
             )
-            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther());
+            .setSdoR2SmallClaimsWitnessStatements(caseData.getSdoR2SmallClaimsWitnessStatementOther())
+            .setShowPenalNotice(hasVariable(caseData, SmallClaimsVariable.PENAL_NOTICE_TOGGLE))
+            .setPenalNoticeText(caseData.getSmallClaimsPenalNotice());
 
         template
             .setHearingLocation(

@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -304,6 +305,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         updatedDetails.setCustomerReference(customerReference);
         caseData.setClaimIssuedPaymentDetails(updatedDetails);
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+        if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+            Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
+            caseData.setOtherRemedyFee(otherRemedyFee);
+        }
         caseData.setPaymentTypePBA("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseData.setApplicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers));

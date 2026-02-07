@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackSchedulesOfLoss;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackTrial;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackWitnessOfFact;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WitnessOfFact;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
@@ -64,6 +65,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private boolean hasHousingDisrepair;
     private boolean hasPersonalInjury;
     private boolean hasRoadTrafficAccident;
+    private boolean hasPaymentProtectionInsurance;
     private boolean writtenByJudge;
     private boolean hasSdoR2CreditHire;
     private boolean hasSdoR2CreditHireDetails;
@@ -92,6 +94,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
+    private PPI fastTrackPPI;
 
     private boolean hasNewDirections;
     private List<Element<FastTrackAddNewDirections>> fastTrackAddNewDirections;
@@ -113,6 +116,8 @@ public class SdoDocumentFormFast implements MappableObject {
     private String fastTrackAllocation;
     private String welshLanguageDescription;
     private boolean showBundleInfo;
+    private boolean showPenalNotice;
+    private String penalNoticeText;
 
     @SuppressWarnings("unused")
     public boolean getFastTrackMethodToggle() {

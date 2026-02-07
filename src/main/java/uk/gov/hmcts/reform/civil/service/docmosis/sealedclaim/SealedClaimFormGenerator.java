@@ -23,13 +23,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
 import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY;
+import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1_OTHER_REMEDY;
 import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.formatCcdCaseReference;
 
 @Service
@@ -88,7 +92,11 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
                                                  .orElse(""))
             .setCaseName(DocmosisTemplateDataUtils.toCaseName.apply(caseData))
             .setApplicantRepresentativeOrganisationName(applicants.get(0).getRepresentative().getOrganisationName())
-            .setCourtFee(caseData.getClaimFee().formData());
+            .setIsClaimDeclarationAdded(caseData.getIsClaimDeclarationAdded())
+            .setClaimDeclarationDescription(caseData.getClaimDeclarationDescription())
+            .setIsHumanRightsActIssues(caseData.getIsHumanRightsActIssues())
+            .setCourtFee(caseData.getClaimFee().formData())
+            .setOtherRemedyFee(YES.equals(caseData.getIsClaimDeclarationAdded()) && nonNull(caseData.getOtherRemedyFee()) ? caseData.getOtherRemedyFee().formData() : null);
 
         if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
             sealedClaimForm.setRespondent2ExternalReference(caseData.getRespondentSolicitor2Reference());
@@ -98,14 +106,11 @@ public class SealedClaimFormGenerator implements TemplateDataGeneratorWithAuth<S
     }
 
     private DocmosisTemplates getDocmosisTemplate(CaseData caseData) {
-        switch (getMultiPartyScenario(caseData)) {
-            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP:
-                return N1;
-            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP:
-                return N1_MULTIPARTY_SAME_SOL;
-            default:
-                throw new IllegalArgumentException("Multiparty scenario doesn't exist");
-        }
+        return switch (getMultiPartyScenario(caseData)) {
+            case ONE_V_ONE, ONE_V_TWO_TWO_LEGAL_REP -> caseData.isOtherRemedyClaim() ? N1_OTHER_REMEDY : N1;
+            case TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP -> caseData.isOtherRemedyClaim() ? N1_MULTIPARTY_SAME_SOL_OTHER_REMEDY  : N1_MULTIPARTY_SAME_SOL;
+            default -> throw new IllegalArgumentException("Multiparty scenario doesn't exist");
+        };
     }
 
     private List<Party> getRespondents(CaseData caseData, MultiPartyScenario multiPartyScenario) {

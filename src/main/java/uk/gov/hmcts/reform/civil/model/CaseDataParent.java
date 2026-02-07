@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.mediation.UploadMediationDocumentsForm;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackAllocation;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddNewDirection;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2AddendumReport;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2DisclosureOfDocuments;
@@ -154,6 +155,8 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMediationSectionToggle;
+    private List<OrderDetailsPagesSectionsToggle> smallClaimsPenalNoticeToggle;
+    private List<OrderDetailsPagesSectionsToggle> fastTrackPenalNoticeToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
 
@@ -220,6 +223,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private SdoR2WelshLanguageUsage sdoR2TrialWelshLanguageDJ;
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
+
+    private PPI smallClaimsPPI;
+    private PPI fastTrackPPI;
 
     private  LocalDate nextDeadline;
     private  String allPartyNames;

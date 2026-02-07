@@ -3,14 +3,20 @@ package uk.gov.hmcts.reform.civil.service.sdo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
+import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +47,24 @@ public class SdoTrackDefaultsService {
 
         sdoExpertEvidenceFieldsService.populateFastTrackExpertEvidence(caseData);
         sdoDisclosureOfDocumentsFieldsService.populateFastTrackDisclosureOfDocuments(caseData);
+
+        populatePenalNoticeFields(caseData);
+        populatePpiFields(caseData);
+    }
+
+    private void populatePenalNoticeFields(CaseData caseData) {
+        caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+        caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+        caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
+        caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+    }
+
+    private void populatePpiFields(CaseData caseData) {
+        PPI ppi = new PPI();
+        ppi.setPpiDate(LocalDate.now().plusDays(28));
+        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+        caseData.setSmallClaimsPPI(ppi);
+        caseData.setFastTrackPPI(ppi);
     }
 
     public void applyR2Defaults(CaseData caseData) {
