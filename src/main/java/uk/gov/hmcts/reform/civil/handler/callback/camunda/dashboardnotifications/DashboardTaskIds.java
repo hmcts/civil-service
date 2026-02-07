@@ -20,4 +20,11 @@ public final class DashboardTaskIds {
     public static final String MOVE_TO_DECISION_OUTCOME = "GenerateDashboardNotificationsDecisionOutcome";
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
+    public static final String RAISE_QUERY = "GenerateDashboardNotificationsRaiseQuery";
+    public static final String RESPOND_TO_QUERY = "GenerateDashboardNotificationsRespondToQuery";
+    public static final String CITIZEN_HEARING_FEE_PAYMENT = "GenerateDashboardNotificationsCitizenHearingFeePayment";
+    public static final String DEFENDANT_SIGN_SETTLEMENT_AGREEMENT = "GenerateDashboardNotificationsSignSettlementAgreement";
+    public static final String DISCONTINUE_CLAIM_CLAIMANT = "GenerateDashboardNotificationsDiscontinueClaimClaimant";
+    public static final String NOTIFY_LIP_CLAIMANT_HWF_OUTCOME = "GenerateDashboardNotificationsNotifyLipClaimantHwfOutcome";
+    public static final String DEFENDANT_RESPONSE_DEADLINE_CHECK = "GenerateDashboardNotificationsDefendantResponseDeadlineCheck";
 }
