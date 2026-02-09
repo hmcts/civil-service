@@ -1,6 +1,6 @@
 {
-  "name": "Fee Lookup - Money Claim with keyword (fallback)",
-  "priority": 5,
+  "name": "Fee Lookup - Money Claim Small (11000)",
+  "priority": 1,
   "request": {
     "method": "GET",
     "urlPath": "/fees-register/fees/lookup",
@@ -10,7 +10,8 @@
       "jurisdiction2": { "equalTo": "county court" },
       "channel": { "equalTo": "default" },
       "event": { "equalTo": "issue" },
-      "keyword": { "equalTo": "MoneyClaim" }
+      "keyword": { "equalTo": "MoneyClaim" },
+      "amount_or_volume": { "matches": "11000(\\.00)?" }
     }
   },
   "response": {

@@ -15,16 +15,16 @@
         "db": {
           "status": "UP",
           "details": {
-            "database": "PostgreSQL",
+            "database": "Wiremock",
             "validationQuery": "isValid()"
           }
         },
         "diskSpace": {
           "status": "UP",
           "details": {
-            "total": 133003395072,
-            "free": 26513068032,
-            "threshold": 10485760,
+            "total": 0,
+            "free": 0,
+            "threshold": 0,
             "path": "/opt/app/.",
             "exists": true
           }
