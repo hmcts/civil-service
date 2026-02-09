@@ -191,7 +191,7 @@ withNightlyPipeline(type, product, component) {
     }
 
     before('fullFunctionalTest') {
-      copyPreviousAllureHistory();
+      copyPreviousAllureHistory()
       if(runPrevFailedAndNotExecutedTestFiles) {
         copyPrevFailedAndNotExecutedTestFilesJson()
       }
