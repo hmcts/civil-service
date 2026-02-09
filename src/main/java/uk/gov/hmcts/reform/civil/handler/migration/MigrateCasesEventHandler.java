@@ -5,11 +5,7 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.engine.variable.value.FileValue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseNoteReference;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
-import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.*;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
@@ -63,6 +59,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<T> caseReferences = new ArrayList<>();
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
+        String camundaProcessIdentifier = externalTask.getVariable("notificationCamundaProcessIdentifier");
         String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
@@ -100,6 +97,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                         scenarioInstance.setCaseReference(id);
                         scenarioInstance.setDashboardScenario(scenario);
                         instance = scenarioInstance;
+                    } else if (camundaProcessIdentifier != null) {
+                        NotificationCaseReference notifyCaseReference = new NotificationCaseReference();
+                        notifyCaseReference.setCaseReference(id);
+                        notifyCaseReference.setCamundaProcessIdentifier(camundaProcessIdentifier);
+                        instance = notifyCaseReference;
                     } else if (caseNoteElementId != null) {
                         CaseNoteReference caseNoteReference = new CaseNoteReference();
                         caseNoteReference.setCaseReference(id);
