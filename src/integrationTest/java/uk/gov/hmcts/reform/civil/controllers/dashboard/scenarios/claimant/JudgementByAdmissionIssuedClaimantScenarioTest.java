@@ -126,10 +126,10 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
                                                  .build())
                                       .build())
             .respondent1(PartyBuilder.builder().organisation().build())
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now())
-                                .state(JudgmentState.ISSUED)
-                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIssueDate(LocalDate.now())
+                                .setState(JudgmentState.ISSUED)
+                                .setType(JudgmentType.JUDGMENT_BY_ADMISSION))
             .build();
     }
 }

@@ -26,8 +26,8 @@ public class HearingValuesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnHttp200() {
-        ServiceHearingValuesModel expectedHearingValues =
-            ServiceHearingValuesModel.builder().publicCaseName("mock case name").build();
+        ServiceHearingValuesModel expectedHearingValues = new ServiceHearingValuesModel();
+        expectedHearingValues.setPublicCaseName("mock case name");
 
         when(hearingValuesService.getValues(anyLong(), anyString()))
             .thenReturn(expectedHearingValues);
