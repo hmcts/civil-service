@@ -54,7 +54,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .takenOfflineDate(LocalDateTime.now())
-            .activeJudgment(JudgmentDetails.builder().type(JudgmentType.JUDGMENT_BY_ADMISSION).build())
+            .activeJudgment(new JudgmentDetails().setType(JudgmentType.JUDGMENT_BY_ADMISSION))
             .changeOfRepresentation(ChangeOfRepresentation.builder().build())
             .build();
 

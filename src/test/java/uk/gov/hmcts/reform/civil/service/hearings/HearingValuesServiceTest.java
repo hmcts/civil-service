@@ -179,49 +179,48 @@ public class HearingValuesServiceTest {
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
 
+        HearingLocationModel expectedLocation = new HearingLocationModel();
+        expectedLocation.setLocationId(BASE_LOCATION_ID);
+        expectedLocation.setLocationType(COURT);
+        List<HearingLocationModel> expectedHearingLocation = List.of(expectedLocation);
+
+        JudiciaryModel expectedJudiciary = new JudiciaryModel();
+
         List<CaseCategoryModel> expectedCaseCategories = getExpectedCaseCategories();
-
-        List<HearingLocationModel> expectedHearingLocation = List.of(HearingLocationModel.builder()
-                                                       .locationId(BASE_LOCATION_ID)
-                                                       .locationType(COURT)
-                                                       .build());
-
-        JudiciaryModel expectedJudiciary = JudiciaryModel.builder().build();
-
-        ServiceHearingValuesModel expected = ServiceHearingValuesModel.builder()
-            .hmctsServiceID("AAA7")
-            .hmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader")
-            .publicCaseName("John Rambo v Sole Trader")
-            .caseAdditionalSecurityFlag(false)
-            .caseCategories(expectedCaseCategories)
-            .caseDeepLink("http://localhost:3333/cases/case-details/1")
-            .caseRestrictedFlag(false)
-            .externalCaseReference(null)
-            .caseManagementLocationCode(BASE_LOCATION_ID)
-            .caseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-            .autoListFlag(false)
-            .hearingType(null)
-            .hearingWindow(null)
-            .duration(0)
-            .hearingPriorityType("Standard")
-            .numberOfPhysicalAttendees(0)
-            .hearingInWelshFlag(true)
-            .hearingLocations(expectedHearingLocation)
-            .facilitiesRequired(null)
-            .listingComments(null)
-            .hearingRequester("")
-            .privateHearingRequiredFlag(false)
-            .caseInterpreterRequiredFlag(false)
-            .panelRequirements(null)
-            .leadJudgeContractType("")
-            .judiciary(expectedJudiciary)
-            .hearingIsLinkedFlag(false)
-            .parties(getExpectedPartyModel())
-            .screenFlow(getScreenFlow())
-            .vocabulary(List.of(VocabularyModel.builder().build()))
-            .hearingChannels(null)
-            .caseFlags(getCaseFlags(caseData))
-            .build();
+        VocabularyModel vocabularyModel = new VocabularyModel();
+        ServiceHearingValuesModel expected = new ServiceHearingValuesModel();
+        expected.setHmctsServiceID("AAA7");
+        expected.setHmctsInternalCaseName("Mr. John Rambo v Mr. Sole Trader");
+        expected.setPublicCaseName("John Rambo v Sole Trader");
+        expected.setCaseAdditionalSecurityFlag(false);
+        expected.setCaseCategories(expectedCaseCategories);
+        expected.setCaseDeepLink("http://localhost:3333/cases/case-details/1");
+        expected.setCaseRestrictedFlag(false);
+        expected.setExternalCaseReference(null);
+        expected.setCaseManagementLocationCode(BASE_LOCATION_ID);
+        expected.setCaseSLAStartDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        expected.setAutoListFlag(false);
+        expected.setHearingType(null);
+        expected.setHearingWindow(null);
+        expected.setDuration(0);
+        expected.setHearingPriorityType("Standard");
+        expected.setNumberOfPhysicalAttendees(0);
+        expected.setHearingInWelshFlag(true);
+        expected.setHearingLocations(expectedHearingLocation);
+        expected.setFacilitiesRequired(null);
+        expected.setListingComments(null);
+        expected.setHearingRequester("");
+        expected.setPrivateHearingRequiredFlag(false);
+        expected.setCaseInterpreterRequiredFlag(false);
+        expected.setPanelRequirements(null);
+        expected.setLeadJudgeContractType("");
+        expected.setJudiciary(expectedJudiciary);
+        expected.setHearingIsLinkedFlag(false);
+        expected.setParties(getExpectedPartyModel());
+        expected.setScreenFlow(getScreenFlow());
+        expected.setVocabulary(List.of(vocabularyModel));
+        expected.setHearingChannels(null);
+        expected.setCaseFlags(getCaseFlags(caseData));
 
         ServiceHearingValuesModel actual = hearingValuesService.getValues(caseId, "auth");
         ServiceHearingValuesModel actualFromCaseData = hearingValuesService.getValues(caseData, "auth");
@@ -440,16 +439,14 @@ public class HearingValuesServiceTest {
 
     @NotNull
     private List<CaseCategoryModel> getExpectedCaseCategories() {
-        CaseCategoryModel caseType = CaseCategoryModel.builder()
-            .categoryParent("")
-            .categoryType(CategoryType.CASE_TYPE)
-            .categoryValue("AAA7-SMALL_CLAIM")
-            .build();
-        CaseCategoryModel caseSubtype = CaseCategoryModel.builder()
-            .categoryParent("AAA7-SMALL_CLAIM")
-            .categoryType(CategoryType.CASE_SUBTYPE)
-            .categoryValue("AAA7-SMALL_CLAIM")
-            .build();
+        CaseCategoryModel caseType = new CaseCategoryModel();
+        caseType.setCategoryParent("");
+        caseType.setCategoryType(CategoryType.CASE_TYPE);
+        caseType.setCategoryValue("AAA7-SMALL_CLAIM");
+        CaseCategoryModel caseSubtype = new CaseCategoryModel();
+        caseSubtype.setCategoryParent("AAA7-SMALL_CLAIM");
+        caseSubtype.setCategoryType(CategoryType.CASE_SUBTYPE);
+        caseSubtype.setCategoryValue("AAA7-SMALL_CLAIM");
 
         List<CaseCategoryModel> expectedCaseCategories = List.of(caseType, caseSubtype);
 
@@ -777,50 +774,48 @@ public class HearingValuesServiceTest {
                                                                   String partyName, String partyRole,
                                                                   String email) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
-        IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .interpreterLanguage(null)
-            .reasonableAdjustments(emptyList())
-            .vulnerableFlag(false)
-            .vulnerabilityDetails(null)
-            .hearingChannelEmail(hearingChannelEmail)
-            .hearingChannelPhone(List.of("0123456789"))
-            .relatedParties(emptyList())
-            .custodyStatus(null)
-            .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        individualDetails.setInterpreterLanguage(null);
+        individualDetails.setReasonableAdjustments(emptyList());
+        individualDetails.setVulnerableFlag(false);
+        individualDetails.setVulnerabilityDetails(null);
+        individualDetails.setHearingChannelEmail(hearingChannelEmail);
+        individualDetails.setHearingChannelPhone(List.of("0123456789"));
+        individualDetails.setRelatedParties(emptyList());
+        individualDetails.setCustodyStatus(null);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(IND)
-            .partyName(partyName)
-            .partyRole(partyRole)
-            .individualDetails(individualDetails)
-            .organisationDetails(null)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(individualDetails);
+        partyDetails.setOrganisationDetails(null);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,
                                                                    String cftOrganisationID) {
-        OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
-            .name(name)
-            .organisationType(ORG.getLabel())
-            .cftOrganisationID(cftOrganisationID)
-            .build();
+        OrganisationDetailsModel organisationDetails = new OrganisationDetailsModel();
+        organisationDetails.setName(name);
+        organisationDetails.setOrganisationType(ORG.getLabel());
+        organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        return PartyDetailsModel.builder()
-            .partyID(cftOrganisationID)
-            .partyType(ORG)
-            .partyName(name)
-            .partyRole("LGRP")
-            .individualDetails(null)
-            .organisationDetails(organisationDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(cftOrganisationID);
+        partyDetails.setPartyType(ORG);
+        partyDetails.setPartyName(name);
+        partyDetails.setPartyRole("LGRP");
+        partyDetails.setIndividualDetails(null);
+        partyDetails.setOrganisationDetails(organisationDetails);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 }

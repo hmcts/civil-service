@@ -5659,18 +5659,18 @@ class EventHistoryMapperTest {
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build();
-                caseData.setQmApplicantSolicitorQueries(CaseQueriesCollection.builder()
-                                                            .roleOnCase("APPLICANT")
-                                                            .build());
+                CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+                applicantQueries.setRoleOnCase("APPLICANT");
+                caseData.setQmApplicantSolicitorQueries(applicantQueries);
             } else {
                 when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build();
-                caseData.setQueries(CaseQueriesCollection.builder()
-                                        .roleOnCase("APPLICANT")
-                                        .build());
+                CaseQueriesCollection publicQueries = new CaseQueriesCollection();
+                publicQueries.setRoleOnCase("APPLICANT");
+                caseData.setQueries(publicQueries);
             }
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -5731,9 +5731,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant1NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection publicQueries = new CaseQueriesCollection();
+            publicQueries.setRoleOnCase("APPLICANT");
+            caseData.setQueries(publicQueries);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -5782,9 +5782,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection publicQueriesDef2 = new CaseQueriesCollection();
+            publicQueriesDef2.setRoleOnCase("APPLICANT");
+            caseData.setQueries(publicQueriesDef2);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -5833,9 +5833,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection privateQueriesDef2 = new CaseQueriesCollection();
+            privateQueriesDef2.setRoleOnCase("APPLICANT");
+            caseData.setQueries(privateQueriesDef2);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -8106,7 +8106,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8133,7 +8133,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8157,7 +8157,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8184,7 +8184,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
