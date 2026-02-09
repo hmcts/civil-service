@@ -338,19 +338,18 @@ class GaFeesPaymentServiceTest {
     }
 
     private CardPaymentStatusResponse expectedResponse(String status) {
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder payment
-            = CardPaymentStatusResponse.builder()
-            .paymentReference("RC-1701-0909-0602-0418")
-            .status(status)
-            .paymentAmount(new BigDecimal(200))
-            .status(status);
+        CardPaymentStatusResponse payment = new CardPaymentStatusResponse()
+            .setPaymentReference("RC-1701-0909-0602-0418")
+            .setStatus(status)
+            .setPaymentAmount(new BigDecimal(200))
+            .setStatus(status);
 
         if (status.equals("Failed")) {
-            payment.errorCode("P0030")
-                .errorDescription("Payment was cancelled by the user");
+            payment.setErrorCode("P0030")
+                .setErrorDescription("Payment was cancelled by the user");
         }
 
-        return payment.build();
+        return payment;
     }
 
     private CardPaymentServiceRequestResponse buildServiceRequestResponse() {

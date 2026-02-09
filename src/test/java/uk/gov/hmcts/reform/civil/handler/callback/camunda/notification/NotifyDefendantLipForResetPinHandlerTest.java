@@ -64,10 +64,9 @@ public class NotifyDefendantLipForResetPinHandlerTest extends BaseCallbackHandle
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
-                                                   .expiryDate(LocalDate.now().plusDays(180))
-                                                   .build())
+                .addRespondent1PinToPostLRspec(new DefendantPinToPostLRspec()
+                                                   .setAccessCode("TEST1234")
+                                                   .setExpiryDate(LocalDate.now().plusDays(180)))
                 .claimDetailsNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .build();
@@ -94,10 +93,9 @@ public class NotifyDefendantLipForResetPinHandlerTest extends BaseCallbackHandle
                 .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
                                  .partyEmail(null)
                                  .build())
-                .addRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder()
-                                                   .accessCode("TEST1234")
-                                                   .expiryDate(LocalDate.now().plusDays(180))
-                                                   .build())
+                .addRespondent1PinToPostLRspec(new DefendantPinToPostLRspec()
+                                                   .setAccessCode("TEST1234")
+                                                   .setExpiryDate(LocalDate.now().plusDays(180)))
                 .build();
             // Given
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

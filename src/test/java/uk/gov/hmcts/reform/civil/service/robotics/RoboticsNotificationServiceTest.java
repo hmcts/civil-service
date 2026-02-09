@@ -442,7 +442,7 @@ class RoboticsNotificationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setRespondent1Represented(NO);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
-        caseData.setCcjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build());
+        caseData.setCcjPaymentDetails(new CCJPaymentDetails().setCcjPaymentPaidSomeOption(YES));
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
             .events(EventHistory.builder()
@@ -514,9 +514,8 @@ class RoboticsNotificationServiceTest {
         caseData.setApplicant1Represented(NO);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
-        caseData.setBusinessProcess(BusinessProcess.builder()
-            .camundaEvent(camundaEvent)
-            .build());
+        caseData.setBusinessProcess(new BusinessProcess()
+            .setCamundaEvent(camundaEvent));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
@@ -554,7 +553,7 @@ class RoboticsNotificationServiceTest {
         caseData.setRespondent1Represented(NO);
         caseData.setApplicant1Represented(NO);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
-        caseData.setCcjPaymentDetails(CCJPaymentDetails.builder().ccjPaymentPaidSomeOption(YES).build());
+        caseData.setCcjPaymentDetails(new CCJPaymentDetails().setCcjPaymentPaidSomeOption(YES));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
         RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
