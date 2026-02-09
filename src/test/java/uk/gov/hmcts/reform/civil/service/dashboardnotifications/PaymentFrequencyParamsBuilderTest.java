@@ -29,14 +29,13 @@ class PaymentFrequencyParamsBuilderTest {
     void shouldAddPaymentFrequencyMessagesWhenJudgmentRecordReasonIsDeterminationOfMeans() {
         // Arrange
         CaseData caseData = mock(CaseData.class);
-        JudgmentInstalmentDetails instalmentDetails = JudgmentInstalmentDetails.builder()
-            .startDate(LocalDate.of(2023, 10, 15))
-            .paymentFrequency(PaymentFrequency.MONTHLY)
-            .amount("1000.00")
-            .build();
+        JudgmentInstalmentDetails instalmentDetails = new JudgmentInstalmentDetails()
+            .setStartDate(LocalDate.of(2023, 10, 15))
+            .setPaymentFrequency(PaymentFrequency.MONTHLY)
+            .setAmount("1000.00");
 
         when(caseData.getJoJudgmentRecordReason()).thenReturn(JudgmentRecordedReason.DETERMINATION_OF_MEANS);
-        when(caseData.getJoPaymentPlan()).thenReturn(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build());
+        when(caseData.getJoPaymentPlan()).thenReturn(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IN_INSTALMENTS));
         when(caseData.getJoAmountOrdered()).thenReturn("10000");
         when(caseData.getJoAmountCostOrdered()).thenReturn("2000");
         when(caseData.getJoInstalmentDetails()).thenReturn(instalmentDetails);
@@ -60,7 +59,7 @@ class PaymentFrequencyParamsBuilderTest {
         CaseData caseData = mock(CaseData.class);
 
         when(caseData.getJoJudgmentRecordReason()).thenReturn(JudgmentRecordedReason.JUDGE_ORDER);
-        when(caseData.getJoPaymentPlan()).thenReturn(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build());
+        when(caseData.getJoPaymentPlan()).thenReturn(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IN_INSTALMENTS));
 
         HashMap<String, Object> params = new HashMap<>();
 
