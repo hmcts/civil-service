@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantnoc;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.helpers.sdo.SdoHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
@@ -27,14 +27,17 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
 
     private final DashboardNotificationService dashboardNotificationService;
     private final FeatureToggleService featureToggleService;
+    private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public DefendantNocClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                 DashboardNotificationsParamsMapper mapper,
                                                 DashboardNotificationService dashboardNotificationService,
-                                                FeatureToggleService featureToggleService) {
+                                                FeatureToggleService featureToggleService,
+                                                SdoCaseClassificationService sdoCaseClassificationService) {
         super(dashboardScenariosService, mapper);
         this.dashboardNotificationService = dashboardNotificationService;
         this.featureToggleService = featureToggleService;
+        this.sdoCaseClassificationService = sdoCaseClassificationService;
     }
 
     public void notifyClaimant(CaseData caseData, String authToken) {
@@ -66,7 +69,7 @@ public class DefendantNocClaimantDashboardService extends DashboardScenarioServi
         }
 
         boolean shouldRecordTrialArrangements = isNull(caseData.getTrialReadyApplicant())
-            && SdoHelper.isFastTrack(caseData);
+            && sdoCaseClassificationService.isFastTrack(caseData);
 
         PaymentDetails hearingFeePaymentDetails = caseData.getHearingFeePaymentDetails();
         boolean isHearingFeeNotPaid = (isNull(hearingFeePaymentDetails)

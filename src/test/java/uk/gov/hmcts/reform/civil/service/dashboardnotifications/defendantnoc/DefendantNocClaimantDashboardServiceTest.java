@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.JudgmentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -49,6 +50,8 @@ class DefendantNocClaimantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private SdoCaseClassificationService sdoCaseClassificationService;
 
     @InjectMocks
     private DefendantNocClaimantDashboardService service;
@@ -266,6 +269,7 @@ class DefendantNocClaimantDashboardServiceTest {
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(false);
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(true);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 
@@ -303,6 +307,7 @@ class DefendantNocClaimantDashboardServiceTest {
         caseData.setDrawDirectionsOrderRequired(YesOrNo.NO);
         caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
         caseData.setHearingFeePaymentDetails(paymentDetails);
+        when(sdoCaseClassificationService.isFastTrack(caseData)).thenReturn(false);
 
         service.notifyClaimant(caseData, AUTH_TOKEN);
 
