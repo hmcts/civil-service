@@ -62,29 +62,27 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
-            .createdTimestamp(LocalDateTime.now())
-            .state(getJudgmentState(caseData))
-            .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-            .paymentPlan(JudgmentPaymentPlan.builder()
-                             .type(paymentPlan)
-                             .paymentDeadlineDate(getPaymentDeadLineDate(caseData, paymentPlan))
-                             .build())
-            .instalmentDetails(paymentPlan.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)
+        activeJudgment
+            .setCreatedTimestamp(LocalDateTime.now())
+            .setState(getJudgmentState(caseData))
+            .setType(JudgmentType.JUDGMENT_BY_ADMISSION)
+            .setPaymentPlan(new JudgmentPaymentPlan()
+                             .setType(paymentPlan)
+                             .setPaymentDeadlineDate(getPaymentDeadLineDate(caseData, paymentPlan)))
+            .setInstalmentDetails(paymentPlan.equals(PaymentPlanSelection.PAY_IN_INSTALMENTS)
                                    ? getInstalmentDetails(caseData) : null)
-            .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
-            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .issueDate(LocalDate.now())
-            .orderedAmount(addInterest(orderAmount, totalInterest, caseData))
-            .costs(costs.toString())
-            .claimFeeAmount(claimFeeAmount.toString())
-            .amountAlreadyPaid(amountAlreadyPaid.toString())
-            .totalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, costs, caseData))
-            .build();
+            .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
+            .setIssueDate(LocalDate.now())
+            .setOrderedAmount(addInterest(orderAmount, totalInterest, caseData))
+            .setCosts(costs.toString())
+            .setClaimFeeAmount(claimFeeAmount.toString())
+            .setAmountAlreadyPaid(amountAlreadyPaid.toString())
+            .setTotalAmount(generateTotalAmount(orderAmount, totalInterest, claimFeeAmount, costs, caseData));
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return activeJudgmentDetails;
+        return activeJudgment;
     }
 
     public CaseData.CaseDataBuilder addUpdateActiveJudgment(CaseData caseData, CaseData.CaseDataBuilder builder) {
@@ -158,22 +156,20 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
         RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan() != null
             ? caseData.getRespondent1RepaymentPlan() : caseData.getRespondent2RepaymentPlan();
         if (repaymentPlan != null) {
-            return buildJudgmentInstalmentDetails(
-                String.valueOf(getValue(repaymentPlan.getPaymentAmount())),
-                getPaymentFrequency(repaymentPlan.getRepaymentFrequency()),
-                repaymentPlan.getFirstRepaymentDate()
-            );
+            return new JudgmentInstalmentDetails()
+                .setAmount(String.valueOf(getValue(repaymentPlan.getPaymentAmount())))
+                .setPaymentFrequency(getPaymentFrequency(repaymentPlan.getRepaymentFrequency()))
+                .setStartDate(repaymentPlan.getFirstRepaymentDate());
         }
         return null;
     }
 
     private JudgmentInstalmentDetails buildJudgmentInstalmentDetails(
         String paymentAmount, PaymentFrequency paymentFrequency, LocalDate firstRepaymentDate) {
-        return JudgmentInstalmentDetails.builder()
-            .amount(paymentAmount)
-            .paymentFrequency(paymentFrequency)
-            .startDate(firstRepaymentDate)
-            .build();
+        return new JudgmentInstalmentDetails()
+            .setAmount(paymentAmount)
+            .setPaymentFrequency(paymentFrequency)
+            .setStartDate(firstRepaymentDate);
     }
 
     private PaymentFrequency getPaymentFrequency(PaymentFrequencyLRspec frequencyLRspec) {

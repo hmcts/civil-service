@@ -271,10 +271,10 @@ public class HearingDetailsMapperTest {
                                         )
             .build();
 
-        List<HearingLocationModel> expected = List.of(HearingLocationModel.builder()
-                                                       .locationId("12345")
-                                                       .locationType(COURT)
-                                                       .build());
+        HearingLocationModel expectedLocation = new HearingLocationModel();
+        expectedLocation.setLocationId("12345");
+        expectedLocation.setLocationType(COURT);
+        List<HearingLocationModel> expected = List.of(expectedLocation);
 
         List<HearingLocationModel> actual = HearingDetailsMapper.getHearingLocations(caseData);
 
@@ -309,7 +309,7 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnJudiciaryObject_whenInvoked() {
-        JudiciaryModel expected = JudiciaryModel.builder().build();
+        JudiciaryModel expected = new JudiciaryModel();
         assertThat(HearingDetailsMapper.getJudiciary()).isEqualTo(expected);
     }
 

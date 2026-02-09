@@ -59,9 +59,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
         when(time.now()).thenReturn(nowMock);
-        caseData.setActiveJudgment(JudgmentDetails.builder()
-                                       .totalAmount("123")
-                                             .build());
+        caseData.setActiveJudgment(new JudgmentDetails().setTotalAmount("123"));
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -97,9 +95,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
             .build();
-        caseData.setActiveJudgment(JudgmentDetails.builder()
-                                       .fullyPaymentMadeDate(LocalDate.of(2023, 1, 15))
-                                             .build());
+        caseData.setActiveJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.of(2023, 1, 15)));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) checkCoscMarkPaidCallbackHandler.handle(params);
