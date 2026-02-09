@@ -9,6 +9,8 @@ public final class DashboardTaskIds {
     public static final String CASE_PROCEEDS_IN_CASEMAN = "GenerateDashboardNotificationsCaseProceedsInCaseman";
     public static final String DISMISS_CASE = "GenerateDashboardNotificationsDismissCase";
     public static final String AMEND_RESTITCH_BUNDLE = "GenerateDashboardNotificationsAmendRestitchBundle";
+    public static final String TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY =
+        "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
     public static final String BUNDLE_CREATION = "GenerateDashboardNotificationsBundleCreation";
     public static final String CLAIM_SETTLED = "GenerateDashboardNotificationsClaimSettled";
     public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
@@ -23,9 +25,7 @@ public final class DashboardTaskIds {
     public static final String MOVE_TO_DECISION_OUTCOME = "GenerateDashboardNotificationsDecisionOutcome";
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
-<<<<<<< HEAD
     public static final String DJ_NON_DIVERGENT = "GenerateDashboardNotificationsDjNonDivergent";
-=======
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
->>>>>>> f58adb267936dcedf973c133605a0b1951f1d38c
+
 }
