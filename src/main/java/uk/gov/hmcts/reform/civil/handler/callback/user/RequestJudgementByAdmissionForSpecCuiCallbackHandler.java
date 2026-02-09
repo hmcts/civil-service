@@ -79,6 +79,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
     private CallbackResponse validateDefaultJudgementEligibility(CallbackParams callbackParams) {
 
         var caseData = callbackParams.getCaseData();
+        logCcjPaymentDetails(caseData);
+
         ArrayList<String> errors = new ArrayList<>();
         LocalDate whenWillThisAmountBePaid =
             Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec()).map(RespondToClaimAdmitPartLRspec::getWhenWillThisAmountBePaid).orElse(
@@ -105,8 +107,14 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
             .build();
     }
 
+    private static void logCcjPaymentDetails(final CaseData caseData) {
+        log.info("Case {} CcjPaymentDetails {}", caseData.getCcdCaseReference(), caseData.getCcjPaymentDetails() == null ? null :
+            caseData.getCcjPaymentDetails().toString());
+    }
+
     private CallbackResponse buildJudgmentAmountSummaryDetails(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        logCcjPaymentDetails(caseData);
 
         caseData.setCcjPaymentDetails(judgementService.buildJudgmentAmountSummaryDetails(caseData));
 
@@ -117,6 +125,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse validateAmountPaid(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        logCcjPaymentDetails(caseData);
+
         List<String> errors = judgementService.validateAmountPaid(caseData);
         if (judgementService.isLrPayImmediatelyPlan(caseData)
             && Objects.nonNull(caseData.getFixedCosts())
@@ -133,6 +143,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
         String nextState;
         BusinessProcess businessProcess;
         CaseData data = caseDetailsConverter.toCaseData(callbackParams.getRequest().getCaseDetails());
+        logCcjPaymentDetails(data);
         CCJPaymentDetails ccjPaymentDetails = data.isLipvLipOneVOne() && featureToggleService.isLipVLipEnabled()
             ? judgementService.buildJudgmentAmountSummaryDetails(data) :
             data.getCcjPaymentDetails();
@@ -178,6 +189,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandler extends Callba
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+        logCcjPaymentDetails(caseData);
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(setUpHeader(caseData))
             .confirmationBody(setUpBody(caseData))
