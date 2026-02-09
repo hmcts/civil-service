@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+
 @Component
 public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
