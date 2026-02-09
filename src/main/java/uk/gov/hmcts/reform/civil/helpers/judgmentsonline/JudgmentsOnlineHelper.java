@@ -285,13 +285,14 @@ public class JudgmentsOnlineHelper {
             .country(removeWelshCharacters(address.getCountry())).build();
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
-        return JudgmentAddress.builder()
-            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
-            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
-            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
-            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
-            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
-            .defendantPostCode(roboticsAddress.getPostCode()).build();
+        JudgmentAddress judgmentAddress = new JudgmentAddress();
+        judgmentAddress.setDefendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()));
+        judgmentAddress.setDefendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()));
+        judgmentAddress.setDefendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()));
+        judgmentAddress.setDefendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()));
+        judgmentAddress.setDefendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()));
+        judgmentAddress.setDefendantPostCode(roboticsAddress.getPostCode());
+        return judgmentAddress;
     }
 
     public static String removeWelshCharacters(String input) {

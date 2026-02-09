@@ -95,10 +95,9 @@ public class HearingDetailsMapper {
     }
 
     public static List<HearingLocationModel> getHearingLocations(CaseData caseData) {
-        HearingLocationModel hearingLocationModel = HearingLocationModel.builder()
-            .locationId(caseData.getCaseManagementLocation().getBaseLocation())
-            .locationType(COURT)
-            .build();
+        HearingLocationModel hearingLocationModel = new HearingLocationModel();
+        hearingLocationModel.setLocationId(caseData.getCaseManagementLocation().getBaseLocation());
+        hearingLocationModel.setLocationType(COURT);
         return List.of(hearingLocationModel);
     }
 
@@ -143,7 +142,7 @@ public class HearingDetailsMapper {
     }
 
     public static JudiciaryModel getJudiciary() {
-        return JudiciaryModel.builder().build();
+        return new JudiciaryModel();
     }
 
     public static boolean getHearingIsLinkedFlag() {

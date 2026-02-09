@@ -50,6 +50,7 @@ public class DashboardScenariosService {
     @SuppressWarnings("java:S1172")
     public void recordScenarios(String authorisation, String scenarioReference,
                                 String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
+        log.info("Recording scenario {} with caseReference {}", scenarioReference, uniqueCaseIdentifier);
 
         Optional<ScenarioEntity> scenarioByName = scenarioRepository.findByName(scenarioReference);
         scenarioByName.ifPresent(scenario -> {
@@ -138,6 +139,7 @@ public class DashboardScenariosService {
 
     private void createTaskItemsForScenario(
         String scenarioReference, String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
+        log.info("Creating task items for scenario {} with caseReference {}", scenarioReference, uniqueCaseIdentifier);
 
         StringSubstitutor stringSubstitutor = new StringSubstitutor(scenarioRequestParams.getParams());
 
@@ -165,11 +167,16 @@ public class DashboardScenariosService {
                 .build();
 
             log.info(
-                "Task Item details for scenario = {}, id = {}, TaskItemEn = {}, HintTextEn = {}",
+                "Task Item details for the role: {}, scenario = {}, caseReference = {}, id = {}, TaskItemEn = {}, HintTextEn = {}," +
+                    "CurrentStatus = {}, nextStatus = {}",
+                template.getRole(),
                 scenarioReference,
+                uniqueCaseIdentifier,
                 taskItemEntity.getId(),
                 taskItemEntity.getTaskNameEn(),
-                taskItemEntity.getHintTextEn()
+                taskItemEntity.getHintTextEn(),
+                taskItemEntity.getCurrentStatus(),
+                taskItemEntity.getNextStatus()
             );
             taskListService.saveOrUpdate(taskItemEntity);
         });

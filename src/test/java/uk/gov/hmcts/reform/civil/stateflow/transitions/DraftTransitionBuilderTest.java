@@ -334,9 +334,8 @@ public class DraftTransitionBuilderTest {
             .specRespondent1Represented(NO)
             .applicant1Represented(NO)
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
-            .activeJudgment(JudgmentDetails.builder()
-                                .type(JudgmentType.JUDGMENT_BY_ADMISSION)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setType(JudgmentType.JUDGMENT_BY_ADMISSION))
             .build();
 
         assertThat(getCaseFlags(result.get(3), caseData)).hasSize(11).contains(
