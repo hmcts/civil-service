@@ -350,13 +350,14 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     private HearingGetResponse createHearing(ListAssistCaseStatus hearingStatus) {
+        PartyDetailsModel partyDetailsModel = new PartyDetailsModel();
         return HearingGetResponse.builder()
             .hearingDetails(HearingDetails.builder().build())
             .requestDetails(HearingRequestDetails.builder()
                                 .versionNumber(VERSION.longValue())
                                 .build())
             .caseDetails(CaseDetailsHearing.builder().caseRef(HearingNoticeSchedulerEventHandlerTest.CASE_ID).build())
-            .partyDetails(List.of(PartyDetailsModel.builder().build()))
+            .partyDetails(List.of(partyDetailsModel))
             .hearingResponse(
                 HearingResponse.builder()
                     .receivedDateTime(RECEIVED_DATETIME)

@@ -242,8 +242,7 @@ class ClaimFormMapperTest {
     void shouldReturnDifferentInterestRate_whenItExists() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .differentRate(INTEREST).build())
+            .sameRateInterestSelection(buildSameRateSelection(INTEREST, null))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -255,7 +254,7 @@ class ClaimFormMapperTest {
     void shouldReturnEightPercentInterestRate_whenDifferentRateIsNull() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .sameRateInterestSelection(SameRateInterestSelection.builder().build())
+            .sameRateInterestSelection(new SameRateInterestSelection())
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -275,8 +274,7 @@ class ClaimFormMapperTest {
     void shouldReturnStandardExplanationText_whenNoDifferentRateReason() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .build())
+            .sameRateInterestSelection(new SameRateInterestSelection())
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
 
@@ -290,9 +288,7 @@ class ClaimFormMapperTest {
     void shouldReturnDifferentExplanationText_whenDifferentRateReasonExists() {
         //Given
         CaseData caseData = getCaseData().toBuilder()
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .differentRateReason(DIFFERENT_RATE_EXPLANATION)
-                                           .build())
+            .sameRateInterestSelection(buildSameRateSelection(null, DIFFERENT_RATE_EXPLANATION))
             .build();
         when(interestCalculator.calculateInterest(any())).thenReturn(INTEREST);
         //When
@@ -527,15 +523,18 @@ class ClaimFormMapperTest {
                              .type(Party.Type.ORGANISATION)
                              .build())
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                                                      .builder()
-                                                                      .build())
-                             .respondent1AdditionalLipPartyDetails(AdditionalLipPartyDetails
-                                                                       .builder()
-                                                                       .build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1AdditionalLipPartyDetails(new AdditionalLipPartyDetails())
+                             .setRespondent1AdditionalLipPartyDetails(new AdditionalLipPartyDetails()))
             .issueDate(LocalDate.now())
             .build();
     }
+
+    private SameRateInterestSelection buildSameRateSelection(BigDecimal rate, String reason) {
+        SameRateInterestSelection selection = new SameRateInterestSelection();
+        selection.setDifferentRate(rate);
+        selection.setDifferentRateReason(reason);
+        return selection;
+    }
+
 }

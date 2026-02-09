@@ -1,13 +1,17 @@
 package uk.gov.hmcts.reform.civil.model.dq;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
 
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class RequirementsLip {
 
     private String name;

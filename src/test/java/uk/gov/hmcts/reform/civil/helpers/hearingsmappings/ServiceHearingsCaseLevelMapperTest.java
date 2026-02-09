@@ -84,10 +84,10 @@ public class ServiceHearingsCaseLevelMapperTest {
     @Test
     void shouldReturnCaseManagementLocationCode_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .baseLocation("0123")
-                                        .region("region")
-                                        .build())
+            .caseManagementLocation(new CaseLocationCivil()
+                                        .setBaseLocation("0123")
+                                        .setRegion("region")
+                                        )
             .build();
         assertThat(ServiceHearingsCaseLevelMapper.getCaseManagementLocationCode(caseData))
             .isEqualTo("0123");
@@ -104,17 +104,15 @@ public class ServiceHearingsCaseLevelMapperTest {
     class CaseCategoriesMapping {
         @Test
         void shouldReturnListWithTypeAndSubtype_whenCaseCategoriesInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CaseCategoryModel caseType = CaseCategoryModel.builder()
-                .categoryParent("")
-                .categoryType(CategoryType.CASE_TYPE)
-                .categoryValue("AAA7-SMALL_CLAIM")
-                .build();
-            CaseCategoryModel caseSubtype = CaseCategoryModel.builder()
-                .categoryParent("AAA7-SMALL_CLAIM")
-                .categoryType(CategoryType.CASE_SUBTYPE)
-                .categoryValue("AAA7-SMALL_CLAIM")
-                .build();
+            CaseCategoryModel caseType = new CaseCategoryModel();
+            caseType.setCategoryParent("");
+            caseType.setCategoryType(CategoryType.CASE_TYPE);
+            caseType.setCategoryValue("AAA7-SMALL_CLAIM");
+
+            CaseCategoryModel caseSubtype = new CaseCategoryModel();
+            caseSubtype.setCategoryParent("AAA7-SMALL_CLAIM");
+            caseSubtype.setCategoryType(CategoryType.CASE_SUBTYPE);
+            caseSubtype.setCategoryValue("AAA7-SMALL_CLAIM");
 
             List<CaseCategoryModel> expectedList = List.of(caseType, caseSubtype);
 
@@ -124,6 +122,7 @@ public class ServiceHearingsCaseLevelMapperTest {
             when(caseCategoriesService.getCaseCategoriesFor(eq(CategoryType.CASE_SUBTYPE), any(),  any())).thenReturn(
                 caseSubtype
             );
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             List<CaseCategoryModel> actualList = ServiceHearingsCaseLevelMapper.getCaseCategories(
                 caseData,
                 caseCategoriesService,
@@ -135,12 +134,10 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         @Test
         void shouldReturnListWithType_whenCaseCategoriesInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CaseCategoryModel caseType = CaseCategoryModel.builder()
-                .categoryParent("")
-                .categoryType(CategoryType.CASE_TYPE)
-                .categoryValue("AAA7-SMALL_CLAIM")
-                .build();
+            CaseCategoryModel caseType = new CaseCategoryModel();
+            caseType.setCategoryParent("");
+            caseType.setCategoryType(CategoryType.CASE_TYPE);
+            caseType.setCategoryValue("AAA7-SMALL_CLAIM");
 
             List<CaseCategoryModel> expectedList = List.of(caseType);
 
@@ -150,6 +147,7 @@ public class ServiceHearingsCaseLevelMapperTest {
             when(caseCategoriesService.getCaseCategoriesFor(eq(CategoryType.CASE_SUBTYPE), any(),  any())).thenReturn(
                 null
             );
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             List<CaseCategoryModel> actualList = ServiceHearingsCaseLevelMapper.getCaseCategories(
                 caseData,
                 caseCategoriesService,
@@ -163,12 +161,10 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         @Test
         void shouldReturnListWithSubType_whenCaseCategoriesInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            CaseCategoryModel caseSubtype = CaseCategoryModel.builder()
-                .categoryParent("AAA7-SMALL_CLAIM")
-                .categoryType(CategoryType.CASE_SUBTYPE)
-                .categoryValue("AAA7-SMALL_CLAIM")
-                .build();
+            CaseCategoryModel caseSubtype = new CaseCategoryModel();
+            caseSubtype.setCategoryParent("AAA7-SMALL_CLAIM");
+            caseSubtype.setCategoryType(CategoryType.CASE_SUBTYPE);
+            caseSubtype.setCategoryValue("AAA7-SMALL_CLAIM");
 
             List<CaseCategoryModel> expectedList = List.of(caseSubtype);
 
@@ -178,6 +174,7 @@ public class ServiceHearingsCaseLevelMapperTest {
             when(caseCategoriesService.getCaseCategoriesFor(eq(CategoryType.CASE_SUBTYPE), any(),  any())).thenReturn(
                 caseSubtype
             );
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
             List<CaseCategoryModel> actualList = ServiceHearingsCaseLevelMapper.getCaseCategories(
                 caseData,
                 caseCategoriesService,

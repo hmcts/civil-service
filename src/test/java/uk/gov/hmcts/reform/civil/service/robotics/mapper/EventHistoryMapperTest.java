@@ -5659,18 +5659,18 @@ class EventHistoryMapperTest {
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build();
-                caseData.setQmApplicantSolicitorQueries(CaseQueriesCollection.builder()
-                                                            .roleOnCase("APPLICANT")
-                                                            .build());
+                CaseQueriesCollection applicantQueries = new CaseQueriesCollection();
+                applicantQueries.setRoleOnCase("APPLICANT");
+                caseData.setQmApplicantSolicitorQueries(applicantQueries);
             } else {
                 when(featureToggleService.isPublicQueryManagementEnabled(any())).thenReturn(true);
                 caseData = CaseDataBuilder.builder()
                     .atStateTakenOfflineByStaff()
                     .takenOfflineDate(time.now())
                     .build();
-                caseData.setQueries(CaseQueriesCollection.builder()
-                                        .roleOnCase("APPLICANT")
-                                        .build());
+                CaseQueriesCollection publicQueries = new CaseQueriesCollection();
+                publicQueries.setRoleOnCase("APPLICANT");
+                caseData.setQueries(publicQueries);
             }
 
             List<Event> expectedMiscellaneousEvents = List.of(
@@ -5731,9 +5731,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant1NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection publicQueries = new CaseQueriesCollection();
+            publicQueries.setRoleOnCase("APPLICANT");
+            caseData.setQueries(publicQueries);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -5782,9 +5782,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection publicQueriesDef2 = new CaseQueriesCollection();
+            publicQueriesDef2.setRoleOnCase("APPLICANT");
+            caseData.setQueries(publicQueriesDef2);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -5833,9 +5833,9 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateTakenOfflineDefendant2NocDeadlinePassed()
                 .build();
-            caseData.setQueries(CaseQueriesCollection.builder()
-                                    .roleOnCase("APPLICANT")
-                                    .build());
+            CaseQueriesCollection privateQueriesDef2 = new CaseQueriesCollection();
+            privateQueriesDef2.setRoleOnCase("APPLICANT");
+            caseData.setQueries(privateQueriesDef2);
 
             List<Event> expectedMiscellaneousEvents = List.of(
                 Event.builder()
@@ -8106,7 +8106,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8133,7 +8133,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8157,7 +8157,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8184,7 +8184,7 @@ class EventHistoryMapperTest {
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2022, 11, 11));
             caseData.setJoSetAsideCreatedDate(LocalDateTime.now());
-            caseData.setActiveJudgment(JudgmentDetails.builder().state(JudgmentState.SET_ASIDE).build());
+            caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
             assertThat(eventHistory).extracting("setAsideJudgment").asList()
@@ -8283,8 +8283,8 @@ class EventHistoryMapperTest {
                 .atStateRespondent1v1FullAdmissionSpec().build();
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
             caseData.setResponseClaimMediationSpecRequired(YES);
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
             caseData.setAddRespondent2(NO);
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
@@ -8335,8 +8335,8 @@ class EventHistoryMapperTest {
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
             caseData.setRespondent1AcknowledgeNotificationDate(null);
             caseData.setTotalClaimAmount(claimValue);
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
             caseData.setRespondToClaim(RespondToClaim.builder()
@@ -8406,8 +8406,8 @@ class EventHistoryMapperTest {
             caseData.setRespondent1Represented(null);
             caseData.setSpecRespondent1Represented(NO);
             caseData.setRespondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().build());
-            caseData.setCaseDataLiP(CaseDataLiP.builder().applicant1ClaimMediationSpecRequiredLip(
-                ClaimantMediationLip.builder().hasAgreedFreeMediation(MediationDecision.Yes).build()).build());
+            caseData.setCaseDataLiP(new CaseDataLiP().setApplicant1ClaimMediationSpecRequiredLip(
+                new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
             caseData.setRespondToClaim(RespondToClaim.builder()
@@ -8885,10 +8885,10 @@ class EventHistoryMapperTest {
         class CancelledStatus {
             @Test
             public void shouldGenerateRPA_Cancelled_MarkPaidInFull_CoscApplied() {
-                CertOfSC certOfSC = CertOfSC.builder()
-                    .defendantFinalPaymentDate(LocalDate.now())
-                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
-                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+                CertOfSC certOfSC = new CertOfSC()
+                    .setDefendantFinalPaymentDate(LocalDate.now())
+                    .setDebtPaymentEvidence(new DebtPaymentEvidence()
+                                             .setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
@@ -8950,10 +8950,10 @@ class EventHistoryMapperTest {
 
             @Test
             public void shouldGenerateRPA_Cancelled_NotMarkPaidInFull_CoscApplied() {
-                CertOfSC certOfSC = CertOfSC.builder()
-                    .defendantFinalPaymentDate(defendantFinalPaymentDate)
-                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
-                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+                CertOfSC certOfSC = new CertOfSC()
+                    .setDefendantFinalPaymentDate(defendantFinalPaymentDate)
+                    .setDebtPaymentEvidence(new DebtPaymentEvidence()
+                                             .setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
@@ -8990,10 +8990,10 @@ class EventHistoryMapperTest {
         class SatisfiedStatus {
             @Test
             public void shouldGenerateRPA_MarkedPaidInFull_CoscApplied() {
-                CertOfSC certOfSC = CertOfSC.builder()
-                    .defendantFinalPaymentDate(LocalDate.now())
-                    .debtPaymentEvidence(DebtPaymentEvidence.builder()
-                                             .debtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT).build()).build();
+                CertOfSC certOfSC = new CertOfSC()
+                    .setDefendantFinalPaymentDate(LocalDate.now())
+                    .setDebtPaymentEvidence(new DebtPaymentEvidence()
+                                             .setDebtPaymentOption(DebtPaymentOptions.MADE_FULL_PAYMENT_TO_COURT));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
@@ -9095,15 +9095,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9120,7 +9116,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9161,15 +9158,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9186,7 +9179,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9230,16 +9224,12 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                            .setApplicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3));
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9256,7 +9246,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9300,15 +9291,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9325,7 +9312,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9366,15 +9354,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9391,7 +9375,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9434,16 +9419,12 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                            .setApplicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3));
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9460,7 +9441,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9509,15 +9491,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9530,12 +9508,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9574,15 +9554,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9595,12 +9571,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9642,15 +9620,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9663,12 +9637,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9711,15 +9687,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9732,12 +9704,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9777,15 +9751,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9798,12 +9768,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9845,15 +9817,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -9866,12 +9834,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9913,15 +9883,11 @@ class EventHistoryMapperTest {
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                    ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                        .builder()
-                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                        .build();
+                    ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                    CaseDataLiP caseDataLip = CaseDataLiP
-                        .builder()
-                        .applicant1LiPResponse(claimantLiPResponse)
-                        .build();
+                    CaseDataLiP caseDataLip = new CaseDataLiP()
+                        .setApplicant1LiPResponse(claimantLiPResponse);
 
                     CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                         .ccjPaymentPaidSomeOption(NO)
@@ -9934,7 +9900,8 @@ class EventHistoryMapperTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .setClaimTypeToSpecClaim()
                         .atStateSpec1v1ClaimSubmitted()
-                        .atStateRespondent1v1FullAdmissionSpec().build();
+                        .atStateRespondent1v1FullAdmissionSpec()
+                        .build();
                     caseData.setCcjPaymentDetails(ccjPaymentDetails);
                     caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                     caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -9972,15 +9939,11 @@ class EventHistoryMapperTest {
                     LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                     LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                    ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                        .builder()
-                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                        .build();
+                    ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                    CaseDataLiP caseDataLip = CaseDataLiP
-                        .builder()
-                        .applicant1LiPResponse(claimantLiPResponse)
-                        .build();
+                    CaseDataLiP caseDataLip = new CaseDataLiP()
+                        .setApplicant1LiPResponse(claimantLiPResponse);
 
                     CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                         .ccjPaymentPaidSomeOption(NO)
@@ -9993,7 +9956,8 @@ class EventHistoryMapperTest {
                     CaseData caseData = CaseDataBuilder.builder()
                         .setClaimTypeToSpecClaim()
                         .atStateSpec1v1ClaimSubmitted()
-                        .atStateRespondent1v1FullAdmissionSpec().build();
+                        .atStateRespondent1v1FullAdmissionSpec()
+                        .build();
                     caseData.setCcjPaymentDetails(ccjPaymentDetails);
                     caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
                     caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10045,15 +10009,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10070,7 +10030,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10111,15 +10072,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10136,7 +10093,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10180,16 +10138,12 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
+                            .setApplicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3));
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10206,7 +10160,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10250,15 +10205,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10275,7 +10226,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10316,15 +10268,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate climantSuggestedFirstInstallmentDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10341,7 +10289,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10384,16 +10333,12 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .applicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3))
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                            .setApplicant1SuggestedImmediatePaymentDeadLine(LocalDate.now().plusDays(3));
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10410,7 +10355,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10459,15 +10405,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10480,12 +10422,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10524,15 +10468,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10545,12 +10485,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10592,15 +10534,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10613,12 +10551,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10661,15 +10601,11 @@ class EventHistoryMapperTest {
                         PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
                             LocalDate.now().plusDays(1)).build();
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10682,12 +10618,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
                             RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
@@ -10726,15 +10664,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10747,12 +10681,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10794,15 +10730,11 @@ class EventHistoryMapperTest {
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10815,12 +10747,14 @@ class EventHistoryMapperTest {
                         RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
                             .firstRepaymentDate(whenWillPay)
                             .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100)).build();
+                            .paymentAmount(BigDecimal.valueOf(100))
+                            .build();
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10864,15 +10798,11 @@ class EventHistoryMapperTest {
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10885,7 +10815,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10923,15 +10854,11 @@ class EventHistoryMapperTest {
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -10944,7 +10871,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -10989,15 +10917,11 @@ class EventHistoryMapperTest {
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -11014,7 +10938,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -11054,15 +10979,11 @@ class EventHistoryMapperTest {
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate claimantSuggestedDate = LocalDate.now().plusDays(1);
 
-                        ClaimantLiPResponse claimantLiPResponse = ClaimantLiPResponse
-                            .builder()
-                            .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
-                            .build();
+                        ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
+                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
 
-                        CaseDataLiP caseDataLip = CaseDataLiP
-                            .builder()
-                            .applicant1LiPResponse(claimantLiPResponse)
-                            .build();
+                        CaseDataLiP caseDataLip = new CaseDataLiP()
+                            .setApplicant1LiPResponse(claimantLiPResponse);
 
                         CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
                             .ccjPaymentPaidSomeOption(NO)
@@ -11075,7 +10996,8 @@ class EventHistoryMapperTest {
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
                             .atStateSpec1v1ClaimSubmitted()
-                            .atStateRespondent1v1FullAdmissionSpec().build();
+                            .atStateRespondent1v1FullAdmissionSpec()
+                            .build();
                         caseData.setCcjPaymentDetails(ccjPaymentDetails);
                         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION);
                         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(

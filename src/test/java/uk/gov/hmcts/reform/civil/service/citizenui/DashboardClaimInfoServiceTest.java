@@ -282,9 +282,8 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .activeJudgment(JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT)
-                                            .createdTimestamp(DATE_IN_2025)
-                                            .build())
+                            .activeJudgment(new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT)
+                                            .setCreatedTimestamp(DATE_IN_2025))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -311,10 +310,9 @@ public class DashboardClaimInfoServiceTest {
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
                             .applicant1ResponseDate(DATE_IN_2025)
-                            .caseDataLiP(CaseDataLiP.builder()
-                                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                                        .applicant1ChoosesHowToProceed(REQUEST_A_CCJ).build())
-                                             .build())
+                            .caseDataLiP(new CaseDataLiP()
+                                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                                        .setApplicant1ChoosesHowToProceed(REQUEST_A_CCJ)))
                             .ccjPaymentDetails(CCJPaymentDetails.builder()
                                                    .ccjPaymentPaidSomeOption(YesOrNo.NO)
                                                    .build())
@@ -470,8 +468,8 @@ public class DashboardClaimInfoServiceTest {
     void shouldIncludeDefaultJudgementIssuedDate() {
         given(caseDetailsConverter.toCaseData(CASE_DETAILS))
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
-                    JudgmentDetails.builder().issueDate(LocalDate.now()).state(JudgmentState.ISSUED)
-                        .type(JudgmentType.DEFAULT_JUDGMENT).build())
+                    new JudgmentDetails().setIssueDate(LocalDate.now()).setState(JudgmentState.ISSUED)
+                        .setType(JudgmentType.DEFAULT_JUDGMENT))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
