@@ -25,6 +25,7 @@ public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerat
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
         return properties;
     }
