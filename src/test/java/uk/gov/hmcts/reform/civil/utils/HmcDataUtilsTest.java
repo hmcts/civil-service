@@ -1625,6 +1625,10 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldNotThrowNpeWhenAttendeesContainsOrgNotIndividualFromListAssistMisuse() {
+            PartyDetailsModel organisationParty = new PartyDetailsModel();
+            organisationParty.setHearingSubChannel(INTER.name());
+            organisationParty.setPartyID("PARTYID");
+            organisationParty.setOrganisationDetails(buildOrganisationDetails("ID", "Misplaced Org"));
             HearingGetResponse hearing = buildHearingWithOrganisation(
                 List.of(HearingIndividual.attendingHearingInPerson("Jason", "Wells"),
                         HearingIndividual.attendingHearingByPhone("Chloe", "Landale"),
@@ -1632,16 +1636,19 @@ class HmcDataUtilsTest {
                         HearingIndividual.attendingHearingByVideo("Jenny", "Harper"),
                         HearingIndividual.attendingHearingInPerson("Jack", "Crawley")
                 ),
-                PartyDetailsModel.builder().hearingSubChannel(INTER.name()).partyID("PARTYID")
-                    .organisationDetails(OrganisationDetailsModel.builder()
-                                             .cftOrganisationID("ID")
-                                             .name("Misplaced Org")
-                                             .build()).build()
+                organisationParty
             );
 
             String actual = HmcDataUtils.getInPersonAttendeeNames(hearing);
 
             assertEquals("Jason Wells\nMichael Carver\nJack Crawley", actual);
+        }
+
+        private OrganisationDetailsModel buildOrganisationDetails(String id, String name) {
+            OrganisationDetailsModel organisationDetailsModel = new OrganisationDetailsModel();
+            organisationDetailsModel.setCftOrganisationID(id);
+            organisationDetailsModel.setName(name);
+            return organisationDetailsModel;
         }
 
     }

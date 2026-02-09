@@ -72,17 +72,16 @@ public class CaseCategoriesServiceTest {
                                                 .build()
                                         ))
                                         .build()));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent(null);
+        expected.setCategoryType(CategoryType.CASE_TYPE);
+        expected.setCategoryValue("AAA7-FAST_CLAIM");
+
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_TYPE,
             caseData,
             AUTH
         );
-
-        CaseCategoryModel expected = CaseCategoryModel.builder()
-            .categoryParent(null)
-            .categoryType(CategoryType.CASE_TYPE)
-            .categoryValue("AAA7-FAST_CLAIM")
-            .build();
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -99,17 +98,16 @@ public class CaseCategoriesServiceTest {
                                                 .build()
                                         ))
                                         .build()));
+        CaseCategoryModel expected = new CaseCategoryModel();
+        expected.setCategoryParent("AAA7-FAST_CLAIM");
+        expected.setCategoryType(CategoryType.CASE_SUBTYPE);
+        expected.setCategoryValue("AAA7-FAST_CLAIM");
+
         CaseCategoryModel actual = caseCategoriesService.getCaseCategoriesFor(
             CategoryType.CASE_SUBTYPE,
             caseData,
             AUTH
         );
-
-        CaseCategoryModel expected = CaseCategoryModel.builder()
-            .categoryParent("AAA7-FAST_CLAIM")
-            .categoryType(CategoryType.CASE_SUBTYPE)
-            .categoryValue("AAA7-FAST_CLAIM")
-            .build();
 
         assertThat(actual).isEqualTo(expected);
     }
