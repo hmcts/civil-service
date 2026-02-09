@@ -42,6 +42,7 @@ public class SdoOrderDetailsService {
         applyTrackFlags(caseData);
         mapHearingMethodFields(caseData, context.callbackParams().getVersion());
         resetPpiFields(caseData);
+        resetHousingDisrepairFields(caseData);
 
         return caseData;
     }
@@ -56,6 +57,19 @@ public class SdoOrderDetailsService {
 
         if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.fastClaimPPI)) {
             caseData.setFastTrackPPI(null);
+        }
+    }
+
+    private void resetHousingDisrepairFields(CaseData caseData) {
+        boolean isSmallClaimsTrack = caseClassificationService.isSmallClaimsTrack(caseData);
+        boolean isFastTrack = caseClassificationService.isFastTrack(caseData);
+
+        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.smallClaimHousingDisrepair)) {
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
+
+        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.fastClaimHousingDisrepair)) {
+            caseData.setFastTrackHousingDisrepair(null);
         }
     }
 

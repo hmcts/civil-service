@@ -12,8 +12,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class HousingDisrepair {
 
-    private String sectionTitle;
-    private String introLine;
     private String clauseA;
     private String clauseB;
     @Future(message = "The date entered must be in the future")

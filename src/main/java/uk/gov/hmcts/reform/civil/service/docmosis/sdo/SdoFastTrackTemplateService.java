@@ -71,7 +71,8 @@ public class SdoFastTrackTemplateService {
             )
             .setFastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .setFastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            .setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            //Todo: need to check with Ruban
+            //.setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
             .setFastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .setFastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
             .setHasNewDirections(hasVariable(caseData, FastTrackVariable.ADD_NEW_DIRECTIONS))
