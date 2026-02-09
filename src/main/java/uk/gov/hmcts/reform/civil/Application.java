@@ -7,7 +7,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import uk.gov.hmcts.reform.fees.client.config.FeesClientAutoConfiguration;
 
-@SpringBootApplication(exclude = {FeesClientAutoConfiguration.class})
+@SpringBootApplication
 @EnableCamundaRestClient
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableFeignClients(basePackages = {
