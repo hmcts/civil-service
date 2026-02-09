@@ -1641,7 +1641,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoApplicant1_when_present() {
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoApplicant1.test(caseData));
         }
 
@@ -1653,7 +1653,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoRespondent1_when_present() {
-            when(caseData.getResp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp1MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent1.test(caseData));
         }
 
@@ -1665,7 +1665,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoRespondent2_when_present() {
-            when(caseData.getResp2MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp2MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent2.test(caseData));
         }
 
