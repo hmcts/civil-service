@@ -23,21 +23,19 @@ public class RoboticsAddressMapper {
     public RoboticsAddress toRoboticsAddress(Address originalAddress) {
         requireNonNull(originalAddress);
         Address address = addressLinesMapper.splitLongerLines(originalAddress);
-        return RoboticsAddress.builder()
-            .addressLine1(address.firstNonNull())
-            .addressLine2(Optional.ofNullable(address.secondNonNull()).orElse("-"))
-            .addressLine3(address.thirdNonNull())
-            .addressLine4(address.fourthNonNull())
-            .addressLine5(address.fifthNonNull())
-            .postCode(address.getPostCode())
-            .build();
+        return new RoboticsAddress()
+            .setAddressLine1(address.firstNonNull())
+            .setAddressLine2(Optional.ofNullable(address.secondNonNull()).orElse("-"))
+            .setAddressLine3(address.thirdNonNull())
+            .setAddressLine4(address.fourthNonNull())
+            .setAddressLine5(address.fifthNonNull())
+            .setPostCode(address.getPostCode());
     }
 
     public RoboticsAddresses toRoboticsAddresses(Address address) {
         requireNonNull(address);
-        return RoboticsAddresses.builder()
-            .contactAddress(toRoboticsAddress(address))
-            .build();
+        return new RoboticsAddresses()
+            .setContactAddress(toRoboticsAddress(address));
     }
 
     public RoboticsAddresses toRoboticsAddresses(List<ContactInformation> contactInformation) {

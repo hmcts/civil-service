@@ -78,44 +78,44 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         var events = eventHistoryMapper.buildEvents(caseData, authToken);
         log.info("RoboticsCaseDataSpec Events built: {}", events);
 
-        var builder = RoboticsCaseDataSpec.builder()
-            .header(header)
-            .litigiousParties(parties)
-            .solicitors(solicitors)
-            .claimDetails(claimDetails)
-            .events(events);
+        RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec()
+            .setHeader(header)
+            .setLitigiousParties(parties)
+            .setSolicitors(solicitors)
+            .setClaimDetails(claimDetails)
+            .setEvents(events);
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
-            builder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
+            roboticsCaseDataSpec.setNoticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
-        return builder.build();
+        return roboticsCaseDataSpec;
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
         BigDecimal claimInterest = caseData.getTotalInterest() != null
             ? caseData.getTotalInterest() : BigDecimal.ZERO;
         BigDecimal amountClaimedWithInterest = caseData.getTotalClaimAmount().add(claimInterest);
-        return ClaimDetails.builder()
-            .amountClaimed(amountClaimedWithInterest)
-            .courtFee(ClaimFeeUtility.getCourtFee(caseData))
-            .caseIssuedDate(ofNullable(caseData.getIssueDate())
-                .map(issueDate -> issueDate.format(ISO_DATE))
-                .orElse(null))
-            .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
-            .build();
+        ClaimDetails claimDetails = new ClaimDetails();
+        claimDetails.setAmountClaimed(amountClaimedWithInterest);
+        claimDetails.setCourtFee(ClaimFeeUtility.getCourtFee(caseData));
+        claimDetails.setCaseIssuedDate(ofNullable(caseData.getIssueDate())
+            .map(issueDate -> issueDate.format(ISO_DATE))
+            .orElse(null));
+        claimDetails.setCaseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE));
+        return claimDetails;
     }
 
     private CaseHeader buildCaseHeader(CaseData caseData) {
-        return CaseHeader.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("700")
-            .owningCourtName("Online Civil Money Claim")
-            .caseType("CLAIM - SPEC ONLY")
-            .preferredCourtCode("")
-            .caseAllocatedTo("")
-            .build();
+        CaseHeader caseHeader = new CaseHeader();
+        caseHeader.setCaseNumber(caseData.getLegacyCaseReference());
+        caseHeader.setOwningCourtCode("700");
+        caseHeader.setOwningCourtName("Online Civil Money Claim");
+        caseHeader.setCaseType("CLAIM - SPEC ONLY");
+        caseHeader.setPreferredCourtCode("");
+        caseHeader.setCaseAllocatedTo("");
+        return caseHeader;
     }
 
     private List<Solicitor> buildSolicitors(CaseData caseData) {
@@ -288,17 +288,16 @@ public class RoboticsDataMapperForSpec extends BaseRoboticsDataMapper {
         String solicitorId,
         LocalDate dateOfService
     ) {
-        return LitigiousParty.builder()
-            .id(id)
-            .solicitorID(solicitorId)
-            .type(type)
-            .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
-            .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
-            .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
-            .solicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
-            .dateOfService(ofNullable(dateOfService)
+        return new LitigiousParty()
+            .setId(id)
+            .setSolicitorID(solicitorId)
+            .setType(type)
+            .setName(PartyUtils.getLitigiousPartyName(party, litigationFriend))
+            .setDateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
+            .setAddresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
+            .setSolicitorOrganisationID(getOrganisationId(organisationPolicy).orElse(null))
+            .setDateOfService(ofNullable(dateOfService)
                 .map(d -> d.format(ISO_DATE))
-                .orElse(null))
-            .build();
+                .orElse(null));
     }
 }

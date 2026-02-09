@@ -48,8 +48,8 @@ public class SdoNihlOrderService {
                                            DynamicList trialCourtList,
                                            DynamicList alternativeCourtLocations) {
 
-        caseData.setSdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
-                                                  .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
+        caseData.setSdoFastTrackJudgesRecital(new FastTrackJudgesRecital()
+                                                  .setInput(SdoR2UiConstantFastTrack.JUDGE_RECITAL));
 
         caseData.setSdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
                                                   .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)

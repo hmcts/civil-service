@@ -114,7 +114,7 @@ class HearingUtilsTest {
             .date(LocalDate.now())
             .build();
         CaseData caseData = CaseData.builder()
-            .fastTrackHearingNotes(FastTrackHearingNotes.builder().input("test notes").build())
+            .fastTrackHearingNotes(new FastTrackHearingNotes().setInput("test notes"))
             .build();
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);
@@ -129,7 +129,7 @@ class HearingUtilsTest {
             .date(LocalDate.now())
             .build();
         CaseData caseData = CaseData.builder()
-            .disposalHearingHearingNotesDJ(DisposalHearingHearingNotesDJ.builder().input("test notes").build())
+            .disposalHearingHearingNotesDJ(new DisposalHearingHearingNotesDJ().setInput("test notes"))
             .build();
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);

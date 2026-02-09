@@ -93,7 +93,7 @@ class DocumentUtilsTest {
 
         @Test
         void shouldReturnNull_whenGivenHearingTimeEstimateIsNull() {
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder().build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ();
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -103,8 +103,8 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenValidHearingTimeEstimateIsGiven() {
             var expected = "15 minutes";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES).build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES);
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -114,11 +114,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateIsGivenAs1Hour() {
             var expected = "1 hour 20 minutes";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("1")
-                .otherMinutes("20")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("1")
+                .setOtherMinutes("20");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -128,11 +127,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateIsGiven() {
             var expected = "6 hours 20 minutes";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("6")
-                .otherMinutes("20")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("6")
+                .setOtherMinutes("20");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -142,11 +140,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateIsGivenAsOneHourOneMin() {
             var expected = "1 hour 1 minute";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("1")
-                .otherMinutes("1")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("1")
+                .setOtherMinutes("1");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -156,11 +153,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateWithZeroMinIsGivenAs1Hour() {
             var expected = "1 hour";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("1")
-                .otherMinutes("0")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("1")
+                .setOtherMinutes("0");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -170,11 +166,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateWithZeroMinIsGiven() {
             var expected = "6 hours";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("6")
-                .otherMinutes("0")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("6")
+                .setOtherMinutes("0");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -184,11 +179,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateWithZeroHourIsGiven() {
             var expected = "20 minutes";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("0")
-                .otherMinutes("20")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("0")
+                .setOtherMinutes("20");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 
@@ -198,11 +192,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateWithZeroHourOneMinIsGiven() {
             var expected = "1 minute";
-            var hearingTime = DisposalHearingFinalDisposalHearingTimeDJ.builder()
-                .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                .otherHours("0")
-                .otherMinutes("1")
-                .build();
+            var hearingTime = new DisposalHearingFinalDisposalHearingTimeDJ()
+                .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                .setOtherHours("0")
+                .setOtherMinutes("1");
 
             var actual = DocumentUtils.getDisposalHearingTimeEstimateDJ(hearingTime);
 

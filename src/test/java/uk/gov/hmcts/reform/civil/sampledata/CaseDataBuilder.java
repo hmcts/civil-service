@@ -2865,21 +2865,19 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoFastTrackTrial() {
-        fastTrackHearingTime = FastTrackHearingTime.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
+        fastTrackHearingTime = new FastTrackHearingTime()
+            .setHelpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateTo(LocalDate.parse("2022-01-02"))
-            .dateToToggle(List.of(DateToShowToggle.SHOW))
-            .build();
-        fastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("Each party has the right to apply "
+            .setHearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
+            .setDateFrom(LocalDate.parse("2022-01-01"))
+            .setDateTo(LocalDate.parse("2022-01-02"))
+            .setDateToToggle(List.of(DateToShowToggle.SHOW));
+        fastTrackOrderWithoutJudgement = new FastTrackOrderWithoutJudgement()
+            .setInput(String.format("Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
                     + "on %s.",
-                LocalDate.parse("2022-01-30")))
-            .build();
+                LocalDate.parse("2022-01-30")));
         return this;
     }
 
@@ -2925,19 +2923,16 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoDisposal() {
-        disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format(
+        disposalOrderWithoutHearing = new DisposalOrderWithoutHearing()
+            .setInput(String.format(
                 "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
                     + "by the Court (together with the appropriate fee) "
-                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
-            .build();
-        disposalHearingHearingTime = DisposalHearingHearingTime.builder()
-            .input("This claim will be listed for final disposal before a judge on the first available date after")
-            .time(FIFTEEN_MINUTES)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateFrom(LocalDate.parse("2022-01-02"))
-            .build();
+                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")));
+        disposalHearingHearingTime = new DisposalHearingHearingTime()
+            .setInput("This claim will be listed for final disposal before a judge on the first available date after")
+            .setTime(FIFTEEN_MINUTES)
+            .setDateFrom(LocalDate.parse("2022-01-02"));
         return this;
     }
 
@@ -3143,14 +3138,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPersonDJ() {
-        disposalHearingFinalDisposalHearingTimeDJ = DisposalHearingFinalDisposalHearingTimeDJ
-            .builder()
-            .input("This claim be listed for final "
+        disposalHearingFinalDisposalHearingTimeDJ = new DisposalHearingFinalDisposalHearingTimeDJ()
+            .setInput("This claim be listed for final "
                 + "disposal before a Judge on the first "
                 + "available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-            .build();
+            .setDate(LocalDate.now().plusWeeks(16))
+            .setTime(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
         return this;
     }
 
@@ -5076,7 +5069,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
         disposalHearingOrderMadeWithoutHearingDJ =
-            DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
+            new DisposalHearingOrderMadeWithoutHearingDJ().setInput("test");
         return this;
     }
 
@@ -5260,9 +5253,8 @@ public class CaseDataBuilder {
         atStateApplicantRespondToDefenceAndProceed();
 
         ccdState = JUDICIAL_REFERRAL;
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5271,9 +5263,8 @@ public class CaseDataBuilder {
 
         atStateApplicantRespondToDefenceAndProceed();
         ccdState = JUDICIAL_REFERRAL;
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(reason)
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(reason);
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5318,9 +5309,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
 
         return this;
@@ -5338,9 +5328,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5352,9 +5341,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5372,9 +5360,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5394,9 +5381,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -7246,10 +7232,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atFastTrackWitnessOfFactWithNegativeInputs() {
         atStateClaimNotified();
-        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input2("-3")
-            .input3("-3")
-            .build();
+        this.fastTrackWitnessOfFact = new FastTrackWitnessOfFact()
+            .setInput2("-3")
+            .setInput3("-3");
 
         return this;
     }
@@ -7276,10 +7261,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
         atStateClaimNotified();
-        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input2("3")
-            .input3("3")
-            .build();
+        this.fastTrackWitnessOfFact = new FastTrackWitnessOfFact()
+            .setInput2("3")
+            .setInput3("3");
 
         return this;
     }

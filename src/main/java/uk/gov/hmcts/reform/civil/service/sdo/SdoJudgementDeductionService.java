@@ -18,15 +18,11 @@ public class SdoJudgementDeductionService {
             .map(deduction -> deduction + "%")
             .ifPresent(deductionPercentage -> {
                 caseData.setDisposalHearingJudgementDeductionValue(
-                    DisposalHearingJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build()
+                    new DisposalHearingJudgementDeductionValue().setValue(deductionPercentage)
                 );
 
                 caseData.setFastTrackJudgementDeductionValue(
-                    FastTrackJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build()
+                    new FastTrackJudgementDeductionValue().setValue(deductionPercentage)
                 );
 
                 caseData.setSmallClaimsJudgementDeductionValue(

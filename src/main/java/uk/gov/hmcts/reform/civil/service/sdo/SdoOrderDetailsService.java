@@ -65,15 +65,11 @@ public class SdoOrderDetailsService {
             .map(d -> d + "%")
             .ifPresent(deductionPercentage -> {
                 DisposalHearingJudgementDeductionValue disposalValue =
-                    DisposalHearingJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                    new DisposalHearingJudgementDeductionValue().setValue(deductionPercentage);
                 caseData.setDisposalHearingJudgementDeductionValue(disposalValue);
 
                 FastTrackJudgementDeductionValue fastTrackValue =
-                    FastTrackJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                    new FastTrackJudgementDeductionValue().setValue(deductionPercentage);
                 caseData.setFastTrackJudgementDeductionValue(fastTrackValue);
 
                 SmallClaimsJudgementDeductionValue smallClaimsValue =

@@ -611,8 +611,8 @@ public class SdoGeneratorServiceTest {
         DynamicListElement selectedCourt = new DynamicListElement();
         selectedCourt.setCode("00002");
         selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
-        updatedData.sdoFastTrackJudgesRecital(FastTrackJudgesRecital.builder()
-                                                  .input(SdoR2UiConstantFastTrack.JUDGE_RECITAL).build());
+        updatedData.sdoFastTrackJudgesRecital(new FastTrackJudgesRecital()
+                                                  .setInput(SdoR2UiConstantFastTrack.JUDGE_RECITAL));
         updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
                                                    .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
                                                    .standardDisclosureDate(LocalDate.now().plusDays(28))
