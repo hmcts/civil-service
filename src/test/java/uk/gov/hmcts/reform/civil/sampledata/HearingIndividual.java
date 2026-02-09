@@ -22,13 +22,13 @@ public class HearingIndividual {
     private HearingSubChannel hearingSubChannel;
 
     public PartyDetailsModel buildPartyDetails() {
-        return PartyDetailsModel.builder()
-                .partyID(partyId)
-                .individualDetails(IndividualDetailsModel.builder()
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .build())
-                .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setIndividualDetails(individualDetails);
+        return partyDetails;
     }
 
     public Attendees buildAttendee() {
