@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.fees.client.health.FeesHealthIndicator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,13 +21,13 @@ import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FeesHealthIndicatorOverrideTest {
+class FeesHealthIndicatorTest {
 
-    private FeesHealthIndicatorOverride feesHealthIndicatorOverride;
+    private FeesHealthIndicator feesHealthIndicatorOverride;
 
     @BeforeEach
     void setUp() {
-        feesHealthIndicatorOverride = new FeesHealthIndicatorOverride();
+        feesHealthIndicatorOverride = new FeesHealthIndicator();
     }
 
     @Test

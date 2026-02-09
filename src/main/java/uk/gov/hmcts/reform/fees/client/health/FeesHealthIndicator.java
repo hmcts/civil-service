@@ -1,9 +1,11 @@
-package uk.gov.hmcts.reform.civil.config;
+package uk.gov.hmcts.reform.fees.client.health;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -17,7 +19,9 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 @Configuration
-public class FeesHealthIndicatorOverride {
+@ConditionalOnProperty(prefix = "fees", name = "api.url")
+@EnableFeignClients(basePackages = "uk.gov.hmcts.reform.fees.client")
+public class FeesHealthIndicator {
 
     @Value("${fees.api.url:}")
     private String feesApiUrl;
