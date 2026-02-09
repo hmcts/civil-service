@@ -188,15 +188,29 @@ class RaiseQueryDashboardServiceTest {
     }
 
     private CaseQueriesCollection singleMessageQuery(String queryId, String createdBy) {
-        return CaseQueriesCollection.builder()
-            .caseMessages(List.of(element(CaseMessage.builder().id(queryId).createdBy(createdBy).build())))
-            .build();
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId(queryId);
+        caseMessage.setCreatedBy(createdBy);
+
+        CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+        caseQueriesCollection.setCaseMessages(List.of(element(caseMessage)));
+        return caseQueriesCollection;
     }
 
     private CaseQueriesCollection multiMessageQuery() {
-        Element<CaseMessage> first = element(CaseMessage.builder().id(CLAIMANT_QUERY_ID).createdBy("claimant").build());
-        Element<CaseMessage> second = element(CaseMessage.builder().id("follow-up").createdBy("claimant").build());
-        return CaseQueriesCollection.builder().caseMessages(List.of(first, second)).build();
+        CaseMessage firstMessage = new CaseMessage();
+        firstMessage.setId(CLAIMANT_QUERY_ID);
+        firstMessage.setCreatedBy("claimant");
+        Element<CaseMessage> first = element(firstMessage);
+
+        CaseMessage secondMessage = new CaseMessage();
+        secondMessage.setId("follow-up");
+        secondMessage.setCreatedBy("claimant");
+        Element<CaseMessage> second = element(secondMessage);
+
+        CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+        caseQueriesCollection.setCaseMessages(List.of(first, second));
+        return caseQueriesCollection;
     }
 
     private void verifyDeletionScenarios() {
