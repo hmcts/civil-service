@@ -149,7 +149,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .setUnassignedCaseListDisplayOrganisationReferences()
                 .anyRepresented(NO)
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -422,7 +424,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep")
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -460,7 +464,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
 
             final var originalRespondent1LRIndividuals = caseData.getRespondent1LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
