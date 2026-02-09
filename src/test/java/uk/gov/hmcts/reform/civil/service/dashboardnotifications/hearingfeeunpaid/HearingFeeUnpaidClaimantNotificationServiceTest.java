@@ -19,8 +19,8 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_UNPAID_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_HEARING_FEE_UNPAID_TRIAL_READY_CLAIMANT;
@@ -126,8 +126,8 @@ class HearingFeeUnpaidClaimantNotificationServiceTest {
 
         service.notifyHearingFeeUnpaid(caseData, AUTH_TOKEN);
 
-        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(dashboardScenariosService);
     }
 }
 

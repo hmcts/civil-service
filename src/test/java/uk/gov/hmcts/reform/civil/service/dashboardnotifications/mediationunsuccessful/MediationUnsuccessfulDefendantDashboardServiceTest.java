@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.mediationunsuccessful;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.APPOINTMENT_NO_AGREEMENT;
 import static uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE;
@@ -139,6 +139,6 @@ class MediationUnsuccessfulDefendantDashboardServiceTest {
 
         service.notifyMediationUnsuccessful(caseData, AUTH_TOKEN);
 
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
+        verifyNoInteractions(dashboardScenariosService);
     }
 }

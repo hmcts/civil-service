@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.decisionreconsideration;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DECISION_REQUEST_FOR_RECONSIDERATION_CLAIMANT;
 
@@ -64,6 +64,6 @@ class DecisionOnRequestForReconsiderationClaimantDashboardServiceTest {
 
         service.notifyDecisionReconsideration(caseData, AUTH_TOKEN);
 
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
+        verifyNoInteractions(dashboardScenariosService);
     }
 }

@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIMANT_INTENT_MEDIATION_SUCCESSFUL_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_DEFENDANT_MEDIATION_SUCCESSFUL;
@@ -85,6 +85,6 @@ class MediationSuccessfulDefendantDashboardServiceTest {
 
         service.notifyMediationSuccessful(caseData, AUTH_TOKEN);
 
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
+        verifyNoInteractions(dashboardScenariosService);
     }
 }
