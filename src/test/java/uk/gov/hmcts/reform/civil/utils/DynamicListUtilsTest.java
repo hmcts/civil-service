@@ -10,6 +10,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.getDynamicListValue;
 import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.listFromDynamicList;
+import static uk.gov.hmcts.reform.civil.utils.DynamicListUtils.trimToSelectedValue;
 
 class DynamicListUtilsTest {
 
@@ -81,5 +82,37 @@ class DynamicListUtilsTest {
             .build();
 
         assertThat(getDynamicListValue(dynamicList)).isNull();
+    }
+
+    @Nested
+    class TrimDynamicList {
+        @Test
+        void shouldTrimListItemsToSelectedValue() {
+            DynamicListElement selected = DynamicListElement.builder()
+                .code("CODE")
+                .label("Label")
+                .build();
+
+            DynamicList dynamicList = DynamicList.builder()
+                .listItems(List.of(
+                    selected,
+                    DynamicListElement.builder()
+                        .code("OTHER")
+                        .label("Other")
+                        .build()
+                ))
+                .value(selected)
+                .build();
+
+            DynamicList trimmed = trimToSelectedValue(dynamicList);
+
+            assertThat(trimmed.getValue()).isEqualTo(selected);
+            assertThat(trimmed.getListItems()).isNull();
+        }
+
+        @Test
+        void shouldReturnNull_whenOriginalListNull() {
+            assertThat(trimToSelectedValue(null)).isNull();
+        }
     }
 }
