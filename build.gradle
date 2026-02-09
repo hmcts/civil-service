@@ -94,7 +94,7 @@ allprojects {
   dependencyManagement {
     dependencies {
       //CVE-2018-10237 - Unbounded memory allocation
-      dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
+      dependencySet(group: 'com.google.guava', version: '33.5.0-jre') {
         entry 'guava'
       }
 
@@ -619,7 +619,7 @@ tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
   // Pipeline-stable settings with JaCoCo enabled
-  maxParallelForks = 1
+  maxParallelForks = 2
   forkEvery = 50
 
   // Keep within typical Jenkins container limits
