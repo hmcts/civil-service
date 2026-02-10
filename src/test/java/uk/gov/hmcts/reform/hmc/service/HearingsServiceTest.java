@@ -79,11 +79,12 @@ class HearingsServiceTest {
     class HearingGetResponses {
         @Test
         void shouldGetHearingRequest() throws HmcException {
+            PartyDetailsModel partyDetails = new PartyDetailsModel();
             HearingGetResponse response = HearingGetResponse.builder()
                 .requestDetails(HearingRequestDetails.builder().build())
                 .hearingDetails(HearingDetails.builder().build())
                 .caseDetails(CaseDetailsHearing.builder().build())
-                .partyDetails(List.of(PartyDetailsModel.builder().build()))
+                .partyDetails(List.of(partyDetails))
                 .hearingResponse(HearingResponse.builder().build())
                 .build();
 
