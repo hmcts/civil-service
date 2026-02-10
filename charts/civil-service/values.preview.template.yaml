@@ -401,6 +401,14 @@ wiremock:
   releaseNameOverride : ${SERVICE_NAME}-wiremock
   verbose: false
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+  volumes:
+    - name: wiremock-mocks
+      configMap:
+        name: ${SERVICE_NAME}-wiremock-wm
+  volumeMounts:
+    - name: wiremock-mocks
+      mountPath: /home/wiremock/mappings
+      subPath: mappings
   initialMappings:
     health-mock.json: |
       {
