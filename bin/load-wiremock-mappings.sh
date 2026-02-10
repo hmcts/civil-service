@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
+set -e
+
 MAPPINGS_DIR="./mappings"
 FILES_DIR="./__files"
+MAX_RETRIES=${MAX_RETRIES:-30}
+RETRY_INTERVAL=${RETRY_INTERVAL:-10}
+
+if [ -z "$WIREMOCK_URL" ]; then
+  echo "Error: WIREMOCK_URL environment variable is not set"
+  exit 1
+fi
 
 if [ ! -d "$MAPPINGS_DIR" ]; then
   echo "Mappings folder not found: $MAPPINGS_DIR"
@@ -10,9 +19,30 @@ fi
 
 echo "Loading mappings into WireMock at $WIREMOCK_URL"
 
+# Wait for WireMock to be ready
+echo "Waiting for WireMock to be ready..."
+attempt=1
+while [ $attempt -le $MAX_RETRIES ]; do
+  response=$(curl -sk -o /dev/null -w "%{http_code}" "$WIREMOCK_URL/__admin/mappings" 2>/dev/null || echo "000")
+
+  if [ "$response" = "200" ]; then
+    echo "WireMock is ready"
+    break
+  fi
+
+  if [ $attempt -eq $MAX_RETRIES ]; then
+    echo "Error: WireMock not ready after $MAX_RETRIES attempts"
+    exit 1
+  fi
+
+  echo "WireMock not ready (HTTP $response), attempt $attempt/$MAX_RETRIES, retrying in ${RETRY_INTERVAL}s..."
+  sleep $RETRY_INTERVAL
+  attempt=$((attempt + 1))
+done
+
 # Reset all existing mappings first to avoid duplicates
 echo "Resetting existing WireMock mappings..."
-RESET_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE "$WIREMOCK_URL/__admin/mappings")
+RESET_RESPONSE=$(curl -sk -o /dev/null -w "%{http_code}" -X DELETE "$WIREMOCK_URL/__admin/mappings")
 if [ "$RESET_RESPONSE" == "200" ]; then
   echo "Existing mappings cleared successfully"
 else
@@ -57,7 +87,7 @@ for file in "$MAPPINGS_DIR"/*.json; do
       cat "$file" > "$TMP_JSON"
     fi
 
-    RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$WIREMOCK_URL/__admin/mappings" \
+    RESPONSE=$(curl -sk -o /dev/null -w "%{http_code}" -X POST "$WIREMOCK_URL/__admin/mappings" \
       -H "Content-Type: application/json" \
       --data-binary "@$TMP_JSON")
 
