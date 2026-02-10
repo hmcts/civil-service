@@ -442,7 +442,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
         //Given
         given(repaymentPlanDecisionService.getCalculatedDecision(any(), any())).willReturn(IN_FAVOUR_OF_CLAIMANT);
         //When
-        doPost(BEARER_TOKEN, ClaimantProposedPlan.builder().proposedRepaymentType(IMMEDIATELY).build(), COURT_DECISION_URL, "1")
+        ClaimantProposedPlan proposedPlan = new ClaimantProposedPlan();
+        proposedPlan.setProposedRepaymentType(IMMEDIATELY);
+        doPost(BEARER_TOKEN, proposedPlan, COURT_DECISION_URL, "1")
             .andExpect(status().isOk());
     }
 

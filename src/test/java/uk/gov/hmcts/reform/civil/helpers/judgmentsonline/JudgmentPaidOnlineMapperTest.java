@@ -50,10 +50,10 @@ public class JudgmentPaidOnlineMapperTest {
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //PAID IN FULL
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.of(2023, 1, 15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid = new JudgmentPaidInFull();
+        paid.setDateOfFullPaymentMade(LocalDate.of(2023, 1, 15));
+        paid.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
@@ -75,10 +75,10 @@ public class JudgmentPaidOnlineMapperTest {
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.of(2012, 12, 15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid2 = new JudgmentPaidInFull();
+        paid2.setDateOfFullPaymentMade(LocalDate.of(2012, 12, 15));
+        paid2.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid2);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
@@ -92,10 +92,10 @@ public class JudgmentPaidOnlineMapperTest {
         CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
 
-        caseData.setJoJudgmentPaidInFull(JudgmentPaidInFull.builder()
-            .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
-            .confirmFullPaymentMade(List.of("CONFIRMED"))
-            .build());
+        JudgmentPaidInFull paid3 = new JudgmentPaidInFull();
+        paid3.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
+        paid3.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+        caseData.setJoJudgmentPaidInFull(paid3);
         caseData.setActiveJudgment(judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData));
 
         assertNotNull(caseData.getActiveJudgment());
