@@ -122,11 +122,10 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     private void updateChangeOrganisationRequestFieldAfterNoCDecisionApplied(
         CaseData caseData,
         ChangeOrganisationRequest preDecisionCor) {
-        caseData.setChangeOrganisationRequestField(
-            ChangeOrganisationRequest.builder()
-                .createdBy(preDecisionCor.getCreatedBy())
-                .organisationToAdd(
-                    Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build()).build());
+        ChangeOrganisationRequest request = new ChangeOrganisationRequest();
+        request.setCreatedBy(preDecisionCor.getCreatedBy());
+        request.setOrganisationToAdd(Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build());
+        caseData.setChangeOrganisationRequestField(request);
 
     }
 
@@ -154,24 +153,21 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         String orgIdCopyIfExists = getOrgIdCopyIfExists(caseDetails, caseRole);
 
         if (organisationToRemove == null) {
-            ChangeOrganisationRequest.ChangeOrganisationRequestBuilder changeOrganisationRequestBuilder
-                = ChangeOrganisationRequest.builder()
-                .organisationToAdd(changeOrganisationRequestField.getOrganisationToAdd())
-                .approvalStatus(changeOrganisationRequestField.getApprovalStatus())
-                .caseRoleId(caseRoleId)
-                .requestTimestamp(changeOrganisationRequestField.getRequestTimestamp());
+            ChangeOrganisationRequest updatedRequest = new ChangeOrganisationRequest();
+            updatedRequest.setOrganisationToAdd(changeOrganisationRequestField.getOrganisationToAdd());
+            updatedRequest.setApprovalStatus(changeOrganisationRequestField.getApprovalStatus());
+            updatedRequest.setCaseRoleId(caseRoleId);
+            updatedRequest.setRequestTimestamp(changeOrganisationRequestField.getRequestTimestamp());
             if (orgIdCopyIfExists == null) {
-                changeOrganisationRequestBuilder
-                    .organisationToRemove(Organisation.builder()
-                                              .organisationID(null)
-                                              .build());
-                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, changeOrganisationRequestBuilder.build());
+                updatedRequest.setOrganisationToRemove(Organisation.builder()
+                    .organisationID(null)
+                    .build());
+                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, updatedRequest);
             } else {
-                changeOrganisationRequestBuilder
-                    .organisationToRemove(Organisation.builder()
-                                              .organisationID(orgIdCopyIfExists)
-                                              .build());
-                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, changeOrganisationRequestBuilder.build());
+                updatedRequest.setOrganisationToRemove(Organisation.builder()
+                    .organisationID(orgIdCopyIfExists)
+                    .build());
+                caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, updatedRequest);
             }
         }
     }

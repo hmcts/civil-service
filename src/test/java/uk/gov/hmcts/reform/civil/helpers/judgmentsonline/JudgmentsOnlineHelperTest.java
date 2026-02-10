@@ -147,30 +147,30 @@ public class JudgmentsOnlineHelperTest {
     @Test
     void testRepaymentBreakdownSummary() {
         BigDecimal interest = BigDecimal.TEN;
-        JudgmentDetails activeJudgment = JudgmentDetails.builder().issueDate(LocalDate.now())
-            .paymentPlan(JudgmentPaymentPlan.builder()
-                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-            .orderedAmount("100")
-            .costs("50")
-            .totalAmount("150")
-            .claimFeeAmount("55")
-            .amountAlreadyPaid("10")
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(LocalDate.now())
+            .setPaymentPlan(new JudgmentPaymentPlan()
+                             .setType(PaymentPlanSelection.PAY_IMMEDIATELY))
+            .setOrderedAmount("100")
+            .setCosts("50")
+            .setTotalAmount("150")
+            .setClaimFeeAmount("55")
+            .setAmountAlreadyPaid("10");
 
         assertThat(calculateRepaymentBreakdownSummary(activeJudgment, interest)).isNotNull();
     }
 
     @Test
     void testRepaymentBreakdownSummaryForImmediatePlan() {
-        JudgmentDetails activeJudgment = JudgmentDetails.builder().issueDate(LocalDate.now())
-            .paymentPlan(JudgmentPaymentPlan.builder()
-                             .type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
-            .orderedAmount("100")
-            .costs("50")
-            .totalAmount("150")
-            .claimFeeAmount("55")
-            .amountAlreadyPaid("10")
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(LocalDate.now())
+            .setPaymentPlan(new JudgmentPaymentPlan()
+                             .setType(PaymentPlanSelection.PAY_IMMEDIATELY))
+            .setOrderedAmount("100")
+            .setCosts("50")
+            .setTotalAmount("150")
+            .setClaimFeeAmount("55")
+            .setAmountAlreadyPaid("10");
 
         assertThat(calculateRepaymentBreakdownSummaryWithoutClaimInterest(activeJudgment, false)).isNotNull();
     }

@@ -31,23 +31,22 @@ public class RecordJudgmentOnlineMapper extends JudgmentOnlineMapper {
         BigDecimal costs = JudgmentsOnlineHelper.getMoneyValue(caseData.getJoAmountCostOrdered());
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
-            .createdTimestamp(LocalDateTime.now())
-            .state(getJudgmentState(caseData))
-            .rtlState(getRtlState(caseData.getJoIsRegisteredWithRTL()))
-            .type(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
-            .instalmentDetails(caseData.getJoInstalmentDetails())
-            .paymentPlan(caseData.getJoPaymentPlan())
-            .isRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
-            .issueDate(caseData.getJoOrderMadeDate())
-            .orderedAmount(orderAmount.toString())
-            .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).toString())
-            .build();
+        activeJudgment
+            .setCreatedTimestamp(LocalDateTime.now())
+            .setState(getJudgmentState(caseData))
+            .setRtlState(getRtlState(caseData.getJoIsRegisteredWithRTL()))
+            .setType(JudgmentType.JUDGMENT_FOLLOWING_HEARING)
+            .setInstalmentDetails(caseData.getJoInstalmentDetails())
+            .setPaymentPlan(caseData.getJoPaymentPlan())
+            .setIsRegisterWithRTL(caseData.getJoIsRegisteredWithRTL())
+            .setIssueDate(caseData.getJoOrderMadeDate())
+            .setOrderedAmount(orderAmount.toString())
+            .setCosts(costs.toString())
+            .setTotalAmount(orderAmount.add(costs).toString());
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return activeJudgmentDetails;
+        return activeJudgment;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {

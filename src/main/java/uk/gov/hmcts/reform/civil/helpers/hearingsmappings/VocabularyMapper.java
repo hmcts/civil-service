@@ -11,6 +11,7 @@ public class VocabularyMapper {
     }
 
     public static List<VocabularyModel> getVocabulary() {
-        return List.of(VocabularyModel.builder().build());
+        VocabularyModel vocabularyModel = new VocabularyModel();
+        return List.of(vocabularyModel);
     }
 }

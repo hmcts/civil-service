@@ -35,18 +35,17 @@ public class CjesMapperTest {
         String legacyCcdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
 
-        JudgmentDetails judgmentDetails = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123.45")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .defendant1Address(createMockAddress())
-            .build();
+        JudgmentDetails judgmentDetails = new JudgmentDetails()
+            .setJudgmentId(123)
+            .setLastUpdateTimeStamp(now)
+            .setCourtLocation("123456")
+            .setTotalAmount("123.45")
+            .setIssueDate(now.toLocalDate())
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setCancelDate(now.toLocalDate())
+            .setDefendant1Name("Defendant 1")
+            .setDefendant1Dob(LocalDate.of(1980, 1, 1))
+            .setDefendant1Address(createMockAddress());
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -112,21 +111,20 @@ public class CjesMapperTest {
         String ccdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
 
-        JudgmentDetails judgmentDetails = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123.45")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .defendant1Address(createMockAddress())
-            .defendant2Name("Defendant 2")
-            .defendant2Dob(LocalDate.of(1990, 2, 2))
-            .defendant2Address(createMockAddress())
-            .build();
+        JudgmentDetails judgmentDetails = new JudgmentDetails()
+            .setJudgmentId(123)
+            .setLastUpdateTimeStamp(now)
+            .setCourtLocation("123456")
+            .setTotalAmount("123.45")
+            .setIssueDate(now.toLocalDate())
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setCancelDate(now.toLocalDate())
+            .setDefendant1Name("Defendant 1")
+            .setDefendant1Dob(LocalDate.of(1980, 1, 1))
+            .setDefendant1Address(createMockAddress())
+            .setDefendant2Name("Defendant 2")
+            .setDefendant2Dob(LocalDate.of(1990, 2, 2))
+            .setDefendant2Address(createMockAddress());
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
@@ -161,21 +159,20 @@ public class CjesMapperTest {
         String ccdReference = "reference";
         LocalDateTime now = LocalDateTime.now();
 
-        JudgmentDetails judgmentDetails = JudgmentDetails.builder()
-            .judgmentId(123)
-            .lastUpdateTimeStamp(now)
-            .courtLocation("123456")
-            .totalAmount("123.45")
-            .issueDate(now.toLocalDate())
-            .rtlState(JudgmentRTLStatus.ISSUED.getRtlState())
-            .cancelDate(now.toLocalDate())
-            .defendant1Name("Defendant 1")
-            .defendant1Dob(LocalDate.of(1980, 1, 1))
-            .defendant1Address(createMockAddress())
-            .defendant2Name("Defendant 2")
-            .defendant2Dob(LocalDate.of(1990, 2, 2))
-            .defendant2Address(createMockAddress())
-            .build();
+        JudgmentDetails judgmentDetails = new JudgmentDetails()
+            .setJudgmentId(123)
+            .setLastUpdateTimeStamp(now)
+            .setCourtLocation("123456")
+            .setTotalAmount("123.45")
+            .setIssueDate(now.toLocalDate())
+            .setRtlState(JudgmentRTLStatus.ISSUED.getRtlState())
+            .setCancelDate(now.toLocalDate())
+            .setDefendant1Name("Defendant 1")
+            .setDefendant1Dob(LocalDate.of(1980, 1, 1))
+            .setDefendant1Address(createMockAddress())
+            .setDefendant2Name("Defendant 2")
+            .setDefendant2Dob(LocalDate.of(1990, 2, 2))
+            .setDefendant2Address(createMockAddress());
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
@@ -205,13 +202,13 @@ public class CjesMapperTest {
     }
 
     private JudgmentAddress createMockAddress() {
-        return JudgmentAddress.builder()
-            .defendantAddressLine1("Line 1")
-            .defendantAddressLine2("Line 2")
-            .defendantAddressLine3("Line 3")
-            .defendantAddressLine4("Town")
-            .defendantAddressLine5("Country")
-            .defendantPostCode("PostCode")
-            .build();
+        JudgmentAddress judgmentAddress = new JudgmentAddress();
+        judgmentAddress.setDefendantAddressLine1("Line 1");
+        judgmentAddress.setDefendantAddressLine2("Line 2");
+        judgmentAddress.setDefendantAddressLine3("Line 3");
+        judgmentAddress.setDefendantAddressLine4("Town");
+        judgmentAddress.setDefendantAddressLine5("Country");
+        judgmentAddress.setDefendantPostCode("PostCode");
+        return judgmentAddress;
     }
 }

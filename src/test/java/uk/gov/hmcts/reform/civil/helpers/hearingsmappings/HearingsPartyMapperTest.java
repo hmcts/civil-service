@@ -83,11 +83,11 @@ public class HearingsPartyMapperTest {
     }
 
     private UnavailabilityRangeModel buildUnavailabilityDateRange(LocalDate from, LocalDate to) {
-        return  UnavailabilityRangeModel.builder()
-            .unavailabilityType(ALL_DAY)
-            .unavailableFromDate(getLocalDateInString(from))
-            .unavailableToDate(getLocalDateInString(to))
-            .build();
+        UnavailabilityRangeModel unavailabilityRangeModel = new UnavailabilityRangeModel();
+        unavailabilityRangeModel.setUnavailabilityType(ALL_DAY);
+        unavailabilityRangeModel.setUnavailableFromDate(getLocalDateInString(from));
+        unavailabilityRangeModel.setUnavailableToDate(getLocalDateInString(to));
+        return unavailabilityRangeModel;
     }
 
     private CaseData rollUpUnavailableDateRespondent(CaseData caseData) {
@@ -1098,53 +1098,51 @@ public class HearingsPartyMapperTest {
                                                                   String email, String phone) {
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
-        IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .interpreterLanguage(null)
-            .reasonableAdjustments(emptyList())
-            .vulnerableFlag(false)
-            .vulnerabilityDetails(null)
-            .hearingChannelEmail(hearingChannelEmail)
-            .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(emptyList())
-            .custodyStatus(null)
-            .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        individualDetails.setInterpreterLanguage(null);
+        individualDetails.setReasonableAdjustments(emptyList());
+        individualDetails.setVulnerableFlag(false);
+        individualDetails.setVulnerabilityDetails(null);
+        individualDetails.setHearingChannelEmail(hearingChannelEmail);
+        individualDetails.setHearingChannelPhone(hearingChannelPhone);
+        individualDetails.setRelatedParties(emptyList());
+        individualDetails.setCustodyStatus(null);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(IND)
-            .partyName(partyName)
-            .partyRole(partyRole)
-            .individualDetails(individualDetails)
-            .organisationDetails(null)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(individualDetails);
+        partyDetails.setOrganisationDetails(null);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String partyId,
                                                                    String name,
                                                                    String partyRole,
                                                                    String cftOrganisationID) {
-        OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
-            .name(name)
-            .organisationType(ORG.getLabel())
-            .cftOrganisationID(cftOrganisationID)
-            .build();
+        OrganisationDetailsModel organisationDetails = new OrganisationDetailsModel();
+        organisationDetails.setName(name);
+        organisationDetails.setOrganisationType(ORG.getLabel());
+        organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(ORG)
-            .partyName(name)
-            .partyRole(partyRole)
-            .individualDetails(null)
-            .organisationDetails(organisationDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(null)
-            .hearingSubChannel(null)
-            .build();
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(ORG);
+        partyDetails.setPartyName(name);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(null);
+        partyDetails.setOrganisationDetails(organisationDetails);
+        partyDetails.setUnavailabilityDOW(null);
+        partyDetails.setUnavailabilityRanges(null);
+        partyDetails.setHearingSubChannel(null);
+        return partyDetails;
     }
 
     private PartyDetailsModel buildExpectedOrganisationPartyObject(String name,

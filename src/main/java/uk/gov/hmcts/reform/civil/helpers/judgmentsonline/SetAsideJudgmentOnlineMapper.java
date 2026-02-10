@@ -26,14 +26,18 @@ public class SetAsideJudgmentOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
-        return activeJudgment.toBuilder()
-            .state(getJudgmentState(caseData))
-            .setAsideDate(getSetAsideDate(caseData))
-            .lastUpdateTimeStamp(LocalDateTime.now())
-            .cancelledTimeStamp(LocalDateTime.now())
-            .rtlState(getNextRTLState(activeJudgment.getRtlState()))
-            .setAsideApplicationDate(getApplicationDateToSetAside(caseData))
-            .build();
+        if (activeJudgment == null) {
+            activeJudgment = new JudgmentDetails();
+            caseData.setActiveJudgment(activeJudgment);
+        }
+        activeJudgment
+            .setState(getJudgmentState(caseData))
+            .setSetAsideDate(getSetAsideDate(caseData))
+            .setLastUpdateTimeStamp(LocalDateTime.now())
+            .setCancelledTimeStamp(LocalDateTime.now())
+            .setRtlState(getNextRTLState(activeJudgment.getRtlState()))
+            .setSetAsideApplicationDate(getApplicationDateToSetAside(caseData));
+        return activeJudgment;
     }
 
     protected JudgmentState getJudgmentState(CaseData caseData) {

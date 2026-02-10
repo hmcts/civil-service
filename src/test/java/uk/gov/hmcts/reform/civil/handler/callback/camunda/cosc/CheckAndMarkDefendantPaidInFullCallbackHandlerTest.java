@@ -64,12 +64,11 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     void shouldSetSendToCjesProcessVariableToFalse_whenDefendantPaidInFull() {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .fullyPaymentMadeDate(LocalDate.of(2024, 9, 20))
-                                .issueDate(LocalDate.of(2024, 9, 9))
-                                .totalAmount("900000")
-                                .orderedAmount("900000")
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setFullyPaymentMadeDate(LocalDate.of(2024, 9, 20))
+                                .setIssueDate(LocalDate.of(2024, 9, 9))
+                                .setTotalAmount("900000")
+                                .setOrderedAmount("900000"))
             .build();
 
         var params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -83,11 +82,10 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldUpdateJudgmentAndSetSendToCjesProcessVariableToTrue_whenJudgmentPaidDateProvided() {
         LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
-        JudgmentDetails activeJudgementWithoutPayment = JudgmentDetails.builder()
-            .issueDate(LocalDate.of(2024, 9, 9))
-            .totalAmount("900000")
-            .orderedAmount("900000")
-            .build();
+        JudgmentDetails activeJudgementWithoutPayment = new JudgmentDetails()
+            .setIssueDate(LocalDate.of(2024, 9, 9))
+            .setTotalAmount("900000")
+            .setOrderedAmount("900000");
 
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
@@ -96,10 +94,12 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
             .activeJudgment(activeJudgementWithoutPayment)
             .build();
 
-        JudgmentDetails expected = caseData.getActiveJudgment().toBuilder()
-            .fullyPaymentMadeDate(markedPaymentDate)
-            .state(JudgmentState.SATISFIED)
-            .build();
+        JudgmentDetails expected = new JudgmentDetails()
+            .setIssueDate(activeJudgementWithoutPayment.getIssueDate())
+            .setTotalAmount(activeJudgementWithoutPayment.getTotalAmount())
+            .setOrderedAmount(activeJudgementWithoutPayment.getOrderedAmount())
+            .setFullyPaymentMadeDate(markedPaymentDate)
+            .setState(JudgmentState.SATISFIED);
 
         when(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData, markedPaymentDate)).thenReturn(expected);
 
@@ -117,11 +117,10 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldSetJudgementStateAsCancelled() {
         LocalDate markedPaymentDate = LocalDate.of(2024, 9, 20);
-        JudgmentDetails activeJudgementWithoutPayment = JudgmentDetails.builder()
-            .issueDate(LocalDate.of(2024, 9, 9))
-            .totalAmount("900000")
-            .orderedAmount("900000")
-            .build();
+        JudgmentDetails activeJudgementWithoutPayment = new JudgmentDetails()
+            .setIssueDate(LocalDate.of(2024, 9, 9))
+            .setTotalAmount("900000")
+            .setOrderedAmount("900000");
 
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
@@ -130,10 +129,12 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
             .activeJudgment(activeJudgementWithoutPayment)
             .build();
 
-        JudgmentDetails expected = caseData.getActiveJudgment().toBuilder()
-            .fullyPaymentMadeDate(markedPaymentDate)
-            .state(JudgmentState.CANCELLED)
-            .build();
+        JudgmentDetails expected = new JudgmentDetails()
+            .setIssueDate(activeJudgementWithoutPayment.getIssueDate())
+            .setTotalAmount(activeJudgementWithoutPayment.getTotalAmount())
+            .setOrderedAmount(activeJudgementWithoutPayment.getOrderedAmount())
+            .setFullyPaymentMadeDate(markedPaymentDate)
+            .setState(JudgmentState.CANCELLED);
 
         when(paidInFullJudgmentOnlineMapper.addUpdateActiveJudgment(caseData, markedPaymentDate)).thenReturn(expected);
 

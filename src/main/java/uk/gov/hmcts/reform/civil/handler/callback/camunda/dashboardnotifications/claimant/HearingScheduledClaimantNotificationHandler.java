@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.claimant;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.DefaultJudgementHa
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.hearingFeeRequired;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HearingScheduledClaimantNotificationHandler extends CallbackHandler {
@@ -86,6 +88,8 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
             caseData.setHearingLocationCourtName(locationRefData.getSiteName());
         }
 
+        log.info("HearingScheduledClaimantNotificationHandler with caseId: {}, isApplicant1NotRepresented: {}", caseId, caseData.isApplicant1NotRepresented());
+
         if (caseData.isApplicant1NotRepresented()) {
             dashboardScenariosService.recordScenarios(
                     authToken,
@@ -112,6 +116,7 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
                 || (isAutoHearingNotice && hearingFeeRequired(camundaVars.getHearingType())));
 
         if (shouldRecordFeeScenario) {
+            log.info("HearingScheduledClaimantNotificationHandler: Recording hearing fee scenario for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_FEE_REQUIRED_CLAIMANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
@@ -121,12 +126,14 @@ public class HearingScheduledClaimantNotificationHandler extends CallbackHandler
         if (caseData.isApplicant1NotRepresented()) {
             if (AllocatedTrack.FAST_CLAIM.name().equals(caseData.getAssignedTrack())
                 && isNull(caseData.getTrialReadyApplicant())) {
+                log.info("HearingScheduledClaimantNotificationHandler: Recording trial arrangements scenario for caseid: {}", caseId);
                 dashboardScenariosService.recordScenarios(authToken,
                                                   SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_RELIST_HEARING_CLAIMANT.getScenario(), caseId,
                                                   ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()
                 );
             }
 
+            log.info("HearingScheduledClaimantNotificationHandler: Recording upload documents scenarios for caseid: {}", caseId);
             dashboardScenariosService.recordScenarios(authToken,
                                               SCENARIO_AAA6_CP_HEARING_DOCUMENTS_UPLOAD_CLAIMANT.getScenario(), caseId,
                                               ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build()

@@ -55,9 +55,8 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(YES)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(YES))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -76,9 +75,8 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseData.builder()
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(YES)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(YES))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -98,9 +96,8 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(NO)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(NO))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -120,9 +117,8 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
-            .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
-                                                            .isRegisterWithRTL(YES)
-                                                            .build()))
+            .historicJudgment(ElementUtils.wrapElements(new JudgmentDetails()
+                                                            .setIsRegisterWithRTL(YES)))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -142,9 +138,8 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
             .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
-            .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
-                                                            .isRegisterWithRTL(NO)
-                                                            .build()))
+            .historicJudgment(ElementUtils.wrapElements(new JudgmentDetails()
+                                                            .setIsRegisterWithRTL(NO)))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

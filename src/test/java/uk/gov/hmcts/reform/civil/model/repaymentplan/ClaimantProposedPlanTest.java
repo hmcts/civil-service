@@ -26,10 +26,8 @@ class ClaimantProposedPlanTest {
     void shouldGetRepaymentDate_fromSetDate() {
         //Given
         LocalDate proposedDate = LocalDate.of(2023, 2, 1);
-        ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
-            .builder()
-            .repaymentByDate(proposedDate)
-            .build();
+        ClaimantProposedPlan claimantProposedPlan = new ClaimantProposedPlan();
+        claimantProposedPlan.setRepaymentByDate(proposedDate);
         //When
         LocalDate result = claimantProposedPlan.getRepaymentDate(new BigDecimal(2345));
         //Then
@@ -41,10 +39,8 @@ class ClaimantProposedPlanTest {
         //Given
         LocalDate proposedDate = LocalDate.of(2023, 2, 1);
         given(repaymentPlan.finalPaymentBy(any())).willReturn(proposedDate);
-        ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
-            .builder()
-            .repaymentPlanLRspec(repaymentPlan)
-            .build();
+        ClaimantProposedPlan claimantProposedPlan = new ClaimantProposedPlan();
+        claimantProposedPlan.setRepaymentPlanLRspec(repaymentPlan);
         //When
         LocalDate result = claimantProposedPlan.getRepaymentDate(new BigDecimal(2345));
         //Then
@@ -54,10 +50,8 @@ class ClaimantProposedPlanTest {
     @Test
     void shouldReturnTrue_whenProposedToPayImmediately() {
         //Given
-        ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
-            .builder()
-            .proposedRepaymentType(IMMEDIATELY)
-            .build();
+        ClaimantProposedPlan claimantProposedPlan = new ClaimantProposedPlan();
+        claimantProposedPlan.setProposedRepaymentType(IMMEDIATELY);
         //Then
         assertThat(claimantProposedPlan.hasProposedPayImmediately()).isTrue();
     }
@@ -65,10 +59,8 @@ class ClaimantProposedPlanTest {
     @Test
     void shouldReturnTrue_whenProposedToPayBySetDate() {
         //Given
-        ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
-            .builder()
-            .proposedRepaymentType(BY_SET_DATE)
-            .build();
+        ClaimantProposedPlan claimantProposedPlan = new ClaimantProposedPlan();
+        claimantProposedPlan.setProposedRepaymentType(BY_SET_DATE);
         //Then
         assertThat(claimantProposedPlan.hasProposedPayBySetDate()).isTrue();
     }
@@ -76,10 +68,8 @@ class ClaimantProposedPlanTest {
     @Test
     void shouldReturnTrue_whenProposedToPayByInstallments() {
         //Given
-        ClaimantProposedPlan claimantProposedPlan = ClaimantProposedPlan
-            .builder()
-            .proposedRepaymentType(SUGGESTION_OF_REPAYMENT_PLAN)
-            .build();
+        ClaimantProposedPlan claimantProposedPlan = new ClaimantProposedPlan();
+        claimantProposedPlan.setProposedRepaymentType(SUGGESTION_OF_REPAYMENT_PLAN);
         //Then
         assertThat(claimantProposedPlan.hasProposedPayByInstallments()).isTrue();
     }

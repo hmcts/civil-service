@@ -46,24 +46,23 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
         isNonDivergent =  JudgmentsOnlineHelper.isNonDivergentForDJ(caseData);
         JudgmentDetails activeJudgment = super.addUpdateActiveJudgment(caseData);
         activeJudgment = super.updateDefendantDetails(activeJudgment, caseData, addressMapper);
-        JudgmentDetails judgmentDetails = activeJudgment.toBuilder()
-            .createdTimestamp(LocalDateTime.now())
-            .state(getJudgmentState(caseData))
-            .type(JudgmentType.DEFAULT_JUDGMENT)
-            .instalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
+        activeJudgment
+            .setCreatedTimestamp(LocalDateTime.now())
+            .setState(getJudgmentState(caseData))
+            .setType(JudgmentType.DEFAULT_JUDGMENT)
+            .setInstalmentDetails(DJPaymentTypeSelection.REPAYMENT_PLAN.equals(caseData.getPaymentTypeSelection())
                                    ? getInstalmentDetails(caseData) : null)
-            .paymentPlan(getPaymentPlan(caseData))
-            .isRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
-            .rtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
-            .issueDate(LocalDate.now())
-            .orderedAmount(orderAmount.toString())
-            .claimFeeAmount(claimFee.toString())
-            .costs(costs.toString())
-            .totalAmount(orderAmount.add(costs).add(claimFee).toString())
-            .build();
-        super.updateJudgmentTabDataWithActiveJudgment(judgmentDetails, caseData);
+            .setPaymentPlan(getPaymentPlan(caseData))
+            .setIsRegisterWithRTL(isNonDivergent ? YesOrNo.YES : YesOrNo.NO)
+            .setRtlState(isNonDivergent ? JudgmentRTLStatus.ISSUED.getRtlState() : null)
+            .setIssueDate(LocalDate.now())
+            .setOrderedAmount(orderAmount.toString())
+            .setClaimFeeAmount(claimFee.toString())
+            .setCosts(costs.toString())
+            .setTotalAmount(orderAmount.add(costs).add(claimFee).toString());
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return judgmentDetails;
+        return activeJudgment;
     }
 
     @Override
@@ -72,10 +71,10 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {
-        return JudgmentInstalmentDetails.builder()
-            .amount(caseData.getRepaymentSuggestion())
-            .startDate(caseData.getRepaymentDate())
-            .paymentFrequency(getPaymentFrequency(caseData.getRepaymentFrequency())).build();
+        return new JudgmentInstalmentDetails()
+            .setAmount(caseData.getRepaymentSuggestion())
+            .setStartDate(caseData.getRepaymentDate())
+            .setPaymentFrequency(getPaymentFrequency(caseData.getRepaymentFrequency()));
     }
 
     private PaymentFrequency getPaymentFrequency(RepaymentFrequencyDJ freqDJ) {
@@ -92,10 +91,9 @@ public class DefaultJudgmentOnlineMapper extends JudgmentOnlineMapper {
     }
 
     private JudgmentPaymentPlan getPaymentPlan(CaseData caseData) {
-        return JudgmentPaymentPlan.builder()
-            .type(getPaymentPlanSeletion(caseData.getPaymentTypeSelection()))
-            .paymentDeadlineDate(getPaymentDeadLineDate(caseData))
-            .build();
+        return new JudgmentPaymentPlan()
+            .setType(getPaymentPlanSeletion(caseData.getPaymentTypeSelection()))
+            .setPaymentDeadlineDate(getPaymentDeadLineDate(caseData));
     }
 
     private PaymentPlanSelection getPaymentPlanSeletion(DJPaymentTypeSelection paymentType) {

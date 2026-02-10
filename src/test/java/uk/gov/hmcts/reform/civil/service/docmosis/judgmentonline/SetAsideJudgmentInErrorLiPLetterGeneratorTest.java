@@ -68,7 +68,7 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .buildJudmentOnlineCaseDataWithPaymentByInstalment();
-        caseData.setHistoricJudgment(wrapElements(JudgmentDetails.builder().issueDate(LocalDate.now()).build()));
+        caseData.setHistoricJudgment(wrapElements(new JudgmentDetails().setIssueDate(LocalDate.now())));
         caseData.setJoIssuedDate(LocalDate.now());
         caseData.setJoSetAsideJudgmentErrorText("Some text");
 

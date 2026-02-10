@@ -89,12 +89,12 @@ public class AssignCategoryId {
                 .documentHash(value.getDocumentHash())
                 .documentUrl(value.getDocumentUrl())
                 .build();
-            return element(MediationNonAttendanceStatement.builder()
-                        .yourName(statement.getYourName())
-                        .documentDate(statement.getDocumentDate())
-                        .document(updatedDocument)
-                        .documentUploadedDatetime(statement.getDocumentUploadedDatetime())
-                        .build());
+            MediationNonAttendanceStatement clone = new MediationNonAttendanceStatement();
+            clone.setYourName(statement.getYourName());
+            clone.setDocumentDate(statement.getDocumentDate());
+            clone.setDocument(updatedDocument);
+            clone.setDocumentUploadedDatetime(statement.getDocumentUploadedDatetime());
+            return element(clone);
         }).toList();
     }
 
@@ -110,12 +110,12 @@ public class AssignCategoryId {
                 .documentHash(value.getDocumentHash())
                 .documentUrl(value.getDocumentUrl())
                 .build();
-            return element(MediationDocumentsReferredInStatement.builder()
-                               .documentType(statement.getDocumentType())
-                               .documentDate(statement.getDocumentDate())
-                               .document(updatedDocument)
-                               .documentUploadedDatetime(statement.getDocumentUploadedDatetime())
-                               .build());
+            MediationDocumentsReferredInStatement clone = new MediationDocumentsReferredInStatement();
+            clone.setDocumentType(statement.getDocumentType());
+            clone.setDocumentDate(statement.getDocumentDate());
+            clone.setDocument(updatedDocument);
+            clone.setDocumentUploadedDatetime(statement.getDocumentUploadedDatetime());
+            return element(clone);
         }).toList();
     }
 
