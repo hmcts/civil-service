@@ -37,7 +37,7 @@ public class ClaimSubmittedTransitionBuilder extends MidTransitionBuilder {
     @Override
     void setUpTransitions(List<Transition> transitions) {
         this.moveTo(CLAIM_ISSUED_PAYMENT_SUCCESSFUL, transitions)
-            .onlyWhen(PaymentPredicate.successful, transitions)
+            .onlyWhen(PaymentPredicate.successful.and(not(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue))), transitions)
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff.and(TakenOfflinePredicate.beforeClaimIssue), transitions)
