@@ -198,11 +198,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
@@ -248,11 +245,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
@@ -299,11 +293,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
@@ -352,11 +343,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
@@ -406,11 +394,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
@@ -458,11 +443,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             assertThat(caseDataContent.getAllValues()).hasSize(2);
 
             Map<String, Object> map = objectMapper
-                .convertValue(caseDataContent.getAllValues().getFirst().getData(),
-                              new TypeReference<>() {
-                              });
-            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map
-                                                                              .get("gaDetailsMasterCollection"),
+                .convertValue(caseDataContent.getAllValues().getFirst().getData(), new TypeReference<>() {});
+            List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
         }
