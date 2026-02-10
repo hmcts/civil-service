@@ -2,13 +2,11 @@ package uk.gov.hmcts.reform.civil.model.robotics;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder
 public class ClaimDetails {
 
     private String caseRequestReceivedDate;
