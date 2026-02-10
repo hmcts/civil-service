@@ -83,14 +83,16 @@ class HttpResponseHeadersServiceTest {
     }
 
     private ClientContextWrapper buildClientContext() {
-        return ClientContextWrapper.builder()
-            .clientContext(ClientContext.builder()
-                               .userTask(
-                                   UserTask.builder()
-                                       .taskData(Task.builder().taskTitle("My Task").build())
-                                       .build())
-                               .build())
-            .build();
+        Task task = new Task();
+        task.setTaskTitle("My Task");
+
+        UserTask userTask = new UserTask();
+        userTask.setTaskData(task);
+
+        ClientContext clientContext = new ClientContext()
+            .setUserTask(userTask);
+
+        return new ClientContextWrapper().setClientContext(clientContext);
     }
 
     private HashMap<String, Object> decodeClientContext(String encodedClientContext) throws Exception {
