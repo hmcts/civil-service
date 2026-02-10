@@ -397,7 +397,7 @@ class JudgmentByAdmissionMapperTest {
                                                  .build())
                                       .build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal(10))
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal(120))
             .totalClaimAmount(new BigDecimal(1000))
             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(paymentFrequencyClaimantResponseLRspec)
             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now().plusDays(10))
@@ -422,10 +422,43 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
-        assertEquals("10", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals("120", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "120,120",
+        "120.50,121",
+        "120.49,120"
+    })
+    void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(inputAmount)
+            .totalClaimAmount(new BigDecimal(1000))
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now().plusDays(10))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .respondent1(PartyBuilder.builder().organisation().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+        assertNotNull(activeJudgment);
+        assertEquals(expectedAmount, activeJudgment.getInstalmentDetails().getAmount());
     }
 
     @Test
