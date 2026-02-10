@@ -1,4 +1,4 @@
-yes {{- if .Values.wiremock.enabled }}
+{{- if .Values.wiremock.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
