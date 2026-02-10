@@ -1,4 +1,4 @@
-# civil-service
+# civil-service - GA functional test
 
 Civil CCD Callback Service.
 
