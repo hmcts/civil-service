@@ -1,6 +1,6 @@
 {
-  "name": "Fee Lookup - Money Claim with keyword (fallback)",
-  "priority": 5,
+  "name": "Fee Lookup - Money Claim with keyword, no amount",
+  "priority": 6,
   "request": {
     "method": "GET",
     "urlPath": "/fees-register/fees/lookup",
@@ -11,7 +11,7 @@
       "channel": { "equalTo": "default" },
       "event": { "equalTo": "issue" },
       "keyword": { "equalTo": "MoneyClaim" },
-      "amount_or_volume": { "matches": ".*" }
+      "amount_or_volume": { "absent": true }
     }
   },
   "response": {
