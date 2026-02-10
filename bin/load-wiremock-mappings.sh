@@ -10,6 +10,15 @@ fi
 
 echo "Loading mappings into WireMock at $WIREMOCK_URL"
 
+# Reset all existing mappings first to avoid duplicates
+echo "Resetting existing WireMock mappings..."
+RESET_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE "$WIREMOCK_URL/__admin/mappings")
+if [ "$RESET_RESPONSE" == "200" ]; then
+  echo "Existing mappings cleared successfully"
+else
+  echo "Warning: Failed to clear existing mappings (HTTP $RESET_RESPONSE)"
+fi
+
 for file in "$MAPPINGS_DIR"/*.json; do
   if [ -f "$file" ]; then
     echo "Posting: $file"
