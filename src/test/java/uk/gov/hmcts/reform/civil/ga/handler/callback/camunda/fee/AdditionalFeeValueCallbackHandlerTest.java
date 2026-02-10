@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.fee;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
@@ -31,11 +36,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_FEE_VALUE;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
-@SpringBootTest(classes = {
-    AdditionalFeeValueCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String VERSION = "1";
@@ -44,18 +46,30 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_167 = BigDecimal.valueOf(16700);
     public static final String TEST_FEE_CODE = "test_fee_code";
     public static final String SOME_EXCEPTION = "Some Exception";
-    @Autowired
+
+    @InjectMocks
     private AdditionalFeeValueCallbackHandler handler;
+
     private static final String TASK_ID = "ObtainAdditionalFeeValue";
-    @MockBean
+
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
-    @MockBean
+
+    @Mock
     GeneralAppFeesConfiguration generalAppFeesConfiguration;
+
     private CallbackParams params;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Mock
     JudicialDecisionHelper judicialDecisionHelper;
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     @BeforeEach
     void setup() {

@@ -4,12 +4,16 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
@@ -29,16 +33,18 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GA_EVIDENCE_UPLOAD_CHECK;
 
-@SpringBootTest(classes = {
-    DocUploadNotifyHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class DocUploadNotifyHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private DocUploadNotifyHandler handler;
 
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Mock
     DocUploadNotificationService notificationService;
 
     Logger logger = (Logger) LoggerFactory.getLogger(DocUploadNotifyHandler.class);
@@ -94,8 +100,8 @@ public class DocUploadNotifyHandlerTest extends GeneralApplicationBaseCallbackHa
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
         List<ILoggingEvent> logsList = listAppender.list;
-        assertThat(logsList.get(0).getMessage()).contains("Failed to send email notification");
-        assertEquals(Level.WARN, logsList.get(0).getLevel());
+        assertThat(logsList.getFirst().getMessage()).contains("Failed to send email notification");
+        assertEquals(Level.WARN, logsList.getFirst().getLevel());
         assertEquals(2, logsList.size());
         listAppender.stop();
     }

@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -36,42 +38,34 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType.HEARING_NOTICE_DOC;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateHearingNoticeDocumentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private GenerateHearingNoticeDocumentCallbackHandler handler;
-    @MockBean
+    @Mock
     private GaHearingFormGenerator hearingFormGenerator;
-    @Autowired
-    private ObjectMapper mapper;
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private SendFinalOrderPrintService sendFinalOrderPrintService;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GenerateHearingNoticeDocument");
     }
 
