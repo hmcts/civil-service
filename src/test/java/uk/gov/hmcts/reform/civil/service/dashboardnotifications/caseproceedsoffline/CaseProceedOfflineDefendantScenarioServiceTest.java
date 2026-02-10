@@ -40,7 +40,7 @@ class CaseProceedOfflineDefendantScenarioServiceTest {
     void shouldResolvePrimaryScenarioForFastTrackJudgment() {
         CaseData fastTrack = CaseData.builder()
             .ccdCaseReference(1L)
-            .activeJudgment(JudgmentDetails.builder().build())
+            .activeJudgment(new JudgmentDetails())
             .responseClaimTrack(AllocatedTrack.FAST_CLAIM.name())
             .build();
 
