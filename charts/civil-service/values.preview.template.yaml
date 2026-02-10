@@ -408,3 +408,99 @@ wiremock:
   volumeMounts:
     - name: wiremock-mocks
       mountPath: /home/wiremock/mappings
+      subPath: mappings
+  initialMappings:
+    health-mock.json: |
+      {
+        "name": "Fees API - Health Check",
+        "request": {
+          "method": "GET",
+          "urlPath": "/health"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "Expires": "0"
+          },
+          "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\",\"details\":{\"database\":\"Wiremock\",\"validationQuery\":\"isValid()\"}},\"diskSpace\":{\"status\":\"UP\",\"details\":{\"total\":0,\"free\":0,\"threshold\":0,\"path\":\"/opt/app/.\",\"exists\":true}},\"livenessState\":{\"status\":\"UP\"},\"ping\":{\"status\":\"UP\"},\"readinessState\":{\"status\":\"UP\"}},\"groups\":[\"liveness\",\"readiness\"]}"
+        }
+      }
+    health-liveness.json: |
+      {
+        "name": "Fees API - Health Liveness",
+        "request": {
+          "method": "GET",
+          "urlPath": "/health/liveness"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+          },
+          "body": "{\"status\":\"UP\"}"
+        }
+      }
+    health-readiness.json: |
+      {
+        "name": "Fees API - Health Readiness",
+        "request": {
+          "method": "GET",
+          "urlPath": "/health/readiness"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+          },
+          "body": "{\"status\":\"UP\"}"
+        }
+      }
+    actuator-health.json: |
+      {
+        "name": "Fees API - Actuator Health",
+        "request": {
+          "method": "GET",
+          "urlPath": "/actuator/health"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "Expires": "0"
+          },
+          "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\",\"details\":{\"database\":\"Wiremock\",\"validationQuery\":\"isValid()\"}},\"diskSpace\":{\"status\":\"UP\",\"details\":{\"total\":0,\"free\":0,\"threshold\":0,\"path\":\"/opt/app/.\",\"exists\":true}},\"livenessState\":{\"status\":\"UP\"},\"ping\":{\"status\":\"UP\"},\"readinessState\":{\"status\":\"UP\"}},\"groups\":[\"liveness\",\"readiness\"]}"
+        }
+      }
+    actuator-health-liveness.json: |
+      {
+        "name": "Fees API - Actuator Health Liveness",
+        "request": {
+          "method": "GET",
+          "urlPath": "/actuator/health/liveness"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+          },
+          "body": "{\"status\":\"UP\"}"
+        }
+      }
+    actuator-health-readiness.json: |
+      {
+        "name": "Fees API - Actuator Health Readiness",
+        "request": {
+          "method": "GET",
+          "urlPath": "/actuator/health/readiness"
+        },
+        "response": {
+          "status": 200,
+          "headers": {
+            "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+          },
+          "body": "{\"status\":\"UP\"}"
+        }
+      }
