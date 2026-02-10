@@ -62,7 +62,7 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldSendNotifications_whenValidSpecClaim() throws JsonProcessingException {
-        RoboticsCaseDataSpec roboticsCaseDataSpec = RoboticsCaseDataSpec.builder().build();
+        RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec();
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
@@ -77,7 +77,7 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldThrowJsonSchemaValidationException_whenInvalidSpecClaim() throws JsonProcessingException {
-        RoboticsCaseDataSpec roboticsCaseDataSpec = RoboticsCaseDataSpec.builder().build();
+        RoboticsCaseDataSpec roboticsCaseDataSpec = new RoboticsCaseDataSpec();
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.SPEC_CLAIM).build();
 
@@ -94,7 +94,7 @@ class RoboticsNotifierTest {
     void shouldSendNotifications_whenValidUnspecClaim() throws JsonProcessingException {
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
-        RoboticsCaseData roboticsCaseData = RoboticsCaseData.builder().build();
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
 
         when(featureToggleService.isRPAEmailEnabled()).thenReturn(true);
         when(roboticsDataMapper.toRoboticsCaseData(eq(caseData), eq(TOKEN))).thenReturn(roboticsCaseData);
@@ -107,7 +107,7 @@ class RoboticsNotifierTest {
 
     @Test
     void shouldThrowJsonSchemaValidationException_whenInvalidUnspecClaim() throws JsonProcessingException {
-        RoboticsCaseData roboticsCaseData = RoboticsCaseData.builder().build();
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData();
         CaseData caseData = CaseDataBuilder.builder().legacyCaseReference(LEGACY_REFERENCE)
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM).build();
 

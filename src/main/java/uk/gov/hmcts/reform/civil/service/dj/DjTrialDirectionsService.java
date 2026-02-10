@@ -26,9 +26,9 @@ public class DjTrialDirectionsService {
 
         LocalDate trialOrderDeadline = trialDeadlineService.workingDaysFromNow(5);
         caseDataBuilder.trialOrderMadeWithoutHearingDJ(
-            TrialOrderMadeWithoutHearingDJ.builder()
-                .input(welshLanguageService.buildOrderMadeWithoutHearingText(trialOrderDeadline))
-                .build());
+            new TrialOrderMadeWithoutHearingDJ()
+                .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(trialOrderDeadline))
+        );
 
         caseDataBuilder.trialHearingNotesDJ(trialNarrativeService.buildTrialHearingNotes());
 
