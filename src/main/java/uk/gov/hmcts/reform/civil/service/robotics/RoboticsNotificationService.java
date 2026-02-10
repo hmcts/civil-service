@@ -286,8 +286,7 @@ public class RoboticsNotificationService {
 
     public static String findLatestEventTriggerReasonSpec(EventHistory eventHistory) {
 
-        List<Event> event = eventHistory.getMiscellaneous();
-        String triggerReason = getLastDetailsText(event).orElse(null);
+        String triggerReason = getLastDetailsText(eventHistory.getMiscellaneous()).orElse(null);
 
         triggerReason = updateTriggerReason(eventHistory.getAcknowledgementOfServiceReceived(), triggerReason);
         triggerReason = updateTriggerReason(eventHistory.getConsentExtensionFilingDefence(), triggerReason);
@@ -308,7 +307,7 @@ public class RoboticsNotificationService {
     }
 
     private static Optional<String> getLastDetailsText(List<Event> events) {
-        if (events.isEmpty()) {
+        if (events == null || events.isEmpty()) {
             return Optional.empty();
         } else {
             return Optional.ofNullable(events.get(events.size() - 1).getEventDetailsText());

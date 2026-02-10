@@ -48,7 +48,7 @@ class SetAsideJudgmentsOnlineMapperTest {
 
     @BeforeEach
     void setUp() {
-        when(addressMapper.toRoboticsAddress(any())).thenReturn(RoboticsAddress.builder().build());
+        when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
     }
 
     @Test

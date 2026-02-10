@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -42,150 +43,167 @@ public class EventHistorySequencer {
     }
 
     private EventHistory prepareEventHistory(List<Event> events) {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory history = new EventHistory();
         events.forEach(event -> {
             EventType eventType = EventType.valueOfCode(event.getEventCode()).orElseThrow(IllegalStateException::new);
             switch (eventType) {
                 case MISCELLANEOUS:
-                    builder.miscellaneous(event);
+                    history.setMiscellaneous(appendEvent(history.getMiscellaneous(), event));
                     break;
                 case ACKNOWLEDGEMENT_OF_SERVICE_RECEIVED:
-                    builder.acknowledgementOfServiceReceived(event);
+                    history.setAcknowledgementOfServiceReceived(appendEvent(history.getAcknowledgementOfServiceReceived(), event));
                     break;
                 case CONSENT_EXTENSION_FILING_DEFENCE:
-                    builder.consentExtensionFilingDefence(event);
+                    history.setConsentExtensionFilingDefence(appendEvent(history.getConsentExtensionFilingDefence(), event));
                     break;
                 case DEFENCE_FILED:
-                    builder.defenceFiled(List.of(event));
+                    history.setDefenceFiled(appendEvent(history.getDefenceFiled(), event));
                     break;
                 case STATES_PAID:
-                    builder.statesPaid(List.of(event));
+                    history.setStatesPaid(appendEvent(history.getStatesPaid(), event));
                     break;
                 case DEFENCE_AND_COUNTER_CLAIM:
-                    builder.defenceAndCounterClaim(List.of(event));
+                    history.setDefenceAndCounterClaim(appendEvent(history.getDefenceAndCounterClaim(), event));
                     break;
                 case RECEIPT_OF_PART_ADMISSION:
-                    builder.receiptOfPartAdmission(List.of(event));
+                    history.setReceiptOfPartAdmission(appendEvent(history.getReceiptOfPartAdmission(), event));
                     break;
                 case RECEIPT_OF_ADMISSION:
-                    builder.receiptOfAdmission(List.of(event));
+                    history.setReceiptOfAdmission(appendEvent(history.getReceiptOfAdmission(), event));
                     break;
                 case REPLY_TO_DEFENCE:
-                    builder.replyDefence(event);
+                    history.setReplyToDefence(appendEvent(history.getReplyToDefence(), event));
                     break;
                 case DIRECTIONS_QUESTIONNAIRE_FILED:
-                    builder.directionsQuestionnaire(event);
+                    history.setDirectionsQuestionnaireFiled(appendEvent(history.getDirectionsQuestionnaireFiled(), event));
                     break;
                 case BREATHING_SPACE_ENTERED:
-                    builder.breathingSpaceEntered(event);
+                    history.setBreathingSpaceEntered(appendEvent(history.getBreathingSpaceEntered(), event));
                     break;
                 case BREATHING_SPACE_LIFTED:
-                    builder.breathingSpaceLifted(event);
+                    history.setBreathingSpaceLifted(appendEvent(history.getBreathingSpaceLifted(), event));
                     break;
                 case MENTAL_HEALTH_BREATHING_SPACE_ENTERED:
-                    builder.breathingSpaceMentalHealthEntered(event);
+                    history.setBreathingSpaceMentalHealthEntered(appendEvent(history.getBreathingSpaceMentalHealthEntered(), event));
                     break;
                 case MENTAL_HEALTH_BREATHING_SPACE_LIFTED:
-                    builder.breathingSpaceMentalHealthLifted(event);
+                    history.setBreathingSpaceMentalHealthLifted(appendEvent(history.getBreathingSpaceMentalHealthLifted(), event));
                     break;
                 case INTERLOCUTORY_JUDGMENT_GRANTED:
-                    builder.interlocutoryJudgment(event);
+                    history.setInterlocutoryJudgment(appendEvent(history.getInterlocutoryJudgment(), event));
                     break;
                 case DEFAULT_JUDGMENT_GRANTED:
-                    builder.defaultJudgment(event);
+                    history.setDefaultJudgment(appendEvent(history.getDefaultJudgment(), event));
                     break;
                 case JUDGEMENT_BY_ADMISSION:
-                    builder.judgmentByAdmission(event);
+                    history.setJudgmentByAdmission(appendEvent(history.getJudgmentByAdmission(), event));
                     break;
                 case GENERAL_FORM_OF_APPLICATION:
-                    builder.generalFormOfApplication(event);
+                    history.setGeneralFormOfApplication(appendEvent(history.getGeneralFormOfApplication(), event));
                     break;
                 case DEFENCE_STRUCK_OUT:
-                    builder.defenceStruckOut(event);
+                    history.setDefenceStruckOut(appendEvent(history.getDefenceStruckOut(), event));
                     break;
                 case SET_ASIDE_JUDGMENT:
-                    builder.setAsideJudgment(event);
+                    history.setSetAsideJudgment(appendEvent(history.getSetAsideJudgment(), event));
                     break;
                 case CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION:
-                    builder.certificateOfSatisfactionOrCancellation(event);
+                    history.setCertificateOfSatisfactionOrCancellation(appendEvent(history.getCertificateOfSatisfactionOrCancellation(), event));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected event type: " + eventType);
             }
         });
-        if (isEmpty(builder.build().getDirectionsQuestionnaireFiled())) {
-            builder.directionsQuestionnaireFiled(List.of(Event.builder().build()));
+
+        if (isEmpty(history.getDirectionsQuestionnaireFiled())) {
+            history.setDirectionsQuestionnaireFiled(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getDefenceFiled())) {
-            builder.defenceFiled(List.of(Event.builder().build()));
+        if (isEmpty(history.getDefenceFiled())) {
+            history.setDefenceFiled(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getStatesPaid())) {
-            builder.statesPaid(List.of(Event.builder().build()));
+        if (isEmpty(history.getStatesPaid())) {
+            history.setStatesPaid(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getReceiptOfAdmission())) {
-            builder.receiptOfAdmission(List.of(Event.builder().build()));
+        if (isEmpty(history.getReceiptOfAdmission())) {
+            history.setReceiptOfAdmission(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getReceiptOfPartAdmission())) {
-            builder.receiptOfPartAdmission(List.of(Event.builder().build()));
+        if (isEmpty(history.getReceiptOfPartAdmission())) {
+            history.setReceiptOfPartAdmission(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getDefenceAndCounterClaim())) {
-            builder.defenceAndCounterClaim(List.of(Event.builder().build()));
+        if (isEmpty(history.getDefenceAndCounterClaim())) {
+            history.setDefenceAndCounterClaim(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getAcknowledgementOfServiceReceived())) {
-            builder.acknowledgementOfServiceReceived(List.of(Event.builder().build()));
+        if (isEmpty(history.getAcknowledgementOfServiceReceived())) {
+            history.setAcknowledgementOfServiceReceived(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getConsentExtensionFilingDefence())) {
-            builder.consentExtensionFilingDefence(List.of(Event.builder().build()));
+        if (isEmpty(history.getConsentExtensionFilingDefence())) {
+            history.setConsentExtensionFilingDefence(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getReplyToDefence())) {
-            builder.replyToDefence(List.of(Event.builder().build()));
+        if (isEmpty(history.getReplyToDefence())) {
+            history.setReplyToDefence(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getBreathingSpaceEntered())) {
-            builder.breathingSpaceEntered(List.of(Event.builder().build()));
+        if (isEmpty(history.getBreathingSpaceEntered())) {
+            history.setBreathingSpaceEntered(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getBreathingSpaceLifted())) {
-            builder.breathingSpaceLifted(List.of(Event.builder().build()));
+        if (isEmpty(history.getBreathingSpaceLifted())) {
+            history.setBreathingSpaceLifted(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getBreathingSpaceMentalHealthEntered())) {
-            builder.breathingSpaceMentalHealthEntered(List.of(Event.builder().build()));
+        if (isEmpty(history.getBreathingSpaceMentalHealthEntered())) {
+            history.setBreathingSpaceMentalHealthEntered(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getBreathingSpaceMentalHealthLifted())) {
-            builder.breathingSpaceMentalHealthLifted(List.of(Event.builder().build()));
+        if (isEmpty(history.getBreathingSpaceMentalHealthLifted())) {
+            history.setBreathingSpaceMentalHealthLifted(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getInterlocutoryJudgment())) {
-            builder.interlocutoryJudgment(List.of(Event.builder().build()));
+        if (isEmpty(history.getInterlocutoryJudgment())) {
+            history.setInterlocutoryJudgment(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getDefaultJudgment())) {
-            builder.defaultJudgment(List.of(Event.builder().build()));
+        if (isEmpty(history.getDefaultJudgment())) {
+            history.setDefaultJudgment(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getJudgmentByAdmission())) {
-            builder.judgmentByAdmission(List.of(Event.builder().build()));
+        if (isEmpty(history.getJudgmentByAdmission())) {
+            history.setJudgmentByAdmission(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getGeneralFormOfApplication())) {
-            builder.generalFormOfApplication(List.of(Event.builder().build()));
+        if (isEmpty(history.getGeneralFormOfApplication())) {
+            history.setGeneralFormOfApplication(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getDefenceStruckOut())) {
-            builder.defenceStruckOut(List.of(Event.builder().build()));
+        if (isEmpty(history.getDefenceStruckOut())) {
+            history.setDefenceStruckOut(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getSetAsideJudgment())) {
-            builder.setAsideJudgment(List.of(Event.builder().build()));
+        if (isEmpty(history.getSetAsideJudgment())) {
+            history.setSetAsideJudgment(List.of(new Event()));
         }
-        if (isEmpty(builder.build().getCertificateOfSatisfactionOrCancellation())) {
-            builder.certificateOfSatisfactionOrCancellation(List.of(Event.builder().build()));
+        if (isEmpty(history.getCertificateOfSatisfactionOrCancellation())) {
+            history.setCertificateOfSatisfactionOrCancellation(List.of(new Event()));
         }
-        return builder
-            .build();
+
+        return history;
+    }
+
+    private List<Event> appendEvent(List<Event> events, Event event) {
+        if (events == null) {
+            events = new ArrayList<>();
+        }
+        events.add(event);
+        return events;
+    }
+
+    private List<Event> appendEvents(List<Event> events, List<Event> eventsToAdd) {
+        if (events == null) {
+            events = new ArrayList<>();
+        }
+        events.addAll(eventsToAdd);
+        return events;
     }
 
     private List<Event> prepareSequenceId(List<Event> events) {
         AtomicInteger sequence = new AtomicInteger(1);
         return events
             .stream()
-            .map(event ->
-                     event.toBuilder()
-                         .eventSequence(sequence.getAndIncrement())
-                         .build()
-            ).collect(Collectors.toList());
+            .map(event -> {
+                event.setEventSequence(sequence.getAndIncrement());
+                return event;
+            })
+            .collect(Collectors.toList());
     }
 
     private List<Event> flatEvents(EventHistory eventHistory) {

@@ -24,10 +24,9 @@ class TaskCompletionPredicateTest {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
-        Task task = Task.builder()
-            .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
-            .additionalProperties(Map.of("messageId", MESSAGE_ID))
-            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
+            .setAdditionalProperties(Map.of("messageId", MESSAGE_ID));
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertTrue(predicate.test(task));
@@ -38,10 +37,9 @@ class TaskCompletionPredicateTest {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
-        Task task = Task.builder()
-            .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
-            .additionalProperties(null)
-            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
+            .setAdditionalProperties(null);
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertFalse(predicate.test(task));
@@ -52,10 +50,9 @@ class TaskCompletionPredicateTest {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
-        Task task = Task.builder()
-            .permissions(TaskPermissions.builder().values(Collections.emptySet()).build())
-            .additionalProperties(Map.of("messageId", MESSAGE_ID))
-            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Collections.emptySet()))
+            .setAdditionalProperties(Map.of("messageId", MESSAGE_ID));
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertFalse(predicate.test(task));
@@ -66,10 +63,9 @@ class TaskCompletionPredicateTest {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(MESSAGE_ID))
             .build();
-        Task task = Task.builder()
-            .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
-            .additionalProperties(Map.of("messageId", "differentId"))
-            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
+            .setAdditionalProperties(Map.of("messageId", "differentId"));
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertFalse(predicate.test(task));
@@ -80,10 +76,9 @@ class TaskCompletionPredicateTest {
         CaseData caseData = CaseData.builder()
             .lastMessage(new Message().setMessageId(null))
             .build();
-        Task task = Task.builder()
-            .permissions(TaskPermissions.builder().values(Set.of(CLAIM)).build())
-            .additionalProperties(Map.of("messageId", MESSAGE_ID))
-            .build();
+        Task task = new Task()
+            .setPermissions(new TaskPermissions().setValues(Set.of(CLAIM)))
+            .setAdditionalProperties(Map.of("messageId", MESSAGE_ID));
         Predicate<Task> predicate = TaskCompletionPredicate.taskToCompleteFilter(caseData);
 
         assertFalse(predicate.test(task));

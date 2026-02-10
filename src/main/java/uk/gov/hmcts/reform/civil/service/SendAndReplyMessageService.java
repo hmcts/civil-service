@@ -95,16 +95,14 @@ public class SendAndReplyMessageService {
 
         messageList.add(element(
             createBaseMessageWithSenderDetails(userAuth)
-                .toBuilder()
-                .updatedTime(time.now())
-                .sentTime(time.now())
-                .recipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
-                .isUrgent(messageMetaData.getIsUrgent())
-                .subjectType(messageMetaData.getSubjectType())
-                .subject(messageMetaData.getSubject())
-                .messageContent(messageContent)
-                .messageId(UUID.randomUUID().toString())
-                .build())
+                .setUpdatedTime(time.now())
+                .setSentTime(time.now())
+                .setRecipientRoleType(ROLE_SELECTION_TO_POOL.get(messageMetaData.getRecipientRoleType()))
+                .setIsUrgent(messageMetaData.getIsUrgent())
+                .setSubjectType(messageMetaData.getSubjectType())
+                .setSubject(messageMetaData.getSubject())
+                .setMessageContent(messageContent)
+                .setMessageId(UUID.randomUUID().toString()))
         );
         return messageList;
     }
@@ -160,7 +158,7 @@ public class SendAndReplyMessageService {
     }
 
     private List<Message> retrieveFullMessageHistory(Element<Message> message) {
-        Message baseMessage = message.getValue().toBuilder().sentTime(message.getValue().getUpdatedTime()).build();
+        Message baseMessage = message.getValue().copyNoHistory().setSentTime(message.getValue().getUpdatedTime());
         return Stream.concat(Stream.of(baseMessage), message.getValue().getHistory().stream()
                 .map(historyItem -> message.getValue().buildFullReplyMessageForTable(historyItem.getValue())))
                 .sorted(Comparator.comparing(Message::getSentTime).reversed())

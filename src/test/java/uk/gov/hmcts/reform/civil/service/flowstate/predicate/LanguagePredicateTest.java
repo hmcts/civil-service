@@ -65,7 +65,7 @@ class LanguagePredicateTest {
         @Test
         void should_return_false_for_onlyInitialResponseIsBilingual_when_response_is_bilingual_and_language_has_changed() {
             when(caseData.isRespondentResponseBilingual()).thenReturn(true);
-            when(caseData.getChangeLanguagePreference()).thenReturn(ChangeLanguagePreference.builder().build());
+            when(caseData.getChangeLanguagePreference()).thenReturn(new ChangeLanguagePreference());
             assertFalse(LanguagePredicate.onlyInitialResponseIsBilingual.test(caseData));
         }
     }

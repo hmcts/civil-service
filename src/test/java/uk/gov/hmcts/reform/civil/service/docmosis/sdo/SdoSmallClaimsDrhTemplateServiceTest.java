@@ -41,7 +41,7 @@ class SdoSmallClaimsDrhTemplateServiceTest {
             .atStateNotificationAcknowledged()
             .build()
             .toBuilder()
-            .sdoR2SmallClaimsHearing(uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing.builder().build())
+            .sdoR2SmallClaimsHearing(new uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsHearing())
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(caseData)).thenReturn(true);

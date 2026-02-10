@@ -2,16 +2,16 @@ package uk.gov.hmcts.reform.civil.model.taskmanagement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
-@EqualsAndHashCode
-@ToString
-@Builder(toBuilder = true)
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
 public class SearchTaskRequest {
 
     @JsonProperty("search_parameters")
