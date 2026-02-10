@@ -105,13 +105,12 @@ public class DjTrialNarrativeService {
     }
 
     public TrialHearingTimeDJ buildTrialHearingTime() {
-        return TrialHearingTimeDJ.builder()
-            .helpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
-            .helpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
-            .dateToToggle(DATE_TO_SHOW)
-            .date1(deadlineService.weeksFromNow(22))
-            .date2(deadlineService.weeksFromNow(30))
-            .build();
+        return new TrialHearingTimeDJ()
+            .setHelpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
+            .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
+            .setDateToToggle(DATE_TO_SHOW)
+            .setDate1(deadlineService.weeksFromNow(22))
+            .setDate2(deadlineService.weeksFromNow(30));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {

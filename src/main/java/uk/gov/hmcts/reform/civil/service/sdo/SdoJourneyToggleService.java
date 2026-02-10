@@ -52,9 +52,9 @@ public class SdoJourneyToggleService {
                                             List<IncludeInOrderToggle> includeInOrderToggle) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
             caseData.setSdoR2SmallClaimsMediationSectionToggle(includeInOrderToggle);
-            caseData.setSdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
-                                                                      .input(CARM_MEDIATION_TEXT)
-                                                                      .build());
+            SdoR2SmallClaimsMediation mediation = new SdoR2SmallClaimsMediation();
+            mediation.setInput(CARM_MEDIATION_TEXT);
+            caseData.setSdoR2SmallClaimsMediationSectionStatement(mediation);
             log.debug("Applied R2 small claims mediation defaults for caseId {}", caseData.getCcdCaseReference());
         }
     }
