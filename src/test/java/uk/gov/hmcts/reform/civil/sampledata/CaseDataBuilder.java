@@ -2882,43 +2882,41 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoFastTrackCreditHire() {
-        sdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                + "a) the need to hire a replacement vehicle; and\n"
-                + "b) impecuniosity")
-            .date1(LocalDate.parse("2022-01-01"))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                + "later than 4pm on")
-            .date2(LocalDate.parse("2022-01-02"))
-            .build();
-        sdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                + "disclosure as ordered earlier in this Order must include:\n"
-                + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                + "commencement of hire until the earlier of:\n "
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                + "prior to the commencement of hire until the earlier of:\n"
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                + "one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(LocalDate.parse("2022-01-01"))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
-            .date4(LocalDate.parse("2022-01-02"))
-            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
-            .detailsShowToggle(List.of(AddOrRemoveToggle.ADD))
-            .sdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails)
-            .build();
+        sdoR2FastTrackCreditHireDetails = new SdoR2FastTrackCreditHireDetails();
+        sdoR2FastTrackCreditHireDetails.setInput2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+            + "a) the need to hire a replacement vehicle; and\n"
+            + "b) impecuniosity");
+        sdoR2FastTrackCreditHireDetails.setDate1(LocalDate.parse("2022-01-01"));
+        sdoR2FastTrackCreditHireDetails.setInput3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+            + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+            + "save with permission of the Trial Judge.");
+        sdoR2FastTrackCreditHireDetails.setInput4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+            + "later than 4pm on");
+        sdoR2FastTrackCreditHireDetails.setDate2(LocalDate.parse("2022-01-02"));
+        sdoR2FastTrackCreditHire = new SdoR2FastTrackCreditHire();
+        sdoR2FastTrackCreditHire.setInput1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+            + "disclosure as ordered earlier in this Order must include:\n"
+            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+            + "commencement of hire until the earlier of:\n "
+            + "     i) 3 months after cessation of hire\n"
+            + "     ii) the repair or replacement of the claimant's vehicle\n"
+            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+            + "prior to the commencement of hire until the earlier of:\n"
+            + "     i) 3 months after cessation of hire\n"
+            + "     ii) the repair or replacement of the claimant's vehicle\n"
+            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.");
+        sdoR2FastTrackCreditHire.setInput5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+            + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+            + "one witness to provide evidence of basic hire rates available within the claimant's "
+            + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+            + "is available.");
+        sdoR2FastTrackCreditHire.setInput6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+        sdoR2FastTrackCreditHire.setDate3(LocalDate.parse("2022-01-01"));
+        sdoR2FastTrackCreditHire.setInput7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+        sdoR2FastTrackCreditHire.setDate4(LocalDate.parse("2022-01-02"));
+        sdoR2FastTrackCreditHire.setInput8("This witness statement is limited to 10 pages per party, including any appendices.");
+        sdoR2FastTrackCreditHire.setDetailsShowToggle(List.of(AddOrRemoveToggle.ADD));
+        sdoR2FastTrackCreditHire.setSdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails);
         return this;
     }
 
@@ -3088,27 +3086,25 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoTrialDj() {
         List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
-        trialHearingTimeDJ = TrialHearingTimeDJ.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
+        trialHearingTimeDJ = new TrialHearingTimeDJ()
+            .setHelpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
+            .setHelpText2("Not more than seven nor less than three clear days before the trial, "
                 + "the claimant must file at court and serve an indexed and paginated bundle of "
                 + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
                 + "and which complies with requirements of PD32. The parties must endeavour to agree "
                 + "the contents of the bundle before it is filed. The bundle will include a case "
                 + "summary and a chronology.")
-            .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
-            .dateToToggle(dateToShowTrue)
-            .date1(LocalDate.now().plusWeeks(22))
-            .date2(LocalDate.now().plusWeeks(30))
-            .build();
-        trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
-            .input("This order has been made without a hearing. "
+            .setHearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
+            .setDateToToggle(dateToShowTrue)
+            .setDate1(LocalDate.now().plusWeeks(22))
+            .setDate2(LocalDate.now().plusWeeks(30));
+        trialOrderMadeWithoutHearingDJ = new TrialOrderMadeWithoutHearingDJ()
+            .setInput("This order has been made without a hearing. "
                 + "Each party has the right to apply to have this Order "
                 + "set aside or varied. Any such application must be "
                 + "received by the Court "
-                + "(together with the appropriate fee) by 4pm on 01 12 2022.")
-            .build();
+                + "(together with the appropriate fee) by 4pm on 01 12 2022.");
         return this;
     }
 
@@ -5276,9 +5272,8 @@ public class CaseDataBuilder {
         ccdState = JUDICIAL_REFERRAL;
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
-        tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
-            .build();
+        tocTransferCaseReason = new TocTransferCaseReason()
+            .setReasonForCaseTransferJudgeTxt("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5290,9 +5285,8 @@ public class CaseDataBuilder {
         ccdState = JUDICIAL_REFERRAL;
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
-        tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt(reason)
-            .build();
+        tocTransferCaseReason = new TocTransferCaseReason()
+            .setReasonForCaseTransferJudgeTxt(reason);
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -7222,10 +7216,10 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atSmallClaimsWitnessStatementWithNegativeInputs() {
         atStateClaimNotified();
-        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .input2("-3")
-            .input3("-3")
-            .build();
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setInput2("-3");
+        witnessStatement.setInput3("-3");
+        this.smallClaimsWitnessStatement = witnessStatement;
 
         return this;
     }
@@ -7241,20 +7235,19 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atSmallClaimsWitnessStatementWithPositiveInputs() {
         atStateClaimNotified();
-        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .input2("3")
-            .input3("3")
-            .build();
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setInput2("3");
+        witnessStatement.setInput3("3");
+        this.smallClaimsWitnessStatement = witnessStatement;
 
         return this;
     }
 
     public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
         atStateClaimNotified();
-        this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
-            .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
-            .build();
+        this.smallClaimsFlightDelay = new SmallClaimsFlightDelay();
+        this.smallClaimsFlightDelay.setRelatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+        this.smallClaimsFlightDelay.setLegalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
 
         return this;
     }

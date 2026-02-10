@@ -72,10 +72,8 @@ public class SdoOrderDetailsService {
                     new FastTrackJudgementDeductionValue().setValue(deductionPercentage);
                 caseData.setFastTrackJudgementDeductionValue(fastTrackValue);
 
-                SmallClaimsJudgementDeductionValue smallClaimsValue =
-                    SmallClaimsJudgementDeductionValue.builder()
-                        .value(deductionPercentage)
-                        .build();
+                SmallClaimsJudgementDeductionValue smallClaimsValue = new SmallClaimsJudgementDeductionValue();
+                smallClaimsValue.setValue(deductionPercentage);
                 caseData.setSmallClaimsJudgementDeductionValue(smallClaimsValue);
             });
     }

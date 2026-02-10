@@ -159,7 +159,7 @@ class HearingUtilsTest {
             .date(LocalDate.now())
             .build();
         CaseData caseData = CaseData.builder()
-            .trialHearingHearingNotesDJ(TrialHearingHearingNotesDJ.builder().input("test notes").build())
+            .trialHearingHearingNotesDJ(new TrialHearingHearingNotesDJ().setInput("test notes"))
             .build();
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);

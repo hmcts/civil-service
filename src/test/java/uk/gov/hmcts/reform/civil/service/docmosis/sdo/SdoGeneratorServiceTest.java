@@ -200,9 +200,9 @@ public class SdoGeneratorServiceTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
         when(userService.getUserDetails(anyString())).thenReturn(UserDetails.builder()
-                                                                    .forename("Judgey")
-                                                                    .surname("McJudge")
-                                                                    .roles(Collections.emptyList()).build());
+                                                                     .forename("Judgey")
+                                                                     .surname("McJudge")
+                                                                     .roles(Collections.emptyList()).build());
     }
 
     @Test
@@ -411,7 +411,7 @@ public class SdoGeneratorServiceTest {
 
         assertThat(form.getFastTrackBuildingDispute())
             .extracting(FastTrackBuildingDispute::getInput1, FastTrackBuildingDispute::getInput2,
-                FastTrackBuildingDispute::getInput3, FastTrackBuildingDispute::getInput4)
+                        FastTrackBuildingDispute::getInput3, FastTrackBuildingDispute::getInput4)
             .containsExactly(
                 BUILDING_SCHEDULE_INTRO_SDO,
                 BUILDING_SCHEDULE_COLUMNS_SDO,
@@ -420,7 +420,7 @@ public class SdoGeneratorServiceTest {
             );
         assertThat(form.getFastTrackClinicalNegligence())
             .extracting(FastTrackClinicalNegligence::getInput1, FastTrackClinicalNegligence::getInput2,
-                FastTrackClinicalNegligence::getInput3, FastTrackClinicalNegligence::getInput4)
+                        FastTrackClinicalNegligence::getInput3, FastTrackClinicalNegligence::getInput4)
             .containsExactly(
                 CLINICAL_DOCUMENTS_HEADING,
                 CLINICAL_PARTIES_SDO,
@@ -613,43 +613,46 @@ public class SdoGeneratorServiceTest {
         selectedCourt.setLabel("court 2 - 2 address - Y02 7RB");
         updatedData.sdoFastTrackJudgesRecital(new FastTrackJudgesRecital()
                                                   .setInput(SdoR2UiConstantFastTrack.JUDGE_RECITAL));
-        updatedData.sdoR2DisclosureOfDocuments(SdoR2DisclosureOfDocuments.builder()
-                                                   .standardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE)
-                                                   .standardDisclosureDate(LocalDate.now().plusDays(28))
-                                                   .inspectionTxt(SdoR2UiConstantFastTrack.INSPECTION)
-                                                   .inspectionDate(LocalDate.now().plusDays(42))
-                                                   .requestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH)
-                                                   .build());
-        updatedData.sdoR2WitnessesOfFact(SdoR2WitnessOfFact.builder()
-                                             .sdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS)
-                                             .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                                                       .isRestrictWitness(NO)
-                                                                       .restrictNoOfWitnessDetails(
-                                                                           SdoR2RestrictNoOfWitnessDetails
-                                                                               .builder()
-                                                                               .noOfWitnessClaimant(3).noOfWitnessDefendant(3)
-                                                                               .partyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT)
-                                                                               .build())
-                                                                       .build())
-                                             .sdoRestrictPages(SdoR2RestrictPages.builder()
-                                                                   .isRestrictPages(NO)
-                                                                   .restrictNoOfPagesDetails(
-                                                                       SdoR2RestrictNoOfPagesDetails.builder()
-                                                                           .witnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                           .noOfPages(12)
-                                                                           .fontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2)
-                                                                           .build()).build())
-                                             .sdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE)
-                                             .sdoWitnessDeadlineDate(LocalDate.now().plusDays(70))
-                                             .sdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE)
-                                             .build());
-        updatedData.sdoR2ScheduleOfLoss(SdoR2ScheduleOfLoss.builder().sdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT)
-                                            .isClaimForPecuniaryLoss(NO)
-                                            .sdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364))
-                                            .sdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT)
-                                            .sdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378))
-                                            .sdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS)
-                                            .build());
+        SdoR2DisclosureOfDocuments disclosureOfDocuments = new SdoR2DisclosureOfDocuments();
+        disclosureOfDocuments.setStandardDisclosureTxt(SdoR2UiConstantFastTrack.STANDARD_DISCLOSURE);
+        disclosureOfDocuments.setStandardDisclosureDate(LocalDate.now().plusDays(28));
+        disclosureOfDocuments.setInspectionTxt(SdoR2UiConstantFastTrack.INSPECTION);
+        disclosureOfDocuments.setInspectionDate(LocalDate.now().plusDays(42));
+        disclosureOfDocuments.setRequestsWillBeCompiledLabel(SdoR2UiConstantFastTrack.REQUEST_COMPILED_WITH);
+        updatedData.sdoR2DisclosureOfDocuments(disclosureOfDocuments);
+        SdoR2RestrictNoOfWitnessDetails restrictWitnessDetails = new SdoR2RestrictNoOfWitnessDetails();
+        restrictWitnessDetails.setNoOfWitnessClaimant(3);
+        restrictWitnessDetails.setNoOfWitnessDefendant(3);
+        restrictWitnessDetails.setPartyIsCountedAsWitnessTxt(SdoR2UiConstantFastTrack.RESTRICT_WITNESS_TEXT);
+        SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
+        restrictWitness.setIsRestrictWitness(NO);
+        restrictWitness.setRestrictNoOfWitnessDetails(restrictWitnessDetails);
+
+        SdoR2RestrictNoOfPagesDetails restrictPagesDetails = new SdoR2RestrictNoOfPagesDetails();
+        restrictPagesDetails.setWitnessShouldNotMoreThanTxt(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT1);
+        restrictPagesDetails.setNoOfPages(12);
+        restrictPagesDetails.setFontDetails(SdoR2UiConstantFastTrack.RESTRICT_NUMBER_PAGES_TEXT2);
+        SdoR2RestrictPages restrictPages = new SdoR2RestrictPages();
+        restrictPages.setIsRestrictPages(NO);
+        restrictPages.setRestrictNoOfPagesDetails(restrictPagesDetails);
+
+        SdoR2WitnessOfFact witnessOfFact = new SdoR2WitnessOfFact();
+        witnessOfFact.setSdoStatementOfWitness(SdoR2UiConstantFastTrack.STATEMENT_WITNESS);
+        witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
+        witnessOfFact.setSdoRestrictPages(restrictPages);
+        witnessOfFact.setSdoWitnessDeadline(SdoR2UiConstantFastTrack.DEADLINE);
+        witnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusDays(70));
+        witnessOfFact.setSdoWitnessDeadlineText(SdoR2UiConstantFastTrack.DEADLINE_EVIDENCE);
+        updatedData.sdoR2WitnessesOfFact(witnessOfFact);
+
+        SdoR2ScheduleOfLoss scheduleOfLoss = new SdoR2ScheduleOfLoss();
+        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_CLAIMANT);
+        scheduleOfLoss.setIsClaimForPecuniaryLoss(NO);
+        scheduleOfLoss.setSdoR2ScheduleOfLossClaimantDate(LocalDate.now().plusDays(364));
+        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantText(SdoR2UiConstantFastTrack.SCHEDULE_OF_LOSS_DEFENDANT);
+        scheduleOfLoss.setSdoR2ScheduleOfLossDefendantDate(LocalDate.now().plusDays(378));
+        scheduleOfLoss.setSdoR2ScheduleOfLossPecuniaryLossTxt(SdoR2UiConstantFastTrack.PECUNIARY_LOSS);
+        updatedData.sdoR2ScheduleOfLoss(scheduleOfLoss);
         DynamicListElement optionOne = new DynamicListElement();
         optionOne.setCode("00001");
         optionOne.setLabel("court 1 - 1 address - Y01 7RB");
@@ -661,87 +664,96 @@ public class SdoGeneratorServiceTest {
         optionThree.setLabel("court 3 - 3 address - Y03 7RB");
         DynamicList options = new DynamicList();
         options.setListItems(List.of(optionOne, optionTwo, optionThree));
-        updatedData.sdoR2Trial(SdoR2Trial.builder()
-                                   .trialOnOptions(TrialOnRadioOptions.OPEN_DATE)
-                                   .lengthList(FastTrackHearingTimeEstimate.FIVE_HOURS)
-                                   .methodOfHearing(HearingMethodUtils.getHearingMethodList(categorySearchResult))
-                                   .physicalBundleOptions(PhysicalTrialBundleOptions.NONE)
-                                   .sdoR2TrialFirstOpenDateAfter(
-                                       SdoR2TrialFirstOpenDateAfter.builder()
-                                           .listFrom(LocalDate.now().plusDays(434)).build())
-                                   .sdoR2TrialWindow(SdoR2TrialWindow.builder()
-                                                         .listFrom(LocalDate.now().plusDays(434))
-                                                         .dateTo(LocalDate.now().plusDays(455))
-                                                         .build())
-                                   .hearingCourtLocationList((options.toBuilder().value(selectedCourt).build()))
-                                   .physicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE)
-                                   .build());
+        SdoR2TrialFirstOpenDateAfter trialFirstOpen = new SdoR2TrialFirstOpenDateAfter();
+        trialFirstOpen.setListFrom(LocalDate.now().plusDays(434));
+        SdoR2TrialWindow trialWindow = new SdoR2TrialWindow();
+        trialWindow.setListFrom(LocalDate.now().plusDays(434));
+        trialWindow.setDateTo(LocalDate.now().plusDays(455));
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setTrialOnOptions(TrialOnRadioOptions.OPEN_DATE);
+        trial.setLengthList(FastTrackHearingTimeEstimate.FIVE_HOURS);
+        trial.setMethodOfHearing(HearingMethodUtils.getHearingMethodList(categorySearchResult));
+        trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.NONE);
+        trial.setSdoR2TrialFirstOpenDateAfter(trialFirstOpen);
+        trial.setSdoR2TrialWindow(trialWindow);
+        trial.setHearingCourtLocationList(options.toBuilder().value(selectedCourt).build());
+        trial.setPhysicalBundlePartyTxt(SdoR2UiConstantFastTrack.PHYSICAL_TRIAL_BUNDLE);
+        updatedData.sdoR2Trial(trial);
 
         updatedData.sdoR2ImportantNotesTxt(SdoR2UiConstantFastTrack.IMPORTANT_NOTES);
         updatedData.sdoR2ImportantNotesDate(LocalDate.now().plusDays(7));
 
-        updatedData.sdoR2ExpertEvidence(SdoR2ExpertEvidence.builder()
-                                            .sdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY).build());
-        updatedData.sdoR2AddendumReport(SdoR2AddendumReport.builder()
-                                            .sdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT)
-                                            .sdoAddendumReportDate(LocalDate.now().plusDays(56)).build());
-        updatedData.sdoR2FurtherAudiogram(SdoR2FurtherAudiogram.builder()
-                                              .sdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO)
-                                              .sdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT)
-                                              .sdoClaimantShallUndergoDate(LocalDate.now().plusDays(42))
-                                              .sdoServiceReportDate(LocalDate.now().plusDays(98)).build());
-        updatedData.sdoR2QuestionsClaimantExpert(SdoR2QuestionsClaimantExpert.builder()
-                                                     .sdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK)
-                                                     .sdoDefendantMayAskDate(LocalDate.now().plusDays(126))
-                                                     .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED)
-                                                     .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147))
-                                                     .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL)
-                                                     .sdoApplicationToRelyOnFurther(
-                                                         SdoR2ApplicationToRelyOnFurther.builder()
-                                                             .doRequireApplicationToRely(YesOrNo.NO)
-                                                             .applicationToRelyOnFurtherDetails(
-                                                                 SdoR2ApplicationToRelyOnFurtherDetails.builder()
-                                                                     .applicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS)
-                                                                     .applicationToRelyDetailsDate(LocalDate.now().plusDays(161)).build()).build())
-                                                     .build());
-        updatedData.sdoR2PermissionToRelyOnExpert(SdoR2PermissionToRelyOnExpert.builder()
-                                                      .sdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT)
-                                                      .sdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119))
-                                                      .sdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS)
-                                                      .sdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147))
-                                                      .sdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS)
-                                                      .build());
-        updatedData.sdoR2EvidenceAcousticEngineer(SdoR2EvidenceAcousticEngineer.builder()
-                                                      .sdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER)
-                                                      .sdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT)
-                                                      .sdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42))
-                                                      .sdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA)
-                                                      .sdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT)
-                                                      .sdoExpertReportDate(LocalDate.now().plusDays(280))
-                                                      .sdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL)
-                                                      .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS)
-                                                      .sdoWrittenQuestionsDate(LocalDate.now().plusDays(294))
-                                                      .sdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL)
-                                                      .sdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES)
-                                                      .sdoRepliesDate(LocalDate.now().plusDays(315))
-                                                      .sdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL)
-                                                      .sdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER)
-                                                      .build());
-        updatedData.sdoR2QuestionsToEntExpert(SdoR2QuestionsToEntExpert.builder()
-                                                  .sdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS)
-                                                  .sdoWrittenQuestionsDate(LocalDate.now().plusDays(336))
-                                                  .sdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL)
-                                                  .sdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED)
-                                                  .sdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350))
-                                                  .sdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED)
-                                                  .build());
-        updatedData.sdoR2UploadOfDocuments(SdoR2UploadOfDocuments.builder()
-                                               .sdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS)
-                                               .build());
+        SdoR2ExpertEvidence expertEvidence = new SdoR2ExpertEvidence();
+        expertEvidence.setSdoClaimantPermissionToRelyTxt(SdoR2UiConstantFastTrack.CLAIMANT_PERMISSION_TO_RELY);
+        updatedData.sdoR2ExpertEvidence(expertEvidence);
+        SdoR2AddendumReport addendumReport = new SdoR2AddendumReport();
+        addendumReport.setSdoAddendumReportTxt(SdoR2UiConstantFastTrack.ADDENDUM_REPORT);
+        addendumReport.setSdoAddendumReportDate(LocalDate.now().plusDays(56));
+        updatedData.sdoR2AddendumReport(addendumReport);
+        SdoR2FurtherAudiogram furtherAudiogram = new SdoR2FurtherAudiogram();
+        furtherAudiogram.setSdoClaimantShallUndergoTxt(SdoR2UiConstantFastTrack.CLAIMANT_SHALL_UNDERGO);
+        furtherAudiogram.setSdoServiceReportTxt(SdoR2UiConstantFastTrack.SERVICE_REPORT);
+        furtherAudiogram.setSdoClaimantShallUndergoDate(LocalDate.now().plusDays(42));
+        furtherAudiogram.setSdoServiceReportDate(LocalDate.now().plusDays(98));
+        updatedData.sdoR2FurtherAudiogram(furtherAudiogram);
+        SdoR2ApplicationToRelyOnFurtherDetails applicationDetails = new SdoR2ApplicationToRelyOnFurtherDetails();
+        applicationDetails.setApplicationToRelyDetailsTxt(SdoR2UiConstantFastTrack.APPLICATION_TO_RELY_DETAILS);
+        applicationDetails.setApplicationToRelyDetailsDate(LocalDate.now().plusDays(161));
+        SdoR2ApplicationToRelyOnFurther applicationToRelyOnFurther = new SdoR2ApplicationToRelyOnFurther();
+        applicationToRelyOnFurther.setDoRequireApplicationToRely(YesOrNo.NO);
+        applicationToRelyOnFurther.setApplicationToRelyOnFurtherDetails(applicationDetails);
+        SdoR2QuestionsClaimantExpert questionsClaimantExpert = new SdoR2QuestionsClaimantExpert();
+        questionsClaimantExpert.setSdoDefendantMayAskTxt(SdoR2UiConstantFastTrack.DEFENDANT_MAY_ASK);
+        questionsClaimantExpert.setSdoDefendantMayAskDate(LocalDate.now().plusDays(126));
+        questionsClaimantExpert.setSdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.QUESTIONS_SHALL_BE_ANSWERED);
+        questionsClaimantExpert.setSdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(147));
+        questionsClaimantExpert.setSdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL);
+        questionsClaimantExpert.setSdoApplicationToRelyOnFurther(applicationToRelyOnFurther);
+        updatedData.sdoR2QuestionsClaimantExpert(questionsClaimantExpert);
+        SdoR2PermissionToRelyOnExpert permissionToRelyOnExpert = new SdoR2PermissionToRelyOnExpert();
+        permissionToRelyOnExpert.setSdoPermissionToRelyOnExpertTxt(SdoR2UiConstantFastTrack.PERMISSION_TO_RELY_ON_EXPERT);
+        permissionToRelyOnExpert.setSdoPermissionToRelyOnExpertDate(LocalDate.now().plusDays(119));
+        permissionToRelyOnExpert.setSdoJointMeetingOfExpertsTxt(SdoR2UiConstantFastTrack.JOINT_MEETING_OF_EXPERTS);
+        permissionToRelyOnExpert.setSdoJointMeetingOfExpertsDate(LocalDate.now().plusDays(147));
+        permissionToRelyOnExpert.setSdoUploadedToDigitalPortalTxt(SdoR2UiConstantFastTrack.UPLOADED_TO_DIGITAL_PORTAL_7_DAYS);
+        updatedData.sdoR2PermissionToRelyOnExpert(permissionToRelyOnExpert);
+        SdoR2EvidenceAcousticEngineer acousticEngineer = new SdoR2EvidenceAcousticEngineer();
+        acousticEngineer.setSdoEvidenceAcousticEngineerTxt(SdoR2UiConstantFastTrack.EVIDENCE_ACOUSTIC_ENGINEER);
+        acousticEngineer.setSdoInstructionOfTheExpertTxt(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT);
+        acousticEngineer.setSdoInstructionOfTheExpertDate(LocalDate.now().plusDays(42));
+        acousticEngineer.setSdoInstructionOfTheExpertTxtArea(SdoR2UiConstantFastTrack.INSTRUCTION_OF_EXPERT_TA);
+        acousticEngineer.setSdoExpertReportTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT);
+        acousticEngineer.setSdoExpertReportDate(LocalDate.now().plusDays(280));
+        acousticEngineer.setSdoExpertReportDigitalPortalTxt(SdoR2UiConstantFastTrack.EXPERT_REPORT_DIGITAL_PORTAL);
+        acousticEngineer.setSdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS);
+        acousticEngineer.setSdoWrittenQuestionsDate(LocalDate.now().plusDays(294));
+        acousticEngineer.setSdoWrittenQuestionsDigitalPortalTxt(SdoR2UiConstantFastTrack.WRITTEN_QUESTIONS_DIGITAL_PORTAL);
+        acousticEngineer.setSdoRepliesTxt(SdoR2UiConstantFastTrack.REPLIES);
+        acousticEngineer.setSdoRepliesDate(LocalDate.now().plusDays(315));
+        acousticEngineer.setSdoRepliesDigitalPortalTxt(SdoR2UiConstantFastTrack.REPLIES_DIGITAL_PORTAL);
+        acousticEngineer.setSdoServiceOfOrderTxt(SdoR2UiConstantFastTrack.SERVICE_OF_ORDER);
+        updatedData.sdoR2EvidenceAcousticEngineer(acousticEngineer);
+        SdoR2QuestionsToEntExpert questionsToEntExpert = new SdoR2QuestionsToEntExpert();
+        questionsToEntExpert.setSdoWrittenQuestionsTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS);
+        questionsToEntExpert.setSdoWrittenQuestionsDate(LocalDate.now().plusDays(336));
+        questionsToEntExpert.setSdoWrittenQuestionsDigPortalTxt(SdoR2UiConstantFastTrack.ENT_WRITTEN_QUESTIONS_DIG_PORTAL);
+        questionsToEntExpert.setSdoQuestionsShallBeAnsweredTxt(SdoR2UiConstantFastTrack.ENT_QUESTIONS_SHALL_BE_ANSWERED);
+        questionsToEntExpert.setSdoQuestionsShallBeAnsweredDate(LocalDate.now().plusDays(350));
+        questionsToEntExpert.setSdoShallBeUploadedTxt(SdoR2UiConstantFastTrack.ENT_SHALL_BE_UPLOADED);
+        updatedData.sdoR2QuestionsToEntExpert(questionsToEntExpert);
+        SdoR2UploadOfDocuments uploadOfDocuments = new SdoR2UploadOfDocuments();
+        uploadOfDocuments.setSdoUploadOfDocumentsTxt(SdoR2UiConstantFastTrack.UPLOAD_OF_DOCUMENTS);
+        updatedData.sdoR2UploadOfDocuments(uploadOfDocuments);
         List<IncludeInOrderToggle> includeInOrderToggle = List.of(IncludeInOrderToggle.INCLUDE);
-        updatedData.sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder().includeInOrderToggle(includeInOrderToggle).build());
-        updatedData.sdoVariationOfDirections(SdoR2VariationOfDirections.builder().includeInOrderToggle(includeInOrderToggle).build());
-        updatedData.sdoR2Settlement(SdoR2Settlement.builder().includeInOrderToggle(includeInOrderToggle).build());
+        SdoR2FastTrackAltDisputeResolution altDisputeResolution = new SdoR2FastTrackAltDisputeResolution();
+        altDisputeResolution.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.sdoAltDisputeResolution(altDisputeResolution);
+        SdoR2VariationOfDirections variation = new SdoR2VariationOfDirections();
+        variation.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.sdoVariationOfDirections(variation);
+        SdoR2Settlement settlement = new SdoR2Settlement();
+        settlement.setIncludeInOrderToggle(includeInOrderToggle);
+        updatedData.sdoR2Settlement(settlement);
         updatedData.sdoR2DisclosureOfDocumentsToggle(includeInOrderToggle).build();
         updatedData.sdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle).build();
         updatedData.sdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle).build();
@@ -798,9 +810,7 @@ public class SdoGeneratorServiceTest {
             .claimsTrack(ClaimsTrack.smallClaimsTrack)
             .drawDirectionsOrderRequired(NO)
             .smallClaims(List.of(SmallTrack.smallClaimDisputeResolutionHearing))
-            .sdoR2SmallClaimsMediationSectionStatement(SdoR2SmallClaimsMediation.builder()
-                                                      .input("mediation representation")
-                                                      .build())
+            .sdoR2SmallClaimsMediationSectionStatement(buildMediation("mediation representation"))
             .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -815,6 +825,12 @@ public class SdoGeneratorServiceTest {
                             .equals("mediation representation")),
             any(DocmosisTemplates.class)
         );
+    }
+
+    private SdoR2SmallClaimsMediation buildMediation(String text) {
+        SdoR2SmallClaimsMediation mediation = new SdoR2SmallClaimsMediation();
+        mediation.setInput(text);
+        return mediation;
     }
 
 }

@@ -50,7 +50,7 @@ class DocumentUtilsTest {
 
         @Test
         void shouldReturnNull_whenGivenHearingTimeEstimateIsNull() {
-            var hearingTime = TrialHearingTimeDJ.builder().build();
+            var hearingTime = new TrialHearingTimeDJ();
 
             var actual = DocumentUtils.getHearingTimeEstimateLabel(hearingTime);
 
@@ -60,8 +60,8 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenValidHearingTimeEstimateIsGiven() {
             var expected = "1 hour";
-            var hearingTime = TrialHearingTimeDJ.builder()
-                .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR).build();
+            var hearingTime = new TrialHearingTimeDJ()
+                .setHearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR);
 
             var actual = DocumentUtils.getHearingTimeEstimateLabel(hearingTime);
 
@@ -71,11 +71,10 @@ class DocumentUtilsTest {
         @Test
         void shouldReturnExpectedLabel_whenOtherHearingTimeEstimateIsGiven() {
             var expected = "1 hours 20 minutes";
-            var hearingTime = TrialHearingTimeDJ.builder()
-                .hearingTimeEstimate(TrialHearingTimeEstimateDJ.OTHER)
-                .otherHours("1")
-                .otherMinutes("20")
-                .build();
+            var hearingTime = new TrialHearingTimeDJ()
+                .setHearingTimeEstimate(TrialHearingTimeEstimateDJ.OTHER)
+                .setOtherHours("1")
+                .setOtherMinutes("20");
 
             var actual = DocumentUtils.getHearingTimeEstimateLabel(hearingTime);
 

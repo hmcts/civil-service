@@ -139,30 +139,32 @@ public class SdoFastTrackNarrativeService {
     }
 
     private SdoR2WitnessOfFact buildWitnessesOfFact() {
-        return SdoR2WitnessOfFact.builder()
-            .sdoStatementOfWitness(STATEMENT_WITNESS)
-            .sdoR2RestrictWitness(SdoR2RestrictWitness.builder()
-                                      .isRestrictWitness(NO)
-                                      .restrictNoOfWitnessDetails(
-                                          SdoR2RestrictNoOfWitnessDetails.builder()
-                                              .noOfWitnessClaimant(3)
-                                              .noOfWitnessDefendant(3)
-                                              .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                              .build())
-                                      .build())
-            .sdoRestrictPages(SdoR2RestrictPages.builder()
-                                  .isRestrictPages(NO)
-                                  .restrictNoOfPagesDetails(
-                                      SdoR2RestrictNoOfPagesDetails.builder()
-                                          .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                          .noOfPages(12)
-                                          .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                          .build())
-                                  .build())
-            .sdoWitnessDeadline(DEADLINE)
-            .sdoWitnessDeadlineDate(sdoDeadlineService.calendarDaysFromNow(70))
-            .sdoWitnessDeadlineText(DEADLINE_EVIDENCE)
-            .build();
+        SdoR2RestrictNoOfWitnessDetails restrictWitnessDetails = new SdoR2RestrictNoOfWitnessDetails();
+        restrictWitnessDetails.setNoOfWitnessClaimant(3);
+        restrictWitnessDetails.setNoOfWitnessDefendant(3);
+        restrictWitnessDetails.setPartyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT);
+
+        SdoR2RestrictWitness restrictWitness = new SdoR2RestrictWitness();
+        restrictWitness.setIsRestrictWitness(NO);
+        restrictWitness.setRestrictNoOfWitnessDetails(restrictWitnessDetails);
+
+        SdoR2RestrictNoOfPagesDetails restrictPagesDetails = new SdoR2RestrictNoOfPagesDetails();
+        restrictPagesDetails.setWitnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1);
+        restrictPagesDetails.setNoOfPages(12);
+        restrictPagesDetails.setFontDetails(RESTRICT_NUMBER_PAGES_TEXT2);
+
+        SdoR2RestrictPages restrictPages = new SdoR2RestrictPages();
+        restrictPages.setIsRestrictPages(NO);
+        restrictPages.setRestrictNoOfPagesDetails(restrictPagesDetails);
+
+        SdoR2WitnessOfFact witnessOfFact = new SdoR2WitnessOfFact();
+        witnessOfFact.setSdoStatementOfWitness(STATEMENT_WITNESS);
+        witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
+        witnessOfFact.setSdoRestrictPages(restrictPages);
+        witnessOfFact.setSdoWitnessDeadline(DEADLINE);
+        witnessOfFact.setSdoWitnessDeadlineDate(sdoDeadlineService.calendarDaysFromNow(70));
+        witnessOfFact.setSdoWitnessDeadlineText(DEADLINE_EVIDENCE);
+        return witnessOfFact;
     }
 
     private LocalDate calendarWeeksFromNow(int weeks) {

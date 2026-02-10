@@ -78,17 +78,17 @@ public class SdoFastTrackSpecialistDirectionsService {
     private SdoR2FastTrackCreditHire buildCreditHire() {
         List<AddOrRemoveToggle> toggleList = List.of(AddOrRemoveToggle.ADD);
 
-        return SdoR2FastTrackCreditHire.builder()
-            .input1(CREDIT_HIRE_DISCLOSURE_SDO)
-            .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
-            .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
-            .date3(deadlineService.nextWorkingDayFromNowWeeks(8))
-            .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
-            .date4(deadlineService.nextWorkingDayFromNowWeeks(10))
-            .input8(CREDIT_HIRE_WITNESS_LIMIT_SDO)
-            .detailsShowToggle(toggleList)
-            .sdoR2FastTrackCreditHireDetails(buildCreditHireDetails())
-            .build();
+        SdoR2FastTrackCreditHire creditHire = new SdoR2FastTrackCreditHire();
+        creditHire.setInput1(CREDIT_HIRE_DISCLOSURE_SDO);
+        creditHire.setInput5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY);
+        creditHire.setInput6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO);
+        creditHire.setDate3(deadlineService.nextWorkingDayFromNowWeeks(8));
+        creditHire.setInput7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO);
+        creditHire.setDate4(deadlineService.nextWorkingDayFromNowWeeks(10));
+        creditHire.setInput8(CREDIT_HIRE_WITNESS_LIMIT_SDO);
+        creditHire.setDetailsShowToggle(toggleList);
+        creditHire.setSdoR2FastTrackCreditHireDetails(buildCreditHireDetails());
+        return creditHire;
     }
 
     private FastTrackCreditHire buildFastTrackCreditHire() {
@@ -108,13 +108,13 @@ public class SdoFastTrackSpecialistDirectionsService {
     }
 
     private SdoR2FastTrackCreditHireDetails buildCreditHireDetails() {
-        return SdoR2FastTrackCreditHireDetails.builder()
-            .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
-            .date1(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
-            .input4(CREDIT_HIRE_PARTIES_LIAISE)
-            .date2(deadlineService.nextWorkingDayFromNowWeeks(6))
-            .build();
+        SdoR2FastTrackCreditHireDetails creditHireDetails = new SdoR2FastTrackCreditHireDetails();
+        creditHireDetails.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO);
+        creditHireDetails.setDate1(deadlineService.nextWorkingDayFromNowWeeks(4));
+        creditHireDetails.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO);
+        creditHireDetails.setInput4(CREDIT_HIRE_PARTIES_LIAISE);
+        creditHireDetails.setDate2(deadlineService.nextWorkingDayFromNowWeeks(6));
+        return creditHireDetails;
     }
 
     private FastTrackHousingDisrepair buildHousingDisrepair() {
