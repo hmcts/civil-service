@@ -44,16 +44,10 @@ class SdoNihlTemplateServiceTest {
             .atStateNotificationAcknowledged()
             .build()
             .toBuilder()
-            .sdoAltDisputeResolution(SdoR2FastTrackAltDisputeResolution.builder()
-                .includeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .sdoVariationOfDirections(SdoR2VariationOfDirections.builder()
-                .includeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .sdoR2Settlement(SdoR2Settlement.builder()
-                .includeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE)).build())
-            .sdoR2Trial(SdoR2Trial.builder()
-                .trialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW)
-                .physicalBundleOptions(PhysicalTrialBundleOptions.PARTY)
-                .build())
+            .sdoAltDisputeResolution(buildAltDisputeResolution())
+            .sdoVariationOfDirections(buildVariationOfDirections())
+            .sdoR2Settlement(buildSettlement())
+            .sdoR2Trial(buildTrial())
             .build();
 
         when(trialTemplateFieldService.hasRestrictWitness(caseData)).thenReturn(true);
@@ -76,5 +70,30 @@ class SdoNihlTemplateServiceTest {
         assertThat(result.getSdoTrialHearingTimeAllocated()).isEqualTo("2 hours");
         assertThat(result.getHearingLocation()).isEqualTo(location);
         assertThat(result.getPhysicalBundlePartyTxt()).isEqualTo("party text");
+    }
+
+    private SdoR2FastTrackAltDisputeResolution buildAltDisputeResolution() {
+        SdoR2FastTrackAltDisputeResolution altDisputeResolution = new SdoR2FastTrackAltDisputeResolution();
+        altDisputeResolution.setIncludeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE));
+        return altDisputeResolution;
+    }
+
+    private SdoR2VariationOfDirections buildVariationOfDirections() {
+        SdoR2VariationOfDirections variation = new SdoR2VariationOfDirections();
+        variation.setIncludeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE));
+        return variation;
+    }
+
+    private SdoR2Settlement buildSettlement() {
+        SdoR2Settlement settlement = new SdoR2Settlement();
+        settlement.setIncludeInOrderToggle(java.util.List.of(IncludeInOrderToggle.INCLUDE));
+        return settlement;
+    }
+
+    private SdoR2Trial buildTrial() {
+        SdoR2Trial trial = new SdoR2Trial();
+        trial.setTrialOnOptions(TrialOnRadioOptions.TRIAL_WINDOW);
+        trial.setPhysicalBundleOptions(PhysicalTrialBundleOptions.PARTY);
+        return trial;
     }
 }
