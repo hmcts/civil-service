@@ -48,6 +48,9 @@ public class SdoValidationService {
             errors.addAll(validateNihl(caseData));
         }
 
+        errors.addAll(validatePpiDates(caseData));
+        errors.addAll(validateHousingDisrepairDates(caseData));
+
         log.info("Validation complete for caseId {}, total errors {}", caseData.getCcdCaseReference(), errors.size());
         return errors;
     }
@@ -232,5 +235,29 @@ public class SdoValidationService {
         for (LocalDate date : dates) {
             validateFutureDate(date).ifPresent(errors::add);
         }
+    }
+
+    private List<String> validatePpiDates(CaseData caseData) {
+        ArrayList<String> errors = new ArrayList<>();
+        if (caseData.getSmallClaimsPPI() != null) {
+            validateFutureDate(caseData.getSmallClaimsPPI().getPpiDate()).ifPresent(errors::add);
+        }
+        if (caseData.getFastTrackPPI() != null) {
+            validateFutureDate(caseData.getFastTrackPPI().getPpiDate()).ifPresent(errors::add);
+        }
+        return errors;
+    }
+
+    private List<String> validateHousingDisrepairDates(CaseData caseData) {
+        ArrayList<String> errors = new ArrayList<>();
+        if (caseData.getSmallClaimsHousingDisrepair() != null) {
+            validateFutureDate(caseData.getSmallClaimsHousingDisrepair().getFirstReportDateBy()).ifPresent(errors::add);
+            validateFutureDate(caseData.getSmallClaimsHousingDisrepair().getJointStatementDateBy()).ifPresent(errors::add);
+        }
+        if (caseData.getFastTrackHousingDisrepair() != null) {
+            validateFutureDate(caseData.getFastTrackHousingDisrepair().getFirstReportDateBy()).ifPresent(errors::add);
+            validateFutureDate(caseData.getFastTrackHousingDisrepair().getJointStatementDateBy()).ifPresent(errors::add);
+        }
+        return errors;
     }
 }
