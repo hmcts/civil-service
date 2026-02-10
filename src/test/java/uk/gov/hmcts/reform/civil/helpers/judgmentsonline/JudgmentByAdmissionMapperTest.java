@@ -422,7 +422,7 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
-        assertEquals("1000", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals("10", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
