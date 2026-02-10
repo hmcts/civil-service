@@ -10,8 +10,7 @@
       "jurisdiction2": { "equalTo": "county court" },
       "channel": { "equalTo": "default" },
       "event": { "equalTo": "issue" },
-      "keyword": { "equalTo": "MoneyClaim" },
-      "amount_or_volume": { "matches": ".*" }
+      "keyword": { "equalTo": "MoneyClaim" }
     }
   },
   "response": {
