@@ -84,10 +84,9 @@ public class DjDisposalNarrativeService {
     }
 
     public DisposalHearingFinalDisposalHearingTimeDJ buildFinalDisposalHearingTime() {
-        return DisposalHearingFinalDisposalHearingTimeDJ.builder()
-            .input(DISPOSAL_FINAL_HEARING_LISTING_DJ)
-            .date(deadlineService.weeksFromNow(16))
-            .build();
+        return new DisposalHearingFinalDisposalHearingTimeDJ()
+            .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
+            .setDate(deadlineService.weeksFromNow(16));
     }
 
     public DisposalHearingBundleDJ buildBundle() {
