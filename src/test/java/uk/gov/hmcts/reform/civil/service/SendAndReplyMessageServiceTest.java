@@ -60,12 +60,11 @@ class SendAndReplyMessageServiceTest {
         .surname("User")
         .build();
 
-    private static final SendMessageMetadata MESSAGE_METADATA = SendMessageMetadata.builder()
-        .subjectType(OTHER)
-        .subject(OTHER.getLabel())
-        .recipientRoleType(CIRCUIT_JUDGE)
-        .isUrgent(YES)
-        .build();
+    private static final SendMessageMetadata MESSAGE_METADATA = new SendMessageMetadata()
+        .setSubjectType(OTHER)
+        .setSubject(OTHER.getLabel())
+        .setRecipientRoleType(CIRCUIT_JUDGE)
+        .setIsUrgent(YES);
     private static final String MESSAGE_CONTENT = "Message Content";
     private static final LocalDateTime NOW = LocalDateTime.of(2014, 11, 1, 0, 0, 0);
 
@@ -669,13 +668,12 @@ class SendAndReplyMessageServiceTest {
                 buildRoleAssignmentsResponse(roleAssignmentResponses)
             );
 
-            Element<Message> existingMessageToBeChanged = element(message.toBuilder()
-                                                           .senderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
-                                                           .senderRoleType(originalSender)
-                                                           .recipientRoleType(currentSender)
-                                                           .sentTime(NOW)
-                                                           .isUrgent(YES)
-                                                           .build());
+            Element<Message> existingMessageToBeChanged = element(message.copyOf()
+                                                           .setSenderName(String.format("%s, %s", USER_NAME, originalUserRoleLabel))
+                                                           .setSenderRoleType(originalSender)
+                                                           .setRecipientRoleType(currentSender)
+                                                           .setSentTime(NOW)
+                                                           .setIsUrgent(YES));
 
             List<Element<Message>> messages = new ArrayList<>();
             messages.add(existingMessageToBeChanged);
@@ -685,15 +683,14 @@ class SendAndReplyMessageServiceTest {
                 .setMessageContent("This is a reply message")
                 .setSentTime(updatedDateTime);
 
-            Message expectedMessage = message.toBuilder()
-                .senderName(String.format("%s, %s", USER_NAME, newUserRoleLabel))
-                .senderRoleType(currentSender)
-                .recipientRoleType(originalSender)
-                .sentTime(NOW)
-                .isUrgent(messageReply.getIsUrgent())
-                .messageContent(messageReply.getMessageContent())
-                .updatedTime(updatedTime)
-                .build();
+            Message expectedMessage = message.copyOf()
+                .setSenderName(String.format("%s, %s", USER_NAME, newUserRoleLabel))
+                .setSenderRoleType(currentSender)
+                .setRecipientRoleType(originalSender)
+                .setSentTime(NOW)
+                .setIsUrgent(messageReply.getIsUrgent())
+                .setMessageContent(messageReply.getMessageContent())
+                .setUpdatedTime(updatedTime);
 
             List<Message> actualMessages = unwrapElements(messageService.addReplyToMessage(
                 messages,
@@ -748,8 +745,8 @@ class SendAndReplyMessageServiceTest {
             history.add(element(firstReply));
             history.add(element(baseMessage));
 
-            Message secondReply = message.toBuilder()
-                .history(history).build();
+            Message secondReply = message.copyOf()
+                .setHistory(history);
 
             Element<Message> existingMessageElement = element(secondReply);
             List<Element<Message>> messages = new ArrayList<>();
