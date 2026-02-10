@@ -70,7 +70,7 @@ class WaTaskManagementServiceTest {
 
             when(taskManagementClient.searchWithCriteria(
                 S2S_TOKEN, USER_TOKEN, buildSearchRequest(CASE_ID)))
-                .thenReturn(GetTasksResponse.builder().tasks(expectedTasks).build());
+                .thenReturn(new GetTasksResponse().setTasks(expectedTasks));
 
             List<Task> actual = taskManagementService.getAllTasks(CASE_ID, USER_TOKEN);
 
@@ -88,11 +88,11 @@ class WaTaskManagementServiceTest {
         @ParameterizedTest
         @ValueSource(booleans = {true, false})
         void getTaskToComplete_shouldReturnExpectedTask(boolean makeMatch) {
-            Task expectedTask = Task.builder().name("TestTask").build();
+            Task expectedTask = new Task().setName("TestTask");
             Predicate<Task> testPredicate = task -> makeMatch;
             when(taskManagementClient.searchWithCriteria(
                 S2S_TOKEN, USER_TOKEN, buildSearchRequest(CASE_ID)))
-                .thenReturn(GetTasksResponse.builder().tasks(List.of(expectedTask)).build());
+                .thenReturn(new GetTasksResponse().setTasks(List.of(expectedTask)));
 
             Task actual = taskManagementService.getTaskToComplete(CASE_ID, USER_TOKEN, testPredicate);
 
@@ -108,7 +108,7 @@ class WaTaskManagementServiceTest {
             Predicate<Task> testPredicate = task -> true;
             when(taskManagementClient.searchWithCriteria(
                 S2S_TOKEN, USER_TOKEN, buildSearchRequest(CASE_ID)))
-                .thenReturn(GetTasksResponse.builder().tasks(List.of()).build());
+                .thenReturn(new GetTasksResponse().setTasks(List.of()));
 
             Task actual = taskManagementService.getTaskToComplete(CASE_ID, USER_TOKEN, testPredicate);
 
@@ -169,15 +169,14 @@ class WaTaskManagementServiceTest {
     }
 
     private SearchTaskRequest buildSearchRequest(String caseId) {
-        return SearchTaskRequest.builder()
-            .searchParameters(List.of(
-                SearchParameterList.builder()
-                    .key(SearchParameterKey.CASE_ID)
-                    .operator(SearchOperator.IN)
-                    .values(List.of(caseId))
-                    .build()))
-            .sortingParameters(null)
-            .requestContext(null)
-            .build();
+        SearchParameterList parameter = new SearchParameterList()
+            .setKey(SearchParameterKey.CASE_ID)
+            .setOperator(SearchOperator.IN)
+            .setValues(List.of(caseId));
+
+        return new SearchTaskRequest()
+            .setSearchParameters(List.of(parameter))
+            .setSortingParameters(null)
+            .setRequestContext(null);
     }
 }
