@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackCreditHire;
@@ -31,10 +31,12 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_INTRO_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_D;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_E;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_QUESTIONS;
@@ -120,15 +122,18 @@ public class SdoFastTrackSpecialistDirectionsService {
             .build();
     }
 
-    private FastTrackHousingDisrepair buildHousingDisrepair() {
-        return FastTrackHousingDisrepair.builder()
-            .input1(HOUSING_SCHEDULE_INTRO_SDO)
-            .input2(HOUSING_SCHEDULE_COLUMNS_SDO)
-            .input3(HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION)
-            .date1(deadlineService.nextWorkingDayFromNowWeeks(10))
-            .input4(HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION)
-            .date2(deadlineService.nextWorkingDayFromNowWeeks(12))
-            .build();
+    //ToDo: Need to discuss with Ruban
+    private HousingDisrepair buildHousingDisrepair() {
+        HousingDisrepair housingDisrepair = new HousingDisrepair();
+        housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
+        housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
+        housingDisrepair.setFirstReportDateBy(deadlineService.nextWorkingDayFromNowWeeks(4));
+        housingDisrepair.setClauseCBeforeDate(HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE);
+        housingDisrepair.setJointStatementDateBy(deadlineService.nextWorkingDayFromNowWeeks(8));
+        housingDisrepair.setClauseCAfterDate(HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE);
+        housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
+        housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
+        return housingDisrepair;
     }
 
     private FastTrackPersonalInjury buildPersonalInjury() {

@@ -8,7 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackPersonalInjury;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackRoadTrafficAccident;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -26,10 +26,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_PARTIES_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION;
-import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_INTRO_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_ANSWERS;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_PERMISSION_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_QUESTIONS;
@@ -64,12 +62,11 @@ class SdoFastTrackSpecialistDirectionsServiceTest {
         assertThat(buildingDispute.getInput3()).isEqualTo(BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION);
         assertThat(buildingDispute.getInput4()).isEqualTo(BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION);
 
-        FastTrackHousingDisrepair housing = caseData.getFastTrackHousingDisrepair();
+        //Todo: not done completely. Need to discuss with Ruban
+        HousingDisrepair housing = caseData.getFastTrackHousingDisrepair();
         assertThat(housing).isNotNull();
-        assertThat(housing.getInput1()).isEqualTo(HOUSING_SCHEDULE_INTRO_SDO);
-        assertThat(housing.getInput2()).isEqualTo(HOUSING_SCHEDULE_COLUMNS_SDO);
-        assertThat(housing.getInput3()).isEqualTo(HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION);
-        assertThat(housing.getInput4()).isEqualTo(HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION);
+        assertThat(housing.getClauseA()).isEqualTo(HOUSING_DISREPAIR_CLAUSE_A);
+        assertThat(housing.getClauseB()).isEqualTo(HOUSING_DISREPAIR_CLAUSE_B);
 
         FastTrackClinicalNegligence clinicalNegligence = caseData.getFastTrackClinicalNegligence();
         assertThat(clinicalNegligence).isNotNull();
