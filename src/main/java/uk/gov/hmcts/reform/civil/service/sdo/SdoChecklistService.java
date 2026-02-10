@@ -58,21 +58,15 @@ public class SdoChecklistService {
         CaseData caseData,
         List<IncludeInOrderToggle> includeInOrderToggle
     ) {
-        caseData.setSdoAltDisputeResolution(
-            SdoR2FastTrackAltDisputeResolution.builder()
-                .includeInOrderToggle(includeInOrderToggle)
-                .build()
-        );
-        caseData.setSdoVariationOfDirections(
-            SdoR2VariationOfDirections.builder()
-                .includeInOrderToggle(includeInOrderToggle)
-                .build()
-        );
-        caseData.setSdoR2Settlement(
-            SdoR2Settlement.builder()
-                .includeInOrderToggle(includeInOrderToggle)
-                .build()
-        );
+        SdoR2FastTrackAltDisputeResolution altDisputeResolution = new SdoR2FastTrackAltDisputeResolution();
+        altDisputeResolution.setIncludeInOrderToggle(includeInOrderToggle);
+        caseData.setSdoAltDisputeResolution(altDisputeResolution);
+        SdoR2VariationOfDirections variationOfDirections = new SdoR2VariationOfDirections();
+        variationOfDirections.setIncludeInOrderToggle(includeInOrderToggle);
+        caseData.setSdoVariationOfDirections(variationOfDirections);
+        SdoR2Settlement settlement = new SdoR2Settlement();
+        settlement.setIncludeInOrderToggle(includeInOrderToggle);
+        caseData.setSdoR2Settlement(settlement);
         caseData.setSdoR2DisclosureOfDocumentsToggle(includeInOrderToggle);
         caseData.setSdoR2SeparatorWitnessesOfFactToggle(includeInOrderToggle);
         caseData.setSdoR2SeparatorExpertEvidenceToggle(includeInOrderToggle);

@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.dq.Respondent1DQ;
 import uk.gov.hmcts.reform.civil.model.robotics.Event;
+import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
 import uk.gov.hmcts.reform.civil.prd.client.OrganisationApi;
@@ -43,12 +44,13 @@ import uk.gov.hmcts.reform.civil.service.robotics.mapper.AddressLinesMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistorySequencer;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsAddressMapper;
-import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForSpec;
+import uk.gov.hmcts.reform.civil.service.robotics.mapper.RoboticsDataMapperForUnspec;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -173,14 +175,13 @@ class RoboticsNotificationServiceTest {
             caseData.setRespondent2Represented(YES);
         }
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
@@ -259,13 +260,13 @@ class RoboticsNotificationServiceTest {
         caseData.setRespondent2SameLegalRepresentative(NO);
 
         String lastEventText = "event text";
-        RoboticsCaseDataSpec roboticsCaseData = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder().miscellaneous(
-                Event.builder().eventDetailsText(lastEventText)
+        RoboticsCaseDataSpec roboticsCaseData = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory().setMiscellaneous(List.of(
+                eventBuilder().eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
                     .build()
-            ).build())
-            .build();
+            )))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(roboticsCaseData);
 
         boolean multiPartyScenario = isMultiPartyScenario(caseData);
@@ -338,14 +339,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCaseAccessCategory(SPEC_CLAIM);
 
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
@@ -376,14 +376,13 @@ class RoboticsNotificationServiceTest {
         caseData.setRespondent1Represented(NO);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -410,14 +409,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         caseData.setPaymentTypeSelection(DJPaymentTypeSelection.SET_DATE);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -444,14 +442,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         caseData.setCcjPaymentDetails(new CCJPaymentDetails().setCcjPaymentPaidSomeOption(YES));
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -479,14 +476,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -520,14 +516,13 @@ class RoboticsNotificationServiceTest {
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -556,14 +551,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCcjPaymentDetails(new CCJPaymentDetails().setCcjPaymentPaidSomeOption(YES));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                .setMiscellaneous(List.of(eventBuilder()
                     .eventDetailsText(lastEventText)
                     .dateReceived(LocalDateTime.now())
-                    .build())
-                .build())
-            .build();
+                    .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         //When
@@ -592,14 +586,13 @@ class RoboticsNotificationServiceTest {
         caseData.setRespondent1Represented(YES);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                        .setMiscellaneous(List.of(eventBuilder()
                                            .eventDetailsText(lastEventText)
                                            .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
-            .build();
+                                           .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
@@ -634,14 +627,13 @@ class RoboticsNotificationServiceTest {
         caseData.setCaseAccessCategory(SPEC_CLAIM);
         caseData.setPaymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY);
         String lastEventText = "event text";
-        RoboticsCaseDataSpec build = RoboticsCaseDataSpec.builder()
-            .events(EventHistory.builder()
-                        .miscellaneous(Event.builder()
+        RoboticsCaseDataSpec build = new RoboticsCaseDataSpec()
+            .setEvents(new EventHistory()
+                        .setMiscellaneous(List.of(eventBuilder()
                                            .eventDetailsText(lastEventText)
                                            .dateReceived(LocalDateTime.now())
-                                           .build())
-                        .build())
-            .build();
+                                           .build())))
+            ;
         when(roboticsDataMapperForSpec.toRoboticsCaseData(caseData, BEARER_TOKEN)).thenReturn(build);
 
         // When
@@ -663,5 +655,47 @@ class RoboticsNotificationServiceTest {
         assertThat(capturedEmailData.getAttachments())
             .extracting("filename", "contentType")
             .containsExactlyInAnyOrder(tuple(fileName, "application/json"));
+    }
+
+    private EventTestBuilder eventBuilder() {
+        return new EventTestBuilder();
+    }
+
+    private static class EventTestBuilder {
+        private final Event event = new Event();
+
+        EventTestBuilder eventSequence(Integer sequence) {
+            event.setEventSequence(sequence);
+            return this;
+        }
+
+        EventTestBuilder eventCode(String code) {
+            event.setEventCode(code);
+            return this;
+        }
+
+        EventTestBuilder dateReceived(LocalDateTime dateReceived) {
+            event.setDateReceived(dateReceived);
+            return this;
+        }
+
+        EventTestBuilder litigiousPartyID(String id) {
+            event.setLitigiousPartyID(id);
+            return this;
+        }
+
+        EventTestBuilder eventDetails(EventDetails details) {
+            event.setEventDetails(details);
+            return this;
+        }
+
+        EventTestBuilder eventDetailsText(String text) {
+            event.setEventDetailsText(text);
+            return this;
+        }
+
+        Event build() {
+            return event;
+        }
     }
 }
