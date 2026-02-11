@@ -153,7 +153,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         if (caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
             return new RepaymentPlanTemplateData()
                 .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .setPaymentAmount(MonetaryConversions.penniesToPounds(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2, RoundingMode.HALF_UP)))
+                .setPaymentAmount(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec().setScale(2))
                 .setPaymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel());
         }
         return null;
