@@ -69,12 +69,9 @@ public class SdoTrackDefaultsService {
 
     public void applyR2Defaults(CaseData caseData) {
         sdoChecklistService.applyR2Checklists(caseData, INCLUDE_IN_ORDER_TOGGLE);
-        caseData.setSdoR2FastTrackUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
-        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(SdoR2WelshLanguageUsage.builder().description(
-            SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION).build());
+        caseData.setSdoR2FastTrackUseOfWelshLanguage(buildWelshLanguageUsage());
+        caseData.setSdoR2SmallClaimsUseOfWelshLanguage(buildWelshLanguageUsage());
+        caseData.setSdoR2DisposalHearingUseOfWelshLanguage(buildWelshLanguageUsage());
     }
 
     public List<IncludeInOrderToggle> defaultIncludeInOrderToggle() {
@@ -84,6 +81,12 @@ public class SdoTrackDefaultsService {
     private void initialiseTrackDefaults(CaseData caseData) {
         caseData.setSmallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson);
         caseData.setFastTrackMethod(FastTrackMethod.fastTrackMethodInPerson);
+    }
+
+    private SdoR2WelshLanguageUsage buildWelshLanguageUsage() {
+        SdoR2WelshLanguageUsage welshLanguageUsage = new SdoR2WelshLanguageUsage();
+        welshLanguageUsage.setDescription(SdoR2UiConstantFastTrack.WELSH_LANG_DESCRIPTION);
+        return welshLanguageUsage;
     }
 
 }
