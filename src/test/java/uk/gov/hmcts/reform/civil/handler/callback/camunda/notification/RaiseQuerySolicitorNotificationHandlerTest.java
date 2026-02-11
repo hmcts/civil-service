@@ -302,9 +302,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(publicQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 

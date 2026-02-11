@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.CoSRecipientServeLocationOwnerType;
 import uk.gov.hmcts.reform.civil.enums.CoSRecipientServeType;
 import uk.gov.hmcts.reform.civil.enums.CosRecipientServeLocationType;
@@ -18,11 +18,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Builder(toBuilder = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class CertificateOfService {
 
     @JsonProperty("cosDateOfServiceForDefendant")

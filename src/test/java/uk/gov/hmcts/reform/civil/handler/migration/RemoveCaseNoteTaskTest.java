@@ -44,7 +44,8 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldRemoveCaseNoteWhenIdMatches() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to remove").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to remove");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);
@@ -67,12 +68,14 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldRemoveCaseNoteWhenIdMatchesAndLeaveOtherNotes() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to remove").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to remove");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);
         caseNotes.add(element);
-        CaseNote note2 = CaseNote.builder().note("Note to retain").build();
+        CaseNote note2 = new CaseNote();
+        note2.setNote("Note to retain");
         Element<CaseNote> element2 = element(note2);
         element2.setId(UUID.randomUUID());
         caseNotes.add(element2);
@@ -95,7 +98,8 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldNotRemoveCaseNoteWhenIdDoesNotMatch() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to keep").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to keep");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);

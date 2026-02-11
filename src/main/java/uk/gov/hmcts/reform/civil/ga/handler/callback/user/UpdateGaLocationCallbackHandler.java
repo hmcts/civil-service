@@ -73,10 +73,9 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder
             .businessProcess(
-                BusinessProcess.builder()
-                    .camundaEvent(callbackParams.getRequest().getEventId())
-                    .status(BusinessProcessStatus.FINISHED)
-                    .build())
+                new BusinessProcess()
+                    .setCamundaEvent(callbackParams.getRequest().getEventId())
+                    .setStatus(BusinessProcessStatus.FINISHED))
             .isCcmccLocation(YesOrNo.NO)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation(civilCaseData.getCaseManagementLocation()
                                                                               .getBaseLocation())

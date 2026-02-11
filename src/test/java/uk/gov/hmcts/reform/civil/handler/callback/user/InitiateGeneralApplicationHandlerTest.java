@@ -1563,9 +1563,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                               .urgentAppConsiderationDate(APP_DATE_EPOCH)
                                               .build())
             .isMultiParty(NO)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY))
             .build();
         return getEmptyTestCase(caseData)
             .toBuilder()

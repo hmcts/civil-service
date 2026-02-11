@@ -193,13 +193,11 @@ public class CaseDataBuilderUnspec {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourtLocationList(
-                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .build();
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourtLocationList(
+                DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build());
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         personalInjuryType = ROAD_ACCIDENT;
         applicantSolicitor1PbaAccounts = DynamicList.builder()
@@ -232,7 +230,7 @@ public class CaseDataBuilderUnspec {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
