@@ -86,7 +86,7 @@ class BaseRoboticsDataMapperTest {
     @Test
     void shouldUseProvidedAddressWhenPresent() {
         Address provided = new Address();
-        RoboticsAddresses roboticsAddresses = RoboticsAddresses.builder().build();
+        RoboticsAddresses roboticsAddresses = new RoboticsAddresses();
 
         when(addressMapper.toRoboticsAddresses(provided)).thenReturn(roboticsAddresses);
 
@@ -99,7 +99,7 @@ class BaseRoboticsDataMapperTest {
     @Test
     void shouldUseContactInformationWhenProvidedAddressNotPresent() {
         ContactInformation contact = ContactInformation.builder().build();
-        RoboticsAddresses roboticsAddresses = RoboticsAddresses.builder().build();
+        RoboticsAddresses roboticsAddresses = new RoboticsAddresses();
 
         when(addressMapper.toRoboticsAddresses(List.of(contact))).thenReturn(roboticsAddresses);
 
@@ -138,7 +138,7 @@ class BaseRoboticsDataMapperTest {
         orgDetails.setEmail("email@test.com");
         orgDetails.setAddress(new Address());
 
-        RoboticsAddresses roboticsAddresses = RoboticsAddresses.builder().build();
+        RoboticsAddresses roboticsAddresses = new RoboticsAddresses();
         when(addressMapper.toRoboticsAddresses(orgDetails.getAddress())).thenReturn(roboticsAddresses);
 
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();

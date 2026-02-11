@@ -1347,10 +1347,11 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
 
             // When
@@ -3141,9 +3142,10 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnClaimDismissedPastDeadline_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -3179,9 +3181,10 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnDismissedState_whenDeadlinePassedAfterNotificationAcknowledgedAndProcessedByCamunda() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
 
@@ -4462,9 +4465,11 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnTakenOfflineSDONotDrawn_whenTransitionedFromMediationUnsuccessfulProceed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+            reasonNotSuitableSDO.setInput("Unsuitable");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Unsuitable").build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .takenOfflineDate(LocalDateTime.now())
                 .build();
 
