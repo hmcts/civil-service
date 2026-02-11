@@ -88,16 +88,25 @@ public class SdoSubmissionService {
         }
 
         SdoR2SmallClaimsHearing hearing = caseData.getSdoR2SmallClaimsHearing();
-        SdoR2SmallClaimsHearing.SdoR2SmallClaimsHearingBuilder hearingBuilder = hearing.toBuilder();
+        SdoR2SmallClaimsHearing updatedHearing = new SdoR2SmallClaimsHearing();
+        updatedHearing.setTrialOnOptions(hearing.getTrialOnOptions());
+        updatedHearing.setSdoR2SmallClaimsHearingFirstOpenDateAfter(hearing.getSdoR2SmallClaimsHearingFirstOpenDateAfter());
+        updatedHearing.setSdoR2SmallClaimsHearingWindow(hearing.getSdoR2SmallClaimsHearingWindow());
+        updatedHearing.setLengthList(hearing.getLengthList());
+        updatedHearing.setLengthListOther(hearing.getLengthListOther());
+        updatedHearing.setMethodOfHearing(hearing.getMethodOfHearing());
+        updatedHearing.setPhysicalBundleOptions(hearing.getPhysicalBundleOptions());
+        updatedHearing.setSdoR2SmallClaimsBundleOfDocs(hearing.getSdoR2SmallClaimsBundleOfDocs());
+        updatedHearing.setHearingNotesTxt(hearing.getHearingNotesTxt());
 
         Optional.ofNullable(hearing.getHearingCourtLocationList())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(hearingBuilder::hearingCourtLocationList);
+            .ifPresent(updatedHearing::setHearingCourtLocationList);
         Optional.ofNullable(hearing.getAltHearingCourtLocationList())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(hearingBuilder::altHearingCourtLocationList);
+            .ifPresent(updatedHearing::setAltHearingCourtLocationList);
 
-        caseData.setSdoR2SmallClaimsHearing(hearingBuilder.build());
+        caseData.setSdoR2SmallClaimsHearing(updatedHearing);
     }
 
     private void updateClaimsTrack(CaseData caseData) {
@@ -128,16 +137,25 @@ public class SdoSubmissionService {
         }
 
         SdoR2Trial trial = caseData.getSdoR2Trial();
-        SdoR2Trial.SdoR2TrialBuilder trialBuilder = trial.toBuilder();
+        SdoR2Trial updatedTrial = new SdoR2Trial();
+        updatedTrial.setTrialOnOptions(trial.getTrialOnOptions());
+        updatedTrial.setSdoR2TrialFirstOpenDateAfter(trial.getSdoR2TrialFirstOpenDateAfter());
+        updatedTrial.setSdoR2TrialWindow(trial.getSdoR2TrialWindow());
+        updatedTrial.setLengthList(trial.getLengthList());
+        updatedTrial.setLengthListOther(trial.getLengthListOther());
+        updatedTrial.setMethodOfHearing(trial.getMethodOfHearing());
+        updatedTrial.setPhysicalBundleOptions(trial.getPhysicalBundleOptions());
+        updatedTrial.setPhysicalBundlePartyTxt(trial.getPhysicalBundlePartyTxt());
+        updatedTrial.setHearingNotesTxt(trial.getHearingNotesTxt());
 
         Optional.ofNullable(trial.getHearingCourtLocationList())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(trialBuilder::hearingCourtLocationList);
+            .ifPresent(updatedTrial::setHearingCourtLocationList);
         Optional.ofNullable(trial.getAltHearingCourtLocationList())
             .map(sdoLocationService::trimListItems)
-            .ifPresent(trialBuilder::altHearingCourtLocationList);
+            .ifPresent(updatedTrial::setAltHearingCourtLocationList);
 
-        caseData.setSdoR2Trial(trialBuilder.build());
+        caseData.setSdoR2Trial(updatedTrial);
     }
 
 }
