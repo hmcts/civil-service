@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.civil.model;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.dq.DQ;
 
 import java.time.LocalDateTime;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ClaimantResponseDetails {
 
     private DQ dq;

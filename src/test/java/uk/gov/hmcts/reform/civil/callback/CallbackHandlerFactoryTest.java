@@ -192,7 +192,7 @@ class CallbackHandlerFactoryTest {
             .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1").build()
+                new BusinessProcess().setActivityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1")
             )).build())
             .build();
 
@@ -215,7 +215,7 @@ class CallbackHandlerFactoryTest {
             .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("unProcessedTask").build()
+                new BusinessProcess().setActivityId("unProcessedTask")
             )).build())
             .build();
 
@@ -238,7 +238,7 @@ class CallbackHandlerFactoryTest {
             .eventId(CREATE_CLAIM.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("unProcessedTask").build()
+                new BusinessProcess().setActivityId("unProcessedTask")
             )).build())
             .build();
 
