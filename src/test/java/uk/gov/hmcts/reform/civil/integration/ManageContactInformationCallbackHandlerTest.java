@@ -865,10 +865,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         private static final String PARTY_ID = "party-id";
         private static final ContactDetailsUpdatedEvent EVENT =
-            ContactDetailsUpdatedEvent.builder()
-                .summary("Summary")
-                .description("Description")
-                .build();
+            new ContactDetailsUpdatedEvent()
+                .setSummary("Summary")
+                .setDescription("Description");
         private static MockedStatic partyIdMock;
 
         @BeforeAll
@@ -958,7 +957,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+                EVENT.copy().setSubmittedByCaseworker(YES), responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -1011,7 +1010,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(YES).build(),
+                EVENT.copy().setSubmittedByCaseworker(YES),
                 responseData.getContactDetailsUpdatedEvent()
             );
             verify(coreCaseDataService).triggerGeneralApplicationEvent(
@@ -1403,7 +1402,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(NO).build(), responseData.getContactDetailsUpdatedEvent());
+                EVENT.copy().setSubmittedByCaseworker(NO), responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -2214,9 +2213,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .build())
                     .applicant1(Party.builder()
                                     .type(INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .postCode(null)
-                                                        .build())
+                                    .primaryAddress(new Address())
                                     .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2425,6 +2422,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldReturnErrorForClaimantManageInformation(String partyChosenId) {
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -2436,22 +2440,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                             .build())
                                            .build())
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .addressLine1("Line 1 test again for more than 35 characters")
-                                                        .addressLine2("Line 1 test again for more than 35 characters")
-                                                        .addressLine3("Line 1 test again for more than 35 characters")
-                                                        .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("PostCode more than 8 characters")
-                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .primaryAddress(invalidAddress)
                                     .build())
                     .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .addressLine1("Line 1 test again for more than 35 characters")
-                                                        .addressLine2("Line 1 test again for more than 35 characters")
-                                                        .addressLine3("Line 1 test again for more than 35 characters")
-                                                        .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("PostCode more than 8 characters")
-                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .primaryAddress(invalidAddress)
                                     .build())
                     .build();
 
@@ -2542,6 +2534,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
             void shouldReturnErrorForDefendantManageInformation(String partyChosenId) {
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -2553,22 +2552,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                             .build())
                                            .build())
                     .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(Address.builder()
-                                                         .addressLine1("Line 1 test again for more than 35 characters")
-                                                         .addressLine2("Line 1 test again for more than 35 characters")
-                                                         .addressLine3("Line 1 test again for more than 35 characters")
-                                                         .county("Line 1 test again for more than 35 characters")
-                                                         .postCode("PostCode more than 8 characters")
-                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .primaryAddress(invalidAddress)
                                      .build())
                     .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(Address.builder()
-                                                         .addressLine1("Line 1 test again for more than 35 characters")
-                                                         .addressLine2("Line 1 test again for more than 35 characters")
-                                                         .addressLine3("Line 1 test again for more than 35 characters")
-                                                         .county("Line 1 test again for more than 35 characters")
-                                                         .postCode("PostCode more than 8 characters")
-                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .primaryAddress(invalidAddress)
                                      .build())
                     .build();
 

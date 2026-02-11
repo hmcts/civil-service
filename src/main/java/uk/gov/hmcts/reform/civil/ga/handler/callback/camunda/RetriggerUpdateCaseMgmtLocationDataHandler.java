@@ -53,6 +53,6 @@ public class RetriggerUpdateCaseMgmtLocationDataHandler extends BaseExternalTask
                 log.error("ERROR Re-trigger update epimsId for  CaseId: {}. ePimsId: {},  {}", caseId, epimsId, e.getMessage(), e);
             }
         }
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }
