@@ -91,17 +91,18 @@ class  SealedClaimFormGeneratorForSpecTest {
     }
 
     private Representative getRepresentative() {
+        Address serviceAddress = new Address();
+        serviceAddress.setAddressLine1("AdmiralHouse");
+        serviceAddress.setAddressLine2("Queensway");
+        serviceAddress.setPostTown("Newport");
+        serviceAddress.setPostCode("NP204AG");
+
         return new Representative()
             .setOrganisationName("MiguelSpooner")
             .setDxAddress("DX 751Newport")
             .setOrganisationName("DBE Law")
             .setEmailAddress("jim.smith@slatergordon.com")
-            .setServiceAddress(Address.builder()
-                                   .addressLine1("AdmiralHouse")
-                                   .addressLine2("Queensway")
-                                   .postTown("Newport")
-                                   .postCode("NP204AG")
-                                   .build());
+            .setServiceAddress(serviceAddress);
     }
 
     @Test
@@ -287,8 +288,7 @@ class  SealedClaimFormGeneratorForSpecTest {
                           .build())
             .timelineOfEvents(timelines)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder()
-                                           .differentRate(new BigDecimal(100)).differentRateReason("test").build())
+            .sameRateInterestSelection(buildSameRateSelection(new BigDecimal(100), "test"))
             .interestFromSpecificDate(LocalDate.now())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
             .fixedCosts(FixedCosts.builder()
@@ -347,7 +347,7 @@ class  SealedClaimFormGeneratorForSpecTest {
             .sdtRequestIdFromSdt("1234")
             .claimInterest(YesOrNo.YES)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
-            .sameRateInterestSelection(SameRateInterestSelection.builder().differentRate(new BigDecimal(5)).differentRateReason("Bulk Claim").build())
+            .sameRateInterestSelection(buildSameRateSelection(new BigDecimal(5), "Bulk Claim"))
             .interestFromSpecificDate(LocalDate.now().minusDays(10))
             .build();
 
@@ -361,6 +361,13 @@ class  SealedClaimFormGeneratorForSpecTest {
         assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
         verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME, bytes, SEALED_CLAIM));
         verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimFormForSpec.class), eq(N2));
+    }
+
+    private SameRateInterestSelection buildSameRateSelection(BigDecimal rate, String reason) {
+        SameRateInterestSelection selection = new SameRateInterestSelection();
+        selection.setDifferentRate(rate);
+        selection.setDifferentRateReason(reason);
+        return selection;
     }
 
 }

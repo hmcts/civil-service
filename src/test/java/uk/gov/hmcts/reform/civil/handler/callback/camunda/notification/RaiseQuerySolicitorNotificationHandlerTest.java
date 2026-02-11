@@ -194,7 +194,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
                                     .individualLastName("b").partyEmail("applicant@email.com").build())
                     .applicant1Represented(YesOrNo.NO)
-                    .qmLatestQuery(LatestQuery.builder().queryId("4").build())
+                    .qmLatestQuery(createLatestQuery("4"))
                     .build();
 
             CallbackParams params = callbackParamsOf(
@@ -227,7 +227,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                 createCaseDataWithQueries().toBuilder()
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
                                     .individualLastName("b").partyEmail("applicant@email.com").build())
-                    .qmLatestQuery(LatestQuery.builder().queryId("4").build())
+                    .qmLatestQuery(createLatestQuery("4"))
                     .claimantBilingualLanguagePreference(Language.WELSH.toString())
                     .applicant1Represented(YesOrNo.NO)
                     .build();
@@ -262,7 +262,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                 createCaseDataWithQueries().toBuilder()
                     .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
                                      .individualLastName("b").partyEmail("applicant@email.com").build())
-                    .qmLatestQuery(LatestQuery.builder().queryId("5").build())
+                    .qmLatestQuery(createLatestQuery("5"))
                     .defendantUserDetails(IdamUserDetails.builder().email("applicant@email.com").build())
                     .respondent1Represented(YesOrNo.NO)
                     .build();
@@ -285,25 +285,14 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     }
 
     private CaseData createCaseDataWithQueries() {
-        CaseQueriesCollection publicQueries = CaseQueriesCollection.builder()
-            .caseMessages(wrapElements(
-                CaseMessage.builder()
-                    .id("1")
-                    .build(),
-                CaseMessage.builder()
-                    .id("3")
-                    .build(),
-                CaseMessage.builder()
-                    .id("2")
-                    .build(),
-                CaseMessage.builder()
-                    .id("4")
-                    .build(),
-                CaseMessage.builder()
-                    .id("5")
-                    .build()
-            ))
-            .build();
+        CaseQueriesCollection publicQueries = new CaseQueriesCollection();
+        publicQueries.setCaseMessages(wrapElements(
+            createCaseMessage("1"),
+            createCaseMessage("3"),
+            createCaseMessage("2"),
+            createCaseMessage("4"),
+            createCaseMessage("5")
+        ));
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
@@ -313,10 +302,21 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(publicQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
+    }
+
+    private CaseMessage createCaseMessage(String id) {
+        CaseMessage caseMessage = new CaseMessage();
+        caseMessage.setId(id);
+        return caseMessage;
+    }
+
+    private LatestQuery createLatestQuery(String queryId) {
+        LatestQuery latestQuery = new LatestQuery();
+        latestQuery.setQueryId(queryId);
+        return latestQuery;
     }
 
     @NotNull

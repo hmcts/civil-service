@@ -240,8 +240,8 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_claimantRequestedCountyCourtJudgementCui_whenGetStatus_thenReturnRequestedCountryCourtJudgement() {
         CaseData claim = CaseData.builder()
-            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                   .ccjJudgmentStatement("test").build())
+            .ccjPaymentDetails(new CCJPaymentDetails()
+                                   .setCcjJudgmentStatement("test"))
             .build();
 
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -791,10 +791,9 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_defendantHasNoticeOfChange_whenGetStatus_thenReturnDefendantNoticeOfChangeApply() {
         CaseData claim = CaseData.builder().takenOfflineDate(LocalDateTime.now()).ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.FINISHED)
-                                 .camundaEvent(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name())
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.FINISHED)
+                                 .setCamundaEvent(CaseEvent.APPLY_NOC_DECISION_DEFENDANT_LIP.name()))
             .build();
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         DashboardClaimStatus status =
@@ -810,8 +809,8 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_defaultJudgementStatusIssuedByClaimant_thenReturnDefaultJudgementStatus() {
         CaseData claim =
             CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1)).activeJudgment(
-                JudgmentDetails.builder().type(JudgmentType.DEFAULT_JUDGMENT).issueDate(LocalDate.now())
-                    .state(JudgmentState.ISSUED).build()).defaultJudgmentDocuments(List.of(
+                new JudgmentDetails().setType(JudgmentType.DEFAULT_JUDGMENT).setIssueDate(LocalDate.now())
+                    .setState(JudgmentState.ISSUED)).defaultJudgmentDocuments(List.of(
                 Element.<CaseDocument>builder()
                     .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
                                .createdDatetime(LocalDateTime.now()).build()).build())).build();

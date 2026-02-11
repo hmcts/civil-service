@@ -35,6 +35,9 @@ import uk.gov.hmcts.reform.civil.sampledata.AddressBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ClaimPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DivergencePredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.ResponsePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
@@ -55,8 +58,7 @@ import static uk.gov.hmcts.reform.civil.enums.FeeType.CLAIMISSUED;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.divergentRespondGoOfflineSpec;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.specClaim;
+
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.ALL_RESPONSES_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED;
 import static uk.gov.hmcts.reform.civil.service.flowstate.FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED;
@@ -1345,10 +1347,11 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnClaimDismissed_whenCaseDataAtStateClaimAcknowledgeAndCcdStateIsDismissed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDate(LocalDateTime.now())
                 .claimDismissedDeadline(LocalDateTime.now().minusHours(4))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
 
             // When
@@ -3139,9 +3142,10 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnClaimDismissedPastDeadline_whenDeadlinePassedAfterStateNotificationAcknowledged() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .build();
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
@@ -3177,9 +3181,10 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnDismissedState_whenDeadlinePassedAfterNotificationAcknowledgedAndProcessedByCamunda() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .claimDismissedDeadline(LocalDateTime.now().minusDays(5))
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .claimDismissedDate(LocalDateTime.now())
                 .build();
 
@@ -3833,9 +3838,9 @@ class SimpleStateFlowEngineTest {
             caseData.setRespondent1ResponseDate(LocalDateTime.now());
             caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
             caseData.setRespondentResponseIsSame(YES);
-            assertThat(FlowPredicate.fullAdmissionSpec.test(caseData))
+            assertThat(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_ADMISSION).test(caseData))
                 .isTrue();
-            assertThat(divergentRespondGoOfflineSpec.and(specClaim).test(caseData))
+            assertThat(DivergencePredicate.divergentRespondGoOfflineSpec.and(ClaimPredicate.isSpec).test(caseData))
                 .isFalse();
         }
 
@@ -4460,9 +4465,11 @@ class SimpleStateFlowEngineTest {
         @Test
         void shouldReturnTakenOfflineSDONotDrawn_whenTransitionedFromMediationUnsuccessfulProceed() {
             // Given
+            ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+            reasonNotSuitableSDO.setInput("Unsuitable");
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
-                .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Unsuitable").build())
+                .reasonNotSuitableSDO(reasonNotSuitableSDO)
                 .takenOfflineDate(LocalDateTime.now())
                 .build();
 

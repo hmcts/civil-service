@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.model.robotics;
 
-import lombok.experimental.SuperBuilder;
-
-@SuperBuilder
 public class SolicitorSpec extends Solicitor {
 
     public RoboticsAddresses getCorrespondenceAddresses() {

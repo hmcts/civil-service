@@ -1,0 +1,49 @@
+name: Update email notification docs
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  regenerate-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Checkout civil-ccd-definition
+        uses: actions/checkout@v4
+        with:
+          repository: hmcts/civil-ccd-definition
+          path: ../civil-ccd-definition
+          fetch-depth: 0
+      - name: Checkout civil-general-apps-ccd-definition
+        uses: actions/checkout@v4
+        with:
+          repository: hmcts/civil-general-apps-ccd-definition
+          path: ../civil-general-apps-ccd-definition
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Regenerate docs
+        run: python3 scripts/generate_email_notifications_table.py --ccd-definition-root ../civil-ccd-definition/ccd-definition --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition
+
+      - name: Commit changes
+        run: |
+          if git diff --quiet docs/email-notifications.md docs/email-notifications.html; then
+            echo "No doc changes detected"
+            exit 0
+          fi
+          git config user.name "civil-service-bot"
+          git config user.email "civil-service-bot@users.noreply.github.com"
+          git add docs/email-notifications.md docs/email-notifications.html
+          git commit -m "chore: regenerate email notification docs"
+          git push origin HEAD:master
