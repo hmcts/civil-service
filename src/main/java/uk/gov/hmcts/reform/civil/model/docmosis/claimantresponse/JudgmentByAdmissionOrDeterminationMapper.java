@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExte
 import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
