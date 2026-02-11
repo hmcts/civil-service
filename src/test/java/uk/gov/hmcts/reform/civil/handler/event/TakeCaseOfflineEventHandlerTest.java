@@ -50,7 +50,7 @@ class TakeCaseOfflineEventHandlerTest {
         Long caseId = 1633357679902210L;
 
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         VariableMap variables = Variables.createVariables();
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");

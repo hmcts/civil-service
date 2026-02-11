@@ -275,14 +275,14 @@ public class JudgmentsOnlineHelper {
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
 
-        Address newAddress = Address.builder()
-            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
-            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
-            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
-            .postCode(removeWelshCharacters(address.getPostCode()))
-            .postTown(removeWelshCharacters(address.getPostTown()))
-            .county(removeWelshCharacters(address.getCounty()))
-            .country(removeWelshCharacters(address.getCountry())).build();
+        Address newAddress = new Address();
+        newAddress.setAddressLine1(removeWelshCharacters(address.getAddressLine1()));
+        newAddress.setAddressLine2(removeWelshCharacters(address.getAddressLine2()));
+        newAddress.setAddressLine3(removeWelshCharacters(address.getAddressLine3()));
+        newAddress.setPostCode(removeWelshCharacters(address.getPostCode()));
+        newAddress.setPostTown(removeWelshCharacters(address.getPostTown()));
+        newAddress.setCounty(removeWelshCharacters(address.getCounty()));
+        newAddress.setCountry(removeWelshCharacters(address.getCountry()));
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
         JudgmentAddress judgmentAddress = new JudgmentAddress();
