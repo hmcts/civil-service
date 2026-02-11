@@ -2,10 +2,11 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -34,35 +35,34 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
-@SpringBootTest(classes = {
-    HearingScheduledNotificationService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class HearingScheduledNotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private HearingScheduledNotificationService hearingScheduledNotificationService;
-    @MockBean
+    @Mock
     private SolicitorEmailValidation solicitorEmailValidation;
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
 
     private static final Long CASE_REFERENCE = 111111L;

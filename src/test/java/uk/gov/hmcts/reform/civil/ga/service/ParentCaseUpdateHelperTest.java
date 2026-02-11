@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -63,22 +65,19 @@ import static uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper.DOCUME
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    ParentCaseUpdateHelper.class,
-    ObjectMapper.class,
-})
+@ExtendWith(MockitoExtension.class)
 class ParentCaseUpdateHelperTest {
 
-    @Autowired
-    ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
-    GaCoreCaseDataService coreCaseDataService;
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @Autowired
-    ObjectMapper objectMapper;
+    @InjectMocks
+    private ParentCaseUpdateHelper parentCaseUpdateHelper;
+    @Mock
+    private GaCoreCaseDataService coreCaseDataService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
     @Captor
     private ArgumentCaptor<Map<String, Object>> mapCaptor;
 
@@ -643,7 +642,6 @@ class ParentCaseUpdateHelperTest {
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "Claimant",
             AWAITING_APPLICATION_PAYMENT,
@@ -669,7 +667,6 @@ class ParentCaseUpdateHelperTest {
                                                                                   .build()).build()).build());
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "RespondentSol",
             AWAITING_APPLICATION_PAYMENT,

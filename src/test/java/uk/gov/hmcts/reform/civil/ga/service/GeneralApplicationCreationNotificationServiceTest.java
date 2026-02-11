@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -50,38 +52,38 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
-@SpringBootTest(classes = {
-    GeneralApplicationCreationNotificationService.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 public class GeneralApplicationCreationNotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private GeneralApplicationCreationNotificationService gaNotificationService;
-    @MockBean
+    @Mock
     private SolicitorEmailValidation solicitorEmailValidation;
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
+    @Spy
+    private GaForLipService gaForLipService;
     @Captor
     ArgumentCaptor<Map<String, String>> argumentCaptor;
 

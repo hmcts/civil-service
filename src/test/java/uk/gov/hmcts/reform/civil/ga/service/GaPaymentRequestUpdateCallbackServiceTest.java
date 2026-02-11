@@ -2,13 +2,16 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -37,6 +40,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PROCESS_GASPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_ADD_PAYMENT;
@@ -47,37 +51,35 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_CASE_ISSUED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-@SpringBootTest(classes = {
-    GaPaymentRequestUpdateCallbackService.class,
-    JacksonAutoConfiguration.class,
-
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 class GaPaymentRequestUpdateCallbackServiceTest {
 
     private static final String PAID = "Paid";
-    private static final String NOT_PAID = "NotPaid";
     private static final String CASE_ID = "12345";
     public static final String REFERENCE = "123445";
     public static final String ACCOUNT_NUMBER = "123445555";
     public static final String TOKEN = "1234";
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     @Mock
-    ObjectMapper objectMapper;
-    @MockBean
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private GeneralApplicationCreationNotificationService gaNotificationService;
 
-    @MockBean
+    @Mock
     private JudicialNotificationService judicialNotificationService;
-    @MockBean
+    @Mock
     Time time;
-    @Autowired
+    @InjectMocks
     GaPaymentRequestUpdateCallbackService paymentRequestUpdateCallbackService;
-    @MockBean
+    @Mock
     StateGeneratorService stateGeneratorService;
 
-    @MockBean
+    @Mock
     CaseDetailsConverter caseDetailsConverter;
 
     @BeforeEach

@@ -5,14 +5,13 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -25,9 +24,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {JacksonAutoConfiguration.class, CaseDetailsConverter.class})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 class GaEventEmitterServiceTest {
 
     @Mock
@@ -36,10 +37,10 @@ class GaEventEmitterServiceTest {
     @Mock
     private RemoteProcessEngineException mockedRemoteProcessEngineException;
 
-    @MockBean
+    @Mock
     private RuntimeService runtimeService;
 
-    @MockBean
+    @Mock
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
     private GaEventEmitterService eventEmitterService;

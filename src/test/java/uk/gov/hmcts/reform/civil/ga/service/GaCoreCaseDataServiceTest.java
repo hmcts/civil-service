@@ -6,11 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -48,43 +48,39 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService.CASE_ID;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GaCoreCaseDataService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GeneralAppLocationRefDataService.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 class GaCoreCaseDataServiceTest {
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
     private static final String SERVICE_AUTH_TOKEN = "Bearer service-xyz";
     private static final String CASE_TYPE = "CIVIL";
 
-    @MockBean
+    @Mock
     private SystemUpdateUserConfiguration userConfig;
 
-    @MockBean
+    @Mock
     private CoreCaseDataApi coreCaseDataApi;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private UserService userService;
 
-    @MockBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @Autowired
+    @InjectMocks
     private GaCoreCaseDataService service;
 
-    @MockBean
+    @Mock
     private GeneralAppLocationRefDataService locationRefDataService;
 
     @BeforeEach
