@@ -30,13 +30,14 @@ public class AddressUtils {
     }
 
     public static Address getAddress(ContactInformation address) {
-        return Address.builder().addressLine1(address.getAddressLine1())
-            .addressLine2(Objects.toString(address.getAddressLine2(), ""))
-            .addressLine3(Objects.toString(address.getAddressLine3(), ""))
-            .country(address.getCountry())
-            .county(address.getCounty())
-            .postCode(address.getPostCode())
-            .postTown(address.getTownCity())
-            .build();
+        Address result = new Address();
+        result.setAddressLine1(address.getAddressLine1());
+        result.setAddressLine2(Objects.toString(address.getAddressLine2(), ""));
+        result.setAddressLine3(Objects.toString(address.getAddressLine3(), ""));
+        result.setCountry(address.getCountry());
+        result.setCounty(address.getCounty());
+        result.setPostCode(address.getPostCode());
+        result.setPostTown(address.getTownCity());
+        return result;
     }
 }
