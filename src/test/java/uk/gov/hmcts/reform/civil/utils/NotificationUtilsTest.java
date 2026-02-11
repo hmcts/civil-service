@@ -356,7 +356,7 @@ class NotificationUtilsTest {
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLR(boolean isApplicantLip) {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted().applicant1(Party.builder().partyEmail(null).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantsolicitor@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantsolicitor@example.com"))
             .build();
 
         if (isApplicantLip) {
@@ -371,7 +371,7 @@ class NotificationUtilsTest {
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().partyEmail("lipapplicant@example.com").build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(null))
             .build();
 
         if (!isApplicantLip) {

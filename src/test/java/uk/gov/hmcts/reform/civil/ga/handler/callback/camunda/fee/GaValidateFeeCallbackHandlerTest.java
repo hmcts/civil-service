@@ -28,8 +28,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.VALIDATE_FEE_GASPEC;
 class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String VERSION = "1";
-    private static final Fee FEE108 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(10800)).code("FEE0443").version(VERSION).build();
+    private static final Fee FEE108 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(10800)).setCode("FEE0443").setVersion(VERSION);
     private static final String TASK_ID = "GeneralApplicationValidateFee";
     @Autowired
     private GaValidateFeeCallbackHandler handler;

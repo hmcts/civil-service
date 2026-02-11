@@ -135,8 +135,8 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             any(),
             any()
         )).willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
-        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(1000)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(new Fee().setCalculatedAmountInPence(
+            BigDecimal.valueOf(1000)));
 
         // when
         generator.generateAndPrintRecordJudgmentDeterminationOfMeansLetter(caseData, BEARER_TOKEN);
@@ -165,9 +165,9 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             .buildJudgmentOnlineCaseDataWithDeterminationMeans();
 
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1400)));
         //When
         RecordJudgmentDeterminationOfMeansLiPDefendantLetter recordJudgmentDeterminationOfMeansLiPDefendantLetter
             = generator.getTemplateData(caseData);

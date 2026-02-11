@@ -3623,7 +3623,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     public GeneralApplicationCaseData getDirectionsText(YesOrNo hasRespondentResponseVul) {
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3645,7 +3645,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     public GeneralApplicationCaseData getMakeAnOrder(YesOrNo hasRespondentResponseVul) {
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3667,7 +3667,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                 YesOrNo hasAgreed) {
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(hasAgreed).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3699,7 +3699,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                  YesOrNo hasRespondentResponseVul) {
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3745,7 +3745,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .add(element(GASolicitorDetailsGAspec.builder().id("2L").build()));
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3794,7 +3794,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .add(element(GASolicitorDetailsGAspec.builder().id("2L").build()));
 
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3927,7 +3927,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .parentClaimantIsApplicant(parentClaimantIsApplicant)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())

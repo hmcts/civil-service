@@ -133,7 +133,7 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
         void shouldLinkGAParentCaseLinkWhenParentCaseReferenceIsEmpty() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink())
                 .build();
 
             VariableMap variables = Variables.createVariables();

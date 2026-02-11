@@ -62,7 +62,7 @@ class NotificationHelperTest {
             .hearingDate(LocalDate.of(2024, 6, 1))
             .hearingDueDate(LocalDate.of(2024, 5, 20))
             .hearingTimeHourMinute("10:30")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .build();
@@ -143,8 +143,8 @@ class NotificationHelperTest {
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .addApplicant2(YesOrNo.YES)
             .build();
 
@@ -216,8 +216,8 @@ class NotificationHelperTest {
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                                         .setOrganisationToAddID("orgAdd")
@@ -241,8 +241,8 @@ class NotificationHelperTest {
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                                         .setOrganisationToAddID("orgAdd")

@@ -80,12 +80,12 @@ class CaseDismissClaimantNotificationHandlerTest {
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build());
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"));
     }
 
     private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
@@ -94,7 +94,7 @@ class CaseDismissClaimantNotificationHandlerTest {
                                              : Language.ENGLISH.toString());
         return commonCaseData()
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString()
                                                      : Language.ENGLISH.toString())
             .build().toBuilder()

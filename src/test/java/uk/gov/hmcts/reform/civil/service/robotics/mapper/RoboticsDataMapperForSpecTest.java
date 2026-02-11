@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -55,7 +56,7 @@ class RoboticsDataMapperForSpecTest {
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(createPartyWithCompany("company 1"))
             .respondent1(createPartyWithCompany("company 2"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(new BreathingSpaceInfo()
@@ -82,7 +83,7 @@ class RoboticsDataMapperForSpecTest {
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(createPartyWithCompany("company 1"))
             .respondent1(createPartyWithCompany("company 2"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
             .build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
         caseData.setBreathing(new BreathingSpaceInfo()
@@ -127,7 +128,7 @@ class RoboticsDataMapperForSpecTest {
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(createPartyWithCompany("company 1"))
             .respondent1(createPartyWithCompany("company 2"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(new BreathingSpaceInfo()
@@ -172,7 +173,7 @@ class RoboticsDataMapperForSpecTest {
             .totalClaimAmount(BigDecimal.valueOf(15000_00))
             .applicant1(createPartyWithCompany("company 1"))
             .respondent1(createPartyWithCompany("company 2"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now().minusDays(14));
         caseData.setBreathing(new BreathingSpaceInfo()
@@ -206,7 +207,7 @@ class RoboticsDataMapperForSpecTest {
             .totalClaimAmount(BigDecimal.valueOf(10000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@email.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now());
 
@@ -219,13 +220,13 @@ class RoboticsDataMapperForSpecTest {
     void shouldReturnCalculatedCourtFee_whenNoHwfDetailsProvided() {
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
-            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
-                          .calculatedAmountInPence(BigDecimal.valueOf(10000)) // £100
-                          .build())
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(BigDecimal.valueOf(10000)) // £100
+                          )
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@email.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now());
 
@@ -240,15 +241,15 @@ class RoboticsDataMapperForSpecTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
-            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
-                          .calculatedAmountInPence(fullFee)
-                          .build())
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(fullFee)
+                          )
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setRemissionAmount(fullFee))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@email.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now());
 
@@ -261,15 +262,15 @@ class RoboticsDataMapperForSpecTest {
     void shouldReturnOutstandingFee_whenHwfOutstandingFeeIsPresent() {
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
-            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
-                          .calculatedAmountInPence(BigDecimal.valueOf(30000)) // £300
-                          .build())
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(BigDecimal.valueOf(30000)) // £300
+                          )
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setOutstandingFeeInPounds(BigDecimal.valueOf(120)))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@email.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now());
 
@@ -285,15 +286,15 @@ class RoboticsDataMapperForSpecTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .legacyCaseReference("reference")
-            .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
-                          .calculatedAmountInPence(fullFee)
-                          .build())
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(fullFee)
+                          )
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setRemissionAmount(remission))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@email.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@email.com"))
             .build();
         caseData.setSubmittedDate(LocalDateTime.now());
 

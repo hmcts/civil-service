@@ -95,9 +95,8 @@ public class OrderMadeClaimantScenarioTest extends DashboardBaseIntegrationTest 
             .responseClaimTrack(FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
-                           .build())
+            .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
+                           )
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);

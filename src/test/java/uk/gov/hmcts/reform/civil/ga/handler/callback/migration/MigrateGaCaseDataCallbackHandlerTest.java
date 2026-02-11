@@ -95,8 +95,8 @@ public class MigrateGaCaseDataCallbackHandlerTest extends GeneralApplicationBase
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .build();
     }
 

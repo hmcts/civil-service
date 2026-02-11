@@ -55,8 +55,8 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsGa() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                             .build())
                     .gaHwfDetails(HelpWithFeesDetails.builder()
                             .remissionAmount(BigDecimal.valueOf(1000))
@@ -81,8 +81,8 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                             .build())
                     .additionalHwfDetails(HelpWithFeesDetails.builder()
                             .remissionAmount(BigDecimal.valueOf(1000))
@@ -108,9 +108,9 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
                         .build())
                 .gaHwfDetails(HelpWithFeesDetails.builder()
                         .remissionAmount(BigDecimal.valueOf(-1000))
@@ -132,9 +132,9 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
                         .build())
                 .additionalHwfDetails(HelpWithFeesDetails.builder()
                         .remissionAmount(BigDecimal.valueOf(-1000))
@@ -157,9 +157,9 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
         //Given
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
                         .build())
                 .additionalHwfDetails(HelpWithFeesDetails.builder()
                         .remissionAmount(BigDecimal.valueOf(35000))

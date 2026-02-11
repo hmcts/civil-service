@@ -159,8 +159,8 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
-        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(1000)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(new Fee().setCalculatedAmountInPence(
+            BigDecimal.valueOf(1000)));
         when(civilStitchService.generateStitchedCaseDocument(anyList(), anyString(), anyLong(), eq(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER),
                                                              anyString())).thenReturn(STITCHED_DOC);
 
@@ -184,11 +184,11 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     void shouldGetTemplateFeesCorrectly() {
         //Given
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(SET_ASIDE_JUDGEMENT))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30300)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30300)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1400)));
         //When
         DefaultJudgmentNonDivergentSpecLipDefendantLetter defaultJudgmentNonDivergentSpecLipDefendantLetter
             = generator.getTemplateData(CASE_DATA);

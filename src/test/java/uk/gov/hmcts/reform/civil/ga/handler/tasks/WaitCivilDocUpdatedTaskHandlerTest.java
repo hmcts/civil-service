@@ -101,7 +101,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
                 .documentType(DocumentType.GENERAL_APPLICATION_DRAFT).documentSize(12L).build();
         gaCaseData = GeneralApplicationCaseData.builder()
                 .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink.builder().caseReference("123").build())
+                        new GeneralAppParentCaseLink().setCaseReference("123"))
                 .gaDraftDocument(ElementUtils.wrapElements(caseDocumentNow))
                 .build();
         civilCaseDataEmpty = GeneralApplicationCaseData.builder().build();

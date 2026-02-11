@@ -113,12 +113,12 @@ public class GeneralApplicationCaseDataBuilder {
         .builder().label("sitename - location name - D12 8997").build();
 
     private static final String HEARING_SCHEDULED = "HEARING_SCHEDULED_GA";
-    private static final Fee FEE108 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(10800)).code("FEE0443").version("1").build();
-    private static final Fee FEE14 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(1400)).code("FEE0458").version("2").build();
-    private static final Fee FEE275 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(27500)).code("FEE0442").version("1").build();
+    private static final Fee FEE108 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(10800)).setCode("FEE0443").setVersion("1");
+    private static final Fee FEE14 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(1400)).setCode("FEE0458").setVersion("2");
+    private static final Fee FEE275 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(27500)).setCode("FEE0442").setVersion("1");
     public static final String STRING_CONSTANT = "this is a string";
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
 
@@ -462,11 +462,11 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppSuperClaimType("UNSPEC_CLAIM")
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
@@ -495,11 +495,11 @@ public class GeneralApplicationCaseDataBuilder {
                                         .customerReference(CUSTOMER_REFERENCE)
                                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .parentClaimantIsApplicant(YES)
@@ -530,11 +530,11 @@ public class GeneralApplicationCaseDataBuilder {
                                         .customerReference(CUSTOMER_REFERENCE)
                                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
@@ -564,11 +564,11 @@ public class GeneralApplicationCaseDataBuilder {
                                         .customerReference(CUSTOMER_REFERENCE)
                                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
@@ -617,11 +617,11 @@ public class GeneralApplicationCaseDataBuilder {
                                         .customerReference(CUSTOMER_REFERENCE)
                                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
@@ -647,11 +647,11 @@ public class GeneralApplicationCaseDataBuilder {
                                         .customerReference(CUSTOMER_REFERENCE)
                                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
@@ -773,7 +773,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> consentOrderApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -806,7 +806,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> finalOrderFreeForm() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -854,7 +854,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> generalOrderApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -956,7 +956,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("1")
@@ -983,7 +983,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dismissalOrderApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1013,15 +1013,12 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> hearingOrderApplication(YesOrNo isAgreed, YesOrNo isWithNotice) {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
             .judicialListForHearing(GAJudgesHearingListGAspec.builder()
                                         .hearingPreferredLocation(DynamicList.builder()
                                                                       .value(selectedLocation).listItems(listItems)
@@ -1077,7 +1074,7 @@ public class GeneralApplicationCaseDataBuilder {
         respondentSols.add(element(respondent2));
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .judicialListForHearing(GAJudgesHearingListGAspec.builder()
                                         .hearingPreferredLocation(DynamicList.builder()
                                                                       .value(selectedLocation).listItems(listItems)
@@ -1091,11 +1088,8 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(HEARING_SCHEDULED))
             .generalAppPBADetails(
@@ -1153,7 +1147,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationSequentialApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1215,7 +1209,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationConcurrentApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1249,7 +1243,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> requestForInformationApplication() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .locationName("Nottingham County Court and Family Court (and Crown)")
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
@@ -1322,11 +1316,8 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .isGaRespondentOneLip(NO)
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(JUDGES_DECISION))
             .generalAppPBADetails(

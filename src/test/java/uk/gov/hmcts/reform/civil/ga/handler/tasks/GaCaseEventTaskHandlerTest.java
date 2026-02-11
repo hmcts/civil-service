@@ -190,7 +190,7 @@ class GaCaseEventTaskHandlerTest {
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitGaUpdate(any(), any()))
                 .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
-                    GeneralAppParentCaseLink.builder().caseReference("123").build()).build());
+                    new GeneralAppParentCaseLink().setCaseReference("123")).build());
             doThrow(new NotFoundException(errorMessage, new RestException(null, null, null)))
                 .when(externalTaskService).complete(mockTask);
 

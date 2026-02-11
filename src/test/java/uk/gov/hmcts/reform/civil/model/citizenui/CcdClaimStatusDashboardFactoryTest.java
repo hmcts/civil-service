@@ -348,11 +348,9 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_mediation_whenGetSatus_mediationSuccessful() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
-            .mediation(Mediation.builder()
-                           .mediationSuccessful(MediationSuccessful.builder()
-                                                    .mediationAgreement(MediationAgreementDocument.builder().build())
-                                                    .build())
-                           .build())
+            .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful().setMediationAgreement(new MediationAgreementDocument())
+                                                    )
+                           )
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -365,9 +363,8 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ResponseDate(LocalDateTime.now())
-            .mediation(Mediation.builder()
-                           .unsuccessfulMediationReason("this is a reason")
-                           .build())
+            .mediation(new Mediation().setUnsuccessfulMediationReason("this is a reason")
+                           )
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -380,10 +377,8 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .ccdState(CaseState.IN_MEDIATION)
-            .mediation(Mediation.builder()
-                           .mediationSuccessful(MediationSuccessful.builder()
-                                                    .build())
-                           .build())
+            .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful())
+                           )
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));

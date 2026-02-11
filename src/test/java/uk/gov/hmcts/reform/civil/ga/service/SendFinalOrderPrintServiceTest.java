@@ -72,7 +72,7 @@ class SendFinalOrderPrintServiceTest {
                 .defendant1PartyName("defendant1")
                 .ccdCaseReference(12345L)
                 .applicationIsCloaked(YesOrNo.NO)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .build();
     }
 

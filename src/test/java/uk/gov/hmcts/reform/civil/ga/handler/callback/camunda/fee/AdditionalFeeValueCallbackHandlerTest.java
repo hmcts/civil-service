@@ -39,8 +39,8 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption
 class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String VERSION = "1";
-    private static final Fee FEE167 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(16700)).code("FEE0444").version(VERSION).build();
+    private static final Fee FEE167 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(16700)).setCode("FEE0444").setVersion(VERSION);
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_167 = BigDecimal.valueOf(16700);
     public static final String TEST_FEE_CODE = "test_fee_code";
     public static final String SOME_EXCEPTION = "Some Exception";
@@ -80,8 +80,8 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     @Test
     void shouldReturnAdditionalFeeValue_WhenApplicationUncloaked() {
         when(generalAppFeesService.getFeeForGA(any(), any(), any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(
-                TEST_FEE_AMOUNT_POUNDS_167).code(TEST_FEE_CODE).version(VERSION).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(
+                TEST_FEE_AMOUNT_POUNDS_167).setCode(TEST_FEE_CODE).setVersion(VERSION));
 
         var caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(
@@ -94,11 +94,11 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-        Fee expectedFeeDto = Fee.builder()
-                .calculatedAmountInPence(TEST_FEE_AMOUNT_POUNDS_167)
-                .code(TEST_FEE_CODE)
-                .version(VERSION)
-                .build();
+        Fee expectedFeeDto = new Fee()
+                .setCalculatedAmountInPence(TEST_FEE_AMOUNT_POUNDS_167)
+                .setCode(TEST_FEE_CODE)
+                .setVersion(VERSION)
+                ;
 
         assertThat(extractAdditionalUncloakFee(response)).isEqualTo(expectedFeeDto);
     }
@@ -106,8 +106,8 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     @Test
     void shouldNotGetAdditionalFeeValue_WhenApplicationIsNotUncloaked() {
         when(generalAppFeesService.getFeeForGA(any(), any(), any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(
-                BigDecimal.valueOf(16700)).code("").version(VERSION).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(
+                BigDecimal.valueOf(16700)).setCode("").setVersion(VERSION));
 
         var caseData = GeneralApplicationCaseDataBuilder.builder()
             .requestForInformationApplication()
@@ -121,8 +121,8 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     @Test
     void shouldSetAppplicationFeeAmount_WhenApplicationUncloaked() {
         when(generalAppFeesService.getFeeForGA(any(), any(), any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(
-                TEST_FEE_AMOUNT_POUNDS_167).code(TEST_FEE_CODE).version(VERSION).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(
+                TEST_FEE_AMOUNT_POUNDS_167).setCode(TEST_FEE_CODE).setVersion(VERSION));
 
         var caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(

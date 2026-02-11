@@ -227,10 +227,9 @@ public class SolicitorEmailValidationTest {
                                           .email(DUMMY_EMAIL).organisationIdentifier("1").build())
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email(applicantEmail)
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail(applicantEmail))
             .applicant1OrganisationPolicy(OrganisationPolicy.builder()
                                               .organisation(Organisation.builder().organisationID("1").build())
                                               .build())
@@ -244,16 +243,14 @@ public class SolicitorEmailValidationTest {
             .build();
         var builder = caseData.toBuilder();
         if (Objects.nonNull(lipClEmail)) {
-            builder.claimantUserDetails(IdamUserDetails.builder()
-                    .id("123")
-                    .email(lipClEmail)
-                    .build());
+            builder.claimantUserDetails(new IdamUserDetails()
+                    .setId("123")
+                    .setEmail(lipClEmail));
         }
         if (Objects.nonNull(lipDefEmail)) {
-            builder.defendantUserDetails(IdamUserDetails.builder()
-                    .id("1")
-                    .email(lipDefEmail)
-                    .build());
+            builder.defendantUserDetails(new IdamUserDetails()
+                    .setId("1")
+                    .setEmail(lipDefEmail));
         }
         return builder.build();
     }

@@ -41,7 +41,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testGetOtherSolicitor1ReturnsApplicant1Details() {
         change.setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
-        IdamUserDetails userDetails = IdamUserDetails.builder().email(TEST_EMAIL).build();
+        IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID(TEST_ORG).build())
             .build();
@@ -74,7 +74,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testGetOtherSolicitor1ReturnsApplicant() {
         change.setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
-        IdamUserDetails userDetails = IdamUserDetails.builder().email(TEST_EMAIL).build();
+        IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID(TEST_ORG).build())
             .build();
@@ -117,7 +117,7 @@ public class NocNotificationUtilsTest {
     @Test
     void testGetOtherSolicitor2ReturnsApplicant2_2v1() {
         change.setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-        IdamUserDetails userDetails = IdamUserDetails.builder().email(TEST_EMAIL).build();
+        IdamUserDetails userDetails = new IdamUserDetails().setEmail(TEST_EMAIL);
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID(TEST_ORG).build())
             .build();

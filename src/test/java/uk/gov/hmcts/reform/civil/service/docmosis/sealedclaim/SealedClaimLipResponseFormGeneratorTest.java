@@ -571,16 +571,13 @@ class SealedClaimLipResponseFormGeneratorTest {
             .specDefendant1Debts(Respondent1DebtLRspec.builder()
                                      .hasLoanCardDebt(YesOrNo.YES)
                                      .loanCardDebtDetails(ElementUtils.wrapElements(
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 1")
-                                             .totalOwed(BigDecimal.valueOf(500))
-                                             .monthlyPayment(BigDecimal.valueOf(50))
-                                             .build(),
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 2")
-                                             .totalOwed(BigDecimal.valueOf(1500))
-                                             .monthlyPayment(BigDecimal.valueOf(200))
-                                     .build()
+                                         new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 1")
+                                             .setTotalOwed(BigDecimal.valueOf(500))
+                                             .setMonthlyPayment(BigDecimal.valueOf(50)),
+                                         new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 2")
+                                             .setTotalOwed(BigDecimal.valueOf(1500))
+                                             .setMonthlyPayment(BigDecimal.valueOf(200))
+                                     
                                      ))
                                      .debtDetails(ElementUtils.wrapElements(
                                          new DebtLRspec()

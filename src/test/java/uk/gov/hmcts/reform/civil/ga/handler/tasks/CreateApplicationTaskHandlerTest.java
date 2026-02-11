@@ -662,7 +662,7 @@ public class CreateApplicationTaskHandlerTest {
 
             when(coreCaseDataService.submitUpdate(any(), any()))
                 .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
-                    GeneralAppParentCaseLink.builder().caseReference("123").build()).build());
+                    new GeneralAppParentCaseLink().setCaseReference("123")).build());
 
             createApplicationTaskHandler.execute(mockTask, externalTaskService);
 
