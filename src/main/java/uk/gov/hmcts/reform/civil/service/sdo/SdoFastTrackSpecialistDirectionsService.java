@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -31,6 +31,10 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_INTRO_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE;
@@ -44,17 +48,27 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO;
 
 @Service
-@RequiredArgsConstructor
 public class SdoFastTrackSpecialistDirectionsService {
 
     private final SdoDeadlineService deadlineService;
+    private final boolean otherRemedyEnabled;
+
+    public SdoFastTrackSpecialistDirectionsService(SdoDeadlineService deadlineService,
+                                                   @Value("${other_remedy.enabled:false}") boolean otherRemedyEnabled) {
+        this.deadlineService = deadlineService;
+        this.otherRemedyEnabled = otherRemedyEnabled;
+    }
 
     public void populateSpecialistDirections(CaseData caseData) {
         caseData.setFastTrackBuildingDispute(buildBuildingDispute());
         caseData.setFastTrackClinicalNegligence(buildClinicalNegligence());
         caseData.setSdoR2FastTrackCreditHire(buildCreditHire());
         caseData.setFastTrackCreditHire(buildFastTrackCreditHire());
-        caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
+        if (otherRemedyEnabled) {
+            caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
+        } else {
+            caseData.setFastTrackHousingDisrepair(buildFastTrackHousingDisrepairAsHousingDisrepair());
+        }
         caseData.setFastTrackPersonalInjury(buildPersonalInjury());
         caseData.setFastTrackRoadTrafficAccident(buildRoadTrafficAccident());
     }
@@ -122,7 +136,17 @@ public class SdoFastTrackSpecialistDirectionsService {
             .build();
     }
 
-    //ToDo: Need to discuss with Ruban
+    private HousingDisrepair buildFastTrackHousingDisrepairAsHousingDisrepair() {
+        HousingDisrepair housingDisrepair = new HousingDisrepair();
+        housingDisrepair.setInput1(HOUSING_SCHEDULE_INTRO_SDO);
+        housingDisrepair.setInput2(HOUSING_SCHEDULE_COLUMNS_SDO);
+        housingDisrepair.setInput3(HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION);
+        housingDisrepair.setDate1(deadlineService.nextWorkingDayFromNowWeeks(10));
+        housingDisrepair.setInput4(HOUSING_SCHEDULE_DEFENDANT_INSTRUCTION);
+        housingDisrepair.setDate2(deadlineService.nextWorkingDayFromNowWeeks(12));
+        return housingDisrepair;
+    }
+
     private HousingDisrepair buildHousingDisrepair() {
         HousingDisrepair housingDisrepair = new HousingDisrepair();
         housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);

@@ -1997,8 +1997,8 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                         The columns should be headed:
                           •  Item
                           •  Alleged disrepair
-                          •  Defendant’s response
-                          •  Reserved for Judge’s use""");
+                          •  Defendant's response
+                          •  Reserved for Judge's use""");
             assertThat(response.getData()).extracting("fastTrackHousingDisrepair").extracting("input3")
                 .isEqualTo("The claimant must upload to the Digital Portal the Scott Schedule with the relevant "
                                + "columns completed by 4pm on");

@@ -19,4 +19,11 @@ public class HousingDisrepair {
     private String clauseCAfterDate;
     private String clauseD;
     private String clauseE;
+
+    private String input1;
+    private String input2;
+    private String input3;
+    private LocalDate date1;
+    private String input4;
+    private LocalDate date2;
 }

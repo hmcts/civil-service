@@ -912,5 +912,9 @@ caseFlags:
 court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
 
+other_remedy:
+  enabled: ${OTHER_REMEDY_ENABLED:true}
+
+
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
