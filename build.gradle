@@ -619,8 +619,8 @@ tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
   // Pipeline-stable settings with JaCoCo enabled
-  maxParallelForks = 2
-  forkEvery = 50
+  //maxParallelForks = 2
+  //forkEvery = 50
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"
