@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - GA Consent/Without Notice",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "general" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "civil" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "general application" },
+      "keyword": { "equalTo": "GeneralAppWithoutNotice" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0446",
+      "description": "Application (Without notice or by consent)",
+      "version": 1,
+      "fee_amount": 110.00
+    }
+  }
+}
