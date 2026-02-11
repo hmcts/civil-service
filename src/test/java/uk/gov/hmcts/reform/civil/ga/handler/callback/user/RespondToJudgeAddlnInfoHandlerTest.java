@@ -4,18 +4,23 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
@@ -48,31 +53,31 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AW
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    RespondToJudgeAddlnInfoHandler.class,
-    CaseDetailsConverter.class,
-    JacksonAutoConfiguration.class},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    RespondToJudgeAddlnInfoHandler handler;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    @Autowired
-    ObjectMapper objectMapper;
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
-    @Autowired
-    CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @InjectMocks
+    private RespondToJudgeAddlnInfoHandler handler;
+
+    @Mock
     IdamClient idamClient;
-    @MockBean
+    @Mock
     RespondForInformationGenerator respondForInformationGenerator;
-    @MockBean
+    @Mock
     DocUploadDashboardNotificationService docUploadDashboardNotificationService;
 
-    @MockBean
+    @Mock
     FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     GaForLipService gaForLipService;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
@@ -310,8 +315,7 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
     }
 
     private GeneralApplicationCaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        return responseCaseData;
+        return objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
     }
 
     private GeneralApplicationCaseData getCase(List<Element<Document>> generalAppAddlnInfoUpload,

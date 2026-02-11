@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -42,20 +44,22 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    HearingScheduledEventCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(mapper);
+
+    @InjectMocks
     private HearingScheduledEventCallbackHandler handler;
-    @MockBean
+
+    @Mock
     private GeneralAppLocationRefDataService locationRefDataService;
 
     @Nested
@@ -73,7 +77,7 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("gaHearingNoticeDetail")))
-                .get("hearingLocation")).get("list_items")).get(0))
+                .get("hearingLocation")).get("list_items")).getFirst())
                            .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
         }
 
@@ -138,7 +142,7 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("gaHearingNoticeDetail")))
-                .get("hearingLocation")).get("list_items")).get(0))
+                .get("hearingLocation")).get("list_items")).getFirst())
                            .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
         }
     }
@@ -164,14 +168,14 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors().get(0)).isEqualTo("Hearing date must be in the future");
+            assertThat(response.getErrors().getFirst()).isEqualTo("Hearing date must be in the future");
         }
 
         @Test
         void shouldNotReturnError_whenDateFromDateIsTwentyFourHoursAfterOfPresentDateProvided() {
             LocalDateTime localDateTime = LocalDateTime.now().plusHours(24).plusMinutes(1);
             String hours = "0" + (localDateTime.getHour());
-            String minutes = "0" + String.valueOf(localDateTime.getMinute());
+            String minutes = "0" + localDateTime.getMinute();
             hours = hours.substring(hours.length() - 2);
             minutes = minutes.substring(minutes.length() - 2);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()

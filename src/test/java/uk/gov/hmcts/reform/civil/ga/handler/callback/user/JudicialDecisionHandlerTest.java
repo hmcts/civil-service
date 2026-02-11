@@ -6,10 +6,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -59,7 +64,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
@@ -91,7 +95,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -119,74 +122,74 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionWrittenRepService.WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    JudicialDecisionHandler.class,
-    AssignCaseToRespondentSolHelper.class,
-    GaForLipService.class,
-    DeadlinesCalculator.class,
-    JacksonAutoConfiguration.class},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    JudicialDecisionHandler handler;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    @MockBean
-    JudicialDecisionWrittenRepService service;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
-    JudicialDecisionHelper helper;
+    @InjectMocks
+    private JudicialDecisionHandler handler;
 
-    @MockBean
-    GeneralAppLocationRefDataService locationRefDataService;
+    @Mock
+    private JudicialDecisionWrittenRepService service;
 
-    @MockBean
+    @Mock
+    private JudicialDecisionHelper helper;
+
+    @Mock
+    private GeneralAppLocationRefDataService locationRefDataService;
+
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private CoreCaseUserService coreCaseUserService;
-
-    @MockBean
+    @Mock
     private GeneralOrderGenerator generalOrderGenerator;
 
-    @MockBean
+    @Mock
     private RequestForInformationGenerator requestForInformationGenerator;
 
-    @MockBean
+    @Mock
     private DirectionOrderGenerator directionOrderGenerator;
 
-    @MockBean
+    @Mock
     private DismissalOrderGenerator dismissalOrderGenerator;
 
-    @MockBean
+    @Mock
     private HearingOrderGenerator hearingOrderGenerator;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationConcurrentOrderGenerator writtenRepresentationConcurrentOrderGenerator;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationSequentialOrderGenerator writtenRepresentationSequentialOrderGenerator;
 
-    @MockBean
+    @Mock
     private FreeFormOrderGenerator gaFreeFormOrderGenerator;
 
-    @MockBean
+    @Mock
     private IdamClient idamClient;
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+
+    @Mock
     private JudicialTimeEstimateHelper timeEstimateHelper;
+
+    @Mock
+    private AssignCaseToRespondentSolHelper assignCaseToResopondentSolHelper;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
     private static final String BUSINESS_PROCESS_INSTANCE_ID = "11111";
@@ -317,7 +320,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .isEqualTo(String.format(expectedJudicialPreferenceLocationApplicantRespondent1Text,
                                          caseDataApplicantRespondent1.getGeneralAppHearingDetails()
                                              .getHearingPreferredLocation().getValue().getLabel(),
-                                         caseDataApplicantRespondent1.getRespondentsResponses().get(0).getValue()
+                                         caseDataApplicantRespondent1.getRespondentsResponses().getFirst().getValue()
                                              .getGaHearingDetails().getHearingPreferredLocation().getValue()
                                              .getLabel()));
 
@@ -381,7 +384,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getJudgeHearingCourtLocationText1())
                 .isEqualTo(String.format(expectedOnlyRespondent1LocationText,
-                                         caseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+                                         caseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                                              .getHearingPreferredLocation().getValue().getLabel()));
         }
 
@@ -650,15 +653,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     expectedJudicialSupportText,
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getGeneralAppHearingDetails()
-                        .getSupportRequirement().get(0).getDisplayedValue(),
+                        .getSupportRequirement().getFirst().getDisplayedValue(),
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getRespondentsResponses().get(0).getValue()
                         .getGaHearingDetails().getSupportRequirement()
-                        .get(0).getDisplayedValue(),
+                        .getFirst().getDisplayedValue(),
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getRespondentsResponses().get(1).getValue()
                         .getGaHearingDetails().getSupportRequirement()
-                        .get(0).getDisplayedValue()
+                        .getFirst().getDisplayedValue()
                 ));
 
         }
@@ -1473,7 +1476,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getHearingPreferredLocation()).isNotNull();
             assertThat(responseCaseData.getHearingPreferredLocation().getValue()).isNotNull();
-            assertThat(responseCaseData.getHearingPreferredLocation().getListItems().get(0).getLabel())
+            assertThat(responseCaseData.getHearingPreferredLocation().getListItems().getFirst().getLabel())
                 .isEqualTo("siteName - court Address - post code");
 
         }
@@ -1771,7 +1774,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
@@ -1790,7 +1793,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
@@ -1863,7 +1866,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
 
         }
 
@@ -1885,7 +1888,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
 
         }
 
@@ -2249,7 +2252,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2270,7 +2273,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2371,7 +2374,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2392,7 +2395,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2559,8 +2562,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnCorrectDirectionsText() {
 
-            List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM),
-                                                          (GeneralApplicationTypes.EXTEND_TIME));
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
@@ -2579,10 +2580,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldAddCorrectDirectionsText() {
-
-            List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM),
-                                                          (GeneralApplicationTypes.EXTEND_TIME));
-
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
@@ -2858,7 +2855,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
@@ -2874,7 +2871,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         private GeneralApplicationCaseData getApplication_MakeDecision_GiveDirections(GAJudgeMakeAnOrderOption orderOption,
@@ -3308,6 +3305,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldCallAssignCase_3Times() {
+            String caseId = GeneralApplicationCaseDataBuilder.CASE_ID.toString();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -3323,12 +3321,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
             assertThat(responseCaseData.getApplicationIsCloaked()).isEqualTo(NO);
-            verify(coreCaseUserService, times(3)).assignCase(
-                any(),
-                any(),
-                any(),
-                any()
-            );
+            verify(assignCaseToResopondentSolHelper).assignCaseToRespondentSolicitor(caseData, caseId);
         }
 
         @Test

@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -51,7 +56,6 @@ import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationServic
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -85,44 +89,42 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SuppressWarnings({"checkstyle:EmptyLineSeparator", "checkstyle:Indentation"})
-@SpringBootTest(classes = {
-    CaseDetailsConverter.class,
-    RespondToApplicationHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @InjectMocks
     RespondToApplicationHandler handler;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @Mock
     IdamClient idamClient;
-    @MockBean
+    @Mock
     GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     ParentCaseUpdateHelper parentCaseUpdateHelper;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     protected GeneralAppLocationRefDataService locationRefDataService;
+
     List<Element<Document>> documents = new ArrayList<>();
+
     @BeforeEach
-        public void setUp() throws IOException {
+    public void setUp() throws IOException {
 
         when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
                                                                  .sub(DUMMY_EMAIL)
@@ -343,6 +345,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(response).isNotNull();
         assertThat(response.getErrors()).isEqualTo(errors);
     }
+
     @Test
     void aboutToStartCallbackChecksRespondendResponseBeforeProceeding() {
 
@@ -431,11 +434,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         CallbackParams params = callbackParamsOf(updateCaseData.build(),
                                                  CallbackType.MID, "validate-debtor-offer");
 
-
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
-        assertThat(response.getErrors().get(0)).isEqualTo(PAYMENT_DATE_CANNOT_BE_IN_PAST);
+        assertThat(response.getErrors().getFirst()).isEqualTo(PAYMENT_DATE_CANNOT_BE_IN_PAST);
     }
 
     @Test
@@ -452,7 +454,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         CallbackParams params = callbackParamsOf(updateCaseData.build(),
                                                  CallbackType.MID, "validate-debtor-offer");
-
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -634,9 +635,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
         assertThat(responseCaseData.getRespondentsResponses()).hasSize(1);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                        .getHearingPreferredLocation().getListItems()).hasSize(1);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                        .getRespondentResponsePartyName()).isEqualTo("Defendant One - Defendant");
     }
 
@@ -791,7 +792,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         assertThat(response).isNotNull();
         assertThat(responseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails().getRespondentResponsePartyName())
+                       .getFirst().getValue().getGaHearingDetails().getRespondentResponsePartyName())
             .isEqualTo("Defendant Two - Defendant");
     }
 
@@ -889,7 +890,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
         assertThat(responseCaseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails()
+                       .getFirst().getValue().getGaHearingDetails()
                        .getRespondentResponsePartyName()).isEqualTo("Claimant One - Claimant");
     }
 
@@ -925,7 +926,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
         assertThat(responseCaseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails()
+                       .getFirst().getValue().getGaHearingDetails()
                        .getHearingPreferredLocation().getValue().getLabel()).isEqualTo("ABCD - RG0 0AL");
     }
 
@@ -952,7 +953,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                                      .generalAppRespondent1Representative(NO).build())
             .generalAppRespondDocument(documents);
 
-
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
         when(coreCaseDataService.getCase(456L)).thenReturn(ga);
@@ -967,9 +967,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
@@ -977,9 +977,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentName()).isEqualTo("Respond evidence");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getCreatedBy()).isEqualTo("Respondent One");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent One");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
     }
 
     @Test
@@ -1008,7 +1008,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                         .generalAppRespondent1Representative(NO).build())
                 .generalAppRespondDocument(documents);
 
-
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
         when(coreCaseDataService.getCase(456L)).thenReturn(ga);
@@ -1023,9 +1022,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
@@ -1033,9 +1032,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocRespondentSolTwo().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentName()).isEqualTo("Respond evidence");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getCreatedBy()).isEqualTo("Respondent Two");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent Two");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
     }
 
     @Test
@@ -1057,7 +1056,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
 
-
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
         when(coreCaseDataService.getCase(123L)).thenReturn(civil);
@@ -1070,9 +1068,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondConsentDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondConsentReason()).isNull();
@@ -1120,9 +1118,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                        .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
         assertThat(responseCaseData.getGeneralAppRespondDebtorDocument()).isNull();
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
@@ -1169,7 +1167,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
     }
 
@@ -1205,7 +1203,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                        .getGeneralAppRespondent1Representative()).isEqualTo(YES);
     }
 

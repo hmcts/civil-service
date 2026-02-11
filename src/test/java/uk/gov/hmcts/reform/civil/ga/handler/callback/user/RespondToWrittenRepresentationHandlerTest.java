@@ -4,12 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -17,7 +22,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
@@ -50,34 +54,31 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPOND_TO_JUDGE_WRIT
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    RespondToWrittenRepresentationHandler.class,
-    CaseDetailsConverter.class,
-    JacksonAutoConfiguration.class},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    RespondToWrittenRepresentationHandler handler;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    @Autowired
-    ObjectMapper objectMapper;
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
-    @Autowired
-    CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    IdamClient idamClient;
-    @MockBean
-    RespondToWrittenRepresentationGenerator respondToWrittenRepresentationGenerator;
+    @InjectMocks
+    private RespondToWrittenRepresentationHandler handler;
 
-    @MockBean
-    DocUploadDashboardNotificationService docUploadDashboardNotificationService;
-
-    @MockBean
-    GaForLipService gaForLipService;
-
-    @MockBean
-    FeatureToggleService featureToggleService;
+    @Mock
+    private IdamClient idamClient;
+    @Mock
+    private RespondToWrittenRepresentationGenerator respondToWrittenRepresentationGenerator;
+    @Mock
+    private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
+    @Mock
+    private GaForLipService gaForLipService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
     private static final String BUSINESS_PROCESS_INSTANCE_ID = "11111";
@@ -107,7 +108,6 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
     void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
 
         List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
-        List<Element<Document>> gaWrittenRepDocList = new ArrayList<>();
 
         Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
             .documentBinaryUrl(TEST_STRING)
@@ -326,8 +326,7 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
     }
 
     private GeneralApplicationCaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {
-        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        return responseCaseData;
+        return objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
     }
 
     private GeneralApplicationCaseData getCase(List<Element<Document>> generalAppWrittenRepUpload,

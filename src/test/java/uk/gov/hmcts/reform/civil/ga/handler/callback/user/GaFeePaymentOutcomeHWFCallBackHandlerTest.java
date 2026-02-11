@@ -5,12 +5,15 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -48,22 +51,23 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_ADD_HWF;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GaFeePaymentOutcomeHWFCallBackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @InjectMocks
     private GaFeePaymentOutcomeHWFCallBackHandler handler;
-    @Autowired
-    private ObjectMapper mapper = new ObjectMapper();
-    @MockBean
+
+    @Mock
     private GaPaymentRequestUpdateCallbackService service;
-    @MockBean
+    @Mock
     private HwfNotificationService hwfNotificationService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
@@ -207,7 +211,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
     class AboutToSubmitCallback {
         @Test
         void shouldTrigger_after_payment_GaFee() {
-            List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
                                     Fee.builder()
