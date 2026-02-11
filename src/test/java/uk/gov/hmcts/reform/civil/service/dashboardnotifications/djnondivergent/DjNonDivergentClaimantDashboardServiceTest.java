@@ -18,7 +18,7 @@ import java.util.HashMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT;
 
 @ExtendWith(MockitoExtension.class)
 class DjNonDivergentClaimantDashboardServiceTest {
@@ -49,7 +49,7 @@ class DjNonDivergentClaimantDashboardServiceTest {
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_JUDGMENT_ONLINE_DEFAULT_JUDGMENT_ISSUED_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_JUDGEMENTS_ONLINE_DEFAULT_JUDGEMENT_ISSUED_CLAIMANT.getScenario(),
             "1594901956117591",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
