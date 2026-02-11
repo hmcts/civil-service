@@ -50,7 +50,7 @@ public class GAResponseDeadlineTaskHandler extends BaseExternalTaskHandler {
         log.info("GAResponseDeadlineTaskHandler Job '{}' found {} case(s) with ids {}", externalTask.getTopicName(), caseList.size(), ids2);
         caseList.forEach(this::deleteDashboardNotifications);
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private void deleteDashboardNotifications(CaseDetails caseDetails) {
