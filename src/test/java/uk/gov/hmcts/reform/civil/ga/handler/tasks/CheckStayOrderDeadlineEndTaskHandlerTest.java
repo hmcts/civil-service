@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -37,48 +42,44 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APP
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CheckStayOrderDeadlineEndTaskHandler.class})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class CheckStayOrderDeadlineEndTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseStateSearchService searchService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
 
-    @Autowired
-    private ObjectMapper mapper;
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
-    private CaseDetails caseDetailsWithTodayDeadlineProcessed;
     private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
     private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
-    private CaseDetails caseDetailsWithTodayDeadLineWithOrderProcessedNull;
 
     private CaseDetails caseDetailsWithNoDeadline;
     private CaseDetails caseDetailsWithFutureDeadline;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadlineProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadLineWithOrderProcessedNull;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
     private GeneralApplicationCaseData caseDataWithFutureDeadline;
 
@@ -92,11 +93,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                                   YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, STAY_THE_CLAIM, deadLineToday,
                                                             YesOrNo.NO);
-
-        caseDetailsWithTodayDeadlineProcessed = getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday,
-                                                               YesOrNo.YES);
-        caseDataWithTodayDeadlineProcessed = getCaseData(1L, STAY_THE_CLAIM, deadLineToday,
-                                                         YesOrNo.YES);
 
         caseDetailsWithTodayDeadlineReliefFromSanctionOrder = getCaseDetails(2L, RELIEF_FROM_SANCTIONS,
                                                                              deadLineToday, YesOrNo.NO);
@@ -122,10 +118,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                        deadlineInFuture, YesOrNo.NO);
         caseDataWithFutureDeadline = getCaseData(6L, STAY_THE_CLAIM,
                                                  deadlineInFuture, YesOrNo.NO);
-        caseDetailsWithTodayDeadLineWithOrderProcessedNull = getCaseDetails(7L, STAY_THE_CLAIM,
-                                                                             deadLineToday, null);
-        caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L, STAY_THE_CLAIM,
-                                                                  deadLineToday, null);
     }
 
     @Test

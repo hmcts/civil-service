@@ -46,7 +46,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldSetStatusStarted_whenInitialStateIs(BusinessProcessStatus status) {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(new BusinessProcess().setStatus(status)).build();
 
         when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
@@ -67,7 +67,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"STARTED", "FINISHED"})
     void shouldReturnErrors_whenInitialStatusIs(BusinessProcessStatus status) {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+        CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
             .businessProcess(new BusinessProcess().setStatus(status)).build();
 
         when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);

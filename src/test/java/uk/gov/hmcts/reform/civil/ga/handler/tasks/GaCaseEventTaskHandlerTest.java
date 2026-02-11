@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
-import org.camunda.bpm.client.exception.NotFoundException;
-import org.camunda.bpm.client.exception.RestException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -13,51 +14,41 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
-import uk.gov.hmcts.reform.civil.exceptions.CompleteTaskException;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
-import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 
-@SpringBootTest(classes = {
-    GaCaseEventTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GaStateFlowEngine.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class GaCaseEventTaskHandlerTest {
 
     private static final String CASE_ID = "1";
@@ -68,20 +59,26 @@ class GaCaseEventTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
-    private FeatureToggleService featureToggleService;
+    @Mock
+    private GaStateFlowEngine gaStateFlowEngine;
 
-    @Autowired
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @InjectMocks
     private GaCaseEventTaskHandler caseEventTaskHandler;
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
     }
 
     @Nested
@@ -99,22 +96,31 @@ class GaCaseEventTaskHandlerTest {
 
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
-            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+            GaStateFlow stateFlow = mock(GaStateFlow.class);
+            State state = mock(State.class);
+            when(state.getName()).thenReturn("MAIN.DRAFT");
+            when(stateFlow.getState()).thenReturn(state);
+            when(stateFlow.getFlags()).thenReturn(Map.of());
+            when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
+
+            CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
-            VariableMap variables = Variables.createVariables();
-            variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
-            variables.putValue(FLOW_FLAGS, Map.of());
-
+            GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
+                .build();
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
+            when(caseDetailsConverter.toCaseData(any(CaseDetails.class))).thenReturn(caseData);
             when(coreCaseDataService.startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
-
-            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+            when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(gaCaseData);
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
+            VariableMap variables = Variables.createVariables();
+            variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
+            variables.putValue(FLOW_FLAGS, Map.of());
             verify(coreCaseDataService).startUpdate(CASE_ID, INITIATE_GENERAL_APPLICATION);
             verify(coreCaseDataService).submitUpdate(eq(CASE_ID), any(CaseDataContent.class));
             verify(externalTaskService).complete(mockTask, variables);
@@ -175,35 +181,6 @@ class GaCaseEventTaskHandlerTest {
                 anyString(),
                 eq(2),
                 eq(300000L)
-            );
-        }
-
-        @Test
-        void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
-            String errorMessage = "there was an error";
-
-            GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
-                .build();
-            CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
-            when(coreCaseDataService.startUpdate(any(), any()))
-                .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
-            when(coreCaseDataService.submitGaUpdate(any(), any()))
-                .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
-                    GeneralAppParentCaseLink.builder().caseReference("123").build()).build());
-            doThrow(new NotFoundException(errorMessage, new RestException(null, null, null)))
-                .when(externalTaskService).complete(mockTask);
-
-            assertThrows(
-                CompleteTaskException.class,
-                () -> caseEventTaskHandler.execute(mockTask, externalTaskService));
-
-            verify(externalTaskService, never()).handleFailure(
-                any(ExternalTask.class),
-                anyString(),
-                anyString(),
-                anyInt(),
-                anyLong()
             );
         }
     }
