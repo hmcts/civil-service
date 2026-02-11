@@ -105,7 +105,7 @@ class GaCoreCaseDataServiceTest {
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
         private final GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .caseManagementLocation(CaseLocationCivil.builder().region("1").baseLocation("12334").siteName("london").siteName("London SE1").postcode("SE1 1AA").build())
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
@@ -207,7 +207,7 @@ class GaCoreCaseDataServiceTest {
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
         private final GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .data(caseData)
@@ -272,7 +272,7 @@ class GaCoreCaseDataServiceTest {
         private static final String EVENT_TOKEN = "eventToken";
         private static final String USER_ID = "User1";
         private final GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .data(caseData)

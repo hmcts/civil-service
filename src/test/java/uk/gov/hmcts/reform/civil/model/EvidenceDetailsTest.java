@@ -12,7 +12,7 @@ class EvidenceDetailsTest {
     @Test
     void shouldReturnPhotoEvidenceWhenItsNotNull() {
         //Given
-        EvidenceDetails evidenceDetails = EvidenceDetails.builder().photoEvidence(PHOTO_EVIDENCE).build();
+        EvidenceDetails evidenceDetails = new EvidenceDetails().setPhotoEvidence(PHOTO_EVIDENCE);
         //When
         String description = evidenceDetails.getEvidenceDescription();
         //Then
@@ -22,7 +22,7 @@ class EvidenceDetailsTest {
     @Test
     void shouldReturnExpertWitnessEvidenceWhenItsNotNull() {
         //Given
-        EvidenceDetails evidenceDetails = EvidenceDetails.builder().expertWitnessEvidence(WITNESS_EVIDENCE).build();
+        EvidenceDetails evidenceDetails = new EvidenceDetails().setExpertWitnessEvidence(WITNESS_EVIDENCE);
         //When
         String description = evidenceDetails.getEvidenceDescription();
         //Then
@@ -32,7 +32,7 @@ class EvidenceDetailsTest {
     @Test
     void shouldREturnEmptyStringWhenNoEvidenceFieldsArePresent() {
         //Given
-        EvidenceDetails evidenceDetails = EvidenceDetails.builder().build();
+        EvidenceDetails evidenceDetails = new EvidenceDetails();
         //When
         String description = evidenceDetails.getEvidenceDescription();
         //Then

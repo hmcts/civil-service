@@ -12,9 +12,8 @@ class PersistDataUtilsTest {
 
     @Test
     void shouldCopyAddress() {
-        Address expectedAddress = Address.builder()
-            .postCode("E11 5BB")
-            .build();
+        Address expectedAddress = new Address();
+        expectedAddress.setPostCode("E11 5BB");
 
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())

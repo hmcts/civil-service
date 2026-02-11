@@ -511,7 +511,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        caseData.setChangeOfRepresentation(ChangeOfRepresentation.builder().build());
+        caseData.setChangeOfRepresentation(new ChangeOfRepresentation());
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
         caseData.setApplicant1Represented(YesOrNo.NO);
@@ -554,7 +554,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
 
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
         caseData.setCcdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
-        caseData.setChangeOfRepresentation(ChangeOfRepresentation.builder().build());
+        caseData.setChangeOfRepresentation(new ChangeOfRepresentation());
         caseData.setLegacyCaseReference("reference");
         caseData.setCcdCaseReference(1234L);
         caseData.setApplicant1Represented(YesOrNo.NO);

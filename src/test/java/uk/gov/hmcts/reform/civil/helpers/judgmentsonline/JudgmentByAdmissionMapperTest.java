@@ -499,11 +499,10 @@ class JudgmentByAdmissionMapperTest {
     }
 
     private CCJPaymentDetails buildCCJPaymentDetails() {
-        return CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-            .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-            .build();
+        return new CCJPaymentDetails()
+            .setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+            .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+            .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
     }
 }
