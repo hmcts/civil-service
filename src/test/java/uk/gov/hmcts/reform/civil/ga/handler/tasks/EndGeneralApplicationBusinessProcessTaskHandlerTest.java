@@ -71,7 +71,7 @@ class EndGeneralApplicationBusinessProcessTaskHandlerTest {
     @Test
     void shouldTriggerEndBusinessProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalled() {
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -98,7 +98,7 @@ class EndGeneralApplicationBusinessProcessTaskHandlerTest {
                 "caseEvent", END_BUSINESS_PROCESS_GASPEC
             ));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -125,9 +125,8 @@ class EndGeneralApplicationBusinessProcessTaskHandlerTest {
     }
 
     private CaseDataContent getCaseDataContent(CaseDetails caseDetails, StartEventResponse value) {
-        caseDetails.getData().put("businessProcess", BusinessProcess.builder()
-            .status(BusinessProcessStatus.FINISHED)
-            .build());
+        caseDetails.getData().put("businessProcess", new BusinessProcess()
+            .setStatus(BusinessProcessStatus.FINISHED));
 
         return CaseDataContent.builder()
             .eventToken(value.getToken())

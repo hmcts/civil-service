@@ -147,7 +147,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
 
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
@@ -192,7 +192,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingFeePaymentDetails(PaymentDetails.builder()
                                               .status(SUCCESS)
                                               .build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
@@ -273,7 +273,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingFeePaymentDetails(PaymentDetails.builder()
                                               .status(SUCCESS)
                                               .build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
 
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
@@ -319,7 +319,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingFeePaymentDetails(PaymentDetails.builder()
                                               .status(SUCCESS)
                                               .build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
@@ -680,7 +680,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingReferenceNumber("000HN001")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING_HMC").build()).build();

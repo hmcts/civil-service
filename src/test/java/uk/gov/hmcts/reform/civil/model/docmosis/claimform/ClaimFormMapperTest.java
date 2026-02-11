@@ -62,16 +62,16 @@ class ClaimFormMapperTest {
     void should_displayIndividualName_whenPartiesIndividual() {
         //Given
         List<Evidence> evidenceList = List.of(
-            Evidence.builder().id("0").value(EvidenceDetails.builder()
-                                                 .evidenceType("EXPERT_WITNESS")
-                                                 .expertWitnessEvidence("This is an expert")
-                                                 .build())
-                .build(),
-            Evidence.builder().id("0").value(EvidenceDetails.builder()
-                                                 .evidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
-                                                 .lettersEmailsAndOtherCorrespondenceEvidence("This is Letter")
-                                                 .build())
-                .build()
+            new Evidence()
+                .setId("0")
+                .setValue(new EvidenceDetails()
+                              .setEvidenceType("EXPERT_WITNESS")
+                              .setExpertWitnessEvidence("This is an expert")),
+            new Evidence()
+                .setId("0")
+                .setValue(new EvidenceDetails()
+                              .setEvidenceType("LETTERS_EMAILS_AND_OTHER_CORRESPONDENCE")
+                              .setLettersEmailsAndOtherCorrespondenceEvidence("This is Letter"))
         );
         CaseData caseData = CaseData.builder()
             .applicant1(Party.builder()

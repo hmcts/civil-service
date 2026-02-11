@@ -67,21 +67,21 @@ public class GaFeesPaymentService {
         log.info("Checking general application payment status for {}", paymentReference);
         PaymentDto cardPaymentDetails = paymentStatusService.getCardPaymentDetails(paymentReference, authorization);
         String paymentStatus = cardPaymentDetails.getStatus();
-        CardPaymentStatusResponse.CardPaymentStatusResponseBuilder response = CardPaymentStatusResponse.builder()
-            .status(paymentStatus)
-            .paymentReference(cardPaymentDetails.getReference())
-            .externalReference(cardPaymentDetails.getPaymentGroupReference())
-            .paymentAmount(cardPaymentDetails.getAmount());
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus(paymentStatus)
+            .setPaymentReference(cardPaymentDetails.getReference())
+            .setExternalReference(cardPaymentDetails.getPaymentGroupReference())
+            .setPaymentAmount(cardPaymentDetails.getAmount());
 
         if (paymentStatus.equals("Failed")) {
             Arrays.stream(cardPaymentDetails.getStatusHistories())
                 .filter(h -> h.getStatus().equals(paymentStatus))
                 .findFirst()
-                .ifPresent(h -> response.errorCode(h.getErrorCode()).errorDescription(h.getErrorMessage()));
+                .ifPresent(h -> response.setErrorCode(h.getErrorCode()).setErrorDescription(h.getErrorMessage()));
         }
 
         try {
-            updatePaymentStatusService.updatePaymentStatus(caseReference, response.build());
+            updatePaymentStatusService.updatePaymentStatus(caseReference, response);
         } catch (Exception e) {
             log.error(
                 "Update general application payment status failed for claim [{}]. Error: {}",
@@ -91,6 +91,6 @@ public class GaFeesPaymentService {
             );
         }
 
-        return response.build();
+        return response;
     }
 }

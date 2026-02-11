@@ -30,6 +30,6 @@ public class DeleteExpiredResponseRespondentNotificationsHandler extends BaseExt
             applicationEventPublisher.publishEvent(new DeleteExpiredResponseRespondentNotificationsEvent(caseDetails.getId()));
         });
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 }
