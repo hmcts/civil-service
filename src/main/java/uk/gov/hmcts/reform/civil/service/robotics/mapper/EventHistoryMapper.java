@@ -1633,29 +1633,26 @@ public class EventHistoryMapper {
         if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
             if (YES.equals(caseData.getApplicant1ProceedWithClaimMultiParty2v1())
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
-                applicantsDetails.add(ClaimantResponseDetails.builder()
-                                          .dq(caseData.getApplicant1DQ())
-                                          .litigiousPartyID(APPLICANT_ID)
-                                          .responseDate(caseData.getApplicant1ResponseDate())
-                                          .build());
+                applicantsDetails.add(new ClaimantResponseDetails()
+                                          .setDq(caseData.getApplicant1DQ())
+                                          .setLitigiousPartyID(APPLICANT_ID)
+                                          .setResponseDate(caseData.getApplicant1ResponseDate()));
             }
             if (YES.equals(caseData.getApplicant2ProceedWithClaimMultiParty2v1())
                 || YES.equals(caseData.getApplicant1ProceedWithClaimSpec2v1())) {
-                applicantsDetails.add(ClaimantResponseDetails.builder()
-                                          .dq(caseData.getApplicant2DQ())
-                                          .litigiousPartyID(APPLICANT2_ID)
-                                          .responseDate(
+                applicantsDetails.add(new ClaimantResponseDetails()
+                                          .setDq(caseData.getApplicant2DQ())
+                                          .setLitigiousPartyID(APPLICANT2_ID)
+                                          .setResponseDate(
                                               SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
                                                   ? caseData.getApplicant1ResponseDate()
-                                                  : caseData.getApplicant2ResponseDate())
-                                          .build());
+                                                  : caseData.getApplicant2ResponseDate()));
             }
         } else {
-            applicantsDetails.add(ClaimantResponseDetails.builder()
-                                      .dq(caseData.getApplicant1DQ())
-                                      .litigiousPartyID(APPLICANT_ID)
-                                      .responseDate(caseData.getApplicant1ResponseDate())
-                                      .build());
+            applicantsDetails.add(new ClaimantResponseDetails()
+                                      .setDq(caseData.getApplicant1DQ())
+                                      .setLitigiousPartyID(APPLICANT_ID)
+                                      .setResponseDate(caseData.getApplicant1ResponseDate()));
         }
         return applicantsDetails;
     }

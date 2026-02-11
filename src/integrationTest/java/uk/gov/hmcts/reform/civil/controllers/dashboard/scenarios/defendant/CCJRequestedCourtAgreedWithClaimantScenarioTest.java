@@ -30,10 +30,9 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
         String caseId = "994321234";
         String claimantFirstName = "John";
         String claimantLastName = "Smith";
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+            .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))

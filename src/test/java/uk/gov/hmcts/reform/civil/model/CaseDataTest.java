@@ -913,12 +913,10 @@ class CaseDataTest {
     void shouldReturnClaimAmountBreakupDetails_whenExists() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimAmountBreakup(List.of(ClaimAmountBreakup.builder()
-                                            .id("1").value(ClaimAmountBreakupDetails.builder()
-                                                               .claimAmount(new BigDecimal("122"))
-                                                               .claimReason("Reason")
-                                                               .build())
-                                            .build()))
+            .claimAmountBreakup(List.of(new ClaimAmountBreakup()
+                                            .setId("1").setValue(new ClaimAmountBreakupDetails()
+                                                               .setClaimAmount(new BigDecimal("122"))
+                                                               .setClaimReason("Reason"))))
             .build();
         //When
         List<ClaimAmountBreakupDetails> result = caseData.getClaimAmountBreakupDetails();
@@ -950,10 +948,8 @@ class CaseDataTest {
     void shouldReturnClaimValueInPounds_whenClaimValuePresent() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimValue(ClaimValue
-                            .builder()
-                            .statementOfValueInPennies(new BigDecimal(1000))
-                            .build())
+            .claimValue(new ClaimValue()
+                            .setStatementOfValueInPennies(new BigDecimal(1000)))
             .build();
         //When
         BigDecimal claimAmount = caseData.getClaimAmountInPounds();

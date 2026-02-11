@@ -43,7 +43,9 @@ public class GaStartGeneralApplicationBusinessProcessTaskHandler extends BaseExt
         if (caseData.getGeneralAppParentCaseLink() != null) {
             variables.putValue("generalAppParentCaseLink", caseData.getGeneralAppParentCaseLink().getCaseReference());
         }
-        return ExternalTaskData.builder().parentCaseData(caseData).variables(variables).build();
+        return new ExternalTaskData()
+            .setParentCaseData(caseData)
+            .setVariables(variables);
     }
 
     @Override
