@@ -25,10 +25,8 @@ import uk.gov.hmcts.reform.civil.utils.MonetaryConversions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 import static java.util.Objects.nonNull;
 
@@ -145,13 +143,9 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
-            BigInteger instalmentsAmount = Optional
-                .ofNullable(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec())
-                .map(a -> a.setScale(0, RoundingMode.HALF_UP))
-                .map(BigDecimal::toBigIntegerExact)
-                .orElse(null);
+            BigDecimal instalmentsAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
             return buildJudgmentInstalmentDetails(
-                String.valueOf(instalmentsAmount),
+                instalmentsAmount != null ? instalmentsAmount.toPlainString() : null,
                 getClaimantLipSuggestedPaymentFrequency(
                     caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()),
                 caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec()
