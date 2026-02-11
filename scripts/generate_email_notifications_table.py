@@ -24,10 +24,17 @@ TEMPLATE_DIR = REPO_ROOT / 'dashboard-notifications' / 'src' / 'main' / 'resourc
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-service/master/"
 TEMPLATE_VIEWER_PATH = "dashboard-template.html"
 DIAGRAM_BASE_URL = "https://raw.githubusercontent.com/hmcts/civil-camunda-bpmn-definition/master/docs/bpmn-diagrams/"
+DOCMOSIS_TEMPLATE_BASE_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/"
+DOCMOSIS_TEMPLATE_PROD_URL = "https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Prod/"
 
 # Regex helpers
 CLASS_DEF_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)")
 BASE_CLASS_RE = re.compile(r"class\s+(?P<name>[A-Za-z0-9_]+)\s+extends\s+(?P<base>[A-Za-z0-9_]+)")
+IMPLEMENTS_RE = re.compile(
+    r"class\s+(?P<name>[A-Za-z0-9_]+)"
+    r"(?:\s+extends\s+[A-Za-z0-9_<>,\s]+)?"
+    r"\s+implements\s+(?P<ifs>[A-Za-z0-9_<>,\s]+)"
+)
 NOTIFIER_EVENT_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.toString\s*\(", re.MULTILINE)
 NOTIFIER_EVENT_NAME_RE = re.compile(r"return\s+(?:[A-Za-z0-9_]+\.)?([A-Za-z0-9_]+)\.name\s*\(", re.MULTILINE)
 CONST_ASSIGN_RE = re.compile(
@@ -36,7 +43,7 @@ CONST_ASSIGN_RE = re.compile(
 RETURN_CONST_RE = re.compile(r"return\s+(?P<const>[A-Za-z0-9_]+)\s*;", re.MULTILINE)
 CALL_HELPER_RE = re.compile(r"(\w+)\.(get[A-Za-z0-9_]+)\s*\(")
 NOTIFICATION_GETTER_RE = re.compile(r"notificationsProperties\s*\.\s*get([A-Za-z0-9_]+)")
-FIELD_DEF_RE = re.compile(r"(?:private|protected|public)\s+final\s+([A-Za-z0-9_<>]+)\s+(\w+)\s*;")
+FIELD_DEF_RE = re.compile(r"(?:private|protected|public)\s+(?:final\s+)?([A-Za-z0-9_<>]+)\s+(\w+)\s*;")
 DASHBOARD_TASK_ID_CONST_RE = re.compile(r"public\s+static\s+final\s+String\s+(\w+)\s*=\s*\"([^\"]+)\";")
 TASK_ID_RE = re.compile(r"(?:public|protected|private)\s+static\s+final\s+String\s+TASK_ID\s*=\s*\"([^\"]+)\"")
 TASK_ID_CONST_RE = re.compile(
@@ -48,6 +55,10 @@ EVENTS_DEF_RE = re.compile(
 )
 SCENARIO_CONST_RE = re.compile(r"SCENARIO_[A-Z0-9_]+")
 SCENARIO_LITERAL_RE = re.compile(r'"(Scenario\.[A-Za-z0-9_.]+)"')
+DOCMOSIS_TEMPLATE_RE = re.compile(r"DocmosisTemplates\.([A-Z0-9_]+)")
+DOCMOSIS_STATIC_IMPORT_RE = re.compile(r"import\s+static\s+[^;]*DocmosisTemplates\.([A-Z0-9_]+);")
+DOCMOSIS_TITLE_PREFIX_RE = re.compile(r"^(?:%s[_-]*)+")
+DOCMOSIS_TITLE_SUFFIX_RE = re.compile(r"([_-]*%s)+(?=\.pdf$|$)")
 
 BASE_PARTY_DESC = {
     "AppSolOneEmailDTOGenerator": "Applicant solicitor (LR)",
@@ -357,6 +368,7 @@ def index_bpmn(bpmn_root: Path):
     ccd_events = {}
     ccd_event_labels = {}
     case_event_map = defaultdict(list)
+    start_event_file_map = defaultdict(list)
     for bpmn_file in sorted(bpmn_root.glob('*.bpmn')):
         try:
             tree = ET.parse(bpmn_file)
@@ -383,16 +395,18 @@ def index_bpmn(bpmn_root: Path):
                     start_labels[event_name] = display
         ccd_events[bpmn_file] = sorted(set(start_events))
         ccd_event_labels[bpmn_file] = start_labels
+        for event_name in start_events:
+            start_event_file_map[event_name].append(bpmn_file)
         for task in root.findall('.//bpmn:serviceTask', ns):
             service_map[task.attrib.get('id')].append(bpmn_file)
             for input_param in task.findall('.//camunda:inputParameter', camunda_ns):
                 if input_param.attrib.get('name') == 'caseEvent' and input_param.text:
                     case_event_map[input_param.text.strip()].append(bpmn_file)
-    return service_map, ccd_events, ccd_event_labels, case_event_map
+    return service_map, ccd_events, ccd_event_labels, case_event_map, start_event_file_map
 
 
 def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_root: Path,
-                     service_tasks, start_events, start_event_labels, case_event_map):
+                     service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map):
     notifiers = find_notifiers(index)
     aggregator_map = map_aggregators_to_generators(index, {n['aggregator'] for n in notifiers})
     rows = []
@@ -402,7 +416,7 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         bpmn_files, ccd_display, ccd_ids = lookup_bpmn(event, service_tasks, start_events, start_event_labels)
         bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
             [event] if event not in (None, 'UNKNOWN') else [],
-            case_event_map, start_events, start_event_labels,
+            case_event_map, start_events, start_event_labels, start_event_file_map,
             bpmn_files, ccd_display, ccd_ids
         )
         for generator in generators:
@@ -439,10 +453,17 @@ def build_email_rows(index: SourceIndex, notifications: Dict[str, str], bpmn_roo
         if not templates:
             templates = [{"id": None, "name": None}]
         party = infer_party_from_class(java_class)
+        path_lower = str(java_class.path).lower()
+        if "/handler/callback/user/" in path_lower:
+            channel = "Docmosis (User callback)"
+        elif "/handler/callback/camunda/" in path_lower:
+            channel = "Docmosis (Camunda callback)"
+        else:
+            channel = "Docmosis"
         for task_id in task_ids:
             bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
             bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
-                events, case_event_map, start_events, start_event_labels,
+                events, case_event_map, start_events, start_event_labels, start_event_file_map,
                 bpmn_files, ccd_display, ccd_ids
             )
             for tpl in templates:
@@ -475,7 +496,10 @@ def lookup_bpmn(task_id: str, service_tasks, start_events, start_event_labels):
 
 
 def augment_with_case_events(events: List[str], case_event_map, start_events, start_event_labels,
-                             bpmn_files: List[str], ccd_display: List[str], ccd_ids: List[str]):
+                             start_event_file_map,
+                             bpmn_files: List[str], ccd_display: List[str], ccd_ids: List[str],
+                             event_label_map: Optional[Dict[str, str]] = None,
+                             include_events: bool = False):
     files = list(bpmn_files)
     displays = list(ccd_display)
     ids = list(ccd_ids)
@@ -483,7 +507,10 @@ def augment_with_case_events(events: List[str], case_event_map, start_events, st
     seen_ids = set(ids)
     seen_displays = set(displays)
     for event in events or []:
-        for file in case_event_map.get(event, []):
+        matched_files = case_event_map.get(event, [])
+        if not matched_files:
+            matched_files = start_event_file_map.get(event, [])
+        for file in matched_files:
             rel_path = os.path.relpath(file, REPO_ROOT)
             if rel_path not in seen_files:
                 files.append(rel_path)
@@ -497,6 +524,14 @@ def augment_with_case_events(events: List[str], case_event_map, start_events, st
                 if event_name not in seen_ids:
                     ids.append(event_name)
                     seen_ids.add(event_name)
+        if include_events and event and not matched_files:
+            label = (event_label_map or {}).get(event, event)
+            if label not in seen_displays:
+                displays.append(label)
+                seen_displays.add(label)
+            if event not in seen_ids:
+                ids.append(event)
+                seen_ids.add(event)
     return files, displays, ids
 
 
@@ -519,6 +554,131 @@ def load_dashboard_scenarios() -> Dict[str, str]:
     for const, value in pattern.findall(text):
         mapping[const] = value
     return mapping
+
+
+def load_docmosis_templates() -> Dict[str, Dict[str, str]]:
+    path = JAVA_ROOT / 'uk' / 'gov' / 'hmcts' / 'reform' / 'civil' / 'service' / 'docmosis' / 'DocmosisTemplates.java'
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding='utf-8')
+    mapping: Dict[str, Dict[str, str]] = {}
+    raw_titles: Dict[str, str] = {}
+    enum_start = text.find("public enum DocmosisTemplates")
+    if enum_start == -1:
+        return {}
+    block_start = text.find("{", enum_start)
+    block_end = text.find("private final String template", block_start)
+    if block_start == -1 or block_end == -1:
+        return {}
+    block = text[block_start:block_end]
+
+    def split_args(arg_text: str) -> List[str]:
+        args = []
+        current = []
+        depth = 0
+        in_quote = False
+        escape = False
+        for ch in arg_text:
+            if in_quote:
+                current.append(ch)
+                if escape:
+                    escape = False
+                elif ch == '\\':
+                    escape = True
+                elif ch == '"':
+                    in_quote = False
+                continue
+            if ch == '"':
+                in_quote = True
+                current.append(ch)
+                continue
+            if ch == '(':
+                depth += 1
+                current.append(ch)
+                continue
+            if ch == ')':
+                if depth > 0:
+                    depth -= 1
+                current.append(ch)
+                continue
+            if ch == ',' and depth == 0:
+                args.append(''.join(current).strip())
+                current = []
+                continue
+            current.append(ch)
+        if current:
+            args.append(''.join(current).strip())
+        return args
+
+    pattern = re.compile(r"\b([A-Z0-9_]+)\s*\(")
+    for match in pattern.finditer(block):
+        const = match.group(1)
+        idx = match.end()
+        depth = 1
+        in_quote = False
+        escape = False
+        buf = []
+        while idx < len(block) and depth > 0:
+            ch = block[idx]
+            buf.append(ch)
+            if in_quote:
+                if escape:
+                    escape = False
+                elif ch == '\\':
+                    escape = True
+                elif ch == '"':
+                    in_quote = False
+            else:
+                if ch == '"':
+                    in_quote = True
+                elif ch == '(':
+                    depth += 1
+                elif ch == ')':
+                    depth -= 1
+            idx += 1
+        if depth != 0:
+            continue
+        arg_text = ''.join(buf[:-1]).strip()
+        args = split_args(arg_text)
+        if len(args) < 2:
+            continue
+        filename = args[0].strip()
+        if filename.startswith('"') and filename.endswith('"'):
+            filename = filename[1:-1]
+        title_expr = args[1].strip()
+        raw_titles[const] = title_expr
+        mapping[const] = {"filename": filename, "title": ""}
+
+    resolved = {}
+    changed = True
+    while changed:
+        changed = False
+        for const, title_expr in raw_titles.items():
+            if const in resolved:
+                continue
+            if title_expr.startswith('"') and title_expr.endswith('"'):
+                resolved[const] = title_expr[1:-1]
+                changed = True
+                continue
+            ref_match = re.match(r"([A-Z0-9_]+)\.getDocumentTitle\(\)", title_expr)
+            if ref_match:
+                ref = ref_match.group(1)
+                if ref in resolved:
+                    resolved[const] = resolved[ref]
+                    changed = True
+    for const, meta in mapping.items():
+        title = resolved.get(const)
+        if title:
+            meta["title"] = title
+    return mapping
+
+
+def normalize_docmosis_title(title: Optional[str]) -> Optional[str]:
+    if not title:
+        return title
+    cleaned = DOCMOSIS_TITLE_PREFIX_RE.sub('', title)
+    cleaned = DOCMOSIS_TITLE_SUFFIX_RE.sub('', cleaned)
+    return cleaned
 
 
 def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
@@ -553,6 +713,15 @@ def load_ccd_event_names(definition_root: Path) -> Dict[str, str]:
                 continue
             names[event_id] = (priority, str(name))
     return {event_id: name for event_id, (_, name) in names.items()}
+
+
+def merge_ccd_event_names(*maps: Dict[str, str]) -> Dict[str, str]:
+    merged: Dict[str, str] = {}
+    for mapping in maps:
+        for key, value in mapping.items():
+            if key not in merged and value:
+                merged[key] = value
+    return merged
 
 
 def load_template_paths() -> Dict[str, Dict[str, str]]:
@@ -638,6 +807,84 @@ def field_types(java_class: JavaClass) -> Dict[str, str]:
         simple = simple.split('<')[-1].replace('>', '')
         types[field_name] = simple
     return types
+
+
+def field_types_including_base(index: SourceIndex, class_name: str) -> Dict[str, str]:
+    types: Dict[str, str] = {}
+    current = class_name
+    seen = set()
+    while current and current not in seen:
+        seen.add(current)
+        java_class = index.get(current)
+        if not java_class:
+            break
+        types.update(field_types(java_class))
+        current = java_class.base_class()
+    return types
+
+
+def is_template_data_generator(java_class: Optional[JavaClass]) -> bool:
+    if not java_class:
+        return False
+    return (
+        "implements TemplateDataGenerator<" in java_class.text
+        or "implements TemplateDataGeneratorWithAuth<" in java_class.text
+        or "implements TemplateDataGenerator" in java_class.text
+        or "implements TemplateDataGeneratorWithAuth" in java_class.text
+    )
+
+
+def collect_docmosis_templates_for_class(java_class: JavaClass) -> Set[str]:
+    templates = set(DOCMOSIS_TEMPLATE_RE.findall(java_class.text))
+    templates.update(DOCMOSIS_STATIC_IMPORT_RE.findall(java_class.text))
+    return templates
+
+
+def build_class_dependency_map(index: SourceIndex) -> Dict[str, Set[str]]:
+    deps: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        param_map = constructor_param_map(java_class, class_name)
+        field_map = field_types_including_base(index, class_name)
+        deps[class_name] = set(param_map.values()) | set(field_map.values())
+    return deps
+
+
+def build_interface_implementations(index: SourceIndex) -> Dict[str, Set[str]]:
+    mapping: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        match = IMPLEMENTS_RE.search(java_class.text)
+        if not match:
+            continue
+        interfaces = [item.strip() for item in match.group('ifs').split(',') if item.strip()]
+        for iface in interfaces:
+            mapping.setdefault(iface, set()).add(class_name)
+    return mapping
+
+
+def resolve_docmosis_templates(class_name: str,
+                               class_deps: Dict[str, Set[str]],
+                               docmosis_templates_by_class: Dict[str, Set[str]],
+                               interface_impls: Optional[Dict[str, Set[str]]] = None,
+                               max_depth: int = 2) -> Set[str]:
+    templates: Set[str] = set()
+    queue = [(class_name, 0)]
+    seen = set()
+    while queue:
+        current, depth = queue.pop(0)
+        if current in seen:
+            continue
+        seen.add(current)
+        templates.update(docmosis_templates_by_class.get(current, set()))
+        if depth >= max_depth:
+            continue
+        for dep in class_deps.get(current, set()):
+            if dep and dep not in seen:
+                queue.append((dep, depth + 1))
+            if interface_impls and dep in interface_impls:
+                for impl in interface_impls[dep]:
+                    if impl not in seen:
+                        queue.append((impl, depth + 1))
+    return templates
 
 
 def scenario_names_for_class(index: SourceIndex,
@@ -878,7 +1125,7 @@ def extract_task_ids_including_base(index: SourceIndex, class_name: str) -> List
 
 
 def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_events,
-                                    start_event_labels, case_event_map,
+                                    start_event_labels, case_event_map, start_event_file_map,
                                     scenario_map: Dict[str, str],
                                     template_map: Dict[str, Dict[str, str]],
                                     scenario_cache: Dict[str, Set[str]]) -> List[Dict[str, object]]:
@@ -900,7 +1147,7 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
         party = infer_party_from_class(java_class)
         bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
         bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
-            events, case_event_map, start_events, start_event_labels,
+            events, case_event_map, start_events, start_event_labels, start_event_file_map,
             bpmn_files, ccd_display, ccd_ids
         )
         scenarios = scenario_names_for_class(index, class_name, scenario_map, scenario_cache)
@@ -919,15 +1166,91 @@ def collect_dashboard_callback_rows(index: SourceIndex, service_tasks, start_eve
 
 
 def build_dashboard_rows(index: SourceIndex, service_tasks, start_events, start_event_labels,
-                         case_event_map, scenario_map: Dict[str, str], template_map: Dict[str, Dict[str, str]]):
+                         case_event_map, start_event_file_map,
+                         scenario_map: Dict[str, str], template_map: Dict[str, Dict[str, str]]):
     scenario_cache: Dict[str, Set[str]] = {}
     contribution_rows = collect_dashboard_contributions(
         index, service_tasks, start_events, start_event_labels, scenario_map, template_map, scenario_cache)
     callback_rows = collect_dashboard_callback_rows(
-        index, service_tasks, start_events, start_event_labels, case_event_map,
+        index, service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map,
         scenario_map, template_map, scenario_cache)
     all_rows = contribution_rows + callback_rows
     return sorted(all_rows, key=lambda row: (row['camunda_task'], row['framework'], row['handler']))
+
+
+def build_docmosis_rows(index: SourceIndex, service_tasks, start_events, start_event_labels,
+                        case_event_map, start_event_file_map, docmosis_template_map: Dict[str, Dict[str, str]],
+                        ccd_event_names: Optional[Dict[str, str]] = None) -> List[Dict[str, object]]:
+    docmosis_templates_by_class: Dict[str, Set[str]] = {}
+    for class_name, java_class in index.classes.items():
+        templates = collect_docmosis_templates_for_class(java_class)
+        if templates:
+            docmosis_templates_by_class[class_name] = templates
+    class_deps = build_class_dependency_map(index)
+    interface_impls = build_interface_implementations(index)
+
+    rows = []
+    callback_handler_cache: Dict[str, bool] = {}
+    for class_name, java_class in index.classes.items():
+        if not extends_callback_handler(index, class_name, callback_handler_cache):
+            continue
+        if re.search(r'abstract\s+class\s+' + re.escape(class_name), java_class.text):
+            continue
+        templates_used: Set[str] = resolve_docmosis_templates(
+            class_name, class_deps, docmosis_templates_by_class,
+            interface_impls, max_depth=4)
+        if not templates_used:
+            continue
+        events = extract_case_events_including_base(index, class_name)
+        task_ids = extract_task_ids_including_base(index, class_name) or [class_name]
+        party = infer_party_from_class(java_class)
+        path_lower = str(java_class.path).lower()
+        if "/handler/callback/user/" in path_lower:
+            channel = "Docmosis (User callback)"
+        elif "/handler/callback/camunda/" in path_lower:
+            channel = "Docmosis (Camunda callback)"
+        else:
+            channel = "Docmosis"
+        for task_id in task_ids:
+            bpmn_files, ccd_display, ccd_ids = lookup_bpmn(task_id, service_tasks, start_events, start_event_labels)
+            bpmn_files, ccd_display, ccd_ids = augment_with_case_events(
+                events, case_event_map, start_events, start_event_labels, start_event_file_map,
+                bpmn_files, ccd_display, ccd_ids,
+                event_label_map=ccd_event_names,
+                include_events=True
+            )
+            template_entries = []
+            for tpl in sorted(templates_used):
+                template_meta = docmosis_template_map.get(tpl) or {}
+                filename = template_meta.get("filename")
+                title = normalize_docmosis_title(template_meta.get("title"))
+                if filename:
+                    label = f"{tpl} ({filename})"
+                    if title:
+                        label = f"{label} - {title}"
+                    link = f"{DOCMOSIS_TEMPLATE_BASE_URL}{filename}?raw=1"
+                    alt_link = f"{DOCMOSIS_TEMPLATE_PROD_URL}{filename}?raw=1"
+                else:
+                    label = tpl
+                    link = None
+                    alt_link = None
+                entry = {'label': label}
+                if link:
+                    entry['link'] = link
+                if alt_link:
+                    entry['alt_link'] = alt_link
+                template_entries.append(entry)
+            rows.append({
+                'camunda_task': task_id,
+                'handler': class_name,
+                'channel': channel,
+                'party': party,
+                'bpmn_files': bpmn_files or ['—'],
+                'ccd_events': ccd_display or ['—'],
+                'ccd_event_ids': ccd_ids,
+                'templates': template_entries,
+            })
+    return sorted(rows, key=lambda row: (row['camunda_task'], row['handler']))
 
 
 def format_bpmn_markdown(paths: List[str]) -> str:
@@ -959,7 +1282,9 @@ def format_templates_markdown(entries: List[Dict[str, str]], notify_service_id: 
         return '—'
     parts = []
     for entry in entries:
-        if entry.get('gov_id'):
+        if entry.get('link'):
+            link = f"[`{entry['label']}`]({entry['link']})"
+        elif entry.get('gov_id'):
             label = entry['label']
             if notify_service_id:
                 link = (
@@ -989,7 +1314,9 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
         return '—'
     parts = []
     for entry in entries:
-        if entry.get('gov_id'):
+        if entry.get('link'):
+            link = f"<a href='{entry['link']}'><code>{html.escape(entry['label'])}</code></a>"
+        elif entry.get('gov_id'):
             label = html.escape(entry['label'])
             if notify_service_id:
                 link = (
@@ -1012,7 +1339,9 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
     return '<br>'.join(parts)
 
 
-def combine_rows(email_rows: List[Dict[str, object]], dashboard_rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
+def combine_rows(email_rows: List[Dict[str, object]],
+                 dashboard_rows: List[Dict[str, object]],
+                 docmosis_rows: List[Dict[str, object]]) -> List[Dict[str, object]]:
     combined = []
     for row in email_rows:
         templates = []
@@ -1044,9 +1373,41 @@ def combine_rows(email_rows: List[Dict[str, object]], dashboard_rows: List[Dict[
             'templates': templates,
             'bpmn_files': row['bpmn_files']
         })
-    channel_priority = {'Email': 0, 'Dashboard': 1}
-    combined.sort(key=lambda r: ((r['ccd_events'] or [''])[0].lower(), channel_priority.get(r['channel'], 99), r['camunda_task']))
+    for row in docmosis_rows:
+        templates = row.get('templates') or []
+        combined.append({
+            'ccd_events': row['ccd_events'],
+            'ccd_event_ids': row['ccd_event_ids'],
+            'camunda_task': row['camunda_task'],
+            'channel': row.get('channel', 'Docmosis'),
+            'party': row.get('party'),
+            'templates': templates,
+            'bpmn_files': row['bpmn_files']
+        })
+    channel_priority = {'Email': 0, 'Dashboard': 1, 'Docmosis': 2}
+    def channel_rank(value: str) -> int:
+        base = (value or '').split(' ', 1)[0]
+        return channel_priority.get(base, 99)
+    combined.sort(key=lambda r: ((r['ccd_events'] or [''])[0].lower(), channel_rank(r['channel']), r['camunda_task']))
     return combined
+
+
+def normalize_ccd_event_labels(rows: List[Dict[str, object]], ccd_event_names: Dict[str, str]) -> List[Dict[str, object]]:
+    if not ccd_event_names:
+        return rows
+    for row in rows:
+        ids = row.get('ccd_event_ids') or []
+        labels = row.get('ccd_events') or []
+        if not ids or not labels:
+            continue
+        normalized = []
+        for event_id, label in zip(ids, labels):
+            if event_id in ('—', ''):
+                normalized.append(label)
+                continue
+            normalized.append(build_filter_label(event_id, label, ccd_event_names.get(event_id)))
+        row['ccd_events'] = normalized
+    return rows
 
 
 def render_combined_markdown(rows: List[Dict[str, object]], notify_service_id: Optional[str]) -> str:
@@ -1093,7 +1454,9 @@ def build_filter_label(event_id: str, bpmn_label: Optional[str], ccd_label: Opti
 
 
 def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optional[str],
-                         ccd_event_names: Optional[Dict[str, str]] = None) -> str:
+                         ccd_event_names: Optional[Dict[str, str]] = None,
+                         docmosis_template_map: Optional[Dict[str, str]] = None,
+                         docmosis_rows: Optional[List[Dict[str, object]]] = None) -> str:
     header = [
         "CCD event(s)",
         "Camunda task",
@@ -1128,9 +1491,11 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "    th, td { border: 1px solid #ddd; padding: 0.4rem; vertical-align: top; }",
         "    th { position: sticky; top: 0; background: #f5f5f5; text-align: left; }",
         "    tr:nth-child(even) { background: #fafafa; }",
+        "    th:nth-child(6), td:nth-child(6) { min-width: 28rem; width: 40%; }",
         "    .filter-panel { margin: 0.75rem 0; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }",
         "    .filter-panel label { font-weight: 600; }",
         "    select { min-width: 18rem; padding: 0.2rem; }",
+        "    #channel-filter { min-width: 12rem; }",
         "    button { padding: 0.2rem 0.6rem; }",
         "    .counts { font-size: 0.85rem; color: #555; }",
         "    h1 { margin-bottom: 0.25rem; }",
@@ -1151,9 +1516,18 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         lines.append(f"      <option value='{html.escape(event_id.lower())}'>{html.escape(label or event_id)}</option>")
     lines.extend([
         "    </select>",
+        "    <label for='channel-filter'>Channel:</label>",
+        "    <select id='channel-filter'>",
+        "      <option value=''>All channels</option>",
+        "      <option value='email'>Email</option>",
+        "      <option value='dashboard'>Dashboard</option>",
+        "      <option value='docmosis'>Docmosis</option>",
+        "    </select>",
         "    <button type='button' id='reset-filter'>Reset</button>",
         "    <span class='counts'><span id='visible-count'>0</span> rows shown</span>",
         "  </div>",
+    ])
+    lines.extend([
         "  <table id='notifications-table'>",
         "    <thead>",
         "      <tr>",
@@ -1168,7 +1542,7 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
     for row in rows:
         ccd_attr = ' '.join(event.lower() for event in row.get('ccd_event_ids', []) if event not in ('—', ''))
         lines.extend([
-            f"      <tr data-ccd-events='{ccd_attr}'>",
+            f"      <tr data-ccd-events='{ccd_attr}' data-channel='{html.escape(row['channel'].split(' ', 1)[0].lower())}'>",
             f"        <td>{'<br>'.join(html.escape(event) for event in row['ccd_events'])}</td>",
             f"        <td><code>{html.escape(row['camunda_task'])}</code></td>",
             f"        <td>{format_bpmn_html(row['bpmn_files'])}</td>",
@@ -1183,15 +1557,20 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "  <script>",
         "    (function() {",
         "      const select = document.getElementById('ccd-filter');",
+        "      const channel = document.getElementById('channel-filter');",
         "      const reset = document.getElementById('reset-filter');",
         "      const rows = Array.from(document.querySelectorAll('#notifications-table tbody tr'));",
         "      const counter = document.getElementById('visible-count');",
         "      function applyFilter() {",
         "        const value = (select.value || '').trim();",
+        "        const channelValue = (channel.value || '').trim();",
         "        let visible = 0;",
         "        rows.forEach(row => {",
         "          const tokens = (row.dataset.ccdEvents || '').split(/\s+/).filter(Boolean);",
-        "          if (!value || tokens.some(token => token === value)) {",
+        "          const channelToken = row.dataset.channel || '';",
+        "          const matchesCcd = !value || tokens.some(token => token === value);",
+        "          const matchesChannel = !channelValue || channelToken === channelValue;",
+        "          if (matchesCcd && matchesChannel) {",
         "            row.style.display = '';",
         "            visible += 1;",
         "          } else {",
@@ -1200,6 +1579,7 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "        });",
         "        counter.textContent = visible;",
         "        window.sessionStorage.setItem('ccdFilter', value);",
+        "        window.sessionStorage.setItem('channelFilter', channelValue);",
         "        if (value) {",
         "          window.location.hash = encodeURIComponent(value);",
         "        } else {",
@@ -1207,11 +1587,16 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "        }",
         "      }",
         "      const saved = window.sessionStorage.getItem('ccdFilter') || (window.location.hash ? decodeURIComponent(window.location.hash.substring(1)) : '');",
+        "      const savedChannel = window.sessionStorage.getItem('channelFilter') || '';",
         "      if (saved) {",
         "        select.value = saved;",
         "      }",
+        "      if (savedChannel) {",
+        "        channel.value = savedChannel;",
+        "      }",
         "      select.addEventListener('change', applyFilter);",
-        "      reset.addEventListener('click', () => { select.value = ''; applyFilter(); });",
+        "      channel.addEventListener('change', applyFilter);",
+        "      reset.addEventListener('click', () => { select.value = ''; channel.value = ''; applyFilter(); });",
         "      applyFilter();",
         "    })();",
         "  </script>",
@@ -1223,12 +1608,16 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
 
 def main(argv: Optional[List[str]] = None) -> int:
     default_ccd_root = (REPO_ROOT / '..' / 'civil-ccd-definition' / 'ccd-definition').resolve()
+    default_ga_root = (REPO_ROOT / '..' / 'civil-general-apps-ccd-definition' / 'ga-ccd-definition').resolve()
     parser = argparse.ArgumentParser(description="Generate docs/email-notifications.md")
     parser.add_argument('--bpmn-root', default=str((REPO_ROOT / '..' / 'civil-camunda-bpmn-definition').resolve()),
                         help='Path to civil-camunda-bpmn-definition project (default: sibling directory).')
     parser.add_argument('--ccd-definition-root',
                         default=str(default_ccd_root) if default_ccd_root.exists() else '',
                         help='Path to civil-ccd-definition/ccd-definition (default: sibling directory if present).')
+    parser.add_argument('--ga-ccd-definition-root',
+                        default=str(default_ga_root) if default_ga_root.exists() else '',
+                        help='Path to civil-general-apps-ccd-definition/ga-ccd-definition (default: sibling directory if present).')
     parser.add_argument('--output', default=str(REPO_ROOT / 'docs' / 'email-notifications.md'),
                         help='Output markdown file path.')
     parser.add_argument('--notify-service-id', default=os.environ.get('NOTIFY_SERVICE_ID')
@@ -1250,22 +1639,38 @@ def main(argv: Optional[List[str]] = None) -> int:
     notifications = parse_notifications_config(APPLICATION_YAML)
     index = SourceIndex(JAVA_ROOT)
     camunda_root = bpmn_root / 'src' / 'main' / 'resources' / 'camunda' if (bpmn_root / 'src').exists() else bpmn_root
-    service_tasks, start_events, start_event_labels, case_event_map = index_bpmn(camunda_root)
+    service_tasks, start_events, start_event_labels, case_event_map, start_event_file_map = index_bpmn(camunda_root)
     scenario_map = load_dashboard_scenarios()
     template_map = load_template_paths()
-    email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels, case_event_map)
-    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, case_event_map, scenario_map, template_map)
-    combined_rows = combine_rows(email_rows, dashboard_rows)
+    ccd_root = Path(args.ccd_definition_root) if args.ccd_definition_root else None
+    ga_root = Path(args.ga_ccd_definition_root) if args.ga_ccd_definition_root else None
+    civil_event_names = load_ccd_event_names(ccd_root) if ccd_root else {}
+    ga_event_names = load_ccd_event_names(ga_root) if ga_root else {}
+    ccd_event_names = merge_ccd_event_names(civil_event_names, ga_event_names)
+    email_rows = build_email_rows(index, notifications, camunda_root, service_tasks, start_events, start_event_labels,
+                                  case_event_map, start_event_file_map)
+    dashboard_rows = build_dashboard_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
+                                          start_event_file_map, scenario_map, template_map)
+    docmosis_template_map = load_docmosis_templates()
+    docmosis_rows = build_docmosis_rows(index, service_tasks, start_events, start_event_labels, case_event_map,
+                                        start_event_file_map, docmosis_template_map, ccd_event_names)
+    combined_rows = combine_rows(email_rows, dashboard_rows, docmosis_rows)
+    combined_rows = normalize_ccd_event_labels(combined_rows, ccd_event_names)
     filtered_rows = filter_rows_by_ccd_event(combined_rows, args.ccd_event_filters)
-    markdown = '\n\n'.join(["# Notification matrix", render_combined_markdown(filtered_rows, args.notify_service_id)])
+    markdown_parts = ["# Notification matrix", render_combined_markdown(filtered_rows, args.notify_service_id)]
+    markdown = '\n\n'.join(markdown_parts)
     output_path = Path(args.output)
     output_path.write_text(markdown + "\n", encoding="utf-8")
     print(f"Wrote {len(filtered_rows)} combined rows to {output_path}")
     html_output = (args.html_output or '').strip()
     if html_output:
-        ccd_root = Path(args.ccd_definition_root) if args.ccd_definition_root else None
-        ccd_event_names = load_ccd_event_names(ccd_root) if ccd_root else {}
-        html_markup = render_combined_html(filtered_rows, args.notify_service_id, ccd_event_names)
+        html_markup = render_combined_html(
+            filtered_rows,
+            args.notify_service_id,
+            ccd_event_names,
+            docmosis_template_map,
+            docmosis_rows
+        )
         html_path = Path(html_output)
         html_path.write_text(html_markup + "\n", encoding="utf-8")
         print(f"Wrote interactive HTML table to {html_path}")

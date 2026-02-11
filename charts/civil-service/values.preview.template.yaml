@@ -54,6 +54,7 @@ java:
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
+    MANAGEMENT_HEALTH_FEES_ENABLED: false
   keyVaults:
     civil:
       resourceGroup: civil
