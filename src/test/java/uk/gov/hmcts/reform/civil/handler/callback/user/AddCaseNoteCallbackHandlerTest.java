@@ -63,11 +63,10 @@ class AddCaseNoteCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseNote caseNote(LocalDateTime timeStamp, String createdBy, String note) {
-        return CaseNote.builder()
-            .createdOn(timeStamp)
-            .createdBy(createdBy)
-            .note(note)
-            .build();
+        return new CaseNote()
+            .setCreatedOn(timeStamp)
+            .setCreatedBy(createdBy)
+            .setNote(note);
     }
 
     @Nested
