@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.FeesService;
@@ -30,7 +31,6 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
@@ -74,7 +74,7 @@ class SubmitClaimTaskTest {
     private Time time;
 
     @Mock
-    private SpecReferenceNumberRepository specReferenceNumberRepository;
+    private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
 
     @Mock
     private OrganisationService organisationService;
@@ -91,7 +91,7 @@ class SubmitClaimTaskTest {
     @BeforeEach
     public void setUp() {
         submitClaimTask = new SubmitClaimTask(featureToggleService, new ObjectMapper(), defendantPinToPostLRspecService, interestCalculator,
-                                              toggleConfiguration, caseFlagInitialiser, feesService, userService, time, specReferenceNumberRepository,
+                                              toggleConfiguration, caseFlagInitialiser, feesService, userService, time, casemanReferenceNumberRepository,
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
@@ -122,7 +122,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -181,7 +181,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -235,7 +235,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -282,7 +282,7 @@ class SubmitClaimTaskTest {
 
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
         DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
         defendantPinToPostLRspec.setAccessCode("12345");
         when(defendantPinToPostLRspecService.buildDefendantPinToPost())
@@ -319,7 +319,7 @@ class SubmitClaimTaskTest {
 
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
+        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
 
         submitClaimTask.submitClaim(notMatchedCase, "eventId", "authToken", NO, null);
 
@@ -327,4 +327,3 @@ class SubmitClaimTaskTest {
         verify(defendantPinToPostLRspecService, never()).buildDefendantPinToPost();
     }
 }
-
