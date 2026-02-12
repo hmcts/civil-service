@@ -130,7 +130,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -207,7 +207,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -270,7 +270,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -339,7 +339,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -402,7 +402,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -465,7 +465,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -529,7 +529,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -591,7 +591,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -662,7 +662,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -752,7 +752,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .civilServiceUserRoles(IdamUserDetails.builder().id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             GeneralApplication.GeneralApplicationBuilder builderWithNotice = GeneralApplication.builder();
@@ -777,7 +777,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                             .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                             .email("applicant@someorg.com")
                             .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .isGaRespondentOneLip(NO)
                     .isGaApplicantLip(NO)
                     .isGaRespondentTwoLip(NO)
@@ -881,7 +881,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
                         .email("applicant@someorg.com")
                         .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
 
         GeneralApplication caseData = builder.build();

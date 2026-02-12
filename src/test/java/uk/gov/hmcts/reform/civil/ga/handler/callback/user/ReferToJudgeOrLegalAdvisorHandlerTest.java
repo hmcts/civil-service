@@ -176,13 +176,11 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent("INITIATE_GENERAL_APPLICATION")
-                                 .processInstanceId("11111")
-                                 .status(BusinessProcessStatus.FINISHED)
-                                 .activityId("anyActivity")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent("INITIATE_GENERAL_APPLICATION")
+                                 .setProcessInstanceId("11111")
+                                 .setStatus(BusinessProcessStatus.FINISHED)
+                                 .setActivityId("anyActivity"))
             .isCcmccLocation(courtAssigned)
             .ccdState(state)
             .build();

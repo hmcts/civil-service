@@ -53,11 +53,12 @@ public class DefendantAddressValidatorTest {
 
     @Test
     void validatePostCode_whenAddressIsNotCorrect() {
+        Address address = new Address();
+        address.setPostCode("postcode");
+
         CaseData caseData = CaseData.builder()
             .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
-            .specAoSApplicantCorrespondenceAddressdetails(
-                Address.builder().postCode("postcode").build()
-            )
+            .specAoSApplicantCorrespondenceAddressdetails(address)
             .build();
         CallbackParams params = CallbackParams.builder()
             .caseData(caseData)

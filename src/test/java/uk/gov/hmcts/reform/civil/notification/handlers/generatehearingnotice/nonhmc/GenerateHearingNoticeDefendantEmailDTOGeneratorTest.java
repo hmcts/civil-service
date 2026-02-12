@@ -91,7 +91,7 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
                 .legacyCaseReference(CASE_REF)
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_ARG)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .respondent1(Party.builder().individualFirstName("Defendant")
                             .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
                 .build();

@@ -275,11 +275,10 @@ public class EvidenceUploadJudgeHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private CaseNote createCaseNote(LocalDateTime timeStamp) {
-        return CaseNote.builder()
-            .createdOn(timeStamp)
-            .createdBy("John Doe")
-            .note("test note")
-            .build();
+        return new CaseNote()
+            .setCreatedOn(timeStamp)
+            .setCreatedBy("John Doe")
+            .setNote("test note");
     }
 
 }

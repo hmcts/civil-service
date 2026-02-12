@@ -84,12 +84,11 @@ class PaymentStatusRetryServiceTest {
         when(coreCaseDataService.startUpdate("123", CaseEvent.CREATE_CLAIM_AFTER_PAYMENT))
             .thenReturn(startEventResponse);
 
-        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
-            .status("success")
-            .paymentReference("ref")
-            .errorCode("err")
-            .errorDescription("desc")
-            .build();
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("success")
+            .setPaymentReference("ref")
+            .setErrorCode("err")
+            .setErrorDescription("desc");
         service.updatePaymentStatus(FeeType.CLAIMISSUED, "123", response);
 
         verify(coreCaseDataService).submitUpdate(eq("123"), any());
@@ -115,12 +114,11 @@ class PaymentStatusRetryServiceTest {
 
     @Test
     void shouldUpdateCaseDataWithPaymentDetails() {
-        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
-            .status("failed")
-            .paymentReference("ref")
-            .errorCode("code")
-            .errorDescription("desc")
-            .build();
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("failed")
+            .setPaymentReference("ref")
+            .setErrorCode("code")
+            .setErrorDescription("desc");
 
         when(caseData.getClaimIssuedPaymentDetails()).thenReturn(null);
         when(caseData.setClaimIssuedPaymentDetails(any())).thenReturn(caseData);
@@ -144,10 +142,9 @@ class PaymentStatusRetryServiceTest {
 
     @Test
     void shouldLogAndRecoverWhenUpdatePaymentStatusCardPaymentFails() {
-        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
-            .status("success")
-            .paymentReference("ref")
-            .build();
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("success")
+            .setPaymentReference("ref");
 
         when(coreCaseDataService.getCase(123L)).thenThrow(new RuntimeException());
 
@@ -157,12 +154,11 @@ class PaymentStatusRetryServiceTest {
             spyService.updatePaymentStatus(FeeType.CLAIMISSUED, "123", response)
         );
 
-        CardPaymentStatusResponse recoverResponse = CardPaymentStatusResponse.builder()
-            .status("FAILED")
-            .paymentReference("REF123")
-            .errorCode("ERR001")
-            .errorDescription("Payment failed")
-            .build();
+        CardPaymentStatusResponse recoverResponse = new CardPaymentStatusResponse()
+            .setStatus("FAILED")
+            .setPaymentReference("REF123")
+            .setErrorCode("ERR001")
+            .setErrorDescription("Payment failed");
 
         spyService.recover(new CaseDataUpdateException(), FeeType.CLAIMISSUED, "123", recoverResponse);
     }
@@ -205,15 +201,13 @@ class PaymentStatusRetryServiceTest {
     void recoverShouldLogErrorForCardPaymentResponse() {
         CaseDataUpdateException ex = new CaseDataUpdateException();
 
-        CardPaymentStatusResponse response = CardPaymentStatusResponse.builder()
-            .status("FAILED")
-            .errorCode("ERR123")
-            .errorDescription("Payment failed")
-            .paymentReference("PAY123")
-            .build();
+        CardPaymentStatusResponse response = new CardPaymentStatusResponse()
+            .setStatus("FAILED")
+            .setErrorCode("ERR123")
+            .setErrorDescription("Payment failed")
+            .setPaymentReference("PAY123");
 
         service.recover(ex, FeeType.CLAIMISSUED, "12345", response);
     }
 }
-
 

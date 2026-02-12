@@ -52,10 +52,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 1 Details Changed")
-                .description("Name: From 'Company One' to 'Company Two'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 1 Details Changed")
+                .setDescription("Name: From 'Company One' to 'Company Two'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -72,10 +71,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 2 Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 2 Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -92,10 +90,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 1 Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 1 Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -112,10 +109,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 2 Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 2 Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -125,14 +121,14 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder().applicant1LitigationFriend(current).build();
@@ -140,10 +136,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 1 Litigation Friend Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 1 Litigation Friend Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -151,18 +146,13 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant1LitigationFriendAddressChanges_toAddressSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
@@ -180,10 +170,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 1 Litigation Friend Details Changed")
-                .description("Address: From '123 Main St, City, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 1 Litigation Friend Details Changed")
+                .setDescription("Address: From '123 Main St, City, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -191,12 +180,7 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant1LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
@@ -208,7 +192,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder()
@@ -220,10 +204,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 1 Litigation Friend Details Changed")
-                .description("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 1 Litigation Friend Details Changed")
+                .setDescription("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -233,14 +216,14 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder().applicant2LitigationFriend(current).build();
@@ -248,10 +231,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 2 Litigation Friend Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 2 Litigation Friend Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -259,18 +241,13 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant2LitigationFriendAddressChanges_toAddressSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
@@ -288,10 +265,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 2 Litigation Friend Details Changed")
-                .description("Address: From '123 Main St, City, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 2 Litigation Friend Details Changed")
+                .setDescription("Address: From '123 Main St, City, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -299,12 +275,7 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant2LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
@@ -316,7 +287,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder()
@@ -328,10 +299,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Applicant 2 Litigation Friend Details Changed")
-                .description("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Applicant 2 Litigation Friend Details Changed")
+                .setDescription("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -341,14 +311,14 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder().respondent1LitigationFriend(current).build();
@@ -356,10 +326,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 1 Litigation Friend Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 1 Litigation Friend Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -367,24 +336,14 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent1LitigationFriendAddressChanges_toAddressSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
                 .primaryAddress(
-                    Address.builder()
-                        .addressLine1("123 Main St")
-                        .postTown("City")
-                        .postCode("YO1 ERP")
-                        .country("Country")
-                        .build())
+                    address("123 Main St", "City", "YO1 ERP", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
@@ -402,10 +361,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 1 Litigation Friend Details Changed")
-                .description("Address: From '123 Main St, City, YO1 ERP, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 1 Litigation Friend Details Changed")
+                .setDescription("Address: From '123 Main St, City, YO1 ERP, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -413,12 +371,7 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent1LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
             Party litigant = Party.builder().primaryAddress(
-                Address.builder()
-                    .addressLine1("Litigant Street")
-                    .postTown("Litigant City")
-                    .postCode("Litigant Postcode")
-                    .country("Litigant Country")
-                    .build()).build();
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
@@ -430,7 +383,7 @@ public class PartyDetailsChangedUtilTest {
                 .firstName("John")
                 .lastName("Doe")
                 .hasSameAddressAsLitigant(YesOrNo.NO)
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder()
@@ -442,10 +395,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 1 Litigation Friend Details Changed")
-                .description("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 1 Litigation Friend Details Changed")
+                .setDescription("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -455,14 +407,14 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .hasSameAddressAsLitigant(YesOrNo.NO)
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             CaseData caseDataCurrent = CaseData.builder().respondent2LitigationFriend(current).build();
@@ -470,10 +422,9 @@ public class PartyDetailsChangedUtilTest {
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-            ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-                .summary("Respondent 2 Litigation Friend Details Changed")
-                .description("Name: From 'John Doe' to 'Jane Smith'.")
-                .build();
+            ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+                .setSummary("Respondent 2 Litigation Friend Details Changed")
+                .setDescription("Name: From 'John Doe' to 'Jane Smith'.");
 
             assertEquals(expectedEvent, actualEvent);
         }
@@ -482,24 +433,14 @@ public class PartyDetailsChangedUtilTest {
     @Test
     public void testBuildChangesEvent_Respondent2LitigationFriendAddressChanges_toAddressSameAsLitigant() {
         Party litigant = Party.builder().primaryAddress(
-            Address.builder()
-                .addressLine1("Litigant Street")
-                .postTown("Litigant City")
-                .postCode("Litigant Postcode")
-                .country("Litigant Country")
-                .build()).build();
+            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
         LitigationFriend current = LitigationFriend.builder()
             .firstName("John")
             .lastName("Doe")
             .hasSameAddressAsLitigant(YesOrNo.NO)
             .primaryAddress(
-                Address.builder()
-                    .addressLine1("123 Main St")
-                    .postTown("City")
-                    .postCode("YO1 ERP")
-                    .country("Country")
-                    .build())
+                address("123 Main St", "City", "YO1 ERP", "Country"))
             .build();
 
         LitigationFriend updated = LitigationFriend.builder()
@@ -517,10 +458,9 @@ public class PartyDetailsChangedUtilTest {
 
         ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-        ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-            .summary("Respondent 2 Litigation Friend Details Changed")
-            .description("Address: From '123 Main St, City, YO1 ERP, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.")
-            .build();
+        ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+            .setSummary("Respondent 2 Litigation Friend Details Changed")
+            .setDescription("Address: From '123 Main St, City, YO1 ERP, Country' to 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country'.");
 
         assertEquals(expectedEvent, actualEvent);
     }
@@ -528,12 +468,7 @@ public class PartyDetailsChangedUtilTest {
     @Test
     public void testBuildChangesEvent_Respondent2LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
         Party litigant = Party.builder().primaryAddress(
-            Address.builder()
-                .addressLine1("Litigant Street")
-                .postTown("Litigant City")
-                .postCode("Litigant Postcode")
-                .country("Litigant Country")
-                .build()).build();
+            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
 
         LitigationFriend current = LitigationFriend.builder()
             .firstName("John")
@@ -545,7 +480,7 @@ public class PartyDetailsChangedUtilTest {
             .firstName("John")
             .lastName("Doe")
             .hasSameAddressAsLitigant(YesOrNo.NO)
-            .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+            .primaryAddress(address("123 Main St", "City", "Country"))
             .build();
 
         CaseData caseDataCurrent = CaseData.builder()
@@ -557,10 +492,9 @@ public class PartyDetailsChangedUtilTest {
 
         ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(caseDataCurrent, caseDataUpdated);
 
-        ContactDetailsUpdatedEvent expectedEvent = ContactDetailsUpdatedEvent.builder()
-            .summary("Respondent 2 Litigation Friend Details Changed")
-            .description("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.")
-            .build();
+        ContactDetailsUpdatedEvent expectedEvent = new ContactDetailsUpdatedEvent()
+            .setSummary("Respondent 2 Litigation Friend Details Changed")
+            .setDescription("Address: From 'Litigant Street, Litigant City, Litigant Postcode, Litigant Country' to '123 Main St, City, Country'.");
 
         assertEquals(expectedEvent, actualEvent);
     }
@@ -669,11 +603,11 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testGetChangesParty_AddressChange() {
             Party current = PartyBuilder.builder().individual().build().toBuilder()
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             Party updated = PartyBuilder.builder().individual().build().toBuilder()
-                .primaryAddress(Address.builder().addressLine1("999 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("999 Main St", "City", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -692,13 +626,13 @@ public class PartyDetailsChangedUtilTest {
             Party current = PartyBuilder.builder().individual().build().toBuilder()
                 .individualFirstName("John")
                 .individualLastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             Party updated = PartyBuilder.builder().individual().build().toBuilder()
                 .individualFirstName("Jane")
                 .individualLastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("999 Elm St").postTown("Town").country("Country").build())
+                .primaryAddress(address("999 Elm St", "Town", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -727,13 +661,13 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -745,13 +679,13 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -770,13 +704,13 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("999 Elm St").postTown("Town").country("Country").build())
+                .primaryAddress(address("999 Elm St", "Town", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -795,13 +729,13 @@ public class PartyDetailsChangedUtilTest {
             LitigationFriend current = LitigationFriend.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .primaryAddress(Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build())
+                .primaryAddress(address("123 Main St", "City", "Country"))
                 .build();
 
             LitigationFriend updated = LitigationFriend.builder()
                 .firstName("Jane")
                 .lastName("Smith")
-                .primaryAddress(Address.builder().addressLine1("999 Elm St").postTown("Town").country("Country").build())
+                .primaryAddress(address("999 Elm St", "Town", "Country"))
                 .build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -820,5 +754,19 @@ public class PartyDetailsChangedUtilTest {
 
             assertEquals(List.of(expectedNameChange, expectedAddressChange), changes);
         }
+    }
+
+    private static Address address(String addressLine1, String postTown, String country) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setCountry(country);
+        return address;
+    }
+
+    private static Address address(String addressLine1, String postTown, String postCode, String country) {
+        Address address = address(addressLine1, postTown, country);
+        address.setPostCode(postCode);
+        return address;
     }
 }

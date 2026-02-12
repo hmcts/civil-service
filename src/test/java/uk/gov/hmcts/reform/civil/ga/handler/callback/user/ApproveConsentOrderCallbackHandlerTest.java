@@ -232,13 +232,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -265,13 +263,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -292,13 +288,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }

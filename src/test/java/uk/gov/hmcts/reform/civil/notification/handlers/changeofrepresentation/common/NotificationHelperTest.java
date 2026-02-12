@@ -53,12 +53,11 @@ class NotificationHelperTest {
                              .partyName("Respondent B").build())
             .legacyCaseReference("LEGACY-REF")
             .issueDate(LocalDate.of(2024, 5, 1))
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .applicant1Represented(YesOrNo.YES)
             .hearingDate(LocalDate.of(2024, 6, 1))
             .hearingDueDate(LocalDate.of(2024, 5, 20))
@@ -121,12 +120,11 @@ class NotificationHelperTest {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent1OrganisationPolicy(respondent1Policy)
             .respondentSolicitor1EmailAddress("resp1sol@example.com")
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .build();
 
         RecipientData result = NotificationHelper.getOtherSolicitor2(caseData);
@@ -195,12 +193,11 @@ class NotificationHelperTest {
         CaseData caseData = baseCaseData.toBuilder()
             .respondent1OrganisationPolicy(respondent1Policy)
             .respondentSolicitor1EmailAddress("resp1sol@example.com")
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .build();
 
         RecipientData result = NotificationHelper.getOtherSolicitor1(caseData);
@@ -221,12 +218,11 @@ class NotificationHelperTest {
             .applicant1OrganisationPolicy(applicantPolicy)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .email("appsol@example.com").build())
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .build();
 
         RecipientData result = NotificationHelper.getOtherSolicitor1(caseData);
@@ -247,12 +243,11 @@ class NotificationHelperTest {
             .applicant1OrganisationPolicy(applicantPolicy)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .email("appsol@example.com").build())
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-                                        .organisationToAddID("orgAdd")
-                                        .organisationToRemoveID("orgRemove")
-                                        .formerRepresentationEmailAddress("former@sol.com")
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
+                                        .setOrganisationToAddID("orgAdd")
+                                        .setOrganisationToRemoveID("orgRemove")
+                                        .setFormerRepresentationEmailAddress("former@sol.com"))
             .applicant1Represented(YesOrNo.YES)
             .build();
 
@@ -266,9 +261,8 @@ class NotificationHelperTest {
     @Test
     void getOtherSolicitor1_shouldReturnNull_whenNoConditionsMatch() {
         CaseData caseData = baseCaseData.toBuilder()
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.CLAIMANT.getFormattedName())
-                                        .build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.CLAIMANT.getFormattedName()))
             .build();
 
         RecipientData result = NotificationHelper.getOtherSolicitor1(caseData);

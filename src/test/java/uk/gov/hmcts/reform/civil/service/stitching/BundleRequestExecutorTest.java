@@ -62,7 +62,7 @@ class BundleRequestExecutorTest {
             .willReturn(responseEntity);
 
         // When
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
         var result = bundleRequestExecutor.post(request, endpoint, "not important");
 
         // Then
@@ -82,7 +82,7 @@ class BundleRequestExecutorTest {
                                                        HttpHeaders.EMPTY, errorData.getBytes(),
                                                        Charset.defaultCharset()
             ));
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
 
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
@@ -105,7 +105,7 @@ class BundleRequestExecutorTest {
             .willReturn(responseEntity);
 
         // When
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
             () -> bundleRequestExecutor.post(request, endpoint, "not important")
@@ -122,7 +122,7 @@ class BundleRequestExecutorTest {
         given(evidenceManagementApiClient.stitchBundle(any(), any(), any(BundleRequest.class)))
             .willReturn(responseEntity);
 
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,
             () -> bundleRequestExecutor.post(request, endpoint, "not important")
@@ -140,7 +140,7 @@ class BundleRequestExecutorTest {
                                                        HttpHeaders.EMPTY, errorData.getBytes(),
                                                        Charset.defaultCharset()
             ));
-        BundleRequest request = BundleRequest.builder().build();
+        BundleRequest request = new BundleRequest();
 
         RetryableStitchingException exception = assertThrows(
             RetryableStitchingException.class,

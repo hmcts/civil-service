@@ -178,13 +178,11 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }
@@ -237,13 +235,11 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }

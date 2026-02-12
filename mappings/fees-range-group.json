@@ -1,0 +1,22 @@
+{
+  "name": "Fee Range Group - Civil Money Claims Issue",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "county court" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "issue" },
+      "feeVersionStatus": { "equalTo": "approved" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "feesRangeGroupResponse.json"
+  }
+}

@@ -113,7 +113,9 @@ class JudgmentOnlineUtilsTest {
 
         ContactInformation contact =  ContactInformation.builder().addressLine1("Test").country(
             "Test").build();
-        Address address = Address.builder().addressLine1("Test").country("Test").build();
+        Address address = new Address();
+        address.setAddressLine1("Test");
+        address.setCountry("Test");
         assertThat(getAddress(contact).getAddressLine1()).isEqualTo(address.getAddressLine1());
         assertThat(getAddress(contact).getCountry()).isEqualTo(address.getCountry());
     }

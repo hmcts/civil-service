@@ -247,7 +247,7 @@ public class UpdateCaseDetailsAfterNoCHandler extends CallbackHandler {
         } else {
             caseData.setSpecRespondent2Represented(YES);
             caseData.setSpecRespondent2CorrespondenceAddressRequired(null);
-            caseData.setSpecRespondent2CorrespondenceAddressdetails(Address.builder().build());
+            caseData.setSpecRespondent2CorrespondenceAddressdetails(new Address());
             caseData.setSpecAoSRespondentCorrespondenceAddressdetails(null);
         }
 

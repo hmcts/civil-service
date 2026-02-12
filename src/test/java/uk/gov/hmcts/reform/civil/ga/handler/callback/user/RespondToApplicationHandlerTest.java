@@ -1441,13 +1441,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }
@@ -1485,13 +1483,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }
@@ -1530,13 +1526,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -1575,13 +1569,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .types(types).build())
             .judicialDecision(GAJudicialDecision.builder().decision(
                 GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }

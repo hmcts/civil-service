@@ -205,7 +205,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
@@ -236,7 +236,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()

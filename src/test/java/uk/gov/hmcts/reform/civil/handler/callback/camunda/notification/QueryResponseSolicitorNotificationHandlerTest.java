@@ -126,9 +126,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueriesCollection)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 
@@ -159,9 +158,8 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 

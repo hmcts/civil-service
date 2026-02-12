@@ -9,7 +9,7 @@ class ChildrenByAgeGroupLRspecTest {
     @Test
     void shouldReturnZeroWhenAllFieldsAreNull() {
         //Given
-        ChildrenByAgeGroupLRspec childrenByAgeGroupLRspec = ChildrenByAgeGroupLRspec.builder().build();
+        ChildrenByAgeGroupLRspec childrenByAgeGroupLRspec = new ChildrenByAgeGroupLRspec();
         //When
         int result = childrenByAgeGroupLRspec.getTotalChildren();
         //Then
@@ -19,10 +19,9 @@ class ChildrenByAgeGroupLRspecTest {
     @Test
     void shouldReturnSumOfThoseFieldsThatAreNotNull() {
         //Given
-        ChildrenByAgeGroupLRspec childrenByAgeGroupLRspec = ChildrenByAgeGroupLRspec.builder()
-            .numberOfElevenToFifteen("2")
-            .numberOfSixteenToNineteen("1")
-            .build();
+        ChildrenByAgeGroupLRspec childrenByAgeGroupLRspec = new ChildrenByAgeGroupLRspec()
+            .setNumberOfElevenToFifteen("2")
+            .setNumberOfSixteenToNineteen("1");
         int expectedNumber = 3;
         //When
         int result = childrenByAgeGroupLRspec.getTotalChildren();

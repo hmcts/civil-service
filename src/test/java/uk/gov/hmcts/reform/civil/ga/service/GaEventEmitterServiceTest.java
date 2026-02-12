@@ -55,7 +55,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withTenantId() {
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(businessProcess)
             .build();
@@ -81,7 +81,7 @@ class GaEventEmitterServiceTest {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(businessProcess)
             .build();
@@ -104,7 +104,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withTenantId() {
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
@@ -124,7 +124,7 @@ class GaEventEmitterServiceTest {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
@@ -142,7 +142,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndNotTriggerEvent_whenNotTrue() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(businessProcess)
             .build();
@@ -165,7 +165,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndNotTriggerGAEvent_whenNotTrue() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
@@ -182,7 +182,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldHandleException_whenInvoked() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
             .businessProcess(businessProcess)
             .build();
@@ -204,7 +204,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldHandleException_whenInvokedGA() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
-        var businessProcess = BusinessProcess.builder().camundaEvent("TEST_EVENT").build();
+        var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .businessProcess(businessProcess)

@@ -91,7 +91,7 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
@@ -110,7 +110,7 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus_whenCaseLinkIsNotNull(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
             .businessProcess(businessProcess).build();
@@ -206,9 +206,8 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
     }
 
     private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
-            .build();
+        return new BusinessProcess()
+            .setStatus(started)
+            .setProcessInstanceId(processInstanceId);
     }
 }

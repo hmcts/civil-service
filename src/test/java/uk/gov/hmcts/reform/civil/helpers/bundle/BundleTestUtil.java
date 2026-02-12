@@ -197,9 +197,9 @@ public class BundleTestUtil {
         Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
         List<Element<DocumentWithRegex>> docs = new ArrayList<>();
-        DocumentWithRegex doc = DocumentWithRegex.builder().document(Document.builder()
-                                                                         .documentFileName(TEST_FILE_NAME)
-                                                                         .documentUrl(TEST_URL).build()).build();
+        DocumentWithRegex doc = new DocumentWithRegex(Document.builder()
+                                                            .documentFileName(TEST_FILE_NAME)
+                                                            .documentUrl(TEST_URL).build());
         docs.add(ElementUtils.element(doc));
         return ServedDocumentFiles.builder()
             .particularsOfClaimDocument(particularsOfClaim)

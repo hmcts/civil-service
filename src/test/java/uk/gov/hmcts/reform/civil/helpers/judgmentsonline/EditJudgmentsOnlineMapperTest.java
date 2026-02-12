@@ -227,12 +227,11 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfJudgmentByAdmission_scenario3() {
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-            .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+            .setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+            .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+            .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)

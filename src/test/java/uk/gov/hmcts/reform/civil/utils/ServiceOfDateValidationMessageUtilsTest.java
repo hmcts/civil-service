@@ -37,10 +37,9 @@ class ServiceOfDateValidationMessageUtilsTest {
     void shouldThrowError_whenDeemedServedDateIsOlderThan14Days() {
         LocalDate currentDate = LocalDate.now();
         LocalDate deemedServedDate = currentDate.minusDays(15);
-        CertificateOfService certificateOfService = CertificateOfService.builder()
-            .cosDateOfServiceForDefendant(currentDate)
-            .cosDateDeemedServedForDefendant(deemedServedDate)
-            .build();
+        CertificateOfService certificateOfService = new CertificateOfService()
+            .setCosDateOfServiceForDefendant(currentDate)
+            .setCosDateDeemedServedForDefendant(deemedServedDate);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
@@ -56,10 +55,9 @@ class ServiceOfDateValidationMessageUtilsTest {
     void shouldThrowError_whenCosDefendantNotifyDateIsFutureDate() {
         LocalDate currentDate = LocalDate.now();
         LocalDate futureDate = currentDate.plusDays(1);
-        CertificateOfService certificateOfService = CertificateOfService.builder()
-            .cosDateOfServiceForDefendant(futureDate)
-            .cosDateDeemedServedForDefendant(currentDate)
-            .build();
+        CertificateOfService certificateOfService = new CertificateOfService()
+            .setCosDateOfServiceForDefendant(futureDate)
+            .setCosDateDeemedServedForDefendant(currentDate);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
@@ -77,10 +75,9 @@ class ServiceOfDateValidationMessageUtilsTest {
         LocalDate currentDate = LocalDate.now();
         LocalDate olderDate = currentDate.minusDays(15);
 
-        CertificateOfService certificateOfService = CertificateOfService.builder()
-            .cosDateOfServiceForDefendant(olderDate)
-            .cosDateDeemedServedForDefendant(currentDate)
-            .build();
+        CertificateOfService certificateOfService = new CertificateOfService()
+            .setCosDateOfServiceForDefendant(olderDate)
+            .setCosDateDeemedServedForDefendant(currentDate);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
@@ -96,10 +93,9 @@ class ServiceOfDateValidationMessageUtilsTest {
     @Test
     void shouldThrowError_whenDeemedServedDateIsNotWorkingDay() {
         LocalDate currentDate = LocalDate.now();
-        CertificateOfService certificateOfService = CertificateOfService.builder()
-            .cosDateOfServiceForDefendant(currentDate)
-            .cosDateDeemedServedForDefendant(currentDate)
-            .build();
+        CertificateOfService certificateOfService = new CertificateOfService()
+            .setCosDateOfServiceForDefendant(currentDate)
+            .setCosDateDeemedServedForDefendant(currentDate);
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);
@@ -118,10 +114,9 @@ class ServiceOfDateValidationMessageUtilsTest {
         LocalDate currentDate = LocalDate.now();
         LocalDate olderDate = currentDate.minusDays(15);
 
-        CertificateOfService certificateOfService = CertificateOfService.builder()
-            .cosDateOfServiceForDefendant(olderDate)
-            .cosDateDeemedServedForDefendant(LocalDate.now().plusDays(3))
-            .build();
+        CertificateOfService certificateOfService = new CertificateOfService()
+            .setCosDateOfServiceForDefendant(olderDate)
+            .setCosDateDeemedServedForDefendant(LocalDate.now().plusDays(3));
 
         LocalDateTime currentDateTime = LocalDateTime.now();
         when(time.now()).thenReturn(currentDateTime);

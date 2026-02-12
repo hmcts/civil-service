@@ -102,7 +102,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
                 .build();
             VariableMap variables = Variables.createVariables();
@@ -187,7 +187,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             String errorMessage = "there was an error";
 
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
             when(coreCaseDataService.startGaUpdate(any(), any()))
