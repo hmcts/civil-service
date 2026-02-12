@@ -12,6 +12,10 @@ import uk.gov.hmcts.reform.civil.enums.PaymentType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
+import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
+import uk.gov.hmcts.reform.civil.model.citizenui.ClaimantLiPResponse;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.ClaimantResponseOnCourtDecisionType;
+import uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
@@ -71,7 +75,7 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
                                           .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal("10000"))
+                                          .paymentAmount(new BigDecimal("21000"))
                                           .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
                                           .build())
             .build();
@@ -83,7 +87,36 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
         RepaymentPlanTemplateData repaymentPlan = form.getRepaymentPlan();
         assertThat(repaymentPlan).isNotNull();
         assertThat(repaymentPlan.getFirstRepaymentDate()).isEqualTo(firstRepaymentDate);
-        assertThat(repaymentPlan.getPaymentAmount()).isEqualTo(new BigDecimal("100.00"));
+        assertThat(repaymentPlan.getPaymentAmount()).isEqualTo(new BigDecimal("210.00"));
+        assertThat(repaymentPlan.getPaymentFrequencyDisplay()).isEqualTo("Paid every month");
+    }
+
+    @Test
+    void shouldReturnRepaymentPlan_whenClaimantAcceptsCourtProposedPlan() {
+        // Given
+        LocalDate firstRepaymentDate = LocalDate.now().plusDays(1);
+        CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                           .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
+                                                           .setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN)))
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .firstRepaymentDate(firstRepaymentDate)
+                                          .paymentAmount(new BigDecimal("21000"))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          .build())
+            .build();
+
+        // When
+        JudgmentByAdmissionOrDetermination form = mapper.toClaimantResponseForm(caseData, null);
+
+        // Then
+        RepaymentPlanTemplateData repaymentPlan = form.getRepaymentPlan();
+        assertThat(repaymentPlan).isNotNull();
+        assertThat(repaymentPlan.getFirstRepaymentDate()).isEqualTo(firstRepaymentDate);
+        assertThat(repaymentPlan.getPaymentAmount()).isEqualTo(new BigDecimal("210.00"));
         assertThat(repaymentPlan.getPaymentFrequencyDisplay()).isEqualTo("Paid every month");
     }
 
