@@ -40,11 +40,11 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
     private ResetPinDefendantLipEmailDTOGenerator emailDTOGenerator;
 
     private final DefendantPinToPostLRspec pin =
-        DefendantPinToPostLRspec.builder()
-            .expiryDate(LocalDate.now())
-            .citizenCaseRole("citizen")
-            .respondentCaseRole("citizen")
-            .accessCode("TEST1234").build();
+        new DefendantPinToPostLRspec()
+            .setExpiryDate(LocalDate.now())
+            .setCitizenCaseRole("citizen")
+            .setRespondentCaseRole("citizen")
+            .setAccessCode("TEST1234");
 
     @BeforeEach
     void setUp() {
@@ -131,4 +131,3 @@ class ResetPinDefendantLipEmailDTOGeneratorTest {
         assertThat(templateId).isEqualTo("template-id");
     }
 }
-

@@ -57,10 +57,9 @@ public class MainCaseClosedEventCallbackHandler extends CallbackHandler implemen
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder
                 .businessProcess(
-                    BusinessProcess.builder()
-                        .camundaEvent(MAIN_CASE_CLOSED.name())
-                        .status(BusinessProcessStatus.FINISHED)
-                        .build())
+                    new BusinessProcess()
+                        .setCamundaEvent(MAIN_CASE_CLOSED.name())
+                        .setStatus(BusinessProcessStatus.FINISHED))
                 .applicationClosedDate(time.now());
 
             return AboutToStartOrSubmitCallbackResponse.builder()
