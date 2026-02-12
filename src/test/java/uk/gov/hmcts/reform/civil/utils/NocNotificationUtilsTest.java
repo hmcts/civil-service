@@ -28,8 +28,8 @@ public class NocNotificationUtilsTest {
 
     @BeforeEach
     void setup() {
-        change = ChangeOfRepresentation.builder()
-            .formerRepresentationEmailAddress(TEST_EMAIL).build();
+        change = new ChangeOfRepresentation()
+            .setFormerRepresentationEmailAddress(TEST_EMAIL);
     }
 
     @Test
@@ -243,16 +243,14 @@ public class NocNotificationUtilsTest {
     void testGetCaseDataWithoutFormerSolicitorEmail() {
         CaseData caseData = CaseData.builder()
             .changeOfRepresentation(
-                ChangeOfRepresentation.builder()
-                    .formerRepresentationEmailAddress("former-sol-email")
-                    .organisationToAddID("some org")
-                    .build()).build();
+                new ChangeOfRepresentation()
+                    .setFormerRepresentationEmailAddress("former-sol-email")
+                    .setOrganisationToAddID("some org")).build();
 
         CaseData expected = CaseData.builder()
             .changeOfRepresentation(
-                ChangeOfRepresentation.builder()
-                    .organisationToAddID("some org")
-                    .build()).build();
+                new ChangeOfRepresentation()
+                    .setOrganisationToAddID("some org")).build();
 
         CaseData actual = NocNotificationUtils.getCaseDataWithoutFormerSolicitorEmail(caseData);
 
@@ -263,9 +261,8 @@ public class NocNotificationUtilsTest {
     void testIsAppliantLipForRespondentSolicitorChange_trueCondition() {
         // Arrange
         CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                        .build()).build();
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).build();
 
         // Act
         boolean result = NocNotificationUtils.isAppliantLipForRespondentSolicitorChange(caseData);
@@ -278,9 +275,8 @@ public class NocNotificationUtilsTest {
     void testApplicantLipEmailForRespondentSolicitorChange() {
         // Arrange
         CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                        .build()).applicant1(Party.builder().partyEmail(TEST_EMAIL).build()).build();
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).applicant1(Party.builder().partyEmail(TEST_EMAIL).build()).build();
 
         assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
     }
