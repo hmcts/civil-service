@@ -5,17 +5,21 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -60,30 +64,31 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GAJudgeRevisitTaskHandler.class
-})
+@ExtendWith(MockitoExtension.class)
 class GAJudgeRevisitTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseStateSearchService caseStateSearchService;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
+        new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
 
-    @Autowired
+    @InjectMocks
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;
 
     private CaseDetails caseDetailsDirectionOrder;
@@ -124,7 +129,6 @@ class GAJudgeRevisitTaskHandlerTest {
                        .judgeRequestMoreInfoByDate(LocalDate.now())
                        .judgeRequestMoreInfoText("test").build()
             )).state(AWAITING_ADDITIONAL_INFORMATION.toString()).build();
-        when(coreCaseDataService.getSystemUpdateUserToken()).thenReturn("userToken");
     }
 
     @Test
@@ -164,8 +168,8 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "(through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         listAppender.stop();
     }
 
@@ -187,8 +191,8 @@ class GAJudgeRevisitTaskHandlerTest {
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         listAppender.stop();
     }
 
@@ -213,8 +217,8 @@ class GAJudgeRevisitTaskHandlerTest {
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
 
         verify(caseStateSearchService).getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS);
         verify(coreCaseDataService).triggerEvent(2L, CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED);
@@ -247,8 +251,8 @@ class GAJudgeRevisitTaskHandlerTest {
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         listAppender.stop();
     }
 
@@ -260,6 +264,8 @@ class GAJudgeRevisitTaskHandlerTest {
                 Map.of("generalAppConsentOrder", "maybe")).state(AWAITING_DIRECTIONS_ORDER_DOCS.toString())
             .build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
             .thenReturn(Set.of(caseDetailsDirectionOrderCase, caseDetailsDirectionOrder));
 
@@ -290,6 +296,10 @@ class GAJudgeRevisitTaskHandlerTest {
         CaseDetails requestForInformation = caseDetailsDirectionOrder.toBuilder().data(
             Map.of("generalAppConsentOrder", "maybe")).state(AWAITING_ADDITIONAL_INFORMATION.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_ADDITIONAL_INFORMATION))
             .thenReturn(Set.of(caseDetailRequestForInformation, requestForInformation));
 
@@ -330,7 +340,10 @@ class GAJudgeRevisitTaskHandlerTest {
 
     @Test
     void shouldNotSendMessageAndTriggerEvent_whenZeroCasesFound() {
-        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS)).thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
 
         gaJudgeRevisitTaskHandler.execute(externalTask, externalTaskService);
 
@@ -341,6 +354,8 @@ class GAJudgeRevisitTaskHandlerTest {
 
     @Test
     void shouldEmitBusinessProcessEvent_whenDirectionOrderDateIsToday() {
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
             .thenReturn(Set.of(caseDetailsDirectionOrder));
 
@@ -363,6 +378,8 @@ class GAJudgeRevisitTaskHandlerTest {
                 .directionsResponseByDate(LocalDate.now().minusDays(2))
                 .build())).state(AWAITING_DIRECTIONS_ORDER_DOCS.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
             .thenReturn(Set.of(caseDetailsDirectionOrderWithPastDate));
 
@@ -386,6 +403,10 @@ class GAJudgeRevisitTaskHandlerTest {
                 .directionsResponseByDate(LocalDate.now().plusDays(2))
                 .build())).state(AWAITING_DIRECTIONS_ORDER_DOCS.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
             .thenReturn(Set.of(caseDetailsDirectionOrderWithPastDate));
 
@@ -488,7 +509,6 @@ class GAJudgeRevisitTaskHandlerTest {
         when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
             .thenReturn(Set.of(caseDetailsWrittenRepresentationS));
         when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
-        when(coreCaseDataService.getSystemUpdateUserToken()).thenReturn("userToken");
 
         gaJudgeRevisitTaskHandler.execute(externalTask, externalTaskService);
 
@@ -558,6 +578,10 @@ class GAJudgeRevisitTaskHandlerTest {
 
     @Test
     void shouldEmitBusinessProcessEvent_whenRequestForInformationDateIsToday() {
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_ADDITIONAL_INFORMATION))
             .thenReturn(Set.of(caseDetailRequestForInformation));
 
@@ -574,7 +598,6 @@ class GAJudgeRevisitTaskHandlerTest {
     void shouldEmitBusinessProcessEvent_whenRequestForInformationDateIsPast() {
 
         when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
-        when(coreCaseDataService.getSystemUpdateUserToken()).thenReturn("userToken");
         CaseDetails caseDetailRequestForInformationWithPastDate = caseDetailRequestForInformation.toBuilder().data(
             Map.of("judicialDecision", GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build(),
                    "judicialDecisionRequestMoreInfo", GAJudicialRequestMoreInfo.builder()
@@ -583,6 +606,10 @@ class GAJudgeRevisitTaskHandlerTest {
                        .judgeRequestMoreInfoText("test").build()
             )).state(AWAITING_ADDITIONAL_INFORMATION.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_ADDITIONAL_INFORMATION))
             .thenReturn(Set.of(caseDetailRequestForInformationWithPastDate));
 
@@ -609,6 +636,10 @@ class GAJudgeRevisitTaskHandlerTest {
                    "isGaApplicantLip", "Yes"
             )).state(AWAITING_ADDITIONAL_INFORMATION.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_ADDITIONAL_INFORMATION))
             .thenReturn(Set.of(caseDetailRequestForInformationWithPastDate));
 
@@ -636,6 +667,10 @@ class GAJudgeRevisitTaskHandlerTest {
                        .judgeRequestMoreInfoText("test").build()
             )).state(AWAITING_ADDITIONAL_INFORMATION.toString()).build();
 
+        when(caseStateSearchService.getGeneralApplications(AWAITING_WRITTEN_REPRESENTATIONS))
+            .thenReturn(Set.of());
+        when(caseStateSearchService.getGeneralApplications(AWAITING_DIRECTIONS_ORDER_DOCS))
+            .thenReturn(Set.of());
         when(caseStateSearchService.getGeneralApplications(AWAITING_ADDITIONAL_INFORMATION))
             .thenReturn(Set.of(caseDetailRequestForInformationWithPastDate));
 

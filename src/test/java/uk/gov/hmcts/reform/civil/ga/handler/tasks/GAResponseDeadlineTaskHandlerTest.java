@@ -4,17 +4,21 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
@@ -43,25 +47,28 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_D
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESPONSE;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GAResponseDeadlineTaskHandler.class})
+@ExtendWith(MockitoExtension.class)
 class GAResponseDeadlineTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseStateSearchService caseSearchService;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
+        new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+
+    @InjectMocks
     private GAResponseDeadlineTaskHandler gaResponseDeadlineTaskHandler;
 
     private CaseDetails caseDetails1;
@@ -135,8 +142,8 @@ class GAResponseDeadlineTaskHandlerTest {
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         listAppender.stop();
     }
 
@@ -161,8 +168,8 @@ class GAResponseDeadlineTaskHandlerTest {
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
                          + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
                          + "[\"generalAppConsentOrder\"])",
-                     logsList.get(0).getMessage());
-        assertEquals(Level.ERROR, logsList.get(0).getLevel());
+                     logsList.getFirst().getMessage());
+        assertEquals(Level.ERROR, logsList.getFirst().getLevel());
         verify(caseSearchService).getGeneralApplications(AWAITING_RESPONDENT_RESPONSE);
         verify(coreCaseDataService).triggerEvent(1L, CHANGE_STATE_TO_AWAITING_JUDICIAL_DECISION);
     }
@@ -218,6 +225,8 @@ class GAResponseDeadlineTaskHandlerTest {
         CaseDetails caseDetails8 = CaseDetails.builder().id(3L).data(
             Map.of("generalAppNotificationDeadlineDate", deadlineInFuture.toString(),
                    "isGaApplicantLip",  YesOrNo.YES)).build();
+        when(caseSearchService.getGeneralApplications(AWAITING_RESPONDENT_RESPONSE))
+            .thenReturn(Set.of());
         when(caseSearchService.getGeneralApplications(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
             .thenReturn(Set.of(caseDetails6, caseDetails7, caseDetails8));
 
