@@ -22,12 +22,14 @@ java:
     CASE_DOCUMENT_AM_URL:  http://${SERVICE_NAME}-cdam
     STITCHING_API_ENABLED: true
     ACA_SERVICE_API_BASEURL: http://${SERVICE_NAME}-aac-manage-case-assignment
-    HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
-    HMC_API_URL: http://${SERVICE_NAME}-wiremock
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: true
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-civil"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-${SERVICE_FQDN}
+    ROLE_ASSIGNMENT_API_URL: https://${SERVICE_NAME}-am-role-assignment-service
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -154,7 +156,6 @@ xui-webapp:
     devmemoryLimits: 8Gi
     devcpuLimits: 4500m
     environment:
-      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
@@ -162,9 +163,18 @@ xui-webapp:
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-cdam
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
+      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
+      SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
+      SERVICES_ROLE_ASSIGNMENT_API: https://${SERVICE_NAME}-am-role-assignment-service
+      HEALTH_ROLE_ASSIGNMENT_API: http://$${SERVICE_NAME}-am-role-assignment-service/health
+      SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: ~
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
+      ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
+      PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
+      FEATURE_SUBSTANTIVE_ROLE_ENABLED: true
 
 ccd:
   enabled: true
