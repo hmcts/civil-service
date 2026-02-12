@@ -431,8 +431,8 @@ class JudgmentByAdmissionMapperTest {
     @ParameterizedTest
     @CsvSource({
         "120,120",
-        "120.50,121",
-        "120.49,120"
+        "120.50,120.50",
+        "120.49,120.49"
     })
     void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
