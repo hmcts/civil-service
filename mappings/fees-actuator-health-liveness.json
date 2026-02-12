@@ -1,0 +1,16 @@
+{
+  "name": "Fees API - Actuator Health Liveness",
+  "request": {
+    "method": "GET",
+    "urlPath": "/actuator/health/liveness"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Expires": "0"
+    },
+    "body": "{\"status\":\"UP\"}"
+  }
+}

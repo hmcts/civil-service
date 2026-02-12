@@ -73,7 +73,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_feeNotRequired_returnsNoFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
                 .thenReturn(HearingNoticeVariables.builder().hearingType(TYPE_ANY).build());
@@ -93,7 +93,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_paymentSuccess_returnsNoFeeOnSuccess() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
@@ -114,7 +114,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void getEmailTemplateId_requiresAndNoPayment_returnsFeeTemplate() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .hearingFeePaymentDetails(null)
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
@@ -140,7 +140,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void addCustomProperties_feeNonNull_populatesAllFields() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
                 .thenReturn(HearingNoticeVariables.builder()
@@ -175,7 +175,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
     void addCustomProperties_feeNull_defaultsToZero() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
                 .thenReturn(HearingNoticeVariables.builder()
