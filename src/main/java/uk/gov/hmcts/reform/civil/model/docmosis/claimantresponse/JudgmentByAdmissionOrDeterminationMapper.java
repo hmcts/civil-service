@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
@@ -48,6 +50,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
+    private static final Logger log = LoggerFactory.getLogger(JudgmentByAdmissionOrDeterminationMapper.class);
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -149,31 +152,52 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private static RepaymentPlanTemplateData addRepaymentPlan(CaseData caseData) {
-        if (!caseData.getApplicant1RepaymentOptionForDefendantSpec().equals(PaymentType.REPAYMENT_PLAN)) {
+
+        if (caseData.getApplicant1RepaymentOptionForDefendantSpec() == null
+            || !PaymentType.REPAYMENT_PLAN
+            .equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
+
+            log.info("Repayment option is not REPAYMENT_PLAN. Skipping repayment plan.");
             return null;
         }
 
-        boolean acceptedPlan = YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
-            || YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec());
+        boolean acceptedPlan =
+            YesOrNo.YES.equals(caseData.getApplicant1AcceptFullAdmitPaymentPlanSpec())
+                || YesOrNo.YES.equals(caseData.getApplicant1AcceptPartAdmitPaymentPlanSpec());
 
         if (acceptedPlan) {
+
             var repaymentPlan = caseData.getRespondent1RepaymentPlan() != null
                 ? caseData.getRespondent1RepaymentPlan()
                 : caseData.getRespondent2RepaymentPlan();
+
             if (repaymentPlan == null) {
+                log.info("Accepted repayment plan expected but no respondent repayment plan found.");
                 return null;
             }
+
+            log.info("Building repayment plan from respondent data.");
+
             return new RepaymentPlanTemplateData()
                 .setFirstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
-                .setPaymentAmount(MonetaryConversions.penniesToPounds(repaymentPlan.getPaymentAmount()))
+                .setPaymentAmount(
+                    MonetaryConversions.penniesToPounds(
+                        repaymentPlan.getPaymentAmount().setScale(2)))
                 .setPaymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay());
-        } else {
-            return new RepaymentPlanTemplateData()
-                .setFirstRepaymentDate(caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
-                .setPaymentAmount(MonetaryConversions.penniesToPounds(
-                    caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()))
-                .setPaymentFrequencyDisplay(caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec().getLabel());
         }
+
+        log.info("Building repayment plan from applicant suggested instalments.");
+
+        return new RepaymentPlanTemplateData()
+            .setFirstRepaymentDate(
+                caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec())
+            .setPaymentAmount(
+                MonetaryConversions.penniesToPounds(
+                    caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec()
+                        .setScale(2)))
+            .setPaymentFrequencyDisplay(
+                caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()
+                    .getLabel());
     }
 
     private String getFormHeader(CaseData caseData, CaseEvent caseEvent) {
