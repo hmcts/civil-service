@@ -1,0 +1,29 @@
+{
+  "name": "Fee Lookup - Money Claim Multi Track (200001+)",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "county court" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "issue" },
+      "keyword": { "equalTo": "MoneyClaim" },
+      "amount_or_volume": { "matches": "200001(\\.00)?" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0210",
+      "description": "Civil Court fees - Money Claims - Claim Amount - over 200000 GBP. Maximum fee.",
+      "version": 4,
+      "fee_amount": 10000.00
+    }
+  }
+}

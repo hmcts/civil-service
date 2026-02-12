@@ -24,5 +24,7 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
+    public static final String HEARING_SCHEDULED_HMC = "GenerateDashboardNotificationsHearingScheduledHmc";
+    public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
     public static final String TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY = "GenerateDashboardNotificationsRespondent1TrialReadyNotifyOthers";
 }

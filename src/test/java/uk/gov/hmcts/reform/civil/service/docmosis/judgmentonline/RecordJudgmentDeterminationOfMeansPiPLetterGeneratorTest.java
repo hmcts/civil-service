@@ -95,14 +95,10 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     @BeforeEach
     void setup() {
         given(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .willReturn(DefendantPinToPostLRspec.builder()
-                            .accessCode(
-                                AccessCodeGenerator.generateAccessCode())
-                            .respondentCaseRole(
-                                CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                            .expiryDate(LocalDate.now().plusDays(
-                                180))
-                            .build());
+            .willReturn(new DefendantPinToPostLRspec()
+                            .setAccessCode(AccessCodeGenerator.generateAccessCode())
+                            .setRespondentCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                            .setExpiryDate(LocalDate.now().plusDays(180)));
         given(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER)

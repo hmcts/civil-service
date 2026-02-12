@@ -1,0 +1,29 @@
+{
+  "name": "Fee Lookup - Money Claim 1500",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "county court" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "issue" },
+      "keyword": { "equalTo": "MoneyClaim" },
+      "amount_or_volume": { "matches": "1500(\\.00)?" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0205",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 1000.01 up to 5000 GBP",
+      "version": 6,
+      "fee_amount": 80.00
+    }
+  }
+}
