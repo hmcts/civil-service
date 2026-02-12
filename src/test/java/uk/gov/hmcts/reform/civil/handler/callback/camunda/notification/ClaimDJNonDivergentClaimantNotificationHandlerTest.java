@@ -107,13 +107,12 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
                 .atStateApplicant2RespondToDefenceAndProceed_2v1()
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_CLAIMANT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -167,13 +166,12 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
                 .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_CLAIMANT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

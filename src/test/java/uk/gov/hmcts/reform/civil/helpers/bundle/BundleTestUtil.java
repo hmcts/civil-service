@@ -194,12 +194,12 @@ public class BundleTestUtil {
 
     private static ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
+        Document document = new Document().setDocumentFileName(TEST_FILE_NAME).setDocumentUrl(TEST_URL);
         particularsOfClaim.add(ElementUtils.element(document));
         List<Element<DocumentWithRegex>> docs = new ArrayList<>();
-        DocumentWithRegex doc = new DocumentWithRegex(Document.builder()
-                                                            .documentFileName(TEST_FILE_NAME)
-                                                            .documentUrl(TEST_URL).build());
+        DocumentWithRegex doc = DocumentWithRegex.builder().document(new Document()
+                                                                         .setDocumentFileName(TEST_FILE_NAME)
+                                                                         .setDocumentUrl(TEST_URL)).build();
         docs.add(ElementUtils.element(doc));
         return ServedDocumentFiles.builder()
             .particularsOfClaimDocument(particularsOfClaim)
@@ -233,16 +233,16 @@ public class BundleTestUtil {
         }
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
-                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                              .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                         .setExpertOptionExpertise("Test")
                                                         .setExpertOptionOtherParty(otherParty)
                                                         .setExpertOptionExpertises("Test1 Test2")
                                                         .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
                                                         .setExpertOptionName(expertName)));
         expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
-                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                              .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                         .setExpertOptionExpertise("Test")
                                                         .setExpertOptionOtherParty("wrong party name")
                                                         .setExpertOptionExpertises("Test1 Test2")
@@ -255,12 +255,12 @@ public class BundleTestUtil {
     private static List<Element<CaseDocument>> getClaimantResponseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.CLAIMANT_DEFENCE)
-                .createdBy("Claimant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.CLAIMANT_DEFENCE)
+                .setCreatedBy("Claimant")
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
         return systemGeneratedCaseDocuments;
     }
@@ -268,12 +268,12 @@ public class BundleTestUtil {
     private static List<Element<CaseDocument>> getDefendantResponseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(DocumentType.DEFENDANT_DEFENCE)
-                .createdBy("Defendant")
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DEFENDANT_DEFENCE)
+                .setCreatedBy("Defendant")
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
         return systemGeneratedCaseDocuments;
     }
@@ -281,11 +281,11 @@ public class BundleTestUtil {
     private static List<Element<CaseDocument>> getOrderDoc(DocumentType docType) {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentDC =
-            CaseDocument.builder()
-                .documentType(docType)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(docType)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDC));
         return systemGeneratedCaseDocuments;
     }
@@ -293,13 +293,13 @@ public class BundleTestUtil {
     private static List<Element<UploadEvidenceDocumentType>> getDocumentEvidenceForTrial() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
-                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                        .setTypeOfDocument(type.getDisplayNames().get(0))
                                                        .setDocumentIssuedDate(LocalDate.of(2023, 1, 12)))));
         otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
-                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                        .setTypeOfDocument("Other")
                                                        .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;
@@ -310,8 +310,8 @@ public class BundleTestUtil {
         otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
                                                        .setWitnessOptionName(witnessOptionName)
                                                        .setTypeOfDocument(TEST_FILE_TYPE)
-                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                        .setDocumentIssuedDate(LocalDate.of(2022, 12, 12))
                                                        .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5))));
         return otherEvidenceDocs;
@@ -320,8 +320,8 @@ public class BundleTestUtil {
     private static List<Element<UploadEvidenceExpert>> getExpertDocs(String expertName) {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
         expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
-                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                              .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                         .setExpertOptionExpertise("Test")
                                                         .setExpertOptionExpertises("Test1 Test2")
                                                         .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
@@ -334,9 +334,9 @@ public class BundleTestUtil {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
-                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                         .setWitnessOptionDocument(new Document().setDocumentBinaryUrl(
                                                              TEST_URL)
-                                                                                         .documentFileName(TEST_FILE_NAME).build())
+                                                                                         .setDocumentFileName(TEST_FILE_NAME))
                                                          .setWitnessOptionName(witnessName)
                                                          .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
                                                          .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)))));
@@ -347,9 +347,9 @@ public class BundleTestUtil {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
         witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
-                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                         .setWitnessOptionDocument(new Document().setDocumentBinaryUrl(
                                                              TEST_URL)
-                                                                                         .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                                                         .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                          .setWitnessOptionName(witnessName)
                                                          .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
                                                          .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)))));
@@ -359,40 +359,40 @@ public class BundleTestUtil {
     private static List<Element<CaseDocument>> setupSystemGeneratedCaseDocsNoId() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentDQDef1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("ONE").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("ONE"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQApp1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("TWO").build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("TWO"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 3, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef22 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("THREE").build())
-                .createdDatetime(LocalDateTime.of(2023, 4, 11, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("THREE"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 4, 11, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef21 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FOUR").build())
-                .createdDatetime(LocalDateTime.of(2023, 5, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("FOUR"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 5, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef23 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("FIVE").build())
-                .createdDatetime(LocalDateTime.of(2023, 6, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("FIVE"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 6, 10, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
@@ -404,70 +404,70 @@ public class BundleTestUtil {
     private static List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                TEST_URL).documentFileName(TEST_FILE_NAME).categoryID("detailsOfClaim").build()).createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                                                                                                  2, 2)).build();
+            new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM).setDocumentLink(new Document().setDocumentUrl(
+                TEST_URL).setDocumentFileName(TEST_FILE_NAME).setCategoryID("detailsOfClaim")).setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                                                                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQDef1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .categoryID(DocCategory.DEF1_DEFENSE_DQ.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setCategoryID(DocCategory.DEF1_DEFENSE_DQ.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQApp1 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.APP1_DQ.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setCategoryID(DocCategory.APP1_DQ.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef22 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 11, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setCategoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 11, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef21 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setCategoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef23 =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .categoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setCategoryID(DocCategory.DEF2_DEFENSE_DQ.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 3, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQNoId =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL)
-                                  .documentFileName("DQ_NO_CATEGORY_ID").build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL)
+                                  .setDocumentFileName("DQ_NO_CATEGORY_ID"))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQApp1LiP =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.DQ_APP1.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 11, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setCategoryID(DocCategory.DQ_APP1.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 3, 11, 2,
+                                                  2, 2));
         CaseDocument caseDocumentDQDef1LiP =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).categoryID(DocCategory.DQ_DEF1.getValue())
-                                  .documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 3, 12, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setCategoryID(DocCategory.DQ_DEF1.getValue())
+                                  .setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 3, 12, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef22));
@@ -477,11 +477,11 @@ public class BundleTestUtil {
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQApp1LiP));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQDef1LiP));
         CaseDocument caseDocumentDJ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
-                .createdDatetime(LocalDateTime.of(2023, 2, 10, 2,
-                                                  2, 2)).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DEFAULT_JUDGMENT_SDO_ORDER)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME))
+                .setCreatedDatetime(LocalDateTime.of(2023, 2, 10, 2,
+                                                  2, 2));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDJ));
         return systemGeneratedCaseDocuments;
     }
