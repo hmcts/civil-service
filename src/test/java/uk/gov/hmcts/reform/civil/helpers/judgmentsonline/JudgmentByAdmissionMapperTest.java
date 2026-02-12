@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyLRspec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CCJPaymentDetails;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -584,7 +583,6 @@ class JudgmentByAdmissionMapperTest {
         assertEquals("300", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(PaymentFrequency.EVERY_TWO_WEEKS, activeJudgment.getInstalmentDetails().getPaymentFrequency());
     }
-
 
     @ParameterizedTest
     @CsvSource({
