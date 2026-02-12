@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.bundle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -25,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BundleTestUtil {
 
@@ -197,9 +197,7 @@ public class BundleTestUtil {
         Document document = new Document().setDocumentFileName(TEST_FILE_NAME).setDocumentUrl(TEST_URL);
         particularsOfClaim.add(ElementUtils.element(document));
         List<Element<DocumentWithRegex>> docs = new ArrayList<>();
-        DocumentWithRegex doc = DocumentWithRegex.builder().document(new Document()
-                                                                         .setDocumentFileName(TEST_FILE_NAME)
-                                                                         .setDocumentUrl(TEST_URL)).build();
+        DocumentWithRegex doc = new DocumentWithRegex(new Document().setDocumentFileName(TEST_FILE_NAME).setDocumentUrl(TEST_URL));
         docs.add(ElementUtils.element(doc));
         return ServedDocumentFiles.builder()
             .particularsOfClaimDocument(particularsOfClaim)
