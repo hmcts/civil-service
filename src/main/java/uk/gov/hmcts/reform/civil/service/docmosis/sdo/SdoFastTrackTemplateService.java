@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,13 +22,25 @@ import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
 
 @Service
-@RequiredArgsConstructor
 public class SdoFastTrackTemplateService {
 
     private final DocumentHearingLocationHelper locationHelper;
     private final SdoCaseClassificationService caseClassificationService;
     private final SdoFastTrackDirectionsService fastTrackDirectionsService;
     private final SdoFastTrackTemplateFieldService fastTrackTemplateFieldService;
+    private final boolean otherRemedyEnabled;
+
+    public SdoFastTrackTemplateService(DocumentHearingLocationHelper locationHelper,
+                                       SdoCaseClassificationService caseClassificationService,
+                                       SdoFastTrackDirectionsService fastTrackDirectionsService,
+                                       SdoFastTrackTemplateFieldService fastTrackTemplateFieldService,
+                                       @Value("${other_remedy.enabled:true}") boolean otherRemedyEnabled) {
+        this.locationHelper = locationHelper;
+        this.caseClassificationService = caseClassificationService;
+        this.fastTrackDirectionsService = fastTrackDirectionsService;
+        this.fastTrackTemplateFieldService = fastTrackTemplateFieldService;
+        this.otherRemedyEnabled = otherRemedyEnabled;
+    }
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
@@ -71,8 +83,8 @@ public class SdoFastTrackTemplateService {
             )
             .setFastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .setFastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
-            //Todo: need to check with Ruban
-            //.setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            .setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
+            .setOtherRemedyEnabled(otherRemedyEnabled)
             .setFastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .setFastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
             .setHasNewDirections(hasVariable(caseData, FastTrackVariable.ADD_NEW_DIRECTIONS))
