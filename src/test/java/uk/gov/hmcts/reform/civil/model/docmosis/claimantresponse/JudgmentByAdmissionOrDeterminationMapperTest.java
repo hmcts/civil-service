@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.RepaymentPlanTemplateData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.JudgementService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.citizenui.responsedeadline.DeadlineExtensionCalculatorService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,7 +29,11 @@ import static org.mockito.Mockito.lenient;
 class JudgmentByAdmissionOrDeterminationMapperTest {
 
     @Mock
+    private DeadlineExtensionCalculatorService deadlineCalculatorService;
+    @Mock
     private JudgementService judgementService;
+    @Mock
+    private OrganisationService organisationService;
 
     @InjectMocks
     private JudgmentByAdmissionOrDeterminationMapper mapper;
