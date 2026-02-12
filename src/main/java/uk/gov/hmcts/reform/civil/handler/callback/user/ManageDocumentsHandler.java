@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,8 @@ public class ManageDocumentsHandler extends CallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(MANAGE_DOCUMENTS);
     private final ObjectMapper objectMapper;
+    private final TaskListService taskListService;
+
     private final Map<String, Callback> callbackMap = Map.of(
         callbackKey(ABOUT_TO_SUBMIT),
         this::uploadManageDocuments,
@@ -58,6 +61,7 @@ public class ManageDocumentsHandler extends CallbackHandler {
                 }
             }
             caseData.setManageDocuments(manageDocumentsList);
+            taskListService.makeViewDocumentTaskAvailable(caseData.getCcdCaseReference().toString());
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()

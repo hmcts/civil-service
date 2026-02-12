@@ -139,4 +139,20 @@ public class TaskListService {
                  caseIdentifier, role, excludedTemplate);
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
     }
+
+    @Transactional
+    public void makeViewDocumentTaskAvailable(String caseIdentifier) {
+        List<TaskListEntity> tasks = taskListRepository.findByReferenceAndCurrentStatusAndTaskItemTemplateIn(caseIdentifier, List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()), List.of(28L, 44L));
+        tasks.forEach(t -> {
+            TaskListEntity task = t.toBuilder()
+                .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                .nextStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                .hintTextCy("")
+                .hintTextEn("")
+                .taskNameEn(StringUtility.activateLink(t.getTaskNameEn()))
+                .taskNameCy(StringUtility.activateLink(t.getTaskNameCy()))
+                .build();
+            taskListRepository.save(task);
+        });
+    }
 }
