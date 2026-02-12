@@ -31,13 +31,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hmcts/civil-ccd-definition
-          path: ../civil-ccd-definition
+          path: civil-ccd-definition
           fetch-depth: 0
       - name: Checkout civil-general-apps-ccd-definition
         uses: actions/checkout@v4
         with:
           repository: hmcts/civil-general-apps-ccd-definition
-          path: ../civil-general-apps-ccd-definition
+          path: civil-general-apps-ccd-definition
           fetch-depth: 0
       - name: Generate email notifications table
         run: scripts/generate_email_notifications_table.py --bpmn-root ../civil-camunda-bpmn-definition --ccd-definition-root ../civil-ccd-definition/ccd-definition --ga-ccd-definition-root ../civil-general-apps-ccd-definition/ga-ccd-definition
