@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.referencedata.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationRefData {
 
     private String courtVenueId;
@@ -32,8 +30,6 @@ public class LocationRefData {
     private String parentLocation;
     private String externalShortName;
     private String welshExternalShortName;
-    private String isCaseManagementLocation;
-    private String isHearingLocation;
 
     @JsonCreator
     LocationRefData(@JsonProperty("court_venue_id") String courtVenueId,
@@ -54,9 +50,7 @@ public class LocationRefData {
                     @JsonProperty("location_type") String locationType,
                     @JsonProperty("parent_location") String parentLocation,
                     @JsonProperty("external_short_name") String externalShortName,
-                    @JsonProperty("welsh_external_short_name") String welshExternalShortName,
-                    @JsonProperty("is_case_management_location") String isCaseManagementLocation,
-                    @JsonProperty("is_hearing_location") String isHearingLocation) {
+                    @JsonProperty("welsh_external_short_name") String welshExternalShortName) {
         this.courtVenueId = courtVenueId;
         this.epimmsId = epimmsId;
         this.siteName = siteName;
@@ -76,7 +70,5 @@ public class LocationRefData {
         this.parentLocation = parentLocation;
         this.externalShortName = externalShortName;
         this.welshExternalShortName = welshExternalShortName;
-        this.isCaseManagementLocation = isCaseManagementLocation;
-        this.isHearingLocation = isHearingLocation;
     }
 }
