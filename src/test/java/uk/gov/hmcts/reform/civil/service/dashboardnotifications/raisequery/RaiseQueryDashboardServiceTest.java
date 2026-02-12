@@ -123,7 +123,7 @@ class RaiseQueryDashboardServiceTest {
     void shouldNotRecordWhenCaseIsNotLip() {
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .applicant1Represented(YesOrNo.YES)
             .respondent1Represented(YesOrNo.YES)
             .queries(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"))
@@ -180,7 +180,7 @@ class RaiseQueryDashboardServiceTest {
     private CaseData lipCaseData(CaseQueriesCollection queries) {
         return CaseDataBuilder.builder()
             .ccdCaseReference(CASE_REFERENCE)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .applicant1Represented(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .queries(queries)
