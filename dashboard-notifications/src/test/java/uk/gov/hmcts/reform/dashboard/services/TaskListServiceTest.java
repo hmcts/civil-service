@@ -407,4 +407,60 @@ class TaskListServiceTest {
         verify(taskListRepository).save(task);
     }
 
+    @Test
+    void shouldMakeProgressAbleTaskListActiveExcludingTemplate() {
+
+        //given
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.INACTIVE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.OPTIONAL.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>").build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.ACTION_NEEDED.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.IN_PROGRESS.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.DONE.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+
+        when(taskListRepository.findByReferenceAndCurrentStatusAndTaskItemTemplateIn(
+            "123",
+            List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(28L, 44L)
+        ))
+            .thenReturn(tasks);
+
+        //when
+        taskListService.makeViewDocumentTaskAvailable("123");
+
+        //then
+        verify(taskListRepository).findByReferenceAndCurrentStatusAndTaskItemTemplateIn(
+            "123",
+            List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(28L, 44L)
+        );
+    }
+
 }
