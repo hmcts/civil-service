@@ -36,11 +36,9 @@ class SetApplicantsForDQGeneratorTest {
             .applicant1(PartyBuilder.builder().individual().build())
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder();
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
 
-        setApplicantsForDQGenerator.setApplicants(builder, caseData);
-
-        DirectionsQuestionnaireForm form = builder.build();
+        setApplicantsForDQGenerator.setApplicants(form, caseData);
 
         assertNotNull(form.getApplicant());
         assertNotNull(form.getApplicant2());
@@ -54,11 +52,9 @@ class SetApplicantsForDQGeneratorTest {
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder();
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
 
-        setApplicantsForDQGenerator.setApplicants(builder, caseData);
-
-        DirectionsQuestionnaireForm form = builder.build();
+        setApplicantsForDQGenerator.setApplicants(form, caseData);
 
         assertNotNull(form.getApplicant());
         assertNull(form.getApplicant2());
@@ -67,8 +63,14 @@ class SetApplicantsForDQGeneratorTest {
 
     @Test
     void shouldSetApplicant2v1ForDQFormBuilder() {
-        Address addr1 = Address.builder().addressLine1("123 Main St").postTown("City").country("Country").build();
-        Address addr2 = Address.builder().addressLine1("345 Main St").postTown("Test City").country("Test Country").build();
+        Address addr1 = new Address();
+        addr1.setAddressLine1("123 Main St");
+        addr1.setPostTown("City");
+        addr1.setCountry("Country");
+        Address addr2 = new Address();
+        addr2.setAddressLine1("345 Main St");
+        addr2.setPostTown("Test City");
+        addr2.setCountry("Test Country");
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder()
                             .partyName("Party").type(Party.Type.INDIVIDUAL)
@@ -83,11 +85,9 @@ class SetApplicantsForDQGeneratorTest {
             .applicant2ProceedWithClaimMultiParty2v1(YES)
             .build();
 
-        DirectionsQuestionnaireForm.DirectionsQuestionnaireFormBuilder builder = DirectionsQuestionnaireForm.builder();
+        DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
 
-        setApplicantsForDQGenerator.setApplicants(builder, caseData);
-
-        DirectionsQuestionnaireForm form = builder.build();
+        setApplicantsForDQGenerator.setApplicants(form, caseData);
 
         assertEquals(form.getApplicant().getPrimaryAddress(), addr1);
         assertEquals(form.getApplicant2().getPrimaryAddress(), addr2);

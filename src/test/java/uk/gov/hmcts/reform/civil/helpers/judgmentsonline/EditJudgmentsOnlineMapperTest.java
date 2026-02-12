@@ -227,12 +227,11 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfJudgmentByAdmission_scenario3() {
 
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-            .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+            .setCcjJudgmentAmountClaimAmount(BigDecimal.valueOf(140))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+            .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+            .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150));
 
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YES)
@@ -246,7 +245,7 @@ public class EditJudgmentsOnlineMapperTest {
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
                 .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("0123").region("0321").build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(ccjPaymentDetails)
             .respondent1(PartyBuilder.builder().organisation().build())
             .build();

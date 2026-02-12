@@ -21,12 +21,11 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_whenFullAdmitRepaymentAcceptedWithCCJ() {
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+                .setCcjPaymentPaidSomeOption(YES)
+                .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
         CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
@@ -42,12 +41,11 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_whenPartAdmitRepaymentAcceptedWithCCJ() {
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+                .setCcjPaymentPaidSomeOption(YES)
+                .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
         CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
@@ -83,11 +81,10 @@ public class JudgmentAdmissionUtilsTest {
             .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                        .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                   .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                   .claimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)
-                                                   .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                        .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                   .setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                   .setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_DATE)))
             .build();
 
         boolean isCCJRequested = JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
@@ -102,11 +99,10 @@ public class JudgmentAdmissionUtilsTest {
             .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                        .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1ChoosesHowToProceed(ChooseHowToProceed.REQUEST_A_CCJ)
+                                                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .build();
 
         boolean isCCJRequested = JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);
@@ -121,11 +117,10 @@ public class JudgmentAdmissionUtilsTest {
             .applicant1Represented(YesOrNo.NO)
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.NO)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .applicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)
-                                                        .claimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)
-                                                        .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setApplicant1ChoosesHowToProceed(ChooseHowToProceed.SIGN_A_SETTLEMENT_AGREEMENT)
+                                                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .build();
 
         boolean isCCJRequested = JudgmentAdmissionUtils.getLIPJudgmentAdmission(caseData);

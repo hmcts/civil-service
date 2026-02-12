@@ -61,16 +61,8 @@ class CoverLetterAppendServiceTest {
     private DocumentDownloadService documentDownloadService;
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
-    private static final Address APPLICANT_ADDRESS = Address.builder()
-        .addressLine1("123 road")
-        .postTown("London")
-        .postCode("SW1 1NT")
-        .build();
-    private static final Address RESPONDENT_ADDRESS = Address.builder()
-        .addressLine1("456 Avenue")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
+    private static final Address APPLICANT_ADDRESS = address("123 road", "London", "SW1 1NT");
+    private static final Address RESPONDENT_ADDRESS = address("456 Avenue", "London", "EX12RT");
 
     private static final Party CLAIMANT = Party.builder()
         .primaryAddress(APPLICANT_ADDRESS)
@@ -88,12 +80,18 @@ class CoverLetterAppendServiceTest {
         .individualLastName("Dave")
         .build();
 
-    private static final CoverLetter CLAIMANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
-        .party(CLAIMANT)
-        .build();
-    private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = CoverLetter.builder()
-        .party(DEFENDANT)
-        .build();
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
+
+    private static final CoverLetter CLAIMANT_LETTER_TEMPLATE_DATA = new CoverLetter()
+        .setParty(CLAIMANT);
+    private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = new CoverLetter()
+        .setParty(DEFENDANT);
 
     private static final CaseDocument caseDocument = CaseDocument.builder()
         .documentType(DocumentType.HEARING_FORM)
@@ -116,7 +114,7 @@ class CoverLetterAppendServiceTest {
                                                              anyString())).thenReturn(buildStitchedDocument());
 
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+            .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(caseDocument.getDocumentLink(), "Cover letter", LocalDate.now().toString()),

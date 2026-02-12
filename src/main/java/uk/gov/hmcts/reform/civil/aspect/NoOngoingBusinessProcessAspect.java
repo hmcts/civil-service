@@ -47,7 +47,7 @@ public class NoOngoingBusinessProcessAspect {
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
             || caseData.hasNoOngoingBusinessProcess()
-            || (caseEvent.equals(CaseEvent.migrateCase) || caseEvent.equals(CaseEvent.UPDATE_CASE_DATA))
+            || (caseEvent.equals(CaseEvent.migrateCase) || caseEvent.equals(CaseEvent.UPDATE_CASE_DATA) || caseEvent.equals(CaseEvent.REMOVE_DOCUMENT))
         ) {
             return joinPoint.proceed();
         }
@@ -86,6 +86,7 @@ public class NoOngoingBusinessProcessAspect {
 
         if (callbackParams.getType() == SUBMITTED
             || caseEvent.isCamundaEvent()
+            || caseEvent.equals(CaseEvent.APPLICATION_PROCEEDS_IN_HERITAGE)
             || caseData.hasNoOngoingBusinessProcess()) {
             return joinPoint.proceed();
         }

@@ -61,21 +61,19 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
     }
 
     public CaseDataMinEdgeCasesBuilder atStateClaimDraftWithMinimalData() {
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                              .region("4")
-                              .baseLocation("000000")
-                              .build())
-            .build();
+            .setCaseLocation(new CaseLocationCivil()
+                              .setRegion("4")
+                              .setBaseLocation("000000")
+                              );
         applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;
-        applicantSolicitor1CheckEmail = CorrectEmail.builder()
-            .email("hmcts.civil@gmail.com")
-            .correct(YES)
-            .build();
+        applicantSolicitor1CheckEmail = new CorrectEmail()
+            .setEmail("hmcts.civil@gmail.com")
+            .setCorrect(YES);
         applicant1OrganisationPolicy = OrganisationPolicy.builder()
             .organisation(Organisation.builder().organisationID("QWERTY A").build())
             .build();
@@ -85,9 +83,8 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimFee = Fee.builder()
             .calculatedAmountInPence(TEN)
             .code("fee code")

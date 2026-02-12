@@ -74,11 +74,7 @@ class PiPLetterGeneratorTest {
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
-    private static final Address RESPONDENT_ADDRESS = Address.builder()
-        .addressLine1("123 road")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
+    private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
     private static final String CLAIMANT_FULL_NAME = "Mr. John Smith";
     private static final String CLAIM_REFERENCE = "ABC";
     private static final Party DEFENDANT = Party.builder()
@@ -88,20 +84,28 @@ class PiPLetterGeneratorTest {
         .individualFirstName("Smith")
         .individualLastName("John")
         .build();
+
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
+
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
     private static final String PIN = "1234789";
     private static final String CUI_URL = "CUI response url";
-    private static final PiPLetter LETTER_TEMPLATE_DATA = PiPLetter.builder()
-        .pin(PIN)
-        .ccdCaseNumber("1234123412341234")
-        .claimantName(CLAIMANT_FULL_NAME)
-        .claimReferenceNumber(CLAIM_REFERENCE)
-        .issueDate(LocalDate.now())
-        .defendant(DEFENDANT)
-        .responseDeadline(RESPONSE_DEADLINE.toLocalDate())
-        .totalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
-        .respondToClaimUrl(CUI_URL)
-        .build();
+    private static final PiPLetter LETTER_TEMPLATE_DATA = new PiPLetter()
+        .setPin(PIN)
+        .setCcdCaseNumber("1234123412341234")
+        .setClaimantName(CLAIMANT_FULL_NAME)
+        .setClaimReferenceNumber(CLAIM_REFERENCE)
+        .setIssueDate(LocalDate.now())
+        .setDefendant(DEFENDANT)
+        .setResponseDeadline(RESPONSE_DEADLINE.toLocalDate())
+        .setTotalAmountOfClaim(TOTAL_CLAIM_AMOUNT)
+        .setRespondToClaimUrl(CUI_URL);
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private List<DocumentMetaData> specClaimTimelineDocuments;
@@ -115,7 +119,7 @@ class PiPLetterGeneratorTest {
                                                              anyString())).thenReturn(buildStitchedDocument());
         given(pipInPostConfiguration.getRespondToClaimUrl()).willReturn(CUI_URL);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
-            .willReturn(DocmosisDocument.builder().bytes(new byte[]{1, 2, 3, 4, 5, 6}).build());
+            .willReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3, 4, 5, 6}));
 
         specClaimTimelineDocuments = List.of(
             new DocumentMetaData(buildClaimFormDocument().getDocumentLink(), "PiP Letter", LocalDate.now().toString()),
@@ -167,7 +171,7 @@ class PiPLetterGeneratorTest {
             .respondent1ResponseDeadline(RESPONSE_DEADLINE)
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
-            .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
+            .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
             .specRespondent1Represented(respondent1Represented)
             .servedDocumentFiles(servedDocumentFiles)
             .build();

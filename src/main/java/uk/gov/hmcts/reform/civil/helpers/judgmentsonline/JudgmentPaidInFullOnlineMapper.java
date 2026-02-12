@@ -24,19 +24,22 @@ public class JudgmentPaidInFullOnlineMapper extends JudgmentOnlineMapper {
     public JudgmentDetails addUpdateActiveJudgment(CaseData caseData, LocalDate paymentDate) {
 
         JudgmentDetails activeJudgment = caseData.getActiveJudgment();
+        if (activeJudgment == null) {
+            activeJudgment = new JudgmentDetails();
+            caseData.setActiveJudgment(activeJudgment);
+        }
         JudgmentState state = getJudgmentState(caseData, paymentDate);
-        JudgmentDetails activeJudgmentDetails = activeJudgment.toBuilder()
-            .state(state)
-            .fullyPaymentMadeDate(nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
-            .lastUpdateTimeStamp(LocalDateTime.now())
-            .rtlState(getJudgmentRTLStatus(state))
-            .cancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
-            .cancelDate(JudgmentState.CANCELLED.equals(state) ? LocalDate.now() : null)
-            .build();
+        activeJudgment
+            .setState(state)
+            .setFullyPaymentMadeDate(nonNull(paymentDate) ? paymentDate : caseData.getJoJudgmentPaidInFull().getDateOfFullPaymentMade())
+            .setLastUpdateTimeStamp(LocalDateTime.now())
+            .setRtlState(getJudgmentRTLStatus(state))
+            .setCancelledTimeStamp(JudgmentState.CANCELLED.equals(state) ? LocalDateTime.now() : null)
+            .setCancelDate(JudgmentState.CANCELLED.equals(state) ? LocalDate.now() : null);
 
-        super.updateJudgmentTabDataWithActiveJudgment(activeJudgmentDetails, caseData);
+        super.updateJudgmentTabDataWithActiveJudgment(activeJudgment, caseData);
 
-        return activeJudgmentDetails;
+        return activeJudgment;
     }
 
     @Override

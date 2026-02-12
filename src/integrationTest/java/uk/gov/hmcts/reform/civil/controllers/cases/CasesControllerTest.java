@@ -202,7 +202,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = new DashboardResponse().setTotalPages(1).setClaims(claimResults);
         when(dashboardClaimInfoService.getDashboardClaimantResponse(any(), any(), eq(1))).thenReturn(dashBoardResponse);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(dashBoardResponse)))
@@ -212,7 +212,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = new DashboardResponse().setTotalPages(1).setClaims(claimResults);
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
             any(),
             any(),
@@ -230,7 +230,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
         doPost(
             BEARER_TOKEN,
-            EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(),
+            new EventDto().setEvent(CaseEvent.DEFENDANT_RESPONSE_SPEC).setCaseDataUpdate(Map.of()),
             SUBMIT_EVENT_URL,
             "123",
             "123"
@@ -245,7 +245,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
-            ExtendedDeadlineDto.builder().responseDate(extensionDate).plusDays(5).build(),
+            new ExtendedDeadlineDto().setResponseDate(extensionDate).setPlusDays(5),
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))
@@ -442,7 +442,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
         //Given
         given(repaymentPlanDecisionService.getCalculatedDecision(any(), any())).willReturn(IN_FAVOUR_OF_CLAIMANT);
         //When
-        doPost(BEARER_TOKEN, ClaimantProposedPlan.builder().proposedRepaymentType(IMMEDIATELY).build(), COURT_DECISION_URL, "1")
+        ClaimantProposedPlan proposedPlan = new ClaimantProposedPlan();
+        proposedPlan.setProposedRepaymentType(IMMEDIATELY);
+        doPost(BEARER_TOKEN, proposedPlan, COURT_DECISION_URL, "1")
             .andExpect(status().isOk());
     }
 
@@ -482,7 +484,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             when(gaCaseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
             doPost(
                 BEARER_TOKEN,
-                EventDto.builder().event(CaseEvent.RESPOND_TO_APPLICATION).caseDataUpdate(Map.of()).build(),
+                new EventDto().setEvent(CaseEvent.RESPOND_TO_APPLICATION).setCaseDataUpdate(Map.of()),
                 GA_SUBMIT_EVENT_URL,
                 "123",
                 "123"

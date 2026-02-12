@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -109,9 +110,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -155,9 +156,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -242,9 +243,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(fullFee)
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .remissionAmount(fullFee)
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setRemissionAmount(fullFee))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
@@ -264,9 +264,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(BigDecimal.valueOf(30000)) // £300
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .outstandingFeeInPounds(BigDecimal.valueOf(120))
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setOutstandingFeeInPounds(BigDecimal.valueOf(120)))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
@@ -289,9 +288,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(fullFee)
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .remissionAmount(remission)
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setRemissionAmount(remission))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))

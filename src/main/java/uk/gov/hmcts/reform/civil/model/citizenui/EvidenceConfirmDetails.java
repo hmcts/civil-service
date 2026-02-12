@@ -3,12 +3,12 @@ package uk.gov.hmcts.reform.civil.model.citizenui;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.experimental.Accessors;
 
 @Data
-@SuperBuilder(toBuilder = true)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class EvidenceConfirmDetails {
 
     private String firstName;

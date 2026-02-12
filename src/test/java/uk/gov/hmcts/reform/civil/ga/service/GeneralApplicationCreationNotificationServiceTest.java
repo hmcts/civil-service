@@ -366,8 +366,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             GeneralApplicationCaseData claimRespondentResponseLan = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
-                .respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                    Language.BOTH.toString()).build()).build();
+                .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                    Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimRespondentResponseLan);
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
@@ -478,8 +478,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                                   .email(DUMMY_EMAIL).organisationIdentifier("1").build())
                     .generalAppRespondentSolicitors(respondentSols)
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
                     .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                     .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                     .parentClaimantIsApplicant(YES)
@@ -508,8 +508,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .applicantPartyName("App")
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
                     .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                     .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                     .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())

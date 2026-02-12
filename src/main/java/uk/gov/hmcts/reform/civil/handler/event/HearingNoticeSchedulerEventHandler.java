@@ -72,7 +72,8 @@ public class HearingNoticeSchedulerEventHandler {
     private void processHearing(String hearingId) {
         HearingGetResponse hearing = hearingsService.getHearingResponse(getSystemUpdateUser().getUserToken(), hearingId);
         ListAssistCaseStatus hearingStatus = hearing.getHearingResponse().getLaCaseStatus();
-        log.info("Processing hearing id: [{}] status: [{}]", hearingId, hearingStatus);
+        int requestedHearingVersion = hearing.getRequestDetails().getVersionNumber().intValue();
+        log.info("Processing hearing id: [{}] status: [{}] and requested version: [{}]", hearingId, hearingStatus, requestedHearingVersion);
 
         if (hearingStatus.equals(ListAssistCaseStatus.LISTED)) {
             PartiesNotifiedResponse partiesNotified = getLatestPartiesNotifiedResponse(hearingId);

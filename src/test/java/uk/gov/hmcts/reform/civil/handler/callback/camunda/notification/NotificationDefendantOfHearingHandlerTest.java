@@ -386,7 +386,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                                  .individualLastName("Doe")
                                  .partyName("Mark").partyEmail("respondent1@example.com").type(Party.Type.INDIVIDUAL).build())
                 .hearingReferenceNumber("000HN001")
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
@@ -411,11 +411,9 @@ public class NotificationDefendantOfHearingHandlerTest {
 
             // Given
             CaseData caseData = CaseDataBuilder.builder()
-                .caseDataLip(CaseDataLiP.builder()
-                                 .respondent1LiPResponse(RespondentLiPResponse.builder()
-                                                             .respondent1ResponseLanguage(Language.BOTH.toString())
-                                                             .build())
-                                 .build())
+                .caseDataLip(new CaseDataLiP()
+                                 .setRespondent1LiPResponse(new RespondentLiPResponse()
+                                                             .setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2023, 05, 17))
                 .hearingTimeHourMinute("1100")
@@ -605,7 +603,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING_HMC").build()).build();
@@ -633,7 +631,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build().toBuilder()
                 .respondentSolicitor2Reference("6789").build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)

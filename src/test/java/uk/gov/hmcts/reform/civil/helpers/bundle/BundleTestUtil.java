@@ -197,9 +197,9 @@ public class BundleTestUtil {
         Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
         List<Element<DocumentWithRegex>> docs = new ArrayList<>();
-        DocumentWithRegex doc = DocumentWithRegex.builder().document(Document.builder()
-                                                                         .documentFileName(TEST_FILE_NAME)
-                                                                         .documentUrl(TEST_URL).build()).build();
+        DocumentWithRegex doc = new DocumentWithRegex(Document.builder()
+                                                            .documentFileName(TEST_FILE_NAME)
+                                                            .documentUrl(TEST_URL).build());
         docs.add(ElementUtils.element(doc));
         return ServedDocumentFiles.builder()
             .particularsOfClaimDocument(particularsOfClaim)
@@ -232,24 +232,22 @@ public class BundleTestUtil {
             }
         }
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                        .expertOptionExpertise("Test")
-                                                        .expertOptionOtherParty(otherParty)
-                                                        .expertOptionExpertises("Test1 Test2")
-                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
-                                                        .expertOptionName(expertName).build()));
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                        .expertOptionExpertise("Test")
-                                                        .expertOptionOtherParty("wrong party name")
-                                                        .expertOptionExpertises("Test1 Test2")
-                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
-                                                        .expertOptionName("Other expert").build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertOptionExpertise("Test")
+                                                        .setExpertOptionOtherParty(otherParty)
+                                                        .setExpertOptionExpertises("Test1 Test2")
+                                                        .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .setExpertOptionName(expertName)));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertOptionExpertise("Test")
+                                                        .setExpertOptionOtherParty("wrong party name")
+                                                        .setExpertOptionExpertises("Test1 Test2")
+                                                        .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .setExpertOptionName("Other expert")));
 
         return  expertEvidenceDocs;
     }
@@ -321,14 +319,13 @@ public class BundleTestUtil {
 
     private static List<Element<UploadEvidenceExpert>> getExpertDocs(String expertName) {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                        .expertOptionExpertise("Test")
-                                                        .expertOptionExpertises("Test1 Test2")
-                                                        .expertOptionUploadDate(LocalDate.of(2023, 1, 12))
-                                                        .expertOptionName(expertName).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(Document.builder().documentBinaryUrl(TEST_URL)
+                                                                              .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                        .setExpertOptionExpertise("Test")
+                                                        .setExpertOptionExpertises("Test1 Test2")
+                                                        .setExpertOptionUploadDate(LocalDate.of(2023, 1, 12))
+                                                        .setExpertOptionName(expertName)));
 
         return expertEvidenceDocs;
     }
@@ -336,28 +333,26 @@ public class BundleTestUtil {
     private static List<Element<UploadEvidenceWitness>> getWitnessDocs() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 TEST_URL)
-                                                                                    .documentFileName(TEST_FILE_NAME).build())
-                                                         .witnessOptionName(witnessName)
-                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                             TEST_URL)
+                                                                                         .documentFileName(TEST_FILE_NAME).build())
+                                                         .setWitnessOptionName(witnessName)
+                                                         .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)))));
         return witnessEvidenceDocs;
     }
 
     private static List<Element<UploadEvidenceWitness>> getWitnessDocsCategoryId() {
         List<String> witnessNames = new ArrayList<>(Arrays.asList("cl1Fname", "df1Fname", "cl2Fname", "df2Fname", "FirstName LastName"));
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 TEST_URL)
-                                                                                    .documentFileName(TEST_FILE_NAME).categoryID("").build())
-                                                         .witnessOptionName(witnessName)
-                                                         .witnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
-                                                         .createdDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)).build())));
+        witnessNames.forEach(witnessName -> witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(Document.builder().documentBinaryUrl(
+                                                             TEST_URL)
+                                                                                         .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                         .setWitnessOptionName(witnessName)
+                                                         .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 10).plusDays(witnessNames.indexOf(witnessName)))
+                                                         .setCreatedDatetime(LocalDateTime.of(2023, 12, 12, 8, 8, 5)))));
         return witnessEvidenceDocs;
     }
 

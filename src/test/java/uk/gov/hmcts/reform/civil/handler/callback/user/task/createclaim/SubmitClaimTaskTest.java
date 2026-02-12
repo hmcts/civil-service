@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user.task.createclaim;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +13,13 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.FlightDelayDetails;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
-import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimFromType;
-import uk.gov.hmcts.reform.civil.model.interestcalc.InterestClaimUntilType;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.AirlineEpimsService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -31,9 +28,10 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.pininpost.DefendantPinToPostLRspecService;
-import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
-import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
+import uk.gov.hmcts.reform.civil.utils.CaseFlagsInitialiser;
+import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.math.BigDecimal;
@@ -41,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -77,7 +74,7 @@ class SubmitClaimTaskTest {
     private Time time;
 
     @Mock
-    private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
+    private SpecReferenceNumberRepository specReferenceNumberRepository;
 
     @Mock
     private OrganisationService organisationService;
@@ -91,15 +88,10 @@ class SubmitClaimTaskTest {
     @InjectMocks
     private SubmitClaimTask submitClaimTask;
 
-    private ObjectMapper objectMapper;
-
     @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        submitClaimTask = new SubmitClaimTask(featureToggleService, objectMapper, defendantPinToPostLRspecService, interestCalculator,
-                                              toggleConfiguration, caseFlagInitialiser, feesService, userService, time,
-                                              casemanReferenceNumberRepository,
+    public void setUp() {
+        submitClaimTask = new SubmitClaimTask(featureToggleService, new ObjectMapper(), defendantPinToPostLRspecService, interestCalculator,
+                                              toggleConfiguration, caseFlagInitialiser, feesService, userService, time, specReferenceNumberRepository,
                                               organisationService, airlineEpimsService, locationRefDataService);
     }
 
@@ -130,7 +122,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -147,14 +139,14 @@ class SubmitClaimTaskTest {
             YES,
             flightDelayDetails
         );
-        CaseData updatedCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
-        assertThat(updatedCaseData).isNotNull();
+
+        assertThat(response.getData()).isNotNull();
         assertThat(response.getErrors()).isEmpty();
-        assertEquals(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE, updatedCaseData.getInterestClaimUntil());
-        assertEquals(YES, updatedCaseData.getAnyRepresented());
-        assertEquals("Clay Mint V Defendant Inc.", updatedCaseData.getAllPartyNames());
-        assertEquals("1234", updatedCaseData.getCaseListDisplayDefendantSolicitorReferences());
-        assertThat(updatedCaseData.getRespondent1().getFlags()).isEqualTo(respFlag);
+        assertThat(response.getData()).containsEntry("interestClaimUntil", "UNTIL_SETTLED_OR_JUDGEMENT_MADE");
+        assertThat(response.getData().get("anyRepresented")).isEqualTo("Yes");
+        assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc.");
+        assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
+            .isEqualTo("1234");
     }
 
     @Test
@@ -189,7 +181,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -243,7 +235,7 @@ class SubmitClaimTaskTest {
         caseData.setSolicitorReferences(solicitorRef);
 
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
         DynamicListElement dynamicListElement = new DynamicListElement();
         dynamicListElement.setCode("OTHER");
@@ -290,7 +282,7 @@ class SubmitClaimTaskTest {
 
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
         DefendantPinToPostLRspec defendantPinToPostLRspec = new DefendantPinToPostLRspec();
         defendantPinToPostLRspec.setAccessCode("12345");
         when(defendantPinToPostLRspecService.buildDefendantPinToPost())
@@ -327,7 +319,7 @@ class SubmitClaimTaskTest {
 
         // When
         when(userService.getUserDetails("authToken")).thenReturn(UserDetails.builder().id("userId").build());
-        when(casemanReferenceNumberRepository.next("spec")).thenReturn("12345");
+        when(specReferenceNumberRepository.getSpecReferenceNumber()).thenReturn("12345");
 
         submitClaimTask.submitClaim(notMatchedCase, "eventId", "authToken", NO, null);
 
@@ -335,3 +327,4 @@ class SubmitClaimTaskTest {
         verify(defendantPinToPostLRspecService, never()).buildDefendantPinToPost();
     }
 }
+

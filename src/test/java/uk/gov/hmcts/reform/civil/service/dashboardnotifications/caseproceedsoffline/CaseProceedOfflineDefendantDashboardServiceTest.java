@@ -116,7 +116,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .ccdCaseReference(5555L)
                 .respondent1Represented(YesOrNo.NO)
-                .activeJudgment(JudgmentDetails.builder().build())
+                .activeJudgment(new JudgmentDetails())
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
@@ -136,7 +136,7 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build().toBuilder()
                 .ccdCaseReference(9999L)
                 .respondent1Represented(YesOrNo.NO)
-                .activeJudgment(JudgmentDetails.builder().build())
+                .activeJudgment(new JudgmentDetails())
                 .responseClaimTrack(AllocatedTrack.FAST_CLAIM.toString())
                 .previousCCDState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
