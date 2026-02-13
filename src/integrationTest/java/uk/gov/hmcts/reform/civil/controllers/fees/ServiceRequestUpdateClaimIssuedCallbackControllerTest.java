@@ -7,6 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrationTest {
 
     private static final String PAYMENT_CALLBACK_URL = "/service-request-update-claim-issued";

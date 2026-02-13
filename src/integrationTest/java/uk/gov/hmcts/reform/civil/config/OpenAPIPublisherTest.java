@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringJUnitWebConfig
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("integration-test")
+@ActiveProfiles("integration-test-nodb")
 class OpenAPIPublisherTest {
 
     @Autowired

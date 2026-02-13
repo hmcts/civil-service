@@ -245,4 +245,40 @@ class DashboardScenariosServiceTest {
         verify(dashboardNotificationService).deleteByNameAndReference("template.missing", "case-id");
     }
 
+    @Test
+    void shouldNotDeleteNotificationWhenItIsAlsoCreatedBySameScenario() {
+        String scenarioName = "scenario.create.and.delete.same.template";
+        String templateName = "template.same";
+        ScenarioEntity scenario = ScenarioEntity.builder()
+            .name(scenarioName)
+            .notificationsToCreate(Map.of(templateName, new String[0]))
+            .notificationsToDelete(new String[]{templateName})
+            .build();
+
+        when(scenarioRepository.findByName(scenarioName)).thenReturn(Optional.of(scenario));
+        when(notificationTemplateCatalog.findByName(templateName))
+            .thenReturn(Optional.of(NotificationTemplateDefinition.builder()
+                                        .name(templateName)
+                                        .role("claimant")
+                                        .titleEn("Title")
+                                        .descriptionEn("Description")
+                                        .titleCy("Title")
+                                        .descriptionCy("Description")
+                                        .build()));
+        when(taskItemTemplateRepository.findByScenarioName(scenarioName)).thenReturn(List.of());
+
+        dashboardScenariosService.recordScenarios(
+            "token",
+            scenarioName,
+            "case-id",
+            new ScenarioRequestParams(new HashMap<>())
+        );
+
+        verify(dashboardNotificationService).saveOrUpdate(any(DashboardNotificationsEntity.class));
+        verify(dashboardNotificationService, never())
+            .deleteByNameAndReferenceAndCitizenRole(any(), any(), any());
+        verify(dashboardNotificationService, never())
+            .deleteByNameAndReference(any(), any());
+    }
+
 }

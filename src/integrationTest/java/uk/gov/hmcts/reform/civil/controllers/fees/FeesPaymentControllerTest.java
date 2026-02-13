@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataUpdateException;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.G
 import static uk.gov.hmcts.reform.civil.controllers.fees.FeesPaymentController.GA_FEES_PAYMENT_STATUS_URL;
 import static uk.gov.hmcts.reform.civil.enums.FeeType.HEARING;
 
+@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 public class FeesPaymentControllerTest extends BaseIntegrationTest {
 
     private static final Long CASE_REFERENCE = 1701090368574910L;

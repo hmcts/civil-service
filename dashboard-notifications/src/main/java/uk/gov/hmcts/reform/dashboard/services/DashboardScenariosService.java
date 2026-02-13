@@ -18,9 +18,11 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -183,7 +185,16 @@ public class DashboardScenariosService {
     }
 
     private void deleteNotificationForScenario(ScenarioEntity scenario, String uniqueCaseIdentifier) {
+        Set<String> templatesCreatedInScenario = new HashSet<>(scenario.getNotificationsToCreate().keySet());
         Arrays.asList(scenario.getNotificationsToDelete()).forEach(templateName -> {
+            if (templatesCreatedInScenario.contains(templateName)) {
+                log.info(
+                    "Skipping deletion for template {} because it is also created by scenario {}",
+                    templateName,
+                    scenario.getName()
+                );
+                return;
+            }
 
             Optional<NotificationTemplateDefinition> templateToRemove = notificationTemplateCatalog.findByName(templateName);
 
