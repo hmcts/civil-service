@@ -716,6 +716,11 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder queries(CaseQueriesCollection queries) {
+        this.queries = queries;
+        return this;
+    }
+
     public CaseDataBuilder fixedCosts(FixedCosts fixedCosts) {
         this.fixedCosts = fixedCosts;
         return this;
