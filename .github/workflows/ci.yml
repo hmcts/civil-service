@@ -29,7 +29,15 @@ jobs:
           java-version: 17
       - name: Run checks
         run: ./gradlew check
+      - name: Ensure Docker is available
+        run: |
+          sudo systemctl start docker || true
+          docker version
+          docker info
       - name: Run integration tests
+        env:
+          DOCKER_HOST: unix:///var/run/docker.sock
+          TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE: /var/run/docker.sock
         run: ./gradlew integration
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
