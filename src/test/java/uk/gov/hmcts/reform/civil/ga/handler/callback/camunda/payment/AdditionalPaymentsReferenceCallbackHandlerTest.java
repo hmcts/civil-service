@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -26,7 +24,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -38,13 +35,11 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_PAYMENT_REF;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String BEARER_TOKEN = "BEARER_TOKEN";
@@ -65,11 +60,6 @@ class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationB
     private CallbackParams params;
     @Mock
     private PaymentsService paymentsService;
-
-    @BeforeEach
-    public void setup() {
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
-    }
 
     private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(
@@ -96,20 +86,15 @@ class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationB
     @Nested
     class MakeAdditionalPaymentReference {
 
-        @BeforeEach
-        void setup() {
-
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
-                                .build());
-        }
-
         @Test
         void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication() {
             var caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(
                     REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
                 .build();
+            when(paymentsService.createServiceRequestGa(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
+                                .build());
             when(judicialDecisionHelper
                      .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
 

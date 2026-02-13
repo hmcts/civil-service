@@ -4,8 +4,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,7 +98,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private EndGeneralAppBusinessProcessCallbackHandler handler;
@@ -801,12 +798,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         @Test
         void theEndOfProcessShouldNotUpdateTheStateOfGAAndAlsoOnParentCaseGADetailsForDirectionOrder() {
-            when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
-            when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(YES, NO).getRequest().getCaseDetails()))
                 .thenReturn(getSampleGeneralApplicationCaseDataByState(YES, NO, AWAITING_DIRECTIONS_ORDER_DOCS));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(getStartEventResponse(YES, NO).getCaseDetails()))
-                .thenReturn(getParentCaseDataBeforeUpdate(YES, NO));
 
             handler.handle(getCallbackParams(YES, NO));
 
@@ -817,12 +810,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         @Test
         void theEndOfProcessShouldNotUpdateTheStateOfGAAndAlsoOnParentCaseGADetailsForWrittenRep() {
-            when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
-            when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(YES, NO).getRequest().getCaseDetails()))
                 .thenReturn(getSampleGeneralApplicationCaseDataByState(YES, NO, AWAITING_WRITTEN_REPRESENTATIONS));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(getStartEventResponse(YES, NO).getCaseDetails()))
-                .thenReturn(getParentCaseDataBeforeUpdate(YES, NO));
 
             handler.handle(getCallbackParams(YES, NO));
 
@@ -833,12 +822,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         @Test
         void theEndOfProcessShouldNotUpdateTheStateOfGAAndAlsoOnParentCaseGADetailsForAddlInfo() {
-            when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
-            when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(YES, NO).getRequest().getCaseDetails()))
                 .thenReturn(getSampleGeneralApplicationCaseDataByState(YES, NO, AWAITING_ADDITIONAL_INFORMATION));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(getStartEventResponse(YES, NO).getCaseDetails()))
-                .thenReturn(getParentCaseDataBeforeUpdate(YES, NO));
 
             handler.handle(getCallbackParams(YES, NO));
 

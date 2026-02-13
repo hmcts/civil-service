@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -35,7 +32,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_CLOSED;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class MainCaseClosedEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
@@ -55,17 +51,15 @@ class MainCaseClosedEventCallbackHandlerTest extends GeneralApplicationBaseCallb
     @Nested
     class AboutToSubmitCallback {
 
-        private LocalDateTime localDateTime;
-
-        @BeforeEach
-        void setup() {
-            localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
-        }
+        private final LocalDateTime localDateTime = LocalDateTime.now();
 
         @ParameterizedTest(name = "The application is in {0} state")
         @EnumSource(value = CaseState.class)
         void shouldRespondWithStateChangedWhenApplicationIsLive(CaseState state) {
+            if (!NON_LIVE_STATES.contains(state)) {
+                when(time.now()).thenReturn(localDateTime);
+            }
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(state).build();

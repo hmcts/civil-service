@@ -16,8 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -81,7 +79,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class CreateApplicationTaskHandlerTest {
 
     private static final String STRING_CONSTANT = "this is a string";
@@ -127,8 +124,6 @@ public class CreateApplicationTaskHandlerTest {
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,

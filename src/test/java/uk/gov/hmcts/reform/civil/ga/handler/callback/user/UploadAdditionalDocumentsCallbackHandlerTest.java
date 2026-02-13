@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -55,9 +53,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder.STRING_CONSTANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SuppressWarnings({"checkstyle:EmptyLineSeparator", "checkstyle:Indentation"})
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
@@ -85,16 +81,6 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
     private static final String DUMMY_EMAIL = "test@gmail.com";
 
-    @BeforeEach
-    public void setUp() throws IOException {
-        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
-
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                                                                 .sub(DUMMY_EMAIL)
-                                                                 .uid(STRING_CONSTANT)
-                                                                 .build());
-    }
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(UPLOAD_ADDL_DOCUMENTS);
@@ -103,8 +89,17 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
     @Nested
     class AboutToSubmit {
 
+        @BeforeEach
+        public void setUp() throws IOException {
+            when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
+                                                                     .sub(DUMMY_EMAIL)
+                                                                     .uid(STRING_CONSTANT)
+                                                                     .build());
+        }
+
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeUncloaked() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -139,6 +134,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeCloakedApplication() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -173,6 +169,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeIsNotUncloakedAndInformOtherPartyIsYes() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -245,6 +242,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsUrgentAddedToApplicantAddlUser() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -327,6 +325,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp1Collection1v2() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -381,6 +380,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp2Collection1v2() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -439,6 +439,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp2Collection1v2MultipleCollection() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -497,6 +498,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsNotConsentOrder() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
@@ -529,6 +531,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldPutBundleInBundleCollection() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()

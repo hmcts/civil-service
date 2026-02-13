@@ -3,14 +3,13 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -37,7 +36,6 @@ import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +53,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
@@ -87,242 +84,307 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
     private static final String DUMMY_EMAIL = "test@gmail.com";
     private static final String APP_UID = "9";
 
-    @BeforeEach
-    public void setUp() throws IOException {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                                                                 .sub(DUMMY_EMAIL)
-                                                                 .uid(APP_UID)
-                                                                 .build());
-        when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
-            .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
-
-    }
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION);
     }
 
-    @Test
-    void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
+    @Nested
+    class AboutToSubmit {
 
-        List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
+        @BeforeEach
+        void setup() {
+            when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
+                                                                     .sub(DUMMY_EMAIL)
+                                                                     .uid(APP_UID)
+                                                                     .build());
+        }
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        @Test
+        void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
-        generalAppWrittenRepUpload.add(element(document1));
-        generalAppWrittenRepUpload.add(element(document2));
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        GeneralApplicationCaseData caseData = getCase(generalAppWrittenRepUpload, null, null);
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            generalAppWrittenRepUpload.add(element(document1));
+            generalAppWrittenRepUpload.add(element(document2));
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        var responseCaseData = getCaseData(response);
-        assertThat(response).isNotNull();
-        assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(2);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
-        assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
+            GeneralApplicationCaseData caseData = getCase(generalAppWrittenRepUpload, null, null);
 
-    }
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-    @Test
-    void shouldPopulateDocListWithExitingDocElement() {
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
+            assertThat(response).isNotNull();
+            assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
+            assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(2);
+            assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
+            assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
 
-        List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
+        }
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        @Test
+        void shouldPopulateDocListWithExitingDocElement() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
-        generalAppWrittenRepUpload.add(element(document1));
-        generalAppWrittenRepUpload.add(element(document2));
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        List<Element<Document>> gaWrittenRepDocList = new ArrayList<>();
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        gaWrittenRepDocList.add(element(document1));
-        gaWrittenRepDocList.add(element(document2));
+            generalAppWrittenRepUpload.add(element(document1));
+            generalAppWrittenRepUpload.add(element(document2));
 
-        GeneralApplicationCaseData caseData = getCase(generalAppWrittenRepUpload,
-                                    DocUploadUtils.prepareDocuments(gaWrittenRepDocList, DocUploadUtils.APPLICANT,
-                                                                    RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION), null);
+            List<Element<Document>> gaWrittenRepDocList = new ArrayList<>();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            gaWrittenRepDocList.add(element(document1));
+            gaWrittenRepDocList.add(element(document2));
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        var responseCaseData = getCaseData(response);
-        assertThat(response).isNotNull();
-        assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(4);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
-        assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
-    }
+            GeneralApplicationCaseData caseData = getCase(
+                generalAppWrittenRepUpload,
+                DocUploadUtils.prepareDocuments(
+                    gaWrittenRepDocList, DocUploadUtils.APPLICANT,
+                    RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION
+                ), null
+            );
 
-    @Test
-    void shouldPopulateDocListWithExitingDocElementWhenGaForWelshEnabled() {
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-        List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
+            assertThat(response).isNotNull();
+            assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
+            assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(4);
+            assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
+            assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
+        }
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        @Test
+        void shouldPopulateDocListWithExitingDocElementWhenGaForWelshEnabled() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
-        generalAppWrittenRepUpload.add(element(document1));
-        generalAppWrittenRepUpload.add(element(document2));
+            List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        List<Element<Document>> gaWrittenRepDocList = new ArrayList<>();
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        gaWrittenRepDocList.add(element(document1));
-        gaWrittenRepDocList.add(element(document2));
+            generalAppWrittenRepUpload.add(element(document1));
+            generalAppWrittenRepUpload.add(element(document2));
 
-        GeneralApplicationCaseData caseData = getCase(generalAppWrittenRepUpload,
-                                    DocUploadUtils.prepareDocuments(gaWrittenRepDocList, DocUploadUtils.APPLICANT,
-                                                                    RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION), null);
+            List<Element<Document>> gaWrittenRepDocList = new ArrayList<>();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            gaWrittenRepDocList.add(element(document1));
+            gaWrittenRepDocList.add(element(document2));
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        var responseCaseData = getCaseData(response);
+            GeneralApplicationCaseData caseData = getCase(
+                generalAppWrittenRepUpload,
+                DocUploadUtils.prepareDocuments(
+                    gaWrittenRepDocList, DocUploadUtils.APPLICANT,
+                    RESPOND_TO_JUDGE_WRITTEN_REPRESENTATION
+                ), null
+            );
 
-        assertThat(response).isNotNull();
-        assertThat(responseCaseData.getIsApplicantResponded()).isEqualTo(YES);
-        assertThat(responseCaseData.getIsRespondentResponded()).isEqualTo(null);
-        assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(4);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
-        assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
-    }
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-    @Test
-    void shouldConvertToDocAndReturnNullWrittenRepText() {
-        GeneralApplicationCaseData caseData = getCase(null, null, "writtenRep text");
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            assertThat(response).isNotNull();
+            assertThat(responseCaseData.getIsApplicantResponded()).isEqualTo(YES);
+            assertThat(responseCaseData.getIsRespondentResponded()).isEqualTo(null);
+            assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
+            assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(4);
+            assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(2);
+            assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(2);
+        }
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-        var responseCaseData = getCaseData(response);
-        assertThat(response).isNotNull();
-        assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
-        assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGeneralAppWrittenRepText()).isEqualTo(null);
-    }
+        @Test
+        void shouldConvertToDocAndReturnNullWrittenRepText() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
+            when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
+                .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
 
-    @Test
-    void shouldCreateDashboardNotificationIfGaForLipIsTrue() {
+            GeneralApplicationCaseData caseData = getCase(null, null, "writtenRep text");
 
-        List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            var responseCaseData = getCaseData(response);
+            assertThat(response).isNotNull();
+            assertThat(responseCaseData.getGeneralAppWrittenRepUpload()).isEqualTo(null);
+            assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
+            assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
+            assertThat(responseCaseData.getGaAddlDocClaimant().size()).isEqualTo(1);
+            assertThat(responseCaseData.getGeneralAppWrittenRepText()).isEqualTo(null);
+        }
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        @Test
+        void shouldCreateDashboardNotificationIfGaForLipIsTrue() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
-        generalAppAddlnInfoUpload.add(element(document1));
-        generalAppAddlnInfoUpload.add(element(document2));
+            List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        handler.handle(params);
-        verify(docUploadDashboardNotificationService).createDashboardNotification(any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
-        verify(docUploadDashboardNotificationService).createResponseDashboardNotification(any(), eq("RESPONDENT"), anyString());
-        verify(docUploadDashboardNotificationService).createResponseDashboardNotification(any(), eq("APPLICANT"), anyString());
+            generalAppAddlnInfoUpload.add(element(document1));
+            generalAppAddlnInfoUpload.add(element(document2));
 
-    }
+            GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
 
-    @Test
-    void shouldNotCreateDashboardNotificationIfTranslationRequired() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            handler.handle(params);
+            verify(docUploadDashboardNotificationService).createDashboardNotification(
+                any(GeneralApplicationCaseData.class),
+                anyString(),
+                anyString(),
+                anyBoolean()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("RESPONDENT"),
+                anyString()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("APPLICANT"),
+                anyString()
+            );
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        }
 
-        generalAppAddlnInfoUpload.add(element(document1));
-        generalAppAddlnInfoUpload.add(element(document2));
+        @Test
+        void shouldNotCreateDashboardNotificationIfTranslationRequired() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            when(respondToWrittenRepresentationGenerator.generate(any(), anyString(), anyString()))
+                .thenReturn(CaseDocument.builder().documentLink(Document.builder().build()).build());
+            List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
-            .generalAppWrittenRepText("test").build();
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        handler.handle(params);
-        verify(docUploadDashboardNotificationService, never()).createDashboardNotification(any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
-        verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(any(), eq("RESPONDENT"), anyString());
-        verify(docUploadDashboardNotificationService).createResponseDashboardNotification(any(), eq("APPLICANT"), anyString());
-    }
+            generalAppAddlnInfoUpload.add(element(document1));
+            generalAppAddlnInfoUpload.add(element(document2));
 
-    @Test
-    void shouldNotCreateDashboardNotificationIfTranslationAwaiting() {
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
+            GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
+            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+                .generalAppWrittenRepText("test").build();
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+            handler.handle(params);
+            verify(docUploadDashboardNotificationService, never()).createDashboardNotification(
+                any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
+            verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(
+                any(),
+                eq("RESPONDENT"),
+                anyString()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("APPLICANT"),
+                anyString()
+            );
+        }
 
-        generalAppAddlnInfoUpload.add(element(document1));
-        generalAppAddlnInfoUpload.add(element(document2));
+        @Test
+        void shouldNotCreateDashboardNotificationIfTranslationAwaiting() {
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
-        GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
-            .preTranslationGaDocuments(List.of(element(CaseDocument.builder().documentName("Written representation").createdBy("Applicant").build()))).build();
+            List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
-        });
-        CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
 
-        handler.handle(params);
-        verify(docUploadDashboardNotificationService, never()).createDashboardNotification(any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
-        verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(any(), eq("RESPONDENT"), anyString());
-        verify(docUploadDashboardNotificationService).createResponseDashboardNotification(any(), eq("APPLICANT"), anyString());
+            Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
+                .documentBinaryUrl(TEST_STRING)
+                .documentHash(TEST_STRING).build();
+
+            generalAppAddlnInfoUpload.add(element(document1));
+            generalAppAddlnInfoUpload.add(element(document2));
+
+            GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
+            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+                .preTranslationGaDocuments(List.of(element(CaseDocument.builder().documentName("Written representation").createdBy(
+                    "Applicant").build()))).build();
+
+            Map<String, Object> dataMap = objectMapper.convertValue(
+                caseData, new TypeReference<>() {
+                }
+            );
+            CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+
+            handler.handle(params);
+            verify(docUploadDashboardNotificationService, never()).createDashboardNotification(
+                any(GeneralApplicationCaseData.class), anyString(), anyString(), anyBoolean());
+            verify(docUploadDashboardNotificationService, never()).createResponseDashboardNotification(
+                any(),
+                eq("RESPONDENT"),
+                anyString()
+            );
+            verify(docUploadDashboardNotificationService).createResponseDashboardNotification(
+                any(),
+                eq("APPLICANT"),
+                anyString()
+            );
+        }
     }
 
     private GeneralApplicationCaseData getCaseData(AboutToStartOrSubmitCallbackResponse response) {

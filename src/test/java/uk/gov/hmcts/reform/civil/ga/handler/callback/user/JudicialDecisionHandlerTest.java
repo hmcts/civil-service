@@ -11,12 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -123,7 +120,6 @@ import static uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionWrittenRepSer
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
@@ -212,13 +208,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         + " Any such application must be made by 4pm on";
 
     private static final LocalDate localDatePlus7days = LocalDate.now().plusDays(7);
-
-    @BeforeEach
-    void setUp() {
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
-    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -1726,23 +1715,10 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         private static final String VALIDATE_WRITTEN_REPRESENTATION_PAGE = "ga-validate-written-representation-date";
         private static final String VALIDATE_HEARING_ORDER_SCREEN = "validate-hearing-order-screen";
 
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
-
-            when(hearingOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
-
-            when(writtenRepresentationConcurrentOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
-
-        }
-
         @Test
         void shouldGenerateListingForHearingDocument() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-hearing-order-doc");
@@ -1759,6 +1735,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorForListingForHearingCourtOwnInitiative() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
@@ -1779,6 +1756,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorForListingForHearingCourtOrderWithOutNotice() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
@@ -1798,6 +1776,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateConcurrentApplicationDocument() {
+            when(writtenRepresentationConcurrentOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().build()
                 .toBuilder().build();
@@ -1824,6 +1804,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateSequentialApplicationDocument() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
                 .toBuilder().build();
@@ -1850,6 +1832,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorCourtOwnInitiativeForWrittenRepIsPastDate() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
                 .toBuilder().build();
@@ -1872,6 +1856,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorOrderWithoutNoticeForWrittenRepIsPastDate() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
                 .toBuilder().build();
@@ -1924,6 +1910,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotReturnErrors_whenSequentialWrittenRepresentationDateIsInFuture() {
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
             String expectedSequentialText = "The defendant should upload any written responses or evidence by 4pm on %s";
             String expectedApplicantSequentialText =
@@ -1986,6 +1973,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             String expectedJudicialHearingTypeText = "The hearing will be %s.";
             String expeceedJudicialTimeEstimateText = "Estimated length of hearing is %s";
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("2 hours");
 
             List<SupportRequirements> judgeSupportReqChoices = new ArrayList<>();
@@ -2072,6 +2060,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnNullForJudgeGOSupportRequirement() {
+
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
             List<SupportRequirements> judgeSupportReqChoices = null;
 
@@ -2178,17 +2168,12 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     @Nested
     class MidEventForMakeAnOrderOption {
 
-        @BeforeEach
-        void setUp() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-        }
-
         private static final String VALIDATE_MAKE_AN_ORDER = "validate-make-an-order";
 
         @Test
         void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
+
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM));
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
@@ -2259,8 +2244,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -2280,9 +2263,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldNotReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
-            when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
@@ -2321,6 +2302,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void shouldReturnNoErrorForHearingWhenJudgeRevisit_AfterUncloak() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
 
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
@@ -2714,18 +2696,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     @Nested
     class MidEventForRespondToDirectionsDateValidity {
 
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(generalOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
-            when(directionOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
-            when(dismissalOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
-        }
-
         private static final String VALIDATE_MAKE_DECISION_SCREEN = "validate-make-decision-screen";
         public static final String RESPOND_TO_DIRECTIONS_DATE_IN_PAST = "The date, by which the response to direction"
                 + " should be given, cannot be in past.";
@@ -2793,6 +2763,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnGenerateOrderDocument() {
+            when(generalOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_MAKE_DECISION_SCREEN);
@@ -2811,6 +2783,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateDirectionOrderDocument() {
+            when(directionOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication()
                 .build();
 
@@ -2828,6 +2803,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateDismissalOrderDocument() {
+            when(dismissalOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_MAKE_DECISION_SCREEN);
@@ -2921,18 +2898,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = LocalDateTime.now().plusDays(5);
 
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(time.now()).thenReturn(responseDate);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(
-                any(LocalDateTime.class), any(Integer.class))).thenReturn(deadline);
-
-            when(requestForInformationGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
-        }
-
         private static final String VALIDATE_REQUEST_MORE_INFO_SCREEN = "validate-request-more-info-screen";
         public static final String REQUESTED_MORE_INFO_BY_DATE_REQUIRED = "The date, by which the applicant must "
                 + "respond, is required.";
@@ -2941,6 +2906,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .applicationIsCloaked(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
@@ -2959,6 +2927,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void should_GenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .applicationIsUncloakedOnce(NO)
                 .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
@@ -3040,6 +3011,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateRequestMoreInfoDocumentWithNotice() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             String judgeRecitalText = "<Title><Name>\n"
                 + "Upon reviewing the application made and upon considering the information "
                 + "provided by the parties,the court requests more information from the applicant.";
@@ -3067,6 +3041,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotReturnErrors_whenRequestedMoreInfoAndTheDateIsInFuture() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation(REQUEST_MORE_INFORMATION,
                                                                       LocalDate.now().plusDays(1), YES);
 
@@ -3079,6 +3056,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnErrors_whenRequestedMoreInfoAndTheDateIsNull() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(REQUEST_MORE_INFORMATION, null, NO);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN);
@@ -3090,6 +3070,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnErrors_whenRequestedMoreInfoAndTheDateIsInPast() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(REQUEST_MORE_INFORMATION,
                     LocalDate.now().minusDays(1), NO);
 
@@ -3103,6 +3086,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(null,
                     LocalDate.now(), YES);
 
@@ -3355,7 +3341,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldAssignToRespondent_WhenJudgeNotUncloaked_RequestMoreInformationApplicationLipRespondent() {
-            when(gaForLipService.isLipResp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(REQUEST_MORE_INFORMATION, NO, YES)
                 .isMultiParty(NO)

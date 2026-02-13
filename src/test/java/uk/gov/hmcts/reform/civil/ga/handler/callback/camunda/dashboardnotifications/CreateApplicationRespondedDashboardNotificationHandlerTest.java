@@ -7,8 +7,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -57,7 +55,6 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class CreateApplicationRespondedDashboardNotificationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Mock
@@ -117,7 +114,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
         when(gaForLipService.isLipApp(any())).thenReturn(false);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -130,7 +126,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -142,7 +137,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRVLip() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),

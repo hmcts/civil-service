@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -48,12 +47,10 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.CaseDefinitionConstants.GENERALAPPLICATION_CASE_TYPE;
 import static uk.gov.hmcts.reform.civil.ga.service.GaEventEmitterService.CASE_ID;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 class GaCoreCaseDataServiceTest {
 
     private static final String USER_AUTH_TOKEN = "Bearer user-xyz";
@@ -88,8 +85,6 @@ class GaCoreCaseDataServiceTest {
         clearInvocations(authTokenGenerator);
         clearInvocations(userService);
         when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTH_TOKEN);
-        when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
-            .thenReturn(USER_AUTH_TOKEN);
     }
 
     @Nested
@@ -117,6 +112,12 @@ class GaCoreCaseDataServiceTest {
                                                          CASE_TYPE, CASE_ID, EVENT_ID
             )).thenReturn(buildStartEventResponse());
 
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
+        }
+
+        @Test
+        void shouldStartAndSubmitEvent_WhenCalled() {
             when(coreCaseDataApi.submitEventForCaseWorker(
                      eq(USER_AUTH_TOKEN),
                      eq(SERVICE_AUTH_TOKEN),
@@ -128,10 +129,7 @@ class GaCoreCaseDataServiceTest {
                      any(CaseDataContent.class)
                  )
             ).thenReturn(caseDetails);
-        }
 
-        @Test
-        void shouldStartAndSubmitEvent_WhenCalled() {
             service.triggerEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
@@ -161,6 +159,18 @@ class GaCoreCaseDataServiceTest {
                 .build();
             mockLocation.add(locationRefData);
             when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
+
+            when(coreCaseDataApi.submitEventForCaseWorker(
+                     eq(USER_AUTH_TOKEN),
+                     eq(SERVICE_AUTH_TOKEN),
+                     eq(USER_ID),
+                     eq(JURISDICTION),
+                     eq(GENERALAPPLICATION_CASE_TYPE),
+                     eq(CASE_ID),
+                     anyBoolean(),
+                     any(CaseDataContent.class)
+                 )
+            ).thenReturn(caseDetails);
 
             service.triggerUpdateCaseManagementLocation(Long.valueOf(CASE_ID),
                                                         CaseEvent.valueOf(EVENT_ID),
@@ -232,6 +242,9 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldStartAndSubmitEvent_WhenCalled() {
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
+
             service.triggerGaEvent(Long.valueOf(CASE_ID), CaseEvent.valueOf(EVENT_ID));
 
             verify(coreCaseDataApi).startEventForCaseWorker(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, USER_ID,
@@ -292,6 +305,9 @@ class GaCoreCaseDataServiceTest {
                      any(CaseDataContent.class)
                  )
             ).thenReturn(caseDetails);
+
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
         }
 
         @Test
@@ -332,6 +348,9 @@ class GaCoreCaseDataServiceTest {
         void shouldReturnCases_WhenSearchingCasesAsSystemUpdateUser() {
             Query query = new Query(QueryBuilders.matchQuery("field", "value"), emptyList(), 0);
 
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
+
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
 
@@ -352,6 +371,9 @@ class GaCoreCaseDataServiceTest {
         @Test
         void shouldReturnGeneralApplications_WhenSearchingGeneralApplicationsAsSystemUpdateUser() {
             Query query = new Query(QueryBuilders.matchQuery("field", "value"), emptyList(), 0);
+
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
 
             List<CaseDetails> cases = List.of(CaseDetails.builder().id(1L).build());
             SearchResult searchResult = SearchResult.builder().cases(cases).build();
@@ -483,6 +505,9 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldReturnCase_WhenInvoked() {
+            when(userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword()))
+                .thenReturn(USER_AUTH_TOKEN);
+
             CaseDetails expectedCaseDetails = CaseDetails.builder().id(1L).build();
             when(coreCaseDataApi.getCase(USER_AUTH_TOKEN, SERVICE_AUTH_TOKEN, "1"))
                 .thenReturn(expectedCaseDetails);
@@ -507,36 +532,15 @@ class GaCoreCaseDataServiceTest {
             when(userService.getAccessToken(any(), any()))
                 .thenReturn(EXPIRED_USER_AUTH_TOKEN)
                 .thenReturn(USER_AUTH_TOKEN);
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
-            when(coreCaseDataApi.startForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(), anyString(),
-                                                    anyString(), anyString()
-            )).thenThrow(new RuntimeException("Exception"));
-            when(coreCaseDataApi.startEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(), anyString(),
-                                                         anyString(), anyString(), anyString()
-            )).thenThrow(new RuntimeException("Exception"));
-            when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
-                                                          anyString(), anyString(), anyString(),
-                                                          anyBoolean(), any(CaseDataContent.class)
-            )).thenThrow(new RuntimeException("Exception"));
-            when(coreCaseDataApi.submitForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
-                                                     anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
-            )).thenThrow(new RuntimeException("Exception"));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-            when(coreCaseDataApi.searchCases(
-                eq(EXPIRED_USER_AUTH_TOKEN),
-                anyString(),
-                anyString(),
-                anyString()
-            )).thenThrow(new RuntimeException("Exception"));
-            when(coreCaseDataApi.getCase(
-                eq(EXPIRED_USER_AUTH_TOKEN),
-                anyString(),
-                anyString()
-            )).thenThrow(new RuntimeException("Exception"));
         }
 
         @Test
         void shouldRetry_startCaseForCaseworker_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.startForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(), anyString(),
+                                                    anyString(), anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             service.startCaseForCaseworker(CASE_ID);
             verify(coreCaseDataApi,
                    times(2))
@@ -545,6 +549,11 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_startUpdate_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.startEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(), anyString(),
+                                                         anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             service.startUpdate(CASE_ID, CaseEvent.valueOf(EVENT_ID));
             verify(coreCaseDataApi, times(2)).startEventForCaseWorker(anyString(), anyString(), anyString(),
                                                                       anyString(), anyString(),
@@ -554,6 +563,11 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_startGaUpdate_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.startEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(), anyString(),
+                                                         anyString(), anyString(), anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             service.startGaUpdate(CASE_ID, CaseEvent.valueOf(EVENT_ID));
             verify(coreCaseDataApi, times(2)).startEventForCaseWorker(anyString(), anyString(), anyString(),
                                                                       anyString(), anyString(),
@@ -563,7 +577,15 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_submitUpdate_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(new RuntimeException("Exception"));
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
             service.submitUpdate(CASE_ID, CaseDataContent.builder().build());
+
             verify(coreCaseDataApi, times(2)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
                                                                        anyString(), anyString(), anyString(),
                                                                        anyBoolean(), any(CaseDataContent.class)
@@ -572,6 +594,13 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_submitGaUpdate_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.submitEventForCaseWorker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
+                                                          anyString(), anyString(), anyString(),
+                                                          anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(new RuntimeException("Exception"));
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
             service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build());
             verify(coreCaseDataApi, times(2)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
                                                                        anyString(), anyString(), anyString(),
@@ -581,6 +610,11 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_submitForCaseWorker_WhenTokenExpired() {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid(USER_ID).build());
+            when(coreCaseDataApi.submitForCaseworker(eq(EXPIRED_USER_AUTH_TOKEN), anyString(), anyString(),
+                                                     anyString(), anyString(), anyBoolean(), any(CaseDataContent.class)
+            )).thenThrow(new RuntimeException("Exception"));
+
             service.submitForCaseWorker(CaseDataContent.builder().build());
             verify(coreCaseDataApi,
                    times(2))
@@ -589,6 +623,13 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_searchCases_WhenTokenExpired() {
+            when(coreCaseDataApi.searchCases(
+                eq(EXPIRED_USER_AUTH_TOKEN),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             Query query = new Query(matchAllQuery(), List.of("reference", "other field"), 0);
             service.searchCases(query);
             verify(coreCaseDataApi, times(2)).searchCases(
@@ -598,6 +639,13 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_searchGeneralApplication_WhenTokenExpired() {
+            when(coreCaseDataApi.searchCases(
+                eq(EXPIRED_USER_AUTH_TOKEN),
+                anyString(),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             Query query = new Query(matchAllQuery(), List.of("reference", "other field"), 0);
             service.searchGeneralApplication(query);
             verify(coreCaseDataApi, times(2)).searchCases(
@@ -607,6 +655,12 @@ class GaCoreCaseDataServiceTest {
 
         @Test
         void shouldRetry_getCase_WhenTokenExpired() {
+            when(coreCaseDataApi.getCase(
+                eq(EXPIRED_USER_AUTH_TOKEN),
+                anyString(),
+                anyString()
+            )).thenThrow(new RuntimeException("Exception"));
+
             service.getCase(1L);
             verify(coreCaseDataApi, times(2)).getCase(
                 anyString(), anyString(), anyString()

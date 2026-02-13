@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.fee;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
@@ -37,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_FEE
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String VERSION = "1";
@@ -56,7 +52,7 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     private GeneralAppFeesService generalAppFeesService;
 
     @Mock
-    GeneralAppFeesConfiguration generalAppFeesConfiguration;
+    private GeneralAppFeesConfiguration generalAppFeesConfiguration;
 
     private CallbackParams params;
 
@@ -70,12 +66,6 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
 
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
-
-    @BeforeEach
-    void setup() {
-        when(generalAppFeesConfiguration.getApplicationUncloakAdditionalFee())
-            .thenReturn(TEST_FEE_CODE);
-    }
 
     @Test
      void shouldReturnCorrectTaskId() {
@@ -119,15 +109,10 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
 
     @Test
     void shouldNotGetAdditionalFeeValue_WhenApplicationIsNotUncloaked() {
-        when(generalAppFeesService.getFeeForGA(any(), any(), any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(
-                BigDecimal.valueOf(16700)).code("").version(VERSION).build());
 
         var caseData = GeneralApplicationCaseDataBuilder.builder()
             .requestForInformationApplication()
             .build();
-        when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(false);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         verify(generalAppFeesService, never()).getFeeForGA(any(), any(), any());
     }

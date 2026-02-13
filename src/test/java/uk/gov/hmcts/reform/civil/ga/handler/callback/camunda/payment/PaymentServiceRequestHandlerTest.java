@@ -41,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PAYMENT_SERVICE_
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
@@ -74,9 +73,6 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
     @BeforeEach
     public void setup() {
         caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
-
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
     }
 
     private GeneralApplicationPbaDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
@@ -94,6 +90,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldMakePaymentServiceRequest_whenInvoked() {
+            when(gaForLipService.isGaForLip(any())).thenReturn(false);
             when(paymentsService.createServiceRequestGa(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -107,9 +104,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldNotMakePaymentServiceRequest_shouldAddFreePaymentDetails_whenInvoked() {
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
-                                .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
+            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -127,10 +123,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldNotMakePaymentServiceRequest_shouldAddFreePaymentDetails_for_Lip_whenInvoked() {
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
-                                .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 

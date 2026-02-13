@@ -2,15 +2,12 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -36,7 +33,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +49,6 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
@@ -86,14 +81,6 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
     private static final String DUMMY_EMAIL = "test@gmail.com";
     private static final String APP_UID = "9";
 
-    @BeforeEach
-    public void setUp() throws IOException {
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                                                                 .sub(DUMMY_EMAIL)
-                                                                 .uid(APP_UID)
-                                                                 .build());
-    }
-
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(RESPOND_TO_JUDGE_DIRECTIONS);
@@ -101,6 +88,8 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
     @Test
     void shouldPopulateDocListAndReturnNullWrittenRepUpload() {
+        mockIdamClient();
+
         List<Element<Document>> generalAppDirOrderUpload = new ArrayList<>();
 
         Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
@@ -131,6 +120,7 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
     @Test
     void shouldPopulateDocListWithExitingDocElement() {
+        mockIdamClient();
 
         List<Element<Document>> generalAppDirOrderUpload = new ArrayList<>();
 
@@ -169,6 +159,7 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
     @Test
     void shouldCreateDashboardNotificationIfGaForLipIsTrue() {
+        mockIdamClient();
 
         List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
@@ -224,5 +215,12 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
                                  .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
+    }
+
+    private void mockIdamClient() {
+        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
+                                                                 .sub(DUMMY_EMAIL)
+                                                                 .uid(APP_UID)
+                                                                 .build());
     }
 }

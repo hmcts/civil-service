@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
-import org.mockito.quality.Strictness;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AW
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Mock
@@ -77,13 +74,16 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralAppli
         @BeforeEach
         void setup() {
             localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
         }
 
         @ParameterizedTest(name = "The application is in {0} state")
         @EnumSource(value = CaseState.class)
         void shouldRespondWithStateChangedWhenApplicationIsLive(CaseState state) {
+            if (!NON_LIVE_STATES.contains(state)) {
+                when(time.now()).thenReturn(localDateTime);
+                when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            }
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(state).build();
@@ -126,8 +126,6 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralAppli
         @Test
         void shouldNotSendAnyDashboardNotificationsWhenLRvsLR() {
             when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            when(gaForLipService.isLipApp(any())).thenReturn(false);
-            when(gaForLipService.isLipResp(any())).thenReturn(false);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();

@@ -12,8 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -43,7 +41,6 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class CheckStayOrderDeadlineEndTaskHandlerTest {
 
     @Mock
@@ -134,10 +131,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenCasesPastDeadlineFoundAndDifferentAppType() {
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM)).thenReturn(Set.of());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithDeadlineCrossedProcessed))
-            .thenReturn(caseDataWithDeadlineCrossedProcessed);
         gaOrderMadeTaskHandler.execute(externalTask, externalTaskService);
 
         verify(searchService).getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM);
@@ -153,8 +146,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
             caseDetailsWithFutureDeadline
         ));
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithFutureDeadline))
             .thenReturn(caseDataWithFutureDeadline);
 
@@ -198,8 +189,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineNotProcessed))
             .thenReturn(caseDataWithTodayDeadlineNotProcessed);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithDeadlineCrossedNotProcessed))
             .thenReturn(caseDataWithDeadlineCrossedNotProcessed);
