@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.CaseDefinitionConstants;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 public class CaseAssignmentControllerTest extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/assignment";
