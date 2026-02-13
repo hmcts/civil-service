@@ -77,7 +77,7 @@ public class GAJudgeRevisitTaskHandler extends BaseExternalTaskHandler {
                  externalTask.getTopicName(), requestForInformationCases.size(), requestForInformationCases.stream().map(CaseDetails::getId).sorted().toList());
         requestForInformationCases.forEach(this::fireEventForStateChange);
         requestForInformationCases.forEach(this::fireEventForUpdatingTaskList);
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     protected void fireEventForStateChange(CaseDetails caseDetails) {

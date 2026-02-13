@@ -44,7 +44,7 @@ public class EndBusinessProcessGASpecWithoutWATaskHandler extends BaseExternalTa
         log.info("Resetting end business process id for caseId {}", caseId);
         coreCaseDataService.submitGaUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {

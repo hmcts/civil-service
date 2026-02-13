@@ -10,13 +10,12 @@ class AddressUtilsTest {
 
     @Test
     void testFormatAddress() {
-        Address address = Address.builder()
-            .addressLine1("123 Street")
-            .addressLine2("Apartment 4B")
-            .postTown("City")
-            .postCode("12345")
-            .country("Country")
-            .build();
+        Address address = new Address();
+        address.setAddressLine1("123 Street");
+        address.setAddressLine2("Apartment 4B");
+        address.setPostTown("City");
+        address.setPostCode("12345");
+        address.setCountry("Country");
 
         String formattedAddress = AddressUtils.formatAddress(address);
 
@@ -26,10 +25,9 @@ class AddressUtilsTest {
 
     @Test
     void testFormatAddressWithNullFields() {
-        Address address = Address.builder()
-            .addressLine1("123 Street")
-            .country("Country")
-            .build();
+        Address address = new Address();
+        address.setAddressLine1("123 Street");
+        address.setCountry("Country");
 
         String formattedAddress = AddressUtils.formatAddress(address);
 
@@ -39,7 +37,7 @@ class AddressUtilsTest {
 
     @Test
     void testFormatEmptyAddress() {
-        Address address = Address.builder().build();
+        Address address = new Address();
 
         String formattedAddress = AddressUtils.formatAddress(address);
 

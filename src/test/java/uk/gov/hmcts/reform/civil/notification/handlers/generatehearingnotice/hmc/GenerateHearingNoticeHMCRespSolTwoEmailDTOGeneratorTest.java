@@ -78,7 +78,7 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
     void addCustomProperties_populatesDateTimeAndDefendantRef() {
         CaseData caseData = CaseData.builder()
                 .hearingDate(HEARING_DATE_VAL)
-                .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_ID).build())
+                .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
                 .solicitorReferences(SolicitorReferences.builder()
                         .respondentSolicitor1Reference(DEF_REF)
                         .build())

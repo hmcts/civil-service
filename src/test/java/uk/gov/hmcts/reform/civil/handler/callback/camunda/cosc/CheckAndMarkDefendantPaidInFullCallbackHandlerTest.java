@@ -63,7 +63,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldSetSendToCjesProcessVariableToFalse_whenDefendantPaidInFull() {
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .activeJudgment(new JudgmentDetails()
                                 .setFullyPaymentMadeDate(LocalDate.of(2024, 9, 20))
                                 .setIssueDate(LocalDate.of(2024, 9, 9))
@@ -88,7 +88,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
             .setOrderedAmount("900000");
 
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .certOfSC(new CertOfSC()
                                     .setDefendantFinalPaymentDate(markedPaymentDate))
             .activeJudgment(activeJudgementWithoutPayment)
@@ -123,7 +123,7 @@ class CheckAndMarkDefendantPaidInFullCallbackHandlerTest extends BaseCallbackHan
             .setOrderedAmount("900000");
 
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .certOfSC(new CertOfSC()
                                     .setDefendantFinalPaymentDate(markedPaymentDate))
             .activeJudgment(activeJudgementWithoutPayment)

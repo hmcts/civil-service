@@ -293,9 +293,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                         .claimantBilingualLanguagePreference("WELSH")
                         .respondentSolicitor1EmailAddress("respondent1@email.com")
                         .queries(query)
-                        .businessProcess(BusinessProcess.builder()
-                                             .processInstanceId("123")
-                                             .build())
+                        .businessProcess(new BusinessProcess()
+                                             .setProcessInstanceId("123"))
                         .build();
                 } else {
                     caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
@@ -303,9 +302,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                         .claimantBilingualLanguagePreference("ENGLISH")
                         .respondentSolicitor1EmailAddress("respondent1@email.com")
                         .queries(query)
-                        .businessProcess(BusinessProcess.builder()
-                                             .processInstanceId("123")
-                                             .build())
+                        .businessProcess(new BusinessProcess()
+                                             .setProcessInstanceId("123"))
                         .build();
                 }
 
@@ -341,7 +339,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                         .respondent1Represented(YesOrNo.NO)
                         .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                         .queries(query)
-                        .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
+                        .businessProcess(new BusinessProcess().setProcessInstanceId("123"))
                         .build();
                 } else {
                     caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
@@ -351,7 +349,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                         .respondent1Represented(YesOrNo.NO)
                         .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                         .queries(query)
-                        .businessProcess(BusinessProcess.builder().processInstanceId("123").build())
+                        .businessProcess(new BusinessProcess().setProcessInstanceId("123"))
                         .build();
                 }
 
@@ -382,9 +380,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     .applicant1Represented(YesOrNo.YES)
                     .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -411,9 +408,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -440,9 +436,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -468,9 +463,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 handler.handle(params);
@@ -509,9 +503,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 handler.handle(params);
@@ -536,9 +529,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
-                    .businessProcess(BusinessProcess.builder()
-                                         .processInstanceId("123")
-                                         .build())
+                    .businessProcess(new BusinessProcess()
+                                         .setProcessInstanceId("123"))
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
                 handler.handle(params);
@@ -560,9 +552,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     createCaseMessage("1"),
                     createCaseMessage("2")
                 )))
-                .businessProcess(BusinessProcess.builder()
-                                     .processInstanceId("123")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setProcessInstanceId("123"))
                 .build();
         }
 
@@ -577,9 +568,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     createCaseMessage("1"),
                     createCaseMessage("2")
                 )))
-                .businessProcess(BusinessProcess.builder()
-                                     .processInstanceId("123")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setProcessInstanceId("123"))
                 .build();
         }
 
@@ -600,9 +590,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     createCaseMessage("2"),
                     createCaseMessage("3")
                 )))
-                .businessProcess(BusinessProcess.builder()
-                                     .processInstanceId("123")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setProcessInstanceId("123"))
                 .build();
         }
 
@@ -623,9 +612,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                     createCaseMessage("2"),
                     createCaseMessage("3")
                 )))
-                .businessProcess(BusinessProcess.builder()
-                                     .processInstanceId("123")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setProcessInstanceId("123"))
                 .build();
         }
 

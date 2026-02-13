@@ -21,12 +21,11 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_whenFullAdmitRepaymentAcceptedWithCCJ() {
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+                .setCcjPaymentPaidSomeOption(YES)
+                .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
         CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
@@ -42,12 +41,11 @@ public class JudgmentAdmissionUtilsTest {
 
     @Test
     public void shouldReturnTrue_whenPartAdmitRepaymentAcceptedWithCCJ() {
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+                .setCcjPaymentPaidSomeOption(YES)
+                .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
         CaseData caseData = CaseData.builder()
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)

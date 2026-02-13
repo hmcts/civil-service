@@ -2100,7 +2100,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
             CaseData data = CaseDataBuilder.builder().atStateClaimDraft().build();
-            data.setCourtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build());
+            data.setCourtLocation(new CourtLocation().setApplicantPreferredCourtLocationList(null));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(data, ABOUT_TO_SUBMIT));

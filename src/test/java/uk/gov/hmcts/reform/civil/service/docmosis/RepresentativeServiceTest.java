@@ -71,14 +71,14 @@ class RepresentativeServiceTest {
     }
 
     private Address createAddress(String prefix) {
-        return Address.builder()
-            .addressLine1(prefix + " service address 1")
-            .addressLine2(prefix + " service address 2")
-            .addressLine3(prefix + " service address 3")
-            .postCode("SW1 1AA " + prefix)
-            .county("London " + prefix)
-            .country("UK " + prefix)
-            .build();
+        Address address = new Address();
+        address.setAddressLine1(prefix + " service address 1");
+        address.setAddressLine2(prefix + " service address 2");
+        address.setAddressLine3(prefix + " service address 3");
+        address.setPostCode("SW1 1AA " + prefix);
+        address.setCounty("London " + prefix);
+        address.setCountry("UK " + prefix);
+        return address;
     }
 
     private Organisation createOrganisation(String name, ContactInformation contactInformation) {
@@ -519,4 +519,3 @@ class RepresentativeServiceTest {
         }
     }
 }
-

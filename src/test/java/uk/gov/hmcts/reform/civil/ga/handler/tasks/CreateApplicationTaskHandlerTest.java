@@ -260,11 +260,10 @@ public class CreateApplicationTaskHandlerTest {
                                                   .build())
                 .isMultiParty(YES)
                 .isDocumentVisibleGA(isDocumentVisible)
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
     }
@@ -573,11 +572,10 @@ public class CreateApplicationTaskHandlerTest {
                 .isMultiParty(isMultiParty)
                 .isDocumentVisibleGA(isDocumentVisible)
                 .generalAppEvidenceDocument(generalAppEvidenceDocument)
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
 
@@ -639,8 +637,8 @@ public class CreateApplicationTaskHandlerTest {
         void shouldNotTriggerCCDEvent() {
 
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+                .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
 
             VariableMap variables = Variables.createVariables();
             variables.putValue(uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -811,11 +809,10 @@ public class CreateApplicationTaskHandlerTest {
                 .isDocumentVisibleGA(NO)
                 .parentClaimantIsApplicant(YES)
                 .caseNameGaInternal("applicant v respondent")
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
 
@@ -868,8 +865,8 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-                                 .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                 .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
 
         VariableMap variables = Variables.createVariables();
         variables.putValue(uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -959,8 +956,8 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-            .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+            .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
         caseData = caseData.toBuilder()
                 .generalAppEvidenceDocument(generalAppEvidenceDocument).build();
         caseData = caseData.toBuilder()
@@ -1058,7 +1055,7 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-                                 .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                 .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
     }
 }

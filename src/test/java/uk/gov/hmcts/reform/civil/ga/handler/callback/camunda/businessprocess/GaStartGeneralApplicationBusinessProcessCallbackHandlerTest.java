@@ -38,7 +38,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldSetStatusStarted_whenInitialStateIs(BusinessProcessStatus status) {
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(status).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(status)).build();
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
@@ -57,7 +57,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     @EnumSource(value = BusinessProcessStatus.class, names = {"STARTED", "FINISHED"})
     void shouldReturnErrors_whenInitialStatusIs(BusinessProcessStatus status) {
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(status).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(status)).build();
 
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });

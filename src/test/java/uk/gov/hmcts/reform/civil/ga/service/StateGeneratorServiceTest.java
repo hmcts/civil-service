@@ -105,7 +105,7 @@ public class StateGeneratorServiceTest {
             .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
                                            .directionsText("test")
                                            .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .applicationIsCloaked(YesOrNo.NO)
@@ -122,7 +122,7 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
                                            .makeAnOrder(DISMISS_THE_APPLICATION)
                                            .build())
@@ -166,7 +166,7 @@ public class StateGeneratorServiceTest {
                                            .makeAnOrder(APPROVE_OR_EDIT)
                                            .build())
             .parentClaimantIsApplicant(YesOrNo.YES)
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppType(GAApplicationType.builder()
                                 .types(applicationTypeJudgement()).build())
             .build();
@@ -185,7 +185,7 @@ public class StateGeneratorServiceTest {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .applicationIsCloaked(YesOrNo.YES)
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .build();
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
         assertThat(caseState).isEqualTo(ORDER_MADE);
@@ -202,7 +202,7 @@ public class StateGeneratorServiceTest {
                                         .setOnInitiativeSelectionTextArea("test"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppDetailsOfOrder("order test")
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .build();
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
         assertThat(caseState).isEqualTo(ORDER_MADE);
@@ -218,7 +218,7 @@ public class StateGeneratorServiceTest {
                                            .build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(YesOrNo.NO)
             .build();
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
@@ -235,7 +235,7 @@ public class StateGeneratorServiceTest {
                                            .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(YesOrNo.NO)
             .build();
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);

@@ -71,7 +71,7 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
     @Test
     void shouldTriggerEndGADocUploadProcessCCDEventAndUpdateBusinessProcessStatusToFinished_whenCalled() {
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -101,7 +101,7 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
                 "caseEvent", END_BUSINESS_PROCESS_GASPEC_WITHOUT_WA_TASK
             ));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -131,9 +131,8 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
     }
 
     private CaseDataContent getCaseDataContent(CaseDetails caseDetails, StartEventResponse value) {
-        caseDetails.getData().put("businessProcess", BusinessProcess.builder()
-            .status(BusinessProcessStatus.FINISHED)
-            .build());
+        caseDetails.getData().put("businessProcess", new BusinessProcess()
+            .setStatus(BusinessProcessStatus.FINISHED));
 
         return CaseDataContent.builder()
             .eventToken(value.getToken())

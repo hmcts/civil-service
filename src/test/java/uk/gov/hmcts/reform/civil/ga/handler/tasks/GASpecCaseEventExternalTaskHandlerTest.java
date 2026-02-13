@@ -98,7 +98,7 @@ class GASpecCaseEventExternalTaskHandlerTest {
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -180,7 +180,7 @@ class GASpecCaseEventExternalTaskHandlerTest {
         void shouldNotCallHandleFailureMethod_whenExceptionOnCompleteCall() {
             String errorMessage = "there was an error";
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
             when(coreCaseDataService.startGaUpdate(any(), any()))

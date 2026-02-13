@@ -170,17 +170,18 @@ class SealedClaimFormGeneratorTest {
     }
 
     private Representative getRepresentative() {
+        Address serviceAddress = new Address();
+        serviceAddress.setAddressLine1("AdmiralHouse");
+        serviceAddress.setAddressLine2("Queensway");
+        serviceAddress.setPostTown("Newport");
+        serviceAddress.setPostCode("NP204AG");
+
         return new Representative()
             .setOrganisationName("MiguelSpooner")
             .setDxAddress("DX 751Newport")
             .setOrganisationName("DBE Law")
             .setEmailAddress("jim.smith@slatergordon.com")
-            .setServiceAddress(Address.builder()
-                                   .addressLine1("AdmiralHouse")
-                                   .addressLine2("Queensway")
-                                   .postTown("Newport")
-                                   .postCode("NP204AG")
-                                   .build());
+            .setServiceAddress(serviceAddress);
     }
 
     @Nested

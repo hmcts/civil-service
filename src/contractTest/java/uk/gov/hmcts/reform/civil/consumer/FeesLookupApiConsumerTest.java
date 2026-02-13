@@ -241,7 +241,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     public void verifyFeeForMoneyClaimWithoutKeyword() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(false);
         Fee fee = feesService.getFeeDataByClaimValue(
-            ClaimValue.builder().statementOfValueInPennies(new BigDecimal(100000)).build()
+            new ClaimValue().setStatementOfValueInPennies(new BigDecimal(100000))
         );
         assertThat(fee.getCode(), is(equalTo("FEE0444")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(9000))));
@@ -253,7 +253,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
         Fee fee = feesService.getFeeDataByClaimValue(
-            ClaimValue.builder().statementOfValueInPennies(new BigDecimal(100000)).build()
+            new ClaimValue().setStatementOfValueInPennies(new BigDecimal(100000))
         );
         assertThat(fee.getCode(), is(equalTo("FEE0443")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(8000))));

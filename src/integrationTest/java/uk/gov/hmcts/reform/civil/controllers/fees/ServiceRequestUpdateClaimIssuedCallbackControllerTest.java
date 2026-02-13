@@ -49,7 +49,7 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     void bareMinimumToMakeAPositiveRequest() {
         when(authorisationService.isServiceAuthorized(any())).thenReturn(true);
         CaseData
-            caseData = CaseData.builder().businessProcess(BusinessProcess.builder().processInstanceId("instance").camundaEvent("camunda event").build()).build();
+            caseData = CaseData.builder().businessProcess(new BusinessProcess().setProcessInstanceId("instance").setCamundaEvent("camunda event")).build();
         CaseDetails caseDetails = CaseDetails.builder().build();
         caseDetails.setData(caseData.toMap(objectMapper));
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();

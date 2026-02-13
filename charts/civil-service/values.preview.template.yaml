@@ -26,6 +26,7 @@ java:
     HMC_API_URL: http://${SERVICE_NAME}-wiremock
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
+    FEES_API_URL: https://wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
     ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
@@ -49,7 +50,6 @@ java:
     SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWKSETURI: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net/o/jwks
     AUTH_IDAM_CLIENT_BASEURL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     AUTH_PROVIDER_SERVICE_CLIENT_BASEURL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     GENAPP_LRD_URL: http://rd-location-ref-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     PAYMENTS_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -399,14 +399,110 @@ wiremock:
   image: "wiremock/wiremock"
   applicationPort: 8080
   imagePullPolicy: Always
-  releaseNameOverride : ${SERVICE_NAME}-wiremock
+  releaseNameOverride: ${SERVICE_NAME}-wiremock
   verbose: false
   ingressHost: wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
   volumes:
-    - name: wiremock-mocks
+    - name: wiremock-mappings
       configMap:
-        name: ${SERVICE_NAME}-wiremock-wm
+        name: ${SERVICE_NAME}-wiremock-mappings
   volumeMounts:
-    - name: wiremock-mocks
+    - name: wiremock-mappings
       mountPath: /home/wiremock/mappings
-      subPath: mappings
+
+# WireMock mappings for health endpoints - defined in parent chart to avoid subchart value inheritance issues
+wiremockMappings:
+  health-mock.json: |
+    {
+      "name": "Fees API - Health Check",
+      "request": {
+        "method": "GET",
+        "urlPath": "/health"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Expires": "0"
+        },
+        "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\",\"details\":{\"database\":\"Wiremock\",\"validationQuery\":\"isValid()\"}},\"diskSpace\":{\"status\":\"UP\",\"details\":{\"total\":0,\"free\":0,\"threshold\":0,\"path\":\"/opt/app/.\",\"exists\":true}},\"livenessState\":{\"status\":\"UP\"},\"ping\":{\"status\":\"UP\"},\"readinessState\":{\"status\":\"UP\"}},\"groups\":[\"liveness\",\"readiness\"]}"
+      }
+    }
+  health-liveness.json: |
+    {
+      "name": "Fees API - Health Liveness",
+      "request": {
+        "method": "GET",
+        "urlPath": "/health/liveness"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+        },
+        "body": "{\"status\":\"UP\"}"
+      }
+    }
+  health-readiness.json: |
+    {
+      "name": "Fees API - Health Readiness",
+      "request": {
+        "method": "GET",
+        "urlPath": "/health/readiness"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+        },
+        "body": "{\"status\":\"UP\"}"
+      }
+    }
+  actuator-health.json: |
+    {
+      "name": "Fees API - Actuator Health",
+      "request": {
+        "method": "GET",
+        "urlPath": "/actuator/health"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json",
+          "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+          "Expires": "0"
+        },
+        "body": "{\"status\":\"UP\",\"components\":{\"db\":{\"status\":\"UP\",\"details\":{\"database\":\"Wiremock\",\"validationQuery\":\"isValid()\"}},\"diskSpace\":{\"status\":\"UP\",\"details\":{\"total\":0,\"free\":0,\"threshold\":0,\"path\":\"/opt/app/.\",\"exists\":true}},\"livenessState\":{\"status\":\"UP\"},\"ping\":{\"status\":\"UP\"},\"readinessState\":{\"status\":\"UP\"}},\"groups\":[\"liveness\",\"readiness\"]}"
+      }
+    }
+  actuator-health-liveness.json: |
+    {
+      "name": "Fees API - Actuator Health Liveness",
+      "request": {
+        "method": "GET",
+        "urlPath": "/actuator/health/liveness"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+        },
+        "body": "{\"status\":\"UP\"}"
+      }
+    }
+  actuator-health-readiness.json: |
+    {
+      "name": "Fees API - Actuator Health Readiness",
+      "request": {
+        "method": "GET",
+        "urlPath": "/actuator/health/readiness"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/vnd.spring-boot.actuator.v3+json"
+        },
+        "body": "{\"status\":\"UP\"}"
+      }
+    }

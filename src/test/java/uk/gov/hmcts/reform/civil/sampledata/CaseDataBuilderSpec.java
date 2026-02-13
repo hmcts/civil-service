@@ -249,9 +249,8 @@ public class CaseDataBuilderSpec {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
             .build();
@@ -282,7 +281,7 @@ public class CaseDataBuilderSpec {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -582,11 +581,11 @@ public class CaseDataBuilderSpec {
         atStateSpec1v1UnrepresentedPendingClaimIssued();
         respondent1Represented = NO;
         claimNotificationDeadline = LocalDate.now().atStartOfDay().plusDays(14);
-        respondent1PinToPostLRspec = DefendantPinToPostLRspec.builder()
-                                           .expiryDate(LocalDate.now())
-                                           .citizenCaseRole("citizen")
-                                           .respondentCaseRole("respondent")
-                                           .accessCode("123").build();
+        respondent1PinToPostLRspec = new DefendantPinToPostLRspec()
+            .setExpiryDate(LocalDate.now())
+            .setCitizenCaseRole("citizen")
+            .setRespondentCaseRole("respondent")
+            .setAccessCode("123");
 
         return this;
     }

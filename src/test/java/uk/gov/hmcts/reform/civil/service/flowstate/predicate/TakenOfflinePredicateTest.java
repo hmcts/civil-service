@@ -487,7 +487,7 @@ class TakenOfflinePredicateTest {
         when(caseData.isLipCase()).thenReturn(true);
         when(caseData.getActiveJudgment()).thenReturn(mockedJudgmentDetails);
         when(caseData.getTakenOfflineDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getChangeOfRepresentation()).thenReturn(ChangeOfRepresentation.builder().build());
+        when(caseData.getChangeOfRepresentation()).thenReturn(new ChangeOfRepresentation());
         assertTrue(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
     }
 

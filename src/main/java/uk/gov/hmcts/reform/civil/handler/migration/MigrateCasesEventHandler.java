@@ -133,7 +133,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         if (caseReferences.isEmpty()) {
             log.warn("No case references found to process");
-            return ExternalTaskData.builder().build();
+            return new ExternalTaskData();
         }
 
         log.info("Found {} case references to process", caseReferences.size());
@@ -141,7 +141,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String state = externalTask.getVariable("state");
         asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     protected <T extends CaseReference> List<T> getCaseReferenceList(Class<T> type, String csvFileName) {

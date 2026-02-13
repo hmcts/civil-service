@@ -101,11 +101,10 @@ class GaDispatchBusinessProcessCallbackHandlerTest extends GeneralApplicationBas
     }
 
     private BusinessProcess businessProcessWithStatus(BusinessProcessStatus status) {
-        return BusinessProcess.builder()
-            .camundaEvent("testCamundaEvent")
-            .activityId("testActivityId")
-            .processInstanceId("testProcessInstanceId")
-            .status(status)
-            .build();
+        return new BusinessProcess()
+            .setCamundaEvent("testCamundaEvent")
+            .setActivityId("testActivityId")
+            .setProcessInstanceId("testProcessInstanceId")
+            .setStatus(status);
     }
 }

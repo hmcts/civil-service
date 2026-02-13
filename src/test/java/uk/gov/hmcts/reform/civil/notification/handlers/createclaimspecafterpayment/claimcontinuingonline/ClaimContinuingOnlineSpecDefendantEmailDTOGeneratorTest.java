@@ -76,7 +76,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
                 .applicant1(Party.builder().companyName(CLAIMANT_NAME).type(Party.Type.COMPANY).build())
                 .legacyCaseReference(LEGACY_CASE_REFERENCE)
                 .ccdCaseReference(CCD_CASE_REFERENCE)
-                .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode("12346").build())
+                .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode("12346"))
                 .respondent1ResponseDeadline(LocalDate.now().plusDays(14).atStartOfDay())
                 .issueDate(LocalDate.now())
                 .build();

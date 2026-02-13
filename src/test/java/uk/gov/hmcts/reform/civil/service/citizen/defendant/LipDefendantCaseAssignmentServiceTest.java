@@ -117,7 +117,7 @@ class LipDefendantCaseAssignmentServiceTest {
 
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
             .addRespondent1PinToPostLRspec(buildPin("TEST1234", LocalDate.now().plusDays(180)))
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .respondent1(Party.builder()
                              .flags(new Flags()
                                         .setPartyName("Mr test")

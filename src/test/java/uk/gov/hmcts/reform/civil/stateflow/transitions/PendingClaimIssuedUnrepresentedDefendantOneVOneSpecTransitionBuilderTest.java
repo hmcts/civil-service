@@ -51,7 +51,7 @@ public class PendingClaimIssuedUnrepresentedDefendantOneVOneSpecTransitionBuilde
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePendingClaimIssuedUnrepresentedDefendant()
             .addRespondent1PinToPostLRspec(
-                DefendantPinToPostLRspec.builder().respondentCaseRole("Solicitor").build()
+                new DefendantPinToPostLRspec().setRespondentCaseRole("Solicitor")
             )
             .build();
         assertTrue(LipPredicate.pinInPostEnabled.test(caseData));

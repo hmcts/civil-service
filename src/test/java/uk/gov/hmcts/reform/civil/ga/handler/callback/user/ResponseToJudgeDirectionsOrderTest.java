@@ -210,13 +210,11 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }

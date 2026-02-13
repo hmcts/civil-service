@@ -51,10 +51,9 @@ class UpdatePaymentStatusServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                     .customerReference("RC-1604-0739-2145-4711")
                     .build()).build())
@@ -82,10 +81,9 @@ class UpdatePaymentStatusServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder().additionalPaymentDetails(PaymentDetails.builder()
                                                                             .customerReference("RC-1604-0739-2145-4711")
                                                                             .build())
@@ -129,6 +127,8 @@ class UpdatePaymentStatusServiceTest {
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse() {
-        return CardPaymentStatusResponse.builder().paymentReference("1234").status(PaymentStatus.SUCCESS.name()).build();
+        return new CardPaymentStatusResponse()
+            .setPaymentReference("1234")
+            .setStatus(PaymentStatus.SUCCESS.name());
     }
 }

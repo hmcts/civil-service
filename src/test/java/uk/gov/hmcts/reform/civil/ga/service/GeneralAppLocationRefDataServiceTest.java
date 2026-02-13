@@ -11,12 +11,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.client.LocationReferenceDataApiClient;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.ga.config.GeneralAppLRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
+import uk.gov.hmcts.reform.civil.service.refdata.CourtVenueService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ class GeneralAppLocationRefDataServiceTest {
     private ArgumentCaptor<HttpEntity<?>> httpEntityCaptor;
 
     @Mock
-    private LocationReferenceDataApiClient locationReferenceDataApiClient;
+    private CourtVenueService courtVenueService;
 
     @Mock
     private GeneralAppLRDConfiguration lrdConfiguration;
@@ -211,15 +211,10 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenue(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
+        when(courtVenueService.getCMLAndHLCourts(
             anyString(),
             anyString()
-        ))
-            .thenReturn(getAllLocationsRefDataResponse());
+        )).thenReturn(getAllLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocations("user_token");
@@ -246,15 +241,10 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsNullBody() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenue(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
+        when(courtVenueService.getCMLAndHLCourts(
             anyString(),
             anyString()
-        ))
-            .thenReturn(new ArrayList<>());
+        )).thenReturn(new ArrayList<>());
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocations("user_token");
@@ -265,15 +255,10 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsOnlyScotlandLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenue(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
+        when(courtVenueService.getCMLAndHLCourts(
             anyString(),
             anyString()
-        ))
-            .thenReturn(getOnlyScotlandLocationsRefDataResponse());
+        )).thenReturn(getOnlyScotlandLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService.getCourtLocations("user_token");
 
@@ -283,15 +268,10 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsNonScotlandLocations() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenue(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
+        when(courtVenueService.getCMLAndHLCourts(
             anyString(),
             anyString()
-        ))
-            .thenReturn(getNonScotlandLocationsRefDataResponse());
+        )).thenReturn(getNonScotlandLocationsRefDataResponse());
 
         List<LocationRefData> courtLocations = refDataService.getCourtLocations("user_token");
 
@@ -317,15 +297,10 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnEmptyList_whenLRDThrowsException() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenue(
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
+        when(courtVenueService.getCMLAndHLCourts(
             anyString(),
             anyString()
-        ))
-            .thenThrow(new RestClientException("403"));
+        )).thenThrow(new RestClientException("403"));
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocations("user_token");
@@ -336,13 +311,11 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocationsByEpimmsId() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenueByEpimmsId(
-            anyString(),
+        when(courtVenueService.getCourtByEpimmsId(
             anyString(),
             anyString(),
             anyString()
-        ))
-            .thenReturn(getAllLocationsRefDataResponseByEpimms());
+        )).thenReturn(getAllLocationsRefDataResponseByEpimms());
 
         List<LocationRefData> courtLocations = refDataService
             .getCourtLocationsByEpimmsId("user_token", "00000");
@@ -360,12 +333,11 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsCcmcc() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenueByName(
+        when(courtVenueService.getCourtVenueByName(
             anyString(),
             anyString(),
             anyString()
-        ))
-            .thenReturn(getLocationRefDataResponseForCcmcc());
+        )).thenReturn(getLocationRefDataResponseForCcmcc());
 
         List<LocationRefData> courtLocations = refDataService
             .getCcmccLocation("user_token");
@@ -383,12 +355,11 @@ class GeneralAppLocationRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsCnbc() {
         when(authTokenGenerator.generate()).thenReturn("service_token");
-        when(locationReferenceDataApiClient.getCourtVenueByName(
+        when(courtVenueService.getCourtVenueByName(
             anyString(),
             anyString(),
             anyString()
-        ))
-            .thenReturn(getLocationRefDataResponseForCnbc());
+        )).thenReturn(getLocationRefDataResponseForCnbc());
 
         List<LocationRefData> courtLocations = refDataService
             .getCnbcLocation("user_token");

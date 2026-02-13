@@ -56,7 +56,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     void setCoscSchedulerDeadline_whenActiveJudgmentGetFullyPaymentDateIsNull() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .applicant1Represented(YesOrNo.YES)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .build();
         when(time.now()).thenReturn(nowMock);
         caseData.setActiveJudgment(new JudgmentDetails().setTotalAmount("123"));
@@ -76,7 +76,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
         when(time.now()).thenReturn(nowMock);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
             .applicant1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .build();
         caseData.setActiveJudgment(null);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -93,7 +93,7 @@ class CheckCoscMarkPaidCallbackHandlerTest extends BaseCallbackHandlerTest {
     void doNotSetCoscSchedulerDeadline_whenActiveJudgementwithDate() {
         when(time.now()).thenReturn(nowMock);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted()
-            .businessProcess(BusinessProcess.builder().processInstanceId(PROCESS_INSTANCE_ID).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_INSTANCE_ID))
             .build();
         caseData.setActiveJudgment(new JudgmentDetails().setFullyPaymentMadeDate(LocalDate.of(2023, 1, 15)));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -68,16 +68,21 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .documentLink(Document.builder().documentFileName(FILE_NAME).documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
 
-    private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
+    private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
     private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
         .type(Party.Type.INDIVIDUAL)
         .individualTitle("Mr.")
         .individualFirstName("Smith")
         .individualLastName("John")
         .build();
+
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
 
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
@@ -89,7 +94,7 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
                         .individualLastName("Smith").build())
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
-        .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
+        .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .systemGeneratedCaseDocuments(List.of(
             Element.<CaseDocument>builder()

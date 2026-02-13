@@ -67,10 +67,9 @@ public class GaDispatchBusinessProcessCallbackHandler extends CallbackHandler {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         if (businessProcess.getStatus() == READY) {
             caseDataBuilder
-                .businessProcess(BusinessProcess.builder()
-                                     .camundaEvent(businessProcess.getCamundaEvent())
-                                     .status(DISPATCHED)
-                                     .build());
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(businessProcess.getCamundaEvent())
+                                     .setStatus(DISPATCHED));
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
