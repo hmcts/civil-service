@@ -620,8 +620,8 @@ tasks.withType(Test).configureEach { t ->
   jvmArgs '-XX:ReservedCodeCacheSize=512m'
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
   jvmArgs "-XX:TieredStopAtLevel=1"
-  jvmArgs "-XX:+UseZGC"
-  jvmArgs "-XX:+ZGenerational"
+//  jvmArgs "-XX:+UseZGC"
+//  jvmArgs "-XX:+ZGenerational"
 
   testLogging {
     exceptionFormat = 'full'
