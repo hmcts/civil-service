@@ -150,9 +150,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
         if (!featureToggleService.isLipVLipEnabled()) {
             return false;
         }
-
-        return Objects.nonNull(caseData.getTakenOfflineDate()) && Objects.nonNull(caseData.getCcdState())
-            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
+        return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.equals(caseData.getCcdState());
     }
 
     @Override
@@ -266,7 +264,7 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
     public boolean hasClaimEnded() {
         return (Objects.nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence()) || caseData.getApplicant1ResponseDeadlinePassed();
+            && caseData.isRespondentResponseFullDefence());
     }
 
     @Override
@@ -318,7 +316,9 @@ public class CcdDashboardClaimantClaimMatcher extends CcdDashboardClaimMatcher i
 
     @Override
     public boolean isClaimantDefaultJudgement() {
-        return caseData.getRespondent1ResponseDeadline() != null
+        return (caseData.isCcjRequestJudgmentByAdmission()
+            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
+            || Objects.nonNull(caseData.getRespondent1ResponseDeadline())
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
