@@ -152,7 +152,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
@@ -319,7 +319,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
             .totalClaimAmount(new BigDecimal(10))
             .responseClaimTrack("SMALL_CLAIM")
             .allocatedTrack(null)

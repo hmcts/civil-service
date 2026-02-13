@@ -55,7 +55,7 @@ class PartAdmissionAgreeRepaymentTransitionBuilderTest {
             .respondent1Represented(YesOrNo.NO)
             .takenOfflineDate(LocalDateTime.now())
             .activeJudgment(new JudgmentDetails().setType(JudgmentType.JUDGMENT_BY_ADMISSION))
-            .changeOfRepresentation(ChangeOfRepresentation.builder().build())
+            .changeOfRepresentation(new ChangeOfRepresentation())
             .build();
 
         assertTrue(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA.test(caseData));
