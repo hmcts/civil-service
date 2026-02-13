@@ -588,7 +588,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         caseData.setCcdState(CaseState.PENDING_CASE_ISSUED);
 
         caseData.setAnyRepresented(YES);
-
+        caseData.setEnableUploadEvent(YES);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

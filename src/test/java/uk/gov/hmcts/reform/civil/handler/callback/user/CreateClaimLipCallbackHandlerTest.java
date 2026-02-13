@@ -50,6 +50,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_LIP_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
     CreateClaimLipCallBackHandler.class,
@@ -165,6 +166,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(updatedData.getRespondent1().getPartyID()).isNotNull();
             assertThat(updatedData.getApplicant1().getPartyID()).isNotNull();
+            assertThat(updatedData.getEnableUploadEvent()).isEqualTo(YES);
         }
 
         @Test

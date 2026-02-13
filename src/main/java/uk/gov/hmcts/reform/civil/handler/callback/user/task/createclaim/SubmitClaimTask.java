@@ -216,7 +216,6 @@ public class SubmitClaimTask {
             caseData.setApplicantSolicitor1PbaAccounts(dynamicList);
         }
 
-        List<String> errors = new ArrayList<>();
         if (getMultiPartyScenario(caseData) == ONE_V_TWO_ONE_LEGAL_REP
             && caseData.getSpecRespondentCorrespondenceAddressdetails() != null) {
             // to keep with heading tab
@@ -237,9 +236,9 @@ public class SubmitClaimTask {
             flightDelayDetails1.setFlightCourtLocation(getAirlineCaseLocation(selectedAirlineCode, authorisationToken));
             caseData.setFlightDelayDetails(flightDelayDetails1);
         }
-
+        caseData.setEnableUploadEvent(YES);
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors)
+            .errors(List.of())
             .data(caseData.toMap(objectMapper))
             .build();
     }
