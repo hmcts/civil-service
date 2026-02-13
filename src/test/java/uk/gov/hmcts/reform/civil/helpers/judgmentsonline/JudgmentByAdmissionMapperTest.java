@@ -397,7 +397,7 @@ class JudgmentByAdmissionMapperTest {
                                                  .build())
                                       .build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
-            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal(10))
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal(120))
             .totalClaimAmount(new BigDecimal(1000))
             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(paymentFrequencyClaimantResponseLRspec)
             .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now().plusDays(10))
@@ -422,10 +422,43 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(PaymentPlanSelection.PAY_IN_INSTALMENTS, activeJudgment.getPaymentPlan().getType());
-        assertEquals("1000", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals("120", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(paymentFrequency, activeJudgment.getInstalmentDetails().getPaymentFrequency());
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getInstalmentDetails().getStartDate());
         assertEquals(paymentFrequency, caseData.getJoRepaymentFrequency());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "120,120",
+        "120.50,120.50",
+        "120.49,120.49"
+    })
+    void testIfJudgmentByAdmission_scenario6_rounding(BigDecimal inputAmount, String expectedAmount) {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1Represented(YesOrNo.NO)
+            .specRespondent1Represented(YesOrNo.NO)
+            .applicant1Represented(YesOrNo.NO)
+            .defendantDetailsSpec(DynamicList.builder()
+                                      .value(DynamicListElement.builder()
+                                                 .label("John Doe")
+                                                 .build())
+                                      .build())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(inputAmount)
+            .totalClaimAmount(new BigDecimal(1000))
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now().plusDays(10))
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
+            .ccjPaymentDetails(buildCCJPaymentDetails())
+            .respondent1(PartyBuilder.builder().organisation().build())
+            .build();
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+        assertNotNull(activeJudgment);
+        assertEquals(expectedAmount, activeJudgment.getInstalmentDetails().getAmount());
     }
 
     @Test
@@ -463,6 +496,118 @@ class JudgmentByAdmissionMapperTest {
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, activeJudgment.getPaymentPlan().getType());
+    }
+
+    @Test
+    void testGetInstalmentDetails_ClaimantInFavour_NullAmount() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(null)
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                           .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
+            .build();
+
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment.getInstalmentDetails());
+        assertEquals(null, activeJudgment.getInstalmentDetails().getAmount());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ONCE_ONE_WEEK,WEEKLY",
+        "ONCE_TWO_WEEKS,EVERY_TWO_WEEKS",
+        "ONCE_ONE_MONTH,MONTHLY"
+    })
+    void testGetInstalmentDetails_ClaimantInFavour_Frequencies(
+        PaymentFrequencyClaimantResponseLRspec repFreq, PaymentFrequency expectedFreq) {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
+            .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("100"))
+            .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(repFreq)
+            .applicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec(LocalDate.now())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                           .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
+            .build();
+
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment.getInstalmentDetails());
+        assertEquals("100", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(expectedFreq, activeJudgment.getInstalmentDetails().getPaymentFrequency());
+    }
+
+    @Test
+    void testGetInstalmentDetails_Respondent1Plan() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .paymentAmount(new BigDecimal("200"))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          .firstRepaymentDate(LocalDate.now())
+                                          .build())
+            .build();
+
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment.getInstalmentDetails());
+        assertEquals("200", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(PaymentFrequency.MONTHLY, activeJudgment.getInstalmentDetails().getPaymentFrequency());
+    }
+
+    @Test
+    void testGetInstalmentDetails_Respondent2Plan() {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1RepaymentPlan(null)
+            .respondent2RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .paymentAmount(new BigDecimal("300"))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_TWO_WEEKS)
+                                          .firstRepaymentDate(LocalDate.now())
+                                          .build())
+            .build();
+
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment.getInstalmentDetails());
+        assertEquals("300", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(PaymentFrequency.EVERY_TWO_WEEKS, activeJudgment.getInstalmentDetails().getPaymentFrequency());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ONCE_ONE_WEEK,WEEKLY",
+        "ONCE_TWO_WEEKS,EVERY_TWO_WEEKS",
+        "ONCE_ONE_MONTH,MONTHLY"
+    })
+    void testGetInstalmentDetails_RespondentPlan_Frequencies(
+        PaymentFrequencyLRspec repFreq, PaymentFrequency expectedFreq) {
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
+            .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .paymentAmount(new BigDecimal("250"))
+                                          .repaymentFrequency(repFreq)
+                                          .firstRepaymentDate(LocalDate.now())
+                                          .build())
+            .build();
+
+        JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
+
+        assertNotNull(activeJudgment.getInstalmentDetails());
+        assertEquals("250", activeJudgment.getInstalmentDetails().getAmount());
+        assertEquals(expectedFreq, activeJudgment.getInstalmentDetails().getPaymentFrequency());
     }
 
     private CCJPaymentDetails buildCCJPaymentDetails() {
