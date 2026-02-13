@@ -25,6 +25,8 @@ public class TaskListService {
 
     private final TaskListRepository taskListRepository;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
+    private static final String DOCUMENT_TEMPLATE_NAME = "Hearing.Document.View";
+    private static final List<String> ROLES = List.of("CLAIMANT", "DEFENDANT");
 
     @Autowired
     public TaskListService(TaskListRepository taskListRepository, TaskItemTemplateRepository taskItemTemplateRepository) {
@@ -142,9 +144,10 @@ public class TaskListService {
 
     @Transactional
     public void makeViewDocumentTaskAvailable(String caseIdentifier) {
-        List<TaskListEntity> tasks = taskListRepository.findByReferenceAndCurrentStatusAndTaskItemTemplateIn(caseIdentifier,
-                                                                                                             List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
-                                                                                                             List.of(28L, 44L));
+        List<TaskListEntity> tasks = taskListRepository.findByReferenceAndRoleAndCurrentStatusInAndTaskItemTemplateName(caseIdentifier,
+                                                                                                                        ROLES,
+                                                                                                                        List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+                                                                                                                        DOCUMENT_TEMPLATE_NAME);
         tasks.forEach(t -> {
             TaskListEntity task = t.toBuilder()
                 .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())

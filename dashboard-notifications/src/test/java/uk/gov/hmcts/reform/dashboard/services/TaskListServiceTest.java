@@ -445,10 +445,11 @@ class TaskListServiceTest {
                       .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
                       .build());
 
-        when(taskListRepository.findByReferenceAndCurrentStatusAndTaskItemTemplateIn(
+        when(taskListRepository.findByReferenceAndRoleAndCurrentStatusInAndTaskItemTemplateName(
             "123",
+            List.of("CLAIMANT", "DEFENDANT"),
             List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
-            List.of(28L, 44L)
+            "Hearing.Document.View"
         ))
             .thenReturn(tasks);
 
@@ -456,10 +457,11 @@ class TaskListServiceTest {
         taskListService.makeViewDocumentTaskAvailable("123");
 
         //then
-        verify(taskListRepository).findByReferenceAndCurrentStatusAndTaskItemTemplateIn(
+        verify(taskListRepository).findByReferenceAndRoleAndCurrentStatusInAndTaskItemTemplateName(
             "123",
+            List.of("CLAIMANT", "DEFENDANT"),
             List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
-            List.of(28L, 44L)
+            "Hearing.Document.View"
         );
     }
 
