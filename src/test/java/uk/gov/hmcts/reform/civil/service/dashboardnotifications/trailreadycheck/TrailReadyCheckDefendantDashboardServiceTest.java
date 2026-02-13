@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.service.dashboardnotifications.trialarrangementsnotifyotherparty;
+package uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.trailreadycheck.TrailReadyCheckDefendantDashboardService;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -21,10 +23,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT;
 
 @ExtendWith(MockitoExtension.class)
-class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
+class TrailReadyCheckDefendantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "BEARER";
 
@@ -38,7 +40,7 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
 
     @InjectMocks
-    private TrialArrangementsNotifyOtherPartyDefendantDashboardService service;
+    private TrailReadyCheckDefendantDashboardService service;
 
     @BeforeEach
     void setUp() {
@@ -46,35 +48,59 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     }
 
     @Test
-    void shouldNotifyDefendantWhenTrialArrangementsNotifyOtherPartyAndUnrepresented() {
+    void shouldNotifyDefendantWhenTrailReadyCheckRequired() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTrialReadyRespondent1(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(1234L);
 
-        service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
+        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("1234", "DEFENDANT");
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("1234", "DEFENDANT");
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT.getScenario(),
             "1234",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
 
     @Test
-    void shouldUseDefendantScenarioWhenUnrepresented() {
+    void shouldNotifyDefendantWhenFastClaimTrack() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTrialReadyRespondent1(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(5678L);
 
-        service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
+        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
+
+        verify(dashboardNotificationService).deleteByReferenceAndCitizenRole("5678", "DEFENDANT");
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole("5678", "DEFENDANT");
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT.getScenario(),
+            "5678",
+            ScenarioRequestParams.builder().params(new HashMap<>()).build()
+        );
+    }
+
+    @Test
+    void shouldUseTrailReadyCheckScenarioWhenTrialReadyNull() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        caseData.setTrialReadyRespondent1(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+        caseData.setCcdCaseReference(9012L);
+
+        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
-            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY_DEFENDANT.getScenario(),
-            "5678",
+            SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_CHECK_DEFENDANT.getScenario(),
+            "9012",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
         );
     }
@@ -83,9 +109,11 @@ class TrialArrangementsNotifyOtherPartyDefendantDashboardServiceTest {
     void shouldNotNotifyDefendantWhenRepresentedYes() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1Represented(YesOrNo.YES);
+        caseData.setTrialReadyRespondent1(null);
+        caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setCcdCaseReference(3456L);
 
-        service.notifyTrialArrangementsNotifyOtherParty(caseData, AUTH_TOKEN);
+        service.notifyCaseTrailReadyCheck(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardNotificationService);
         verifyNoInteractions(taskListService);
