@@ -167,7 +167,11 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
         ))
             .thenReturn(tasks);
 
@@ -177,7 +181,11 @@ class TaskListServiceTest {
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
         );
 
         verify(taskListRepository, atLeast(4)).save(ArgumentMatchers.argThat(
@@ -239,18 +247,30 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
             "Template"
         ))
             .thenReturn(tasks);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate("123", "Claimant", "Template");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(
+            "123",
+            "Claimant",
+            "Template"
+        );
 
         //then
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(), TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
             "Template"
         );
 
@@ -313,8 +333,10 @@ class TaskListServiceTest {
 
         when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
             List.of(Long.valueOf(123))
         ))
             .thenReturn(tasks);
@@ -335,15 +357,21 @@ class TaskListServiceTest {
             .thenReturn(categories);
 
         //when
-        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory("123", "Claimant", "CategoryEn");
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "123",
+            "Claimant",
+            "CategoryEn"
+        );
 
         //then
         verify(taskItemTemplateRepository).findByCategoryEnAndRole(
             "CategoryEn", "Claimant");
         verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
             "123", "Claimant",
-            List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
             List.of(Long.valueOf(123))
         );
 
@@ -395,11 +423,11 @@ class TaskListServiceTest {
         tasks.add(task3);
 
         when(taskListRepository
-            .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
-                any(),
-                any(),
-                any()
-            )).thenReturn(tasks);
+                 .findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+                     any(),
+                     any(),
+                     any()
+                 )).thenReturn(tasks);
 
         taskListService.saveOrUpdate(task);
 
@@ -459,7 +487,7 @@ class TaskListServiceTest {
         //then
         verify(taskListRepository, times(2)).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
             any(),
-           any(),
+            any(),
             any()
         );
     }
