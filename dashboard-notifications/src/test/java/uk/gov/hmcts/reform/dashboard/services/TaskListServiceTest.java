@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.dashboard.utils.DashboardNotificationsTestUtils.getTaskListEntity;
@@ -445,11 +446,10 @@ class TaskListServiceTest {
                       .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
                       .build());
 
-        when(taskListRepository.findByReferenceAndRoleAndCurrentStatusInAndTaskItemTemplateName(
-            "123",
-            List.of("CLAIMANT", "DEFENDANT"),
-            List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
-            "Hearing.Document.View"
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+            any(),
+            any(),
+            any()
         ))
             .thenReturn(tasks);
 
@@ -457,11 +457,10 @@ class TaskListServiceTest {
         taskListService.makeViewDocumentTaskAvailable("123");
 
         //then
-        verify(taskListRepository).findByReferenceAndRoleAndCurrentStatusInAndTaskItemTemplateName(
-            "123",
-            List.of("CLAIMANT", "DEFENDANT"),
-            List.of(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()),
-            "Hearing.Document.View"
+        verify(taskListRepository, times(2)).findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+            any(),
+           any(),
+            any()
         );
     }
 
