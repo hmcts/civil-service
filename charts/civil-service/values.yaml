@@ -8,6 +8,8 @@ xui-webapp:
 camunda-bpm:
   enabled: false
 
+servicebus:
+  enabled: false
 
 aac-manage-case-assignment:
   enabled: false
