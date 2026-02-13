@@ -810,6 +810,33 @@ spring:
   main:
     lazy-initialization: true
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: integration-test-nodb
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:civil;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+  flyway:
+    enabled: false
+
+  main:
+    lazy-initialization: true
+
 management:
   endpoints:
     enabled-by-default: false
