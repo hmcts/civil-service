@@ -17,6 +17,8 @@ public final class DashboardTaskIds {
     public static final String TRAIL_READY_CHECK = "GenerateDashboardNotificationsTrailReadyCheck";
     public static final String DECISION_RECONSIDERATION = "GenerateDashboardNotificationsDecisionReconsideration";
     public static final String COURT_OFFICER_ORDER = "GenerateDashboardNotificationsCourtOfficerOrder";
+    public static final String STAY_CASE = "GenerateDashboardNotificationsStayCase";
+    public static final String RECORD_JUDGMENT = "GenerateDashboardNotificationsRecordJudgment";
     public static final String TRIAL_READY_NOTIFICATION = "GenerateDashboardNotificationsTrialArrangements";
     public static final String TRIAL_ARRANGEMENTS_NOTIFY_PARTY = "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
     public static final String CREATE_LIP_CLAIM = "GenerateDashboardNotificationsCreateLipClaim";
@@ -24,6 +26,7 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
+    public static final String HELP_WITH_HEARING_FEES = "GenerateDashboardNotificationsLipHelpWithHearingFees";
     public static final String HEARING_SCHEDULED_HMC = "GenerateDashboardNotificationsHearingScheduledHmc";
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
 }
