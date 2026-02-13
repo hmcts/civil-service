@@ -115,7 +115,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .build();
         CallbackRequest request = CallbackRequest.builder()
             .eventId(isRespondent1 ? CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name() : CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE.name()).build();
-        CallbackParams params = CallbackParams.builder().request(request).caseData(caseData).build();
+        CallbackParams params = new CallbackParams().request(request).caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

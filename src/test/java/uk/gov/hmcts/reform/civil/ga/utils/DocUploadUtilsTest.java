@@ -37,22 +37,20 @@ public class DocUploadUtilsTest {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<Element<CaseDocument>> tobeAdded = new ArrayList<>();
-        tobeAdded.add(element(CaseDocument.builder().createdBy("civil")
-                                  .documentLink(Document.builder()
-                                                    .documentFileName("witness_document.pdf")
-                                                    .documentUrl("http://dm-store:8080")
-                                                    .documentBinaryUrl("http://dm-store:8080/documents")
-                                                    .build())
-                                  .documentName("witness_document.docx")
-                                  .createdDatetime(LocalDateTime.now()).build()));
-        tobeAdded.add(element(CaseDocument.builder().createdBy("civil")
-                                  .documentLink(Document.builder()
-                                                    .documentFileName("witness_document.pdf")
-                                                    .documentUrl("http://dm-store:8080")
-                                                    .documentBinaryUrl("http://dm-store:8080/documents")
-                                                    .build())
-                                  .documentName("witness_document.docx")
-                                  .createdDatetime(LocalDateTime.now()).build()));
+        tobeAdded.add(element(new CaseDocument().setCreatedBy("civil")
+                                  .setDocumentLink(new Document()
+                                                    .setDocumentFileName("witness_document.pdf")
+                                                    .setDocumentUrl("http://dm-store:8080")
+                                                    .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                                  .setDocumentName("witness_document.docx")
+                                  .setCreatedDatetime(LocalDateTime.now())));
+        tobeAdded.add(element(new CaseDocument().setCreatedBy("civil")
+                                  .setDocumentLink(new Document()
+                                                    .setDocumentFileName("witness_document.pdf")
+                                                    .setDocumentUrl("http://dm-store:8080")
+                                                    .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                                  .setDocumentName("witness_document.docx")
+                                  .setCreatedDatetime(LocalDateTime.now())));
 
         DocUploadUtils.addToAddl(caseData, builder, tobeAdded, DocUploadUtils.APPLICANT, false);
         caseData = builder.build();
@@ -77,12 +75,11 @@ public class DocUploadUtilsTest {
     public void should_prepareUploadDocumentByType() {
         List<Element<UploadDocumentByType>> uploadDocument = new ArrayList<>();
         uploadDocument.add(element(UploadDocumentByType.builder()
-                                       .documentType("Witness")
-                                       .additionalDocument(Document.builder()
-                                                               .documentFileName("witness_document.pdf")
-                                                               .documentUrl("http://dm-store:8080")
-                                                               .documentBinaryUrl("http://dm-store:8080/documents")
-                                                               .build()).build()));
+                                       .documentType("witness")
+                                       .additionalDocument(new Document()
+                                                               .setDocumentFileName("witness_document.pdf")
+                                                               .setDocumentUrl("http://dm-store:8080")
+                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents")).build()));
         List<Element<CaseDocument>> result = DocUploadUtils.prepareUploadDocumentByType(uploadDocument, "role");
         assertThat(result.get(0).getValue().getCreatedBy()).isEqualTo("role");
         assertThat(result.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(AssignCategoryId.APPLICATIONS);
@@ -133,43 +130,39 @@ public class DocUploadUtilsTest {
     @Test
     public void should_addDocuments() {
         List<Element<CaseDocument>> from = new ArrayList<>();
-        from.add(element(CaseDocument.builder().createdBy("civil")
-                             .documentLink(Document.builder()
-                                               .documentFileName("witness_document.pdf")
-                                               .documentUrl("http://dm-store:8080")
-                                               .documentBinaryUrl("http://dm-store:8080/documents")
-                                               .build())
-                             .documentName("witness_document.docx")
-                             .createdDatetime(LocalDateTime.now()).build()));
-        from.add(element(CaseDocument.builder().createdBy("civil")
-                             .documentLink(Document.builder()
-                                               .documentFileName("witness_document.pdf")
-                                               .documentUrl("http://dm-store:8080")
-                                               .documentBinaryUrl("http://dm-store:8080/documents")
-                                               .build())
-                             .documentName("witness_document.docx")
-                             .createdDatetime(LocalDateTime.now()).build()));
+        from.add(element(new CaseDocument().setCreatedBy("civil")
+                             .setDocumentLink(new Document()
+                                               .setDocumentFileName("witness_document.pdf")
+                                               .setDocumentUrl("http://dm-store:8080")
+                                               .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                             .setDocumentName("witness_document.docx")
+                             .setCreatedDatetime(LocalDateTime.now())));
+        from.add(element(new CaseDocument().setCreatedBy("civil")
+                             .setDocumentLink(new Document()
+                                               .setDocumentFileName("witness_document.pdf")
+                                               .setDocumentUrl("http://dm-store:8080")
+                                               .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                             .setDocumentName("witness_document.docx")
+                             .setCreatedDatetime(LocalDateTime.now())));
         UUID sameId = from.get(1).getId();
         List<Element<CaseDocument>> to = new ArrayList<>();
         to.add(Element.<CaseDocument>builder()
-                   .id(sameId).value(CaseDocument.builder().createdBy("civil")
-                                         .documentLink(Document.builder()
-                                                           .documentFileName("witness_document.pdf")
-                                                           .documentUrl("http://dm-store:8080")
-                                                           .documentBinaryUrl("http://dm-store:8080/documents")
-                                                           .build())
-                                         .documentName("witness_document.docx")
-                                         .createdDatetime(LocalDateTime.now()).build()).build());
+                   .id(sameId).value(new CaseDocument().setCreatedBy("civil")
+                                         .setDocumentLink(new Document()
+                                                           .setDocumentFileName("witness_document.pdf")
+                                                           .setDocumentUrl("http://dm-store:8080")
+                                                           .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                                         .setDocumentName("witness_document.docx")
+                                         .setCreatedDatetime(LocalDateTime.now())).build());
         assertThat(DocUploadUtils.addDocuments(from, to).size()).isEqualTo(2);
     }
 
     @Test
     public void should_prepareDocuments() {
-        List<Element<Document>> source = List.of(element(Document.builder()
-                                                             .documentFileName("witness_document.pdf")
-                                                             .documentUrl("http://dm-store:8080")
-                                                             .documentBinaryUrl("http://dm-store:8080/documents")
-                                                             .build()));
+        List<Element<Document>> source = List.of(element(new Document()
+                                                             .setDocumentFileName("witness_document.pdf")
+                                                             .setDocumentUrl("http://dm-store:8080")
+                                                             .setDocumentBinaryUrl("http://dm-store:8080/documents")));
         List<Element<CaseDocument>> result = DocUploadUtils
             .prepareDocuments(source, "role", CaseEvent.INITIATE_GENERAL_APPLICATION);
         assertThat(result.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(AssignCategoryId.APPLICATIONS);
@@ -252,14 +245,14 @@ public class DocUploadUtilsTest {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
-        tobeAdded.add(element(Document.builder()
-                                  .documentFileName("witness_document.pdf")
-                                  .documentUrl("http://dm-store:8080")
-                                  .documentBinaryUrl("http://dm-store:8080/documents").build()));
-        tobeAdded.add(element(Document.builder()
-                                  .documentFileName("witness_document.pdf")
-                                  .documentUrl("http://dm-store:8080")
-                                  .documentBinaryUrl("http://dm-store:8080/documents").build()));
+        tobeAdded.add(element(new Document()
+                                  .setDocumentFileName("witness_document.pdf")
+                                  .setDocumentUrl("http://dm-store:8080")
+                                  .setDocumentBinaryUrl("http://dm-store:8080/documents")));
+        tobeAdded.add(element(new Document()
+                                  .setDocumentFileName("witness_document.pdf")
+                                  .setDocumentUrl("http://dm-store:8080")
+                                  .setDocumentBinaryUrl("http://dm-store:8080/documents")));
 
         DocUploadUtils.addDocumentToPreTranslation(
             caseData,
@@ -280,14 +273,14 @@ public class DocUploadUtilsTest {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
-        tobeAdded.add(element(Document.builder()
-                                  .documentFileName("witness_document.pdf")
-                                  .documentUrl("http://dm-store:8080")
-                                  .documentBinaryUrl("http://dm-store:8080/documents").build()));
-        tobeAdded.add(element(Document.builder()
-                                  .documentFileName("witness_document.pdf")
-                                  .documentUrl("http://dm-store:8080")
-                                  .documentBinaryUrl("http://dm-store:8080/documents").build()));
+        tobeAdded.add(element(new Document()
+                                  .setDocumentFileName("witness_document.pdf")
+                                  .setDocumentUrl("http://dm-store:8080")
+                                  .setDocumentBinaryUrl("http://dm-store:8080/documents")));
+        tobeAdded.add(element(new Document()
+                                  .setDocumentFileName("witness_document.pdf")
+                                  .setDocumentUrl("http://dm-store:8080")
+                                  .setDocumentBinaryUrl("http://dm-store:8080/documents")));
 
         DocUploadUtils.addDocumentToPreTranslation(
             caseData,
@@ -308,10 +301,10 @@ public class DocUploadUtilsTest {
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
-        tobeAdded.add(element(Document.builder()
-                                  .documentFileName("witness_document.pdf")
-                                  .documentUrl("http://dm-store:8080")
-                                  .documentBinaryUrl("http://dm-store:8080/documents").build()));
+        tobeAdded.add(element(new Document()
+                                  .setDocumentFileName("witness_document.pdf")
+                                  .setDocumentUrl("http://dm-store:8080")
+                                  .setDocumentBinaryUrl("http://dm-store:8080/documents")));
         DocUploadUtils.addDocumentToPreTranslation(
             caseData,
             builder,

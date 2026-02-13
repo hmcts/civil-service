@@ -143,7 +143,7 @@ public class ClaimantResponseConfirmsNotToProceedAppSolOneEmailDTOGeneratorTest 
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)

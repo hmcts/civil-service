@@ -96,7 +96,7 @@ class NotifyClaimantCaseStayedHandlerTest {
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(email).build())
             .build();
-        final CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        final CallbackParams params = new CallbackParams().caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isApplicantLiP && isClaimantBilingual) {

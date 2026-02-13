@@ -36,7 +36,7 @@ class UpdatePartyExpertsTaskTest {
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseRef = CaseReference.builder().caseReference(null).build();
+        CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
 
@@ -52,7 +52,7 @@ class UpdatePartyExpertsTaskTest {
             ))
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference caseRef = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, caseRef);
 
@@ -72,7 +72,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent1Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -89,7 +89,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent2Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -116,7 +116,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent2DQ(new Respondent2DQ().setRespondent2DQExperts(dqExperts))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("999").build();
+        CaseReference ref = caseReference("999");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -143,7 +143,7 @@ class UpdatePartyExpertsTaskTest {
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("111").build();
+        CaseReference ref = caseReference("111");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -163,7 +163,7 @@ class UpdatePartyExpertsTaskTest {
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -183,7 +183,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent2DQ(null)
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference caseRef = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, caseRef);
 
@@ -199,5 +199,11 @@ class UpdatePartyExpertsTaskTest {
         assertThat(task.getTaskName()).isEqualTo("UpdatePartyExpertsTask");
         assertThat(task.getEventSummary()).contains("Update case party experts");
         assertThat(task.getEventDescription()).contains("UpdatePartyExpertsTask updates experts");
+    }
+
+    private CaseReference caseReference(String value) {
+        CaseReference caseReference = new CaseReference();
+        caseReference.setCaseReference(value);
+        return caseReference;
     }
 }

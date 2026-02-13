@@ -55,7 +55,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 

@@ -176,7 +176,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationPaymentServiceReq");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GeneralApplicationPaymentServiceReq");
         }
 
         @Test

@@ -167,7 +167,7 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
         }
 
         @Test

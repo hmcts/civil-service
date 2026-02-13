@@ -67,7 +67,7 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends Gener
         ObjectMapper objectMapper = JsonMapper.builder()
                 .addModule(new JavaTimeModule())
                 .build();
-        return CallbackParams.builder()
+        return new CallbackParams()
                               .type(ABOUT_TO_SUBMIT)
                               .pageId(null)
                               .request(CallbackRequest.builder()
@@ -80,7 +80,6 @@ public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends Gener
                                            .build())
                               .caseData(caseData)
                               .version(null)
-                              .params(null)
-                              .build();
+                              .params(null);
     }
 }

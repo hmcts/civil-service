@@ -59,10 +59,7 @@ class HearingFeeUnpaidRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDismissedPastHearingFeeDueDeadline()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(Organisation.builder()
-                                .organisationID("OrgId").build())
-                        .build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("OrgId")))
                 .build();
 
         when(organisationService.findOrganisationById("OrgId"))

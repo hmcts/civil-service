@@ -156,11 +156,7 @@ class CaseFlagsInitialiserTest {
     @Test
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
         CaseData caseData = CaseData.builder()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("id")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("id")))
             .updateDetailsForm(UpdateDetailsForm.builder()
                                    .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
                                    .build())

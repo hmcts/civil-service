@@ -138,9 +138,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
                              .organisationName("org-name")
                              .build())
             .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
-                    .build())
+                new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
             .build();
         // When
         notifier.sendNotificationToSolicitor(caseData, "solicitor1@example.com");
@@ -160,9 +158,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         CaseData caseData = CaseData.builder()
             .respondent1DQ(null)
             .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
-                    .build())
+                new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
             .build();
 
         when(organisationService.findOrganisationById("org-id"))

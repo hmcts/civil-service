@@ -91,7 +91,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -99,8 +99,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
@@ -110,13 +109,12 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOfPendingState(Map<String, Object> data, CallbackType type) {
@@ -137,7 +135,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                                String eventId,
                                                Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -146,8 +144,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     private CallbackRequest toCallbackRequest(Map<String, Object> data, String state) {

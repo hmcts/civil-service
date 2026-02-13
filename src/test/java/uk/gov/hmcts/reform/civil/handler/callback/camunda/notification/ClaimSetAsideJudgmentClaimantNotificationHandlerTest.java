@@ -108,13 +108,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -147,13 +146,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

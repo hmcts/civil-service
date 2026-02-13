@@ -64,9 +64,7 @@ class DjNotificationPropertiesServiceTest {
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .applicant1(PartyBuilder.builder().individual().build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation applicantOrganisation = new Organisation();
         applicantOrganisation.setName("Applicant Org");
@@ -103,9 +101,7 @@ class DjNotificationPropertiesServiceTest {
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation respondentOrganisation = new Organisation();
         respondentOrganisation.setName("Def Two Org");
@@ -127,9 +123,7 @@ class DjNotificationPropertiesServiceTest {
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent2(PartyBuilder.builder().individual().build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
 
         Organisation sharedOrganisation = new Organisation();

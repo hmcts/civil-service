@@ -986,8 +986,7 @@ public class HearingsPartyMapperTest {
             .addApplicant1ExpertsAndWitnesses()
             .addRespondent1ExpertsAndWitnesses()
             .build().toBuilder()
-            .applicant1OrganisationPolicy(uk.gov.hmcts.reform.ccd.model.OrganisationPolicy.builder()
-                                              .orgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]").build()).build();
+            .applicant1OrganisationPolicy(new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy().setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]")).build();
 
         PartyDetailsModel applicantPartyDetails = buildExpectedIndividualPartyDetails(
             "app-1-party-id",

@@ -554,8 +554,10 @@ class RoboticsDataMapperForUnspecTest {
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(toDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
     }
 
     private SolicitorOrganisationDetails createSolicitorOrganisationDetails(String orgName, String email, String phone, String fax, String dx) {

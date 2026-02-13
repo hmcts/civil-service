@@ -53,11 +53,7 @@ class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CLAIM_REF)
                 .respondent1Represented(YesOrNo.YES)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID("F1")
-                                .build())
-                        .build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("F1")))
                 .build();
 
         when(organisationService.findOrganisationById(anyString()))

@@ -171,10 +171,11 @@ public class HearingValuesServiceTest {
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        Category inPerson = hearingChannel("INTER", "In Person");
+        Category video = hearingChannel("VID", "Video");
+        Category telephone = hearingChannel("TEL", "Telephone");
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, video, telephone));
 
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
@@ -497,10 +498,11 @@ public class HearingValuesServiceTest {
             given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
             given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-            Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-            Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+            Category inPerson = hearingChannel("INTER", "In Person");
+            Category video = hearingChannel("VID", "Video");
+            Category telephone = hearingChannel("TEL", "Telephone");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(inPerson, video, telephone));
             when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
                 Optional.of(categorySearchResult));
         }
@@ -817,5 +819,13 @@ public class HearingValuesServiceTest {
         partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
+    }
+
+    private Category hearingChannel(String key, String valueEn) {
+        return new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(valueEn)
+            .setActiveFlag("Y");
     }
 }

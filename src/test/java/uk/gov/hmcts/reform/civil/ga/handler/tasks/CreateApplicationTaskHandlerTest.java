@@ -462,7 +462,7 @@ public class CreateApplicationTaskHandlerTest {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, YES, YES, YES, null);
             GeneralApplicationCaseData caseData = buildOnlyData(generalApplication, NO, NO).toBuilder()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent1OrganisationIDCopy("respondent1").build();
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -846,16 +846,8 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsMasterCollection.add(element(generalApplicationsDetails));
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -930,23 +922,15 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
         Element<Document> same = Element.<Document>builder()
                 .id(DOC_ID)
-                .value(Document.builder().documentUrl("string").build()).build();
+                .value(new Document().setDocumentUrl("string")).build();
         List<Element<Document>> generalAppEvidenceDocument = addEvidenceDoc ? (new ArrayList<>() {{
                 add(same);
             }
         }) : null;
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -1036,16 +1020,8 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
 
         return new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -1057,5 +1033,11 @@ public class CreateApplicationTaskHandlerTest {
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
             .businessProcess(new BusinessProcess().setStatus(STARTED)
                                  .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
+    }
+
+    private OrganisationPolicy respondentOrganisationPolicy(String organisationId) {
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+        organisationPolicy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        return organisationPolicy;
     }
 }

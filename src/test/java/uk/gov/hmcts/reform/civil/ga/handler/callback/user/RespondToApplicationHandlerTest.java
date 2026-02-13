@@ -129,7 +129,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                                                  .uid(DEF_UID)
                                                                  .build());
 
-        Document document = Document.builder().documentUrl("url").documentFileName("file").build();
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("file");
         documents.add(ElementUtils.element(document));
     }
 
@@ -531,70 +531,62 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private CallbackParams getParams(int trialRanges) {
         return switch (trialRanges) {
-            case 0 -> CallbackParams.builder()
+            case 0 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithInvalidTrailDateRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 1 -> CallbackParams.builder()
+                             .build());
+            case 1 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithInvalidDateToRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 2 -> CallbackParams.builder()
+                             .build());
+            case 2 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullFromAndToDate())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 3 -> CallbackParams.builder()
+                             .build());
+            case 3 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 4 -> CallbackParams.builder()
+                             .build());
+            case 4 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithUnavailableDatesBeforeToday())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 5 -> CallbackParams.builder()
+                             .build());
+            case 5 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 6 -> CallbackParams.builder()
+                             .build());
+            case 6 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullUnavailableDateFrom())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            default -> CallbackParams.builder()
+                             .build());
+            default -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
+                             .build());
         };
     }
 
@@ -627,9 +619,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
@@ -673,9 +664,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
 
@@ -714,9 +704,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
@@ -751,9 +740,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(updatedCaseData);
 
         CallbackParams params = callbackParamsOf(updatedCaseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
@@ -784,9 +772,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
@@ -825,9 +812,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
         assertThat(responseCaseData.getGeneralAppRespondent1Representative()
@@ -854,9 +840,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
@@ -881,9 +866,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
@@ -917,9 +901,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
@@ -960,10 +943,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
@@ -1016,10 +998,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
@@ -1064,9 +1045,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(caseDetailsConverter.toGeneralApplicationCaseData(civil))
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
@@ -1110,9 +1090,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         String expectedReason = "Proposed payment plan is I will accept payment in full by a set date. " +
                 "Proposed set date is 29 November 2023. " +
@@ -1165,9 +1144,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         String expectedReason = "Proposed payment plan is I will accept the following instalments per month." +
                 " Proposed instalments per month is 12.34 pounds." +
                 " Objections to the debtor's proposals is I have no money";
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
@@ -1198,9 +1176,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
@@ -1243,9 +1220,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(updatedCaseData);
 
         CallbackParams params = callbackParamsOf(updatedCaseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
@@ -1605,5 +1581,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                                 .build())
             .respondent2SameLegalRepresentative(NO)
             .build();
+    }
+
+    private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
+        return params.copy()
+            .request(request);
     }
 }

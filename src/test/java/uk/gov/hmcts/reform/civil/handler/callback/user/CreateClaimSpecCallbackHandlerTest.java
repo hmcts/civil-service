@@ -969,7 +969,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -984,12 +984,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1004,12 +1002,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldBeSuccessful_whenValid() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1047,7 +1043,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1063,12 +1059,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1084,12 +1078,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldBeSuccessful_whenValid() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1127,7 +1119,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1143,12 +1135,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIdIsNull() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1164,12 +1154,10 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldBeSuccessful_whenValid() {
             // Given
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2457,9 +2445,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData modifiedCaseData = objMapper.convertValue(params.getCaseData(), CaseData.class);
             modifiedCaseData.setRespondent1OrganisationPolicy(null);
-            var callbackParams = params.toBuilder()
-                .caseData(modifiedCaseData)
-                .build();
+            var callbackParams = params.copy()
+                .caseData(modifiedCaseData);
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -2473,9 +2460,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddMissingRespondent2OrgPolicyWithCaseRole_whenInvoked() {
             // Given
-            var callbackParams = params.toBuilder()
-                .caseData(params.getCaseData())
-                .build();
+            var callbackParams = params.copy()
+                .caseData(params.getCaseData());
 
             // When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParams);
@@ -2760,10 +2746,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData.setLegacyCaseReference("000MC001");
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
-            .build();
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build());
 
         // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
@@ -2784,10 +2769,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData.setLegacyCaseReference("000MC001");
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
-            .build();
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build());
 
         // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
@@ -2806,10 +2790,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData.setLegacyCaseReference("000MC001");
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build())
-            .build();
+            .request(CallbackRequest.builder().eventId("CREATE_CLAIM_SPEC").build());
 
         // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);
@@ -2833,10 +2816,9 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData.setLegacyCaseReference("000MC001");
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .request(CallbackRequest.builder().eventId(null).build())
-            .build();
+            .request(CallbackRequest.builder().eventId(null).build());
 
         // When
         SubmittedCallbackResponse response = handler.buildConfirmation(params);

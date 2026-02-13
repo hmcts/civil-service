@@ -18,10 +18,9 @@ class CaseTypeHandlerKeyFactoryTest {
 
     @Test
     void shouldCreateCivilCaseHandlerKeyGivenCallParamsWithGeneralApplicationCaseFalse() {
-        final CallbackParams callbackParams = CallbackParams.builder()
+        final CallbackParams callbackParams = new CallbackParams()
             .isGeneralApplicationCaseType(false)
-            .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
-            .build();
+            .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build());
 
         final String handlerKey = factory.createHandlerKey(callbackParams);
         assertEquals(CREATE_CLAIM.name(), handlerKey);
@@ -30,10 +29,9 @@ class CaseTypeHandlerKeyFactoryTest {
     @Test
     void shouldCreateGeneralApplicationCaseHandlerKeyGivenCallParamsWithGeneralApplicationCaseTrue() {
         final String expectedHandlerKey = GENERALAPPLICATION_CASE_TYPE + "-" + RESPOND_TO_APPLICATION.name();
-        final CallbackParams callbackParams = CallbackParams.builder()
+        final CallbackParams callbackParams = new CallbackParams()
             .isGeneralApplicationCaseType(true)
-            .request(CallbackRequest.builder().eventId(RESPOND_TO_APPLICATION.name()).build())
-            .build();
+            .request(CallbackRequest.builder().eventId(RESPOND_TO_APPLICATION.name()).build());
 
         final String handlerKey = factory.createHandlerKey(callbackParams);
 

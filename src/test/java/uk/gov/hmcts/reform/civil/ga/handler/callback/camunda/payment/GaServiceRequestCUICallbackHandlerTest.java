@@ -115,7 +115,7 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
             CallbackParams params =  params = callbackParamsOf(caseData,
                                                                CREATE_SERVICE_REQUEST_CUI_GENERAL_APP, ABOUT_TO_SUBMIT);
             //THEN
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("CreateServiceRequestCUI");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("CreateServiceRequestCUI");
         }
 
         @Test

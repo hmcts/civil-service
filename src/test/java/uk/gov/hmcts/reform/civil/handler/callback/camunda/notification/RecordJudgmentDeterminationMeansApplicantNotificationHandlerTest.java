@@ -106,8 +106,8 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                                  .partyName("Test")
                                  .individualLastName("Test Lastname")
                                  .individualFirstName("Test Firstname").build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                            .organisationID(ORG_NAME).build()).build()).build();
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME))).build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");

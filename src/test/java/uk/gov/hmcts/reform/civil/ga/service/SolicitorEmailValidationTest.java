@@ -231,16 +231,10 @@ public class SolicitorEmailValidationTest {
                                                 .id("123")
                                                 .email(applicantEmail)
                                                 .build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder().organisationID("1").build())
-                                              .build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("2").build())
-                                               .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
             .respondent2SameLegalRepresentative(NO)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("3").build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
             .build();
         var builder = caseData.toBuilder();
         if (Objects.nonNull(lipClEmail)) {

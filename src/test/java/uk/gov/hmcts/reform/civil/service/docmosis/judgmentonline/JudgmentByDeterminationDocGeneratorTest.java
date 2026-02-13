@@ -190,8 +190,7 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -256,8 +255,7 @@ class JudgmentByDeterminationDocGeneratorTest {
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
 
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,

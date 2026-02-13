@@ -115,7 +115,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
     @Test
     void shouldReturnCorrectTaskId() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(TASK_ID);
+        assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
     }
 
     @Test

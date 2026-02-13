@@ -21,12 +21,8 @@ class CaseListSolicitorReferenceUtilsTest {
             void shouldReturnAllOrganisationReference() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted()
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .orgPolicyReference("CLAIMANTREF1")
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .orgPolicyReference("DEFENDANTREF1")
-                                                       .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("CLAIMANTREF1"))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("DEFENDANTREF1"))
                     .build();
 
                 assertThat(getAllOrganisationPolicyReferences(caseData))
@@ -37,9 +33,7 @@ class CaseListSolicitorReferenceUtilsTest {
             void shouldReturnAllOrganisationReference_whenNoClaimantOrgReference() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted()
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .orgPolicyReference("DEFENDANTREF1")
-                                                       .build())
+                    .respondent1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("DEFENDANTREF1"))
                     .build();
 
                 assertThat(getAllOrganisationPolicyReferences(caseData))
@@ -64,15 +58,9 @@ class CaseListSolicitorReferenceUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimSubmitted()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .orgPolicyReference("CLAIMANTREF1")
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .orgPolicyReference("DEFENDANTREF1")
-                                                       .build())
-                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .orgPolicyReference("DEFENDANTREF2")
-                                                       .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("CLAIMANTREF1"))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("DEFENDANTREF1"))
+                    .respondent2OrganisationPolicy(new OrganisationPolicy().setOrgPolicyReference("DEFENDANTREF2"))
                     .build();
 
                 assertThat(getAllOrganisationPolicyReferences(caseData))

@@ -162,14 +162,14 @@ class BundleRequestDocsOrganizerTest {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         Arrays.stream(TypeOfDocDocumentaryEvidenceOfTrial.values()).toList().forEach(type -> {
             otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
-                                                           .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                               .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                           .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                               .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                            .setTypeOfDocument(type.getDisplayNames().get(0))
                                                            .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         });
         otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
-                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).categoryID("").build())
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME).setCategoryID(""))
                                                        .setTypeOfDocument("Other")
                                                        .setDocumentIssuedDate(LocalDate.of(2023, 1, 12))));
         return otherEvidenceDocs;

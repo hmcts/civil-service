@@ -44,10 +44,9 @@ class DashboardNotificationHandlerTest {
             .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
             .build();
 
-        callbackParams = CallbackParams.builder()
+        callbackParams = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
-            .caseData(caseData)
-            .build();
+            .caseData(caseData);
     }
 
     @Test

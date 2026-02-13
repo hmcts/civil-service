@@ -35,15 +35,11 @@ public class OrgPolicyUtils {
     public static void addMissingOrgPolicies(CaseData caseData) {
         if (caseData.getRespondent1OrganisationPolicy() == null) {
             caseData
-                .setRespondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName())
-                                                   .build());
+                .setRespondent1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()));
         }
         if (caseData.getRespondent2OrganisationPolicy() == null) {
             caseData
-                .setRespondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
-                                                   .build());
+                .setRespondent2OrganisationPolicy(new OrganisationPolicy().setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName()));
         }
     }
 

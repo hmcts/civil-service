@@ -271,10 +271,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldHaveListOfTwoGenerateDirectionOrderDocIfElementInListAlreadyPresent() {
 
-            CaseDocument caseDocument = CaseDocument.builder().documentName("abcd")
-                .documentLink(Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                                  .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.DIRECTION_ORDER).documentSize(12L).build();
+            CaseDocument caseDocument = new CaseDocument().setDocumentName("abcd")
+                .setDocumentLink(new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                                  .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.DIRECTION_ORDER).setDocumentSize(12L);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication()
                 .directionOrderDocument(wrapElements(caseDocument))
@@ -495,10 +495,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldHaveListOfTwoGenerateWrittenRepSequentialDocIfElementInListAlreadyPresent() {
 
-            CaseDocument caseDocument = CaseDocument.builder().documentName("abcd")
-                .documentLink(Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                                  .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL).documentSize(12L).build();
+            CaseDocument caseDocument = new CaseDocument().setDocumentName("abcd")
+                .setDocumentLink(new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                                  .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL).setDocumentSize(12L);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication()
                 .writtenRepSequentialDocument(wrapElements(caseDocument))
@@ -559,10 +559,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldHaveListOfTwoGenerateWrittenRepConcurrentDocIfElementInListAlreadyPresent() {
 
-            CaseDocument caseDocument = CaseDocument.builder().documentName("abcd")
-                .documentLink(Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                                  .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.WRITTEN_REPRESENTATION_CONCURRENT).documentSize(12L).build();
+            CaseDocument caseDocument = new CaseDocument().setDocumentName("abcd")
+                .setDocumentLink(new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                                  .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.WRITTEN_REPRESENTATION_CONCURRENT).setDocumentSize(12L);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication()
                 .writtenRepConcurrentDocument(wrapElements(caseDocument))
@@ -674,10 +674,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldHaveListOfTwoGenerateRequestForInfotDocIfElementInListAlreadyPresent() {
 
-            CaseDocument caseDocument = CaseDocument.builder().documentName("abcd")
-                .documentLink(Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                                  .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.REQUEST_FOR_INFORMATION).documentSize(12L).build();
+            CaseDocument caseDocument = new CaseDocument().setDocumentName("abcd")
+                .setDocumentLink(new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                                  .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.REQUEST_FOR_INFORMATION).setDocumentSize(12L);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .requestForInformationDocument(wrapElements(caseDocument))
@@ -720,11 +720,11 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         void shouldHaveListOfTwoGeneralOrderDocumentIfElementInListAlreadyPresent_withFinalOrder(
                 GaFinalOrderSelection selection) {
 
-            CaseDocument caseDocument = CaseDocument.builder().documentName("abcd")
-                    .documentLink(Document.builder().documentUrl("url")
-                            .documentFileName("filename").documentHash("hash")
-                            .documentBinaryUrl("binaryUrl").build())
-                    .documentType(DocumentType.GENERAL_ORDER).documentSize(12L).build();
+            CaseDocument caseDocument = new CaseDocument().setDocumentName("abcd")
+                    .setDocumentLink(new Document().setDocumentUrl("url")
+                            .setDocumentFileName("filename").setDocumentHash("hash")
+                            .setDocumentBinaryUrl("binaryUrl"))
+                    .setDocumentType(DocumentType.GENERAL_ORDER).setDocumentSize(12L);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                     .build()
@@ -1173,7 +1173,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("CreatePDFDocument");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("CreatePDFDocument");
         }
     }
 }

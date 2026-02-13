@@ -17,27 +17,24 @@ class CallbackParamsTest {
         @Test
         void shouldReturnGeneralApplicationCaseDataWhenCaseDataIsGeneralApplicationCaseData() {
             final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(caseData);
 
             assertEquals(caseData, callbackParams.getGeneralApplicationCaseData());
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsNull() {
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(null)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(null);
             assertThrows(IllegalStateException.class, callbackParams::getGeneralApplicationCaseData);
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsCaseData() {
             final CaseData caseData = CaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getGeneralApplicationCaseData);
         }
     }
@@ -48,27 +45,24 @@ class CallbackParamsTest {
         @Test
         void shouldReturnGeneralApplicationCaseDataWhenCaseDataBeforeIsGeneralApplicationCaseData() {
             final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(caseData);
 
             assertEquals(caseData, callbackParams.getGeneralApplicationCaseDataBefore());
         }
 
         @Test
         void shouldNotThrowIllegalStateExceptionWhenCaseDataBeforeIsNull() {
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(null)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(null);
             assertNull(callbackParams.getCaseDataBefore());
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataBeforeIsCaseData() {
             final CaseData caseData = CaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getGeneralApplicationCaseDataBefore);
         }
     }
@@ -79,27 +73,24 @@ class CallbackParamsTest {
         @Test
         void shouldReturnCaseDataWhenCaseDataIsCaseData() {
             final CaseData caseData = CaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(caseData);
 
             assertEquals(caseData, callbackParams.getCaseData());
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsNull() {
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(null)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(null);
             assertThrows(IllegalStateException.class, callbackParams::getCaseData);
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsGeneralApplicationCaseData() {
             final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseData(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseData(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getCaseData);
         }
     }
@@ -110,27 +101,24 @@ class CallbackParamsTest {
         @Test
         void shouldReturnCaseDataWhenCaseDataBeforeIsCaseData() {
             final CaseData caseData = CaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(caseData);
 
             assertEquals(caseData, callbackParams.getCaseDataBefore());
         }
 
         @Test
         void shouldNotThrowIllegalStateExceptionWhenCaseDataBeforeIsNull() {
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(null)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(null);
             assertNull(callbackParams.getCaseDataBefore());
         }
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataBeforeIsGeneralApplicationCaseData() {
             final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-            final CallbackParams callbackParams = CallbackParams.builder()
-                .caseDataBefore(caseData)
-                .build();
+            final CallbackParams callbackParams = new CallbackParams()
+                .caseDataBefore(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getCaseDataBefore);
         }
     }
