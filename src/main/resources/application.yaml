@@ -810,6 +810,23 @@ spring:
   main:
     lazy-initialization: true
 
+rd_professional:
+  api:
+    url: ${RD_PROFESSIONAL_API_URL:http://localhost:8765}
+
+rd_commondata:
+  api:
+    url: ${RD_COMMONDATA_API_URL:http://localhost:8765}
+
+idam:
+  web:
+    url: ${IDAM_WEB_URL:http://localhost:9002}
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
+    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
+
 ---
 
 spring:
