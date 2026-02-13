@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.fee;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
@@ -31,11 +33,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_FEE_VALUE;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
-@SpringBootTest(classes = {
-    AdditionalFeeValueCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
 class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     public static final String VERSION = "1";
@@ -44,24 +42,30 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS_167 = BigDecimal.valueOf(16700);
     public static final String TEST_FEE_CODE = "test_fee_code";
     public static final String SOME_EXCEPTION = "Some Exception";
-    @Autowired
+
+    @InjectMocks
     private AdditionalFeeValueCallbackHandler handler;
+
     private static final String TASK_ID = "ObtainAdditionalFeeValue";
-    @MockBean
+
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
-    @MockBean
-    GeneralAppFeesConfiguration generalAppFeesConfiguration;
+
+    @Mock
+    private GeneralAppFeesConfiguration generalAppFeesConfiguration;
+
     private CallbackParams params;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
+
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Mock
     JudicialDecisionHelper judicialDecisionHelper;
 
-    @BeforeEach
-    void setup() {
-        when(generalAppFeesConfiguration.getApplicationUncloakAdditionalFee())
-            .thenReturn(TEST_FEE_CODE);
-    }
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     @Test
      void shouldReturnCorrectTaskId() {
@@ -105,15 +109,10 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
 
     @Test
     void shouldNotGetAdditionalFeeValue_WhenApplicationIsNotUncloaked() {
-        when(generalAppFeesService.getFeeForGA(any(), any(), any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(
-                BigDecimal.valueOf(16700)).code("").version(VERSION).build());
 
         var caseData = GeneralApplicationCaseDataBuilder.builder()
             .requestForInformationApplication()
             .build();
-        when(judicialDecisionHelper
-                 .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(false);
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         verify(generalAppFeesService, never()).getFeeForGA(any(), any(), any());
     }

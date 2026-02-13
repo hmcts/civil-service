@@ -1,21 +1,19 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
 import uk.gov.hmcts.reform.civil.ga.service.StateGeneratorService;
-import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,27 +25,18 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PR
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@SpringBootTest(classes = {
-    EndJudgeMakesDecisionBusinessProcessCallbackHandler.class,
-    CoreCaseDataService.class,
-    ObjectMapper.class,
-    JudicialDecisionNotificationUtil.class
-})
+@ExtendWith(MockitoExtension.class)
 class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private EndJudgeMakesDecisionBusinessProcessCallbackHandler handler;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
-
-    @MockBean
+    @Mock
     private StateGeneratorService stateGeneratorService;
-    @MockBean
+    @Mock
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
+    @Mock
     private JudicialDecisionHelper judicialDecisionHelper;
     private CallbackParams params;
 

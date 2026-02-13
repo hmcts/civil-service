@@ -1,21 +1,22 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -39,58 +39,62 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_PAYMENT_REF;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
-@SpringBootTest(classes = {
-    AdditionalPaymentsReferenceCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
+class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplicationBaseCallbackHandlerTest {
-
-    private static final String PAYMENT_REQUEST_REFERENCE = "RC-1234-1234-1234-1234";
     public static final String BEARER_TOKEN = "BEARER_TOKEN";
     public static final String DUPLICATE_PAYMENT = "Duplicate Payment.";
     public static final String UNEXPECTED_RESPONSE_BODY = "unexpected response body";
     public static final String EXCEPTION_MESSAGE = "exception message";
-
-    @MockBean
+    private static final String PAYMENT_REQUEST_REFERENCE = "RC-1234-1234-1234-1234";
+    @Mock
+    JudicialDecisionHelper judicialDecisionHelper;
+    @Mock
     private Time time;
-
-    @Autowired
+    @InjectMocks
     private AdditionalPaymentsReferenceCallbackHandler handler;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private CallbackParams params;
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
 
-    @MockBean
-    JudicialDecisionHelper judicialDecisionHelper;
+    private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(
+            response.getData(),
+            GeneralApplicationCaseData.class
+        );
+        return responseCaseData.getGeneralAppPBADetails().getAdditionalPaymentServiceRef();
+    }
 
-    @BeforeEach
-    public void setup() {
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
+    private FeignException buildForbiddenFeignExceptionWithInvalidResponse() {
+        return buildFeignClientException(403, UNEXPECTED_RESPONSE_BODY.getBytes(UTF_8));
+    }
+
+    private FeignException.FeignClientException buildFeignClientException(int status, byte[] body) {
+        return new FeignException.FeignClientException(
+            status,
+            EXCEPTION_MESSAGE,
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            body,
+            Map.of()
+        );
     }
 
     @Nested
     class MakeAdditionalPaymentReference {
 
-        @BeforeEach
-        void setup() {
-
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
-                                .build());
-        }
-
         @Test
-        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication()  {
+        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication() {
             var caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(
                     REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
                 .build();
+            when(paymentsService.createServiceRequestGa(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
+                                .build());
             when(judicialDecisionHelper
                      .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
 
@@ -134,8 +138,10 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
             doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
                 .when(paymentsService).createServiceRequestGa(any(), any());
             var caseData = GeneralApplicationCaseDataBuilder.builder()
-                .judicialDecisionWithUncloakRequestForInformationApplication(REQUEST_MORE_INFORMATION,
-                                                                             YesOrNo.NO, YesOrNo.NO)
+                .judicialDecisionWithUncloakRequestForInformationApplication(
+                    REQUEST_MORE_INFORMATION,
+                    YesOrNo.NO, YesOrNo.NO
+                )
                 .build();
             when(judicialDecisionHelper
                      .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
@@ -167,7 +173,8 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
+            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(
+                "GeneralApplicationMakeAdditionalPayment");
         }
 
         @Test
@@ -175,25 +182,6 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
             assertThat(handler.handledEvents()).contains(OBTAIN_ADDITIONAL_PAYMENT_REF);
         }
 
-    }
-
-    private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        return responseCaseData.getGeneralAppPBADetails().getAdditionalPaymentServiceRef();
-    }
-
-    private FeignException buildForbiddenFeignExceptionWithInvalidResponse() {
-        return buildFeignClientException(403, UNEXPECTED_RESPONSE_BODY.getBytes(UTF_8));
-    }
-
-    private FeignException.FeignClientException buildFeignClientException(int status, byte[] body) {
-        return new FeignException.FeignClientException(
-            status,
-            EXCEPTION_MESSAGE,
-            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-            body,
-            Map.of()
-        );
     }
 
 }

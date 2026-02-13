@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -61,15 +62,14 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes =
-    StateGeneratorService.class
-)
+@ExtendWith(MockitoExtension.class)
 public class StateGeneratorServiceTest {
 
-    @Autowired
+    @InjectMocks
     StateGeneratorService stateGeneratorService;
-    @MockBean
+    @Mock
     JudicialDecisionHelper judicialDecisionHelper;
+
     private static final String JUDGES_DECISION = "MAKE_DECISION";
 
     @Test
@@ -81,7 +81,6 @@ public class StateGeneratorServiceTest {
             .build();
 
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
-        when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(any())).thenReturn(false);
         assertThat(caseState).isEqualTo(AWAITING_ADDITIONAL_INFORMATION);
     }
 

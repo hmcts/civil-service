@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
@@ -40,29 +40,26 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CASE_ID;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
-@SpringBootTest(classes = {
-    HearingScheduledNotificationService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class HearingScheduledNotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private HearingScheduledNotificationService hearingScheduledNotificationService;
-    @MockBean
+    @Mock
     private SolicitorEmailValidation solicitorEmailValidation;
-    @MockBean
+    @Mock
     private NotificationService notificationService;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
 
     private static final Long CASE_REFERENCE = 111111L;
@@ -75,16 +72,6 @@ public class HearingScheduledNotificationServiceTest {
 
     @BeforeEach
     void setup() {
-        when(notificationsProperties.getHearingNoticeTemplate())
-            .thenReturn("general-apps-notice-of-hearing-template-id");
-        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
-            .thenReturn("ga-notice-of-hearing-applicant-template-id");
-        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
-            .thenReturn("ga-notice-of-hearing-applicant-welsh-template-id");
-        when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-            .thenReturn("ga-notice-of-hearing-respondent-template-id");
-        when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
-            .thenReturn("ga-notice-of-hearing-respondent-welsh-template-id");
         when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
         when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                              + "\n For all other matters, call 0300 123 7050");
@@ -149,7 +136,8 @@ public class HearingScheduledNotificationServiceTest {
 
     @Test
     void notificationShouldSendToDefendantsWhenInvoked() {
-
+        when(notificationsProperties.getHearingNoticeTemplate())
+            .thenReturn("general-apps-notice-of-hearing-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
@@ -169,7 +157,8 @@ public class HearingScheduledNotificationServiceTest {
 
     @Test
     void notificationShouldSendEmailReferenceWhenSolicitorReferenceisPresent() {
-
+        when(notificationsProperties.getHearingNoticeTemplate())
+            .thenReturn("general-apps-notice-of-hearing-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .emailPartyReference("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd")
             .build();
@@ -190,6 +179,8 @@ public class HearingScheduledNotificationServiceTest {
 
     @Test
     void notificationShouldSendToClaimantWhenInvoked() {
+        when(notificationsProperties.getHearingNoticeTemplate())
+            .thenReturn("general-apps-notice-of-hearing-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .build();
 
@@ -214,6 +205,9 @@ public class HearingScheduledNotificationServiceTest {
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
+        when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+            .thenReturn("ga-notice-of-hearing-respondent-template-id");
+
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
             .email(DUMMY_EMAIL).surname(Optional.of("surname"))
@@ -245,6 +239,8 @@ public class HearingScheduledNotificationServiceTest {
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
+            .thenReturn("ga-notice-of-hearing-applicant-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
@@ -271,6 +267,8 @@ public class HearingScheduledNotificationServiceTest {
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
+            .thenReturn("ga-notice-of-hearing-applicant-welsh-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)

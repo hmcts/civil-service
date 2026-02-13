@@ -18,11 +18,10 @@ import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 import static org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.mockito.Mockito.mockStatic;
 
-@SuppressWarnings("unchecked")
 class CaseHearingDateSearchServiceTest extends ElasticSearchServiceTest {
 
     private static final LocalDate CURRENT_DATE = LocalDate.of(2023, 7, 10);
-    private static MockedStatic currentDateMock;
+    private static MockedStatic<LocalDate> currentDateMock;
 
     @BeforeAll
     static void setupSuite() {

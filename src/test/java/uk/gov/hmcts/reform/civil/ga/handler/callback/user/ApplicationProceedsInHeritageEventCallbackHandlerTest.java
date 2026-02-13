@@ -6,11 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationServic
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 
 import java.time.LocalDateTime;
 
@@ -37,20 +40,25 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPLICATION_PROCEEDS_
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PROCEEDS_IN_HERITAGE;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ApplicationProceedsInHeritageEventCallbackHandler.class, JacksonAutoConfiguration.class, Time.class
-})
+@ExtendWith(MockitoExtension.class)
 class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     private Time time;
-    @MockBean
+    @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
 
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
     private ApplicationProceedsInHeritageEventCallbackHandler handler;
 
     @Test
@@ -66,13 +74,16 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralAppli
         @BeforeEach
         void setup() {
             localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
         }
 
         @ParameterizedTest(name = "The application is in {0} state")
         @EnumSource(value = CaseState.class)
         void shouldRespondWithStateChangedWhenApplicationIsLive(CaseState state) {
+            if (!NON_LIVE_STATES.contains(state)) {
+                when(time.now()).thenReturn(localDateTime);
+                when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            }
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(state).build();
@@ -115,8 +126,6 @@ class ApplicationProceedsInHeritageEventCallbackHandlerTest extends GeneralAppli
         @Test
         void shouldNotSendAnyDashboardNotificationsWhenLRvsLR() {
             when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            when(gaForLipService.isLipApp(any())).thenReturn(false);
-            when(gaForLipService.isLipResp(any())).thenReturn(false);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).build();

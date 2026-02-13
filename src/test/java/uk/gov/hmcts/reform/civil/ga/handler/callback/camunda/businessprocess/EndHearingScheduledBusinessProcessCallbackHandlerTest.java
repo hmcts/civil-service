@@ -5,9 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -15,9 +16,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
-import uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,21 +27,14 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_HEARING_SCHEDULED_PROCESS_GASPEC;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@SpringBootTest(classes = {
-    EndHearingScheduledBusinessProcessCallbackHandler.class,
-    CoreCaseDataService.class,
-    ObjectMapper.class,
-    JudicialDecisionNotificationUtil.class
-})
+@ExtendWith(MockitoExtension.class)
 public class EndHearingScheduledBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private EndHearingScheduledBusinessProcessCallbackHandler handler;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
     private CallbackParams params;
 

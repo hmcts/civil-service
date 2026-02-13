@@ -1,17 +1,20 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -68,71 +71,68 @@ import static uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslatio
 import static uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GeneratePDFDocumentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class},
-    properties = {"print.service.enabled=true"})
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private GeneralOrderGenerator generalOrderGenerator;
 
-    @MockBean
+    @Mock
     private ConsentOrderGenerator consentOrderGenerator;
 
-    @MockBean
+    @Mock
     private RequestForInformationGenerator requestForInformationGenerator;
 
-    @MockBean
+    @Mock
     private DirectionOrderGenerator directionOrderGenerator;
 
-    @MockBean
+    @Mock
     private DismissalOrderGenerator dismissalOrderGenerator;
 
-    @MockBean
+    @Mock
     private HearingOrderGenerator hearingOrderGenerator;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationConcurrentOrderGenerator writtenRepresentationConcurrentOrderGenerator;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationSequentialOrderGenerator writtenRepresentationSequentailOrderGenerator;
 
-    @MockBean
+    @Mock
     private FreeFormOrderGenerator freeFormOrderGenerator;
 
-    @MockBean
+    @Mock
     private AssistedOrderFormGenerator assistedOrderFormGenerator;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @MockBean
+    @Mock
     private SendFinalOrderPrintService sendFinalOrderPrintService;
 
-    @Autowired
+    @InjectMocks
     private GeneratePDFDocumentCallbackHandler handler;
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private final LocalDate submittedOn = now();
 
@@ -205,7 +205,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getGeneralOrderDocument().get(0).getValue())
+            assertThat(updatedData.getGeneralOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -242,7 +242,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getDirectionOrderDocument().get(0).getValue())
+            assertThat(updatedData.getDirectionOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -303,7 +303,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getDismissalOrderDocument().get(0).getValue())
+            assertThat(updatedData.getDismissalOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -362,7 +362,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getGeneralOrderDocument().get(0).getValue())
+            assertThat(updatedData.getGeneralOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -403,7 +403,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getHearingOrderDocument().get(0).getValue())
+            assertThat(updatedData.getHearingOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.HEARING_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -424,7 +424,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.HEARING_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType()).isEqualTo(PreTranslationGaDocumentType.HEARING_ORDER_DOC);
         }
@@ -487,7 +487,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getWrittenRepSequentialDocument().get(0).getValue())
+            assertThat(updatedData.getWrittenRepSequentialDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -551,7 +551,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getWrittenRepConcurrentDocument().get(0).getValue())
+            assertThat(updatedData.getWrittenRepConcurrentDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -617,7 +617,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getRequestForInformationDocument().get(0).getValue())
+            assertThat(updatedData.getRequestForInformationDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -666,7 +666,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getRequestForInformationDocument().get(0).getValue())
+            assertThat(updatedData.getRequestForInformationDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -710,7 +710,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getGeneralOrderDocument().get(0).getValue())
+            assertThat(updatedData.getGeneralOrderDocument().getFirst().getValue())
                     .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
         }
@@ -762,7 +762,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
             verifyNoInteractions(sendFinalOrderPrintService);
@@ -780,7 +780,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getConsentOrderDocument().get(0).getValue())
+            assertThat(updatedData.getConsentOrderDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.CONSENT_ORDER_DOCUMENT);
 
         }
@@ -800,7 +800,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(WRITTEN_REPRESENTATION_ORDER_DOC);
@@ -821,7 +821,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(WRITTEN_REPRESENTATION_ORDER_DOC);
@@ -842,7 +842,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(WRITTEN_REPRESENTATION_ORDER_DOC);
@@ -865,7 +865,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(DIRECTIONS_ORDER_DOC);
@@ -888,7 +888,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(DIRECTIONS_ORDER_DOC);
@@ -930,7 +930,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(WRITTEN_REPRESENTATION_ORDER_DOC);
@@ -992,7 +992,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(GENERAL_ORDER_DOC);
@@ -1014,7 +1014,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(GENERAL_ORDER_DOC);
@@ -1037,7 +1037,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(GENERAL_ORDER_DOC);
@@ -1082,7 +1082,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-            assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+            assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
                 .isEqualTo(PDFBuilder.GENERAL_ORDER_DOCUMENT);
             assertThat(updatedData.getPreTranslationGaDocumentType())
                 .isEqualTo(GENERAL_ORDER_DOC);

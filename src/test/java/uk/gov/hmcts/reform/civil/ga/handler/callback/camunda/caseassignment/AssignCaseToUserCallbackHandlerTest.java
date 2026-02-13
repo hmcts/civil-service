@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -45,6 +45,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -55,35 +56,51 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    AssignCaseToUserCallbackHandler.class,
-    AssignCaseToRespondentSolHelper.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
     private AssignCaseToUserCallbackHandler assignCaseToUserHandler;
 
-    @MockBean
+    private AssignCaseToRespondentSolHelper assignCaseToRespondentSolHelper;
+
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockBean
+    @Mock
     private RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
+
+    @Mock
+    private GaForLipService gaForLipService;
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     private CallbackParams params;
     private GeneralApplication generalApplication;
     private GeneralApplication generalApplicationWithNotice;
 
     public static final Long CASE_ID = 1594901956117591L;
+
+    @BeforeEach
+    void initHandler() {
+        assignCaseToRespondentSolHelper = new AssignCaseToRespondentSolHelper(coreCaseUserService, gaForLipService);
+        assignCaseToUserHandler = new AssignCaseToUserCallbackHandler(
+            assignCaseToRespondentSolHelper,
+            objectMapper,
+            generalAppFeesService,
+            coreCaseUserService,
+            caseDetailsConverter,
+            gaForLipService,
+            rolesAndAccessAssignmentService
+        );
+    }
+
     public static final int RESPONDENT_ONE = 0;
     public static final int RESPONDENT_TWO = 1;
     public static final String SPEC_CLAIM = "SPEC_CLAIM";
@@ -239,7 +256,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignDefendantRoleForGALip {
         @BeforeEach
         void setup() {
-
+            when(gaForLipService.isLipResp(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -291,9 +308,9 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(1))
                     .assignCase(CASE_ID.toString(),
-                            generalApplication
-                                    .getGeneralAppRespondentSolicitors().get(0).getValue().getId(), null,
-                            CaseRole.DEFENDANT
+                                generalApplication
+                                    .getGeneralAppRespondentSolicitors().getFirst().getValue().getId(), null,
+                                CaseRole.DEFENDANT
                 );
         }
     }
@@ -428,6 +445,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipResp {
         @BeforeEach
         void setup() {
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -498,6 +516,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipApp {
         @BeforeEach
         void setup() {
+            when(gaForLipService.isLipApp(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
