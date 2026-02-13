@@ -31,8 +31,7 @@ class SdoSmallClaimsTemplateServiceTest {
         classificationService,
         directionsService,
         featureToggleService,
-        templateFieldService,
-        true
+        templateFieldService
     );
 
     @Test

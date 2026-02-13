@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class SdoSmallClaimsTemplateService {
 
     private final DocumentHearingLocationHelper locationHelper;
@@ -26,21 +27,6 @@ public class SdoSmallClaimsTemplateService {
     private final SdoSmallClaimsDirectionsService smallClaimsDirectionsService;
     private final FeatureToggleService featureToggleService;
     private final SdoSmallClaimsTemplateFieldService smallClaimsTemplateFieldService;
-    private final boolean otherRemedyEnabled;
-
-    public SdoSmallClaimsTemplateService(DocumentHearingLocationHelper locationHelper,
-                                         SdoCaseClassificationService caseClassificationService,
-                                         SdoSmallClaimsDirectionsService smallClaimsDirectionsService,
-                                         FeatureToggleService featureToggleService,
-                                         SdoSmallClaimsTemplateFieldService smallClaimsTemplateFieldService,
-                                         @Value("${other_remedy.enabled:true}") boolean otherRemedyEnabled) {
-        this.locationHelper = locationHelper;
-        this.caseClassificationService = caseClassificationService;
-        this.smallClaimsDirectionsService = smallClaimsDirectionsService;
-        this.featureToggleService = featureToggleService;
-        this.smallClaimsTemplateFieldService = smallClaimsTemplateFieldService;
-        this.otherRemedyEnabled = otherRemedyEnabled;
-    }
 
     public SdoDocumentFormSmall buildTemplate(
         CaseData caseData,
@@ -68,7 +54,6 @@ public class SdoSmallClaimsTemplateService {
             .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
             .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.smallClaimHousingDisrepair))
             .setSmallClaimsHousingDisrepair(caseData.getSmallClaimsHousingDisrepair())
-            .setOtherRemedyEnabled(otherRemedyEnabled)
             .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)

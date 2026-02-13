@@ -72,7 +72,6 @@ public class SdoDocumentFormSmall implements MappableObject {
     private LocationRefData caseManagementLocation;
     private SmallClaimsCreditHire smallClaimsCreditHire;
     private HousingDisrepair smallClaimsHousingDisrepair;
-    private boolean isOtherRemedyEnabled;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
     private PPI smallClaimsPPI;
