@@ -37,7 +37,7 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
             .toBuilder()
             .applicant1ResponseDeadline(LocalDateTime.of(2025, 5, 13, 16, 0))
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .changeOfRepresentation(ChangeOfRepresentation.builder().build())
+            .changeOfRepresentation(new ChangeOfRepresentation())
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(NO)

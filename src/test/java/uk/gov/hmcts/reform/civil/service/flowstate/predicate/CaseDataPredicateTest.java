@@ -1641,7 +1641,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoApplicant1_when_present() {
-            when(caseData.getApp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getApp1MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoApplicant1.test(caseData));
         }
 
@@ -1653,7 +1653,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoRespondent1_when_present() {
-            when(caseData.getResp1MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp1MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent1.test(caseData));
         }
 
@@ -1665,7 +1665,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasContactInfoRespondent2_when_present() {
-            when(caseData.getResp2MediationContactInfo()).thenReturn(MediationContactInformation.builder().build());
+            when(caseData.getResp2MediationContactInfo()).thenReturn(new MediationContactInformation());
             assertTrue(CaseDataPredicate.Mediation.hasContactInfoRespondent2.test(caseData));
         }
 
@@ -1770,7 +1770,8 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasSdoReasonNotSuitable_when_reason_and_input_present() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input("reason").build();
+            ReasonNotSuitableSDO reason = new ReasonNotSuitableSDO();
+            reason.setInput("reason");
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertTrue(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }
@@ -1783,7 +1784,8 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_hasSdoReasonNotSuitable_when_input_empty() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input(null).build();
+            ReasonNotSuitableSDO reason = new ReasonNotSuitableSDO();
+            reason.setInput(null);
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertFalse(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }

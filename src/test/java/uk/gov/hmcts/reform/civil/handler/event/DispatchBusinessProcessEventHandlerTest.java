@@ -28,11 +28,10 @@ class DispatchBusinessProcessEventHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenBusinessProcessIsReady() {
-        BusinessProcess businessProcess = BusinessProcess.builder()
-            .activityId("someActivityId")
-            .processInstanceId("someProcessId")
-            .status(READY)
-            .build();
+        BusinessProcess businessProcess = new BusinessProcess()
+            .setActivityId("someActivityId")
+            .setProcessInstanceId("someProcessId")
+            .setStatus(READY);
         var event = new DispatchBusinessProcessEvent(1L, businessProcess);
 
         handler.dispatchBusinessProcess(event);
@@ -43,11 +42,10 @@ class DispatchBusinessProcessEventHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotTriggerEvent_whenBusinessProcessIsNotReady(BusinessProcessStatus businessProcessStatus) {
-        BusinessProcess businessProcess = BusinessProcess.builder()
-            .activityId("someActivityId")
-            .processInstanceId("someProcessId")
-            .status(businessProcessStatus)
-            .build();
+        BusinessProcess businessProcess = new BusinessProcess()
+            .setActivityId("someActivityId")
+            .setProcessInstanceId("someProcessId")
+            .setStatus(businessProcessStatus);
         var event = new DispatchBusinessProcessEvent(1L, businessProcess);
 
         handler.dispatchBusinessProcess(event);
