@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -24,11 +23,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 class GaEventEmitterServiceTest {
 
     @Mock
@@ -51,7 +48,6 @@ class GaEventEmitterServiceTest {
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
     }
 
     @Test
@@ -79,6 +75,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
@@ -122,6 +119,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withoutTenantId() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
@@ -182,6 +180,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldHandleException_whenInvoked() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
@@ -204,6 +203,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldHandleException_whenInvokedGA() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 

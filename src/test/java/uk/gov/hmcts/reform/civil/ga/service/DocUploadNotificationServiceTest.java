@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
@@ -42,7 +41,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -50,7 +48,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 public class DocUploadNotificationServiceTest {
 
     @InjectMocks
@@ -89,16 +86,6 @@ public class DocUploadNotificationServiceTest {
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getEvidenceUploadTemplate())
-                .thenReturn("general-apps-notice-of-document-template-id");
-            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
-                .thenReturn("ga-notice-of-document-lip-appln-template-id");
-            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
-                .thenReturn("ga-notice-of-document-lip-appln-welsh-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-                .thenReturn("ga-notice-of-document-lip-respondent-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
-                .thenReturn("ga-notice-of-document-lip-respondent-welsh-template-id");
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
@@ -114,6 +101,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void appNotificationShouldSendWhenInvoked() {
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(true, NO, NO);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
                 CaseState.CASE_PROGRESSION).build());
@@ -128,7 +117,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void appNotificationWithSolicitorReferenceAdded() {
-
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(false, NO, NO);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
                 CaseState.CASE_PROGRESSION).build());
@@ -143,6 +133,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void respNotificationShouldSendTwice1V2() {
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             when(configuration.getSpecUnspecContact()).thenReturn(
@@ -160,6 +152,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked() {
+            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
+                .thenReturn("ga-notice-of-document-lip-appln-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -178,6 +172,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked_whenMainClaimIssuedInWelsh() {
+            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
+                .thenReturn("ga-notice-of-document-lip-appln-welsh-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -200,6 +196,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend() {
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("ga-notice-of-document-lip-respondent-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -226,6 +224,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend_whenRespondentResponseInWelsh() {
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
+                .thenReturn("ga-notice-of-document-lip-respondent-welsh-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");

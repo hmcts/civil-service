@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 
+import org.mockito.stubbing.OngoingStubbing;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
@@ -52,7 +51,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.STARTED;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -60,7 +58,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 public class GeneralApplicationCreationNotificationServiceTest {
 
     @InjectMocks
@@ -97,28 +94,6 @@ public class GeneralApplicationCreationNotificationServiceTest {
     @Nested
     class AboutToSubmitCallback {
 
-        @BeforeEach
-        void setup() {
-            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-id");
-            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-                .thenReturn("general-application-respondent-template-lip-id");
-            //when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
-                .thenReturn("general-application-respondent-welsh-template-lip-id");
-            when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
-            when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
-                                                                 + "\n For all other matters, call 0300 123 7050");
-            when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
-            when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
-            when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
-            when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
-            when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
-            when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
-        }
-
         @Test
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFee() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
@@ -127,10 +102,13 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .build();
 
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
-            when(solicitorEmailValidation
-                     .validateSolicitorEmail(any(), any()))
-                .thenReturn(caseData);
+            getGeneralApplicationCaseDataOngoingStubbing(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), any(), any(), any()
             );
@@ -191,7 +169,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService).sendMail(
                 any(), any(), any(), any()
             );
@@ -220,7 +203,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService).sendMail(
                 any(), any(), any(), any()
             );
@@ -239,7 +227,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getUrgentGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), any(), any(), any()
             );
@@ -293,7 +286,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -318,7 +316,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -343,6 +346,9 @@ public class GeneralApplicationCreationNotificationServiceTest {
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-lip-id");
+            mockNotificationsSignatureConfiguration();
 
             gaNotificationService.sendNotification(caseData);
             verify(notificationService, times(2)).sendMail(
@@ -371,7 +377,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
                     Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimRespondentResponseLan);
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
+                .thenReturn("general-application-respondent-welsh-template-lip-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(), eq("general-application-respondent-welsh-template-lip-id"), argumentCaptor.capture(), any()
             );
@@ -388,7 +399,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
+
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 DUMMY_EMAIL,
                 "general-application-respondent-template-id",
@@ -406,8 +422,12 @@ public class GeneralApplicationCreationNotificationServiceTest {
             when(solicitorEmailValidation
                      .validateSolicitorEmail(any(), any()))
                 .thenReturn(caseData);
+            when(notificationsProperties.getGeneralApplicationRespondentEmailTemplate())
+                .thenReturn("general-application-respondent-template-id");
+            mockNotificationsSignatureConfiguration();
 
             gaNotificationService.sendNotification(caseData);
+
             verify(notificationService, times(2)).sendMail(
                 any(),
                 any(),
@@ -536,5 +556,23 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .build();
             }
         }
+    }
+
+    private void mockNotificationsSignatureConfiguration() {
+        when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
+        when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
+                                                             + "\n For all other matters, call 0300 123 7050");
+        when(configuration.getOpeningHours()).thenReturn("Monday to Friday, 8.30am to 5pm");
+        when(configuration.getWelshContact()).thenReturn("E-bost: ymholiadaucymraeg@justice.gov.uk");
+        when(configuration.getSpecContact()).thenReturn("Email: contactocmc@justice.gov.uk");
+        when(configuration.getWelshHmctsSignature()).thenReturn("Hawliadau am Arian yn y Llys Sifil Ar-lein \n Gwasanaeth Llysoedd a Thribiwnlysoedd EF");
+        when(configuration.getWelshPhoneContact()).thenReturn("Ffôn: 0300 303 5174");
+        when(configuration.getWelshOpeningHours()).thenReturn("Dydd Llun i ddydd Iau, 9am – 5pm, dydd Gwener, 9am – 4.30pm");
+    }
+
+    private OngoingStubbing<GeneralApplicationCaseData> getGeneralApplicationCaseDataOngoingStubbing(GeneralApplicationCaseData caseData) {
+        return when(solicitorEmailValidation
+                        .validateSolicitorEmail(any(), any()))
+            .thenReturn(caseData);
     }
 }

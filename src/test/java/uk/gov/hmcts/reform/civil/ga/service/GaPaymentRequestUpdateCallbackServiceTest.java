@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
@@ -30,7 +28,6 @@ import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,7 +37,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PROCESS_GASPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_ADD_PAYMENT;
@@ -52,7 +48,6 @@ import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = LENIENT)
 class GaPaymentRequestUpdateCallbackServiceTest {
 
     private static final String PAID = "Paid";
@@ -82,12 +77,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Mock
     CaseDetailsConverter caseDetailsConverter;
 
-    @BeforeEach
-    public void setup() {
-        when(time.now()).thenReturn(LocalDateTime
-                                        .of(2020, 1, 1, 12, 0, 0));
-    }
-
     @Test
     public void shouldStartAndSubmitEventWithCaseDetails() {
 
@@ -95,7 +84,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
         when(coreCaseDataService.startGaUpdate(any(), any())).thenReturn(
             startEventResponse(caseDetails,
@@ -179,12 +167,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
-        when(coreCaseDataService.startGaUpdate(any(), any())).thenReturn(
-            startEventResponse(caseDetails,
-                               END_JUDGE_BUSINESS_PROCESS_GASPEC));
-        when(coreCaseDataService.submitGaUpdate(any(), any())).thenReturn(caseData);
-
         doThrow(buildNotificationException())
             .when(judicialNotificationService)
             .sendNotification(caseData, "respondent");
@@ -233,9 +215,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         caseData = caseData.toBuilder().ccdState(PENDING_CASE_ISSUED).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
-            .thenReturn(caseData);
-
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
 
         verify(coreCaseDataService, never()).startGaUpdate(any(), any());
@@ -277,7 +256,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder().build();
         caseData = caseData.toBuilder().ccdState(AWAITING_APPLICATION_PAYMENT).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
-        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
             .thenReturn(caseData);
         when(coreCaseDataService.startGaUpdate(any(), any())).thenReturn(
@@ -297,10 +275,6 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder().build();
         caseData = caseData.toBuilder().ccdState(AWAITING_RESPONDENT_RESPONSE).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
-
-        when(coreCaseDataService.getCase(Long.valueOf(CASE_ID))).thenReturn(caseDetails);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
-            .thenReturn(caseData);
 
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
 
