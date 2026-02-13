@@ -90,18 +90,19 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
 
     private ChangeOfRepresentation getChangeOfRepresentation(ChangeOrganisationRequest corFieldBeforeNoC,
                                                              CaseData caseData) {
-        ChangeOfRepresentation.ChangeOfRepresentationBuilder builder = ChangeOfRepresentation.builder()
-            .organisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
-            .organisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
-            .caseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
-            .timestamp(corFieldBeforeNoC.getRequestTimestamp())
-            .formerRepresentationEmailAddress(
+        ChangeOfRepresentation changeOfRepresentation = new ChangeOfRepresentation()
+            .setOrganisationToRemoveID(getChangedOrg(caseData, corFieldBeforeNoC))
+            .setOrganisationToAddID(corFieldBeforeNoC.getOrganisationToAdd().getOrganisationID())
+            .setCaseRole(corFieldBeforeNoC.getCaseRoleId().getValue().getCode())
+            .setTimestamp(corFieldBeforeNoC.getRequestTimestamp())
+            .setFormerRepresentationEmailAddress(
                 getFormerEmail(corFieldBeforeNoC.getCaseRoleId().getValue().getCode(), caseData));
 
         if (corFieldBeforeNoC.getOrganisationToRemove() != null) {
-            builder.organisationToRemoveID(corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
+            changeOfRepresentation.setOrganisationToRemoveID(
+                corFieldBeforeNoC.getOrganisationToRemove().getOrganisationID());
         }
-        return builder.build();
+        return changeOfRepresentation;
     }
 
     /** After applying the NoC decision the ChangeOrganisationRequest field is nullified

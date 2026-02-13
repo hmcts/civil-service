@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - Application to Vary or Suspend",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "other" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "civil" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "miscellaneous" },
+      "keyword": { "equalTo": "AppnToVaryOrSuspend" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0447",
+      "description": "Application to vary or suspend enforcement",
+      "version": 1,
+      "fee_amount": 120.00
+    }
+  }
+}

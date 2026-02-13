@@ -58,12 +58,9 @@ class SdoCoverLetterAppendServiceTest {
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
+    private static final Address PARTY_ADDRESS = address("456 Avenue", "London", "EX12RT");
     private static final Party partyDetails = new Party()
-        .setPrimaryAddress(Address.builder()
-                .addressLine1("456 Avenue")
-                .postTown("London")
-                .postCode("EX12RT")
-                .build())
+        .setPrimaryAddress(PARTY_ADDRESS)
         .setName("Mr.John White");
 
     private static final SdoCoverLetter PARTY_LETTER_TEMPLATE_DATA = new SdoCoverLetter()
@@ -78,6 +75,15 @@ class SdoCoverLetterAppendServiceTest {
         .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
         .documentLink(Document.builder().documentFileName("DocumentName.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
         .build();
+
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
+
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private List<DocumentMetaData> specClaimTimelineDocuments;
