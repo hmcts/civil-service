@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.djnondivergent;
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.trailreadycheck;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,20 +10,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
-class DjNonDivergentDashboardTaskContributorTest {
+class TrailReadyCheckDashboardTaskContributorTest {
 
     @Mock
-    private DjNonDivergentClaimantDashboardTask claimantTask;
-
+    private TrailReadyCheckClaimantDashboardTask claimantTask;
     @Mock
-    private DjNonDivergentDefendantDashboardTask defendantTask;
+    private TrailReadyCheckDefendantDashboardTask defendantTask;
 
     @Test
     void shouldExposeTaskIdAndHandlers() {
-        DjNonDivergentDashboardTaskContributor contributor =
-            new DjNonDivergentDashboardTaskContributor(claimantTask, defendantTask);
+        TrailReadyCheckDashboardTaskContributor contributor =
+            new TrailReadyCheckDashboardTaskContributor(claimantTask, defendantTask);
 
-        assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.DJ_NON_DIVERGENT);
+        assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.TRAIL_READY_CHECK);
         assertThat(contributor.dashboardTasks()).containsExactly(claimantTask, defendantTask);
         assertThatThrownBy(() -> contributor.dashboardTasks().add(claimantTask))
             .isInstanceOf(UnsupportedOperationException.class);
