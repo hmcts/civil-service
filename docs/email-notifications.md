@@ -803,5 +803,6 @@ The table below lists every citizen-facing notification triggered from CCD event
 |—|`GenerateDashboardNotificationsTrailReadyCheck`|—|Dashboard|Defendant|`No template — task list only`|
 |—|`GenerateDefendantDashboardNotificationCourtOfficerOrder`|—|Dashboard|Defendant|[`Notice.AAA6.CP.Court.Officer.Order.Defendant`](dashboard-template.html?path=dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Court.Officer.Order.Defendant.json)|
 |—|`GenerateDefendantDashboardNotificationTrialArrangementsNotifyParty`|—|Dashboard|Defendant|[`Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant`](dashboard-template.html?path=dashboard-notifications/src/main/resources/notification-templates/Notice.AAA6.CP.Trial.Arrangements.Finalised.NotifyOtherParty.Defendant.json)|
+|—|`taskId`|—|Dashboard|—|—|
 |—|`MoveToJudicialDecisionStateEventCallbackHandler`|—|Docmosis (Camunda callback)|General application|[`GENERAL_APPLICATION_DRAFT (CV-UNS-GAP-ENG-01077.docx) - Draft_application.pdf`](https://github.com/hmcts/rdo-docmosis/blob/HEAD/Templates/Base/CV-UNS-GAP-ENG-01077.docx?raw=1)|
 

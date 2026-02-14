@@ -1566,7 +1566,7 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "        const channelValue = (channel.value || '').trim();",
         "        let visible = 0;",
         "        rows.forEach(row => {",
-        "          const tokens = (row.dataset.ccdEvents || '').split(/\s+/).filter(Boolean);",
+        "          const tokens = (row.dataset.ccdEvents || '').split(/\\s+/).filter(Boolean);",
         "          const channelToken = row.dataset.channel || '';",
         "          const matchesCcd = !value || tokens.some(token => token === value);",
         "          const matchesChannel = !channelValue || channelToken === channelValue;",
