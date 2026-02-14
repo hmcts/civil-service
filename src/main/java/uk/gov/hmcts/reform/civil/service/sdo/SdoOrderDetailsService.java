@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
-import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
+import uk.gov.hmcts.reform.civil.enums.sdo.SmallTrack;
+import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingJudgementDeductionValue;
@@ -17,8 +19,8 @@ import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsJudgementDeductionValue;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackVersion.V_1;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -30,6 +32,8 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class SdoOrderDetailsService {
 
     private final SdoCaseClassificationService caseClassificationService;
+    private final SdoSmallClaimsDirectionsService smallClaimsDirectionsService;
+    private final SdoFastTrackDirectionsService fastTrackDirectionsService;
 
     public CaseData updateOrderDetails(DirectionsOrderTaskContext context) {
         CaseData caseData = context.caseData();
@@ -37,8 +41,22 @@ public class SdoOrderDetailsService {
         updateDeductionValue(caseData);
         applyTrackFlags(caseData);
         mapHearingMethodFields(caseData, context.callbackParams().getVersion());
+        resetPpiFields(caseData);
 
         return caseData;
+    }
+
+    private void resetPpiFields(CaseData caseData) {
+        boolean isSmallClaimsTrack = caseClassificationService.isSmallClaimsTrack(caseData);
+        boolean isFastTrack = caseClassificationService.isFastTrack(caseData);
+
+        if (isSmallClaimsTrack && !smallClaimsDirectionsService.hasSmallAdditionalDirections(caseData, SmallTrack.smallClaimPPI)) {
+            caseData.setSmallClaimsPPI(null);
+        }
+
+        if (isFastTrack && !fastTrackDirectionsService.hasFastAdditionalDirections(caseData, FastTrack.fastClaimPPI)) {
+            caseData.setFastTrackPPI(null);
+        }
     }
 
     private void applyTrackFlags(CaseData caseData) {

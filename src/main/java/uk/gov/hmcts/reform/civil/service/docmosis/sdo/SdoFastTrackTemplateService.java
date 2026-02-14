@@ -32,6 +32,7 @@ public class SdoFastTrackTemplateService {
 
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
+        boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
 
         SdoDocumentFormFast template = new SdoDocumentFormFast()
             .setWrittenByJudge(isJudge)
@@ -56,6 +57,8 @@ public class SdoFastTrackTemplateService {
             .setHasHousingDisrepair(hasDirection(caseData, FastTrack.fastClaimHousingDisrepair))
             .setHasPersonalInjury(hasDirection(caseData, FastTrack.fastClaimPersonalInjury))
             .setHasRoadTrafficAccident(hasDirection(caseData, FastTrack.fastClaimRoadTrafficAccident))
+            .setHasPaymentProtectionInsurance(hasPpi)
+            .setFastTrackPPI(hasPpi ? caseData.getFastTrackPPI() : null)
             .setFastTrackJudgesRecital(caseData.getFastTrackJudgesRecital())
             .setFastTrackDisclosureOfDocuments(caseData.getFastTrackDisclosureOfDocuments())
             .setFastTrackSchedulesOfLoss(caseData.getFastTrackSchedulesOfLoss())
@@ -93,7 +96,9 @@ public class SdoFastTrackTemplateService {
             .setWelshLanguageDescription(Optional.ofNullable(caseData.getSdoR2FastTrackUseOfWelshLanguage())
                                           .map(SdoR2WelshLanguageUsage::getDescription).orElse(null))
             .setSdoR2WitnessesOfFact(caseData.getSdoR2FastTrackWitnessOfFact())
-            .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire());
+            .setSdoR2FastTrackCreditHire(caseData.getSdoR2FastTrackCreditHire())
+            .setShowPenalNotice(hasVariable(caseData, FastTrackVariable.PENAL_NOTICE_TOGGLE))
+            .setPenalNoticeText(caseData.getFastTrackPenalNotice());
 
         template
             .setHearingLocation(locationHelper.getHearingLocation(
