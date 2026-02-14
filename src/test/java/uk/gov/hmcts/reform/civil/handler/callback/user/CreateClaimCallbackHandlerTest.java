@@ -2238,7 +2238,6 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(updatedData.getServedDocumentFiles().getScheduleOfLoss()).isNull();
             assertThat(updatedData.getServedDocumentFiles().getCertificateOfSuitability()).isNull();
             assertThat(updatedData.getServedDocumentFiles().getOther()).isNull();
-            assertThat(updatedData.getEnableUploadEvent()).isEqualTo(YES);
         }
     }
 

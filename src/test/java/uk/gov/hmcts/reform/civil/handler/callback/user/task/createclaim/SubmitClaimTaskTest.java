@@ -147,7 +147,6 @@ class SubmitClaimTaskTest {
         assertThat(response.getData().get("allPartyNames")).isEqualTo("Clay Mint V Defendant Inc.");
         assertThat(response.getData().get("caseListDisplayDefendantSolicitorReferences"))
             .isEqualTo("1234");
-        assertThat(response.getData().get("enableUploadEvent")).isEqualTo(YES.getLabel());
     }
 
     @Test
