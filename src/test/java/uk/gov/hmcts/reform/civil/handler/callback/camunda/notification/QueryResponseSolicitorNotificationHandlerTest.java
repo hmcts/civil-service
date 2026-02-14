@@ -120,9 +120,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueriesCollection)
@@ -152,9 +152,9 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueries)
@@ -509,7 +509,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -538,7 +538,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
                     new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();

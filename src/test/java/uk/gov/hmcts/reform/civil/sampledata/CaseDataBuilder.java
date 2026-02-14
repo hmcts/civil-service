@@ -2535,11 +2535,11 @@ public class CaseDataBuilder {
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
             .build();
-        claimFee = Fee.builder()
-            .version("1")
-            .code("CODE")
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .build();
+        claimFee = new Fee()
+            .setVersion("1")
+            .setCode("CODE")
+            .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+            ;
         applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
         respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
         respondent1Represented = YES;
@@ -2558,7 +2558,7 @@ public class CaseDataBuilder {
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
-        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
@@ -2586,11 +2586,11 @@ public class CaseDataBuilder {
         applicantSolicitor1PbaAccounts = DynamicList.builder()
             .value(DynamicListElement.builder().label("PBA0077597").build())
             .build();
-        claimFee = Fee.builder()
-            .version("1")
-            .code("CODE")
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .build();
+        claimFee = new Fee()
+            .setVersion("1")
+            .setCode("CODE")
+            .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+            ;
         applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
         respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
         respondent1Represented = YES;
@@ -2609,7 +2609,7 @@ public class CaseDataBuilder {
             .build();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
-        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
@@ -2942,20 +2942,20 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateClaimantRequestsDJWithUnavailableDates() {
-        HearingDates singleDate = HearingDates.builder()
-            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
-            .hearingUnavailableUntil(LocalDate.of(2023, 8, 20))
-            .build();
+        HearingDates singleDate = new HearingDates()
+            .setHearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .setHearingUnavailableUntil(LocalDate.of(2023, 8, 20))
+            ;
 
-        HearingDates dateRange = HearingDates.builder()
-            .hearingUnavailableFrom(LocalDate.of(2023, 8, 20))
-            .hearingUnavailableUntil(LocalDate.of(2023, 8, 22))
-            .build();
+        HearingDates dateRange = new HearingDates()
+            .setHearingUnavailableFrom(LocalDate.of(2023, 8, 20))
+            .setHearingUnavailableUntil(LocalDate.of(2023, 8, 22))
+            ;
 
-        this.hearingSupportRequirementsDJ = HearingSupportRequirementsDJ.builder()
-            .hearingUnavailableDates(YES)
-            .hearingDates(wrapElements(List.of(singleDate, dateRange)))
-            .build();
+        this.hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ()
+            .setHearingUnavailableDates(YES)
+            .setHearingDates(wrapElements(List.of(singleDate, dateRange)))
+            ;
 
         this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
             .documentName("test")
@@ -5436,7 +5436,7 @@ public class CaseDataBuilder {
                 new ClaimantMediationLip()
                     .setHasAgreedFreeMediation(MediationDecision.Yes));
 
-        mediation = Mediation.builder().unsuccessfulMediationReason("Unsuccessful").build();
+        mediation = new Mediation().setUnsuccessfulMediationReason("Unsuccessful");
 
         return this;
     }
@@ -5449,8 +5449,8 @@ public class CaseDataBuilder {
                 new ClaimantMediationLip()
                     .setHasAgreedFreeMediation(MediationDecision.Yes));
 
-        mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
-            List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build();
+        mediation = new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
+            List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE));
 
         return this;
     }
@@ -5469,14 +5469,11 @@ public class CaseDataBuilder {
                 new ClaimantMediationLip()
                     .setHasAgreedFreeMediation(MediationDecision.Yes));
 
-        mediation = Mediation.builder()
-            .mediationSuccessful(MediationSuccessful.builder()
-                .mediationSettlementAgreedAt(now())
-                .mediationAgreement(MediationAgreementDocument.builder()
-                    .name("mediation")
-                    .build())
-                .build())
-            .build();
+        mediation = new Mediation().setMediationSuccessful(new MediationSuccessful().setMediationSettlementAgreedAt(now())
+                .setMediationAgreement(new MediationAgreementDocument().setName("mediation")
+                    )
+                )
+            ;
 
         return this;
     }
@@ -5507,43 +5504,40 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addApplicant1LitigationFriend() {
-        this.applicant1LitigationFriend = LitigationFriend.builder()
-            .partyID("app-1-litfriend-party-id")
-            .fullName("Mr Applicant Litigation Friend")
-            .firstName("Applicant")
-            .lastName("Litigation Friend")
-            .primaryAddress(AddressBuilder.defaults().build())
-            .hasSameAddressAsLitigant(YES)
-            .certificateOfSuitability(List.of())
-            .build();
+        this.applicant1LitigationFriend = new LitigationFriend().setPartyID("app-1-litfriend-party-id")
+            .setFullName("Mr Applicant Litigation Friend")
+            .setFirstName("Applicant")
+            .setLastName("Litigation Friend")
+            .setPrimaryAddress(AddressBuilder.defaults().build())
+            .setHasSameAddressAsLitigant(YES)
+            .setCertificateOfSuitability(List.of())
+            ;
         this.applicant1LitigationFriendRequired = YES;
         return this;
     }
 
     public CaseDataBuilder addApplicant2LitigationFriend() {
-        this.applicant2LitigationFriend = LitigationFriend.builder()
-            .partyID("app-2-litfriend-party-id")
-            .fullName("Mr Applicant Litigation Friend")
-            .firstName("Applicant Two")
-            .lastName("Litigation Friend")
-            .primaryAddress(AddressBuilder.defaults().build())
-            .hasSameAddressAsLitigant(YES)
-            .certificateOfSuitability(List.of())
-            .build();
+        this.applicant2LitigationFriend = new LitigationFriend().setPartyID("app-2-litfriend-party-id")
+            .setFullName("Mr Applicant Litigation Friend")
+            .setFirstName("Applicant Two")
+            .setLastName("Litigation Friend")
+            .setPrimaryAddress(AddressBuilder.defaults().build())
+            .setHasSameAddressAsLitigant(YES)
+            .setCertificateOfSuitability(List.of())
+            ;
         this.applicant2LitigationFriendRequired = YES;
         return this;
     }
 
     public CaseDataBuilder addRespondent1LitigationFriend() {
-        this.respondent1LitigationFriend = LitigationFriend.builder()
-            .partyID("res-1-litfriend-party-id")
-            .fullName("Mr Litigation Friend")
-            .firstName("Litigation")
-            .lastName("Friend")
-            .primaryAddress(AddressBuilder.defaults().build())
-            .hasSameAddressAsLitigant(YES)
-            .certificateOfSuitability(List.of())
-            .build();
+        this.respondent1LitigationFriend = new LitigationFriend().setPartyID("res-1-litfriend-party-id")
+            .setFullName("Mr Litigation Friend")
+            .setFirstName("Litigation")
+            .setLastName("Friend")
+            .setPrimaryAddress(AddressBuilder.defaults().build())
+            .setHasSameAddressAsLitigant(YES)
+            .setCertificateOfSuitability(List.of())
+            ;
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent1LitigationFriendDate = tomrrowsDateTime;
         this.respondent1LitigationFriendCreatedDate = tomrrowsDateTime;
@@ -5551,22 +5545,20 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addGenericRespondentLitigationFriend() {
-        this.genericLitigationFriend = LitigationFriend.builder()
-            .fullName("Mr Litigation Friend")
-            .build();
+        this.genericLitigationFriend = new LitigationFriend().setFullName("Mr Litigation Friend")
+            ;
         return this;
     }
 
     public CaseDataBuilder addRespondent2LitigationFriend() {
-        this.respondent2LitigationFriend = LitigationFriend.builder()
-            .partyID("res-2-litfriend-party-id")
-            .fullName("Mr Litigation Friend")
-            .firstName("Litigation")
-            .lastName("Friend")
-            .primaryAddress(AddressBuilder.defaults().build())
-            .hasSameAddressAsLitigant(YES)
-            .certificateOfSuitability(List.of())
-            .build();
+        this.respondent2LitigationFriend = new LitigationFriend().setPartyID("res-2-litfriend-party-id")
+            .setFullName("Mr Litigation Friend")
+            .setFirstName("Litigation")
+            .setLastName("Friend")
+            .setPrimaryAddress(AddressBuilder.defaults().build())
+            .setHasSameAddressAsLitigant(YES)
+            .setCertificateOfSuitability(List.of())
+            ;
         LocalDateTime tomrrowsDateTime = LocalDateTime.now().plusDays(1);
         this.respondent2LitigationFriendDate = tomrrowsDateTime;
         this.respondent2LitigationFriendCreatedDate = tomrrowsDateTime;
@@ -5574,12 +5566,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addBothRespondent1LitigationFriend() {
-        this.respondent1LitigationFriend = LitigationFriend.builder()
-            .fullName("Mr Litigation Friend")
-            .build();
-        this.respondent2LitigationFriend = LitigationFriend.builder()
-            .fullName("Mr Litigation Friend 2")
-            .build();
+        this.respondent1LitigationFriend = new LitigationFriend().setFullName("Mr Litigation Friend")
+            ;
+        this.respondent2LitigationFriend = new LitigationFriend().setFullName("Mr Litigation Friend 2")
+            ;
         return this;
     }
 
@@ -5783,10 +5773,9 @@ public class CaseDataBuilder {
 
         respondToClaimAdmitPartUnemployedLRspec = UnemployedComplexTypeLRspec.builder()
             .unemployedComplexTypeRequired("No")
-            .lengthOfUnemployment(LengthOfUnemploymentComplexTypeLRspec.builder()
-                .numberOfMonthsInUnemployment("1.5")
-                .numberOfYearsInUnemployment("2.6")
-                .build())
+            .lengthOfUnemployment(new LengthOfUnemploymentComplexTypeLRspec().setNumberOfMonthsInUnemployment("1.5")
+                .setNumberOfYearsInUnemployment("2.6")
+                )
             .build();
 
         return this;
@@ -5982,15 +5971,15 @@ public class CaseDataBuilder {
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100)).setCode("CODE"))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
@@ -5999,7 +5988,7 @@ public class CaseDataBuilder {
     public CaseData buildCuiCaseDataWithFee() {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100)).code("CODE").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100)).setCode("CODE"))
             .build();
     }
 
@@ -6022,11 +6011,11 @@ public class CaseDataBuilder {
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build()).build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            ).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
     }
@@ -6040,21 +6029,21 @@ public class CaseDataBuilder {
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
-                    Fee.builder()
-                        .code("FE203")
-                        .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                        .version("1")
-                        .build())
+                    new Fee()
+                        .setCode("FE203")
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                        .setVersion("1")
+                        )
                 .serviceReqReference(CUSTOMER_REFERENCE).build())
             .build();
     }
@@ -6064,11 +6053,11 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
-                    Fee.builder()
-                        .code("FE203")
-                        .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                        .version("1")
-                        .build())
+                    new Fee()
+                        .setCode("FE203")
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                        .setVersion("1")
+                        )
                 .paymentDetails(PaymentDetails.builder()
                     .status(FAILED)
                     .build())
@@ -6081,11 +6070,11 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
-                    Fee.builder()
-                        .code("FE203")
-                        .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                        .version("1")
-                        .build())
+                    new Fee()
+                        .setCode("FE203")
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                        .setVersion("1")
+                        )
                 .paymentDetails(PaymentDetails.builder()
                     .status(SUCCESS)
                     .build())
@@ -6114,11 +6103,11 @@ public class CaseDataBuilder {
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
@@ -6135,11 +6124,11 @@ public class CaseDataBuilder {
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
@@ -6167,21 +6156,21 @@ public class CaseDataBuilder {
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
-                    Fee.builder()
-                        .code("FE203")
-                        .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                        .version("1")
-                        .build())
+                    new Fee()
+                        .setCode("FE203")
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                        .setVersion("1")
+                        )
                 .serviceReqReference(CUSTOMER_REFERENCE).build())
             .build();
     }
@@ -6194,11 +6183,11 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdState(PENDING_CASE_ISSUED)
             .claimFee(
-                Fee.builder()
-                    .code("FE203")
-                    .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                    .version("1")
-                    .build())
+                new Fee()
+                    .setCode("FE203")
+                    .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                    .setVersion("1")
+                    )
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .applicant1(Party.builder()
                 .individualFirstName("First name")
@@ -6233,11 +6222,11 @@ public class CaseDataBuilder {
                         .customerReference(CUSTOMER_REFERENCE)
                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
@@ -6264,11 +6253,11 @@ public class CaseDataBuilder {
                         .customerReference(CUSTOMER_REFERENCE)
                         .build())
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
             .build();
@@ -6779,12 +6768,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withApplicant1LitigationFriendFlags() {
-        this.applicant1LitigationFriend = applicant1LitigationFriend.toBuilder()
-            .flags(new Flags()
+        this.applicant1LitigationFriend = applicant1LitigationFriend.copy()
+            .setFlags(new Flags()
                 .setPartyName(applicant1LitigationFriend.getFullName())
                 .setRoleOnCase("Claimant 1 Litigation Friend")
-                .setDetails(flagDetails()))
-            .build();
+                .setDetails(flagDetails()));
         return this;
     }
 
@@ -6824,12 +6812,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withApplicant2LitigationFriendFlags() {
-        this.applicant2LitigationFriend = applicant2LitigationFriend.toBuilder()
-            .flags(new Flags()
+        this.applicant2LitigationFriend = applicant2LitigationFriend.copy()
+            .setFlags(new Flags()
                 .setPartyName(applicant2LitigationFriend.getFullName())
                 .setRoleOnCase("Claimant 2 Litigation Friend")
-                .setDetails(flagDetails()))
-            .build();
+                .setDetails(flagDetails()));
         return this;
     }
 
@@ -6838,13 +6825,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withRespondent1LitigationFriendFlags(List<Element<FlagDetail>> flags) {
-        this.respondent1LitigationFriend = respondent1LitigationFriend.toBuilder()
-            .partyID("res-1-litfriend-party-id")
-            .flags(new Flags()
+        this.respondent1LitigationFriend = respondent1LitigationFriend.copy()
+            .setPartyID("res-1-litfriend-party-id")
+            .setFlags(new Flags()
                 .setPartyName(respondent1LitigationFriend.getFullName())
                 .setRoleOnCase("Defendant 1 Litigation Friend")
-                .setDetails(flags))
-            .build();
+                .setDetails(flags));
         return this;
     }
 
@@ -6927,12 +6913,11 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withRespondent2LitigationFriendFlags() {
-        this.respondent2LitigationFriend = respondent2LitigationFriend.toBuilder()
-            .flags(new Flags()
+        this.respondent2LitigationFriend = respondent2LitigationFriend.copy()
+            .setFlags(new Flags()
                 .setPartyName(respondent2LitigationFriend.getFullName())
                 .setRoleOnCase("Defendant 2 Litigation Friend")
-                .setDetails(flagDetails()))
-            .build();
+                .setDetails(flagDetails()));
         return this;
     }
 

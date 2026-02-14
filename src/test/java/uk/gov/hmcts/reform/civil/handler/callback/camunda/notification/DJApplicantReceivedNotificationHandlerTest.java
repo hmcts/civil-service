@@ -199,10 +199,10 @@ class DJApplicantReceivedNotificationHandlerTest {
                 .respondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .claimantUserDetails(IdamUserDetails.builder()
-                                         .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                         .email("test@gmail.com")
-                                         .build())
+                .claimantUserDetails(new IdamUserDetails()
+                                         .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                         .setEmail("test@gmail.com")
+                                         )
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

@@ -110,7 +110,7 @@ public class ClaimantResponseUtilsTest {
                                           .firstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .paymentAmount(new BigDecimal(10000)).build())
             .issueDate(LocalDate.now())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .defenceAdmitPartPaymentTimeRouteRequired(SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
@@ -139,7 +139,7 @@ public class ClaimantResponseUtilsTest {
                                           .firstRepaymentDate(LocalDate.of(2024, 1, 1))
                                           .paymentAmount(new BigDecimal(10000)).build())
             .issueDate(LocalDate.now())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
@@ -156,8 +156,8 @@ public class ClaimantResponseUtilsTest {
                 .firstRepaymentDate(LocalDate.of(2024, 1, 1))
                 .paymentAmount(new BigDecimal(10000)).build())
             .issueDate(LocalDate.now())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
-            .fixedCosts(FixedCosts.builder().claimFixedCosts(YesOrNo.YES).fixedCostAmount("5000").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
+            .fixedCosts(new FixedCosts().setClaimFixedCosts(YesOrNo.YES).setFixedCostAmount("5000"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .build();
@@ -172,7 +172,7 @@ public class ClaimantResponseUtilsTest {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
@@ -187,13 +187,13 @@ public class ClaimantResponseUtilsTest {
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.TEN);
         CaseData caseData = CaseData.builder()
             .issueDate(LocalDate.now())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(2000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(2000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .totalClaimAmount(BigDecimal.valueOf(1000))
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(1000))
             .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES)))
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .fixedCosts(FixedCosts.builder().claimFixedCosts(YesOrNo.NO).build())
+            .fixedCosts(new FixedCosts().setClaimFixedCosts(YesOrNo.NO))
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(100)))
             .build();
 

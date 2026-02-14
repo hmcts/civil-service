@@ -198,8 +198,8 @@ public class GaPaymentRequestUpdateCallbackService {
 
         if (generalAppParentCaseLink == null
             || StringUtils.isBlank(generalAppParentCaseLink.getCaseReference())) {
-            updatedData.put("generalAppParentCaseLink", GeneralAppParentCaseLink.builder()
-                .caseReference(caseId).build());
+            updatedData.put("generalAppParentCaseLink", new GeneralAppParentCaseLink()
+                .setCaseReference(caseId));
         }
 
         return CaseDataContent.builder()

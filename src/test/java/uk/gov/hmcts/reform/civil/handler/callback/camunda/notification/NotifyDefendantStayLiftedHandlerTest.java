@@ -151,7 +151,7 @@ class NotifyDefendantStayLiftedHandlerTest {
 
         private CaseDataBuilder commonCaseData() {
             return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
                 .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                                 .type(Party.Type.INDIVIDUAL).build())
                 .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
@@ -258,7 +258,7 @@ class NotifyDefendantStayLiftedHandlerTest {
     @Test
     void checkCamundaActivityDefendantTest() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build()).build();
@@ -269,7 +269,7 @@ class NotifyDefendantStayLiftedHandlerTest {
     @Test
     void checkCamundaActivityDefendant2Test() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build()).build();

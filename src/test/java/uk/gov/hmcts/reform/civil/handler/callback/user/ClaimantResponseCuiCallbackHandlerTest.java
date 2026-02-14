@@ -385,9 +385,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1Represented(NO);
             caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
-            caseData.setClaimFee(Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(10000))
-                .build());
+            caseData.setClaimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
@@ -450,9 +448,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
-            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
-                .nameOfAirline("Sri Lankan")
-                .build());
+            caseData.setFlightDelayDetails(new FlightDelayDetails().setNameOfAirline("Sri Lankan"));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
@@ -472,9 +468,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
-            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
-                .nameOfAirline("INVALID_AIRLINE")
-                .build());
+            caseData.setFlightDelayDetails(new FlightDelayDetails().setNameOfAirline("INVALID_AIRLINE"));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);

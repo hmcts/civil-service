@@ -157,8 +157,8 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
-        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(1000)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(new Fee().setCalculatedAmountInPence(
+            BigDecimal.valueOf(1000)));
         when(civilStitchService.generateStitchedCaseDocument(
             anyList(), anyString(), anyLong(), eq(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER),
             anyString())).thenReturn(STITCHED_DOC);
@@ -183,9 +183,9 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     void shouldGetTemplateFeesCorrectly() {
         //Given
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1400)));
         //When
         JudgmentByAdmissionLiPDefendantLetter judgmentByAdmissionLiPDefendantLetter
             = generator.getTemplateData(CASE_DATA);

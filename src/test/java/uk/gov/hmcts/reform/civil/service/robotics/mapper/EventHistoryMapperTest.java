@@ -7864,7 +7864,7 @@ class EventHistoryMapperTest {
             caseData.setRespondent2(PartyBuilder.builder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(DynamicList.builder()
                                              .value(DynamicListElement.builder()
@@ -7884,7 +7884,7 @@ class EventHistoryMapperTest {
             caseData.setRespondent2(PartyBuilder.builder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(DynamicList.builder()
                                              .value(DynamicListElement.builder()
@@ -7921,7 +7921,7 @@ class EventHistoryMapperTest {
                     + "Subtotal \n £1172.00\n\n ### Amount"
                     + " already paid \n£100.00\n ## Total still owed \n £1072.00");
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(DynamicList.builder()
                                                  .value(DynamicListElement.builder()
@@ -7951,7 +7951,7 @@ class EventHistoryMapperTest {
                     + "Subtotal \n £1172.00\n\n ### Amount"
                     + " already paid \n£100.00\n ## Total still owed \n £1072.00");
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
@@ -7989,7 +7989,7 @@ class EventHistoryMapperTest {
                     + " already paid \n£100.00\n ## Total still owed \n £1072.00");
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(DynamicList.builder()
                                                  .value(DynamicListElement.builder()
@@ -8029,7 +8029,7 @@ class EventHistoryMapperTest {
                     + "Subtotal \n £1172.00\n\n ### Amount"
                     + " already paid \n£100.00\n ## Total still owed \n £1072.00");
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(DynamicList.builder()
                                                  .value(DynamicListElement.builder()
@@ -8069,7 +8069,7 @@ class EventHistoryMapperTest {
                     + "Subtotal \n £1172.00\n\n ### Amount"
                     + " already paid \n£100.00\n ## Total still owed \n £1072.00");
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(DynamicList.builder()
                                                  .value(DynamicListElement.builder()

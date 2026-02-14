@@ -102,13 +102,13 @@ public class CaseFlagUtils {
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
         return litFriendToUpdate != null ? litFriendToUpdate.getFlags() != null ? litFriendToUpdate
-            : litFriendToUpdate.toBuilder().flags(createFlags(
+            : litFriendToUpdate.copy().setFlags(createFlags(
             // LitigationFriend was updated to split fullName into firstname and lastname for H&L ==================
             // ToDo: Remove the use of fullName after H&L changes are default =====================================
             litFriendToUpdate.getFullName() != null ? litFriendToUpdate.getFullName()
                 // ====================================================================================================
                 : formattedPartyNameForFlags(litFriendToUpdate.getFirstName(), litFriendToUpdate.getLastName()),
-            roleOnCase)).build() : null;
+            roleOnCase)) : null;
     }
 
     private static List<Element<PartyFlagStructure>> getTopLevelFieldForWitnessesWithFlagsStructure(
@@ -368,8 +368,8 @@ public class CaseFlagUtils {
                 .setRoleOnCase(existingFlags.getRoleOnCase())
                 .setDetails(existingFlags.getDetails())
             : createFlags(partyName, null);
-        return litigationFriend.toBuilder()
-            .flags(updatedFlags).build();
+        return litigationFriend.copy()
+            .setFlags(updatedFlags);
     }
 
     public static List<FlagDetail> getAllCaseFlags(CaseData caseData) {

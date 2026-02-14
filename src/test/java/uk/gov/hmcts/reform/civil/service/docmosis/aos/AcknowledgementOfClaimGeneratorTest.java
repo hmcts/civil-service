@@ -405,7 +405,7 @@ class AcknowledgementOfClaimGeneratorTest {
         @Test
         void whenCaseIsAtClaimAcknowledge_shouldGetAcknowledgementOfClaimFormData() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent1LitigationFriend(LitigationFriend.builder().fullName("LF name").build())
+                .respondent1LitigationFriend(new LitigationFriend().setFullName("LF name"))
                 .build();
 
             var templateData = generator.getTemplateData(caseData);

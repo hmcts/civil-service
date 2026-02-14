@@ -261,7 +261,7 @@ class AssistedOrderFormGeneratorTest {
         appealShowOption.add(FinalOrderShowToggle.SHOW);
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775"))
             .claimant1PartyName("ClaimantName")
             .defendant1PartyName("defendant1PartyName")
             .claimant2PartyName("Test Claimant2 Name")

@@ -75,12 +75,12 @@ class NotifyClaimantStayLiftedHandlerTest {
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
                              .type(Party.Type.INDIVIDUAL).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build());
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"));
     }
 
     private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
@@ -90,7 +90,7 @@ class NotifyClaimantStayLiftedHandlerTest {
             .setRespondent1ResponseLanguage(claimantBilingualLanguagePreference);
         return commonCaseData()
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
             .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
             .build().toBuilder()
             .caseDataLiP(new CaseDataLiP()
@@ -108,7 +108,7 @@ class NotifyClaimantStayLiftedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
             .build();
@@ -144,7 +144,7 @@ class NotifyClaimantStayLiftedHandlerTest {
         when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = CallbackParams.builder().caseData(caseData).build();
         CallbackResponse response = handler.sendNotification(params);

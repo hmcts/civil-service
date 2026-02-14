@@ -59,8 +59,8 @@ class GeneralAppFeesServiceTest {
 
     private static final BigDecimal TEST_FEE_AMOUNT_POUNDS = new BigDecimal("108.00");
     private static final BigDecimal TEST_FEE_AMOUNT_PENCE = new BigDecimal(TEST_FEE_AMOUNT_POUNDS.intValue() * 100);
-    private static final FeeLookupResponseDto FEE_POUNDS = FeeLookupResponseDto.builder()
-        .feeAmount(TEST_FEE_AMOUNT_POUNDS).code(TEST_FEE_CODE).version(1).build();
+    private static final FeeLookupResponseDto FEE_POUNDS = new FeeLookupResponseDto()
+        .setFeeAmount(TEST_FEE_AMOUNT_POUNDS).setCode(TEST_FEE_CODE).setVersion(1);
     private static final Fee FEE_PENCE;
     public static final String FREE_REF = "FREE";
     private static final Fee FEE_PENCE_0;
@@ -131,8 +131,8 @@ class GeneralAppFeesServiceTest {
             when(feesConfiguration.getJurisdiction1()).thenReturn(CIVIL_JURISDICTION);
             when(feesConfiguration.getJurisdiction2()).thenReturn(CIVIL_JURISDICTION);
             when(feesConfiguration.getWithNoticeKeyword()).thenReturn(GENERAL_APPLICATION_WITH_NOTICE);
-            FeeLookupResponseDto feeLookupResponse = FeeLookupResponseDto.builder()
-                .code(TEST_FEE_CODE).version(1).build();
+            FeeLookupResponseDto feeLookupResponse = new FeeLookupResponseDto()
+                .setCode(TEST_FEE_CODE).setVersion(1);
             when(feesApiClient.lookupFee(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(feeLookupResponse);
 

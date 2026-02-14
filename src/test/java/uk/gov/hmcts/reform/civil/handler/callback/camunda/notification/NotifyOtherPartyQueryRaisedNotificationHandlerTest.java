@@ -337,7 +337,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                                          .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                                      .setRespondent1ResponseLanguage("WELSH")))
                         .respondent1Represented(YesOrNo.NO)
-                        .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                        .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                         .queries(query)
                         .businessProcess(new BusinessProcess().setProcessInstanceId("123"))
                         .build();
@@ -347,7 +347,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                                          .setRespondent1LiPResponse(new RespondentLiPResponse()
                                                                      .setRespondent1ResponseLanguage("ENGLSH")))
                         .respondent1Represented(YesOrNo.NO)
-                        .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                        .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                         .queries(query)
                         .businessProcess(new BusinessProcess().setProcessInstanceId("123"))
                         .build();
@@ -378,7 +378,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
                     .respondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.YES)
-                    .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                    .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                     .queries(query)
                     .businessProcess(new BusinessProcess()
                                          .setProcessInstanceId("123"))
@@ -544,9 +544,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         private CaseData createCaseDataWithQueries1v1() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .email("applicant@email.com")
-                                                    .build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                    .setEmail("applicant@email.com")
+                                                    )
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
                 .queries(createCaseQueries(null, wrapElements(
                     createCaseMessage("1"),
@@ -560,9 +560,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         private CaseData createCaseDataWithQueries1v1AtStateClaimIssued() {
             return CaseDataBuilder.builder().atStateClaimIssued().build()
                 .toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .email("applicant@email.com")
-                                                    .build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                    .setEmail("applicant@email.com")
+                                                    )
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
                 .queries(createCaseQueries(null, wrapElements(
                     createCaseMessage("1"),
@@ -576,9 +576,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         private CaseData createCaseDataWithQueries1v2SameSol() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .email("applicant@email.com")
-                                                    .build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                    .setEmail("applicant@email.com")
+                                                    )
                 .respondent1(PartyBuilder.builder().build())
                 .respondent2(PartyBuilder.builder().build())
                 .addRespondent2(YesOrNo.YES)
@@ -602,9 +602,9 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 .respondent2(PartyBuilder.builder().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                    .email("applicant@email.com")
-                                                    .build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                    .setEmail("applicant@email.com")
+                                                    )
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
                 .respondentSolicitor2EmailAddress("respondent2@email.com")
                 .queries(createCaseQueries(null, wrapElements(

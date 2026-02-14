@@ -42,7 +42,7 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@example.com"))
                 .build();
 
         assertThat(generator.getEmailAddress(caseData)).isEqualTo(APPLICANT_EMAIL);

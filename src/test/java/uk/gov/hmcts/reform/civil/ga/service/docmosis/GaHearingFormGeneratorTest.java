@@ -215,7 +215,7 @@ class GaHearingFormGeneratorTest {
     @Test
     void test_getCaseNumberFormatted() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build()).build();
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775")).build();
         String formattedCaseNumber = generator.getCaseNumberFormatted(caseData);
         assertThat(formattedCaseNumber).isEqualTo("1644-4957-3908-7775");
     }

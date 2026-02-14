@@ -42,7 +42,7 @@ class CaseNameUtilsTest {
 
         @Test
         void shouldReturnExpectedLitigationFriendName_withValidLitigationFriend() {
-            var litigationFriend = LitigationFriend.builder().firstName("Litigation").lastName("Friend").build();
+            var litigationFriend = new LitigationFriend().setFirstName("Litigation").setLastName("Friend");
 
             var actual = CaseNameUtils.getFormattedLitigationFriendName(litigationFriend);
 
@@ -76,10 +76,9 @@ class CaseNameUtilsTest {
                 .individualLastName("One")
                 .type(Party.Type.INDIVIDUAL).build();
 
-            applicant1LitigationFriend = LitigationFriend.builder()
-                .firstName("ApplicantOne")
-                .lastName("LitigationFriend")
-                .build();
+            applicant1LitigationFriend = new LitigationFriend().setFirstName("ApplicantOne")
+                .setLastName("LitigationFriend")
+                ;
 
             applicant2 = Party.builder()
                 .individualFirstName("Applicant")
@@ -87,10 +86,9 @@ class CaseNameUtilsTest {
                 .type(Party.Type.INDIVIDUAL)
                 .build();
 
-            applicant2LitigationFriend = LitigationFriend.builder()
-                .firstName("ApplicantTwo")
-                .lastName("LitigationFriend")
-                .build();
+            applicant2LitigationFriend = new LitigationFriend().setFirstName("ApplicantTwo")
+                .setLastName("LitigationFriend")
+                ;
 
             respondent1 = Party.builder()
                 .individualFirstName("Respondent")
@@ -98,10 +96,9 @@ class CaseNameUtilsTest {
                 .type(Party.Type.INDIVIDUAL)
                 .build();
 
-            respondent1LitigationFriend = LitigationFriend.builder()
-                .firstName("RespondentOne")
-                .lastName("LitigationFriend")
-                .build();
+            respondent1LitigationFriend = new LitigationFriend().setFirstName("RespondentOne")
+                .setLastName("LitigationFriend")
+                ;
 
             respondent2 = Party.builder()
                 .individualFirstName("Respondent")
@@ -109,10 +106,9 @@ class CaseNameUtilsTest {
                 .type(Party.Type.INDIVIDUAL)
                 .build();
 
-            respondent2LitigationFriend = LitigationFriend.builder()
-                .firstName("RespondentTwo")
-                .lastName("LitigationFriend")
-                .build();
+            respondent2LitigationFriend = new LitigationFriend().setFirstName("RespondentTwo")
+                .setLastName("LitigationFriend")
+                ;
         }
 
         @Test

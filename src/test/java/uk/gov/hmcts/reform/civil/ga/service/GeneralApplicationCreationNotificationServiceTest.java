@@ -121,7 +121,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFee() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .build();
 
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
@@ -138,7 +138,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .generalAppRespondentSolicitors(List.of())
                 .build();
 
@@ -154,7 +154,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldSendIfGa_Urgent_WithNoticeAndFreeFeeV2Null() {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .generalAppRespondentSolicitors(null)
                 .build();
 
@@ -181,7 +181,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
 
@@ -210,7 +210,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
 
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .generalAppRespondentSolicitors(respondentSols)
                 .build();
 
@@ -229,7 +229,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             GeneralApplicationCaseData caseData = getCaseData(true).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -247,7 +247,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
         void notificationShouldNotSendIfGa_NonUrgent_WithNoticeAndFreeFee() {
             GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .build();
 
             when(solicitorEmailValidation
@@ -262,7 +262,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
             GeneralApplicationCaseData caseData = getCaseData(false).toBuilder()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -281,7 +281,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .parentClaimantIsApplicant(YES)
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -306,7 +306,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .parentClaimantIsApplicant(NO)
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -331,7 +331,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .isGaRespondentOneLip(YES)
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -356,7 +356,7 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .isGaRespondentOneLip(YES)
                 .respondentBilingualLanguagePreference(YES)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAID").build())
+                                          .fee(new Fee().setCode("PAID"))
                                           .paymentDetails(PaymentDetails.builder().status(
                                               PaymentStatus.SUCCESS).build()).build())
                 .build();
@@ -495,11 +495,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                        .organisation(Organisation.builder().organisationID("3").build())
                                                        .build())
-                    .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink
-                            .builder()
-                            .caseReference(CASE_REFERENCE.toString())
-                            .build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                                  .setCaseReference(CASE_REFERENCE.toString()))
                     .generalAppDeadlineNotificationDate(DUMMY_DATE)
                     .build();
             } else {
@@ -525,11 +522,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                     .respondent2OrganisationPolicy(OrganisationPolicy.builder()
                                                        .organisation(Organisation.builder().organisationID("3").build())
                                                        .build())
-                    .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink
-                            .builder()
-                            .caseReference(CASE_REFERENCE.toString())
-                            .build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                                  .setCaseReference(CASE_REFERENCE.toString()))
                     .generalAppDeadlineNotificationDate(DUMMY_DATE)
                     .build();
             }

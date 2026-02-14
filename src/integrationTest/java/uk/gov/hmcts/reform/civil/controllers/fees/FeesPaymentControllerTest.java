@@ -64,10 +64,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
                 .data(Map.of(
                         "hearingFeePBADetails",
                         SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                                .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
+                                .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
                                 .build(),
                         "hearingFee",
-                        Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build()
+                        new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))
                 )).build();
 
         when(coreCaseDataService.getCase(CASE_REFERENCE)).thenReturn(expectedCaseDetails);
@@ -130,10 +130,10 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
                 .data(Map.of(
                     "generalAppPBADetails",
                     GAPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                        .fee(Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build())
+                        .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
                         .build(),
                     "generalAppFee",
-                    Fee.builder().calculatedAmountInPence(new BigDecimal("23200")).build(),
+                    new Fee().setCalculatedAmountInPence(new BigDecimal("23200")),
                     "parentCaseReference",
                     CASE_REFERENCE
                 )).build();

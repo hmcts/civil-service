@@ -46,12 +46,16 @@ public class RepresentedLitigantPopulatorTest {
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
         addMediationInfoRepresented(buildClaimant1(YES));
 
-        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
-
         Organisation organisation = Organisation.builder().build();
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(organisation)
             .build();
+
+        MediationContactInformation contactInfo = new MediationContactInformation()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setTelephoneNumber("0123456789")
+            .setEmailAddress("john.doe@example.com");
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -97,12 +101,16 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleUnavailableDatesCorrectly() {
+        MediationContactInformation contactInfo = new MediationContactInformation()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setTelephoneNumber("0123456789")
+            .setEmailAddress("john.doe@example.com");
+
         Organisation organisation = Organisation.builder().build();
         OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
             .organisation(organisation)
             .build();
-
-        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
         UnavailableDate unavailableDate = UnavailableDate.builder()

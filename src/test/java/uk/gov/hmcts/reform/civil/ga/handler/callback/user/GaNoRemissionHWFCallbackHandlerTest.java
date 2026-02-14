@@ -49,8 +49,8 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
             .ccdState(AWAITING_RESPONDENT_RESPONSE)
             .hwfFeeType(FeeType.APPLICATION)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                    Fee.builder()
-                        .calculatedAmountInPence(BigDecimal.valueOf(500)).code("FEE205").build())
+                    new Fee()
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(500)).setCode("FEE205"))
                                       .build())
             .gaHwfDetails(HelpWithFeesDetails.builder()
                                .remissionAmount(BigDecimal.valueOf(500))

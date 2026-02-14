@@ -901,7 +901,7 @@ class CaseDataTest {
     void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE))
             .build();
         //When
         BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
@@ -1525,7 +1525,7 @@ class CaseDataTest {
     @Test
     void shouldReturnApplicantSolicitor1UserDetailsEmail() {
         CaseData caseData = CaseData.builder().applicantSolicitor1UserDetails(
-            IdamUserDetails.builder().email("test@test.com").build()
+            new IdamUserDetails().setEmail("test@test.com")
         ).build();
         assertEquals("test@test.com", caseData.getApplicantSolicitor1UserDetailsEmail());
     }
@@ -1539,7 +1539,7 @@ class CaseDataTest {
     @Test
     void shouldReturnClaimantUserDetailsEmail() {
         CaseData caseData = CaseData.builder().claimantUserDetails(
-            IdamUserDetails.builder().email("test@test.com").build()
+            new IdamUserDetails().setEmail("test@test.com")
         ).build();
         assertEquals("test@test.com", caseData.getClaimantUserDetailsEmail());
     }

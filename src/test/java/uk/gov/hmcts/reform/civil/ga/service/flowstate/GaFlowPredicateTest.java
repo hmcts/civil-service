@@ -154,7 +154,7 @@ public class GaFlowPredicateTest {
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                         .paymentDetails(PaymentDetails.builder()
                                                             .status(PaymentStatus.SUCCESS).build())
-                                        .fee(Fee.builder().code("FREE").build()).build())
+                                        .fee(new Fee().setCode("FREE")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);
@@ -170,7 +170,7 @@ public class GaFlowPredicateTest {
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
-                                      .fee(Fee.builder().code("Not_Free").build()).build())
+                                      .fee(new Fee().setCode("Not_Free")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);
