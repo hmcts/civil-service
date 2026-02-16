@@ -128,6 +128,7 @@ java:
             CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "org-role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "emstitch" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: ${POSTGRES_USER}
@@ -607,11 +608,12 @@ am-org-role-mapping-service:
       JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
       AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
       AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      ORG_ROLE_MAPPING_DB_HOST: civil-preview.postgres.database.azure.com
-      ORG_ROLE_MAPPING_DB_NAME: "pr-${CHANGE_ID}-org_role_mapping"
-      ORG_ROLE_MAPPING_DB_USERNAME: hmcts
+      ORG_ROLE_MAPPING_DB_HOST: ${SERVICE_NAME}-postgresql
+      ORG_ROLE_MAPPING_DB_NAME: org-role-assignment
+      ORG_ROLE_MAPPING_DB_USERNAME: ${POSTGRES_USER}
+      ORG_ROLE_MAPPING_DB_PASSWORD: ${POSTGRES_PASSWORD}
       ORG_ROLE_MAPPING_DB_PORT: 5432
-      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
       TESTING_SUPPORT_ENABLED: true
       JUDICIAL_REF_APP_V2_ACTIVE: true
       JUDICIAL_REF_APP_V2_FILTER_AUTHS_BY_APP_ID: true
