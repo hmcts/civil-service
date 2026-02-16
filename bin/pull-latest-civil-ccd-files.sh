@@ -1,30 +1,60 @@
 #!/usr/bin/env bash
 
-ccdRepoName="civil-ccd-definition"
-directoryName="civil-test"
-branchName=$1
+set -eu
 
-#Checkout specific branch of CCD definitions
+ccdRepoName="civil-ccd-definition"
+branchName=${1:-master}
+
+find_first_existing_dir() {
+  for candidate in "$@"; do
+    if [ -d "${candidate}" ]; then
+      echo "${candidate}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Checkout specific branch of CCD definitions.
 git clone https://github.com/hmcts/${ccdRepoName}.git
-cd ${ccdRepoName}
+cd "${ccdRepoName}"
 
 echo "Switch to ${branchName} branch on ${ccdRepoName}"
-git checkout ${branchName}
+git checkout "${branchName}"
 cd ..
 
-#Copy ccd definition files  to civil-ccd-def which contains ccd def files
-cp -r ./${ccdRepoName}/ccd-definition .
-if [ "$FT_TYPE" = "CIVIL_FT" ]; then
-  cp -r ./civil-ccd-definition/e2e .
-  cp -r ./civil-ccd-definition/playwright-e2e .
-  cp -r ./civil-ccd-definition/plugins .
-  cp -r ./civil-ccd-definition/package.json .
-  cp -r ./civil-ccd-definition/yarn.lock .
-  cp -r ./civil-ccd-definition/.yarnrc.yml .
-  cp -r ./civil-ccd-definition/.yarn .
-  cp -r ./civil-ccd-definition/codecept.conf.js .
-  cp -r ./civil-ccd-definition/playwright.config.ts .
-  cp -r ./civil-ccd-definition/saucelabs.conf.js .
+mergedDefinitionsDir=$(find_first_existing_dir \
+  "./${ccdRepoName}/ccd-definition" \
+  "./${ccdRepoName}/civil-ccd-definition/ccd-definition" || true)
+
+if [ -z "${mergedDefinitionsDir:-}" ]; then
+  echo "Unable to locate merged CCD definition directory in ${ccdRepoName}."
+  exit 1
 fi
-echo *
-rm -rf ./${ccdRepoName}
+
+rm -rf ./ccd-definition ./ga-ccd-definition
+cp -r "${mergedDefinitionsDir}" ./ccd-definition
+
+if [ "${FT_TYPE:-}" = "CIVIL_FT" ]; then
+  cp -r "./${ccdRepoName}/e2e" .
+  cp -r "./${ccdRepoName}/playwright-e2e" .
+  cp -r "./${ccdRepoName}/plugins" .
+  cp -r "./${ccdRepoName}/package.json" .
+  cp -r "./${ccdRepoName}/yarn.lock" .
+  cp -r "./${ccdRepoName}/.yarnrc.yml" .
+  cp -r "./${ccdRepoName}/.yarn" .
+  cp -r "./${ccdRepoName}/codecept.conf.js" .
+  cp -r "./${ccdRepoName}/playwright.config.ts" .
+  cp -r "./${ccdRepoName}/saucelabs.conf.js" .
+fi
+
+if [ "${FT_TYPE:-}" = "GENERAL_APPS_FT" ]; then
+  cp -r "./${ccdRepoName}/e2e" .
+  cp -r "./${ccdRepoName}/package.json" .
+  cp -r "./${ccdRepoName}/yarn.lock" .
+  cp -r "./${ccdRepoName}/codecept.conf.js" .
+  cp -r "./${ccdRepoName}/saucelabs.conf.js" .
+  cp -r ./bin/yarn/.yarnrc.yml .
+fi
+
+rm -rf "./${ccdRepoName}"

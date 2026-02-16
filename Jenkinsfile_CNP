@@ -144,14 +144,6 @@ def getCivilCcdDefinitionBranch() {
   return "master"
 }
 
-def getGenAppsCcdDefinitionBranch() {
-  def githubApi = new GithubAPI(this)
-  for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "gaDefinitionBranch:")) {
-    return label.minus("gaDefinitionBranch:").trim()
-  }
-  return "master"
-}
-
 withPipeline(type, product, component) {
   env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
   env.PACT_BROKER_PORT = "443"
@@ -198,7 +190,6 @@ withPipeline(type, product, component) {
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-        ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
         ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
       """
@@ -259,7 +250,6 @@ withPipeline(type, product, component) {
       ./bin/pull-latest-camunda-files.sh ${camundaBranch}
       ./bin/pull-latest-dmn-files.sh ${dmnBranch}
       ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
-      ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
       ./bin/import-ccd-definition.sh "-e *-nonprod.json,*COS-nonprod.json,AuthorisationCaseType-shuttered.json"
       ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
       ./bin/import-bpmn-diagram.sh .
