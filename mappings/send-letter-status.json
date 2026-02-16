@@ -2,7 +2,7 @@
   "name": "Send Letter API - Get Letter Status",
   "request": {
     "method": "GET",
-    "urlPattern": "/letters/[a-fA-F0-9-]+"
+    "urlPathPattern": "/letters/[a-fA-F0-9-]+"
   },
   "response": {
     "status": 200,
