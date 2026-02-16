@@ -170,6 +170,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
+            .state(CaseState.CASE_PROGRESSION.toString())
             .build();
     }
 

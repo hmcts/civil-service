@@ -33,10 +33,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -183,6 +179,18 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @Test
+        void shouldSetCaseProgressionState_whenDecisonMadeAndNotFinalOrder() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(NO);
+            caseData.setObligationDatePresent(NO);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_PROGRESSION.name());
         }
 
         @Test
