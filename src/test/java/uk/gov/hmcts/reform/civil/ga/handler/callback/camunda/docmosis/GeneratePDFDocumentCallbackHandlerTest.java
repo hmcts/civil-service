@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -130,9 +129,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
     private GeneratePDFDocumentCallbackHandler handler;
 
     @Spy
-    private ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper mapper = ObjectMapperBuilder.instance();
 
     private final LocalDate submittedOn = now();
 

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -62,9 +61,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
     private PaymentServiceRequestHandler handler;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
     @Mock
     private GeneralAppFeesService generalAppFeesService;
     private GeneralApplicationCaseData caseData;

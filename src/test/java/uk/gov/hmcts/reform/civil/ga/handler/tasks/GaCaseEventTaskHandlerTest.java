@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
@@ -33,6 +31,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.HashMap;
@@ -72,9 +71,7 @@ class GaCaseEventTaskHandlerTest {
     private GaCaseEventTaskHandler caseEventTaskHandler;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @BeforeEach
     void init() {

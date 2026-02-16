@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +14,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralApplicationCreationNotificationService;
 
@@ -36,9 +35,7 @@ public class GeneralApplicationCreationNotificationHandlerTest extends GeneralAp
     private GeneralApplicationCreationNotificationHandler handler;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @Mock
     private GeneralApplicationCreationNotificationService gaNotificationService;

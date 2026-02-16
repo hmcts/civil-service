@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 
 import java.util.Map;
 
@@ -36,9 +35,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     private GaStartGeneralApplicationBusinessProcessCallbackHandler startGeneralApplicationBusinessProcessCallbackHandler;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;

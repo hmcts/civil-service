@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.RESPONDENT_RESPONSE_D
 public class GaRespondentResponseDeadlineCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @InjectMocks
     private GaRespondentResponseDeadlineCallbackHandler handler;

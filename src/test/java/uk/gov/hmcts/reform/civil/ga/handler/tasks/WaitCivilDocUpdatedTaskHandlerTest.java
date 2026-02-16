@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import feign.Response;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -61,9 +60,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
     @Spy
-    private ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper mapper = ObjectMapperBuilder.instance();
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
     @Mock

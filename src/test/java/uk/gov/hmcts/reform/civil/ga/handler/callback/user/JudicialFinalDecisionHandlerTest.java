@@ -8,8 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -40,6 +38,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -80,9 +79,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     private static final LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
 
     @Spy
-    private ObjectMapper objMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objMapper = ObjectMapperBuilder.instance();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
@@ -204,7 +201,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
                 "claimantPartyName")
             .isEqualTo(caseData.getClaimant1PartyName());
         assertThat(response.getData().get("assistedOrderRepresentation")).extracting("claimantDefendantRepresentation").extracting(
-                "defendantPartyName")
+                "defendantOnePartyName")
             .isEqualTo(caseData.getDefendant1PartyName());
         assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts").extracting(
                 "assistedOrderAssessmentThirdDropdownDate")
@@ -215,18 +212,18 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts").extracting(
                 "assistedOrderCostsFirstDropdownDate")
             .isEqualTo(localDatePlus14days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForGranted").extracting(
-                "appealChoiceOptionA")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForGranted").extracting(
-                "appealChoiceOptionB")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForRefused").extracting(
-                "appealChoiceOptionA")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForRefused").extracting(
-                "appealChoiceOptionB")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownGranted").extracting(
+                "assistedOrderAppealFirstOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownGranted").extracting(
+                "assistedOrderAppealSecondOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownRefused").extracting(
+                "assistedOrderAppealFirstOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownRefused").extracting(
+                "assistedOrderAppealSecondOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
             .get("alternativeHearingLocation")).get("list_items")).getFirst())
                        .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");
@@ -285,7 +282,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
                 "claimantPartyName")
             .isEqualTo(caseData.getClaimant1PartyName());
         assertThat(response.getData().get("assistedOrderRepresentation")).extracting("claimantDefendantRepresentation").extracting(
-                "defendantPartyName")
+                "defendantOnePartyName")
             .isEqualTo(caseData.getDefendant1PartyName());
         assertThat(response.getData().get("assistedOrderRepresentation")).extracting("claimantDefendantRepresentation").extracting(
                 "defendantTwoPartyName")
@@ -299,18 +296,18 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         assertThat(response.getData()).extracting("assistedOrderMakeAnOrderForCosts").extracting(
                 "assistedOrderCostsFirstDropdownDate")
             .isEqualTo(localDatePlus14days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForGranted").extracting(
-                "appealChoiceOptionA")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForGranted").extracting(
-                "appealChoiceOptionB")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForRefused").extracting(
-                "appealChoiceOptionA")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
-        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("appealTypeChoicesForRefused").extracting(
-                "appealChoiceOptionB")
-            .extracting("appealGrantedRefusedDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownGranted").extracting(
+                "assistedOrderAppealFirstOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownGranted").extracting(
+                "assistedOrderAppealSecondOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownRefused").extracting(
+                "assistedOrderAppealFirstOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
+        assertThat(response.getData().get("assistedOrderAppealDetails")).extracting("assistedOrderAppealDropdownRefused").extracting(
+                "assistedOrderAppealSecondOption")
+            .extracting("assistedOrderAppealDate").isEqualTo(localDatePlus21days.toString());
         assertThat(((Map) ((ArrayList) ((Map) ((Map) (response.getData().get("assistedOrderFurtherHearingDetails")))
             .get("alternativeHearingLocation")).get("list_items")).getFirst())
                        .get("label")).isEqualTo("Site Name 1 - Address1 - 18000");

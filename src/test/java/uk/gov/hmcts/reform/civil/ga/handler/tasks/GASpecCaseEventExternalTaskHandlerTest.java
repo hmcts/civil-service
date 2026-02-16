@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
@@ -62,7 +63,7 @@ class GASpecCaseEventExternalTaskHandlerTest {
     private GaSpecExternalCaseEventTaskHandler gaSpecCaseEventTaskHandler;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @BeforeEach
     void init() {

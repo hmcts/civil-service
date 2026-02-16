@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +20,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -60,9 +59,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
     private CheckUnlessOrderDeadlineEndTaskHandler gaUnlessOrderMadeTaskHandler;
 
     @Spy
-    private ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper mapper = ObjectMapperBuilder.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
     private CaseDetails caseDetailsWithTodayDeadlineProcessed;

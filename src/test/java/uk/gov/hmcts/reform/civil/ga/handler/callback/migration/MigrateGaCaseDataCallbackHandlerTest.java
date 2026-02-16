@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 
 import java.util.List;
@@ -40,7 +41,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 public class MigrateGaCaseDataCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @InjectMocks
     private MigrateGaCaseDataCallbackHandler handler;

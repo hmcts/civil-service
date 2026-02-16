@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
@@ -68,7 +69,7 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
     @InjectMocks
     private GaStartGeneralApplicationBusinessProcessTaskHandler handler;
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     private final VariableMap variables = Variables.createVariables();
 

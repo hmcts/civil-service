@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.util.Map;
@@ -55,10 +56,10 @@ class ApplicationProcessCaseEventTaskHandlerTest {
     private GaCoreCaseDataService coreCaseDataService;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @Spy
-    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(new ObjectMapper());
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     @Mock
     private GaStateFlowEngine gaStateFlowEngine;

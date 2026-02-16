@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 class GaDispatchBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @InjectMocks
     private GaDispatchBusinessProcessCallbackHandler handler;

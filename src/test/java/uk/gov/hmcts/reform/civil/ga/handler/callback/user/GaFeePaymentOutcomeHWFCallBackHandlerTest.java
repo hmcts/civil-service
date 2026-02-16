@@ -10,8 +10,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -23,6 +21,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -52,9 +51,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_
 public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
-    private ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper mapper = ObjectMapperBuilder.instance();
 
     @InjectMocks
     private GaFeePaymentOutcomeHWFCallBackHandler handler;

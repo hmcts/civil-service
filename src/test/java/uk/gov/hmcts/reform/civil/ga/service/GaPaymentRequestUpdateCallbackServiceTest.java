@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.civil.ga.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
@@ -56,9 +55,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public static final String ACCOUNT_NUMBER = "123445555";
     public static final String TOKEN = "1234";
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 

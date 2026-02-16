@@ -5,9 +5,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import feign.FeignException;
 import feign.Request;
 import org.camunda.bpm.client.task.ExternalTask;
@@ -31,6 +28,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -84,9 +82,7 @@ class GAJudgeRevisitTaskHandlerTest {
     private GaForLipService gaForLipService;
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
-        new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
+        ObjectMapperBuilder.instance());
 
     @InjectMocks
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;

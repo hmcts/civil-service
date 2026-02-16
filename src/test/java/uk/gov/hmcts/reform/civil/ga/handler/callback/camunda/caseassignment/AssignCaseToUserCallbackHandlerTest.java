@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -70,7 +71,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     private GeneralAppFeesService generalAppFeesService;
 
     @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
 
     @Mock
     private RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
