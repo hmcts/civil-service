@@ -1,0 +1,20 @@
+{
+  "name": "Fee Lookup - Catch-all fallback",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0209",
+      "description": "Civil Court fees - Money Claims - Claim Amount - 10000.01 up to 200000 GBP. Fee - 5% of claim",
+      "version": 3,
+      "fee_amount": 550.00
+    }
+  }
+}
