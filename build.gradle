@@ -609,13 +609,16 @@ tasks.register('runProviderPactVerification') {
 tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors()
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
 
   jvmArgs '-Xshare:off'
-
-  // Keep within typical Jenkins container limits
+//
+//  // Keep within typical Jenkins container limits
   minHeapSize = "256m"
   maxHeapSize = "1536m"
+//  jvmArgs "-XX:MaxMetaspaceSize=512m"
+//  jvmArgs '-XX:ReservedCodeCacheSize=512m'
+  jvmArgs '-XX:+UseZGC'
 
   testLogging {
     exceptionFormat = 'full'
