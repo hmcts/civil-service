@@ -271,10 +271,12 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         caseData.setApplicant1DefenceResponseDocument(null);
         caseData.setRespondent1ClaimResponseDocument(null);
         caseData.setRespondentSharedClaimResponseDocument(null);
-        if (caseData.getApplicant1DQ() != null) {
+        if (caseData.getApplicant1DQ() != null
+            && caseData.getApplicant1DQ() != null) {
             caseData.getApplicant1DQ().setApplicant1DQDraftDirections(null);
         }
-        if (caseData.getApplicant2DQ() != null) {
+        if (caseData.getApplicant2DQ() != null
+            && caseData.getApplicant2DQ() != null) {
             caseData.getApplicant2DQ().setApplicant2DQDraftDirections(null);
         }
 
@@ -286,7 +288,7 @@ public class RespondToDefenceCallbackHandler extends CallbackHandler implements 
         }
 
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
-        caseData.setEnableUploadEvent(YES);
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .state((JudicialReferralUtils.shouldMoveToJudicialReferral(
