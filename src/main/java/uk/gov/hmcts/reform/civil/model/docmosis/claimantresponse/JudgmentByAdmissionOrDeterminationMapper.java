@@ -157,7 +157,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             || !PaymentType.REPAYMENT_PLAN
             .equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
 
-            log.info("Repayment option is not REPAYMENT_PLAN. Skipping repayment plan for case_reference : {}.",caseData.getCcdCaseReference());
+            log.info("Repayment option is not REPAYMENT_PLAN. Skipping repayment plan for case_reference : {}.", caseData.getCcdCaseReference());
             return null;
         }
 
@@ -173,11 +173,11 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 : caseData.getRespondent2RepaymentPlan();
 
             if (repaymentPlan == null) {
-                log.info("Accepted repayment plan expected but no respondent repayment plan found for case_reference : {}.",caseData.getCcdCaseReference());
+                log.info("Accepted repayment plan expected but no respondent repayment plan found for case_reference : {}.", caseData.getCcdCaseReference());
                 return null;
             }
 
-            log.info("Building repayment plan from respondent data for case_reference : {}.",caseData.getCcdCaseReference());
+            log.info("Building repayment plan from respondent data for case_reference : {}.", caseData.getCcdCaseReference());
 
             return new RepaymentPlanTemplateData()
                 .setFirstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
@@ -187,7 +187,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 .setPaymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay());
         }
 
-        log.info("Building repayment plan from applicant suggested instalments for case_reference : {}.",caseData.getCcdCaseReference());
+        log.info("Building repayment plan from applicant suggested instalments for case_reference : {}.", caseData.getCcdCaseReference());
 
         return new RepaymentPlanTemplateData()
             .setFirstRepaymentDate(
@@ -488,7 +488,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
         } else {
 
             if (!caseData.isPayByInstallment()) {
-                log.info("is payment by installment : {} for case_reference : {}.",caseData.isPayByInstallment(),caseData.getCcdCaseReference());
+                log.info("is payment by installment : {} for case_reference : {}.", caseData.isPayByInstallment(), caseData.getCcdCaseReference());
                 return null;
             }
 
