@@ -153,7 +153,9 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
         if (!featureToggleService.isLipVLipEnabled()) {
             return false;
         }
-        return CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.equals(caseData.getCcdState());
+
+        return nonNull(caseData.getTakenOfflineDate()) && nonNull(caseData.getCcdState())
+            && caseData.getCcdState().equals(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM);
     }
 
     @Override
