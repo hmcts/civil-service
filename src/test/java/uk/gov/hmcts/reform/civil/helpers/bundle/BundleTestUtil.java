@@ -201,13 +201,12 @@ public class BundleTestUtil {
                                                             .documentFileName(TEST_FILE_NAME)
                                                             .documentUrl(TEST_URL).build());
         docs.add(ElementUtils.element(doc));
-        return ServedDocumentFiles.builder()
-            .particularsOfClaimDocument(particularsOfClaim)
-            .medicalReport(docs)
-            .certificateOfSuitability(docs)
-            .scheduleOfLoss(docs)
-            .other(docs)
-            .build();
+        return new ServedDocumentFiles()
+            .setParticularsOfClaimDocument(particularsOfClaim)
+            .setMedicalReport(docs)
+            .setCertificateOfSuitability(docs)
+            .setScheduleOfLoss(docs)
+            .setOther(docs);
     }
 
     private static List<Element<UploadEvidenceExpert>> getExpertOtherPartyQuestionDocs(String partyName) {

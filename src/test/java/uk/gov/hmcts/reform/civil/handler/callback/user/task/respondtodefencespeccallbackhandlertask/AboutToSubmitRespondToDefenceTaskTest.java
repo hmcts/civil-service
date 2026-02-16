@@ -383,9 +383,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .documentFileName("defence-response.pdf")
             .build();
 
-        ResponseDocument responseDocument = ResponseDocument.builder()
-            .file(document)
-            .build();
+        ResponseDocument responseDocument = new ResponseDocument(document);
 
         CaseData caseData = CaseData.builder()
             .applicant1DefenceResponseDocumentSpec(responseDocument)

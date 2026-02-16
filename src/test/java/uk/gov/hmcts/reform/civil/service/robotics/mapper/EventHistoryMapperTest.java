@@ -1481,9 +1481,9 @@ class EventHistoryMapperTest {
                 .respondent1AcknowledgeNotificationDate(null)
                 .totalClaimAmount(claimValue)
                 .build();
-            caseData.setRespondToClaim(RespondToClaim.builder()
-                                           .howMuchWasPaid(BigDecimal.valueOf(100000))
-                                           .build());
+            caseData.setRespondToClaim(new RespondToClaim()
+                .setHowMuchWasPaid(BigDecimal.valueOf(100000))
+            );
             Event expectedDefenceFiled = eventBuilder()
                 .eventSequence(2)
                 .eventCode("49")
@@ -2768,9 +2768,9 @@ class EventHistoryMapperTest {
                 .respondent1AcknowledgeNotificationDate(null)
                 .totalClaimAmount(BigDecimal.valueOf(1200))
                 .build();
-            caseData.setRespondToClaim(RespondToClaim.builder()
-                                           .howMuchWasPaid(BigDecimal.valueOf(120000))
-                                           .build());
+            caseData.setRespondToClaim(new RespondToClaim()
+                .setHowMuchWasPaid(BigDecimal.valueOf(120000))
+            );
             if (caseData.getRespondent2OrgRegistered() != null
                 && caseData.getRespondent2Represented() == null) {
                 caseData.setRespondent2Represented(YES);
@@ -8335,9 +8335,9 @@ class EventHistoryMapperTest {
                 new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
-            caseData.setRespondToClaim(RespondToClaim.builder()
-                                           .howMuchWasPaid(BigDecimal.valueOf(100000))
-                                           .build());
+            caseData.setRespondToClaim(new RespondToClaim()
+                .setHowMuchWasPaid(BigDecimal.valueOf(100000))
+            );
             Event expectedDefenceFiled = eventBuilder()
                 .eventSequence(2)
                 .eventCode("49")
@@ -8406,9 +8406,9 @@ class EventHistoryMapperTest {
                 new ClaimantMediationLip().setHasAgreedFreeMediation(MediationDecision.Yes)));
             caseData.setApplicant1DQ(createApplicant1DQWithCourt(preferredCourt, "test"));
             caseData.setRespondent1DQ(createRespondent1DQWithCourt(preferredCourt, "Reason"));
-            caseData.setRespondToClaim(RespondToClaim.builder()
-                                           .howMuchWasPaid(BigDecimal.valueOf(100000))
-                                           .build());
+            caseData.setRespondToClaim(new RespondToClaim()
+                .setHowMuchWasPaid(BigDecimal.valueOf(100000))
+            );
             Event expectedDefenceFiled = eventBuilder()
                 .eventSequence(2)
                 .eventCode("49")
@@ -8463,9 +8463,9 @@ class EventHistoryMapperTest {
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                 .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
@@ -8509,11 +8509,11 @@ class EventHistoryMapperTest {
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                 .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-            RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
-                .firstRepaymentDate(whenWillPay)
-                .paymentAmount(BigDecimal.valueOf(10000))
-                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                .build();
+            RepaymentPlanLRspec respondent1RepaymentPlan = new RepaymentPlanLRspec()
+                .setFirstRepaymentDate(whenWillPay)
+                .setPaymentAmount(BigDecimal.valueOf(10000))
+                .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                ;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
@@ -8559,9 +8559,9 @@ class EventHistoryMapperTest {
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                 .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
@@ -8600,9 +8600,9 @@ class EventHistoryMapperTest {
                 .setCcjPaymentPaidSomeAmountInPounds(ZERO)
                 .setCcjJudgmentLipInterest(ZERO);
 
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
 
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
@@ -8697,9 +8697,9 @@ class EventHistoryMapperTest {
         void shouldGenerateRPA_WhenClaimPayImmediately() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -8735,9 +8735,9 @@ class EventHistoryMapperTest {
         void shouldGenerateRPA_WhenLrvLrClaimPayImmediately() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -8775,9 +8775,9 @@ class EventHistoryMapperTest {
         public void shouldGenerateRPA_ForFullAdmit_WhenLipClaimAgreedRepaymentPlan_BySetDate_JoLiveFeed() {
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
-            RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(whenWillPay)
-                .build();
+            RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
+                ;
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -8812,11 +8812,11 @@ class EventHistoryMapperTest {
             when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
             LocalDate whenWillPay = LocalDate.now().plusDays(5);
             CCJPaymentDetails ccjPaymentDetails = buildCcjPaymentDetails();
-            RepaymentPlanLRspec respondent1RepaymentPlan = RepaymentPlanLRspec.builder()
-                .firstRepaymentDate(whenWillPay)
-                .paymentAmount(BigDecimal.valueOf(10000))
-                .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                .build();
+            RepaymentPlanLRspec respondent1RepaymentPlan = new RepaymentPlanLRspec()
+                .setFirstRepaymentDate(whenWillPay)
+                .setPaymentAmount(BigDecimal.valueOf(10000))
+                .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                ;
             CaseData caseData = CaseDataBuilder.builder()
                 .setClaimTypeToSpecClaim()
                 .atStateSpec1v1ClaimSubmitted()
@@ -9082,8 +9082,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
@@ -9098,9 +9098,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9160,9 +9160,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9226,9 +9226,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9275,8 +9275,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
@@ -9291,9 +9291,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9353,9 +9353,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9418,9 +9418,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9472,8 +9472,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
@@ -9488,11 +9488,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9550,11 +9550,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9615,11 +9615,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9665,8 +9665,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
@@ -9681,11 +9681,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9744,11 +9744,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9809,11 +9809,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -9889,8 +9889,8 @@ class EventHistoryMapperTest {
                     caseData.setCaseDataLiP(caseDataLip);
                     caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(NO);
                     caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE);
-                    caseData.setApplicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(
-                        claimantSuggestedDate).build());
+                    caseData.setApplicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(
+                        claimantSuggestedDate));
 
                     var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                     List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
@@ -9982,8 +9982,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
@@ -9998,9 +9998,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10060,9 +10060,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10126,9 +10126,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10175,8 +10175,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
@@ -10191,9 +10191,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10253,9 +10253,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10318,9 +10318,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(whenWillPay)
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(whenWillPay)
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10372,8 +10372,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT);
@@ -10388,11 +10388,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10450,11 +10450,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10515,11 +10515,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10565,8 +10565,8 @@ class EventHistoryMapperTest {
                         when(featureToggleService.isJOLiveFeedActive()).thenReturn(false);
                         LocalDateTime now = LocalDate.now().atTime(12, 0, 0);
                         LocalDate whenWillPay = LocalDate.now().plusDays(5);
-                        PaymentBySetDate claimantSuggestedPayByDate = PaymentBySetDate.builder().paymentSetDate(
-                            LocalDate.now().plusDays(1)).build();
+                        PaymentBySetDate claimantSuggestedPayByDate = new PaymentBySetDate().setPaymentSetDate(
+                            LocalDate.now().plusDays(1));
 
                         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse()
                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT);
@@ -10581,11 +10581,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10643,11 +10643,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10708,11 +10708,11 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RepaymentPlanLRspec defendantRepaymentPlan = RepaymentPlanLRspec.builder()
-                            .firstRepaymentDate(whenWillPay)
-                            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                            .paymentAmount(BigDecimal.valueOf(100))
-                            .build();
+                        RepaymentPlanLRspec defendantRepaymentPlan = new RepaymentPlanLRspec()
+                            .setFirstRepaymentDate(whenWillPay)
+                            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                            .setPaymentAmount(BigDecimal.valueOf(100))
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10790,8 +10790,8 @@ class EventHistoryMapperTest {
                         caseData.setCaseDataLiP(caseDataLip);
                         caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(NO);
                         caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE);
-                        caseData.setApplicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(
-                            claimantSuggestedDate).build());
+                        caseData.setApplicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(
+                            claimantSuggestedDate));
 
                         var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);
                         List<Event> judgmentByAdmission = eventHistory.getJudgmentByAdmission();
@@ -10892,9 +10892,9 @@ class EventHistoryMapperTest {
                             .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(40))
                             .setCcjPaymentPaidSomeAmountInPounds(ZERO);
 
-                        RespondToClaimAdmitPartLRspec paymentDetails = RespondToClaimAdmitPartLRspec.builder()
-                            .whenWillThisAmountBePaid(now.toLocalDate())
-                            .build();
+                        RespondToClaimAdmitPartLRspec paymentDetails = new RespondToClaimAdmitPartLRspec()
+                            .setWhenWillThisAmountBePaid(now.toLocalDate())
+                            ;
 
                         CaseData caseData = CaseDataBuilder.builder()
                             .setClaimTypeToSpecClaim()
@@ -10912,8 +10912,8 @@ class EventHistoryMapperTest {
                         caseData.setCaseDataLiP(caseDataLip);
                         caseData.setApplicant1AcceptFullAdmitPaymentPlanSpec(NO);
                         caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE);
-                        caseData.setApplicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(
-                            claimantSuggestedDate).build());
+                        caseData.setApplicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(
+                            claimantSuggestedDate));
                         caseData.setRespondent1DQ(new Respondent1DQ());
 
                         var eventHistory = mapper.buildEvents(caseData, BEARER_TOKEN);

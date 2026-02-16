@@ -32,10 +32,9 @@ abstract class DQTest {
     }
 
     protected StatementOfTruth statementOfTruth() {
-        return StatementOfTruth.builder()
-            .name("John Smith")
-            .role("Solicitor")
-            .build();
+        return new StatementOfTruth()
+            .setName("John Smith")
+            .setRole("Solicitor");
     }
 
     protected RequestedCourt requestedCourt() {

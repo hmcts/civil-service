@@ -87,12 +87,12 @@ public class UpdatePaymentStatusService {
         GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
         pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
 
-        PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
-            .reference(cardPaymentStatusResponse.getPaymentReference())
-            .errorCode(cardPaymentStatusResponse.getErrorCode())
-            .errorMessage(cardPaymentStatusResponse.getErrorDescription())
-            .build();
+        PaymentDetails paymentDetails = new PaymentDetails()
+            .setStatus(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
+            .setReference(cardPaymentStatusResponse.getPaymentReference())
+            .setErrorCode(cardPaymentStatusResponse.getErrorCode())
+            .setErrorMessage(cardPaymentStatusResponse.getErrorDescription())
+            ;
         if (caseData.isAdditionalFeeRequested()) {
             pbaDetails = pbaDetailsBuilder.additionalPaymentDetails(paymentDetails).build();
             log.info("Applied additional payment details for caseReference: {}", caseData.getCcdCaseReference());

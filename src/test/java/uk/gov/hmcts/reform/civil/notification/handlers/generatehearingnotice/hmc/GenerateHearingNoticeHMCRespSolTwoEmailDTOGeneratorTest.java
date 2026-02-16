@@ -79,9 +79,8 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .hearingDate(HEARING_DATE_VAL)
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
-                .solicitorReferences(SolicitorReferences.builder()
-                        .respondentSolicitor1Reference(DEF_REF)
-                        .build())
+                .solicitorReferences(new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(DEF_REF))
                 .build();
 
         when(camundaService.getProcessVariables(PROCESS_ID))

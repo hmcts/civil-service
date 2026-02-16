@@ -135,13 +135,13 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(FAILED)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
+                                      .additionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(FAILED)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
                                       .build())
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -166,13 +166,13 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(FAILED)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
+                                      .additionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(FAILED)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
                                       .build())
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -199,13 +199,13 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(SUCCESS)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
+                                      .additionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(SUCCESS)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
                                       .build())
             .generalAppConsentOrder(YesOrNo.NO)
             .build();
@@ -248,16 +248,15 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
-        return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CASE_ID)
-            .serviceRequestStatus(status)
-            .payment(PaymentDto.builder()
-                         .amount(new BigDecimal(167))
-                         .paymentReference(REFERENCE)
-                         .caseReference(REFERENCE)
-                         .accountNumber(ACCOUNT_NUMBER)
-                         .build())
-            .build();
+        return new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(CASE_ID)
+            .setServiceRequestStatus(status)
+            .setPayment(PaymentDto.builder()
+                .amount(new BigDecimal(167))
+                .paymentReference(REFERENCE)
+                .caseReference(REFERENCE)
+                .accountNumber(ACCOUNT_NUMBER)
+                .build());
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails,

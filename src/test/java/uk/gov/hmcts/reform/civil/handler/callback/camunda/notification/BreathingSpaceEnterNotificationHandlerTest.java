@@ -328,9 +328,8 @@ class BreathingSpaceEnterNotificationHandlerTest {
                                                                 .organisationID(organisationId)
                                                                 .build())
                                               .build())
-            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
-                                                          .name(solicitorName)
-                                                          .build())
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
+                .setName(solicitorName))
             .build();
         CallbackParams params = CallbackParams.builder()
             .type(CallbackType.ABOUT_TO_SUBMIT)

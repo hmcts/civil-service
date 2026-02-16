@@ -170,7 +170,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             String suppliedValuePennies = "12345";
             String expectedValuePounds = "123.45";
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal(suppliedValuePennies)).build());
+            caseData.setRespondToAdmittedClaim(new RespondToClaim().setHowMuchWasPaid(new BigDecimal(suppliedValuePennies)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

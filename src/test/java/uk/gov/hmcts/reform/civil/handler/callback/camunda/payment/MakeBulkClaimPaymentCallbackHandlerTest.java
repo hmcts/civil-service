@@ -72,7 +72,7 @@ class MakeBulkClaimPaymentCallbackHandlerTest extends BaseCallbackHandlerTest {
         caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build();
         caseData.setHearingDate(null);
         caseData.setSdtRequestIdFromSdt("testRequestId");
-        caseData.setClaimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("12345").build());
+        caseData.setClaimIssuedPBADetails(new SRPbaDetails().setServiceReqReference("12345"));
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
     }
 

@@ -201,10 +201,9 @@ class PiPLetterGeneratorTest {
             .documentFileName("file-name")
             .documentBinaryUrl("binary-url")
             .build();
-        return ServedDocumentFiles.builder()
-            .timelineEventUpload(List.of(ElementUtils.element(document2)))
-            .particularsOfClaimDocument(List.of(ElementUtils.element(document1)))
-            .build();
+        return new ServedDocumentFiles()
+            .setTimelineEventUpload(List.of(ElementUtils.element(document2)))
+            .setParticularsOfClaimDocument(List.of(ElementUtils.element(document1)));
     }
 
     private CaseDocument buildClaimFormDocument() {

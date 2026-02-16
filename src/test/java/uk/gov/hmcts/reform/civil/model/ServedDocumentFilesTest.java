@@ -14,9 +14,8 @@ class ServedDocumentFilesTest {
 
         @Test
         void shouldReturnEmptyList_WhenOnlyDocument() {
-            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles()
+                .setParticularsOfClaimDocument(wrapElements(Document.builder().build()));
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
             assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
@@ -24,9 +23,8 @@ class ServedDocumentFilesTest {
 
         @Test
         void shouldReturnEmptyList_WhenOnlyText() {
-            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimText("Some string")
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles()
+                .setParticularsOfClaimText("Some string");
 
             assertThat(servedDocumentFiles.getErrors()).isEmpty();
             assertThat(servedDocumentFiles.getErrorsAddOrAmendDocuments()).isEmpty();
@@ -34,17 +32,16 @@ class ServedDocumentFilesTest {
 
         @Test
         void shouldReturnRequiredError_WhenBothParticularsOfClaimFieldsAreNull() {
-            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder().build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles();
 
             assertThat(servedDocumentFiles.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
         @Test
         void shouldReturnMoreThanOneError_WhenBothParticularsOfClaimFieldsAreNotNull() {
-            ServedDocumentFiles servedDocumentFiles = ServedDocumentFiles.builder()
-                .particularsOfClaimDocument(wrapElements(Document.builder().build()))
-                .particularsOfClaimText("Some string")
-                .build();
+            ServedDocumentFiles servedDocumentFiles = new ServedDocumentFiles()
+                .setParticularsOfClaimDocument(wrapElements(Document.builder().build()))
+                .setParticularsOfClaimText("Some string");
 
             assertThat(servedDocumentFiles.getErrors())
                 .containsOnly("You need to either upload 1 Particulars of claim only or enter the Particulars "

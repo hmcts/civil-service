@@ -1106,8 +1106,8 @@ class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                                   .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1123,8 +1123,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1138,8 +1138,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().plusDays(1))
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(3)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1153,8 +1153,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(3)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1170,8 +1170,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1187,8 +1187,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().minusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().minusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1204,8 +1204,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+                .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                                   .setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1229,8 +1229,8 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
-                                                                    .paymentSetDate(LocalDate.now().plusDays(1)).build())
+                .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate()
+                                                                    .setPaymentSetDate(LocalDate.now().plusDays(1)))
                 .caseDataLiP(new CaseDataLiP()
                                  .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT))
@@ -1353,9 +1353,9 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-                .respondToClaim(RespondToClaim.builder()
-                                    .howMuchWasPaid(new BigDecimal(1000))
-                                    .build())
+                .respondToClaim(new RespondToClaim()
+                                    .setHowMuchWasPaid(new BigDecimal(1000))
+                                    )
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1369,9 +1369,9 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                .respondToAdmittedClaim(RespondToClaim.builder()
-                                            .howMuchWasPaid(new BigDecimal(1000))
-                                            .build())
+                .respondToAdmittedClaim(new RespondToClaim()
+                                            .setHowMuchWasPaid(new BigDecimal(1000))
+                                            )
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1397,7 +1397,7 @@ class CaseDataTest {
         void shouldReturnTrueIfHearingFeePaymentStatusSuccess() {
             //Given
             CaseData caseData = CaseData.builder()
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .build();
             //When
             boolean isHearingFeePaid = caseData.isHearingFeePaid();
@@ -1426,7 +1426,7 @@ class CaseDataTest {
         void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
             //Given
             CaseData caseData = CaseData.builder()
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(FAILED))
                 .build();
             //When
             boolean isHearingFeePaid = caseData.isHearingFeePaid();
@@ -1578,5 +1578,4 @@ class CaseDataTest {
         assertNull(caseData.getRespondent1PartyEmail());
     }
 }
-
 

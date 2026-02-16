@@ -95,14 +95,14 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
                 .build();
             if (freeGa || freeGaLip) {
                 PaymentDetails paymentDetails = ofNullable(pbaDetails.getPaymentDetails())
-                        .map(PaymentDetails::toBuilder)
-                        .orElse(PaymentDetails.builder())
-                        .status(SUCCESS)
-                        .customerReference(serviceRequestReference)
-                        .reference(serviceRequestReference)
-                        .errorCode(null)
-                        .errorMessage(null)
-                        .build();
+                        .map(PaymentDetails::copy)
+                        .orElse(new PaymentDetails())
+                        .setStatus(SUCCESS)
+                        .setCustomerReference(serviceRequestReference)
+                        .setReference(serviceRequestReference)
+                        .setErrorCode(null)
+                        .setErrorMessage(null)
+                        ;
                 pbaDetailsBuilder.paymentDetails(paymentDetails)
                                 .paymentSuccessfulDate(time.now()).build();
             }

@@ -183,7 +183,7 @@ class BundleCreationTriggerEventHandlerTest {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
         Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
         particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return new ServedDocumentFiles().setParticularsOfClaimDocument(particularsOfClaim);
     }
 
     @Test
