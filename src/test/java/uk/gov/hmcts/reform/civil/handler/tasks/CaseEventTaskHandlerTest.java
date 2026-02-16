@@ -127,10 +127,9 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder()
-                                     .status(BusinessProcessStatus.READY)
-                                     .processInstanceId("processInstanceId")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
@@ -479,10 +478,9 @@ class CaseEventTaskHandlerTest {
         @Nested
         class FullDefenceProceed {
             FlowState.Main state = FULL_DEFENCE_PROCEED;
-            BusinessProcess businessProcess = BusinessProcess.builder()
-                .status(BusinessProcessStatus.READY)
-                .processInstanceId("processInstanceId")
-                .build();
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setStatus(BusinessProcessStatus.READY)
+                .setProcessInstanceId("processInstanceId");
 
             @BeforeEach
             void initForFullDefence() {
@@ -802,7 +800,7 @@ class CaseEventTaskHandlerTest {
         }
 
         private CaseData getCaseData(FlowState.Main state) {
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            BusinessProcess businessProcess = new BusinessProcess().setStatus(BusinessProcessStatus.READY);
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
             switch (state) {
                 case FULL_ADMISSION:

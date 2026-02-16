@@ -238,6 +238,10 @@ import static uk.gov.hmcts.reform.civil.enums.hearing.HearingDuration.MINUTES_12
 import static uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.FIFTEEN_MINUTES;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.NON_ATTENDANCE_STATEMENT;
 import static uk.gov.hmcts.reform.civil.model.mediation.MediationDocumentsType.REFERRED_DOCUMENTS;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.DISPOSAL_FINAL_HEARING_LISTING_DJ;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FAST_TRACK_TRIAL_BUNDLE_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.FLIGHT_DELAY_RELATED_CLAIMS_NOTICE;
 import static uk.gov.hmcts.reform.civil.service.docmosis.dj.DefaultJudgmentOrderFormGenerator.DISPOSAL_HEARING;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
@@ -2410,10 +2414,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder discontinueClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2425,10 +2428,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder discontinueClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2444,20 +2446,18 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withdrawClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
     public CaseDataBuilder withdrawClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2472,19 +2472,18 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder courtLocation_old() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127").build();
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127");
         return this;
     }
 
     public CaseDataBuilder courtLocation() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .caseLocation(new CaseLocationCivil()
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("2")
                 .setBaseLocation("000000")
-                )
-            .build();
+                );
         return this;
     }
 
@@ -2519,19 +2518,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2563,7 +2560,7 @@ public class CaseDataBuilder {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -2572,19 +2569,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2616,7 +2611,7 @@ public class CaseDataBuilder {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -2861,79 +2856,72 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateSdoFastTrackTrial() {
-        fastTrackHearingTime = FastTrackHearingTime.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
+        fastTrackHearingTime = new FastTrackHearingTime()
+            .setHelpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .hearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateTo(LocalDate.parse("2022-01-02"))
-            .dateToToggle(List.of(DateToShowToggle.SHOW))
-            .build();
-        fastTrackOrderWithoutJudgement = FastTrackOrderWithoutJudgement.builder()
-            .input(String.format("Each party has the right to apply "
+            .setHearingDuration(FastTrackHearingTimeEstimate.ONE_HOUR)
+            .setDateFrom(LocalDate.parse("2022-01-01"))
+            .setDateTo(LocalDate.parse("2022-01-02"))
+            .setDateToToggle(List.of(DateToShowToggle.SHOW));
+        fastTrackOrderWithoutJudgement = new FastTrackOrderWithoutJudgement()
+            .setInput(String.format("Each party has the right to apply "
                     + "to have this Order set aside or varied. Any such application must be "
                     + "received by the Court (together with the appropriate fee) by 4pm "
                     + "on %s.",
-                LocalDate.parse("2022-01-30")))
-            .build();
+                LocalDate.parse("2022-01-30")));
         return this;
     }
 
     public CaseDataBuilder atStateSdoFastTrackCreditHire() {
-        sdoR2FastTrackCreditHireDetails = SdoR2FastTrackCreditHireDetails.builder()
-            .input2("The claimant must upload to the Digital Portal a witness statement addressing\n"
-                + "a) the need to hire a replacement vehicle; and\n"
-                + "b) impecuniosity")
-            .date1(LocalDate.parse("2022-01-01"))
-            .input3("A failure to comply with the paragraph above will result in the claimant being debarred from "
-                + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
-                + "save with permission of the Trial Judge.")
-            .input4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
-                + "later than 4pm on")
-            .date2(LocalDate.parse("2022-01-02"))
-            .build();
-        sdoR2FastTrackCreditHire = SdoR2FastTrackCreditHire.builder()
-            .input1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
-                + "disclosure as ordered earlier in this Order must include:\n"
-                + "a) Evidence of all income from all sources for a period of 3 months prior to the "
-                + "commencement of hire until the earlier of:\n "
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
-                + "prior to the commencement of hire until the earlier of:\n"
-                + "     i) 3 months after cessation of hire\n"
-                + "     ii) the repair or replacement of the claimant's vehicle\n"
-                + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.")
-            .input5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
-                + "paragraph above, each party may rely upon written evidence by way of witness statement of "
-                + "one witness to provide evidence of basic hire rates available within the claimant's "
-                + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
-                + "is available.")
-            .input6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on")
-            .date3(LocalDate.parse("2022-01-01"))
-            .input7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on")
-            .date4(LocalDate.parse("2022-01-02"))
-            .input8("This witness statement is limited to 10 pages per party, including any appendices.")
-            .detailsShowToggle(List.of(AddOrRemoveToggle.ADD))
-            .sdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails)
-            .build();
+        sdoR2FastTrackCreditHireDetails = new SdoR2FastTrackCreditHireDetails();
+        sdoR2FastTrackCreditHireDetails.setInput2("The claimant must upload to the Digital Portal a witness statement addressing\n"
+            + "a) the need to hire a replacement vehicle; and\n"
+            + "b) impecuniosity");
+        sdoR2FastTrackCreditHireDetails.setDate1(LocalDate.parse("2022-01-01"));
+        sdoR2FastTrackCreditHireDetails.setInput3("A failure to comply with the paragraph above will result in the claimant being debarred from "
+            + "asserting need or relying on impecuniosity as the case may be at the final hearing, "
+            + "save with permission of the Trial Judge.");
+        sdoR2FastTrackCreditHireDetails.setInput4("The parties are to liaise and use reasonable endeavours to agree the basic hire rate no "
+            + "later than 4pm on");
+        sdoR2FastTrackCreditHireDetails.setDate2(LocalDate.parse("2022-01-02"));
+        sdoR2FastTrackCreditHire = new SdoR2FastTrackCreditHire();
+        sdoR2FastTrackCreditHire.setInput1("If impecuniosity is alleged by the claimant and not admitted by the defendant, the claimant's "
+            + "disclosure as ordered earlier in this Order must include:\n"
+            + "a) Evidence of all income from all sources for a period of 3 months prior to the "
+            + "commencement of hire until the earlier of:\n "
+            + "     i) 3 months after cessation of hire\n"
+            + "     ii) the repair or replacement of the claimant's vehicle\n"
+            + "b) Copies of all bank, credit card, and saving account statements for a period of 3 months "
+            + "prior to the commencement of hire until the earlier of:\n"
+            + "     i) 3 months after cessation of hire\n"
+            + "     ii) the repair or replacement of the claimant's vehicle\n"
+            + "c) Evidence of any loan, overdraft or other credit facilities available to the claimant.");
+        sdoR2FastTrackCreditHire.setInput5("If the parties fail to agree rates subject to liability and/or other issues pursuant to the "
+            + "paragraph above, each party may rely upon written evidence by way of witness statement of "
+            + "one witness to provide evidence of basic hire rates available within the claimant's "
+            + "geographical location, from a mainstream supplier, or a local reputable supplier if none "
+            + "is available.");
+        sdoR2FastTrackCreditHire.setInput6("The defendant's evidence is to be uploaded to the Digital Portal by 4pm on");
+        sdoR2FastTrackCreditHire.setDate3(LocalDate.parse("2022-01-01"));
+        sdoR2FastTrackCreditHire.setInput7("and the claimant's evidence in reply if so advised to be uploaded by 4pm on");
+        sdoR2FastTrackCreditHire.setDate4(LocalDate.parse("2022-01-02"));
+        sdoR2FastTrackCreditHire.setInput8("This witness statement is limited to 10 pages per party, including any appendices.");
+        sdoR2FastTrackCreditHire.setDetailsShowToggle(List.of(AddOrRemoveToggle.ADD));
+        sdoR2FastTrackCreditHire.setSdoR2FastTrackCreditHireDetails(sdoR2FastTrackCreditHireDetails);
         return this;
     }
 
     public CaseDataBuilder atStateSdoDisposal() {
-        disposalOrderWithoutHearing = DisposalOrderWithoutHearing.builder()
-            .input(String.format(
+        disposalOrderWithoutHearing = new DisposalOrderWithoutHearing()
+            .setInput(String.format(
                 "Each party has the right to apply to have this Order set "
                     + "aside or varied. Any such application must be received "
                     + "by the Court (together with the appropriate fee) "
-                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")))
-            .build();
-        disposalHearingHearingTime = DisposalHearingHearingTime.builder()
-            .input("This claim will be listed for final disposal before a judge on the first available date after")
-            .time(FIFTEEN_MINUTES)
-            .dateFrom(LocalDate.parse("2022-01-01"))
-            .dateFrom(LocalDate.parse("2022-01-02"))
-            .build();
+                    + "by 4pm on %s.", LocalDate.parse("2022-01-30")));
+        disposalHearingHearingTime = new DisposalHearingHearingTime()
+            .setInput("This claim will be listed for final disposal before a judge on the first available date after")
+            .setTime(FIFTEEN_MINUTES)
+            .setDateFrom(LocalDate.parse("2022-01-02"));
         return this;
     }
 
@@ -3089,27 +3077,25 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateSdoTrialDj() {
         List<DateToShowToggle> dateToShowTrue = List.of(DateToShowToggle.SHOW);
-        trialHearingTimeDJ = TrialHearingTimeDJ.builder()
-            .helpText1("If either party considers that the time estimate is insufficient, "
+        trialHearingTimeDJ = new TrialHearingTimeDJ()
+            .setHelpText1("If either party considers that the time estimate is insufficient, "
                 + "they must inform the court within 7 days of the date of this order.")
-            .helpText2("Not more than seven nor less than three clear days before the trial, "
+            .setHelpText2("Not more than seven nor less than three clear days before the trial, "
                 + "the claimant must file at court and serve an indexed and paginated bundle of "
                 + "documents which complies with the requirements of Rule 39.5 Civil Procedure Rules "
                 + "and which complies with requirements of PD32. The parties must endeavour to agree "
                 + "the contents of the bundle before it is filed. The bundle will include a case "
                 + "summary and a chronology.")
-            .hearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
-            .dateToToggle(dateToShowTrue)
-            .date1(LocalDate.now().plusWeeks(22))
-            .date2(LocalDate.now().plusWeeks(30))
-            .build();
-        trialOrderMadeWithoutHearingDJ = TrialOrderMadeWithoutHearingDJ.builder()
-            .input("This order has been made without a hearing. "
+            .setHearingTimeEstimate(TrialHearingTimeEstimateDJ.ONE_HOUR)
+            .setDateToToggle(dateToShowTrue)
+            .setDate1(LocalDate.now().plusWeeks(22))
+            .setDate2(LocalDate.now().plusWeeks(30));
+        trialOrderMadeWithoutHearingDJ = new TrialOrderMadeWithoutHearingDJ()
+            .setInput("This order has been made without a hearing. "
                 + "Each party has the right to apply to have this Order "
                 + "set aside or varied. Any such application must be "
                 + "received by the Court "
-                + "(together with the appropriate fee) by 4pm on 01 12 2022.")
-            .build();
+                + "(together with the appropriate fee) by 4pm on 01 12 2022.");
         return this;
     }
 
@@ -3121,16 +3107,7 @@ public class CaseDataBuilder {
             .setInput2("If either party considers that the time estimates is"
                 + " insufficient, they must inform the court within "
                 + "7 days of the date of this order.")
-            .setInput3("Not more than seven nor less than three clear days before "
-                + "the trial, the claimant must file at court and serve an"
-                + "indexed and paginated bundle of documents which complies"
-                + " with the requirements of Rule 39.5 Civil "
-                + "Procedure Rules"
-                + " and Practice Direction 39A. The parties must "
-                + "endeavour to agree the contents of the "
-                + "bundle before it is filed. "
-                + "The bundle will include a case summary"
-                + " and a chronology.")
+            .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ")
             .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         return this;
     }
@@ -3139,26 +3116,21 @@ public class CaseDataBuilder {
         disposalHearingBundleDJ = new DisposalHearingBundleDJ()
             .setInput("The claimant must lodge at court at least 7 "
                 + "days before the disposal")
-            .setType(List.of(DisposalHearingBundleType.DOCUMENTS))
-            ;
+            .setType(List.of(DisposalHearingBundleType.DOCUMENTS));
         disposalHearingFinalDisposalHearingDJ = new DisposalHearingFinalDisposalHearingDJ()
-            .setInput("This claim be listed for final "
-                + "disposal before a Judge on the first "
-                + "available date after.")
+            .setInput(DISPOSAL_FINAL_HEARING_LISTING_DJ)
             .setDate(LocalDate.now().plusWeeks(16))
             .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
         return this;
     }
 
     public CaseDataBuilder atStateClaimIssuedDisposalHearingInPersonDJ() {
-        disposalHearingFinalDisposalHearingTimeDJ = DisposalHearingFinalDisposalHearingTimeDJ
-            .builder()
-            .input("This claim be listed for final "
+        disposalHearingFinalDisposalHearingTimeDJ = new DisposalHearingFinalDisposalHearingTimeDJ()
+            .setInput("This claim be listed for final "
                 + "disposal before a Judge on the first "
                 + "available date after.")
-            .date(LocalDate.now().plusWeeks(16))
-            .time(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES)
-            .build();
+            .setDate(LocalDate.now().plusWeeks(16))
+            .setTime(uk.gov.hmcts.reform.civil.enums.sdo.DisposalHearingFinalDisposalHearingTimeEstimate.THIRTY_MINUTES);
         return this;
     }
 
@@ -3362,23 +3334,23 @@ public class CaseDataBuilder {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        changeOrganisationRequest = ChangeOrganisationRequest.builder()
-            .requestTimestamp(LocalDateTime.now())
-            .createdBy(email)
-            .caseRoleId(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .code(caseRole)
-                    .label(caseRole)
-                    .build())
+        ChangeOrganisationRequest request = new ChangeOrganisationRequest();
+        request.setRequestTimestamp(LocalDateTime.now());
+        request.setCreatedBy(email);
+        request.setCaseRoleId(DynamicList.builder()
+            .value(DynamicListElement.builder()
+                .code(caseRole)
+                .label(caseRole)
                 .build())
-            .organisationToAdd(Organisation.builder()
-                .organisationID(newOrgID)
-                .build())
-            .organisationToRemove(Organisation.builder()
-                .organisationID(oldOrgId)
-                .build())
-            .approvalStatus(ChangeOrganisationApprovalStatus.APPROVED)
-            .build();
+            .build());
+        request.setOrganisationToAdd(Organisation.builder()
+            .organisationID(newOrgID)
+            .build());
+        request.setOrganisationToRemove(Organisation.builder()
+            .organisationID(oldOrgId)
+            .build());
+        request.setApprovalStatus(ChangeOrganisationApprovalStatus.APPROVED);
+        changeOrganisationRequest = request;
         return this;
     }
 
@@ -3387,18 +3359,15 @@ public class CaseDataBuilder {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
-            .caseRole(caseRole)
-            .organisationToAddID(newOrgID)
-            .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now());
-        if (oldOrgId != null) {
-            newChangeBuilder.organisationToRemoveID(oldOrgId);
-        }
+        ChangeOfRepresentation newChange = new ChangeOfRepresentation()
+            .setCaseRole(caseRole)
+            .setOrganisationToAddID(newOrgID)
+            .setOrganisationToRemoveID(oldOrgId)
+            .setTimestamp(LocalDateTime.now());
         if (formerSolicitorEmail != null) {
-            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+            newChange.setFormerRepresentationEmailAddress(formerSolicitorEmail);
         }
-        changeOfRepresentation = newChangeBuilder.build();
+        changeOfRepresentation = newChange;
         return this;
     }
 
@@ -3717,19 +3686,17 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder takenOfflineByStaff() {
-        claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCaseman = new ClaimProceedsInCaseman()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder takenOfflineByStaffSpec() {
-        claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCasemanLR = new ClaimProceedsInCasemanLR()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
@@ -4225,112 +4192,106 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder includesApplicantCitizenQuery(OffsetDateTime queryCreationDatetime) {
+        CaseMessage applicantQuery = new CaseMessage();
+        applicantQuery.setId("app-query-id");
+        applicantQuery.setIsHearingRelated(YES);
+        applicantQuery.setCreatedOn(queryCreationDatetime);
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
         caseMessages.add(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
-                                .value(
-                                    CaseMessage.builder()
-                                        .id("app-query-id")
-                                        .isHearingRelated(YES)
-                                        .createdOn(queryCreationDatetime)
-                                        .build())
+                                .value(applicantQuery)
                                 .build());
-        this.queries = CaseQueriesCollection.builder()
-            .partyName("Claimant")
-            .roleOnCase("applicant-citizen")
-            .caseMessages(caseMessages).build();
+        CaseQueriesCollection caseQueries = new CaseQueriesCollection();
+        caseQueries.setPartyName("Claimant");
+        caseQueries.setRoleOnCase("applicant-citizen");
+        caseQueries.setCaseMessages(caseMessages);
+        this.queries = caseQueries;
         return this;
     }
 
     public CaseDataBuilder includesApplicantCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQuery(queryCreationDatetime);
-        this.queries = this.queries.toBuilder().caseMessages(
+        CaseMessage applicantResponse = new CaseMessage();
+        applicantResponse.setId("app-response-id");
+        applicantResponse.setIsHearingRelated(NO);
+        applicantResponse.setCreatedOn(queryCreationDatetime.plusHours(3));
+        applicantResponse.setParentId("app-query-id");
+        this.queries.setCaseMessages(
             Stream.concat(
                 this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
-                            .value(
-                                CaseMessage.builder()
-                                    .id("app-response-id")
-                                    .isHearingRelated(NO)
-                                    .createdOn(queryCreationDatetime.plusHours(3))
-                                    .parentId("app-query-id")
-                                    .build()).build()).stream()
-            ).toList()).build();
+                            .value(applicantResponse).build()).stream()
+            ).toList());
         return this;
     }
 
     public CaseDataBuilder includesApplicantCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesApplicantCitizenQueryResponse(queryCreationDatetime);
-        this.queries = this.queries.toBuilder().caseMessages(
+        CaseMessage applicantFollowUp = new CaseMessage();
+        applicantFollowUp.setId("app-followup-id");
+        applicantFollowUp.setIsHearingRelated(NO);
+        applicantFollowUp.setCreatedOn(queryCreationDatetime.plusHours(5));
+        applicantFollowUp.setParentId("app-query-id");
+        this.queries.setCaseMessages(
                 Stream.concat(
                     this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
-                                .value(
-                                    CaseMessage.builder()
-                                        .id("app-followup-id")
-                                        .isHearingRelated(NO)
-                                        .createdOn(queryCreationDatetime.plusHours(5))
-                                        .parentId("app-query-id")
-                                        .build()).build()).stream()
-                ).toList())
-            .build();
+                                .value(applicantFollowUp).build()).stream()
+                ).toList());
         return this;
     }
 
     public CaseDataBuilder includesRespondentCitizenQuery(OffsetDateTime queryCreationDatetime) {
+        CaseMessage respondentQuery = new CaseMessage();
+        respondentQuery.setId("res-query-id");
+        respondentQuery.setIsHearingRelated(YES);
+        respondentQuery.setCreatedOn(queryCreationDatetime);
         List<Element<CaseMessage>> caseMessages = new ArrayList<>();
         caseMessages.add(Element.<CaseMessage>builder()
                              .id(UUID.randomUUID())
-                             .value(
-                                 CaseMessage.builder()
-                                     .id("res-query-id")
-                                     .isHearingRelated(YES)
-                                     .createdOn(queryCreationDatetime)
-                                     .build())
+                             .value(respondentQuery)
                              .build());
-        this.queries = CaseQueriesCollection.builder()
-            .partyName("Defendant")
-            .roleOnCase("respondent-citizen")
-            .caseMessages(caseMessages).build();
+        CaseQueriesCollection caseQueries = new CaseQueriesCollection();
+        caseQueries.setPartyName("Defendant");
+        caseQueries.setRoleOnCase("respondent-citizen");
+        caseQueries.setCaseMessages(caseMessages);
+        this.queries = caseQueries;
         return this;
     }
 
     public CaseDataBuilder includesRespondentCitizenQueryResponse(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQuery(queryCreationDatetime);
-        this.queries = this.queries.toBuilder().caseMessages(
+        CaseMessage respondentResponse = new CaseMessage();
+        respondentResponse.setId("res-response-id");
+        respondentResponse.setIsHearingRelated(NO);
+        respondentResponse.setCreatedOn(queryCreationDatetime.plusHours(3));
+        respondentResponse.setParentId("res-query-id");
+        this.queries.setCaseMessages(
             Stream.concat(
                 this.queries.getCaseMessages().stream(),
                 List.of(Element.<CaseMessage>builder()
                             .id(UUID.randomUUID())
-                            .value(
-                                CaseMessage.builder()
-                                    .id("res-response-id")
-                                    .isHearingRelated(NO)
-                                    .createdOn(queryCreationDatetime.plusHours(3))
-                                    .parentId("res-query-id")
-                                    .build()).build()).stream()
-            ).toList()).build();
+                            .value(respondentResponse).build()).stream()
+            ).toList());
         return this;
     }
 
     public CaseDataBuilder includesRespondentCitizenQueryFollowUp(OffsetDateTime queryCreationDatetime) {
         includesRespondentCitizenQueryResponse(queryCreationDatetime);
-        this.queries = this.queries.toBuilder().caseMessages(
+        CaseMessage respondentFollowUp = new CaseMessage();
+        respondentFollowUp.setId("res-followup-id");
+        respondentFollowUp.setIsHearingRelated(NO);
+        respondentFollowUp.setCreatedOn(queryCreationDatetime.plusHours(5));
+        respondentFollowUp.setParentId("res-query-id");
+        this.queries.setCaseMessages(
                 Stream.concat(
                     this.queries.getCaseMessages().stream(),
                     List.of(Element.<CaseMessage>builder()
                                 .id(UUID.randomUUID())
-                                .value(
-                                    CaseMessage.builder()
-                                        .id("res-followup-id")
-                                        .isHearingRelated(NO)
-                                        .createdOn(queryCreationDatetime.plusHours(5))
-                                        .parentId("res-query-id")
-                                        .build()).build()).stream()
-                ).toList())
-            .build();
+                                .value(respondentFollowUp).build()).stream()
+                ).toList());
         return this;
     }
 
@@ -5090,7 +5051,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateDisposalHearingOrderMadeWithoutHearing() {
         disposalHearingOrderMadeWithoutHearingDJ =
-            DisposalHearingOrderMadeWithoutHearingDJ.builder().input("test").build();
+            new DisposalHearingOrderMadeWithoutHearingDJ().setInput("test");
         return this;
     }
 
@@ -5274,9 +5235,8 @@ public class CaseDataBuilder {
         atStateApplicantRespondToDefenceAndProceed();
 
         ccdState = JUDICIAL_REFERRAL;
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5285,9 +5245,8 @@ public class CaseDataBuilder {
 
         atStateApplicantRespondToDefenceAndProceed();
         ccdState = JUDICIAL_REFERRAL;
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(reason)
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(reason);
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5299,9 +5258,8 @@ public class CaseDataBuilder {
         ccdState = JUDICIAL_REFERRAL;
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
-        tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt("unforeseen complexities")
-            .build();
+        tocTransferCaseReason = new TocTransferCaseReason()
+            .setReasonForCaseTransferJudgeTxt("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5313,9 +5271,8 @@ public class CaseDataBuilder {
         ccdState = JUDICIAL_REFERRAL;
         notSuitableSdoOptions = NotSuitableSdoOptions.CHANGE_LOCATION;
 
-        tocTransferCaseReason = TocTransferCaseReason.builder()
-            .reasonForCaseTransferJudgeTxt(reason)
-            .build();
+        tocTransferCaseReason = new TocTransferCaseReason()
+            .setReasonForCaseTransferJudgeTxt(reason);
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
         return this;
     }
@@ -5332,9 +5289,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = applicant1ResponseDate.plusDays(1);
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input("unforeseen complexities")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput("unforeseen complexities");
         unsuitableSDODate = applicant1ResponseDate.plusDays(1);
 
         return this;
@@ -5352,9 +5308,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5366,9 +5321,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5386,9 +5340,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5408,9 +5361,8 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
 
-        reasonNotSuitableSDO = ReasonNotSuitableSDO.builder()
-            .input(isReason ? "unforeseen complexities" : "")
-            .build();
+        reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput(isReason ? "unforeseen complexities" : "");
         unsuitableSDODate = LocalDateTime.now();
 
         return this;
@@ -5644,9 +5596,8 @@ public class CaseDataBuilder {
                     .build())
 
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .businessProcess(BusinessProcess.builder()
-                    .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
-                    .build())
+                .businessProcess(new BusinessProcess()
+                    .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline"))
                 .build());
 
         this.generalApplications = generalApplicationValues;
@@ -6145,9 +6096,8 @@ public class CaseDataBuilder {
     public CaseData withHearingFeePBADetailsNoPaymentStatus() {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimValue(ClaimValue.builder()
-                .statementOfValueInPennies(BigDecimal.valueOf(10800))
-                .build())
+            .claimValue(new ClaimValue()
+                .setStatementOfValueInPennies(BigDecimal.valueOf(10800)))
             .allocatedTrack(SMALL_CLAIM)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
                 Organisation.builder()
@@ -6274,7 +6224,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
@@ -6301,7 +6251,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(
@@ -6329,13 +6279,13 @@ public class CaseDataBuilder {
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .respondent1(PartyBuilder.builder().individual().build())
-            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
-                .startDate(LocalDate.of(2022, 12, 12))
-                .amount("120")
-                .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joInstalmentDetails(new JudgmentInstalmentDetails()
+                .setStartDate(LocalDate.of(2022, 12, 12))
+                .setAmount("120")
+                .setPaymentFrequency(PaymentFrequency.MONTHLY))
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
+            .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IN_INSTALMENTS))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .joIsRegisteredWithRTL(YES).build();
@@ -6346,13 +6296,13 @@ public class CaseDataBuilder {
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(PartyBuilder.builder().individual().build())
             .joJudgmentRecordReason(JudgmentRecordedReason.DETERMINATION_OF_MEANS)
-            .joInstalmentDetails(JudgmentInstalmentDetails.builder()
-                .startDate(LocalDate.of(2022, 12, 12))
-                .amount("120")
-                .paymentFrequency(PaymentFrequency.MONTHLY).build())
+            .joInstalmentDetails(new JudgmentInstalmentDetails()
+                .setStartDate(LocalDate.of(2022, 12, 12))
+                .setAmount("120")
+                .setPaymentFrequency(PaymentFrequency.MONTHLY))
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IN_INSTALMENTS).build())
+            .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IN_INSTALMENTS))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -6369,7 +6319,7 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .respondent1(PartyBuilder.builder().soleTrader().build())
@@ -6377,12 +6327,20 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress() {
+        Address oldAddress = new Address();
+        oldAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+        oldAddress.setCounty("Line 1 test again for more than 35 characters");
+        oldAddress.setPostCode("Line 1 test again for more than 35 characters");
+        oldAddress.setPostTown("Line 1 test again for more than 35 characters");
+
         return build().toBuilder()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder().type(PaymentPlanSelection.PAY_IMMEDIATELY).build())
+            .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .respondent1(Party.builder()
@@ -6394,14 +6352,7 @@ public class CaseDataBuilder {
                 .partyName(
                     "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
                 .partyEmail("respondent1@gmail.com")
-                .primaryAddress(Address.builder()
-                    .addressLine1("Line 1 test again for more than 35 characters")
-                    .addressLine2("Line 1 test again for more than 35 characters")
-                    .addressLine3("Line 1 test again for more than 35 characters")
-                    .county("Line 1 test again for more than 35 characters")
-                    .postCode("Line 1 test again for more than 35 characters")
-                    .postTown("Line 1 test again for more than 35 characters")
-                    .build())
+                .primaryAddress(oldAddress)
                 .build())
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -6413,9 +6364,9 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder()
-                .type(PaymentPlanSelection.PAY_BY_DATE)
-                .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
+            .joPaymentPlan(new JudgmentPaymentPlan()
+                .setType(PaymentPlanSelection.PAY_BY_DATE)
+                .setPaymentDeadlineDate(LocalDate.of(2023, 12, 12)))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
@@ -6431,9 +6382,9 @@ public class CaseDataBuilder {
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
             .joAmountOrdered("1200")
             .joAmountCostOrdered("1100")
-            .joPaymentPlan(JudgmentPaymentPlan.builder()
-                .type(PaymentPlanSelection.PAY_BY_DATE)
-                .paymentDeadlineDate(LocalDate.of(2023, 12, 12)).build())
+            .joPaymentPlan(new JudgmentPaymentPlan()
+                .setType(PaymentPlanSelection.PAY_BY_DATE)
+                .setPaymentDeadlineDate(LocalDate.of(2023, 12, 12)))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .joIsRegisteredWithRTL(YES)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
@@ -6441,63 +6392,64 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days() {
+        JudgmentPaidInFull paidInFull = new JudgmentPaidInFull();
+        paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(35));
+        paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
-            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.now().plusDays(35))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build())
+            .joJudgmentPaidInFull(paidInFull)
             .joIsRegisteredWithRTL(YES)
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .activeJudgment(new JudgmentDetails().setIssueDate(LocalDate.now()))
             .locationName("Barnet Court")
             .legacyCaseReference("000MC015")
             .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days() {
+        JudgmentPaidInFull paidInFull = new JudgmentPaidInFull();
+        paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
+        paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+
         return build().toBuilder()
             .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .joOrderMadeDate(LocalDate.of(2023, 3, 1))
-            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build())
+            .joJudgmentPaidInFull(paidInFull)
             .joIsRegisteredWithRTL(YES)
             .caseManagementLocation(new CaseLocationCivil()
                 .setBaseLocation("231596")
                 .setRegion("2"))
             .legacyCaseReference("000MC015")
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .activeJudgment(new JudgmentDetails().setIssueDate(LocalDate.now()))
             .build();
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc() {
 
         CaseData caseData = buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .defendant1Name("Test name")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .fullyPaymentMadeDate(LocalDate.now().plusDays(15))
-            .state(JudgmentState.SATISFIED)
-            .totalAmount("90000")
-            .issueDate(LocalDate.now())
-            .issueDate(LocalDate.now()).build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setDefendant1Name("Test name")
+            .setDefendant1Address(new JudgmentAddress())
+            .setFullyPaymentMadeDate(LocalDate.now().plusDays(15))
+            .setState(JudgmentState.SATISFIED)
+            .setTotalAmount("90000")
+            .setIssueDate(LocalDate.now());
         caseData.setActiveJudgment(activeJudgment);
         return caseData;
     }
 
     public CaseData buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc() {
         CaseData caseData = buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .defendant1Name("Test name")
-            .defendant1Address(JudgmentAddress.builder().build())
-            .fullyPaymentMadeDate(null)
-            .state(JudgmentState.CANCELLED)
-            .totalAmount("90000")
-            .issueDate(LocalDate.now()).build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setDefendant1Name("Test name")
+            .setDefendant1Address(new JudgmentAddress())
+            .setFullyPaymentMadeDate(null)
+            .setState(JudgmentState.CANCELLED)
+            .setTotalAmount("90000")
+            .setIssueDate(LocalDate.now());
         caseData.setActiveJudgment(activeJudgment);
         return caseData;
     }
@@ -6544,6 +6496,10 @@ public class CaseDataBuilder {
     }
 
     public CaseData getDefaultJudgment1v1CaseJudgmentPaid() {
+        JudgmentPaidInFull paidInFull = new JudgmentPaidInFull();
+        paidInFull.setDateOfFullPaymentMade(LocalDate.now().plusDays(15));
+        paidInFull.setConfirmFullPaymentMade(List.of("CONFIRMED"));
+
         return build().toBuilder()
             .respondent1ResponseDeadline(LocalDateTime.now().minusDays(15))
             .partialPayment(YesOrNo.YES)
@@ -6558,11 +6514,8 @@ public class CaseDataBuilder {
                     .label("Test User")
                     .build())
                 .build())
-            .joJudgmentPaidInFull(JudgmentPaidInFull.builder()
-                .dateOfFullPaymentMade(LocalDate.now().plusDays(15))
-                .confirmFullPaymentMade(List.of("CONFIRMED"))
-                .build())
-            .activeJudgment(JudgmentDetails.builder().issueDate(LocalDate.now()).build())
+            .joJudgmentPaidInFull(paidInFull)
+            .activeJudgment(new JudgmentDetails().setIssueDate(LocalDate.now()))
             .build();
     }
 
@@ -6598,22 +6551,22 @@ public class CaseDataBuilder {
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
-            CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date)
-                .cosDateDeemedServedForDefendant(deemed1Date);
+            CertificateOfService cos1 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos1Date)
+                .setCosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
-                cos1Builder.cosEvidenceDocument(files);
+                cos1.setCosEvidenceDocument(files);
             }
-            this.cosNotifyClaimDetails1 = cos1Builder.build();
+            this.cosNotifyClaimDetails1 = cos1;
         }
         if (setCos2) {
-            CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date)
-                .cosDateDeemedServedForDefendant(deemed2Date);
+            CertificateOfService cos2 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos2Date)
+                .setCosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files2);
+                cos2.setCosEvidenceDocument(files2);
             }
-            this.cosNotifyClaimDetails2 = cos2Builder.build();
+            this.cosNotifyClaimDetails2 = cos2;
         }
         return this;
     }
@@ -7248,50 +7201,47 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atSmallClaimsWitnessStatementWithNegativeInputs() {
         atStateClaimNotified();
-        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .input2("-3")
-            .input3("-3")
-            .build();
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setInput2("-3");
+        witnessStatement.setInput3("-3");
+        this.smallClaimsWitnessStatement = witnessStatement;
 
         return this;
     }
 
     public CaseDataBuilder atFastTrackWitnessOfFactWithNegativeInputs() {
         atStateClaimNotified();
-        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input2("-3")
-            .input3("-3")
-            .build();
+        this.fastTrackWitnessOfFact = new FastTrackWitnessOfFact()
+            .setInput2("-3")
+            .setInput3("-3");
 
         return this;
     }
 
     public CaseDataBuilder atSmallClaimsWitnessStatementWithPositiveInputs() {
         atStateClaimNotified();
-        this.smallClaimsWitnessStatement = SmallClaimsWitnessStatement.builder()
-            .input2("3")
-            .input3("3")
-            .build();
+        SmallClaimsWitnessStatement witnessStatement = new SmallClaimsWitnessStatement();
+        witnessStatement.setInput2("3");
+        witnessStatement.setInput3("3");
+        this.smallClaimsWitnessStatement = witnessStatement;
 
         return this;
     }
 
     public CaseDataBuilder atSmallSmallClaimsFlightDelayInputs() {
         atStateClaimNotified();
-        this.smallClaimsFlightDelay = SmallClaimsFlightDelay.builder()
-            .relatedClaimsInput(" ")
-            .legalDocumentsInput(" ")
-            .build();
+        this.smallClaimsFlightDelay = new SmallClaimsFlightDelay();
+        this.smallClaimsFlightDelay.setRelatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+        this.smallClaimsFlightDelay.setLegalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
 
         return this;
     }
 
     public CaseDataBuilder atFastTrackWitnessOfFactWithPositiveInputs() {
         atStateClaimNotified();
-        this.fastTrackWitnessOfFact = FastTrackWitnessOfFact.builder()
-            .input2("3")
-            .input3("3")
-            .build();
+        this.fastTrackWitnessOfFact = new FastTrackWitnessOfFact()
+            .setInput2("3")
+            .setInput3("3");
 
         return this;
     }
@@ -7535,59 +7485,47 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder addApplicant1MediationInfo() {
-        this.app1MediationContactInfo = MediationContactInformation.builder()
-            .firstName("Contact")
-            .lastName("person")
-            .emailAddress("Contact.person@mediation.com")
-            .telephoneNumber("07888888888")
-            .build();
+        MediationContactInformation info = new MediationContactInformation("Contact", "person", "Contact.person@mediation.com", "07888888888");
+        this.app1MediationContactInfo = info;
 
         return this;
     }
 
     public CaseDataBuilder addApplicant1MediationAvailability() {
-        this.app1MediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(getMediationUnavailableDates())
-            .build();
+        MediationAvailability availability = new MediationAvailability();
+        availability.setIsMediationUnavailablityExists(YES);
+        availability.setUnavailableDatesForMediation(getMediationUnavailableDates());
+        this.app1MediationAvailability = availability;
         return this;
     }
 
     public CaseDataBuilder addRespondent1MediationInfo() {
-        this.resp1MediationContactInfo = MediationContactInformation.builder()
-            .firstName("Contact")
-            .lastName("person")
-            .emailAddress("Contact.person@mediation.com")
-            .telephoneNumber("07888888888")
-            .build();
+        MediationContactInformation info = new MediationContactInformation("Contact", "person", "Contact.person@mediation.com", "07888888888");
+        this.resp1MediationContactInfo = info;
 
         return this;
     }
 
     public CaseDataBuilder addRespondent1MediationAvailability() {
-        this.resp1MediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(getMediationUnavailableDates())
-            .build();
+        MediationAvailability availability = new MediationAvailability();
+        availability.setIsMediationUnavailablityExists(YES);
+        availability.setUnavailableDatesForMediation(getMediationUnavailableDates());
+        this.resp1MediationAvailability = availability;
         return this;
     }
 
     public CaseDataBuilder addRespondent2MediationInfo() {
-        this.resp2MediationContactInfo = MediationContactInformation.builder()
-            .firstName("Contact")
-            .lastName("person")
-            .emailAddress("Contact.person@mediation.com")
-            .telephoneNumber("07888888888")
-            .build();
+        MediationContactInformation info = new MediationContactInformation("Contact", "person", "Contact.person@mediation.com", "07888888888");
+        this.resp2MediationContactInfo = info;
 
         return this;
     }
 
     public CaseDataBuilder addRespondent2MediationAvailability() {
-        this.resp2MediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(getMediationUnavailableDates())
-            .build();
+        MediationAvailability availability = new MediationAvailability();
+        availability.setIsMediationUnavailablityExists(YES);
+        availability.setUnavailableDatesForMediation(getMediationUnavailableDates());
+        this.resp2MediationAvailability = availability;
         return this;
     }
 
@@ -7659,39 +7597,39 @@ public class CaseDataBuilder {
         } else {
             documentsReferred = null;
         }
-        this.uploadDocumentsForm = UploadMediationDocumentsForm.builder()
-            .uploadMediationDocumentsPartyChosen(DynamicList.builder()
-                .value(DynamicListElement.builder()
-                    .code(partyChosen)
-                    .build())
+        UploadMediationDocumentsForm form = new UploadMediationDocumentsForm();
+        form.setUploadMediationDocumentsPartyChosen(DynamicList.builder()
+            .value(DynamicListElement.builder()
+                .code(partyChosen)
                 .build())
-            .mediationDocumentsType(documentTypes)
-            .documentsReferredForm(documentsReferred)
-            .nonAttendanceStatementForm(mediationNonAttendanceStatement)
-            .build();
+            .build());
+        form.setMediationDocumentsType(documentTypes);
+        form.setDocumentsReferredForm(documentsReferred);
+        form.setNonAttendanceStatementForm(mediationNonAttendanceStatement);
+        this.uploadDocumentsForm = form;
         return this;
     }
 
     public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
-        return wrapElements(MediationNonAttendanceStatement.builder()
-            .yourName("My name")
-            .document(Document.builder()
-                .documentFileName("Mediation non attendance")
-                .build())
-            .documentDate(LocalDate.of(2023, 4, 2))
-            .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+        MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
+        statement.setYourName("My name");
+        statement.setDocument(Document.builder()
+            .documentFileName("Mediation non attendance")
             .build());
+        statement.setDocumentDate(LocalDate.of(2023, 4, 2));
+        statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
+        return wrapElements(statement);
     }
 
     private List<Element<MediationDocumentsReferredInStatement>> buildMediationDocumentsReferred() {
-        return wrapElements(MediationDocumentsReferredInStatement.builder()
-            .documentType("type")
-            .document(Document.builder()
-                .documentFileName("Referred documents")
-                .build())
-            .documentDate(LocalDate.of(2023, 4, 2))
-            .documentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1))
+        MediationDocumentsReferredInStatement statement = new MediationDocumentsReferredInStatement();
+        statement.setDocumentType("type");
+        statement.setDocument(Document.builder()
+            .documentFileName("Referred documents")
             .build());
+        statement.setDocumentDate(LocalDate.of(2023, 4, 2));
+        statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
+        return wrapElements(statement);
     }
 
     public CaseDataBuilder atStateRespondent1v1BilingualFlagSet() {
