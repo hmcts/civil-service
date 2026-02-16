@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.docmosis.claimantresponse;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.PaymentFrequencyClaimantResponseLRspec;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.RepaymentPlanLRspec;
 import uk.gov.hmcts.reform.civil.model.citizenui.AdditionalLipPartyDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.docmosis.common.Party;
@@ -43,6 +43,7 @@ import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JudgmentByAdmissionOrDeterminationMapper {
 
     private final DeadlineExtensionCalculatorService deadlineCalculatorService;
@@ -50,7 +51,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     private final OrganisationService organisationService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d MMMM yyyy 'at' h:mma");
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy");
-    private static final Logger log = LoggerFactory.getLogger(JudgmentByAdmissionOrDeterminationMapper.class);
 
     public JudgmentByAdmissionOrDetermination toClaimantResponseForm(CaseData caseData, CaseEvent caseEvent) {
         Optional<CaseDataLiP> caseDataLip = Optional.ofNullable(caseData.getCaseDataLiP());
@@ -157,7 +157,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             || !PaymentType.REPAYMENT_PLAN
             .equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())) {
 
-            log.info("Repayment option is not REPAYMENT_PLAN. Skipping repayment plan.");
+            log.info("Repayment option is not REPAYMENT_PLAN. Skipping repayment plan for case_reference : {}.",caseData.getCcdCaseReference());
             return null;
         }
 
@@ -173,11 +173,11 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 : caseData.getRespondent2RepaymentPlan();
 
             if (repaymentPlan == null) {
-                log.info("Accepted repayment plan expected but no respondent repayment plan found.");
+                log.info("Accepted repayment plan expected but no respondent repayment plan found for case_reference : {}.",caseData.getCcdCaseReference());
                 return null;
             }
 
-            log.info("Building repayment plan from respondent data.");
+            log.info("Building repayment plan from respondent data for case_reference : {}.",caseData.getCcdCaseReference());
 
             return new RepaymentPlanTemplateData()
                 .setFirstRepaymentDate(repaymentPlan.getFirstRepaymentDate())
@@ -187,7 +187,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
                 .setPaymentFrequencyDisplay(repaymentPlan.getPaymentFrequencyDisplay());
         }
 
-        log.info("Building repayment plan from applicant suggested instalments.");
+        log.info("Building repayment plan from applicant suggested instalments for case_reference : {}.",caseData.getCcdCaseReference());
 
         return new RepaymentPlanTemplateData()
             .setFirstRepaymentDate(
@@ -472,24 +472,58 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getInstalmentAmount(CaseData caseData) {
+        if (caseData == null) {
+            return null;
+        }
+
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
             || caseData.hasApplicant1AcceptedCourtDecision()) {
-            return PaymentType.REPAYMENT_PLAN.equals(caseData.getApplicant1RepaymentOptionForDefendantSpec())
+
+            return PaymentType.REPAYMENT_PLAN.equals(
+                caseData.getApplicant1RepaymentOptionForDefendantSpec())
                 || caseData.hasApplicant1AcceptedCourtDecision()
                 ? getAmount(caseData)
                 : null;
+
         } else {
-            return caseData.isPayByInstallment()
-                ? String.valueOf(MonetaryConversions.penniesToPounds(
-                    caseData.getRespondent1RepaymentPlan().getPaymentAmount()))
-                : null;
+
+            if (!caseData.isPayByInstallment()) {
+                log.info("is payment by installment : {} for case_reference : {}.",caseData.isPayByInstallment(),caseData.getCcdCaseReference());
+                return null;
+            }
+
+            RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
+            if (repaymentPlan == null || repaymentPlan.getPaymentAmount() == null) {
+                log.info("repaymentPlan or payment amount is null for case_reference : {}.", caseData.getCcdCaseReference());
+                return null;
+            }
+
+            return String.valueOf(
+                MonetaryConversions.penniesToPounds(
+                    repaymentPlan.getPaymentAmount()
+                )
+            );
         }
     }
 
     private String getAmount(CaseData caseData) {
-        BigDecimal amount = caseData.hasApplicant1AcceptedCourtDecision()
-            ? caseData.getRespondent1RepaymentPlan().getPaymentAmount()
-            : caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
-        return amount != null ? String.valueOf(MonetaryConversions.penniesToPounds(amount)) : null;
+        if (caseData == null) {
+            return null;
+        }
+
+        BigDecimal amount = null;
+
+        if (caseData.hasApplicant1AcceptedCourtDecision()) {
+            RepaymentPlanLRspec repaymentPlan = caseData.getRespondent1RepaymentPlan();
+            if (repaymentPlan != null) {
+                amount = repaymentPlan.getPaymentAmount();
+            }
+        } else {
+            amount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
+        }
+
+        return amount != null
+            ? String.valueOf(MonetaryConversions.penniesToPounds(amount))
+            : null;
     }
 }
