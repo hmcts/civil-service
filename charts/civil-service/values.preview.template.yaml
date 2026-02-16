@@ -29,7 +29,7 @@ java:
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-    ROLE_ASSIGNMENT_API_URL: https://${SERVICE_NAME}-am-role-assignment-service
+    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
     FEES_API_URL: https://wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
@@ -165,8 +165,8 @@ xui-webapp:
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
-      SERVICES_ROLE_ASSIGNMENT_API: https://${SERVICE_NAME}-am-role-assignment-service
-      HEALTH_ROLE_ASSIGNMENT_API: http://$${SERVICE_NAME}-am-role-assignment-service/health
+      SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-service-${SERVICE_FQDN}
+      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
       SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: ~
@@ -362,6 +362,7 @@ aac-manage-case-assignment:
       IDAM_NOC_APPROVER_USERNAME: ${IDAM_NOC_APPROVER_USERNAME}
       IDAM_NOC_APPROVER_PASSWORD: ${IDAM_NOC_APPROVER_PASSWORD}
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
+      ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
     autoscaling:
       enabled: false
 
@@ -550,7 +551,7 @@ wiremockMappings:
         "body": "{\"status\":\"UP\"}"
       }
     }
-    
+
 servicebus:
   enabled: true
   releaseNameOverride: ${SERVICE_NAME}-asb
