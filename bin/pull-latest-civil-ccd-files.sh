@@ -32,29 +32,18 @@ if [ -z "${mergedDefinitionsDir:-}" ]; then
   exit 1
 fi
 
-rm -rf ./ccd-definition ./ga-ccd-definition
+rm -rf ./ccd-definition
 cp -r "${mergedDefinitionsDir}" ./ccd-definition
 
-if [ "${FT_TYPE:-}" = "CIVIL_FT" ]; then
-  cp -r "./${ccdRepoName}/e2e" .
-  cp -r "./${ccdRepoName}/playwright-e2e" .
-  cp -r "./${ccdRepoName}/plugins" .
-  cp -r "./${ccdRepoName}/package.json" .
-  cp -r "./${ccdRepoName}/yarn.lock" .
-  cp -r "./${ccdRepoName}/.yarnrc.yml" .
-  cp -r "./${ccdRepoName}/.yarn" .
-  cp -r "./${ccdRepoName}/codecept.conf.js" .
-  cp -r "./${ccdRepoName}/playwright.config.ts" .
-  cp -r "./${ccdRepoName}/saucelabs.conf.js" .
-fi
-
-if [ "${FT_TYPE:-}" = "GENERAL_APPS_FT" ]; then
-  cp -r "./${ccdRepoName}/e2e" .
-  cp -r "./${ccdRepoName}/package.json" .
-  cp -r "./${ccdRepoName}/yarn.lock" .
-  cp -r "./${ccdRepoName}/codecept.conf.js" .
-  cp -r "./${ccdRepoName}/saucelabs.conf.js" .
-  cp -r ./bin/yarn/.yarnrc.yml .
-fi
+cp -r "./${ccdRepoName}/e2e" .
+cp -r "./${ccdRepoName}/playwright-e2e" .
+cp -r "./${ccdRepoName}/plugins" .
+cp -r "./${ccdRepoName}/package.json" .
+cp -r "./${ccdRepoName}/yarn.lock" .
+cp -r "./${ccdRepoName}/.yarnrc.yml" .
+cp -r "./${ccdRepoName}/.yarn" .
+cp -r "./${ccdRepoName}/codecept.conf.js" .
+cp -r "./${ccdRepoName}/playwright.config.ts" .
+cp -r "./${ccdRepoName}/saucelabs.conf.js" .
 
 rm -rf "./${ccdRepoName}"

@@ -91,11 +91,6 @@ elif [ ! -f "$TEST_FILES_REPORT" ] || [ ! -s "$TEST_FILES_REPORT" ]; then
   echo "testFilesReport.json not found or is empty."
   run_functional_tests
 
-#Check if ftType is not the same as ftType of test files report
-elif [ "$(jq -r 'if .ftType == null then "__NULL__" else .ftType end' "$TEST_FILES_REPORT")" != "$FT_TYPE" ]; then
-  echo "The ftType does not match the current FT_TYPE.";
-  run_functional_tests
-
 #Check if latest current git commit is the not the same as git commit of test files report
 elif [ "$(jq -r 'if .gitCommitId == null then "__NULL__" else .gitCommitId end' "$TEST_FILES_REPORT")" != "$GIT_COMMIT" ]; then
   echo "The gitCommitId does not match the current GIT_COMMIT.";

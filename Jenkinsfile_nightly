@@ -160,7 +160,6 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
-  env.FT_TYPE = "CIVIL_FT"
   env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT
