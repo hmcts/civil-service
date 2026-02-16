@@ -1,0 +1,28 @@
+{
+  "name": "Send Letter API - Get Letter Status",
+  "request": {
+    "method": "GET",
+    "urlPattern": "/letters/[a-fA-F0-9-]+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": "af0e7cd4-c0a4-4c4a-8f7e-1234567890ab",
+      "status": "Posted",
+      "message_id": "msg-12345",
+      "checksum": "abc123checksum",
+      "created_at": "2024-01-15T10:30:00.000Z",
+      "sent_to_print_at": "2024-01-15T10:35:00.000Z",
+      "printed_at": "2024-01-15T11:00:00.000Z",
+      "additional_data": {
+        "letterType": "test-letter",
+        "caseIdentifier": "1234567890",
+        "caseReferenceNumber": "000MC001"
+      },
+      "copies": 1
+    }
+  }
+}

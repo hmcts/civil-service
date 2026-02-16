@@ -55,6 +55,7 @@ java:
     DOCUMENT_MANAGEMENT_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
+    SEND_LETTER_URL: http://${SERVICE_NAME}-wiremock
   keyVaults:
     civil:
       resourceGroup: civil
