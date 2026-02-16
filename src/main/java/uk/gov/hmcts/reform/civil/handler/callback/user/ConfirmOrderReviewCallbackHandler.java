@@ -163,14 +163,15 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
             caseData.setObligationData(null);
             caseData.setStoredObligationData(combinedData);
         }
-        caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
+
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
+            caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
-
+        caseData.setEnableUploadEvent(YesOrNo.YES);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
@@ -182,7 +183,7 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
         log.info("Evidence upload event eaCourtLocation {} is for caseId {}", eaFlag, caseData.getCcdCaseReference());
         boolean result = (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack) || AllocatedTrack.INTERMEDIATE_CLAIM.equals(allocatedTrack))
-                    && YesOrNo.YES.equals(caseData.getIsFinalOrder()) && eaFlag;
+                     && eaFlag;
         log.info("Evidence upload event is enabled for minti claim {} for caseId {}", result, caseData.getCcdCaseReference());
         return result ? YesOrNo.YES : YesOrNo.NO;
     }

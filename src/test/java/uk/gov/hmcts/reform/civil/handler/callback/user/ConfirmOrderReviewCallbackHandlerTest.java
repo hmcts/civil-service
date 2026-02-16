@@ -185,6 +185,19 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_v2() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+        }
+
+        @Test
         void shouldSetStoredObligationData_whenObligationDataIsPresent() {
             LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 1, 10, 10, 10);
             Mockito.when(time.now()).thenReturn(localDateTime);
