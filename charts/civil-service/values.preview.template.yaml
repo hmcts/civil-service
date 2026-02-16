@@ -28,8 +28,8 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment
-    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-${SERVICE_FQDN}
+    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
     FEES_API_URL: https://wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
@@ -165,8 +165,8 @@ xui-webapp:
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
       SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
-      SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-${SERVICE_FQDN}
-      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment/health
+      SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-service-${SERVICE_FQDN}
+      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
       SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: ~
@@ -288,10 +288,9 @@ ccd:
       devcpuRequests: 2000m
       devmemoryLimits: 4096Mi
       devcpuLimits: 4000m
-      releaseNameOverride: ${SERVICE_NAME}-am-role-assignment-service
       imagePullPolicy: Always
       image: hmctspublic.azurecr.io/am/role-assignment-service:latest
-      ingressHost: am-role-assignment-${SERVICE_FQDN}
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
       environment:
         RELEASE_REVISION: "{{ .Release.Revision }}"
         ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}

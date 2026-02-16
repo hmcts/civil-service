@@ -47,7 +47,7 @@ def copyPreviousAllureHistory() {
         target: targetDir,
         flatten: true
       )
-      
+
       buildFound = true
       echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
@@ -194,7 +194,7 @@ withPipeline(type, product, component) {
     env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.FT_TYPE = getFunctionalTestsType()
 
