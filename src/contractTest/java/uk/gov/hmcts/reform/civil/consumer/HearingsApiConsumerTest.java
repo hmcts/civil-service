@@ -10,8 +10,10 @@ import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -39,6 +41,7 @@ import static org.mockito.Mockito.when;
 @PactTestFor(providerName = "fis_hmc_api")
 @MockServerConfig(hostInterface = "localhost", port = "8991")
 @TestPropertySource(properties = "hmc.api.url=http://localhost:8991")
+@ExtendWith(MockitoExtension.class)
 public class HearingsApiConsumerTest extends BaseContractTest {
 
     private static final String HEARING_ID = "2000000000000000";
@@ -50,10 +53,10 @@ public class HearingsApiConsumerTest extends BaseContractTest {
     private static final LocalDateTime HEARING_END = HEARING_START.plusHours(2);
     private static final LocalDateTime PARTIES_NOTIFIED_DATE = LocalDateTime.of(2024, 10, 5, 14, 45);
 
-    @Autowired
+    @InjectMocks
     private HearingsService hearingsService;
 
-    @MockBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
 
     @BeforeEach
@@ -163,7 +166,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
         PartiesNotifiedResponses response = hearingsService.getPartiesNotifiedResponses(AUTHORIZATION_TOKEN, HEARING_ID);
 
         assertThat(response.getResponses()).hasSize(1);
-        assertThat(response.getResponses().get(0).getServiceData().isHearingNoticeGenerated()).isFalse();
+        assertThat(response.getResponses().getFirst().getServiceData().isHearingNoticeGenerated()).isFalse();
     }
 
     @Test
@@ -177,7 +180,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
             getPartiesNotifiedPayload()
         );
 
-        assertThat(response.getStatusCodeValue()).isEqualTo(HttpStatus.SC_OK);
+        assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.SC_OK);
     }
 
     @Test
@@ -201,7 +204,7 @@ public class HearingsApiConsumerTest extends BaseContractTest {
 
         assertThat(response.getCaseRef()).isEqualTo(CASE_REFERENCE);
         assertThat(response.getCaseHearings()).hasSize(1);
-        assertThat(response.getCaseHearings().get(0).getHmcStatus()).isEqualTo("LISTED");
+        assertThat(response.getCaseHearings().getFirst().getHmcStatus()).isEqualTo("LISTED");
     }
 
     private PartiesNotified getPartiesNotifiedPayload() {
