@@ -676,6 +676,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData()).containsEntry("applicant2ResponseDate", localDateTime.format(ISO_DATE_TIME));
             assertThat(response.getData()).extracting("applicant2DQStatementOfTruth").isNotNull();
+            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YES.getLabel());
         }
 
         @ParameterizedTest
