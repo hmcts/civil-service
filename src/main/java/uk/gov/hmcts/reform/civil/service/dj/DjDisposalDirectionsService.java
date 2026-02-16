@@ -34,11 +34,8 @@ public class DjDisposalDirectionsService {
         // existing cases
         LocalDate orderDeadline = deadlineService.workingDaysFromNow(5);
         caseDataBuilder.disposalHearingOrderMadeWithoutHearingDJ(
-            DisposalHearingOrderMadeWithoutHearingDJ
-                .builder()
-                .input(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline))
-                .build()
-        );
+            new DisposalHearingOrderMadeWithoutHearingDJ()
+                .setInput(welshLanguageService.buildOrderMadeWithoutHearingText(orderDeadline)));
 
         caseDataBuilder.sdoR2DisposalHearingWelshLanguageDJ(
             welshLanguageService.buildWelshUsage());

@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
@@ -63,6 +64,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         List<T> caseReferences = new ArrayList<>();
         String caseIds = externalTask.getVariable("caseIds");
         String scenario = externalTask.getVariable("scenario");
+        String camundaProcessIdentifier = externalTask.getVariable("notificationCamundaProcessIdentifier");
         String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
@@ -100,6 +102,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                         scenarioInstance.setCaseReference(id);
                         scenarioInstance.setDashboardScenario(scenario);
                         instance = scenarioInstance;
+                    } else if (camundaProcessIdentifier != null) {
+                        NotificationCaseReference notifyCaseReference = new NotificationCaseReference();
+                        notifyCaseReference.setCaseReference(id);
+                        notifyCaseReference.setCamundaProcessIdentifier(camundaProcessIdentifier);
+                        instance = notifyCaseReference;
                     } else if (caseNoteElementId != null) {
                         CaseNoteReference caseNoteReference = new CaseNoteReference();
                         caseNoteReference.setCaseReference(id);
@@ -126,7 +133,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
 
         if (caseReferences.isEmpty()) {
             log.warn("No case references found to process");
-            return ExternalTaskData.builder().build();
+            return new ExternalTaskData();
         }
 
         log.info("Found {} case references to process", caseReferences.size());
@@ -134,7 +141,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String state = externalTask.getVariable("state");
         asyncCaseMigrationService.migrateCasesAsync(task, caseReferences, state);
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     protected <T extends CaseReference> List<T> getCaseReferenceList(Class<T> type, String csvFileName) {

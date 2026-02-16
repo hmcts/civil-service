@@ -105,11 +105,10 @@ class ExpenditureCalculatorTest {
     }
 
     private List<Element<DebtLRspec>> createDebts() {
-        return wrapElements(DebtLRspec.builder()
-                                .debtType(DebtTypeLRspec.MORTGAGE)
-                                .paymentAmount(new BigDecimal(20000))
-                                .paymentFrequency(ONCE_TWO_WEEKS)
-                                .build());
+        return wrapElements(new DebtLRspec()
+                                .setDebtType(DebtTypeLRspec.MORTGAGE)
+                                .setPaymentAmount(new BigDecimal(20000))
+                                .setPaymentFrequency(ONCE_TWO_WEEKS));
     }
 
     private List<Element<LoanCardDebtLRspec>> createLoanCardDents() {

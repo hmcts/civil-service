@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
+
 @Component
 public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
@@ -25,6 +27,7 @@ public class NotifyClaimAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerat
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
+        properties.put(RESPONDENT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         properties.putAll(notifyClaimHelper.retrieveCustomProperties(caseData));
         return properties;
     }

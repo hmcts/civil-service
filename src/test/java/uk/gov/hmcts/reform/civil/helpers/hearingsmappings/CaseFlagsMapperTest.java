@@ -19,9 +19,9 @@ public class CaseFlagsMapperTest {
             .atStateRespondentFullDefence()
             .build();
 
-        CaseFlags expectedCaseFlags = CaseFlags.builder()
-            .flags(List.of(PartyFlagsModel.builder()
-                               .build())).build();
+        CaseFlags expectedCaseFlags = new CaseFlags();
+        PartyFlagsModel emptyFlag = new PartyFlagsModel();
+        expectedCaseFlags.setFlags(List.of(emptyFlag));
 
         CaseFlagsMapper.getCaseFlags(caseData);
 
@@ -35,28 +35,28 @@ public class CaseFlagsMapperTest {
             .withRespondent1Flags()
             .build();
 
-        CaseFlags expectedCaseFlags = CaseFlags.builder()
-            .flags(List.of(PartyFlagsModel.builder()
-                               .partyID("res-1-party-id")
-                               .partyName(caseData.getRespondent1().getPartyName())
-                               .flagParentId("")
-                               .flagId("AB001")
-                               .flagDescription("Vulnerable user")
-                               .flagStatus("Active")
-                               .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                               .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                               .build(),
-                           PartyFlagsModel.builder()
-                               .partyID("res-1-party-id")
-                               .partyName(caseData.getRespondent1().getPartyName())
-                               .flagParentId("")
-                               .flagId("SM001")
-                               .flagDescription("Flight risk")
-                               .flagStatus("Active")
-                               .dateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0))
-                               .dateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0))
-                               .build()))
-            .build();
+        PartyFlagsModel flagOne = new PartyFlagsModel();
+        flagOne.setPartyID("res-1-party-id");
+        flagOne.setPartyName(caseData.getRespondent1().getPartyName());
+        flagOne.setFlagParentId("");
+        flagOne.setFlagId("AB001");
+        flagOne.setFlagDescription("Vulnerable user");
+        flagOne.setFlagStatus("Active");
+        flagOne.setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0));
+        flagOne.setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
+
+        PartyFlagsModel flagTwo = new PartyFlagsModel();
+        flagTwo.setPartyID("res-1-party-id");
+        flagTwo.setPartyName(caseData.getRespondent1().getPartyName());
+        flagTwo.setFlagParentId("");
+        flagTwo.setFlagId("SM001");
+        flagTwo.setFlagDescription("Flight risk");
+        flagTwo.setFlagStatus("Active");
+        flagTwo.setDateTimeCreated(LocalDateTime.of(2024, 1, 1,  9, 0, 0));
+        flagTwo.setDateTimeModified(LocalDateTime.of(2024, 2, 1,  12, 0, 0));
+
+        CaseFlags expectedCaseFlags = new CaseFlags();
+        expectedCaseFlags.setFlags(List.of(flagOne, flagTwo));
 
         CaseFlagsMapper.getCaseFlags(caseData);
 

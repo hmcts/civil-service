@@ -67,11 +67,10 @@ class RoboticsAddressMapperTest {
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
             assertThat(roboticsAddress)
-                .isEqualTo(RoboticsAddress.builder()
-                               .addressLine1("address line 1, address line 1")
-                               .addressLine2("address line 2")
-                               .postCode("SW1 1AA")
-                               .build());
+                .isEqualTo(new RoboticsAddress()
+                               .setAddressLine1("address line 1, address line 1")
+                               .setAddressLine2("address line 2")
+                               .setPostCode("SW1 1AA"));
         }
 
         @Test
@@ -84,12 +83,11 @@ class RoboticsAddressMapperTest {
             RoboticsAddress roboticsAddress = mapper.toRoboticsAddress(address);
 
             assertThat(roboticsAddress)
-                .isEqualTo(RoboticsAddress.builder()
-                               .addressLine1("address line 1, address line 1")
-                               .addressLine2("address line 2, address line 2")
-                               .addressLine3("address line 3")
-                               .postCode("SW1 1AA")
-                               .build());
+                .isEqualTo(new RoboticsAddress()
+                               .setAddressLine1("address line 1, address line 1")
+                               .setAddressLine2("address line 2, address line 2")
+                               .setAddressLine3("address line 3")
+                               .setPostCode("SW1 1AA"));
         }
     }
 
