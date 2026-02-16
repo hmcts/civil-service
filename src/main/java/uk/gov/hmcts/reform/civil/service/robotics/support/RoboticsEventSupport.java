@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BinaryOperator;
 
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_FILED;
@@ -19,66 +21,70 @@ public final class RoboticsEventSupport {
         // utility class
     }
 
-    public static Event buildMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildMiscEvent(EventHistory builder,
                                        RoboticsSequenceGenerator sequenceGenerator,
                                        String message,
                                        LocalDateTime dateReceived) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(dateReceived)
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build();
+        return createEvent(
+            sequenceGenerator.nextSequence(builder),
+            MISCELLANEOUS.getCode(),
+            dateReceived,
+            null,
+            message,
+            new EventDetails().setMiscText(message)
+        );
     }
 
-    public static Event buildDirectionsQuestionnaireEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildDirectionsQuestionnaireEvent(EventHistory builder,
                                                           RoboticsSequenceGenerator sequenceGenerator,
                                                           LocalDateTime dateReceived,
                                                           String partyId,
                                                           DQ dq,
                                                           String preferredCourtCode,
                                                           String eventDetailsText) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode())
-            .dateReceived(dateReceived)
-            .litigiousPartyID(partyId)
-            .eventDetailsText(eventDetailsText)
-            .eventDetails(EventDetails.builder()
-                              .stayClaim(RoboticsDirectionsQuestionnaireSupport.isStayClaim(dq))
-                              .preferredCourtCode(preferredCourtCode)
-                              .preferredCourtName("")
-                              .build())
-            .build();
+        return createEvent(
+            sequenceGenerator.nextSequence(builder),
+            EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode(),
+            dateReceived,
+            partyId,
+            eventDetailsText,
+            new EventDetails()
+                .setStayClaim(RoboticsDirectionsQuestionnaireSupport.isStayClaim(dq))
+                .setPreferredCourtCode(preferredCourtCode)
+                .setPreferredCourtName("")
+        );
     }
 
-    public static Event buildDefenceOrStatesPaidEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildDefenceOrStatesPaidEvent(EventHistory builder,
                                                       RoboticsSequenceGenerator sequenceGenerator,
                                                       LocalDateTime dateReceived,
                                                       String partyId,
                                                       boolean statesPaid) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(statesPaid ? STATES_PAID.getCode() : DEFENCE_FILED.getCode())
-            .dateReceived(dateReceived)
-            .litigiousPartyID(partyId)
-            .build();
+        return createEvent(
+            sequenceGenerator.nextSequence(builder),
+            statesPaid ? STATES_PAID.getCode() : DEFENCE_FILED.getCode(),
+            dateReceived,
+            partyId,
+            null,
+            null
+        );
     }
 
-    public static Event buildCounterClaimEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildCounterClaimEvent(EventHistory builder,
                                                RoboticsSequenceGenerator sequenceGenerator,
                                                LocalDateTime dateReceived,
                                                String partyId) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(DEFENCE_AND_COUNTER_CLAIM.getCode())
-            .dateReceived(dateReceived)
-            .litigiousPartyID(partyId)
-            .build();
+        return createEvent(
+            sequenceGenerator.nextSequence(builder),
+            DEFENCE_AND_COUNTER_CLAIM.getCode(),
+            dateReceived,
+            partyId,
+            null,
+            null
+        );
     }
 
-    public static Event buildEnumeratedMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildEnumeratedMiscEvent(EventHistory builder,
                                                  RoboticsSequenceGenerator sequenceGenerator,
                                                  RoboticsTimelineHelper timelineHelper,
                                                  EnumeratedMiscParams params) {
@@ -86,13 +92,14 @@ public final class RoboticsEventSupport {
             ? String.format("[%d of %d - %s] ", params.index + 1, params.total, timelineHelper.now().toLocalDate())
             : "";
         String details = params.messageResolver.apply(prefix, params.subject);
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(MISCELLANEOUS.getCode())
-            .dateReceived(params.dateReceived)
-            .eventDetailsText(details)
-            .eventDetails(EventDetails.builder().miscText(details).build())
-            .build();
+        return createEvent(
+            sequenceGenerator.nextSequence(builder),
+            MISCELLANEOUS.getCode(),
+            params.dateReceived,
+            null,
+            details,
+            new EventDetails().setMiscText(details)
+        );
     }
 
     public static final class EnumeratedMiscParams {
@@ -116,7 +123,7 @@ public final class RoboticsEventSupport {
         }
     }
 
-    public static Event buildLipVsLrMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public static Event buildLipVsLrMiscEvent(EventHistory builder,
                                               RoboticsSequenceGenerator sequenceGenerator,
                                               RoboticsEventTextFormatter textFormatter) {
         return buildMiscEvent(
@@ -127,10 +134,30 @@ public final class RoboticsEventSupport {
         );
     }
 
-    public static void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public static void addRespondentMiscEvent(EventHistory builder,
                                               RoboticsSequenceGenerator sequenceGenerator,
                                               String message,
                                               LocalDateTime dateReceived) {
-        builder.miscellaneous(buildMiscEvent(builder, sequenceGenerator, message, dateReceived));
+        List<Event> events = builder.getMiscellaneous() == null
+            ? new ArrayList<>()
+            : new ArrayList<>(builder.getMiscellaneous());
+        events.add(buildMiscEvent(builder, sequenceGenerator, message, dateReceived));
+        builder.setMiscellaneous(events);
+    }
+
+    public static Event createEvent(Integer eventSequence,
+                                    String eventCode,
+                                    LocalDateTime dateReceived,
+                                    String litigiousPartyId,
+                                    String eventDetailsText,
+                                    EventDetails eventDetails) {
+        Event event = new Event();
+        event.setEventSequence(eventSequence);
+        event.setEventCode(eventCode);
+        event.setDateReceived(dateReceived);
+        event.setLitigiousPartyID(litigiousPartyId);
+        event.setEventDetailsText(eventDetailsText);
+        event.setEventDetails(eventDetails);
+        return event;
     }
 }

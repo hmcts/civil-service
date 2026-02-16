@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,9 +12,7 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import static org.apache.commons.lang3.StringUtils.left;
 import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -33,7 +34,7 @@ public class CaseNotesStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -42,12 +43,18 @@ public class CaseNotesStrategy implements EventHistoryStrategy {
         List<CaseNote> notes = unwrapElements(caseData.getCaseNotes());
         notes.stream()
             .map(this::buildPayload)
-            .forEach(payload -> builder.miscellaneous(buildMiscEvent(
-                builder,
-                sequenceGenerator,
-                payload.message(),
-                payload.createdOn()
-            )));
+            .forEach(payload -> {
+                List<Event> updatedMiscellaneousEvents = eventHistory.getMiscellaneous() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(eventHistory.getMiscellaneous());
+                updatedMiscellaneousEvents.add(buildMiscEvent(
+                        eventHistory,
+                    sequenceGenerator,
+                    payload.message(),
+                    payload.createdOn()
+                ));
+                eventHistory.setMiscellaneous(updatedMiscellaneousEvents);
+            });
     }
 
     private NotePayload buildPayload(CaseNote caseNote) {

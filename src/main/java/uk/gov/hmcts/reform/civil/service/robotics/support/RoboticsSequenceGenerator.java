@@ -32,6 +32,9 @@ public class RoboticsSequenceGenerator {
     }
 
     private int maxSequence(List<Event> events, int currentSequence) {
+        if (events == null) {
+            return currentSequence;
+        }
         for (Event event : events) {
             if (event.getEventSequence() != null && event.getEventSequence() > currentSequence) {
                 currentSequence = event.getEventSequence();

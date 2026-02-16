@@ -8,12 +8,12 @@ public interface EventHistoryStrategy {
 
     boolean supports(CaseData caseData);
 
-    void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken);
+    void contribute(EventHistory eventHistory, CaseData caseData, String authToken);
 
-    default void contribute(EventHistory.EventHistoryBuilder builder,
+    default void contribute(EventHistory eventHistory,
                             CaseData caseData,
                             String authToken,
                             FlowState.Main flowState) {
-        contribute(builder, caseData, authToken);
+        contribute(eventHistory, caseData, authToken);
     }
 }

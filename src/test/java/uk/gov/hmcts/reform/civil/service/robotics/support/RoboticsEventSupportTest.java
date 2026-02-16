@@ -15,12 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RoboticsEventSupportTest {
 
-    private EventHistory.EventHistoryBuilder builder;
+    private EventHistory builder;
     private RoboticsSequenceGenerator sequenceGenerator;
 
     @BeforeEach
     void setUp() {
-        builder = EventHistory.builder();
+        builder = new EventHistory();
         sequenceGenerator = new RoboticsSequenceGenerator();
     }
 

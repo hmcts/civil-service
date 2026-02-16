@@ -106,13 +106,12 @@ class RespondentPartAdmissionStrategyTest {
             .atStateRespondentPartAdmission()
             .build();
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(historyBuilder.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(historyBuilder.getMiscellaneous()).isNullOrEmpty();
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
         verifyNoInteractions(sequenceGenerator);
     }
 
@@ -127,23 +126,22 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission()).hasSize(1);
-        assertThat(history.getReceiptOfPartAdmission().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getReceiptOfPartAdmission().get(0).getDateReceived())
+        assertThat(historyBuilder.getReceiptOfPartAdmission()).hasSize(1);
+        assertThat(historyBuilder.getReceiptOfPartAdmission().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(historyBuilder.getReceiptOfPartAdmission().getFirst().getDateReceived())
             .isEqualTo(caseData.getRespondent1ResponseDate());
 
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(11);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(
+        assertThat(historyBuilder.getMiscellaneous()).hasSize(1);
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(11);
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo(
             respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true)
         );
 
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getEventSequence()).isEqualTo(12);
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled().getFirst().getEventSequence()).isEqualTo(12);
     }
 
     @Test
@@ -158,19 +156,18 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13, 14, 15);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission())
+        assertThat(historyBuilder.getReceiptOfPartAdmission())
             .extracting(Event::getEventSequence)
             .containsExactly(10, 13);
 
-        assertThat(history.getMiscellaneous())
+        assertThat(historyBuilder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(11, 14);
 
-        assertThat(history.getDirectionsQuestionnaireFiled())
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventSequence)
             .containsExactly(12, 15);
     }
@@ -184,19 +181,18 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13, 14, 15);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission())
+        assertThat(historyBuilder.getReceiptOfPartAdmission())
             .extracting(Event::getEventSequence)
             .containsExactly(10, 13);
 
-        assertThat(history.getMiscellaneous())
+        assertThat(historyBuilder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(11, 14);
 
-        assertThat(history.getDirectionsQuestionnaireFiled())
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventSequence)
             .containsExactly(12, 15);
     }
@@ -213,20 +209,19 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(historyBuilder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getDateReceived()).isBeforeOrEqualTo(after);
+        assertThat(historyBuilder.getMiscellaneous()).hasSize(2);
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(historyBuilder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo(formatter.lipVsLrFullOrPartAdmissionReceived());
 
-        assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
+        assertThat(historyBuilder.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo(respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true));
     }
 
@@ -241,16 +236,15 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission()).hasSize(2);
-        assertThat(history.getReceiptOfPartAdmission())
+        assertThat(historyBuilder.getReceiptOfPartAdmission()).hasSize(2);
+        assertThat(historyBuilder.getReceiptOfPartAdmission())
             .extracting(Event::getDateReceived)
             .containsOnly(caseData.getRespondent1ResponseDate());
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
+        assertThat(historyBuilder.getMiscellaneous()).hasSize(2);
+        assertThat(historyBuilder.getDirectionsQuestionnaireFiled()).hasSize(2);
     }
 
     @Test
@@ -265,16 +259,15 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getStatesPaid()).hasSize(1);
-        assertThat(history.getStatesPaid().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(EventType.STATES_PAID.getCode());
+        assertThat(historyBuilder.getStatesPaid()).hasSize(1);
+        assertThat(historyBuilder.getStatesPaid().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(historyBuilder.getStatesPaid().getFirst().getEventCode()).isEqualTo(EventType.STATES_PAID.getCode());
 
-        assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(historyBuilder.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(historyBuilder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
@@ -289,13 +282,12 @@ class RespondentPartAdmissionStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21);
 
-        EventHistory.EventHistoryBuilder historyBuilder = EventHistory.builder();
+        EventHistory historyBuilder = new EventHistory();
         strategy.contribute(historyBuilder, caseData, null);
 
-        EventHistory history = historyBuilder.build();
-        assertThat(history.getReceiptOfPartAdmission()).hasSize(1);
-        assertThat(history.getReceiptOfPartAdmission().get(0).getEventSequence()).isEqualTo(20);
-        assertThat(history.getStatesPaid()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(historyBuilder.getReceiptOfPartAdmission()).hasSize(1);
+        assertThat(historyBuilder.getReceiptOfPartAdmission().getFirst().getEventSequence()).isEqualTo(20);
+        assertThat(historyBuilder.getStatesPaid()).isNullOrEmpty();
+        assertThat(historyBuilder.getMiscellaneous()).isNullOrEmpty();
     }
 }

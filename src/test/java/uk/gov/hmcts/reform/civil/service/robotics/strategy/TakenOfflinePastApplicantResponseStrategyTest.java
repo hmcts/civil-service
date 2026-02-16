@@ -81,14 +81,13 @@ class TakenOfflinePastApplicantResponseStrategyTest {
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(34);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(34);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(takenOffline);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(34);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(takenOffline);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Claim moved offline after no response from applicant past response deadline.");
     }
 }

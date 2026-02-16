@@ -1,5 +1,15 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static java.util.Collections.emptyList;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
+import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,15 +26,6 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
-import java.util.List;
-import java.util.Objects;
-
-import static java.util.Collections.emptyList;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.DEFENCE_STRUCK_OUT;
-import static uk.gov.hmcts.reform.civil.model.robotics.EventType.GENERAL_FORM_OF_APPLICATION;
 
 @Slf4j
 @Component
@@ -45,32 +46,52 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         List<Element<GeneralApplication>> applications = getStrikeOutApplications(caseData);
         if (applications.isEmpty()) {
             return;
         }
-        log.info("Building general application strike out robotics events for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building general application strike out robotics events for caseId {}",
+                caseData.getCcdCaseReference());
 
-        builder.generalFormOfApplication(applications.stream()
-            .map(app -> Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(GENERAL_FORM_OF_APPLICATION.getCode())
-                .dateReceived(app.getValue().getGeneralAppSubmittedDateGAspec())
-                .litigiousPartyID(app.getValue().getLitigiousPartyID())
-                .eventDetailsText(STRIKE_OUT_TEXT)
-                .eventDetails(EventDetails.builder().miscText(STRIKE_OUT_TEXT).build())
-                .build())
-            .toList());
+        List<Event> eventsToAdd1 =
+                applications.stream()
+                        .map(
+                                app ->
+                                        createEvent(
+                                                sequenceGenerator.nextSequence(eventHistory),
+                                                GENERAL_FORM_OF_APPLICATION.getCode(),
+                                                app.getValue().getGeneralAppSubmittedDateGAspec(),
+                                                app.getValue().getLitigiousPartyID(),
+                                                STRIKE_OUT_TEXT,
+                                                new EventDetails().setMiscText(STRIKE_OUT_TEXT)))
+                        .toList();
+        List<Event> updatedGeneralFormOfApplicationEvents1 =
+                eventHistory.getGeneralFormOfApplication() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getGeneralFormOfApplication());
+        updatedGeneralFormOfApplicationEvents1.addAll(eventsToAdd1);
+        eventHistory.setGeneralFormOfApplication(updatedGeneralFormOfApplicationEvents1);
 
-        builder.defenceStruckOut(applications.stream()
-            .map(app -> Event.builder()
-                .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-                .eventCode(DEFENCE_STRUCK_OUT.getCode())
-                .dateReceived(app.getValue().getGeneralAppSubmittedDateGAspec())
-                .litigiousPartyID(app.getValue().getLitigiousPartyID())
-                .build())
-            .toList());
+        List<Event> eventsToAdd2 =
+                applications.stream()
+                        .map(
+                                app ->
+                                        createEvent(
+                                                sequenceGenerator.nextSequence(eventHistory),
+                                                DEFENCE_STRUCK_OUT.getCode(),
+                                                app.getValue().getGeneralAppSubmittedDateGAspec(),
+                                                app.getValue().getLitigiousPartyID(),
+                                                null,
+                                                null))
+                        .toList();
+        List<Event> updatedDefenceStruckOutEvents2 =
+                eventHistory.getDefenceStruckOut() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getDefenceStruckOut());
+        updatedDefenceStruckOutEvents2.addAll(eventsToAdd2);
+        eventHistory.setDefenceStruckOut(updatedDefenceStruckOutEvents2);
     }
 
     private List<Element<GeneralApplication>> getStrikeOutApplications(CaseData caseData) {
@@ -79,11 +100,11 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
         }
 
         return caseData.getGeneralApplications().stream()
-            .filter(element -> element != null && element.getValue() != null)
-            .filter(element -> element.getValue().getCaseLink() != null)
-            .filter(element -> isStrikeOutApplication(element.getValue()))
-            .filter(element -> hasJudgeDecision(caseData, element.getValue()))
-            .toList();
+                .filter(element -> element != null && element.getValue() != null)
+                .filter(element -> element.getValue().getCaseLink() != null)
+                .filter(element -> isStrikeOutApplication(element.getValue()))
+                .filter(element -> hasJudgeDecision(caseData, element.getValue()))
+                .toList();
     }
 
     private boolean isStrikeOutApplication(GeneralApplication application) {
@@ -95,27 +116,29 @@ public class GeneralApplicationStrikeOutStrategy implements EventHistoryStrategy
     }
 
     private boolean hasJudgeDecision(CaseData caseData, GeneralApplication application) {
-        if (caseData.getGaDetailsMasterCollection() == null || application == null
-            || application.getCaseLink() == null) {
+        if (caseData.getGaDetailsMasterCollection() == null
+                || application == null
+                || application.getCaseLink() == null) {
             return false;
         }
 
         return caseData.getGaDetailsMasterCollection().stream()
-            .map(Element::getValue)
-            .filter(Objects::nonNull)
-            .anyMatch(details -> matchesStrikeOutDecision(details, application));
+                .map(Element::getValue)
+                .filter(Objects::nonNull)
+                .anyMatch(details -> matchesStrikeOutDecision(details, application));
     }
 
-    private boolean matchesStrikeOutDecision(GeneralApplicationsDetails details, GeneralApplication application) {
-        return Objects.equals(details.getCaseLink().getCaseReference(),
-            application.getCaseLink().getCaseReference())
-            && PROCEEDS_IN_HERITAGE.getDisplayedValue().equals(details.getCaseState());
+    private boolean matchesStrikeOutDecision(
+            GeneralApplicationsDetails details, GeneralApplication application) {
+        return Objects.equals(
+                        details.getCaseLink().getCaseReference(), application.getCaseLink().getCaseReference())
+                && PROCEEDS_IN_HERITAGE.getDisplayedValue().equals(details.getCaseState());
     }
 
     private boolean hasTakenOfflineByStaffState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         return stateFlow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName()::equals);
+                .map(State::getName)
+                .anyMatch(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName()::equals);
     }
 }

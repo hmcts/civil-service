@@ -69,18 +69,17 @@ class RespondentLitigationFriendStrategyTest {
         caseData.setRespondent1LitigationFriendCreatedDate(r1Date);
         caseData.setRespondent2LitigationFriendCreatedDate(r2Date);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(5);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(r1Date);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(5);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(r1Date);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Litigation friend added for respondent: Resp One");
-        assertThat(history.getMiscellaneous().get(1).getEventSequence()).isEqualTo(6);
-        assertThat(history.getMiscellaneous().get(1).getDateReceived()).isEqualTo(r2Date);
-        assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().get(1).getEventSequence()).isEqualTo(6);
+        assertThat(builder.getMiscellaneous().get(1).getDateReceived()).isEqualTo(r2Date);
+        assertThat(builder.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("Litigation friend added for respondent: Resp Two");
     }
 
@@ -96,13 +95,12 @@ class RespondentLitigationFriendStrategyTest {
             .build();
         caseData.setRespondent2LitigationFriendCreatedDate(r2Date);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(r2Date);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(r2Date);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Litigation friend added for respondent: Resp Two Ltd");
     }
 }

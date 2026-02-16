@@ -41,16 +41,15 @@ public class RoboticsCaseDataSupport {
         String solicitorOrganisationId,
         LocalDate dateOfService
     ) {
-        return LitigiousParty.builder()
-            .id(id)
-            .solicitorID(solicitorId)
-            .type(type)
-            .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
-            .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
-            .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
-            .dateOfService(Optional.ofNullable(dateOfService).map(d -> d.format(ISO_DATE)).orElse(null))
-            .solicitorOrganisationID(solicitorOrganisationId)
-            .build();
+        return new LitigiousParty()
+            .setId(id)
+            .setSolicitorID(solicitorId)
+            .setType(type)
+            .setName(PartyUtils.getLitigiousPartyName(party, litigationFriend))
+            .setDateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
+            .setAddresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
+            .setDateOfService(Optional.ofNullable(dateOfService).map(d -> d.format(ISO_DATE)).orElse(null))
+            .setSolicitorOrganisationID(solicitorOrganisationId);
     }
 
     public Solicitor buildSolicitor(SolicitorData solicitorData) {
@@ -122,8 +121,8 @@ public class RoboticsCaseDataSupport {
         if (contactInformation == null || contactInformation.isEmpty()) {
             return null;
         }
-        List<DxAddress> dxAddresses = contactInformation.get(0).getDxAddress();
-        return (dxAddresses == null || dxAddresses.isEmpty()) ? null : dxAddresses.get(0).getDxNumber();
+        List<DxAddress> dxAddresses = contactInformation.getFirst().getDxAddress();
+        return (dxAddresses == null || dxAddresses.isEmpty()) ? null : dxAddresses.getFirst().getDxNumber();
     }
 
     public String resolveRespondentSolicitorId(YesOrNo represented, YesOrNo sameLegalRepresentative) {

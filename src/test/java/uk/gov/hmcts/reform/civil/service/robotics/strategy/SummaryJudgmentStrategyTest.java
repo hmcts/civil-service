@@ -61,20 +61,19 @@ class SummaryJudgmentStrategyTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setDefendantDetails(defendantDetails);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
 
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(42);
-        assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isBeforeOrEqualTo(after);
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(42);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
         String expectedMessage = formatter.summaryJudgmentGranted();
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expectedMessage);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo(expectedMessage);
     }
 
     @Test
@@ -94,15 +93,14 @@ class SummaryJudgmentStrategyTest {
             .build();
         caseData.setDefendantDetails(defendantDetails);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
 
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(42);
-        assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(42);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
         String expected = formatter.summaryJudgmentRequested();
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo(expected);
     }
 }

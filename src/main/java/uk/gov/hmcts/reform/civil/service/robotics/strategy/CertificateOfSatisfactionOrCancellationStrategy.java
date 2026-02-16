@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,12 +19,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.APPLICANT_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
 @Slf4j
 @Component
@@ -34,39 +36,47 @@ public class CertificateOfSatisfactionOrCancellationStrategy implements EventHis
         boolean markPaidInFullExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
         boolean coscApplied = caseData.hasCoscCert();
         return (markPaidInFullExists && caseData.getJoDefendantMarkedPaidInFullIssueDate() == null)
-            || coscApplied;
+                || coscApplied;
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
         log.info("Building COSC robotics events for caseId {}", caseData.getCcdCaseReference());
 
         boolean markPaidInFullExists = caseData.getJoMarkedPaidInFullIssueDate() != null;
-        LocalDateTime dateReceived = markPaidInFullExists
-            ? caseData.getJoMarkedPaidInFullIssueDate()
-            : caseData.getJoDefendantMarkedPaidInFullIssueDate();
+        LocalDateTime dateReceived =
+                markPaidInFullExists
+                        ? caseData.getJoMarkedPaidInFullIssueDate()
+                        : caseData.getJoDefendantMarkedPaidInFullIssueDate();
 
-        EventDetails details = EventDetails.builder()
-            .status(caseData.getJoCoscRpaStatus().toString())
-            .datePaidInFull(resolvePaymentDate(caseData))
-            .notificationReceiptDate(markPaidInFullExists
-                ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
-                : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate())
-            .build();
+        EventDetails details =
+                new EventDetails()
+                        .setStatus(caseData.getJoCoscRpaStatus().toString())
+                        .setDatePaidInFull(resolvePaymentDate(caseData))
+                        .setNotificationReceiptDate(
+                                markPaidInFullExists
+                                        ? caseData.getJoMarkedPaidInFullIssueDate().toLocalDate()
+                                        : caseData.getJoDefendantMarkedPaidInFullIssueDate().toLocalDate());
 
-        Event event = Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode())
-            .litigiousPartyID(markPaidInFullExists ? APPLICANT_ID : RESPONDENT_ID)
-            .dateReceived(dateReceived)
-            .eventDetails(details)
-            .eventDetailsText("")
-            .build();
+        Event event =
+                createEvent(
+                        sequenceGenerator.nextSequence(eventHistory),
+                        EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode(),
+                        dateReceived,
+                        markPaidInFullExists ? APPLICANT_ID : RESPONDENT_ID,
+                        "",
+                        details);
 
-        builder.certificateOfSatisfactionOrCancellation(event);
+        List<Event> updatedCertificateOfSatisfactionOrCancellationEvents1 =
+                eventHistory.getCertificateOfSatisfactionOrCancellation() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getCertificateOfSatisfactionOrCancellation());
+        updatedCertificateOfSatisfactionOrCancellationEvents1.add(event);
+        eventHistory.setCertificateOfSatisfactionOrCancellation(
+                updatedCertificateOfSatisfactionOrCancellationEvents1);
     }
 
     private LocalDate resolvePaymentDate(CaseData caseData) {

@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,10 +17,7 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.IntStream;
-
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREGISTERED;
 import static uk.gov.hmcts.reform.civil.enums.UnrepresentedOrUnregisteredScenario.UNREPRESENTED;
@@ -40,7 +41,7 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -52,9 +53,9 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
 
         List<String> bodies = List.of(
             format("Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: %s",
-                unrepresented.get(0)),
+                unrepresented.getFirst()),
             format("Unrepresented defendant and unregistered defendant solicitor firm. Unregistered defendant solicitor firm: %s",
-                unregistered.get(0))
+                unregistered.getFirst())
         );
 
         String dateStamp = timelineHelper.now().toLocalDate().toString();
@@ -62,9 +63,15 @@ public class UnrepresentedAndUnregisteredDefendantStrategy implements EventHisto
             .mapToObj(index -> {
                 String prefix = String.format("[%d of %d - %s] ", index + 1, bodies.size(), dateStamp);
                 String message = textFormatter.unrepresentedAndUnregisteredCombined(prefix, bodies.get(index));
-                return buildMiscEvent(builder, sequenceGenerator, message, submittedDate);
+                return buildMiscEvent(eventHistory, sequenceGenerator, message, submittedDate);
             })
-            .forEach(builder::miscellaneous);
+            .forEach(event -> {
+                List<Event> updatedMiscellaneousEvents = eventHistory.getMiscellaneous() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(eventHistory.getMiscellaneous());
+                updatedMiscellaneousEvents.add(event);
+                eventHistory.setMiscellaneous(updatedMiscellaneousEvents);
+            });
     }
 
     private boolean hasState(CaseData caseData) {

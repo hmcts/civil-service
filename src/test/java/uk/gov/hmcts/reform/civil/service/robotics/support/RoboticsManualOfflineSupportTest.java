@@ -40,10 +40,9 @@ class RoboticsManualOfflineSupportTest {
     void prepareTakenOfflineEventDetailsHonoursProvidedDetails() {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-        ClaimProceedsInCasemanLR claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .date(LocalDate.of(2023, 3, 2))
-            .build();
+        ClaimProceedsInCasemanLR claimProceedsInCasemanLR = new ClaimProceedsInCasemanLR();
+        claimProceedsInCasemanLR.setReason(ReasonForProceedingOnPaper.APPLICATION);
+        claimProceedsInCasemanLR.setDate(LocalDate.of(2023, 3, 2));
         caseData.setClaimProceedsInCasemanLR(claimProceedsInCasemanLR);
 
         assertThat(support.prepareTakenOfflineEventDetails(caseData))

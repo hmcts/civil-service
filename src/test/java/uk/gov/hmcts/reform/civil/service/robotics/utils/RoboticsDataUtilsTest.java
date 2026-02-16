@@ -48,8 +48,8 @@ class RoboticsDataUtilsTest {
             var actual = RoboticsDataUtil.buildNoticeOfChange(caseData);
 
             assertEquals(3, actual.size());
-            assertEquals("001", actual.get(0).getLitigiousPartyID());
-            assertEquals("2022-02-01", actual.get(0).getDateOfNoC());
+            assertEquals("001", actual.getFirst().getLitigiousPartyID());
+            assertEquals("2022-02-01", actual.getFirst().getDateOfNoC());
 
             assertEquals("002", actual.get(1).getLitigiousPartyID());
             assertEquals("2022-02-01", actual.get(1).getDateOfNoC());
@@ -76,8 +76,8 @@ class RoboticsDataUtilsTest {
             var actual = RoboticsDataUtil.buildNoticeOfChange(caseData);
 
             assertEquals(2, actual.size());
-            assertEquals("002", actual.get(0).getLitigiousPartyID());
-            assertEquals("2022-02-01", actual.get(0).getDateOfNoC());
+            assertEquals("002", actual.getFirst().getLitigiousPartyID());
+            assertEquals("2022-02-01", actual.getFirst().getDateOfNoC());
 
             assertEquals("003", actual.get(1).getLitigiousPartyID());
             assertEquals("2022-02-01", actual.get(1).getDateOfNoC());

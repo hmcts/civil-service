@@ -1,5 +1,11 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,10 +19,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
-
-import java.time.LocalDateTime;
-
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Slf4j
 @Component
@@ -43,48 +45,62 @@ public class InterlocutoryJudgmentStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder,
-                           CaseData caseData,
-                           String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
-        log.info("Building InterlocutoryJudgmentStrategy events for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building InterlocutoryJudgmentStrategy events for caseId {}",
+                caseData.getCcdCaseReference());
 
         boolean grantedForSingleRespondent = isGrantedForSingleRespondent(caseData);
 
         if (caseData.getHearingSupportRequirementsDJ() != null && !grantedForSingleRespondent) {
-            builder.interlocutoryJudgment(buildEvent(builder, 0));
+            List<Event> updatedInterlocutoryJudgmentEvents1 =
+                    eventHistory.getInterlocutoryJudgment() == null
+                            ? new ArrayList<>()
+                            : new ArrayList<>(eventHistory.getInterlocutoryJudgment());
+            updatedInterlocutoryJudgmentEvents1.add(buildEvent(eventHistory, 0));
+            eventHistory.setInterlocutoryJudgment(updatedInterlocutoryJudgmentEvents1);
             if (caseData.getRespondent2() != null) {
-                builder.interlocutoryJudgment(buildEvent(builder, 1));
+                List<Event> updatedInterlocutoryJudgmentEvents2 =
+                        eventHistory.getInterlocutoryJudgment() == null
+                                ? new ArrayList<>()
+                                : new ArrayList<>(eventHistory.getInterlocutoryJudgment());
+                updatedInterlocutoryJudgmentEvents2.add(buildEvent(eventHistory, 1));
+                eventHistory.setInterlocutoryJudgment(updatedInterlocutoryJudgmentEvents2);
             }
         }
 
         if (caseData.getDefendantDetails() != null) {
-            builder.miscellaneous(buildMiscEvent(
-                builder,
-                sequenceGenerator,
-                resolveMiscMessage(grantedForSingleRespondent),
-                LocalDateTime.now()
-            ));
+            List<Event> updatedMiscellaneousEvents3 =
+                    eventHistory.getMiscellaneous() == null
+                            ? new ArrayList<>()
+                            : new ArrayList<>(eventHistory.getMiscellaneous());
+            updatedMiscellaneousEvents3.add(
+                    buildMiscEvent(
+                            eventHistory,
+                            sequenceGenerator,
+                            resolveMiscMessage(grantedForSingleRespondent),
+                            LocalDateTime.now()));
+            eventHistory.setMiscellaneous(updatedMiscellaneousEvents3);
         }
     }
 
     private String resolveMiscMessage(boolean grantedForSingleRespondent) {
         return grantedForSingleRespondent
-            ? textFormatter.summaryJudgmentRequested()
-            : textFormatter.summaryJudgmentGranted();
+                ? textFormatter.summaryJudgmentRequested()
+                : textFormatter.summaryJudgmentGranted();
     }
 
-    private Event buildEvent(EventHistory.EventHistoryBuilder builder, int respondentIndex) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.INTERLOCUTORY_JUDGMENT_GRANTED.getCode())
-            .dateReceived(LocalDateTime.now())
-            .litigiousPartyID(partyLookup.respondentId(respondentIndex))
-            .eventDetailsText("")
-            .eventDetails(EventDetails.builder().miscText("").build())
-            .build();
+    private Event buildEvent(EventHistory builder, int respondentIndex) {
+        return createEvent(
+                sequenceGenerator.nextSequence(builder),
+                EventType.INTERLOCUTORY_JUDGMENT_GRANTED.getCode(),
+                LocalDateTime.now(),
+                partyLookup.respondentId(respondentIndex),
+                "",
+                new EventDetails().setMiscText(""));
     }
 
     private boolean isGrantedForSingleRespondent(CaseData caseData) {

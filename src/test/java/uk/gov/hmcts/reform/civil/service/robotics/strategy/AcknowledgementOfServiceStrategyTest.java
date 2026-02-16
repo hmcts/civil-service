@@ -69,10 +69,10 @@ class AcknowledgementOfServiceStrategyTest {
         );
         CaseData caseData = CaseDataBuilder.builder().build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        assertThat(builder.build().getAcknowledgementOfServiceReceived()).isNullOrEmpty();
+        assertThat(builder.getAcknowledgementOfServiceReceived()).isNullOrEmpty();
         verifyNoInteractions(sequenceGenerator);
     }
 
@@ -89,13 +89,12 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 10, 0))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(1);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(1);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .isEqualTo("responseIntention: Defend all of the claim");
     }
 
@@ -106,12 +105,11 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 2, 9, 0))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(1);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(1);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .isEqualTo("Defendant LR Acknowledgement of Service ");
     }
 
@@ -136,14 +134,13 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent2AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 11, 0))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(2);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(2);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .contains("[1 of 2 - 2024-03-15]");
-        assertThat(history.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
             .contains("[2 of 2 - 2024-03-15]");
     }
 
@@ -166,14 +163,13 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(2);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(2);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .contains("Defendant: Firm A has acknowledged");
-        assertThat(history.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
             .contains("Defendant: Firm B has acknowledged");
     }
 
@@ -184,11 +180,10 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent1AcknowledgeNotificationDate(null)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).isNullOrEmpty();
+        assertThat(builder.getAcknowledgementOfServiceReceived()).isNullOrEmpty();
     }
 
     @Test
@@ -210,12 +205,11 @@ class AcknowledgementOfServiceStrategyTest {
             .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getAcknowledgementOfServiceReceived()).hasSize(1);
-        assertThat(history.getAcknowledgementOfServiceReceived().get(0).getEventDetailsText())
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(1);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .contains("Defendant: Firm A has acknowledged");
     }
 }

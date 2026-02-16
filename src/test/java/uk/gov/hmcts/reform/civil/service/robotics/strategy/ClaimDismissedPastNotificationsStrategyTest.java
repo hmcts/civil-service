@@ -65,13 +65,12 @@ class ClaimDismissedPastNotificationsStrategyTest {
             .claimDismissedDate(dismissedDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null, FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_NOTIFICATION_DEADLINE);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(40);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(40);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Claim dismissed. Claimant hasn't taken action since the claim was issued.");
     }
 
@@ -82,37 +81,36 @@ class ClaimDismissedPastNotificationsStrategyTest {
             .claimDismissedDate(dismissedDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null, FlowState.Main.CLAIM_DISMISSED_PAST_CLAIM_DETAILS_NOTIFICATION_DEADLINE);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(40);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(40);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Claim dismissed. Claimant hasn't notified defendant of the claim details within the allowed 2 weeks.");
     }
 
     @Test
     void contributeNoOpOverloadDoesNotAddEvents() {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
 
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
     void contributeReturnsWhenFlowStateNull() {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null, null);
 
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
     void contributeIgnoresUnrelatedState() {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null, FlowState.Main.CLAIM_ISSUED);
 
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 }

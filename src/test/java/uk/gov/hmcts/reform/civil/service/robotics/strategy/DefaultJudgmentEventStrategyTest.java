@@ -88,18 +88,17 @@ class DefaultJudgmentEventStrategyTest {
 
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Case();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefaultJudgment()).hasSize(1);
-        assertThat(history.getDefaultJudgment().get(0).getEventCode())
+        assertThat(builder.getDefaultJudgment()).hasSize(1);
+        assertThat(builder.getDefaultJudgment().getFirst().getEventCode())
             .isEqualTo(DEFAULT_JUDGMENT_GRANTED.getCode());
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode()).isEqualTo(MISCELLANEOUS.getCode());
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Default Judgment granted and claim moved offline.");
-        assertThat(history.getDefaultJudgment().get(0).getEventDetails().getInstallmentAmount()).isEqualByComparingTo("0.00");
+        assertThat(builder.getDefaultJudgment().getFirst().getEventDetails().getInstallmentAmount()).isEqualByComparingTo("0.00");
     }
 
     @Test
@@ -111,13 +110,12 @@ class DefaultJudgmentEventStrategyTest {
 
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v2Case();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefaultJudgment()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getDefaultJudgment()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Default Judgment requested and claim moved offline.");
     }
 
@@ -131,12 +129,11 @@ class DefaultJudgmentEventStrategyTest {
 
         CaseData caseData = StrategyTestDataFactory.defaultJudgment1v1Case();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Judgment recorded.");
     }
 
@@ -157,20 +154,19 @@ class DefaultJudgmentEventStrategyTest {
             .defendantDetailsSpec(defendantDetailsSpec)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = builder.build();
-        history.getDefaultJudgment().forEach(event -> {
+        builder.getDefaultJudgment().forEach(event -> {
             assertThat(event.getDateReceived()).isAfterOrEqualTo(before);
             assertThat(event.getDateReceived()).isBeforeOrEqualTo(after);
         });
-        assertThat(history.getDefaultJudgment()).hasSize(2);
-        assertThat(history.getDefaultJudgment().get(0).getLitigiousPartyID()).isEqualTo("002");
-        assertThat(history.getDefaultJudgment().get(1).getLitigiousPartyID()).isEqualTo("003");
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getDefaultJudgment()).hasSize(2);
+        assertThat(builder.getDefaultJudgment().getFirst().getLitigiousPartyID()).isEqualTo("002");
+        assertThat(builder.getDefaultJudgment().get(1).getLitigiousPartyID()).isEqualTo("003");
+        assertThat(builder.getMiscellaneous())
             .singleElement()
             .satisfies(event ->
                 assertThat(event.getEventDetailsText())
@@ -207,11 +203,10 @@ class DefaultJudgmentEventStrategyTest {
             .repaymentSuggestion("1234")
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        EventDetails details = history.getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("12.34");
         assertThat(details.getInstallmentPeriod()).isEqualTo("FOR");
         assertThat(details.getAmountOfCosts()).isEqualByComparingTo("55.00");
@@ -241,10 +236,10 @@ class DefaultJudgmentEventStrategyTest {
             .applicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getPaymentInFullDate()).isEqualTo(requestedPaymentDate.atStartOfDay());
         assertThat(details.getInstallmentPeriod()).isEqualTo("FUL");
     }
@@ -270,10 +265,10 @@ class DefaultJudgmentEventStrategyTest {
             .applicant1SuggestPayImmediatelyPaymentDateForDefendantSpec(immediateDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getPaymentInFullDate()).isEqualTo(immediateDate.atStartOfDay());
     }
 
@@ -298,10 +293,10 @@ class DefaultJudgmentEventStrategyTest {
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_WEEK)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("43.21");
         assertThat(details.getInstallmentPeriod()).isEqualTo("WK");
     }
@@ -321,10 +316,10 @@ class DefaultJudgmentEventStrategyTest {
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("12.34");
         assertThat(details.getInstallmentPeriod()).isEqualTo("MTH");
     }
@@ -341,10 +336,10 @@ class DefaultJudgmentEventStrategyTest {
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("0.00");
     }
 
@@ -370,10 +365,10 @@ class DefaultJudgmentEventStrategyTest {
             .repaymentSuggestion("2000")
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventDetails details = builder.build().getDefaultJudgment().get(0).getEventDetails();
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
         assertThat(details.getInstallmentPeriod()).isEqualTo("MTH");
     }
 
@@ -390,12 +385,11 @@ class DefaultJudgmentEventStrategyTest {
             .joDJCreatedDate(jolDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        EventDetails details = history.getDefaultJudgment().get(0).getEventDetails();
-        assertThat(history.getDefaultJudgment().get(0).getDateReceived()).isEqualTo(jolDate);
+        EventDetails details = builder.getDefaultJudgment().getFirst().getEventDetails();
+        assertThat(builder.getDefaultJudgment().getFirst().getDateReceived()).isEqualTo(jolDate);
         assertThat(details.getDateOfJudgment()).isEqualTo(jolDate);
     }
 }

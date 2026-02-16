@@ -79,15 +79,14 @@ class UnregisteredDefendantStrategyTest {
 
         caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 15, 0, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(21);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(21);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived())
             .isEqualTo(LocalDateTime.of(2024, 2, 15, 0, 0));
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo(textFormatter.unregisteredSolicitor("", "Def One"));
     }
 
@@ -138,12 +137,11 @@ class UnregisteredDefendantStrategyTest {
 
         caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 15, 0, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .containsExactly(
                 textFormatter.unregisteredSolicitor("[1 of 2 - 2024-03-01] ", "Def One"),

@@ -43,11 +43,10 @@ class CaseNotesStrategyTest {
     @Test
     void supportsReturnsTrueWhenCaseNotesPresent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .caseNotes(CaseNote.builder()
-                .createdBy("user")
-                .createdOn(LocalDateTime.now())
-                .note("note")
-                .build())
+            .caseNotes(new CaseNote()
+                .setCreatedBy("user")
+                .setCreatedOn(LocalDateTime.now())
+                .setNote("note"))
             .build();
 
         assertThat(strategy.supports(caseData)).isTrue();
@@ -69,25 +68,24 @@ class CaseNotesStrategyTest {
             .build();
         caseData.setCaseNotes(wrapElements(of(firstNote, secondNote)));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous()).hasSize(2);
 
-        assertThat(history.getMiscellaneous().get(0).getEventCode())
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode())
             .isEqualTo(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(5);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(5);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("case note added: first note");
-        assertThat(history.getMiscellaneous().get(0).getEventDetails().getMiscText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetails().getMiscText())
             .isEqualTo("case note added: first note");
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(createdOn);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(createdOn);
 
-        assertThat(history.getMiscellaneous().get(1).getEventSequence()).isEqualTo(6);
-        assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().get(1).getEventSequence()).isEqualTo(6);
+        assertThat(builder.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("case note added: ");
-        assertThat(history.getMiscellaneous().get(1).getDateReceived()).isEqualTo(createdOn.plusDays(1));
+        assertThat(builder.getMiscellaneous().get(1).getDateReceived()).isEqualTo(createdOn.plusDays(1));
     }
 
     @Test
@@ -101,12 +99,12 @@ class CaseNotesStrategyTest {
             .build();
         caseData.setCaseNotes(wrapElements(note));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
         String prefix = "case note added: ";
         String expected = prefix + "x".repeat(250 - prefix.length());
-        assertThat(builder.build().getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo(expected);
     }
 
     @Test
@@ -116,12 +114,11 @@ class CaseNotesStrategyTest {
             .build();
         caseData.setCaseNotes(wrapElements(emptyNote));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo("case note added: ");
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isNull();
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo("case note added: ");
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isNull();
     }
 }

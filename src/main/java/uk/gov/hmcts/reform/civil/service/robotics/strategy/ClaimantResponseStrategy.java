@@ -1,5 +1,21 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
+import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,32 +36,13 @@ import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.TWO_V_ONE;
-import static uk.gov.hmcts.reform.civil.enums.MultiPartyScenario.getMultiPartyScenario;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
-import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
-    private static final Set<FlowState.Main> PROCEED_STATES = EnumSet.of(
-        FlowState.Main.FULL_DEFENCE_PROCEED,
-        FlowState.Main.FULL_DEFENCE_NOT_PROCEED
-    );
+    private static final Set<FlowState.Main> PROCEED_STATES =
+            EnumSet.of(FlowState.Main.FULL_DEFENCE_PROCEED, FlowState.Main.FULL_DEFENCE_NOT_PROCEED);
     private static final String PROCEED_INTENTION = "proceed";
     private static final String NOT_PROCEED_INTENTION = "not proceed";
     private static final String CLAIMANT_PROCEEDS_TEXT = "Claimant proceeds.";
@@ -67,25 +64,26 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
-        log.info("Building claimant response robotics events for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building claimant response robotics events for caseId {}", caseData.getCcdCaseReference());
 
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         boolean hasProceedState = hasState(stateFlow, FlowState.Main.FULL_DEFENCE_PROCEED);
         boolean hasNotProceedState = hasState(stateFlow, FlowState.Main.FULL_DEFENCE_NOT_PROCEED);
 
         if (hasProceedState) {
-            addProceedEvents(builder, caseData, authToken);
+            addProceedEvents(eventHistory, caseData, authToken);
         }
         if (hasNotProceedState) {
-            addNotProceedEvent(builder, caseData);
+            addNotProceedEvent(eventHistory, caseData);
         }
     }
 
-    private void addProceedEvents(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    private void addProceedEvents(EventHistory builder, CaseData caseData, String authToken) {
         List<ClaimantResponseDetails> claimantDetails = prepareApplicantsDetails(caseData);
         if (!claimantDetails.isEmpty()) {
             addDirectionsQuestionnaireEvents(builder, caseData, authToken, claimantDetails);
@@ -103,99 +101,157 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
         switch (scenario) {
             case ONE_V_ONE:
-                boolean useMultipartyTexts = isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
-                handleProceedScenario(builder, caseData, useMultipartyTexts, multipartyTexts,
-                                      List.of(CLAIMANT_PROCEEDS_TEXT));
+                boolean useMultipartyTexts =
+                        isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
+                handleProceedScenario(
+                        builder,
+                        caseData,
+                        useMultipartyTexts,
+                        multipartyTexts,
+                        List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case ONE_V_TWO_ONE_LEGAL_REP:
-                YesOrNo proceedResp1 = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
-                YesOrNo proceedResp2 = caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                boolean useMultiSameSolicitor = isAnyNo(proceedResp1, proceedResp2)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation);
-                handleProceedScenario(builder, caseData, useMultiSameSolicitor, multipartyTexts,
-                                      List.of(CLAIMANT_PROCEEDS_TEXT));
+                YesOrNo proceedResp1 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                YesOrNo proceedResp2 =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                boolean useMultiSameSolicitor =
+                        isAnyNo(proceedResp1, proceedResp2)
+                                || isSmallClaimMediation(
+                                        claimType, track, respondent1Mediation, applicant1Mediation);
+                handleProceedScenario(
+                        builder,
+                        caseData,
+                        useMultiSameSolicitor,
+                        multipartyTexts,
+                        List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case ONE_V_TWO_TWO_LEGAL_REP:
-                YesOrNo proceedRespOne = caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
-                YesOrNo proceedRespTwo = caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
-                boolean useMultiTwoSolicitors = isAnyNo(proceedRespOne, proceedRespTwo)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, respondent2Mediation);
-                handleProceedScenario(builder, caseData, useMultiTwoSolicitors, multipartyTexts,
-                                      List.of(CLAIMANT_PROCEEDS_TEXT));
+                YesOrNo proceedRespOne =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2();
+                YesOrNo proceedRespTwo =
+                        caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2();
+                boolean useMultiTwoSolicitors =
+                        isAnyNo(proceedRespOne, proceedRespTwo)
+                                || isSmallClaimMediation(
+                                        claimType,
+                                        track,
+                                        respondent1Mediation,
+                                        applicant1Mediation,
+                                        respondent2Mediation);
+                handleProceedScenario(
+                        builder,
+                        caseData,
+                        useMultiTwoSolicitors,
+                        multipartyTexts,
+                        List.of(CLAIMANT_PROCEEDS_TEXT));
                 break;
             case TWO_V_ONE:
                 YesOrNo applicant1Proceeds = caseData.getApplicant1ProceedWithClaimMultiParty2v1();
                 YesOrNo applicant2Proceeds = caseData.getApplicant2ProceedWithClaimMultiParty2v1();
-                boolean useMultiTwoApplicants = isAnyNo(applicant1Proceeds, applicant2Proceeds)
-                    || isSmallClaimMediation(claimType, track, respondent1Mediation, applicant1Mediation, applicant2Mediation);
-                handleProceedScenario(builder, caseData, useMultiTwoApplicants, multipartyTexts,
-                                      List.of(CLAIMANTS_PROCEED_TEXT));
+                boolean useMultiTwoApplicants =
+                        isAnyNo(applicant1Proceeds, applicant2Proceeds)
+                                || isSmallClaimMediation(
+                                        claimType,
+                                        track,
+                                        respondent1Mediation,
+                                        applicant1Mediation,
+                                        applicant2Mediation);
+                handleProceedScenario(
+                        builder,
+                        caseData,
+                        useMultiTwoApplicants,
+                        multipartyTexts,
+                        List.of(CLAIMANTS_PROCEED_TEXT));
                 break;
             default:
-                handleProceedScenario(builder, caseData, false, multipartyTexts,
-                                      List.of(CLAIMANT_PROCEEDS_TEXT));
+                handleProceedScenario(
+                        builder, caseData, false, multipartyTexts, List.of(CLAIMANT_PROCEEDS_TEXT));
         }
     }
 
-    private void handleProceedScenario(EventHistory.EventHistoryBuilder builder,
-                                       CaseData caseData,
-                                       boolean useMultipartyTexts,
-                                       List<String> multipartyTexts,
-                                       List<String> proceedTexts) {
+    private void handleProceedScenario(
+            EventHistory builder,
+            CaseData caseData,
+            boolean useMultipartyTexts,
+            List<String> multipartyTexts,
+            List<String> proceedTexts) {
         List<String> textsToApply = useMultipartyTexts ? multipartyTexts : proceedTexts;
-        builder.miscellaneous(prepareMiscEvents(builder, caseData, textsToApply));
+        List<Event> eventsToAdd1 = prepareMiscEvents(builder, caseData, textsToApply);
+        List<Event> updatedMiscellaneousEvents1 =
+                builder.getMiscellaneous() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(builder.getMiscellaneous());
+        updatedMiscellaneousEvents1.addAll(eventsToAdd1);
+        builder.setMiscellaneous(updatedMiscellaneousEvents1);
         if (!useMultipartyTexts) {
             addTakenOfflineForMultitrack(builder, caseData);
         }
     }
 
-    private void addDirectionsQuestionnaireEvents(EventHistory.EventHistoryBuilder builder,
-                                                  CaseData caseData,
-                                                  String authToken,
-                                                  List<ClaimantResponseDetails> claimantDetails) {
+    private void addDirectionsQuestionnaireEvents(
+            EventHistory builder,
+            CaseData caseData,
+            String authToken,
+            List<ClaimantResponseDetails> claimantDetails) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             String preferredCourt = getPreferredCourtCode(caseData.getApplicant1DQ());
-            List<Event> dqEvents = claimantDetails.stream()
-                .map(detail -> buildDirectionsQuestionnaireEvent(
-                    builder,
-                    sequenceGenerator,
-                    detail.getResponseDate(),
-                    detail.getLitigiousPartyID(),
-                    detail.getDq(),
-                    preferredCourt,
-                    prepareEventDetailsText(detail.getDq(), preferredCourt)
-                ))
-                .toList();
-            builder.directionsQuestionnaireFiled(dqEvents);
+            List<Event> eventsToAdd2 = claimantDetails.stream()
+                    .map(
+                            detail ->
+                                    buildDirectionsQuestionnaireEvent(
+                                            builder,
+                                            sequenceGenerator,
+                                            detail.getResponseDate(),
+                                            detail.getLitigiousPartyID(),
+                                            detail.getDq(),
+                                            preferredCourt,
+                                            prepareEventDetailsText(detail.getDq(), preferredCourt)))
+                    .toList();
+            List<Event> updatedDirectionsQuestionnaireFiledEvents2 =
+                    builder.getDirectionsQuestionnaireFiled() == null
+                            ? new ArrayList<>()
+                            : new ArrayList<>(builder.getDirectionsQuestionnaireFiled());
+            updatedDirectionsQuestionnaireFiledEvents2.addAll(eventsToAdd2);
+            builder.setDirectionsQuestionnaireFiled(updatedDirectionsQuestionnaireFiledEvents2);
             return;
         }
 
         String preferredCourt = locationRefDataUtil.getPreferredCourtData(caseData, authToken, true);
-        List<Event> dqEvents = claimantDetails.stream()
-            .map(detail -> buildDirectionsQuestionnaireEvent(
-                builder,
-                sequenceGenerator,
-                detail.getResponseDate(),
-                detail.getLitigiousPartyID(),
-                detail.getDq(),
-                preferredCourt,
-                prepareEventDetailsText(detail.getDq(), preferredCourt)
-            ))
-            .toList();
-        builder.directionsQuestionnaireFiled(dqEvents);
+        List<Event> eventsToAdd3 = claimantDetails.stream()
+                .map(
+                        detail ->
+                                buildDirectionsQuestionnaireEvent(
+                                        builder,
+                                        sequenceGenerator,
+                                        detail.getResponseDate(),
+                                        detail.getLitigiousPartyID(),
+                                        detail.getDq(),
+                                        preferredCourt,
+                                        prepareEventDetailsText(detail.getDq(), preferredCourt)))
+                .toList();
+        List<Event> updatedDirectionsQuestionnaireFiledEvents3 =
+                builder.getDirectionsQuestionnaireFiled() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(builder.getDirectionsQuestionnaireFiled());
+        updatedDirectionsQuestionnaireFiledEvents3.addAll(eventsToAdd3);
+        builder.setDirectionsQuestionnaireFiled(updatedDirectionsQuestionnaireFiledEvents3);
     }
 
-    private void addNotProceedEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
-        String message = getMultiPartyScenario(caseData).equals(TWO_V_ONE)
-            ? textFormatter.claimantsIntendNotToProceed()
-            : textFormatter.claimantIntendsNotToProceed();
+    private void addNotProceedEvent(EventHistory builder, CaseData caseData) {
+        String message =
+                getMultiPartyScenario(caseData).equals(TWO_V_ONE)
+                        ? textFormatter.claimantsIntendNotToProceed()
+                        : textFormatter.claimantIntendsNotToProceed();
 
-        builder.miscellaneous(buildMiscEvent(
-            builder,
-            sequenceGenerator,
-            message,
-            resolveApplicantResponseDate(caseData)
-        ));
+        List<Event> updatedMiscellaneousEvents4 =
+                builder.getMiscellaneous() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(builder.getMiscellaneous());
+        updatedMiscellaneousEvents4.add(
+                buildMiscEvent(
+                        builder, sequenceGenerator, message, resolveApplicantResponseDate(caseData)));
+        builder.setMiscellaneous(updatedMiscellaneousEvents4);
     }
 
     private List<String> prepareMultipartyTexts(CaseData caseData) {
@@ -204,43 +260,45 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
         switch (getMultiPartyScenario(caseData)) {
             case ONE_V_TWO_ONE_LEGAL_REP, ONE_V_TWO_TWO_LEGAL_REP -> {
-                texts.add(textFormatter.formatRpa(
-                    "[1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    dateStamp,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
-                        ? PROCEED_INTENTION
-                        : NOT_PROCEED_INTENTION,
-                    caseData.getRespondent1().getPartyName()
-                ));
-                texts.add(textFormatter.formatRpa(
-                    "[2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
-                    dateStamp,
-                    YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
-                        ? PROCEED_INTENTION
-                        : NOT_PROCEED_INTENTION,
-                    caseData.getRespondent2().getPartyName()
-                ));
+                texts.add(
+                        textFormatter.formatRpa(
+                                "[1 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                                dateStamp,
+                                YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2())
+                                        ? PROCEED_INTENTION
+                                        : NOT_PROCEED_INTENTION,
+                                caseData.getRespondent1().getPartyName()));
+                texts.add(
+                        textFormatter.formatRpa(
+                                "[2 of 2 - %s] Claimant has provided intention: %s against defendant: %s",
+                                dateStamp,
+                                YES.equals(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2())
+                                        ? PROCEED_INTENTION
+                                        : NOT_PROCEED_INTENTION,
+                                caseData.getRespondent2().getPartyName()));
             }
             case TWO_V_ONE -> {
-                YesOrNo app1Proceeds = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getApplicant1ProceedWithClaimSpec2v1()
-                    : caseData.getApplicant1ProceedWithClaimMultiParty2v1();
-                YesOrNo app2Proceeds = SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
-                    ? caseData.getApplicant1ProceedWithClaimSpec2v1()
-                    : caseData.getApplicant2ProceedWithClaimMultiParty2v1();
+                YesOrNo app1Proceeds =
+                        SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                ? caseData.getApplicant1ProceedWithClaimSpec2v1()
+                                : caseData.getApplicant1ProceedWithClaimMultiParty2v1();
+                YesOrNo app2Proceeds =
+                        SPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+                                ? caseData.getApplicant1ProceedWithClaimSpec2v1()
+                                : caseData.getApplicant2ProceedWithClaimMultiParty2v1();
 
-                texts.add(textFormatter.formatRpa(
-                    "[1 of 2 - %s] Claimant: %s has provided intention: %s",
-                    dateStamp,
-                    caseData.getApplicant1().getPartyName(),
-                    YES.equals(app1Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION
-                ));
-                texts.add(textFormatter.formatRpa(
-                    "[2 of 2 - %s] Claimant: %s has provided intention: %s",
-                    dateStamp,
-                    caseData.getApplicant2().getPartyName(),
-                    YES.equals(app2Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION
-                ));
+                texts.add(
+                        textFormatter.formatRpa(
+                                "[1 of 2 - %s] Claimant: %s has provided intention: %s",
+                                dateStamp,
+                                caseData.getApplicant1().getPartyName(),
+                                YES.equals(app1Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION));
+                texts.add(
+                        textFormatter.formatRpa(
+                                "[2 of 2 - %s] Claimant: %s has provided intention: %s",
+                                dateStamp,
+                                caseData.getApplicant2().getPartyName(),
+                                YES.equals(app2Proceeds) ? PROCEED_INTENTION : NOT_PROCEED_INTENTION));
             }
             default -> texts.add(textFormatter.claimantProceeds());
         }
@@ -248,70 +306,72 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
         return texts;
     }
 
-    private List<Event> prepareMiscEvents(EventHistory.EventHistoryBuilder builder,
-                                          CaseData caseData,
-                                          List<String> texts) {
+    private List<Event> prepareMiscEvents(
+            EventHistory builder, CaseData caseData, List<String> texts) {
         LocalDateTime defaultDate = resolveApplicantResponseDate(caseData);
         return texts.stream()
-            .map(text -> buildMiscEvent(builder, sequenceGenerator, text, defaultDate))
-            .toList();
+                .map(text -> buildMiscEvent(builder, sequenceGenerator, text, defaultDate))
+                .toList();
     }
 
-    private void addTakenOfflineForMultitrack(EventHistory.EventHistoryBuilder builder, CaseData caseData) {
+    private void addTakenOfflineForMultitrack(EventHistory builder, CaseData caseData) {
         if (AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack())) {
             String message = textFormatter.multitrackUnspecOffline();
-            builder.miscellaneous(buildMiscEvent(
-                builder,
-                sequenceGenerator,
-                message,
-                resolveApplicantResponseDate(caseData)
-            ));
+            List<Event> updatedMiscellaneousEvents5 =
+                    builder.getMiscellaneous() == null
+                            ? new ArrayList<>()
+                            : new ArrayList<>(builder.getMiscellaneous());
+            updatedMiscellaneousEvents5.add(
+                    buildMiscEvent(
+                            builder, sequenceGenerator, message, resolveApplicantResponseDate(caseData)));
+            builder.setMiscellaneous(updatedMiscellaneousEvents5);
         }
     }
 
-    private boolean isSmallClaimMediation(CaseCategory claimType,
-                                          String track,
-                                          YesOrNo respondent1,
-                                          YesOrNo applicant1) {
+    private boolean isSmallClaimMediation(
+            CaseCategory claimType, String track, YesOrNo respondent1, YesOrNo applicant1) {
         return claimType == SPEC_CLAIM
-            && AllocatedTrack.SMALL_CLAIM.name().equals(track)
-            && respondent1 == YES
-            && applicant1 == YES;
+                && AllocatedTrack.SMALL_CLAIM.name().equals(track)
+                && respondent1 == YES
+                && applicant1 == YES;
     }
 
-    private boolean isSmallClaimMediation(CaseCategory claimType,
-                                          String track,
-                                          YesOrNo respondent1,
-                                          YesOrNo applicant1,
-                                          YesOrNo additionalParty) {
+    private boolean isSmallClaimMediation(
+            CaseCategory claimType,
+            String track,
+            YesOrNo respondent1,
+            YesOrNo applicant1,
+            YesOrNo additionalParty) {
         return isSmallClaimMediation(claimType, track, respondent1, applicant1)
-            && additionalParty == YES;
+                && additionalParty == YES;
     }
 
     private YesOrNo resolveApplicant1Mediation(CaseData caseData) {
         return caseData.getApplicant1ClaimMediationSpecRequired() != null
-            && caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation() != null
-            ? caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()
-            : NO;
+                        && caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()
+                                != null
+                ? caseData.getApplicant1ClaimMediationSpecRequired().getHasAgreedFreeMediation()
+                : NO;
     }
 
     private YesOrNo resolveApplicant2Mediation(CaseData caseData) {
         return caseData.getApplicantMPClaimMediationSpecRequired() != null
-            && caseData.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation() != null
-            ? caseData.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()
-            : NO;
+                        && caseData.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()
+                                != null
+                ? caseData.getApplicantMPClaimMediationSpecRequired().getHasAgreedFreeMediation()
+                : NO;
     }
 
     private YesOrNo resolveRespondent1Mediation(CaseData caseData) {
         return caseData.getResponseClaimMediationSpecRequired() != null
-            ? caseData.getResponseClaimMediationSpecRequired()
-            : NO;
+                ? caseData.getResponseClaimMediationSpecRequired()
+                : NO;
     }
 
     private YesOrNo resolveRespondent2Mediation(CaseData caseData) {
         return caseData.getResponseClaimMediationSpec2Required() != null
-            ? caseData.getResponseClaimMediationSpec2Required()
-            : NO;
+                ? caseData.getResponseClaimMediationSpec2Required()
+                : NO;
     }
 
     private boolean isAnyNo(YesOrNo first, YesOrNo second) {
@@ -324,7 +384,7 @@ public class ClaimantResponseStrategy implements EventHistoryStrategy {
 
     private boolean hasState(StateFlow stateFlow, FlowState.Main state) {
         return stateFlow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(state.fullName()::equals);
+                .map(State::getName)
+                .anyMatch(state.fullName()::equals);
     }
 }

@@ -69,10 +69,7 @@ class RoboticsCaseDataSupportTest {
             .fax("01234 098765")
             .dx("DX 123")
             .email("contact@example.com")
-            .address(Address.builder()
-                .addressLine1("1 High Street")
-                .postCode("ZZ1 1ZZ")
-                .build())
+            .address(new Address("1 High Street", null, null, null, null, null, "ZZ1 1ZZ"))
             .build();
 
         Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder();
@@ -99,10 +96,7 @@ class RoboticsCaseDataSupportTest {
             uk.gov.hmcts.reform.civil.prd.model.Organisation.class);
         when(organisation.getName()).thenReturn("Organisation Ltd");
         when(organisation.getContactInformation()).thenReturn(List.of(contactInformation));
-        Address providedServiceAddress = Address.builder()
-            .addressLine1("Provided Line 1")
-            .postCode("BB1 1BB")
-            .build();
+        Address providedServiceAddress = new Address("Provided Line 1", null, null, null, null, null, "BB1 1BB");
 
         Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder();
         support.applyOrganisation(builder, organisation, providedServiceAddress);
@@ -170,16 +164,10 @@ class RoboticsCaseDataSupportTest {
             .phoneNumber("01234 567890")
             .email("org@example.com")
             .dx("DX 222")
-            .address(Address.builder()
-                .addressLine1("Details Line 1")
-                .postCode("YY1 2YY")
-                .build())
+            .address(new Address("Details Line 1", null, null, null, null, null, "YY1 2YY"))
             .build();
 
-        Address serviceAddress = Address.builder()
-            .addressLine1("Service Line 1")
-            .postCode("ZZ1 9ZZ")
-            .build();
+        Address serviceAddress = new Address("Service Line 1", null, null, null, null, null, "ZZ1 9ZZ");
 
         Solicitor solicitor = support.buildSolicitor(
             RoboticsCaseDataSupport.SolicitorData.builder()

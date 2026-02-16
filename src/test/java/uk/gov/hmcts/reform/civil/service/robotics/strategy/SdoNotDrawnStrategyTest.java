@@ -82,21 +82,20 @@ class SdoNotDrawnStrategyTest {
     void contributeAddsSdoNotDrawnEvent() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("No SDO drawn").build())
+            .reasonNotSuitableSDO(new ReasonNotSuitableSDO("No SDO drawn"))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getMiscellaneous().get(0).getEventCode())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode())
             .isEqualTo(EventType.MISCELLANEOUS.getCode());
         String expected = new RoboticsEventTextFormatter()
             .caseProceedOffline("Judge / Legal Advisor did not draw a Direction's Order: No SDO drawn");
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo(expected);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(caseData.getUnsuitableSDODate());
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo(expected);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(caseData.getUnsuitableSDODate());
     }
 
     @Test
@@ -104,13 +103,13 @@ class SdoNotDrawnStrategyTest {
         String longReason = "x".repeat(600);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawn(MultiPartyScenario.ONE_V_ONE)
-            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input(longReason).build())
+            .reasonNotSuitableSDO(new ReasonNotSuitableSDO(longReason))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        String message = builder.build().getMiscellaneous().get(0).getEventDetailsText();
+        String message = builder.getMiscellaneous().getFirst().getEventDetailsText();
         assertThat(message).hasSize(250);
     }
 }

@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -24,28 +33,15 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.StrategyTestDataFactor
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 class RespondentDivergentResponseStrategyTest {
 
     private static final LocalDateTime NOW = LocalDateTime.of(2024, 6, 20, 9, 15);
 
-    @Mock
-    private RoboticsSequenceGenerator sequenceGenerator;
+    @Mock private RoboticsSequenceGenerator sequenceGenerator;
 
-    @Mock
-    private IStateFlowEngine stateFlowEngine;
+    @Mock private IStateFlowEngine stateFlowEngine;
 
-    @Mock
-    private StateFlow stateFlow;
+    @Mock private StateFlow stateFlow;
 
     private RoboticsRespondentResponseSupport respondentResponseSupport;
     private RespondentDivergentResponseStrategy strategy;
@@ -56,18 +52,17 @@ class RespondentDivergentResponseStrategyTest {
         RoboticsEventTextFormatter formatter = new RoboticsEventTextFormatter();
         RoboticsTimelineHelper timelineHelper = new RoboticsTimelineHelper(() -> NOW);
         respondentResponseSupport = new RoboticsRespondentResponseSupport(formatter, timelineHelper);
-        strategy = new RespondentDivergentResponseStrategy(
-            sequenceGenerator,
-            respondentResponseSupport,
-            stateFlowEngine
-        );
+        strategy =
+                new RespondentDivergentResponseStrategy(
+                        sequenceGenerator, respondentResponseSupport, stateFlowEngine);
 
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
     }
 
     @Test
     void supportsReturnsFalseWhenStateMissing() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+        when(stateFlow.getStateHistory())
+                .thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
 
         CaseData caseData = createUnspecDivergentCase();
 
@@ -81,9 +76,12 @@ class RespondentDivergentResponseStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentEvenIfResponsesMissing() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
-        ));
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(
+                                        FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED
+                                                .fullName())));
 
         CaseData caseData = CaseDataBuilder.builder().build();
 
@@ -92,9 +90,10 @@ class RespondentDivergentResponseStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStatePresentAndResponsesExist() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        ));
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())));
 
         CaseData caseData = createUnspecDivergentCase();
 
@@ -103,136 +102,129 @@ class RespondentDivergentResponseStrategyTest {
 
     @Test
     void contributeDoesNothingWhenNotSupported() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+        when(stateFlow.getStateHistory())
+                .thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
         when(stateFlow.getState()).thenReturn(State.from(FlowState.Main.CLAIM_ISSUED.fullName()));
 
         CaseData caseData = createUnspecDivergentCase();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
-        assertThat(history.getReceiptOfPartAdmission()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getDefenceFiled()).isNullOrEmpty();
+        assertThat(builder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(builder.getReceiptOfPartAdmission()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
         verifyNoInteractions(sequenceGenerator);
     }
 
     @Test
     void contributeAddsEventsForUnspecDivergentResponses() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(
+                                        FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED
+                                                .fullName())));
+        when(stateFlow.getState())
+                .thenReturn(
+                        State.from(
+                                FlowState.Main.AWAITING_RESPONSES_NOT_FULL_DEFENCE_OR_FULL_ADMIT_RECEIVED
+                                        .fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
         CaseData caseData = createUnspecDivergentCase();
 
         assertThat(strategy.supports(caseData)).isTrue();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
+        assertThat(builder.getDefenceFiled()).extracting(Event::getEventSequence).containsExactly(10);
 
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(10);
+        assertThat(builder.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getEventSequence)
+                .containsExactly(11);
 
-        assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(11);
+        assertThat(builder.getReceiptOfPartAdmission())
+                .extracting(Event::getEventSequence)
+                .containsExactly(12);
 
-        assertThat(history.getReceiptOfPartAdmission())
-            .extracting(Event::getEventSequence)
-            .containsExactly(12);
+        assertThat(builder.getMiscellaneous()).extracting(Event::getEventSequence).containsExactly(13);
 
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getEventSequence)
-            .containsExactly(13);
-
-        assertThat(history.getMiscellaneous())
-            .filteredOn(event -> event.getEventCode() != null)
-            .extracting(Event::getEventDetails)
-            .extracting(EventDetails::getMiscText)
-            .containsExactly(
-                respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent2(), false)
-            );
+        assertThat(builder.getMiscellaneous())
+                .filteredOn(event -> event.getEventCode() != null)
+                .extracting(Event::getEventDetails)
+                .extracting(EventDetails::getMiscText)
+                .containsExactly(
+                        respondentResponseSupport.prepareRespondentResponseText(
+                                caseData, caseData.getRespondent2(), false));
     }
 
     @Test
     void contributeUsesStateFlowWhenFlowStateNull() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(70, 71, 72, 73);
 
         CaseData caseData = createSpecDivergentCase();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous()).hasSize(1);
     }
 
     @Test
     void contributeAddsSpecMiscOnlyWhenOffline() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName()),
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName()),
+                                State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21, 22, 23);
 
         CaseData caseData = createSpecDivergentCase();
 
         assertThat(strategy.supports(caseData)).isTrue();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getReceiptOfPartAdmission())
-            .extracting(Event::getEventSequence)
-            .containsExactly(20);
+        assertThat(builder.getReceiptOfPartAdmission())
+                .extracting(Event::getEventSequence)
+                .containsExactly(20);
 
-        List<String> miscTexts = history.getMiscellaneous().stream()
-            .filter(event -> event != null && event.getEventCode() != null)
-            .map(Event::getEventDetailsText)
-            .toList();
+        List<String> miscTexts =
+                builder.getMiscellaneous().stream()
+                        .filter(event -> event != null && event.getEventCode() != null)
+                        .map(Event::getEventDetailsText)
+                        .toList();
         assertThat(miscTexts)
-            .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
-                caseData,
-                caseData.getRespondent1(),
-                true
-            ));
+                .containsExactly(
+                        respondentResponseSupport.prepareRespondentResponseText(
+                                caseData, caseData.getRespondent1(), true));
 
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getEventSequence)
-            .containsExactly(22);
+        assertThat(builder.getDefenceFiled()).extracting(Event::getEventSequence).containsExactly(22);
 
-        assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getLitigiousPartyID)
-            .containsExactly("003");
+        assertThat(builder.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getLitigiousPartyID)
+                .containsExactly("003");
     }
 
     @Test
     void addsStatesPaidWhenRespondentPaysInFull() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(30, 31);
 
         BigDecimal claimAmount = BigDecimal.valueOf(1000);
@@ -245,54 +237,55 @@ class RespondentDivergentResponseStrategyTest {
         caseData.setRespondToClaim(respondToClaim);
         caseData.setRespondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid()).hasSize(1);
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(builder.getStatesPaid()).hasSize(1);
+        assertThat(builder.getDefenceFiled()).isNullOrEmpty();
     }
 
     @Test
     void doesNotAddMiscForSpecFullDefenceWhenGoingOffline() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()),
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()),
+                                State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.DIVERGENT_RESPOND_GO_OFFLINE.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(40, 41);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .respondent1DQ()
-            .setClaimTypeToSpecClaim()
-            .respondent1(createIndividualParty("One"))
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .respondent1DQ()
+                        .setClaimTypeToSpecClaim()
+                        .respondent1(createIndividualParty("One"))
+                        .build();
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
         caseData.setRespondent1ResponseDate(NOW);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
     }
 
     @Test
     void usesRespondent1ResponseDateWhenSameSolicitor() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(50, 51, 52, 53);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .atState1v2SameSolicitorDivergentResponse(RespondentResponseType.FULL_DEFENCE, RespondentResponseType.PART_ADMISSION)
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .atState1v2SameSolicitorDivergentResponse(
+                                RespondentResponseType.FULL_DEFENCE, RespondentResponseType.PART_ADMISSION)
+                        .build();
         caseData.setRespondent1(createIndividualParty("One"));
         caseData.setRespondent2(createIndividualParty("Two"));
         caseData.setRespondent1ResponseDate(NOW);
@@ -300,79 +293,76 @@ class RespondentDivergentResponseStrategyTest {
         caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
         caseData.setSameSolicitorSameResponse(YesOrNo.YES);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
         LocalDateTime expectedDate = caseData.getRespondent1ResponseDate();
-        assertThat(history.getDirectionsQuestionnaireFiled())
-            .extracting(Event::getDateReceived)
-            .contains(expectedDate);
-        assertThat(history.getMiscellaneous())
-            .extracting(Event::getDateReceived)
-            .contains(expectedDate);
+        assertThat(builder.getDirectionsQuestionnaireFiled())
+                .extracting(Event::getDateReceived)
+                .contains(expectedDate);
+        assertThat(builder.getMiscellaneous())
+                .extracting(Event::getDateReceived)
+                .contains(expectedDate);
     }
 
     @Test
     void addsReceiptOfAdmissionForFullAdmissionResponse() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
-        );
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName()));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(60, 61, 62, 63);
 
         CaseData caseData = createUnspecDivergentCase();
         caseData.setRespondent2ClaimResponseType(RespondentResponseType.FULL_ADMISSION);
         caseData.setRespondent2ResponseDate(NOW.plusDays(3));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getReceiptOfAdmission()).hasSize(1);
-        assertThat(history.getReceiptOfAdmission().get(0).getLitigiousPartyID()).isEqualTo("003");
+        assertThat(builder.getReceiptOfAdmission()).hasSize(1);
+        assertThat(builder.getReceiptOfAdmission().getFirst().getLitigiousPartyID()).isEqualTo("003");
     }
 
     @Test
     void usesClaimantResponseTypeForTwoVOneSpec() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())
-        ));
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED.fullName())));
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(80);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .setClaimTypeToSpecClaim()
-            .respondent1(createIndividualParty("Solo"))
-            .respondent1ResponseDate(NOW)
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .setClaimTypeToSpecClaim()
+                        .respondent1(createIndividualParty("Solo"))
+                        .respondent1ResponseDate(NOW)
+                        .build();
         caseData.setAddApplicant2(YesOrNo.YES);
         caseData.setClaimant1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
-        strategy.contribute(builder, caseData, null, FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED);
+        EventHistory builder = new EventHistory();
+        strategy.contribute(
+                builder, caseData, null, FlowState.Main.AWAITING_RESPONSES_FULL_ADMIT_RECEIVED);
 
-        EventHistory history = builder.build();
-        assertThat(history.getReceiptOfAdmission()).hasSize(1);
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(builder.getReceiptOfAdmission()).hasSize(1);
+        assertThat(builder.getDefenceFiled()).isNullOrEmpty();
+        assertThat(builder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
     }
 
     @Test
     void usesRespondent1ResponseWhenSameSolicitorSameResponseForRespondent2() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        );
-        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(90, 91, 92, 93, 94, 95);
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()));
+        when(sequenceGenerator.nextSequence(any(EventHistory.class)))
+                .thenReturn(90, 91, 92, 93, 94, 95);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor().build();
         caseData.setRespondent1(createIndividualParty("One"));
         caseData.setRespondent2(createIndividualParty("Two"));
         caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
@@ -393,28 +383,24 @@ class RespondentDivergentResponseStrategyTest {
         respondToClaim2.setHowMuchWasPaid(BigDecimal.ZERO);
         caseData.setRespondToClaim2(respondToClaim2);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid())
-            .extracting(Event::getLitigiousPartyID)
-            .contains("003");
+        assertThat(builder.getStatesPaid()).extracting(Event::getLitigiousPartyID).contains("003");
     }
 
     @Test
     void addsDefenceFiledWhenPaidLessThanClaimForRespondent2() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        ));
-        when(stateFlow.getState()).thenReturn(
-            State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())
-        );
-        when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(100, 101, 102, 103, 104, 105);
+        when(stateFlow.getStateHistory())
+                .thenReturn(
+                        List.of(
+                                State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName())));
+        when(stateFlow.getState())
+                .thenReturn(State.from(FlowState.Main.AWAITING_RESPONSES_FULL_DEFENCE_RECEIVED.fullName()));
+        when(sequenceGenerator.nextSequence(any(EventHistory.class)))
+                .thenReturn(100, 101, 102, 103, 104, 105);
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .multiPartyClaimOneDefendantSolicitor()
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().multiPartyClaimOneDefendantSolicitor().build();
         caseData.setRespondent1(createIndividualParty("One"));
         caseData.setRespondent2(createIndividualParty("Two"));
         caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
@@ -435,22 +421,19 @@ class RespondentDivergentResponseStrategyTest {
         respondToClaim2.setHowMuchWasPaid(BigDecimal.valueOf(0));
         caseData.setRespondToClaim2(respondToClaim2);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled())
-            .extracting(Event::getLitigiousPartyID)
-            .contains("003");
+        assertThat(builder.getDefenceFiled()).extracting(Event::getLitigiousPartyID).contains("003");
     }
 
     private CaseData createUnspecDivergentCase() {
         return StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
-            .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
-            .respondent2ClaimResponseType(RespondentResponseType.PART_ADMISSION)
-            .respondent1ResponseDate(NOW)
-            .respondent2ResponseDate(NOW.plusDays(1))
-            .build();
+                .respondent1ClaimResponseType(RespondentResponseType.FULL_DEFENCE)
+                .respondent2ClaimResponseType(RespondentResponseType.PART_ADMISSION)
+                .respondent1ResponseDate(NOW)
+                .respondent2ResponseDate(NOW.plusDays(1))
+                .build();
     }
 
     private CaseData createSpecDivergentCase() {
@@ -460,11 +443,11 @@ class RespondentDivergentResponseStrategyTest {
         builder.respondent1(respondent1);
         builder.respondent2(respondent2);
         return builder
-            .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondent1ResponseDate(NOW)
-            .respondent2ResponseDate(NOW.plusDays(2))
-            .build();
+                .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
+                .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
+                .respondent1ResponseDate(NOW)
+                .respondent2ResponseDate(NOW.plusDays(2))
+                .build();
     }
 
     private Party createIndividualParty(String lastName) {

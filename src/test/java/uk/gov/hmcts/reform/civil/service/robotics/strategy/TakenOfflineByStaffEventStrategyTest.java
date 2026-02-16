@@ -76,13 +76,12 @@ class TakenOfflineByStaffEventStrategyTest {
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(4);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(4);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(offlineDate);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo("RPA Reason: offline.");
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(4);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(offlineDate);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo("RPA Reason: offline.");
     }
 }

@@ -92,27 +92,26 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setApplicant1ResponseDate(responseDate);
         caseData.setJoJudgementByAdmissionIssueDate(null);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
 
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getMiscellaneous().get(0).getEventCode())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode())
             .isEqualTo(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo(textFormatter.judgmentByAdmissionOffline());
 
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventSequence()).isEqualTo(11);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventCode())
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventSequence()).isEqualTo(11);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventCode())
             .isEqualTo(EventType.JUDGEMENT_BY_ADMISSION.getCode());
-        assertThat(history.getJudgmentByAdmission().get(0).getLitigiousPartyID())
+        assertThat(builder.getJudgmentByAdmission().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.APPLICANT_ID);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo(BigDecimal.valueOf(1000).setScale(2));
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfCosts())
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfCosts())
             .isEqualByComparingTo(BigDecimal.valueOf(150).setScale(2));
     }
 
@@ -137,12 +136,11 @@ class JudgmentByAdmissionStrategyTest {
             .applicant1ResponseDate(responseDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo("1200.00");
     }
 
@@ -168,12 +166,11 @@ class JudgmentByAdmissionStrategyTest {
             .applicant1ResponseDate(responseDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo("1150.00");
     }
 
@@ -199,12 +196,11 @@ class JudgmentByAdmissionStrategyTest {
             .applicant1ResponseDate(responseDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment())
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment())
             .isEqualByComparingTo("1000.00");
     }
 
@@ -227,15 +223,14 @@ class JudgmentByAdmissionStrategyTest {
         LocalDateTime issueDate = LocalDateTime.of(2024, 3, 5, 15, 30);
         caseData.setJoJudgementByAdmissionIssueDate(issueDate);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetails().getMiscText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetails().getMiscText())
             .isEqualTo(EventHistoryMapper.RECORD_JUDGMENT);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(issueDate);
-        assertThat(history.getJudgmentByAdmission().get(0).getLitigiousPartyID())
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(issueDate);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
     }
 
@@ -275,12 +270,11 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(responseDate);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        var details = history.getJudgmentByAdmission().get(0).getEventDetails();
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        var details = builder.getJudgmentByAdmission().getFirst().getEventDetails();
         assertThat(details.getAmountOfCosts()).isEqualByComparingTo("99.00");
         assertThat(details.getAmountOfJudgment()).isEqualByComparingTo("545.00");
         assertThat(details.getInstallmentAmount()).isEqualByComparingTo("25.00");
@@ -288,7 +282,7 @@ class JudgmentByAdmissionStrategyTest {
         assertThat(details.getFirstInstallmentDate()).isEqualTo(LocalDate.of(2024, 6, 15));
         assertThat(details.getAmountPaidBeforeJudgment()).isEqualByComparingTo("5.00");
         assertThat(details.getPaymentInFullDate()).isNull();
-        assertThat(history.getJudgmentByAdmission().get(0).getLitigiousPartyID())
+        assertThat(builder.getJudgmentByAdmission().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.APPLICANT_ID);
     }
 
@@ -315,16 +309,15 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setRespondToClaimAdmitPartLRspec(respondToClaim);
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        var details = history.getJudgmentByAdmission().get(0).getEventDetails();
+        var details = builder.getJudgmentByAdmission().getFirst().getEventDetails();
         assertThat(details.getPaymentInFullDate()).isEqualTo(paymentDate.atStartOfDay());
         assertThat(details.getInstallmentPeriod()).isEqualTo("FUL");
-        assertThat(history.getJudgmentByAdmission().get(0).getLitigiousPartyID())
+        assertThat(builder.getJudgmentByAdmission().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
-        assertThat(history.getMiscellaneous()).singleElement()
+        assertThat(builder.getMiscellaneous()).singleElement()
             .extracting(event -> event.getEventDetails().getMiscText())
             .isEqualTo(EventHistoryMapper.RECORD_JUDGMENT);
     }
@@ -351,12 +344,11 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setJoJudgementByAdmissionIssueDate(null);
         caseData.setApplicant1ResponseDate(responseDate);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        BigDecimal amount = history.getJudgmentByAdmission().get(0).getEventDetails().getAmountOfJudgment();
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        BigDecimal amount = builder.getJudgmentByAdmission().getFirst().getEventDetails().getAmountOfJudgment();
         assertThat(amount).isEqualByComparingTo(new BigDecimal("1250.00"));
     }
 
@@ -383,11 +375,10 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setRespondent1RepaymentPlan(repaymentPlan);
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        var details = history.getJudgmentByAdmission().get(0).getEventDetails();
+        var details = builder.getJudgmentByAdmission().getFirst().getEventDetails();
         assertThat(details.getInstallmentPeriod()).isEqualTo("FW");
         assertThat(details.getPaymentInFullDate()).isNull();
     }
@@ -406,14 +397,13 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(null);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = builder.build();
-        LocalDateTime miscDate = history.getMiscellaneous().get(0).getDateReceived();
-        LocalDateTime judgmentDate = history.getJudgmentByAdmission().get(0).getDateReceived();
+        LocalDateTime miscDate = builder.getMiscellaneous().getFirst().getDateReceived();
+        LocalDateTime judgmentDate = builder.getJudgmentByAdmission().getFirst().getDateReceived();
         assertThat(miscDate).isAfterOrEqualTo(before);
         assertThat(miscDate).isBeforeOrEqualTo(after);
         assertThat(judgmentDate).isAfterOrEqualTo(before);
@@ -444,12 +434,11 @@ class JudgmentByAdmissionStrategyTest {
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 10, 1, 9, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getJudgmentByAdmission()).hasSize(1);
-        assertThat(history.getJudgmentByAdmission().get(0).getEventDetails().getPaymentInFullDate())
+        assertThat(builder.getJudgmentByAdmission()).hasSize(1);
+        assertThat(builder.getJudgmentByAdmission().getFirst().getEventDetails().getPaymentInFullDate())
             .isEqualTo(LocalDate.of(2024, 12, 20).atStartOfDay());
     }
 }

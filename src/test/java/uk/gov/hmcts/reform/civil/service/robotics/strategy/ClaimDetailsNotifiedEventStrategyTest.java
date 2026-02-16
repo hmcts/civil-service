@@ -77,14 +77,13 @@ class ClaimDetailsNotifiedEventStrategyTest {
             .claimDetailsNotificationDate(notified)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(18);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(notified);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(18);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(notified);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Claim details notified.");
     }
 }

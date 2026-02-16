@@ -102,18 +102,17 @@ class SpecRejectRepaymentPlanStrategyTest {
             .applicant1ResponseDate(NOW.minusDays(1))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, base, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isAfterOrEqualTo(before);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isBeforeOrEqualTo(after);
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(25);
-        assertThat(history.getMiscellaneous().get(0).getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isBeforeOrEqualTo(after);
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(25);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode()).isEqualTo(EventType.MISCELLANEOUS.getCode());
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo(formatter.manualDeterminationRequired());
     }
 }

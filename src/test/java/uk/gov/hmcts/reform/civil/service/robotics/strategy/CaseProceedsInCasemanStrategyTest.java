@@ -101,9 +101,9 @@ class CaseProceedsInCasemanStrategyTest {
             .atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(5);
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null, FlowState.Main.TAKEN_OFFLINE_AFTER_SDO);
-        assertThat(builder.build().getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous()).hasSize(1);
     }
 
     @Test
@@ -119,13 +119,12 @@ class CaseProceedsInCasemanStrategyTest {
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(1, 2);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null, FlowState.Main.TAKEN_OFFLINE_AFTER_SDO);
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous()).allMatch(event ->
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous()).allMatch(event ->
             event.getDateReceived().equals(offline)
                 && "RPA Reason: Case Proceeds in Caseman.".equals(event.getEventDetailsText())
         );
@@ -153,14 +152,13 @@ class CaseProceedsInCasemanStrategyTest {
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(3);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(3);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(offline);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(3);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(offline);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Case Proceeds in Caseman.");
     }
 }

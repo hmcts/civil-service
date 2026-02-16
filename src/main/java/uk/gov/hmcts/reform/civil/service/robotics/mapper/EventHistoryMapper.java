@@ -80,8 +80,8 @@ public class EventHistoryMapper {
     public EventHistory buildEvents(CaseData caseData, String authToken) {
         log.info("Building robotics event history for caseId {}", caseData.getCcdCaseReference());
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder()
-            .directionsQuestionnaireFiled(List.of(Event.builder().build()));
+        EventHistory builder = new EventHistory()
+            .setDirectionsQuestionnaireFiled(List.of(new Event()));
 
         Map<Class<?>, EventHistoryStrategy> registry = buildStrategyRegistry();
         Set<Class<? extends EventHistoryStrategy>> invoked = new HashSet<>();
@@ -91,7 +91,7 @@ public class EventHistoryMapper {
 
         runGlobalStrategies(builder, caseData, authToken, registry, invoked);
 
-        EventHistory eventHistory = eventHistorySequencer.sortEvents(builder.build());
+        EventHistory eventHistory = eventHistorySequencer.sortEvents(builder);
         log.info("Completed robotics event history for caseId {}", caseData.getCcdCaseReference());
         log.info("Event history: {}", eventHistory);
         return eventHistory;
@@ -124,7 +124,7 @@ public class EventHistoryMapper {
         return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
     }
 
-    private void dispatchState(EventHistory.EventHistoryBuilder builder,
+    private void dispatchState(EventHistory builder,
                                CaseData caseData,
                                String authToken,
                                Map<Class<?>, EventHistoryStrategy> registry,
@@ -153,7 +153,7 @@ public class EventHistoryMapper {
         return registry;
     }
 
-    private void runGlobalStrategies(EventHistory.EventHistoryBuilder builder,
+    private void runGlobalStrategies(EventHistory builder,
                                      CaseData caseData,
                                      String authToken,
                                      Map<Class<?>, EventHistoryStrategy> registry,

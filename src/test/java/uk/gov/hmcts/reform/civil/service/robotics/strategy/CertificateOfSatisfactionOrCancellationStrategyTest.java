@@ -66,21 +66,20 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(7);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getCertificateOfSatisfactionOrCancellation()).hasSize(1);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventSequence()).isEqualTo(7);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventCode())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation()).hasSize(1);
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventSequence()).isEqualTo(7);
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventCode())
             .isEqualTo(EventType.CERTIFICATE_OF_SATISFACTION_OR_CANCELLATION.getCode());
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getLitigiousPartyID())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.APPLICANT_ID);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventDetails().getStatus())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventDetails().getStatus())
             .isEqualTo(CoscRPAStatus.CANCELLED.toString());
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventDetails().getDatePaidInFull())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventDetails().getDatePaidInFull())
             .isEqualTo(paidDate);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getDateReceived())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getDateReceived())
             .isEqualTo(issueDate);
     }
 
@@ -109,18 +108,17 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(12);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getCertificateOfSatisfactionOrCancellation()).hasSize(1);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getLitigiousPartyID())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation()).hasSize(1);
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventDetails().getStatus())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventDetails().getStatus())
             .isEqualTo(CoscRPAStatus.SATISFIED.toString());
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getEventDetails().getDatePaidInFull())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getEventDetails().getDatePaidInFull())
             .isEqualTo(defendantPaidDate);
-        assertThat(history.getCertificateOfSatisfactionOrCancellation().get(0).getDateReceived())
+        assertThat(builder.getCertificateOfSatisfactionOrCancellation().getFirst().getDateReceived())
             .isEqualTo(defendantIssueDate);
     }
 }

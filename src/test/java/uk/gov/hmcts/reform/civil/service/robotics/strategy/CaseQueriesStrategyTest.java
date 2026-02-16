@@ -74,15 +74,14 @@ class CaseQueriesStrategyTest {
         caseData.setCcdState(CaseState.CASE_DISMISSED);
         caseData.setQmApplicantSolicitorQueries(queries);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(60);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(60);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived())
             .isEqualTo(LocalDateTime.of(2024, 2, 11, 10, 0));
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("There has been a query on this case");
     }
 }

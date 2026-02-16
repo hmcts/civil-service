@@ -78,14 +78,13 @@ class TakenOfflineAfterClaimNotifiedStrategyTest {
         caseData.setSubmittedDate(submitted);
         when(sequenceGenerator.nextSequence(any())).thenReturn(21);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(21);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(submitted);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(21);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(submitted);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: only one defendant notified.");
     }
 }

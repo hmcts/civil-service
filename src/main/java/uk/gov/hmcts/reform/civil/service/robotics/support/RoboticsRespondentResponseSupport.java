@@ -159,7 +159,7 @@ public class RoboticsRespondentResponseSupport {
             : caseData.getRespondent1ResponseDate();
     }
 
-    public void addRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public void addRespondentMiscEvent(EventHistory builder,
                                        RoboticsSequenceGenerator sequenceGenerator,
                                        CaseData caseData,
                                        Party respondent,
@@ -169,7 +169,7 @@ public class RoboticsRespondentResponseSupport {
         RoboticsEventSupport.addRespondentMiscEvent(builder, sequenceGenerator, message, dateReceived);
     }
 
-    public void addSpecDivergentRespondentMiscEvent(EventHistory.EventHistoryBuilder builder,
+    public void addSpecDivergentRespondentMiscEvent(EventHistory builder,
                                                     RoboticsSequenceGenerator sequenceGenerator,
                                                     CaseData caseData,
                                                     Party respondent,

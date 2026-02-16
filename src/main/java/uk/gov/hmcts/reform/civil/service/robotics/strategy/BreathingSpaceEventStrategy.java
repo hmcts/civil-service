@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -12,13 +16,11 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.BREATHING_SPACE_LIFTED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_ENTERED;
 import static uk.gov.hmcts.reform.civil.model.robotics.EventType.MENTAL_HEALTH_BREATHING_SPACE_LIFTED;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
 
 @Slf4j
 @Component
@@ -38,7 +40,7 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -46,40 +48,64 @@ public class BreathingSpaceEventStrategy implements EventHistoryStrategy {
 
         if (caseData.getBreathing().getEnter() != null && caseData.getBreathing().getLift() == null) {
             if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
-                buildEvent(builder, caseData, BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
+                buildEvent(eventHistory, caseData, BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
             } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
-                buildEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
+                buildEvent(eventHistory, caseData, MENTAL_HEALTH_BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
             }
         } else if (caseData.getBreathing().getLift() != null) {
             if (BreathingSpaceType.STANDARD.equals(caseData.getBreathing().getEnter().getType())) {
-                buildEvent(builder, caseData, BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
-                buildEvent(builder, caseData, BREATHING_SPACE_LIFTED, BreathingStatus.LIFTED);
+                buildEvent(eventHistory, caseData, BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
+                buildEvent(eventHistory, caseData, BREATHING_SPACE_LIFTED, BreathingStatus.LIFTED);
             } else if (BreathingSpaceType.MENTAL_HEALTH.equals(caseData.getBreathing().getEnter().getType())) {
-                buildEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
-                buildEvent(builder, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, BreathingStatus.LIFTED);
+                buildEvent(eventHistory, caseData, MENTAL_HEALTH_BREATHING_SPACE_ENTERED, BreathingStatus.ENTER);
+                buildEvent(eventHistory, caseData, MENTAL_HEALTH_BREATHING_SPACE_LIFTED, BreathingStatus.LIFTED);
             }
         }
     }
 
-    private void buildEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData,
+    private void buildEvent(EventHistory builder, CaseData caseData,
                              EventType eventType, BreathingStatus status) {
         LocalTime timeNow = LocalTime.now();
         String details = buildEventDetails(caseData, status);
         LocalDateTime dateReceived = resolveEventDate(caseData, eventType, timeNow);
-        Event event = Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(eventType.getCode())
-            .dateReceived(dateReceived)
-            .litigiousPartyID(LITIGIOUS_PARTY_ID)
-            .eventDetailsText(details)
-            .eventDetails(EventDetails.builder().miscText(details).build())
-            .build();
+        Event event = createEvent(
+            sequenceGenerator.nextSequence(builder),
+            eventType.getCode(),
+            dateReceived,
+            LITIGIOUS_PARTY_ID,
+            details,
+            new EventDetails().setMiscText(details)
+        );
 
         switch (eventType) {
-            case BREATHING_SPACE_ENTERED -> builder.breathingSpaceEntered(event);
-            case BREATHING_SPACE_LIFTED -> builder.breathingSpaceLifted(event);
-            case MENTAL_HEALTH_BREATHING_SPACE_ENTERED -> builder.breathingSpaceMentalHealthEntered(event);
-            case MENTAL_HEALTH_BREATHING_SPACE_LIFTED -> builder.breathingSpaceMentalHealthLifted(event);
+            case BREATHING_SPACE_ENTERED -> {
+                List<Event> updatedBreathingSpaceEnteredEvents = builder.getBreathingSpaceEntered() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(builder.getBreathingSpaceEntered());
+                updatedBreathingSpaceEnteredEvents.add(event);
+                builder.setBreathingSpaceEntered(updatedBreathingSpaceEnteredEvents);
+            }
+            case BREATHING_SPACE_LIFTED -> {
+                List<Event> updatedBreathingSpaceLiftedEvents = builder.getBreathingSpaceLifted() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(builder.getBreathingSpaceLifted());
+                updatedBreathingSpaceLiftedEvents.add(event);
+                builder.setBreathingSpaceLifted(updatedBreathingSpaceLiftedEvents);
+            }
+            case MENTAL_HEALTH_BREATHING_SPACE_ENTERED -> {
+                List<Event> updatedMentalHealthBreathingSpaceEnteredEvents = builder.getBreathingSpaceMentalHealthEntered() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(builder.getBreathingSpaceMentalHealthEntered());
+                updatedMentalHealthBreathingSpaceEnteredEvents.add(event);
+                builder.setBreathingSpaceMentalHealthEntered(updatedMentalHealthBreathingSpaceEnteredEvents);
+            }
+            case MENTAL_HEALTH_BREATHING_SPACE_LIFTED -> {
+                List<Event> updatedMentalHealthBreathingSpaceLiftedEvents = builder.getBreathingSpaceMentalHealthLifted() == null
+                    ? new ArrayList<>()
+                    : new ArrayList<>(builder.getBreathingSpaceMentalHealthLifted());
+                updatedMentalHealthBreathingSpaceLiftedEvents.add(event);
+                builder.setBreathingSpaceMentalHealthLifted(updatedMentalHealthBreathingSpaceLiftedEvents);
+            }
             default -> throw new IllegalStateException("Unsupported breathing-space event: " + eventType);
         }
     }

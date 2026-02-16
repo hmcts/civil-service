@@ -79,9 +79,9 @@ class MediationEventStrategyTest {
 
     @Test
     void contributeDoesNothingWhenUnsupported() {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
@@ -104,12 +104,11 @@ class MediationEventStrategyTest {
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(11, 12);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
-        EventHistory history = builder.build();
 
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        Event dqEvent = history.getDirectionsQuestionnaireFiled().get(0);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        Event dqEvent = builder.getDirectionsQuestionnaireFiled().getFirst();
         assertThat(dqEvent.getEventSequence()).isEqualTo(11);
         assertThat(dqEvent.getLitigiousPartyID()).isEqualTo(APPLICANT_ID);
         assertThat(dqEvent.getEventDetails().getPreferredCourtCode()).isEqualTo("432");
@@ -117,8 +116,8 @@ class MediationEventStrategyTest {
         assertThat(dqEvent.getEventDetailsText())
             .isEqualTo(prepareEventDetailsText(caseData.getApplicant1DQ(), "432"));
 
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        Event miscEvent = history.getMiscellaneous().get(0);
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        Event miscEvent = builder.getMiscellaneous().getFirst();
         assertThat(miscEvent.getEventSequence()).isEqualTo(12);
         assertThat(miscEvent.getDateReceived()).isEqualTo(responseDate);
         assertThat(miscEvent.getEventDetailsText()).isEqualTo("IN MEDIATION");
@@ -135,13 +134,12 @@ class MediationEventStrategyTest {
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(5);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isEqualTo("IN MEDIATION");
+        assertThat(builder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isEqualTo("IN MEDIATION");
     }
 
     private CaseDataBuilder baseCaseDataBuilder(CaseCategory category) {

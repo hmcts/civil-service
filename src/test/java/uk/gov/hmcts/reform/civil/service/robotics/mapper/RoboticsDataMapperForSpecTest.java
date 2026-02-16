@@ -78,14 +78,13 @@ class RoboticsDataMapperForSpecTest {
             String solicitorId = invocation.getArgument(4);
             String solicitorOrganisationId = invocation.getArgument(5);
             LocalDate dateOfService = invocation.getArgument(6);
-            return LitigiousParty.builder()
-                .id(id)
-                .solicitorID(solicitorId)
-                .type(type)
-                .name(party != null ? party.getPartyName() : null)
-                .solicitorOrganisationID(solicitorOrganisationId)
-                .dateOfService(dateOfService != null ? dateOfService.format(ISO_DATE) : null)
-                .build();
+            return new LitigiousParty()
+                .setId(id)
+                .setSolicitorID(solicitorId)
+                .setType(type)
+                .setName(party != null ? party.getPartyName() : null)
+                .setSolicitorOrganisationID(solicitorOrganisationId)
+                .setDateOfService(dateOfService != null ? dateOfService.format(ISO_DATE) : null);
         });
         when(caseDataSupport.buildSolicitor(any())).thenReturn(Solicitor.builder().build());
     }

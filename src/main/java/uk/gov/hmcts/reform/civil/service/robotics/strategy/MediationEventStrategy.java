@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,14 +24,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildDirectionsQuestionnaireEvent;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -37,13 +37,13 @@ public class MediationEventStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.hasDefendantAgreedToFreeMediation()
-            && caseData.hasClaimantAgreedToFreeMediation()
-            && hasMediationState(caseData);
+                && caseData.hasDefendantAgreedToFreeMediation()
+                && caseData.hasClaimantAgreedToFreeMediation()
+                && hasMediationState(caseData);
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -51,35 +51,46 @@ public class MediationEventStrategy implements EventHistoryStrategy {
 
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             List<ClaimantResponseDetails> applicantDetails = prepareApplicantsDetails(caseData);
-            List<Event> dqEvents = applicantDetails.stream().map(applicantDetail -> buildApplicantDirectionsQuestionnaireEvent(builder, caseData, applicantDetail))
-                .toList();
-            builder.directionsQuestionnaireFiled(dqEvents);
+            List<Event> eventsToAdd1 = applicantDetails.stream()
+                    .map(
+                            applicantDetail ->
+                                    buildApplicantDirectionsQuestionnaireEvent(
+                                            eventHistory, caseData, applicantDetail))
+                    .toList();
+            List<Event> updatedDirectionsQuestionnaireFiledEvents1 =
+                    eventHistory.getDirectionsQuestionnaireFiled() == null
+                            ? new ArrayList<>()
+                            : new ArrayList<>(eventHistory.getDirectionsQuestionnaireFiled());
+            updatedDirectionsQuestionnaireFiledEvents1.addAll(eventsToAdd1);
+            eventHistory.setDirectionsQuestionnaireFiled(updatedDirectionsQuestionnaireFiledEvents1);
         }
 
-        builder.miscellaneous(buildMiscEvent(
-            builder,
-            sequenceGenerator,
-            textFormatter.inMediation(),
-            resolveApplicantResponseDate(caseData)
-        ));
+        List<Event> updatedMiscellaneousEvents2 =
+                eventHistory.getMiscellaneous() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getMiscellaneous());
+        updatedMiscellaneousEvents2.add(
+                buildMiscEvent(
+                        eventHistory,
+                        sequenceGenerator,
+                        textFormatter.inMediation(),
+                        resolveApplicantResponseDate(caseData)));
+        eventHistory.setMiscellaneous(updatedMiscellaneousEvents2);
     }
 
-    private Event buildApplicantDirectionsQuestionnaireEvent(EventHistory.EventHistoryBuilder builder,
-                                                             CaseData caseData,
-                                                             ClaimantResponseDetails claimantDetails) {
-        String preferredCourtCode = RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode(caseData.getApplicant1DQ());
+    private Event buildApplicantDirectionsQuestionnaireEvent(
+            EventHistory builder, CaseData caseData, ClaimantResponseDetails claimantDetails) {
+        String preferredCourtCode =
+                RoboticsDirectionsQuestionnaireSupport.getPreferredCourtCode(caseData.getApplicant1DQ());
         return buildDirectionsQuestionnaireEvent(
-            builder,
-            sequenceGenerator,
-            claimantDetails.getResponseDate(),
-            claimantDetails.getLitigiousPartyID(),
-            claimantDetails.getDq(),
-            preferredCourtCode,
-            RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText(
+                builder,
+                sequenceGenerator,
+                claimantDetails.getResponseDate(),
+                claimantDetails.getLitigiousPartyID(),
                 claimantDetails.getDq(),
-                preferredCourtCode
-            )
-        );
+                preferredCourtCode,
+                RoboticsDirectionsQuestionnaireSupport.prepareEventDetailsText(
+                        claimantDetails.getDq(), preferredCourtCode));
     }
 
     private LocalDateTime resolveApplicantResponseDate(CaseData caseData) {
@@ -94,7 +105,7 @@ public class MediationEventStrategy implements EventHistoryStrategy {
     private boolean hasMediationState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         return stateFlow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(FlowState.Main.IN_MEDIATION.fullName()::equals);
+                .map(State::getName)
+                .anyMatch(FlowState.Main.IN_MEDIATION.fullName()::equals);
     }
 }

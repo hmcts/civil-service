@@ -79,10 +79,10 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
             List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName()))
         );
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
 
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
         verifyNoInteractions(sequenceGenerator);
     }
 
@@ -108,16 +108,15 @@ class UnrepresentedAndUnregisteredDefendantStrategyTest {
 
         caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 20, 0, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(31);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(31);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: [1 of 2 - 2024-03-02] Unrepresented defendant and unregistered defendant solicitor firm. Unrepresented defendant: Resp One");
-        assertThat(history.getMiscellaneous().get(1).getEventSequence()).isEqualTo(32);
-        assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().get(1).getEventSequence()).isEqualTo(32);
+        assertThat(builder.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("RPA Reason: [2 of 2 - 2024-03-02] Unrepresented defendant and unregistered defendant solicitor firm. Unregistered defendant solicitor firm: Firm One");
     }
 }

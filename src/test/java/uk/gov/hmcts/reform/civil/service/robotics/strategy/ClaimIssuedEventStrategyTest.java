@@ -68,15 +68,14 @@ class ClaimIssuedEventStrategyTest {
             .build();
         when(sequenceGenerator.nextSequence(any())).thenReturn(12);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(12);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(12);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived())
             .isEqualTo(LocalDate.of(2024, 1, 10).atStartOfDay());
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("Claim issued in CCD.");
     }
 }

@@ -1,9 +1,14 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.robotics.Event;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
@@ -11,8 +16,6 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsManualOfflineS
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
-
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Slf4j
 @Component
@@ -26,30 +29,34 @@ public class TakenOfflineByStaffEventStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && caseData.getTakenOfflineByStaffDate() != null
-            && hasTakenOfflineByStaffState(caseData);
+                && caseData.getTakenOfflineByStaffDate() != null
+                && hasTakenOfflineByStaffState(caseData);
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
 
-        log.info("Building taken offline by staff robotics event for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building taken offline by staff robotics event for caseId {}",
+                caseData.getCcdCaseReference());
         String details = manualOfflineSupport.prepareTakenOfflineEventDetails(caseData);
-        builder.miscellaneous(buildMiscEvent(
-            builder,
-            sequenceGenerator,
-            details,
-            caseData.getTakenOfflineByStaffDate()
-        ));
+        List<Event> updatedMiscellaneousEvents1 =
+                eventHistory.getMiscellaneous() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getMiscellaneous());
+        updatedMiscellaneousEvents1.add(
+                buildMiscEvent(
+                        eventHistory, sequenceGenerator, details, caseData.getTakenOfflineByStaffDate()));
+        eventHistory.setMiscellaneous(updatedMiscellaneousEvents1);
     }
 
     private boolean hasTakenOfflineByStaffState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         return stateFlow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName()::equals);
+                .map(State::getName)
+                .anyMatch(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName()::equals);
     }
 }

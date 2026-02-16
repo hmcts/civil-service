@@ -3,20 +3,19 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
 
 import java.time.LocalDateTime;
-
 import java.util.EnumSet;
 import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.service.robotics.mapper.EventHistoryMapper.QUERIES_ON_CASE;
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.buildMiscEvent;
 
 @Slf4j
 @Component
@@ -41,7 +40,7 @@ public class CaseQueriesStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -51,12 +50,7 @@ public class CaseQueriesStrategy implements EventHistoryStrategy {
             ? caseData.getTakenOfflineDate()
             : timelineHelper.now();
 
-        builder.miscellaneous(buildMiscEvent(
-            builder,
-            sequenceGenerator,
-            QUERIES_ON_CASE,
-            dateReceived
-        ));
+        RoboticsEventSupport.addRespondentMiscEvent(eventHistory, sequenceGenerator, QUERIES_ON_CASE, dateReceived);
     }
 
     private boolean hasActiveQueries(CaseData caseData) {

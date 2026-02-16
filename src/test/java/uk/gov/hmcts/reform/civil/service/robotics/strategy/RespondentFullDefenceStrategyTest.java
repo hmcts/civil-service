@@ -79,20 +79,19 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDefenceFiled().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
-        assertThat(history.getDefenceFiled().get(0).getDateReceived()).isEqualTo(caseData.getRespondent1ResponseDate());
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDefenceFiled().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getDefenceFiled().getFirst().getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
+        assertThat(builder.getDefenceFiled().getFirst().getDateReceived()).isEqualTo(caseData.getRespondent1ResponseDate());
 
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getEventSequence()).isEqualTo(11);
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getEventCode())
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled().getFirst().getEventSequence()).isEqualTo(11);
+        assertThat(builder.getDirectionsQuestionnaireFiled().getFirst().getEventCode())
             .isEqualTo(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getEventDetailsText())
+        assertThat(builder.getDirectionsQuestionnaireFiled().getFirst().getEventDetailsText())
             .isEqualTo(respondentResponseSupport.prepareFullDefenceEventText(
                 caseData.getRespondent1DQ(),
                 caseData,
@@ -111,39 +110,36 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDefenceAndCounterClaim()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDefenceAndCounterClaim()).isNullOrEmpty();
     }
 
     @Test
     void contributeAddsStatesPaidWhenFirstRespondentPaysInFull() {
-        CaseData baseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .build();
 
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
 
-        CaseData caseData = baseData;
         caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
         caseData.setRespondToClaim(respondToClaim);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid()).hasSize(1);
-        assertThat(history.getStatesPaid().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(STATES_PAID.getCode());
-        assertThat(history.getDefenceFiled()).isNullOrEmpty();
+        assertThat(builder.getStatesPaid()).hasSize(1);
+        assertThat(builder.getStatesPaid().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getStatesPaid().getFirst().getEventCode()).isEqualTo(STATES_PAID.getCode());
+        assertThat(builder.getDefenceFiled()).isNullOrEmpty();
     }
 
     @Test
@@ -156,27 +152,26 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(2);
-        assertThat(history.getDefenceFiled())
+        assertThat(builder.getDefenceFiled()).hasSize(2);
+        assertThat(builder.getDefenceFiled())
             .extracting(Event::getEventCode)
             .containsOnly(DEFENCE_FILED.getCode());
-        assertThat(history.getDefenceFiled().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getDefenceFiled().get(1).getEventSequence())
-            .isGreaterThan(history.getDefenceFiled().get(0).getEventSequence());
+        assertThat(builder.getDefenceFiled().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getDefenceFiled().get(1).getEventSequence())
+            .isGreaterThan(builder.getDefenceFiled().getFirst().getEventSequence());
 
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
-        assertThat(history.getDirectionsQuestionnaireFiled())
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(2);
+        assertThat(builder.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventCode)
             .containsOnly(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
     }
 
     @Test
     void contributeAddsStatesPaidForSecondRespondentWhenSameSolicitorPaidInFull() {
-        CaseData baseCase = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimOneDefendantSolicitor()
             .atStateBothRespondentsSameResponse1v2SameSolicitor(FULL_DEFENCE)
             .respondentResponseIsSame(YES)
@@ -185,28 +180,26 @@ class RespondentFullDefenceStrategyTest {
         RespondToClaim respondToClaim = new RespondToClaim();
         respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
 
-        CaseData caseData = baseCase;
         caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
         caseData.setRespondToClaim(respondToClaim);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13, 14);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid()).hasSize(2);
-        assertThat(history.getStatesPaid())
+        assertThat(builder.getStatesPaid()).hasSize(2);
+        assertThat(builder.getStatesPaid())
             .extracting(Event::getEventCode)
             .containsOnly(STATES_PAID.getCode());
-        assertThat(history.getStatesPaid().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getStatesPaid().get(1).getEventSequence())
-            .isGreaterThan(history.getStatesPaid().get(0).getEventSequence());
-        assertThat(history.getStatesPaid())
+        assertThat(builder.getStatesPaid().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getStatesPaid().get(1).getEventSequence())
+            .isGreaterThan(builder.getStatesPaid().getFirst().getEventSequence());
+        assertThat(builder.getStatesPaid())
             .extracting(Event::getEventCode)
             .containsOnly(STATES_PAID.getCode());
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDefenceFiled().getFirst().getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
     }
 
     @Test
@@ -217,64 +210,59 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(2);
-        assertThat(history.getDefenceFiled())
+        assertThat(builder.getDefenceFiled()).hasSize(2);
+        assertThat(builder.getDefenceFiled())
             .extracting(Event::getEventCode)
             .containsOnly(DEFENCE_FILED.getCode());
 
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(2);
-        assertThat(history.getDirectionsQuestionnaireFiled())
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(2);
+        assertThat(builder.getDirectionsQuestionnaireFiled())
             .extracting(Event::getEventCode)
             .containsOnly(DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
     }
 
     @Test
     void contributeAddsStatesPaidForSecondRespondentWhenDifferentSolicitorsAndPaid() {
-        CaseData baseCase = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
+        CaseData caseData = StrategyTestDataFactory.unspecTwoDefendantSolicitorsCase()
             .atStateBothRespondentsSameResponse(FULL_DEFENCE)
             .build();
 
         RespondToClaim respondToClaim2 = new RespondToClaim();
         respondToClaim2.setHowMuchWasPaid(BigDecimal.valueOf(10_000));
 
-        CaseData caseData = baseCase;
         caseData.setTotalClaimAmount(BigDecimal.valueOf(100));
         caseData.setRespondToClaim2(respondToClaim2);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid()).hasSize(1);
-        assertThat(history.getStatesPaid().get(0).getEventCode()).isEqualTo(STATES_PAID.getCode());
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDefenceFiled().get(0).getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
+        assertThat(builder.getStatesPaid()).hasSize(1);
+        assertThat(builder.getStatesPaid().getFirst().getEventCode()).isEqualTo(STATES_PAID.getCode());
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDefenceFiled().getFirst().getEventCode()).isEqualTo(DEFENCE_FILED.getCode());
     }
 
     @Test
     void contributeRespectsLrVsLipStatesPaidBranch() {
-        CaseData baseCase = CaseDataBuilder.builder()
+
+        CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
             .applicant1Represented(YES)
             .respondent1Represented(NO)
             .build();
-
-        CaseData caseData = baseCase;
         caseData.setDefenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED);
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getStatesPaid())
+        assertThat(builder.getStatesPaid())
             .extracting(Event::getEventSequence)
             .containsExactly(10);
     }
@@ -289,14 +277,13 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled())
+        assertThat(builder.getDefenceFiled())
             .extracting(Event::getEventSequence)
             .containsExactly(10);
-        assertThat(history.getStatesPaid()).isNullOrEmpty();
+        assertThat(builder.getStatesPaid()).isNullOrEmpty();
     }
 
     @Test
@@ -307,11 +294,10 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
@@ -325,11 +311,10 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 
     @Test
@@ -346,12 +331,11 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
     }
 
     @Test
@@ -366,13 +350,12 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDefenceFiled().get(0).getLitigiousPartyID())
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDefenceFiled().getFirst().getLitigiousPartyID())
             .isEqualTo("002");
     }
 
@@ -385,12 +368,11 @@ class RespondentFullDefenceStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(20, 21);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getDefenceFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getLitigiousPartyID()).isEqualTo("002");
+        assertThat(builder.getDefenceFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled().getFirst().getLitigiousPartyID()).isEqualTo("002");
     }
 }

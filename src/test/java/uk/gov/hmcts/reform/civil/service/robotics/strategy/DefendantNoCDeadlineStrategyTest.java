@@ -64,14 +64,13 @@ class DefendantNoCDeadlineStrategyTest {
 
         when(sequenceGenerator.nextSequence(any())).thenReturn(7);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(7);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(offline);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(7);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(offline);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Claim moved offline after defendant NoC deadline has passed");
     }
 
@@ -84,9 +83,9 @@ class DefendantNoCDeadlineStrategyTest {
             .build();
         caseData.setAddLegalRepDeadlineRes1(offline.plusDays(2));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        assertThat(builder.build().getMiscellaneous()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
     }
 }

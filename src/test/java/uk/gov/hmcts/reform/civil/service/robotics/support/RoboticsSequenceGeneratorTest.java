@@ -15,44 +15,53 @@ class RoboticsSequenceGeneratorTest {
 
     @Test
     void nextSequenceReturnsOneWhenHistoryEmpty() {
-        assertThat(generator.nextSequence(EventHistory.builder().build())).isEqualTo(1);
+        assertThat(generator.nextSequence(new EventHistory())).isEqualTo(1);
     }
 
     @Test
     void nextSequenceFindsMaxAcrossAllBuckets() {
-        Event event1 = Event.builder().eventSequence(2).dateReceived(LocalDateTime.now()).build();
-        Event event2 = Event.builder().eventSequence(5).dateReceived(LocalDateTime.now()).build();
-        Event event3 = Event.builder().eventSequence(3).dateReceived(LocalDateTime.now()).build();
+        Event event1 = new Event();
+        event1.setEventSequence(2);
+        event1.setDateReceived(LocalDateTime.now());
+        Event event2 = new Event();
+        event2.setEventSequence(5);
+        event2.setDateReceived(LocalDateTime.now());
+        Event event3 = new Event();
+        event3.setEventSequence(3);
+        event3.setDateReceived(LocalDateTime.now());
 
-        EventHistory history = EventHistory.builder()
-            .miscellaneous(List.of(event1))
-            .defenceFiled(List.of(event2))
-            .breathingSpaceEntered(List.of(event3))
-            .build();
+        EventHistory history = new EventHistory();
+        history.setMiscellaneous(List.of(event1));
+        history.setDefenceFiled(List.of(event2));
+        history.setBreathingSpaceEntered(List.of(event3));
 
         assertThat(generator.nextSequence(history)).isEqualTo(6);
     }
 
     @Test
     void nextSequenceIgnoresNullEvents() {
-        Event event = Event.builder().eventSequence(null).dateReceived(LocalDateTime.now()).build();
+        Event event = new Event();
+        event.setEventSequence(null);
+        event.setDateReceived(LocalDateTime.now());
 
-        EventHistory history = EventHistory.builder()
-            .miscellaneous(List.of(event))
-            .build();
+        EventHistory history = new EventHistory();
+        history.setMiscellaneous(List.of(event));
 
         assertThat(generator.nextSequence(history)).isEqualTo(1);
     }
 
     @Test
     void nextSequenceSkipsNullSequencesAcrossLists() {
-        Event nullSequence = Event.builder().eventSequence(null).dateReceived(LocalDateTime.now()).build();
-        Event maxEvent = Event.builder().eventSequence(7).dateReceived(LocalDateTime.now()).build();
+        Event nullSequence = new Event();
+        nullSequence.setEventSequence(null);
+        nullSequence.setDateReceived(LocalDateTime.now());
+        Event maxEvent = new Event();
+        maxEvent.setEventSequence(7);
+        maxEvent.setDateReceived(LocalDateTime.now());
 
-        EventHistory history = EventHistory.builder()
-            .miscellaneous(List.of(nullSequence))
-            .statesPaid(List.of(maxEvent))
-            .build();
+        EventHistory history = new EventHistory();
+        history.setMiscellaneous(List.of(nullSequence));
+        history.setStatesPaid(List.of(maxEvent));
 
         assertThat(generator.nextSequence(history)).isEqualTo(8);
     }

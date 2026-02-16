@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,33 +30,40 @@ public class TakenOfflineAfterClaimNotifiedStrategy implements EventHistoryStrat
 
     @Override
     public boolean supports(CaseData caseData) {
-        return caseData != null
-            && hasTakenOfflineAfterClaimNotifiedState(caseData);
+        return caseData != null && hasTakenOfflineAfterClaimNotifiedState(caseData);
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
-        log.info("Building taken offline after claim notified robotics event for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building taken offline after claim notified robotics event for caseId {}",
+                caseData.getCcdCaseReference());
 
         String message = textFormatter.onlyOneRespondentNotified();
-        Event event = Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .eventCode(EventType.MISCELLANEOUS.getCode())
-            .dateReceived(caseData.getSubmittedDate())
-            .eventDetailsText(message)
-            .eventDetails(EventDetails.builder().miscText(message).build())
-            .build();
+        Event event =
+                createEvent(
+                        sequenceGenerator.nextSequence(eventHistory),
+                        EventType.MISCELLANEOUS.getCode(),
+                        caseData.getSubmittedDate(),
+                        null,
+                        message,
+                        new EventDetails().setMiscText(message));
 
-        builder.miscellaneous(event);
+        List<Event> updatedMiscellaneousEvents1 =
+                eventHistory.getMiscellaneous() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getMiscellaneous());
+        updatedMiscellaneousEvents1.add(event);
+        eventHistory.setMiscellaneous(updatedMiscellaneousEvents1);
     }
 
     private boolean hasTakenOfflineAfterClaimNotifiedState(CaseData caseData) {
         StateFlow stateFlow = stateFlowEngine.evaluate(caseData);
         return stateFlow.getStateHistory().stream()
-            .map(State::getName)
-            .anyMatch(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()::equals);
+                .map(State::getName)
+                .anyMatch(FlowState.Main.TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED.fullName()::equals);
     }
 }

@@ -28,7 +28,7 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
@@ -36,7 +36,7 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
 
         if (defendant1ResponseExists.test(caseData)) {
             respondentResponseSupport.addRespondentMiscEvent(
-                builder,
+                    eventHistory,
                 sequenceGenerator,
                 caseData,
                 caseData.getRespondent1(),
@@ -47,7 +47,7 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
             if (defendant1v2SameSolicitorSameResponse.test(caseData)) {
                 LocalDateTime respondent2Date = respondentResponseSupport.resolveRespondent2ActualOrFallbackDate(caseData);
                 respondentResponseSupport.addRespondentMiscEvent(
-                    builder,
+                        eventHistory,
                     sequenceGenerator,
                     caseData,
                     caseData.getRespondent2(),
@@ -60,7 +60,7 @@ public class RespondentCounterClaimStrategy implements EventHistoryStrategy {
 
         if (defendant2ResponseExists.test(caseData)) {
             respondentResponseSupport.addRespondentMiscEvent(
-                builder,
+                    eventHistory,
                 sequenceGenerator,
                 caseData,
                 caseData.getRespondent2(),

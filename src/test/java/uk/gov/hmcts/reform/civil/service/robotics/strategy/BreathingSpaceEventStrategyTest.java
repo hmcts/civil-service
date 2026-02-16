@@ -51,9 +51,9 @@ class BreathingSpaceEventStrategyTest {
 
     @Test
     void contributeNoopsWhenUnsupported() {
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, CaseDataBuilder.builder().build(), null);
-        assertThat(builder.build().getBreathingSpaceEntered()).isNullOrEmpty();
+        assertThat(builder.getBreathingSpaceEntered()).isNullOrEmpty();
     }
 
     @Test
@@ -70,22 +70,21 @@ class BreathingSpaceEventStrategyTest {
             .build();
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
         LocalTime after = LocalTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
-        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceEntered()).hasSize(1);
-        Event event = history.getBreathingSpaceEntered().get(0);
+        assertThat(builder.getBreathingSpaceEntered().getFirst().getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(builder.getBreathingSpaceEntered().getFirst().getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
+        assertThat(builder.getBreathingSpaceEntered()).hasSize(1);
+        Event event = builder.getBreathingSpaceEntered().getFirst();
         assertThat(event.getEventSequence()).isEqualTo(1);
         assertThat(event.getEventCode()).isEqualTo(EventType.BREATHING_SPACE_ENTERED.getCode());
         assertThat(event.getDateReceived().toLocalDate()).isEqualTo(start);
         assertThat(event.getEventDetailsText())
             .isEqualTo("Breathing space reference REF-123, actual start date " + start);
-        assertThat(history.getBreathingSpaceLifted()).isNullOrEmpty();
+        assertThat(builder.getBreathingSpaceLifted()).isNullOrEmpty();
     }
 
     @Test
@@ -105,21 +104,20 @@ class BreathingSpaceEventStrategyTest {
             .build();
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
         LocalTime after = LocalTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
-        assertThat(history.getBreathingSpaceEntered().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
-        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceEntered()).hasSize(1);
-        assertThat(history.getBreathingSpaceLifted()).hasSize(1);
+        assertThat(builder.getBreathingSpaceEntered().getFirst().getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(builder.getBreathingSpaceEntered().getFirst().getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
+        assertThat(builder.getBreathingSpaceLifted().getFirst().getDateReceived().toLocalTime()).isAfterOrEqualTo(before);
+        assertThat(builder.getBreathingSpaceLifted().getFirst().getDateReceived().toLocalTime()).isBeforeOrEqualTo(after);
+        assertThat(builder.getBreathingSpaceEntered()).hasSize(1);
+        assertThat(builder.getBreathingSpaceLifted()).hasSize(1);
 
-        Event enterEvent = history.getBreathingSpaceEntered().get(0);
-        Event liftEvent = history.getBreathingSpaceLifted().get(0);
+        Event enterEvent = builder.getBreathingSpaceEntered().getFirst();
+        Event liftEvent = builder.getBreathingSpaceLifted().getFirst();
 
         assertThat(enterEvent.getEventSequence()).isEqualTo(5);
         assertThat(enterEvent.getEventCode()).isEqualTo(EventType.BREATHING_SPACE_ENTERED.getCode());
@@ -144,12 +142,12 @@ class BreathingSpaceEventStrategyTest {
             .build();
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        Event event = builder.build().getBreathingSpaceMentalHealthEntered().get(0);
+        Event event = builder.getBreathingSpaceMentalHealthEntered().getFirst();
         assertThat(event.getDateReceived()).isAfterOrEqualTo(before);
         assertThat(event.getDateReceived()).isBeforeOrEqualTo(after);
         assertThat(event.getEventSequence()).isEqualTo(7);
@@ -179,21 +177,20 @@ class BreathingSpaceEventStrategyTest {
 
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalTime before = LocalTime.now();
         strategy.contribute(builder, caseData, null);
         LocalTime after = LocalTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getBreathingSpaceMentalHealthEntered().get(0).getDateReceived().toLocalTime())
+        assertThat(builder.getBreathingSpaceMentalHealthEntered().getFirst().getDateReceived().toLocalTime())
             .isAfterOrEqualTo(before)
             .isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceMentalHealthLifted().get(0).getDateReceived().toLocalTime())
+        assertThat(builder.getBreathingSpaceMentalHealthLifted().getFirst().getDateReceived().toLocalTime())
             .isAfterOrEqualTo(before)
             .isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceMentalHealthEntered()).hasSize(1);
-        assertThat(history.getBreathingSpaceMentalHealthLifted()).hasSize(1);
-        assertThat(history.getBreathingSpaceMentalHealthLifted().get(0).getEventDetailsText())
+        assertThat(builder.getBreathingSpaceMentalHealthEntered()).hasSize(1);
+        assertThat(builder.getBreathingSpaceMentalHealthLifted()).hasSize(1);
+        assertThat(builder.getBreathingSpaceMentalHealthLifted().getFirst().getEventDetailsText())
             .isEqualTo("Breathing space reference MH-REF, actual end date " + end);
     }
 
@@ -213,17 +210,16 @@ class BreathingSpaceEventStrategyTest {
 
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        EventHistory history = builder.build();
-        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived()).isAfterOrEqualTo(before);
-        assertThat(history.getBreathingSpaceLifted().get(0).getDateReceived()).isBeforeOrEqualTo(after);
-        assertThat(history.getBreathingSpaceEntered()).hasSize(1);
-        assertThat(history.getBreathingSpaceLifted()).hasSize(1);
-        assertThat(history.getBreathingSpaceLifted().get(0).getEventDetailsText())
+        assertThat(builder.getBreathingSpaceLifted().getFirst().getDateReceived()).isAfterOrEqualTo(before);
+        assertThat(builder.getBreathingSpaceLifted().getFirst().getDateReceived()).isBeforeOrEqualTo(after);
+        assertThat(builder.getBreathingSpaceEntered()).hasSize(1);
+        assertThat(builder.getBreathingSpaceLifted()).hasSize(1);
+        assertThat(builder.getBreathingSpaceLifted().getFirst().getEventDetailsText())
             .isEqualTo("Breathing space reference REF-NO-END, ");
     }
 
@@ -238,12 +234,12 @@ class BreathingSpaceEventStrategyTest {
             .build();
         caseData.setBreathing(breathing);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         LocalDateTime before = LocalDateTime.now();
         strategy.contribute(builder, caseData, null);
         LocalDateTime after = LocalDateTime.now();
 
-        Event event = builder.build().getBreathingSpaceEntered().get(0);
+        Event event = builder.getBreathingSpaceEntered().getFirst();
         assertThat(event.getEventDetailsText()).startsWith("Actual start date ");
         LocalDateTime detailsTimestamp = extractTimestamp(event.getEventDetailsText(), "Actual start date ");
         assertThat(detailsTimestamp)

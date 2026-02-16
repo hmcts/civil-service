@@ -65,8 +65,8 @@ class RoboticsDirectionsQuestionnaireSupportTest {
         var details = RoboticsDirectionsQuestionnaireSupport.prepareApplicantsDetails(caseData);
 
         assertThat(details).hasSize(1);
-        assertThat(details.get(0).getLitigiousPartyID()).isEqualTo(APPLICANT2_ID);
-        assertThat(details.get(0).getResponseDate()).isEqualTo(responseDate);
+        assertThat(details.getFirst().getLitigiousPartyID()).isEqualTo(APPLICANT2_ID);
+        assertThat(details.getFirst().getResponseDate()).isEqualTo(responseDate);
     }
 
     @Test

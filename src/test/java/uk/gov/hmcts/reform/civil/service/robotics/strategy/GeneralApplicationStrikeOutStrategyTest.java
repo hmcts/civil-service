@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,35 +25,23 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenera
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-
 class GeneralApplicationStrikeOutStrategyTest {
 
-    @Mock
-    private RoboticsSequenceGenerator sequenceGenerator;
+    @Mock private RoboticsSequenceGenerator sequenceGenerator;
 
-    @Mock
-    private IStateFlowEngine stateFlowEngine;
+    @Mock private IStateFlowEngine stateFlowEngine;
 
-    @Mock
-    private StateFlow stateFlow;
+    @Mock private StateFlow stateFlow;
 
-    @InjectMocks
-    private GeneralApplicationStrikeOutStrategy strategy;
+    @InjectMocks private GeneralApplicationStrikeOutStrategy strategy;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11, 12, 13);
         when(stateFlowEngine.evaluate(any(CaseData.class))).thenReturn(stateFlow);
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName())));
+        when(stateFlow.getStateHistory())
+                .thenReturn(List.of(State.from(FlowState.Main.TAKEN_OFFLINE_BY_STAFF.fullName())));
     }
 
     @Test
@@ -56,87 +52,92 @@ class GeneralApplicationStrikeOutStrategyTest {
 
     @Test
     void supportsReturnsTrueWhenStrikeOutApplicationPresent() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
-            .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
+                        .getGeneralStrikeOutApplicationsDetailsWithCaseState(
+                                PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                        .build();
 
         assertThat(strategy.supports(caseData)).isTrue();
     }
 
     @Test
     void supportsReturnsFalseWhenStateMissing() {
-        when(stateFlow.getStateHistory()).thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
+        when(stateFlow.getStateHistory())
+                .thenReturn(List.of(State.from(FlowState.Main.CLAIM_ISSUED.fullName())));
 
-        CaseData caseData = CaseDataBuilder.builder()
-            .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
-            .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
+                        .getGeneralStrikeOutApplicationsDetailsWithCaseState(
+                                PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                        .build();
 
         assertThat(strategy.supports(caseData)).isFalse();
     }
 
     @Test
     void contributeAddsGeneralFormAndDefenceEvents() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
-            .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
+                        .getGeneralStrikeOutApplicationsDetailsWithCaseState(
+                                PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                        .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
+        assertThat(builder.getGeneralFormOfApplication()).hasSize(1);
+        assertThat(builder.getGeneralFormOfApplication().getFirst().getEventCode())
+                .isEqualTo(EventType.GENERAL_FORM_OF_APPLICATION.getCode());
+        assertThat(builder.getGeneralFormOfApplication().getFirst().getEventDetailsText())
+                .isEqualTo("APPLICATION TO Strike Out");
 
-        assertThat(history.getGeneralFormOfApplication()).hasSize(1);
-        assertThat(history.getGeneralFormOfApplication().get(0).getEventCode())
-            .isEqualTo(EventType.GENERAL_FORM_OF_APPLICATION.getCode());
-        assertThat(history.getGeneralFormOfApplication().get(0).getEventDetailsText())
-            .isEqualTo("APPLICATION TO Strike Out");
-
-        assertThat(history.getDefenceStruckOut()).hasSize(1);
-        assertThat(history.getDefenceStruckOut().get(0).getEventCode())
-            .isEqualTo(EventType.DEFENCE_STRUCK_OUT.getCode());
+        assertThat(builder.getDefenceStruckOut()).hasSize(1);
+        assertThat(builder.getDefenceStruckOut().getFirst().getEventCode())
+                .isEqualTo(EventType.DEFENCE_STRUCK_OUT.getCode());
     }
 
     @Test
     void contributeSkipsWhenNoMatchingJudgeDecision() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder().getGeneralApplicationWithStrikeOut(RESPONDENT_ID).build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getGeneralFormOfApplication()).isNullOrEmpty();
-        assertThat(history.getDefenceStruckOut()).isNullOrEmpty();
+        assertThat(builder.getGeneralFormOfApplication()).isNullOrEmpty();
+        assertThat(builder.getDefenceStruckOut()).isNullOrEmpty();
     }
 
     @Test
     void contributeHandlesMultipleApplications() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
-            .getGeneralStrikeOutApplicationsDetailsWithCaseState(PROCEEDS_IN_HERITAGE.getDisplayedValue())
-            .build();
-        Element<GeneralApplication> first = caseData.getGeneralApplications().get(0);
-        GeneralApplication secondValue = GeneralApplication.builder()
-            .applicantPartyName(first.getValue().getApplicantPartyName())
-            .litigiousPartyID("004")
-            .generalAppDateDeadline(first.getValue().getGeneralAppDateDeadline())
-            .generalAppSubmittedDateGAspec(first.getValue().getGeneralAppSubmittedDateGAspec())
-            .generalAppType(first.getValue().getGeneralAppType())
-            .caseLink(first.getValue().getCaseLink())
-            .businessProcess(first.getValue().getBusinessProcess())
-            .build();
+        CaseData caseData =
+                CaseDataBuilder.builder()
+                        .getGeneralApplicationWithStrikeOut(RESPONDENT_ID)
+                        .getGeneralStrikeOutApplicationsDetailsWithCaseState(
+                                PROCEEDS_IN_HERITAGE.getDisplayedValue())
+                        .build();
+        Element<GeneralApplication> first = caseData.getGeneralApplications().getFirst();
+        GeneralApplication secondValue =
+                GeneralApplication.builder()
+                        .applicantPartyName(first.getValue().getApplicantPartyName())
+                        .litigiousPartyID("004")
+                        .generalAppDateDeadline(first.getValue().getGeneralAppDateDeadline())
+                        .generalAppSubmittedDateGAspec(first.getValue().getGeneralAppSubmittedDateGAspec())
+                        .generalAppType(first.getValue().getGeneralAppType())
+                        .caseLink(first.getValue().getCaseLink())
+                        .businessProcess(first.getValue().getBusinessProcess())
+                        .build();
         Element<GeneralApplication> second = new Element<>(UUID.randomUUID(), secondValue);
         caseData.setGeneralApplications(List.of(first, second));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getGeneralFormOfApplication()).hasSize(2);
-        assertThat(history.getDefenceStruckOut()).hasSize(2);
+        assertThat(builder.getGeneralFormOfApplication()).hasSize(2);
+        assertThat(builder.getDefenceStruckOut()).hasSize(2);
     }
 }

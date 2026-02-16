@@ -79,14 +79,13 @@ class ClaimDismissedPastDeadlineStrategyTest {
             .claimDismissedDate(dismissed)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(50);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(dismissed);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(50);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(dismissed);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: Claim dismissed after no response from defendant after claimant sent notification.");
     }
 
@@ -101,7 +100,7 @@ class ClaimDismissedPastDeadlineStrategyTest {
         CaseData caseData = CaseDataBuilder.builder()
             .claimDismissedDate(LocalDateTime.now())
             .build();
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
 
         assertThatThrownBy(() -> strategy.contribute(builder, caseData, null))
             .isInstanceOf(IllegalStateException.class);

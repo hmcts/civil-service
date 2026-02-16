@@ -88,16 +88,15 @@ class TakenOfflineSpecDefendantNocStrategyTest {
             .takenOfflineDate(offlineDate)
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(4);
-        assertThat(history.getMiscellaneous().get(0).getEventCode())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(4);
+        assertThat(builder.getMiscellaneous().getFirst().getEventCode())
             .isEqualTo(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason : Notice of Change filed.");
-        assertThat(history.getMiscellaneous().get(0).getDateReceived()).isEqualTo(offlineDate);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(offlineDate);
     }
 }

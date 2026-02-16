@@ -62,21 +62,20 @@ class SetAsideJudgmentStrategyTest {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getSetAsideJudgment()).hasSize(1);
-        assertThat(history.getSetAsideJudgment().get(0).getEventSequence()).isEqualTo(10);
-        assertThat(history.getSetAsideJudgment().get(0).getEventCode())
+        assertThat(builder.getSetAsideJudgment()).hasSize(1);
+        assertThat(builder.getSetAsideJudgment().getFirst().getEventSequence()).isEqualTo(10);
+        assertThat(builder.getSetAsideJudgment().getFirst().getEventCode())
             .isEqualTo(EventType.SET_ASIDE_JUDGMENT.getCode());
-        assertThat(history.getSetAsideJudgment().get(0).getLitigiousPartyID())
+        assertThat(builder.getSetAsideJudgment().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
-        assertThat(history.getSetAsideJudgment().get(0).getEventDetails().getApplicant())
+        assertThat(builder.getSetAsideJudgment().getFirst().getEventDetails().getApplicant())
             .isEqualTo("PARTY AGAINST");
-        assertThat(history.getSetAsideJudgment().get(0).getEventDetails().getApplicationDate())
+        assertThat(builder.getSetAsideJudgment().getFirst().getEventDetails().getApplicationDate())
             .isEqualTo(LocalDate.of(2024, 4, 10));
-        assertThat(history.getSetAsideJudgment().get(0).getEventDetails().getResultDate())
+        assertThat(builder.getSetAsideJudgment().getFirst().getEventDetails().getResultDate())
             .isEqualTo(LocalDate.of(2024, 5, 1));
     }
 
@@ -97,16 +96,15 @@ class SetAsideJudgmentStrategyTest {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(21, 22);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getSetAsideJudgment()).hasSize(2);
-        assertThat(history.getSetAsideJudgment().get(0).getLitigiousPartyID())
+        assertThat(builder.getSetAsideJudgment()).hasSize(2);
+        assertThat(builder.getSetAsideJudgment().getFirst().getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT_ID);
-        assertThat(history.getSetAsideJudgment().get(1).getLitigiousPartyID())
+        assertThat(builder.getSetAsideJudgment().get(1).getLitigiousPartyID())
             .isEqualTo(RoboticsDataUtil.RESPONDENT2_ID);
-        assertThat(history.getSetAsideJudgment())
+        assertThat(builder.getSetAsideJudgment())
             .allSatisfy(event -> assertThat(event.getEventDetails().getApplicant()).isEqualTo("PROPER OFFICER"));
     }
 
@@ -123,11 +121,10 @@ class SetAsideJudgmentStrategyTest {
         when(featureToggleService.isJOLiveFeedActive()).thenReturn(true);
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(33);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getSetAsideJudgment()).singleElement().satisfies(event -> {
+        assertThat(builder.getSetAsideJudgment()).singleElement().satisfies(event -> {
             assertThat(event.getEventDetails().getApplicant()).isEqualTo("PARTY AGAINST");
             assertThat(event.getEventDetails().getApplicationDate()).isEqualTo(LocalDate.of(2024, 5, 20));
             assertThat(event.getEventDetails().getResultDate()).isEqualTo(LocalDate.of(2024, 6, 10));

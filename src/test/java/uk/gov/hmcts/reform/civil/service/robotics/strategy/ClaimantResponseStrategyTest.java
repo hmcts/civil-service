@@ -99,15 +99,14 @@ class ClaimantResponseStrategyTest {
         caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
         caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "auth-token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        assertThat(history.getDirectionsQuestionnaireFiled().get(0).getEventCode())
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        assertThat(builder.getDirectionsQuestionnaireFiled().getFirst().getEventCode())
             .isEqualTo(EventType.DIRECTIONS_QUESTIONNAIRE_FILED.getCode());
 
-        assertThat(history.getMiscellaneous()).extracting(Event::getEventDetailsText)
+        assertThat(builder.getMiscellaneous()).extracting(Event::getEventDetailsText)
             .contains("Claimant proceeds.", "RPA Reason:Multitrack Unspec going offline.");
     }
 
@@ -130,10 +129,10 @@ class ClaimantResponseStrategyTest {
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 3, 18, 9, 0));
         caseData.setApplicant1DQ(applicant1DQ);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "auth-token");
 
-        Event dqEvent = builder.build().getDirectionsQuestionnaireFiled().get(0);
+        Event dqEvent = builder.getDirectionsQuestionnaireFiled().getFirst();
         assertThat(dqEvent.getEventDetails().getPreferredCourtCode()).isNull();
         assertThat(dqEvent.getEventDetailsText()).isEqualTo("preferredCourtCode: null; stayClaim: true");
     }
@@ -150,11 +149,10 @@ class ClaimantResponseStrategyTest {
         caseData.setApplicant1ProceedWithClaimMultiParty2v1(YesOrNo.NO);
         caseData.setApplicant2ProceedWithClaimMultiParty2v1(YesOrNo.NO);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).extracting(Event::getEventDetailsText)
+        assertThat(builder.getMiscellaneous()).extracting(Event::getEventDetailsText)
             .containsExactly("RPA Reason: Claimants intend not to proceed.");
     }
 
@@ -167,12 +165,11 @@ class ClaimantResponseStrategyTest {
             .build();
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 5, 10, 14, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .contains("Claimant has provided intention");
     }
 
@@ -189,14 +186,13 @@ class ClaimantResponseStrategyTest {
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0));
         caseData.setApplicant2ResponseDate(LocalDateTime.of(2024, 3, 21, 9, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).extracting(Event::getEventDetailsText)
+        assertThat(builder.getMiscellaneous()).extracting(Event::getEventDetailsText)
             .anySatisfy(text -> assertThat(text).contains("[1 of 2"))
             .anySatisfy(text -> assertThat(text).contains("[2 of 2"));
-        assertThat(history.getDirectionsQuestionnaireFiled()).extracting(Event::getLitigiousPartyID)
+        assertThat(builder.getDirectionsQuestionnaireFiled()).extracting(Event::getLitigiousPartyID)
             .contains(APPLICANT2_ID);
     }
 
@@ -211,12 +207,11 @@ class ClaimantResponseStrategyTest {
             .build();
         caseData.setApplicant1ResponseDate(applicantResponse);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getDirectionsQuestionnaireFiled()).hasSize(1);
-        Event dqEvent = history.getDirectionsQuestionnaireFiled().get(0);
+        assertThat(builder.getDirectionsQuestionnaireFiled()).hasSize(1);
+        Event dqEvent = builder.getDirectionsQuestionnaireFiled().getFirst();
         String expectedCourt = uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsDirectionsQuestionnaireSupport
             .getPreferredCourtCode(caseData.getApplicant1DQ());
         assertThat(dqEvent.getEventDetails().getPreferredCourtCode()).isEqualTo(expectedCourt);
@@ -238,15 +233,14 @@ class ClaimantResponseStrategyTest {
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 7, 1, 11, 0));
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .allSatisfy(text -> assertThat(text).contains("Claimant has provided intention"));
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .map(Event::getEventDetailsText)
             .noneMatch(text -> text.contains("Multitrack"));
     }
@@ -260,12 +254,11 @@ class ClaimantResponseStrategyTest {
             .build();
         caseData.setApplicant1ResponseDate(LocalDateTime.of(2024, 8, 15, 10, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .contains("Claimant proceeds");
     }
 
@@ -283,11 +276,10 @@ class ClaimantResponseStrategyTest {
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .contains(
                 "Claimant proceeds.",
@@ -310,12 +302,11 @@ class ClaimantResponseStrategyTest {
         caseData.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         caseData.setResponseClaimTrack(AllocatedTrack.FAST_CLAIM.name());
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, "token");
 
-        EventHistory history = builder.build();
-        assertThat(history.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getDirectionsQuestionnaireFiled()).isNullOrEmpty();
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .anySatisfy(text -> assertThat(text).contains("[1 of 2"))
             .anySatisfy(text -> assertThat(text).contains("[2 of 2"));

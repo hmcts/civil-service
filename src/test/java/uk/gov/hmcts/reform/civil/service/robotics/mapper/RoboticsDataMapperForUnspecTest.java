@@ -175,7 +175,7 @@ class RoboticsDataMapperForUnspecTest {
 
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -202,7 +202,7 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -240,7 +240,7 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -269,7 +269,7 @@ class RoboticsDataMapperForUnspecTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
-        var applicantSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var applicantSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -363,7 +363,7 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");

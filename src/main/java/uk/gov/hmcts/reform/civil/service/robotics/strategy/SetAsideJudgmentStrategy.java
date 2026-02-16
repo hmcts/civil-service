@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
+import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,13 +22,6 @@ import uk.gov.hmcts.reform.civil.model.robotics.EventType;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT2_ID;
-import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -33,34 +33,40 @@ public class SetAsideJudgmentStrategy implements EventHistoryStrategy {
     @Override
     public boolean supports(CaseData caseData) {
         return caseData != null
-            && featureToggleService.isJOLiveFeedActive()
-            && caseData.getJoSetAsideReason() != null;
+                && featureToggleService.isJOLiveFeedActive()
+                && caseData.getJoSetAsideReason() != null;
     }
 
     @Override
-    public void contribute(EventHistory.EventHistoryBuilder builder, CaseData caseData, String authToken) {
+    public void contribute(EventHistory eventHistory, CaseData caseData, String authToken) {
         if (!supports(caseData)) {
             return;
         }
-        log.info("Building set aside judgment robotics events for caseId {}", caseData.getCcdCaseReference());
+        log.info(
+                "Building set aside judgment robotics events for caseId {}",
+                caseData.getCcdCaseReference());
 
         List<Event> events = new ArrayList<>();
-        events.add(buildEvent(builder, caseData, RESPONDENT_ID));
+        events.add(buildEvent(eventHistory, caseData, RESPONDENT_ID));
         if (caseData.getRespondent2() != null) {
-            events.add(buildEvent(builder, caseData, RESPONDENT2_ID));
+            events.add(buildEvent(eventHistory, caseData, RESPONDENT2_ID));
         }
-        builder.setAsideJudgment(events);
+        List<Event> updatedSetAsideJudgmentEvents1 =
+                eventHistory.getSetAsideJudgment() == null
+                        ? new ArrayList<>()
+                        : new ArrayList<>(eventHistory.getSetAsideJudgment());
+        updatedSetAsideJudgmentEvents1.addAll(events);
+        eventHistory.setSetAsideJudgment(updatedSetAsideJudgmentEvents1);
     }
 
-    private Event buildEvent(EventHistory.EventHistoryBuilder builder, CaseData caseData, String litigiousPartyId) {
-        return Event.builder()
-            .eventSequence(sequenceGenerator.nextSequence(builder.build()))
-            .litigiousPartyID(litigiousPartyId)
-            .eventCode(EventType.SET_ASIDE_JUDGMENT.getCode())
-            .dateReceived(caseData.getJoSetAsideCreatedDate())
-            .eventDetails(buildEventDetails(caseData))
-            .eventDetailsText("")
-            .build();
+    private Event buildEvent(EventHistory builder, CaseData caseData, String litigiousPartyId) {
+        return createEvent(
+                sequenceGenerator.nextSequence(builder),
+                EventType.SET_ASIDE_JUDGMENT.getCode(),
+                caseData.getJoSetAsideCreatedDate(),
+                litigiousPartyId,
+                "",
+                buildEventDetails(caseData));
     }
 
     private EventDetails buildEventDetails(CaseData caseData) {
@@ -71,7 +77,8 @@ public class SetAsideJudgmentStrategy implements EventHistoryStrategy {
         if (caseData.getJoSetAsideReason() == JudgmentSetAsideReason.JUDGE_ORDER) {
             if (caseData.getJoSetAsideOrderType() == JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION) {
                 applicationDate = caseData.getJoSetAsideApplicationDate();
-            } else if (caseData.getJoSetAsideOrderType() == JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE) {
+            } else if (caseData.getJoSetAsideOrderType()
+                    == JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE) {
                 applicationDate = caseData.getJoSetAsideDefenceReceivedDate();
             }
             applicant = SetAsideApplicantTypeForRPA.PARTY_AGAINST.getValue();
@@ -80,11 +87,10 @@ public class SetAsideJudgmentStrategy implements EventHistoryStrategy {
             applicant = SetAsideApplicantTypeForRPA.PROPER_OFFICER.getValue();
         }
 
-        return EventDetails.builder()
-            .result(SetAsideResultTypeForRPA.GRANTED.name())
-            .applicant(applicant)
-            .applicationDate(applicationDate)
-            .resultDate(resultDate)
-            .build();
+        return new EventDetails()
+                .setResult(SetAsideResultTypeForRPA.GRANTED.name())
+                .setApplicant(applicant)
+                .setApplicationDate(applicationDate)
+                .setResultDate(resultDate);
     }
 }

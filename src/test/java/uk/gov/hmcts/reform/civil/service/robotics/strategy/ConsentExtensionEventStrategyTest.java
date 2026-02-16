@@ -67,16 +67,15 @@ class ConsentExtensionEventStrategyTest {
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 25))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getConsentExtensionFilingDefence()).hasSize(1);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventSequence()).isEqualTo(5);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getLitigiousPartyID()).isEqualTo(RESPONDENT_ID);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventDetailsText())
+        assertThat(builder.getConsentExtensionFilingDefence()).hasSize(1);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventSequence()).isEqualTo(5);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getLitigiousPartyID()).isEqualTo(RESPONDENT_ID);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventDetailsText())
             .isEqualTo("agreed extension date: 25 03 2024");
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventDetails().getAgreedExtensionDate())
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventDetails().getAgreedExtensionDate())
             .isEqualTo("2024-03-25");
     }
 
@@ -99,18 +98,17 @@ class ConsentExtensionEventStrategyTest {
             .respondentSolicitor2AgreedDeadlineExtension(LocalDate.of(2024, 4, 2))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getConsentExtensionFilingDefence()).hasSize(2);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventSequence()).isEqualTo(5);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventDetailsText())
+        assertThat(builder.getConsentExtensionFilingDefence()).hasSize(2);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventSequence()).isEqualTo(5);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventDetailsText())
             .isEqualTo("Defendant: Defendant One has agreed extension: 01 04 2024");
-        assertThat(history.getConsentExtensionFilingDefence().get(1).getEventSequence()).isEqualTo(6);
-        assertThat(history.getConsentExtensionFilingDefence().get(1).getEventDetailsText())
+        assertThat(builder.getConsentExtensionFilingDefence().get(1).getEventSequence()).isEqualTo(6);
+        assertThat(builder.getConsentExtensionFilingDefence().get(1).getEventDetailsText())
             .isEqualTo("Defendant: Defendant Two has agreed extension: 02 04 2024");
-        assertThat(history.getConsentExtensionFilingDefence().get(1).getLitigiousPartyID()).isEqualTo(RESPONDENT2_ID);
+        assertThat(builder.getConsentExtensionFilingDefence().get(1).getLitigiousPartyID()).isEqualTo(RESPONDENT2_ID);
     }
 
     @Test
@@ -134,16 +132,15 @@ class ConsentExtensionEventStrategyTest {
             .respondentSolicitor2AgreedDeadlineExtension(LocalDate.of(2024, 3, 29))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getConsentExtensionFilingDefence()).hasSize(2);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventSequence()).isEqualTo(5);
-        assertThat(history.getConsentExtensionFilingDefence().get(0).getEventDetailsText())
+        assertThat(builder.getConsentExtensionFilingDefence()).hasSize(2);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventSequence()).isEqualTo(5);
+        assertThat(builder.getConsentExtensionFilingDefence().getFirst().getEventDetailsText())
             .isEqualTo("Defendant(s) have agreed extension: 28 03 2024");
-        assertThat(history.getConsentExtensionFilingDefence().get(1).getEventSequence()).isEqualTo(6);
-        assertThat(history.getConsentExtensionFilingDefence().get(1).getEventDetailsText())
+        assertThat(builder.getConsentExtensionFilingDefence().get(1).getEventSequence()).isEqualTo(6);
+        assertThat(builder.getConsentExtensionFilingDefence().get(1).getEventDetailsText())
             .isEqualTo("Defendant(s) have agreed extension: 29 03 2024");
     }
 
@@ -154,10 +151,9 @@ class ConsentExtensionEventStrategyTest {
             .respondentSolicitor1AgreedDeadlineExtension(LocalDate.of(2024, 3, 30))
             .build();
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getConsentExtensionFilingDefence()).isEmpty();
+        assertThat(builder.getConsentExtensionFilingDefence()).isEmpty();
     }
 }

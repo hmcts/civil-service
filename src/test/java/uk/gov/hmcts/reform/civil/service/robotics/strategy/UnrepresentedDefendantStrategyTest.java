@@ -98,18 +98,17 @@ class UnrepresentedDefendantStrategyTest {
             .build();
         caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 10, 0, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(2);
-        assertThat(history.getMiscellaneous().get(0).getEventSequence()).isEqualTo(11);
-        assertThat(history.getMiscellaneous().get(0).getDateReceived())
+        assertThat(builder.getMiscellaneous()).hasSize(2);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(11);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived())
             .isEqualTo(LocalDateTime.of(2024, 2, 10, 0, 0));
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
             .isEqualTo("RPA Reason: [1 of 2 - 2024-02-12] Unrepresented defendant: Resp One");
-        assertThat(history.getMiscellaneous().get(1).getEventSequence()).isEqualTo(12);
-        assertThat(history.getMiscellaneous().get(1).getEventDetailsText())
+        assertThat(builder.getMiscellaneous().get(1).getEventSequence()).isEqualTo(12);
+        assertThat(builder.getMiscellaneous().get(1).getEventDetailsText())
             .isEqualTo("RPA Reason: [2 of 2 - 2024-02-12] Unrepresented defendant: Resp Two");
     }
 
@@ -148,11 +147,10 @@ class UnrepresentedDefendantStrategyTest {
             .build();
         caseData.setSubmittedDate(LocalDateTime.of(2024, 2, 10, 0, 0));
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous()).hasSize(1);
-        assertThat(history.getMiscellaneous().get(0).getEventDetailsText()).isNotNull();
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText()).isNotNull();
     }
 }

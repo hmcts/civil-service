@@ -79,20 +79,19 @@ class RespondentCounterClaimStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(10);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventCode)
             .containsExactly(EventType.MISCELLANEOUS.getCode());
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getDateReceived)
             .containsExactly(caseData.getRespondent1ResponseDate());
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
                 caseData,
@@ -112,14 +111,13 @@ class RespondentCounterClaimStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10, 11);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(10, 11);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .containsExactly(
                 respondentResponseSupport.prepareRespondentResponseText(caseData, caseData.getRespondent1(), true),
@@ -136,14 +134,13 @@ class RespondentCounterClaimStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(10);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
                 caseData,
@@ -163,14 +160,13 @@ class RespondentCounterClaimStrategyTest {
 
         when(sequenceGenerator.nextSequence(any(EventHistory.class))).thenReturn(10);
 
-        EventHistory.EventHistoryBuilder builder = EventHistory.builder();
+        EventHistory builder = new EventHistory();
         strategy.contribute(builder, caseData, null);
 
-        EventHistory history = builder.build();
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventSequence)
             .containsExactly(10);
-        assertThat(history.getMiscellaneous())
+        assertThat(builder.getMiscellaneous())
             .extracting(Event::getEventDetailsText)
             .containsExactly(respondentResponseSupport.prepareRespondentResponseText(
                 caseData,
