@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 
-@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 public class CallbackControllerTest extends BaseIntegrationTest {
 
     private static final String CALLBACK_URL = "/cases/callbacks/{callback-type}";

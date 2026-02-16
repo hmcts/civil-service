@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.auth.checker.core.exceptions.BearerTokenMissingException;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -57,7 +56,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.model.citizenui.dto.RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT;
 
-@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 public class CasesControllerTest extends BaseIntegrationTest {
 
     private static final String CASES_URL = "/cases/{caseId}";

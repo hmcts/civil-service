@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.controllers.cases;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.civil.controllers.BaseIntegrationTest;
 import uk.gov.hmcts.reform.civil.exceptions.MissingFieldsUpdatedException;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
@@ -17,7 +16,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 public class HearingValuesControllerTest extends BaseIntegrationTest {
 
     private static final String HEARING_VALUES_URL = "/serviceHearingValues";

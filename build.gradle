@@ -171,7 +171,6 @@ tasks.withType(Copy) {
 
 task integration(type: Test) {
   maxHeapSize = '3G'
-  maxParallelForks = 1
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs

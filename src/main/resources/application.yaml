@@ -810,56 +810,6 @@ spring:
   main:
     lazy-initialization: true
 
-rd_professional:
-  api:
-    url: ${RD_PROFESSIONAL_API_URL:http://localhost:8765}
-
-rd_commondata:
-  api:
-    url: ${RD_COMMONDATA_API_URL:http://localhost:8765}
-
-idam:
-  web:
-    url: ${IDAM_WEB_URL:http://localhost:9002}
-  api:
-    url: ${IDAM_API_URL:http://localhost:5000}
-  s2s-auth:
-    url: ${IDAM_S2S_AUTH_URL:http://localhost:4502}
-    totp_secret: ${S2S_SECRET:AABBCCDDEEFFGGHH}
-
----
-
-spring:
-  config:
-    activate:
-      on-profile: integration-test-nodb
-  datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:mem:civil;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    jdbcUrl: jdbc:h2:mem:civil;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
-    password:
-    hikari:
-      minimum-idle: 1
-      connectionTimeout: 10000
-      idleTimeout: 30000
-      maxLifetime: 60000
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
-  flyway:
-    enabled: false
-
-  main:
-    lazy-initialization: true
-
 management:
   endpoints:
     enabled-by-default: false

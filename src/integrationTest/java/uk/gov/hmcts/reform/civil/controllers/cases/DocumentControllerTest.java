@@ -16,7 +16,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClientApi;
@@ -59,7 +58,6 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N1;
 import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
-@ActiveProfiles(value = "integration-test-nodb", inheritProfiles = false)
 @SpringBootTest(classes = {
     ClaimFormService.class,
     JacksonAutoConfiguration.class})
