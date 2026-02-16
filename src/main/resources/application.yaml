@@ -803,7 +803,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
-    enabled: false
+    enabled: true
     baselineOnMigrate: true
     placeholder-replacement: false
 
