@@ -179,8 +179,10 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
     private YesOrNo shouldEvidenceUploadEventBeAvailable(CaseData caseData) {
         AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         YesOrNo eaCourtLocation = caseData.getEaCourtLocation();
+        boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
+        log.info("Evidence upload event eaCourtLocation {} is for caseId {}", eaFlag, caseData.getCcdCaseReference());
         boolean result = (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack) || AllocatedTrack.INTERMEDIATE_CLAIM.equals(allocatedTrack))
-                    && YesOrNo.YES.equals(caseData.getIsFinalOrder()) &&  YesOrNo.YES.equals(eaCourtLocation);
+                    && YesOrNo.YES.equals(caseData.getIsFinalOrder()) && eaFlag;
         log.info("Evidence upload event is enabled for minti claim {} for caseId {}", result, caseData.getCcdCaseReference());
         return result ? YesOrNo.YES : YesOrNo.NO;
     }
