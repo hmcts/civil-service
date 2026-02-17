@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -33,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -47,6 +47,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE_TIME_AT;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDateTime;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultJudgementHandler extends CallbackHandler {
@@ -195,9 +196,12 @@ public class DefaultJudgementHandler extends CallbackHandler {
                 optionalRequestedCourt.orElse(null),
                 locations
             );
+            log.info("If locationsList [{}] for caseId [{}]", locationsList, caseData.getCcdCaseReference());
             hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsList);
         } else {
-            hearingSupportRequirementsDJ.setHearingTemporaryLocation(getLocationsFromList(locations));
+            DynamicList locationsFromList = getLocationsFromList(locations);
+            log.info("Else locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());
+            hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsFromList);
         }
         caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -257,8 +261,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
             hearingSupportRequirementsDJ.setHearingTemporaryLocation(list);
             caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
-            String code = list.getValue().getCode();
-            final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
+            String epimId = list.getValue().getCode();
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
 
@@ -288,7 +291,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<DynamicListElement> list = locations.stream()
             .map(location ->
                      DynamicListElement.dynamicElementFromCode(
-                         UUID.randomUUID() + "-" + location.getEpimmsId(),
+                         location.getEpimmsId(),
                          location.getSiteName()
                              + " - " + location.getCourtAddress()
                              + " - " + location.getPostcode()
@@ -357,6 +360,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     private String getLocationEpimms(LocationRefData location) {
-        return UUID.randomUUID() + "-" + location.getEpimmsId();
+        return location.getEpimmsId();
     }
 }
