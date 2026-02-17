@@ -144,7 +144,7 @@ xui-webapp:
   nodejs:
     imagePullPolicy: Always
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
-    image: hmctspublic.azurecr.io/xui/webapp:latest
+    image: hmctspublic.azurecr.io/xui/webapp:pr-4912
     ingressHost: xui-${SERVICE_FQDN}
     memoryRequests: 2Gi
     cpuRequests: 2000m
@@ -164,11 +164,13 @@ xui-webapp:
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-cdam
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       JURISDICTIONS: CIVIL
-      LAUNCH_DARKLY_CLIENT_ID: ~
+      HEARINGS_JURISDICTIONS: CIVIL
+      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
       SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
       ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
       PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
+
 
 ccd:
   enabled: true
