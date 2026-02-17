@@ -160,7 +160,7 @@ xui-webapp:
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
       SERVICES_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw
-      SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
+      SERVICES_CCD_DATA_STORE_API: https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-cdam
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
       JURISDICTIONS: CIVIL
@@ -170,7 +170,6 @@ xui-webapp:
       SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
       ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
       PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
-
 
 ccd:
   enabled: true
