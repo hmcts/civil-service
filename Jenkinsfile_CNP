@@ -166,11 +166,9 @@ withPipeline(type, product, component) {
   env.ENABLE_SECURE_URL = true
 
   onPR {
+    setPreviewEnvVars()
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
-    env.ENVIRONMENT = "preview"
-    env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
     loadVaultSecrets(secrets)
-
     before('build') {
       sh """
       ./bin/validate-migration-files.sh ${env.CHANGE_BRANCH} ${env.CHANGE_TARGET} --jenkins
@@ -191,13 +189,6 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
-    env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.FT_TYPE = getFunctionalTestsType()
-
     retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
@@ -305,4 +296,15 @@ withPipeline(type, product, component) {
     ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
+}
+
+def setPreviewEnvVars() {
+  env.ENVIRONMENT = "preview"
+  env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+  env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+  env.FT_TYPE = getFunctionalTestsType()
 }
