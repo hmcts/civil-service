@@ -188,15 +188,21 @@ public class DefaultJudgementHandler extends CallbackHandler {
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
         DynamicList locationsFromList = getLocationsFromList(locations);
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
-            CaseLocationCivil cml = caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation() : callbackParams.getCaseDataBefore().getCaseManagementLocation();
-            String baseLocation = cml.getBaseLocation();
-            List<LocationRefData> locationRef = (locationRefDataService
-                .getCourtLocationsByEpimmsIdAndCourtType(authToken, baseLocation));
-            if (!locationRef.isEmpty()) {
-                LocationRefData locationRefData = locations.getFirst();
-                locationsFromList.setValue(DynamicListElement.dynamicElementFromCode(UUID.randomUUID() + "-" + baseLocation, getLocationLabel(locationRefData)));
+            CaseLocationCivil cml = caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation()
+                : callbackParams.getCaseDataBefore().getCaseManagementLocation();
+            if (cml != null) {
+                String baseLocation = cml.getBaseLocation();
+                List<LocationRefData> locationRef = (locationRefDataService
+                    .getCourtLocationsByEpimmsIdAndCourtType(authToken, baseLocation));
+                if (!locationRef.isEmpty()) {
+                    LocationRefData locationRefData = locations.getFirst();
+                    locationsFromList.setValue(DynamicListElement.dynamicElementFromCode(UUID.randomUUID() + "-" + baseLocation,
+                                                                                         getLocationLabel(
+                                                                                             locationRefData)
+                    ));
+                }
+                log.info("If locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());
             }
-            log.info("If locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());
             hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsFromList);
         } else {
             log.info("Else locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());

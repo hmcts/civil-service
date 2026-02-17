@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -355,6 +357,78 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 assertThat(response.getErrors()).isNull();
                 assertThat(updatedData.getCaseManagementLocation()).isNotNull();
                 assertTrue(updatedData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation().getValue().getCode().contains("123456"));
+            }
+
+            @Test
+            void shouldNotReturnError_whenLocationsProvidedV3() throws JsonProcessingException {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setAddRespondent2(YES);
+                caseData.setRespondent2SameLegalRepresentative(YES);
+                caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+                caseData.setReasonForTransfer("Court Closed");
+                caseData.setTransferCourtLocationList(DynamicList
+                                                          .builder()
+                                                          .value(DynamicListElement
+                                                                     .builder()
+                                                                     .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                                                                     .label("Central London County Court - Royal Courts of Justice, Strand, London - WC2A 2LL")
+                                                                     .build())
+                                                          .build());
+                CaseData caseDataBefore = mapper.readValue(mapper.writeValueAsString(caseData), CaseData.class);
+                CaseLocationCivil civil = new CaseLocationCivil();
+                civil.setRegion("1");
+                civil.setBaseLocation("123456");
+                caseDataBefore.setCaseManagementLocation(civil);
+
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                                  .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                                  .epimmsId("123456").build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+                when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
+                    any(),
+                    any()
+                )).thenReturn(locations);
+
+                CallbackParams params = callbackParamsOf(caseData, caseDataBefore, "checkPreferredLocations", MID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(response.getErrors()).isNull();
+                assertTrue(updatedData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation().getValue().getCode().contains("123456"));
+            }
+
+            @Test
+            void shouldNotReturnError_whenLocationsProvidedV4() throws JsonProcessingException {
+                CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setAddRespondent2(YES);
+                caseData.setRespondent2SameLegalRepresentative(YES);
+                caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
+                caseData.setReasonForTransfer("Court Closed");
+                caseData.setTransferCourtLocationList(DynamicList
+                                                          .builder()
+                                                          .value(DynamicListElement
+                                                                     .builder()
+                                                                     .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                                                                     .label("Central London County Court - Royal Courts of Justice, Strand, London - WC2A 2LL")
+                                                                     .build())
+                                                          .build());
+                CaseData caseDataBefore = mapper.readValue(mapper.writeValueAsString(caseData), CaseData.class);
+
+                List<LocationRefData> locations = new ArrayList<>();
+                locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
+                                  .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
+                                  .epimmsId("123456").build());
+                when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
+
+                CallbackParams params = callbackParamsOf(caseData, caseDataBefore, "checkPreferredLocations", MID);
+
+                var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+                CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+                assertThat(response.getErrors()).isNull();
+                assertNull(updatedData.getHearingSupportRequirementsDJ().getHearingTemporaryLocation().getValue().getCode());
             }
         }
 
