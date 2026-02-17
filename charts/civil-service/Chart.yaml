@@ -51,11 +51,3 @@ dependencies:
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: servicebus.enabled
     alias: hmcsb
-  - name: servicebus
-    version: 1.2.2-beta
-    repository: 'oci://hmctsprod.azurecr.io/helm'
-    condition: servicebus.enabled
-  - name: am-org-role-mapping-service
-    version: 0.0.72
-    repository: 'oci://hmctspublic.azurecr.io/helm'
-    condition: am-org-role-mapping-service.enabled

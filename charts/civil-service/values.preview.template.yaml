@@ -28,9 +28,8 @@ java:
     HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
-    ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-    ROLE_ASSIGNMENT_API_URL: https://am-role-assignment-service-${SERVICE_FQDN}
     FEES_API_URL: https://wiremock-${SERVICE_NAME}.preview.platform.hmcts.net
+    ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
     ROLE_INITIALISATION_ENABLED: true
     CASE_FLAGS_LOGGING_ENABLED: true
     COURT_LOCATION_WA_DMN_ENABLED: true
@@ -128,7 +127,6 @@ java:
             CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "org-role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "emstitch" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
     auth:
       username: ${POSTGRES_USER}
@@ -157,6 +155,7 @@ xui-webapp:
     devmemoryLimits: 8Gi
     devcpuLimits: 4500m
     environment:
+      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
       HEALTH_CCD_COMPONENT_API: http://${SERVICE_NAME}-ccd-api-gw/health
       HEALTH_CCD_DATA_API: http://${SERVICE_NAME}-ccd-data-store-api/health
       HEALTH_TERMS_AND_CONDITIONS_API: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal/health
@@ -164,19 +163,12 @@ xui-webapp:
       SERVICES_CCD_DATA_STORE_API: http://${SERVICE_NAME}-ccd-data-store-api
       SERVICES_DOCUMENTS_API_V2: http://${SERVICE_NAME}-cdam
       SERVICES_TERMS_AND_CONDITIONS: http://xui-terms-and-conditions-${SERVICE_FQDN}.service.core-compute-preview.internal
-      SERVICES_HEARINGS_COMPONENT_API: http://jurisdiction-hearings-api-aat.service.core-compute-aat.internal
-      SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
-      SERVICES_ROLE_ASSIGNMENT_API: https://am-role-assignment-service-${SERVICE_FQDN}
-      HEALTH_ROLE_ASSIGNMENT_API: http://${SERVICE_NAME}-am-role-assignment-service/health
-      SERVICES_ROLE_ASSIGNMENT_MAPPING_API: http://${SERVICE_NAME}-am-org-role-mapping-service
       JURISDICTIONS: CIVIL
       LAUNCH_DARKLY_CLIENT_ID: ~
       SERVICES_CCD_CASE_ASSIGNMENT_API: http://${SERVICE_NAME}-aac-manage-case-assignment
+      SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
       ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
       PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
-      FEATURE_ACCESS_MANAGEMENT_ENABLED: true
-      FEATURE_SUBSTANTIVE_ROLE_ENABLED: true
-      ALLOW_CONFIG_MUTATIONS: true
 
 ccd:
   enabled: true
@@ -241,7 +233,7 @@ ccd:
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
         DATA_STORE_DB_PASSWORD: ${POSTGRES_PASSWORD}
-        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,civil_service,ccd_case_document_am_api,aac_manage_case_assignment
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,probate_backend,divorce_ccd_submission,sscs,sscs_bulkscan,cmc,cmc_claim_store,cmc_claim_external_api,jui_webapp,pui_webapp,bulk_scan_orchestrator,fpl_case_service,iac,finrem_ccd_data_migrator,finrem_case_orchestration,employment_tribunals,ethos_repl_service,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,bulk_scan_payment_processor,pcq_consolidation_service,em_npa_app,ecm_consumer,aac_manage_case_assignment,unspec_service,divorce_frontend,ccd_case_document_am_api,prl_cos_api,prl_citizen_frontend,wa_workflow_api,wa_task_configuration_api,wa_task_management_api,wa_task_monitor,wa_case_event_handler,am_role_assignment_service,ccd_gateway,em_ccd_orchestrator,hmc_cft_hearing_service
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/realms/root/realms/hmcts
@@ -254,11 +246,10 @@ ccd:
         CCD_MULTIPARTY_LOG_LEVEL: DEBUG
         CCD_MULTIPARTY_CASE_TYPES: CIVIL
         CCD_MULTIPARTY_EVENTS: DEFENDANT_RESPONSE,ACKNOWLEDGE_CLAIM,CLAIMANT_RESPONSE,queryManagementRaiseQuery,queryManagementRespondQuery
-        ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
-        ASSIGN_ROLES_ON_STARTUP: true
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
         ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
       secrets:
         DATA_STORE_DB_PASSWORD:
           secretRef: "{{ .Values.global.postgresSecret }}"
@@ -421,7 +412,7 @@ aac-manage-case-assignment:
       IDAM_NOC_APPROVER_USERNAME: ${IDAM_NOC_APPROVER_USERNAME}
       IDAM_NOC_APPROVER_PASSWORD: ${IDAM_NOC_APPROVER_PASSWORD}
       NOTIFY_MCA_API_KEY: ${NOTIFY_MCA_API_KEY}
-      ROLE_ASSIGNMENT_URL: http://${SERVICE_NAME}-am-role-assignment-service
+      ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
     autoscaling:
       enabled: false
 
@@ -513,7 +504,7 @@ wiremock:
   volumeMounts:
     - name: wiremock-mappings
       mountPath: /home/wiremock/mappings
-      subPath: mappings
+
 # WireMock mappings for health endpoints - defined in parent chart to avoid subchart value inheritance issues
 wiremockMappings:
   health-mock.json: |
@@ -611,89 +602,6 @@ wiremockMappings:
       }
     }
 
-am-org-role-mapping-service:
-  enabled: true
-  java:
-    image: 'hmctspublic.azurecr.io/am/org-role-mapping-service:latest'
-    ingressHost: orm-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-am-org-role-mapping-service
-    devmemoryRequests: 1024Mi
-    devcpuRequests: 250m
-    devmemoryLimits: 2048Mi
-    devcpuLimits: 1500m
-    secrets:
-      SB_ACCESS_KEY:
-        secretRef: civil-sb-preview
-        key: primaryKey
-      SB_CONNECTION_STRING:
-        secretRef: civil-sb-preview
-        key: connectionString
-      ORG_ROLE_MAPPING_DB_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
-    keyVaults:
-      am:
-        secrets:
-          - name: app-insights-connection-string
-            alias: app-insights-connection-string
-          - name: am-org-role-mapping-service-s2s-secret
-            alias: AM_ORG_ROLE_MAPPING_SERVICE_SECRET
-          - name: orm-IDAM-CLIENT-ID
-            alias: ORM_IDAM_CLIENT_ID
-          - name: orm-IDAM-CLIENT-SECRET
-            alias: ORG_ROLE_MAPPING_IDAM_CLIENT_SECRET
-          - name: orm-IDAM-ADMIN-SECRET
-            alias: ORG_ROLE_MAPPING_IDAM_ADMIN_PASSWORD
-          - name: caseworker-topic-primary-send-listen-shared-access-key
-            alias: AMQP_CRD_SHARED_ACCESS_KEY_VALUE
-          - name: org-role-mapping-service-POSTGRES-PASS
-            alias: ORG_ROLE_MAPPING_DB_PASSWORD
-          - name: judicial-topic-primary-send-listen-shared-access-key
-            alias: AMQP_JRD_SHARED_ACCESS_KEY_VALUE
-    environment:
-      IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-      S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-      CASE_WORKER_REF_APP_URL: http://rd-caseworker-ref-api-aat.service.core-compute-aat.internal
-      JUDICIAL_REF_APP_URL: http://rd-judicial-api-aat.service.core-compute-aat.internal
-      ROLE_ASSIGNMENT_APP_URL: ${SERVICE_NAME}-am-role-assignment-service
-      JUDICIAL_BOOKING_APP_URL: http://am-judicial-booking-service-aat.service.core-compute-aat.internal
-      AMQP_SHARED_ACCESS_KEY_NAME: RootManageSharedAccessKey
-      AMQP_HOST: "civil-sb-preview.servicebus.windows.net"
-      CRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
-      JRD_SUBSCRIPTION_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
-      CRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-crd-topic"
-      JRD_TOPIC_NAME: "{{ .Release.Name}}-servicebus-jrd-topic"
-      AMQP_CRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      AMQP_JRD_SHARED_ACCESS_KEY_VALUE: "$(SB_ACCESS_KEY)"
-      ORG_ROLE_MAPPING_DB_HOST: ${SERVICE_NAME}-postgresql
-      ORG_ROLE_MAPPING_DB_NAME: org-role-assignment
-      ORG_ROLE_MAPPING_DB_USERNAME: ${POSTGRES_USER}
-      ORG_ROLE_MAPPING_DB_PASSWORD: ${POSTGRES_PASSWORD}
-      ORG_ROLE_MAPPING_DB_PORT: 5432
-      ORG_ROLE_MAPPING_DB_OPTIONS: "?stringtype=unspecified"
-      TESTING_SUPPORT_ENABLED: true
-      JUDICIAL_REF_APP_V2_ACTIVE: true
-      JUDICIAL_REF_APP_V2_FILTER_AUTHS_BY_APP_ID: true
-      ORM_ENV: pr
-
-servicebus:
-  enabled: true
-  releaseNameOverride: ${SERVICE_NAME}-asb
-  resourceGroup: civil-aso-preview-rg
-  sbNamespace: civil-servicebus-preview # due to a bug https://github.com/kubernetes-sigs/kustomize/issues/5072 this value is set to civil, when this bug is resolved, the sbNamespace should be changed to the actual name of the Service Bus Namespace (civil-sb-preview)
-  setup:
-    topics:
-      - name: ccd-case-events
-        subscriptionNeeded: yes
-        requiresSession: true
-      - name: crd-topic
-        subscriptionNeeded: yes
-      - name: jrd-topic
-        subscriptionNeeded: yes
-      - name: ccd-events
-        subscriptionNeeded: yes
-        requiresSession: true
 hmcsb:
   enabled: true
   resourceGroup: hmc-shared-aat

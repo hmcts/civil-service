@@ -23,7 +23,7 @@ public class HearingsService {
 
     private final HearingsApi hearingNoticeApi;
     private final AuthTokenGenerator authTokenGenerator;
-    @Value("${role-assignment.api.url:#{null}}")
+    @Value("${role-assignment-service.api.url:#{null}}")
     private String roleAssignmentUrl;
     @Value("${core_case_data.api.url:#{null}}")
     private String dataStoreUrl;
