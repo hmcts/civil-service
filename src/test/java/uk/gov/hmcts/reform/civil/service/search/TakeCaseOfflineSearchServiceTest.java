@@ -27,6 +27,7 @@ class TakeCaseOfflineSearchServiceTest extends ElasticSearchServiceTest {
 
     @Override
     protected Query buildQuery(int fromValue) {
+        when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
         BoolQueryBuilder query = boolQuery()
             .minimumShouldMatch(1)
             .should(boolQuery()
