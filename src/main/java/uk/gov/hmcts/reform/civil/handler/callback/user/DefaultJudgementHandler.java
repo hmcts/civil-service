@@ -188,7 +188,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
         DynamicList locationsFromList = getLocationsFromList(locations);
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
-            CaseLocationCivil cml = caseData.getCaseManagementLocation();
+            CaseLocationCivil cml = caseData.getCaseManagementLocation() != null ? caseData.getCaseManagementLocation() : callbackParams.getCaseDataBefore().getCaseManagementLocation();
             String baseLocation = cml.getBaseLocation();
             List<LocationRefData> locationRef = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authToken, baseLocation));
