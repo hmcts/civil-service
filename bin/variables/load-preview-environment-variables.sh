@@ -12,7 +12,7 @@ echo "export IDAM_API_BASE_URL=https://idam-api.aat.platform.hmcts.net"
 echo "export CCD_IDAM_REDIRECT_URL=https://ccd-case-management-web-aat.service.core-compute-aat.internal/oauth2redirect"
 echo "export CCD_DEFINITION_STORE_API_BASE_URL=https://ccd-definition-store-civil-service-pr-${pr}.preview.platform.hmcts.net"
 echo "export CAMUNDA_BASE_URL=https://camunda-civil-service-pr-${pr}.preview.platform.hmcts.net"
-
+echo "export ROLE_ASSIGNMENT_URL=https://am-role-assignment-service-civil-service-pr-${pr}.preview.platform.hmcts.net"
 # definition placeholders
 echo "export CCD_DEF_CASE_SERVICE_BASE_URL=http://civil-service-pr-${pr}-java"
 echo "export CCD_DEF_GEN_APP_SERVICE_BASE_URL=http://civil-service-pr-${pr}-java"
