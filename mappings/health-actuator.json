@@ -1,5 +1,5 @@
 {
-  "name": "Fees API - Actuator Health",
+  "name": "WireMocks API - Actuator Health",
   "request": {
     "method": "GET",
     "urlPath": "/actuator/health"
