@@ -97,7 +97,7 @@ class CoreCaseDataServiceTest {
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
         private final CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .data(caseData)

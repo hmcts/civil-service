@@ -90,7 +90,7 @@ class StartBusinessProcessTaskHandlerTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatus(BusinessProcessStatus status) {
-        BusinessProcess businessProcess = BusinessProcess.builder().status(status).build();
+        BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
@@ -194,9 +194,8 @@ class StartBusinessProcessTaskHandlerTest {
     }
 
     private BusinessProcess getBusinessProcess(BusinessProcessStatus started, String processInstanceId) {
-        return BusinessProcess.builder()
-            .status(started)
-            .processInstanceId(processInstanceId)
-            .build();
+        return new BusinessProcess()
+            .setStatus(started)
+            .setProcessInstanceId(processInstanceId);
     }
 }

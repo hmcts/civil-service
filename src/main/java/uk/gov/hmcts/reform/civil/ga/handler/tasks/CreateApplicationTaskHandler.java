@@ -92,10 +92,9 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                                                               coreCaseDataService.caseDataContentFromStartEventResponse(
                                                                   startEventResponse,
                                                                   caseData.toMap(mapper)));
-        return ExternalTaskData.builder()
-            .parentCaseData(parentCaseData)
-            .updateGeneralApplicationCaseData(generalAppCaseData)
-            .build();
+        return new ExternalTaskData()
+            .setParentCaseData(parentCaseData)
+            .setUpdateGeneralApplicationCaseData(generalAppCaseData);
     }
 
     private GeneralApplicationCaseData withoutNoticeNoConsent(GeneralApplication generalApplication,

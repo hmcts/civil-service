@@ -285,7 +285,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
-            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
+            caseData.setBusinessProcess(new BusinessProcess().setCamundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -308,7 +308,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now().plusDays(99));
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
-            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
+            caseData.setBusinessProcess(new BusinessProcess().setCamundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -336,7 +336,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
-            caseData.setBusinessProcess(BusinessProcess.builder().camundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE).build());
+            caseData.setBusinessProcess(new BusinessProcess().setCamundaEvent(SPEC_ACKNOWLEDGEMENT_OF_SERVICE));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 

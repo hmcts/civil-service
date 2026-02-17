@@ -80,9 +80,9 @@ class DefRepresentedApplicantSolEmailDTOGeneratorTest {
                              .individualLastName("Defendant")
                              .partyName("Jane Defendant").build())
             .issueDate(LocalDate.of(2023, 12, 1))
-            .changeOfRepresentation(ChangeOfRepresentation.builder()
-                                        .caseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                                        .organisationToAddID(orgId).build())
+            .changeOfRepresentation(new ChangeOfRepresentation()
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                                        .setOrganisationToAddID(orgId))
             .build();
 
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);

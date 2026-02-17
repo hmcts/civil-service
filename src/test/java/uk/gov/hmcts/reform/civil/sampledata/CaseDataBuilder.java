@@ -2414,10 +2414,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder discontinueClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2429,10 +2428,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder discontinueClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2448,20 +2446,18 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withdrawClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
     public CaseDataBuilder withdrawClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2476,19 +2472,18 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder courtLocation_old() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127").build();
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127");
         return this;
     }
 
     public CaseDataBuilder courtLocation() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .caseLocation(new CaseLocationCivil()
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("2")
                 .setBaseLocation("000000")
-                )
-            .build();
+                );
         return this;
     }
 
@@ -2523,19 +2518,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2567,7 +2560,7 @@ public class CaseDataBuilder {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -2576,19 +2569,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2620,7 +2611,7 @@ public class CaseDataBuilder {
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -3368,18 +3359,15 @@ public class CaseDataBuilder {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
-            .caseRole(caseRole)
-            .organisationToAddID(newOrgID)
-            .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now());
-        if (oldOrgId != null) {
-            newChangeBuilder.organisationToRemoveID(oldOrgId);
-        }
+        ChangeOfRepresentation newChange = new ChangeOfRepresentation()
+            .setCaseRole(caseRole)
+            .setOrganisationToAddID(newOrgID)
+            .setOrganisationToRemoveID(oldOrgId)
+            .setTimestamp(LocalDateTime.now());
         if (formerSolicitorEmail != null) {
-            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+            newChange.setFormerRepresentationEmailAddress(formerSolicitorEmail);
         }
-        changeOfRepresentation = newChangeBuilder.build();
+        changeOfRepresentation = newChange;
         return this;
     }
 
@@ -3698,19 +3686,17 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder takenOfflineByStaff() {
-        claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCaseman = new ClaimProceedsInCaseman()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder takenOfflineByStaffSpec() {
-        claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCasemanLR = new ClaimProceedsInCasemanLR()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
@@ -5610,9 +5596,8 @@ public class CaseDataBuilder {
                     .build())
 
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .businessProcess(BusinessProcess.builder()
-                    .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
-                    .build())
+                .businessProcess(new BusinessProcess()
+                    .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline"))
                 .build());
 
         this.generalApplications = generalApplicationValues;
@@ -6121,9 +6106,8 @@ public class CaseDataBuilder {
     public CaseData withHearingFeePBADetailsNoPaymentStatus() {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimValue(ClaimValue.builder()
-                .statementOfValueInPennies(BigDecimal.valueOf(10800))
-                .build())
+            .claimValue(new ClaimValue()
+                .setStatementOfValueInPennies(BigDecimal.valueOf(10800)))
             .allocatedTrack(SMALL_CLAIM)
             .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
                 Organisation.builder()
@@ -6250,7 +6234,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
@@ -6277,7 +6261,7 @@ public class CaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(
@@ -6353,6 +6337,14 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress() {
+        Address oldAddress = new Address();
+        oldAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+        oldAddress.setCounty("Line 1 test again for more than 35 characters");
+        oldAddress.setPostCode("Line 1 test again for more than 35 characters");
+        oldAddress.setPostTown("Line 1 test again for more than 35 characters");
+
         return build().toBuilder()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
@@ -6370,14 +6362,7 @@ public class CaseDataBuilder {
                 .partyName(
                     "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
                 .partyEmail("respondent1@gmail.com")
-                .primaryAddress(Address.builder()
-                    .addressLine1("Line 1 test again for more than 35 characters")
-                    .addressLine2("Line 1 test again for more than 35 characters")
-                    .addressLine3("Line 1 test again for more than 35 characters")
-                    .county("Line 1 test again for more than 35 characters")
-                    .postCode("Line 1 test again for more than 35 characters")
-                    .postTown("Line 1 test again for more than 35 characters")
-                    .build())
+                .primaryAddress(oldAddress)
                 .build())
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -6576,22 +6561,22 @@ public class CaseDataBuilder {
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
-            CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date)
-                .cosDateDeemedServedForDefendant(deemed1Date);
+            CertificateOfService cos1 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos1Date)
+                .setCosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
-                cos1Builder.cosEvidenceDocument(files);
+                cos1.setCosEvidenceDocument(files);
             }
-            this.cosNotifyClaimDetails1 = cos1Builder.build();
+            this.cosNotifyClaimDetails1 = cos1;
         }
         if (setCos2) {
-            CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date)
-                .cosDateDeemedServedForDefendant(deemed2Date);
+            CertificateOfService cos2 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos2Date)
+                .setCosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files2);
+                cos2.setCosEvidenceDocument(files2);
             }
-            this.cosNotifyClaimDetails2 = cos2Builder.build();
+            this.cosNotifyClaimDetails2 = cos2;
         }
         return this;
     }
