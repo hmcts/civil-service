@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +47,7 @@ class NotifyLipResetPinDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(notificationsProperties.getRespondentDefendantResponseForSpec()).thenReturn(TEMPLATE_ID);
 
         assertThat(generator.getEmailTemplateId(caseData)).isEqualTo(TEMPLATE_ID);
@@ -61,7 +62,7 @@ class NotifyLipResetPinDefendantEmailDTOGeneratorTest {
     void shouldAddClaimAndDefendantSpecificProperties() {
         LocalDate issueDate = LocalDate.of(2024, 1, 1);
         LocalDateTime responseDeadline = LocalDateTime.of(2024, 1, 20, 10, 0);
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder()
                 .type(Party.Type.INDIVIDUAL)
                 .individualFirstName("Jane")
@@ -76,7 +77,7 @@ class NotifyLipResetPinDefendantEmailDTOGeneratorTest {
                 .build())
             .issueDate(issueDate)
             .ccdCaseReference(1234567890123456L)
-            .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode("PINCODE"))
+            .addRespondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode("PINCODE"))
             .respondent1ResponseDeadline(responseDeadline)
             .build();
         Map<String, String> properties = new HashMap<>();
