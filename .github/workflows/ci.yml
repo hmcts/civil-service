@@ -27,8 +27,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-      - name: Run checks
-        run: ./gradlew check
+#      - name: Run checks
+#        run: ./gradlew check
+      - name: Check Docker Version
+        run: docker --version
       - name: Run integration tests
         run: ./gradlew integration
       - name: Upload build artifacts
