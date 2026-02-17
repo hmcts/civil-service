@@ -26,7 +26,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
@@ -66,7 +66,7 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
     private GeneralApplicationTaskHandler generalApplicationTaskHandler;
 
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     private final CaseDataContent caseDataContent = CaseDataContent.builder().build();
 

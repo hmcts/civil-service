@@ -144,6 +144,17 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     }
 
     @Test
+    void shouldNotGenerateApplicationDraftDocument_whenAboutToSubmitEventIsCalledAndWithNoticeAndNotUrgent_LR() {
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
     void shouldGenerateApplicationDraftDocument_whenAboutToSubmitEventIsCalledAndWithNoticeAndUrgent_LR() {
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
@@ -310,6 +321,32 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
+    }
+
+    @Test
+    void shouldNotGenerateDraftDocument_Unpaid_ConsentApp_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, NO);
+        when(generalAppFeesService.isFreeApplication(any(GeneralApplicationCaseData.class))).thenReturn(false);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
+    void shouldNotGenerateDraftDocument_whenFeeUnpaid_WithNoticeAndUrgent_LR() {
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        caseData = caseData.toBuilder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
+                                      .fee(Fee.builder().code("NotFree").build()).build()).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
     }
 
     @Test

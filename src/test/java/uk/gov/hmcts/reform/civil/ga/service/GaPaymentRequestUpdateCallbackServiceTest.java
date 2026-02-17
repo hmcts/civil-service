@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 
@@ -55,7 +55,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public static final String ACCOUNT_NUMBER = "123445555";
     public static final String TOKEN = "1234";
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
     @Mock
     private GaCoreCaseDataService coreCaseDataService;
 

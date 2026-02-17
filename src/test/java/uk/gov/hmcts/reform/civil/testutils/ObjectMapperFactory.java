@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-public class ObjectMapperBuilder {
+public class ObjectMapperFactory {
 
-    private ObjectMapperBuilder() {
+    private ObjectMapperFactory() {
         // utility class
     }
 

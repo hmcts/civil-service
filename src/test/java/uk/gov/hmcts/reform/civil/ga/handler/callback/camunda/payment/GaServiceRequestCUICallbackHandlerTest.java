@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
@@ -43,7 +43,7 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
     private GaServiceRequestCUICallbackHandler handler;
 
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     private GeneralApplicationCaseData caseData;
     private CallbackParams params;

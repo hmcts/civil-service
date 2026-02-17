@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,7 +45,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     @Spy
-    private ObjectMapper mapper = ObjectMapperBuilder.instance();
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(mapper);

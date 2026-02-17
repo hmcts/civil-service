@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ class GaStartGeneralApplicationBusinessProcessCallbackHandlerTest extends Genera
     private GaStartGeneralApplicationBusinessProcessCallbackHandler startGeneralApplicationBusinessProcessCallbackHandler;
 
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;

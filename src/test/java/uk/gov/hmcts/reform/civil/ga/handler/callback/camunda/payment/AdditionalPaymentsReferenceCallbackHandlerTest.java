@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
@@ -39,59 +39,42 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_PAY
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
 @ExtendWith(MockitoExtension.class)
-class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
+class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplicationBaseCallbackHandlerTest {
 
+    private static final String PAYMENT_REQUEST_REFERENCE = "RC-1234-1234-1234-1234";
     public static final String BEARER_TOKEN = "BEARER_TOKEN";
     public static final String DUPLICATE_PAYMENT = "Duplicate Payment.";
     public static final String UNEXPECTED_RESPONSE_BODY = "unexpected response body";
     public static final String EXCEPTION_MESSAGE = "exception message";
-    private static final String PAYMENT_REQUEST_REFERENCE = "RC-1234-1234-1234-1234";
-    @Mock
-    JudicialDecisionHelper judicialDecisionHelper;
+
     @Mock
     private Time time;
+
     @InjectMocks
     private AdditionalPaymentsReferenceCallbackHandler handler;
+
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
     private CallbackParams params;
     @Mock
     private PaymentsService paymentsService;
 
-    private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {
-        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(
-            response.getData(),
-            GeneralApplicationCaseData.class
-        );
-        return responseCaseData.getGeneralAppPBADetails().getAdditionalPaymentServiceRef();
-    }
-
-    private FeignException buildForbiddenFeignExceptionWithInvalidResponse() {
-        return buildFeignClientException(403, UNEXPECTED_RESPONSE_BODY.getBytes(UTF_8));
-    }
-
-    private FeignException.FeignClientException buildFeignClientException(int status, byte[] body) {
-        return new FeignException.FeignClientException(
-            status,
-            EXCEPTION_MESSAGE,
-            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
-            body,
-            Map.of()
-        );
-    }
+    @Mock
+    JudicialDecisionHelper judicialDecisionHelper;
 
     @Nested
     class MakeAdditionalPaymentReference {
 
         @Test
-        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication() {
+        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication()  {
+            when(paymentsService.createServiceRequestGa(any(), any()))
+                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
+                                .build());
             var caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(
                     REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
                 .build();
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
-                                .build());
             when(judicialDecisionHelper
                      .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
 
@@ -135,10 +118,8 @@ class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationB
             doThrow(buildForbiddenFeignExceptionWithInvalidResponse())
                 .when(paymentsService).createServiceRequestGa(any(), any());
             var caseData = GeneralApplicationCaseDataBuilder.builder()
-                .judicialDecisionWithUncloakRequestForInformationApplication(
-                    REQUEST_MORE_INFORMATION,
-                    YesOrNo.NO, YesOrNo.NO
-                )
+                .judicialDecisionWithUncloakRequestForInformationApplication(REQUEST_MORE_INFORMATION,
+                                                                             YesOrNo.NO, YesOrNo.NO)
                 .build();
             when(judicialDecisionHelper
                      .isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
@@ -170,8 +151,7 @@ class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationB
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(
-                "GeneralApplicationMakeAdditionalPayment");
+            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
         }
 
         @Test
@@ -179,6 +159,25 @@ class AdditionalPaymentsReferenceCallbackHandlerTest extends GeneralApplicationB
             assertThat(handler.handledEvents()).contains(OBTAIN_ADDITIONAL_PAYMENT_REF);
         }
 
+    }
+
+    private String extractPaymentRequestReferenceFromResponse(AboutToStartOrSubmitCallbackResponse response) {
+        GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
+        return responseCaseData.getGeneralAppPBADetails().getAdditionalPaymentServiceRef();
+    }
+
+    private FeignException buildForbiddenFeignExceptionWithInvalidResponse() {
+        return buildFeignClientException(403, UNEXPECTED_RESPONSE_BODY.getBytes(UTF_8));
+    }
+
+    private FeignException.FeignClientException buildFeignClientException(int status, byte[] body) {
+        return new FeignException.FeignClientException(
+            status,
+            EXCEPTION_MESSAGE,
+            Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
+            body,
+            Map.of()
+        );
     }
 
 }

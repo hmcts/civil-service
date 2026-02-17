@@ -38,7 +38,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -79,7 +79,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
     private static final LocalDate localDatePlus21days = LocalDate.now().plusDays(21);
 
     @Spy
-    private ObjectMapper objMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objMapper = ObjectMapperFactory.instance();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;

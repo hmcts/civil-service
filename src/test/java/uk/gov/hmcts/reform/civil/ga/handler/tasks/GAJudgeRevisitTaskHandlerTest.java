@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepres
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -82,7 +82,7 @@ class GAJudgeRevisitTaskHandlerTest {
     private GaForLipService gaForLipService;
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
-        ObjectMapperBuilder.instance());
+        ObjectMapperFactory.instance());
 
     @InjectMocks
     private GAJudgeRevisitTaskHandler gaJudgeRevisitTaskHandler;

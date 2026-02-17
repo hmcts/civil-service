@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,7 +62,7 @@ class GAResponseDeadlineTaskHandlerTest {
 
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(
-        ObjectMapperBuilder.instance());
+        ObjectMapperFactory.instance());
 
     @InjectMocks
     private GAResponseDeadlineTaskHandler gaResponseDeadlineTaskHandler;

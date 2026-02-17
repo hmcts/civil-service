@@ -59,10 +59,10 @@ public class EndGaHwfNotifyProcessTaskHandlerTest {
         when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         when(mockExternalTask.getAllVariables())
-            .thenReturn(Map.of(
-                "caseId", CASE_ID,
-                "caseEvent", END_GA_HWF_NOTIFY_PROCESS
-            ));
+                .thenReturn(Map.of(
+                        "caseId", CASE_ID,
+                        "caseEvent", END_GA_HWF_NOTIFY_PROCESS
+                ));
     }
 
     @Test
@@ -121,10 +121,10 @@ public class EndGaHwfNotifyProcessTaskHandlerTest {
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails) {
         return StartEventResponse.builder()
-            .token("1234")
-            .eventId(END_GA_HWF_NOTIFY_PROCESS.name())
-            .caseDetails(caseDetails)
-            .build();
+                .token("1234")
+                .eventId(END_GA_HWF_NOTIFY_PROCESS.name())
+                .caseDetails(caseDetails)
+                .build();
     }
 
     private CaseDataContent getCaseDataContent(CaseDetails caseDetails, StartEventResponse value) {
@@ -132,11 +132,11 @@ public class EndGaHwfNotifyProcessTaskHandlerTest {
                 .setStatus(BusinessProcessStatus.FINISHED));
 
         return CaseDataContent.builder()
-            .eventToken(value.getToken())
-            .event(Event.builder()
-                       .id(value.getEventId())
-                       .build())
-            .data(caseDetails.getData())
-            .build();
+                .eventToken(value.getToken())
+                .event(Event.builder()
+                        .id(value.getEventId())
+                        .build())
+                .data(caseDetails.getData())
+                .build();
     }
 }

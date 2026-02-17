@@ -56,7 +56,8 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
@@ -121,9 +122,6 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(MockitoExtension.class)
 public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
-
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
@@ -147,6 +145,12 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
     @Mock
     private GaForLipService gaForLipService;
+
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @Mock
+    private CoreCaseUserService coreCaseUserService;
 
     @Mock
     private GeneralOrderGenerator generalOrderGenerator;

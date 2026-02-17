@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -43,7 +43,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
     @Mock
     private GaHearingFormGenerator hearingFormGenerator;
     @Spy
-    private ObjectMapper mapper = ObjectMapperBuilder.instance();
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     @Mock
     private GaForLipService gaForLipService;

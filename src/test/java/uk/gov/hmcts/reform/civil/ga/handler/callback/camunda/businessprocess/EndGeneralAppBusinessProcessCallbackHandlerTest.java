@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.testutils.ObjectMapperBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -104,7 +104,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
     private EndGeneralAppBusinessProcessCallbackHandler handler;
 
     @Spy
-    private ObjectMapper objectMapper = ObjectMapperBuilder.instance();
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     @Mock
     private CaseDetailsConverter caseDetailsConverter;
