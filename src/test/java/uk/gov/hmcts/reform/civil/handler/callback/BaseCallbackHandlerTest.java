@@ -85,10 +85,6 @@ public abstract class BaseCallbackHandlerTest {
         return callbackParamsOf(caseData, caseDataBefore, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
-    public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore, String pageId, CallbackType type) {
-        return callbackParamsOf(caseData, caseDataBefore, type, null, pageId, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"));
-    }
-
     public CallbackParams callbackParamsOf(CaseData caseData, CallbackType type, CaseState currentState) {
         return callbackParamsOf(caseData, type, null, null, Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"), currentState);
     }
