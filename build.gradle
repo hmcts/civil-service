@@ -26,7 +26,7 @@ def versions = [
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
   camunda           : '7.20.0',
-  testcontainers    : '2.0.3',
+  testcontainers    : '1.21.3',
   pdfbox            : '3.0.6',
   tika              : '3.2.3'
 ]
@@ -476,8 +476,8 @@ dependencies {
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.2')
   integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.2')
 
-  testImplementation group: 'org.testcontainers', name: 'testcontainers-postgresql', version: versions.testcontainers
-  testImplementation group: 'org.testcontainers', name: 'testcontainers-junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
   testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
   // dashboard specific changes ends
 
