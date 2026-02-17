@@ -1,0 +1,27 @@
+{
+  "name": "Fee Lookup - Small Claims Hearing",
+  "request": {
+    "method": "GET",
+    "urlPath": "/fees-register/fees/lookup",
+    "queryParameters": {
+      "service": { "equalTo": "civil money claims" },
+      "jurisdiction1": { "equalTo": "civil" },
+      "jurisdiction2": { "equalTo": "county court" },
+      "channel": { "equalTo": "default" },
+      "event": { "equalTo": "hearing" },
+      "keyword": { "equalTo": "HearingSmallClaims" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "code": "FEE0440",
+      "description": "Civil Court fees - Hearing fees - Small claims",
+      "version": 1,
+      "fee_amount": 50.00
+    }
+  }
+}

@@ -1770,7 +1770,8 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasSdoReasonNotSuitable_when_reason_and_input_present() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input("reason").build();
+            ReasonNotSuitableSDO reason = new ReasonNotSuitableSDO();
+            reason.setInput("reason");
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertTrue(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }
@@ -1783,7 +1784,8 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_hasSdoReasonNotSuitable_when_input_empty() {
-            ReasonNotSuitableSDO reason = ReasonNotSuitableSDO.builder().input(null).build();
+            ReasonNotSuitableSDO reason = new ReasonNotSuitableSDO();
+            reason.setInput(null);
             when(caseData.getReasonNotSuitableSDO()).thenReturn(reason);
             assertFalse(CaseDataPredicate.TakenOffline.hasSdoReasonNotSuitable.test(caseData));
         }

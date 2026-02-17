@@ -47,11 +47,10 @@ class SdoDisposalTemplateServiceTest {
 
         caseData = caseData.toBuilder()
             .disposalHearingHearingTime(
-                uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime.builder()
-                    .time(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
-                    .otherHours("2")
-                    .otherMinutes("30")
-                    .build()
+                new uk.gov.hmcts.reform.civil.model.sdo.DisposalHearingHearingTime()
+                    .setTime(DisposalHearingFinalDisposalHearingTimeEstimate.OTHER)
+                    .setOtherHours("2")
+                    .setOtherMinutes("30")
             )
             .build();
 

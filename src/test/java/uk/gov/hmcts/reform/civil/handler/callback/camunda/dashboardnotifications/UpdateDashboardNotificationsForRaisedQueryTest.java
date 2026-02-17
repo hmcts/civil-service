@@ -96,7 +96,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123456"))
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -155,7 +155,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -217,7 +217,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(defendantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -274,7 +274,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
             .qmLatestQuery(createLatestQuery("123457"))
             .queries(applicantCitizenQuery)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
