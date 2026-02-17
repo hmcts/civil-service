@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
@@ -33,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.UUID;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -63,7 +62,6 @@ public class DefaultJudgementHandler extends CallbackHandler {
     private static final int DEFAULT_JUDGEMENT_DEADLINE_EXTENSION_MONTHS = 36;
     private final ObjectMapper objectMapper;
     private final LocationReferenceDataService locationRefDataService;
-    private final LocationHelper locationHelper;
     private final DeadlinesCalculator deadlinesCalculator;
 
     @Override
@@ -188,21 +186,23 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<LocationRefData> locations = (locationRefDataService
             .getCourtLocationsForDefaultJudgments(authToken));
         HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
+        DynamicList locationsFromList = getLocationsFromList(locations);
         if (caseData.getReasonForTransfer() != null && caseData.getTransferCourtLocationList() != null) {
-            RequestedCourt requestedCourt = new RequestedCourt();
-            requestedCourt.setCaseLocation(caseData.getCaseManagementLocation());
-            Optional<RequestedCourt> optionalRequestedCourt = Optional.of(requestedCourt);
-            DynamicList locationsList = buildLocationList(
-                optionalRequestedCourt.orElse(null),
-                locations
-            );
-            log.info("If locationsList [{}] for caseId [{}]", locationsList, caseData.getCcdCaseReference());
-            hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsList);
+            CaseLocationCivil cml = caseData.getCaseManagementLocation();
+            String baseLocation = cml.getBaseLocation();
+            List<LocationRefData> locationRef = (locationRefDataService
+                .getCourtLocationsByEpimmsIdAndCourtType(authToken, baseLocation));
+            if (!locationRef.isEmpty()) {
+                LocationRefData locationRefData = locations.getFirst();
+                locationsFromList.setValue(DynamicListElement.dynamicElementFromCode(UUID.randomUUID() + "-" + baseLocation, getLocationLabel(locationRefData)));
+            }
+            log.info("If locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());
+            hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsFromList);
         } else {
-            DynamicList locationsFromList = getLocationsFromList(locations);
             log.info("Else locationsList [{}] for caseId [{}]", locationsFromList, caseData.getCcdCaseReference());
             hearingSupportRequirementsDJ.setHearingTemporaryLocation(locationsFromList);
         }
+
         caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -261,12 +261,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
             HearingSupportRequirementsDJ hearingSupportRequirementsDJ = caseData.getHearingSupportRequirementsDJ();
             hearingSupportRequirementsDJ.setHearingTemporaryLocation(list);
             caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
-            String epimId = list.getValue().getCode();
+            String code = list.getValue().getCode();
+            final String epimId = code.substring(code.lastIndexOf("-") + 1).trim();
             List<LocationRefData> locations = (locationRefDataService
                 .getCourtLocationsByEpimmsIdAndCourtType(authToken, epimId));
 
             if (!locations.isEmpty()) {
-                LocationRefData locationRefData = locations.getFirst();
+                LocationRefData locationRefData = locations.get(0);
                 CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
                 caseLocationCivil.setRegion(locationRefData.getRegionId());
                 caseLocationCivil.setBaseLocation(locationRefData.getEpimmsId());
@@ -291,7 +292,7 @@ public class DefaultJudgementHandler extends CallbackHandler {
         List<DynamicListElement> list = locations.stream()
             .map(location ->
                      DynamicListElement.dynamicElementFromCode(
-                         location.getEpimmsId(),
+                         UUID.randomUUID() + "-" + location.getEpimmsId(),
                          location.getSiteName()
                              + " - " + location.getCourtAddress()
                              + " - " + location.getPostcode()
@@ -318,10 +319,13 @@ public class DefaultJudgementHandler extends CallbackHandler {
     }
 
     public static Boolean checkLocation(final LocationRefData location, String locationTempLabel) {
-        String locationLabel = location.getSiteName()
+        return getLocationLabel(location).equals(locationTempLabel);
+    }
+
+    private static String getLocationLabel(final LocationRefData location) {
+        return location.getSiteName()
             + " - " + location.getCourtAddress()
             + " - " + location.getPostcode();
-        return locationLabel.equals(locationTempLabel);
     }
 
     private DynamicList formatLocationList(DynamicList locationList) {
@@ -338,28 +342,4 @@ public class DefaultJudgementHandler extends CallbackHandler {
         return element.getLabel().equals(preferredLocation.getLabel());
     }
 
-    private DynamicList buildLocationList(RequestedCourt preferredCourt,
-                                         List<LocationRefData> locations) {
-        Optional<LocationRefData> matchingLocation = Optional.ofNullable(preferredCourt)
-            .flatMap(requestedCourt -> locationHelper.getMatching(locations, preferredCourt));
-
-        return matchingLocation
-            .map(location -> DynamicList.fromList(
-                locations,
-                this::getLocationEpimms,
-                LocationReferenceDataService::getDisplayEntry,
-                location,
-                true))
-            .orElseGet(() -> DynamicList.fromList(
-                locations,
-                this::getLocationEpimms,
-                LocationReferenceDataService::getDisplayEntry,
-                null,
-                true
-            ));
-    }
-
-    private String getLocationEpimms(LocationRefData location) {
-        return location.getEpimmsId();
-    }
 }

@@ -14,14 +14,12 @@ import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.HearingDates;
 import uk.gov.hmcts.reform.civil.model.HearingSupportRequirementsDJ;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
-import uk.gov.hmcts.reform.civil.model.dq.RequestedCourt;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
@@ -33,7 +31,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -54,8 +51,6 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
     private ObjectMapper mapper;
 
     @Mock
-    private LocationHelper locationHelper;
-    @Mock
     private LocationReferenceDataService locationRefDataService;
     @Mock
     private DeadlinesCalculator deadlinesCalculator;
@@ -65,7 +60,7 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        handler = new DefaultJudgementHandler(mapper, locationRefDataService, locationHelper, deadlinesCalculator);
+        handler = new DefaultJudgementHandler(mapper, locationRefDataService, deadlinesCalculator);
     }
 
     @Nested
@@ -349,9 +344,10 @@ class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                                   .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
                                   .epimmsId("123456").build());
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
-                RequestedCourt requestedCourt = new RequestedCourt();
-                requestedCourt.setCaseLocation(caseData.getCaseManagementLocation());
-                when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(locations.getFirst()));
+                when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
+                    any(),
+                    any()
+                )).thenReturn(locations);
                 CallbackParams params = callbackParamsOf(caseData, MID, "checkPreferredLocations");
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
                 CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
