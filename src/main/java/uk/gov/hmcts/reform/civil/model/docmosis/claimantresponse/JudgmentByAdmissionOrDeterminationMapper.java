@@ -472,9 +472,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getInstalmentAmount(CaseData caseData) {
-        if (caseData == null) {
-            return null;
-        }
 
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()
             || caseData.hasApplicant1AcceptedCourtDecision()) {
@@ -507,9 +504,6 @@ public class JudgmentByAdmissionOrDeterminationMapper {
     }
 
     private String getAmount(CaseData caseData) {
-        if (caseData == null) {
-            return null;
-        }
 
         BigDecimal amount = null;
 
