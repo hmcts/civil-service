@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(properties = {
     "hmc.api.url=http://localhost:8991",
     "core_case_data.api.url=" + BaseContractTest.DATA_STORE_URL,
-    "role-assignment.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL
+    "role-assignment-service.api.url=" + BaseContractTest.ROLE_ASSIGNMENT_URL
 })
 public class HearingsApiConsumerTest extends BaseContractTest {
 
