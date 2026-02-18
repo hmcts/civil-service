@@ -44,6 +44,7 @@ class OpenAPIPublisherTest {
     OpenAPIPublisherTest(WebApplicationContext wac) {
         this.wac = wac;
     }
+
     @BeforeEach
     void setUp() {
         mvc = webAppContextSetup(wac).build();
