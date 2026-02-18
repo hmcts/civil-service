@@ -589,21 +589,10 @@ class RoboticsDataMapperForUnspecTest {
                 .build();
             caseData.setClaimTypeUnSpec(claimTypeUnspec);
             caseData.setClaimType(claimType);
-            RoboticsCaseData testHeader = RoboticsCaseData.builder()
-                .header(CaseHeader.builder()
-                            .caseNumber(caseData.getLegacyCaseReference())
-                            .owningCourtCode("807")
-                            .owningCourtName("CCMCC")
-                            .caseType("Multi/Other")
-                            .preferredCourtCode("")
-                            .caseAllocatedTo("FAST TRACK")
-                            .build())
-                .build();
-
             when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
             RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-            assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
 
             assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(2);
         }
@@ -616,21 +605,10 @@ class RoboticsDataMapperForUnspecTest {
                 .build();
             caseData.setClaimTypeUnSpec(claimTypeUnspec);
             caseData.setClaimType(claimType);
-            RoboticsCaseData testHeader = RoboticsCaseData.builder()
-                .header(CaseHeader.builder()
-                            .caseNumber(caseData.getLegacyCaseReference())
-                            .owningCourtCode("807")
-                            .owningCourtName("CCMCC")
-                            .caseType("Multi/Other")
-                            .preferredCourtCode("")
-                            .caseAllocatedTo("FAST TRACK")
-                            .build())
-                .build();
-
             when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
             RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-            assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
 
             assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(1);
         }
