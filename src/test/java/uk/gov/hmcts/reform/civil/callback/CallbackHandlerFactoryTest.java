@@ -249,20 +249,18 @@ class CallbackHandlerFactoryTest {
             .eventId(DASHBOARD_NOTIFICATION_EVENT.name())
             .build();
 
-        CallbackParams civilParams = CallbackParams.builder()
+        CallbackParams civilParams = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
-        CallbackParams gaParams = CallbackParams.builder()
+        CallbackParams gaParams = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .isGeneralApplicationCaseType(true)
-            .build();
+            .isGeneralApplicationCaseType(true);
 
         assertEquals(EVENT_HANDLED_RESPONSE, callbackHandlerFactory.dispatch(civilParams));
         assertEquals(EVENT_HANDLED_RESPONSE, callbackHandlerFactory.dispatch(gaParams));
@@ -275,20 +273,18 @@ class CallbackHandlerFactoryTest {
             .eventId(RESPOND_TO_APPLICATION.name())
             .build();
 
-        CallbackParams civilParams = CallbackParams.builder()
+        CallbackParams civilParams = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
-        CallbackParams gaParams = CallbackParams.builder()
+        CallbackParams gaParams = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .isGeneralApplicationCaseType(true)
-            .build();
+            .isGeneralApplicationCaseType(true);
 
         assertEquals(CIVIL_ONLY_EVENT_RESPONSE, callbackHandlerFactory.dispatch(civilParams));
         assertEquals(GA_ONLY_EVENT_RESPONSE, callbackHandlerFactory.dispatch(gaParams));

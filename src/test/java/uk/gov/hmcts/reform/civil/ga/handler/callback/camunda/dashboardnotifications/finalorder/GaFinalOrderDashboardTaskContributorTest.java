@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
-class FinalOrderDashboardTaskContributorTest {
+class GaFinalOrderDashboardTaskContributorTest {
 
     @Mock
     private FinalOrderApplicantDashboardTask applicantTask;
@@ -21,8 +21,8 @@ class FinalOrderDashboardTaskContributorTest {
 
     @Test
     void shouldExposeTaskIdCaseTypeAndDashboardTasks() {
-        FinalOrderDashboardTaskContributor contributor =
-            new FinalOrderDashboardTaskContributor(applicantTask, respondentTask);
+        GaFinalOrderDashboardTaskContributor contributor =
+            new GaFinalOrderDashboardTaskContributor(applicantTask, respondentTask);
 
         assertThat(contributor.taskId()).isEqualTo(DashboardTaskIds.GA_FINAL_ORDER);
         assertThat(contributor.caseType()).isEqualTo(DashboardCaseType.GENERAL_APPLICATION);

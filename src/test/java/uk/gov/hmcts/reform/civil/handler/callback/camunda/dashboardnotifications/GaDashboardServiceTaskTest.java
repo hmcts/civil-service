@@ -19,10 +19,9 @@ class GaDashboardServiceTaskTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdCaseReference(123456L)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN));
 
         DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
         CapturingTask task = new CapturingTask();
@@ -38,9 +37,8 @@ class GaDashboardServiceTaskTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdCaseReference(123456L)
             .build();
-        CallbackParams callbackParams = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(caseData);
 
         DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
         CapturingTask task = new CapturingTask();
