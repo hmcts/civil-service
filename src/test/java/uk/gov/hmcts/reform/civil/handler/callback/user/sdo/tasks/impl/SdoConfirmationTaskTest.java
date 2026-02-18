@@ -32,9 +32,8 @@ class SdoConfirmationTaskTest {
     void shouldBuildSubmittedResponse() {
         SdoConfirmationTask task = new SdoConfirmationTask(narrativeService);
         CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, "token"));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.CONFIRMATION);
 

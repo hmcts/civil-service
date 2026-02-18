@@ -154,7 +154,7 @@ class SdoHearingPreparationServiceTest {
 
         CaseData caseData = CaseDataBuilder.builder().build();
         service.applyVersionSpecificHearingDefaults(
-            CallbackParams.builder().version(V_1).caseData(caseData).build(),
+            new CallbackParams().version(V_1).caseData(caseData),
             hearingList
         );
 
@@ -187,10 +187,9 @@ class SdoHearingPreparationServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
         caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("EPIMS123"));
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, AUTH))
-            .build();
+            .params(Map.of(BEARER_TOKEN, AUTH));
     }
 
     private LocationRefData locationRefData() {

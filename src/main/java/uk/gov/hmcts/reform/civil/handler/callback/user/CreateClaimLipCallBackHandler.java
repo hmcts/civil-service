@@ -143,9 +143,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
     private void addOrginsationPoliciesforClaimantLip(CaseData caseData) {
         //         LiP are not represented or registered
         if (caseData.getApplicant1OrganisationPolicy() == null) {
-            caseData.setApplicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                  .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                                                  .build());
+            caseData.setApplicant1OrganisationPolicy(new OrganisationPolicy().setOrgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()));
         }
 
         OrgPolicyUtils.addMissingOrgPolicies(caseData);
