@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.ras.model.Attributes;
 import uk.gov.hmcts.reform.civil.ras.model.GrantType;
@@ -39,7 +37,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService.ROLE_NAMES;
 import static uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService.ROLE_TYPE;
 
-@MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
 class RolesAndAccessAssignmentServiceTest {
 
@@ -66,7 +63,6 @@ class RolesAndAccessAssignmentServiceTest {
     @BeforeEach
     void setUp() {
         when(userService.getAccessToken(any(), any())).thenReturn(bearerToken);
-        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
 
         RoleAssignmentResponse allocatedJudgeRoleAssignment = RoleAssignmentResponse.builder()
             .actorId(judgeUserToCopyInto)
@@ -191,6 +187,7 @@ class RolesAndAccessAssignmentServiceTest {
 
     @Test
     void shouldCopyCaseRolesFromMainCaseIntoGaCase() {
+        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(mainCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
             .thenReturn(allocatedCaseRoles);
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(gaCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
@@ -258,6 +255,7 @@ class RolesAndAccessAssignmentServiceTest {
 
     @Test
     void shouldNotCopyCaseRolesFromMainCaseIntoGaCase_if_alreadyExist() {
+        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(mainCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
             .thenReturn(allocatedCaseRoles);
         // GA role assignments already contain allocated-admin-caseworker
