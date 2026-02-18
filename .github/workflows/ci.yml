@@ -22,10 +22,10 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle-
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v4
-        with:
-          version: type=image,tag=28.5.1
+#      - name: Set up Docker
+#        uses: docker/setup-docker-action@v4
+#        with:
+#          version: type=image,tag=28.5.1
       - name: Check Docker Version
         run: docker --version
       - name: Set up JDK 21
