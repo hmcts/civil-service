@@ -55,11 +55,10 @@ class BundleUtilsTest {
     void shouldBuildBundlingRequestDocWithGivenParameters() {
 
         String docName = "TestDocument";
-        Document document = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/document-binary.pdf")
-            .documentFileName("document.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/document-binary.pdf")
+            .setDocumentFileName("document.pdf");
         String docType = "TestDocType";
 
         BundlingRequestDocument result = BundleUtils.buildBundlingRequestDoc(docName, document, docType);

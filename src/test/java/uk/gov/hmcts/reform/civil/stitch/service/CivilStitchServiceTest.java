@@ -78,45 +78,39 @@ class CivilStitchServiceTest {
     );
 
     private static final CaseDocument CLAIM_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     private static final CaseDocument LIP_FORM =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(LIP_CLAIM_FORM.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(LITIGANT_IN_PERSON_CLAIM_FORM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
 }

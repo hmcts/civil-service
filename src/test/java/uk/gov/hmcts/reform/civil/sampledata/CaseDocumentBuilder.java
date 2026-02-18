@@ -24,9 +24,17 @@ public class CaseDocumentBuilder {
         return this;
     }
 
+    public CaseDocumentBuilder setDocumentName(String documentName) {
+        return documentName(documentName);
+    }
+
     public CaseDocumentBuilder documentType(DocumentType documentType) {
         this.documentType = documentType;
         return this;
+    }
+
+    public CaseDocumentBuilder setDocumentType(DocumentType documentType) {
+        return documentType(documentType);
     }
 
     public CaseDocumentBuilder createdDatetime(LocalDateTime createdDatetime) {
@@ -34,14 +42,17 @@ public class CaseDocumentBuilder {
         return this;
     }
 
+    public CaseDocumentBuilder setCreatedDatetime(LocalDateTime createdDatetime) {
+        return createdDatetime(createdDatetime);
+    }
+
     public CaseDocument build() {
-        return CaseDocument.builder()
-            .documentLink(DocumentBuilder.builder().documentName(documentName).build())
-            .documentSize(56975)
-            .createdDatetime(nonNull(createdDatetime) ? createdDatetime : of(2020, 7, 16, 14, 5, 15, 550439))
-            .documentType(documentType)
-            .createdBy("Civil")
-            .documentName(documentName)
-            .build();
+        return new CaseDocument()
+            .setDocumentLink(DocumentBuilder.builder().documentName(documentName).build())
+            .setDocumentSize(56975)
+            .setCreatedDatetime(nonNull(createdDatetime) ? createdDatetime : of(2020, 7, 16, 14, 5, 15, 550439))
+            .setDocumentType(documentType)
+            .setCreatedBy("Civil")
+            .setDocumentName(documentName);
     }
 }
