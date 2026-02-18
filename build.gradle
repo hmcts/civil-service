@@ -26,7 +26,7 @@ def versions = [
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
   camunda           : '7.20.0',
-  testcontainers    : '1.19.8',
+  testcontainers    : '1.21.4',
   pdfbox            : '3.0.6',
   tika              : '3.2.3'
 ]
