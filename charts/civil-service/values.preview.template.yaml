@@ -56,7 +56,7 @@ java:
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
     SENDGRID_HOST: ${SERVICE_NAME}-wiremock
-    SENDGRID_TEST: "true"
+    SENDGRID_TEST: true
   keyVaults:
     civil:
       resourceGroup: civil
