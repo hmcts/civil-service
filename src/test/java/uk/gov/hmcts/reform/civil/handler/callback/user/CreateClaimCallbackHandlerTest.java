@@ -1025,7 +1025,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1038,12 +1038,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIdIsNull() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1056,12 +1054,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldBeSuccessful_whenValid() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1095,7 +1091,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1109,12 +1105,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIdIsNull() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1128,12 +1122,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldBeSuccessful_whenValid() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent1OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1147,13 +1139,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenBothSolicitorOrganisationsAreSame1v1() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1168,14 +1158,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame2v1() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .multiPartyClaimTwoApplicants()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1210,7 +1198,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenOrganisationIsNull() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1223,12 +1211,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenOrganisationIdIsNull() {
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID(null)
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(null);
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1241,12 +1227,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldBeSuccessful_whenValid() {
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .respondent2OrgRegistered(YES)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -1260,15 +1244,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2Represented(YES)
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1283,15 +1265,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenApplicantAndRespondent2SolicitorOrganisationsAreSame1v2() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .multiPartyClaimTwoDefendantSolicitors()
                 .respondent2Represented(YES)
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -1306,14 +1286,12 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenApplicantAndRespondent1SolicitorOrganisationsAreSame1v2SameSol() {
 
             uk.gov.hmcts.reform.ccd.model.Organisation organisation
-                = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                .organisationID("orgId")
-                .build();
+                = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("orgId");
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .multiPartyClaimOneDefendantSolicitor()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(organisation).build())
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(organisation))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -2008,19 +1986,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData localCaseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("CLAIMANTREF1")
-                    .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("DEFENDANTREF1")
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                        .organisationID("QWERTY R").build())
-                    .build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("DEFENDANTREF2")
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                        .organisationID("QWERTY R2").build())
-                    .build())
+                .applicant1OrganisationPolicy(policyWithReference("CLAIMANTREF1", null))
+                .respondent1OrganisationPolicy(policyWithReference("DEFENDANTREF1", "QWERTY R"))
+                .respondent2OrganisationPolicy(policyWithReference("DEFENDANTREF2", "QWERTY R2"))
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -2037,11 +2005,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldUpdateRespondent1Organisation1IDCopySameSol() {
             CaseData localCaseData = CaseDataBuilder.builder()
                 .atStateClaimIssued1v2AndSameRepresentative()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("DEFENDANTREF1")
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                        .organisationID("QWERTY R").build())
-                    .build())
+                .respondent1OrganisationPolicy(policyWithReference("DEFENDANTREF1", "QWERTY R"))
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -2060,19 +2024,9 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData localCaseData = CaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .multiPartyClaimTwoDefendantSolicitors()
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("CLAIMANTREF1")
-                    .build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("DEFENDANTREF1")
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                        .organisationID("QWERTY R").build())
-                    .build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyReference("DEFENDANTREF2")
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                        .organisationID("QWERTY R2").build())
-                    .build())
+                .applicant1OrganisationPolicy(policyWithReference("CLAIMANTREF1", null))
+                .respondent1OrganisationPolicy(policyWithReference("DEFENDANTREF1", "QWERTY R"))
+                .respondent2OrganisationPolicy(policyWithReference("DEFENDANTREF2", "QWERTY R2"))
                 .build();
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
@@ -2100,7 +2054,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedErrorMessagesInResponse_whenInvokedWithNullApplicantPreferredCourt() {
             CaseData data = CaseDataBuilder.builder().atStateClaimDraft().build();
-            data.setCourtLocation(CourtLocation.builder().applicantPreferredCourtLocationList(null).build());
+            data.setCourtLocation(new CourtLocation().setApplicantPreferredCourtLocationList(null));
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
                 callbackParamsOf(data, ABOUT_TO_SUBMIT));
@@ -2450,5 +2404,13 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                         .build());
             }
         }
+    }
+
+    private OrganisationPolicy policyWithReference(String reference, String organisationId) {
+        OrganisationPolicy policy = new OrganisationPolicy().setOrgPolicyReference(reference);
+        if (organisationId != null) {
+            policy.setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(organisationId));
+        }
+        return policy;
     }
 }

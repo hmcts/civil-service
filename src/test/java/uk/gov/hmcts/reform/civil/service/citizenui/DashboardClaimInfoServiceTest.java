@@ -135,10 +135,8 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(new BigDecimal("100000"))
-                                            .build())
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(new BigDecimal("100000")))
                             .build());
 
         given(caseDetailsConverter.toCaseData(CASE_DETAILS_2))
@@ -153,10 +151,8 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Chan")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(new BigDecimal("100000"))
-                                            .build())
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(new BigDecimal("100000")))
                             .build());
     }
 
@@ -217,11 +213,9 @@ public class DashboardClaimInfoServiceTest {
                                                                                              .individualLastName("Bond")
                                                                                              .type(Party.Type.INDIVIDUAL)
                                                                                              .build())
-                                                                            .claimValue(ClaimValue
-                                                                                            .builder()
-                                                                                            .statementOfValueInPennies(
-                                                                                                new BigDecimal("100000"))
-                                                                                            .build())
+                                                                            .claimValue(new ClaimValue()
+                                                                                            .setStatementOfValueInPennies(
+                                                                                                new BigDecimal("100000")))
                                                                             .respondent1ResponseDeadline(DATE_IN_2025)
                                                                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
@@ -248,11 +242,9 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(
-                                                new BigDecimal("100000"))
-                                            .build())
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(
+                                                new BigDecimal("100000")))
                             .respondToClaimAdmitPartLRspec(
                                 RespondToClaimAdmitPartLRspec
                                     .builder()
@@ -313,9 +305,8 @@ public class DashboardClaimInfoServiceTest {
                             .caseDataLiP(new CaseDataLiP()
                                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                                         .setApplicant1ChoosesHowToProceed(REQUEST_A_CCJ)))
-                            .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                                   .ccjPaymentPaidSomeOption(YesOrNo.NO)
-                                                   .build())
+                            .ccjPaymentDetails(new CCJPaymentDetails()
+                                                   .setCcjPaymentPaidSomeOption(YesOrNo.NO))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -341,11 +332,9 @@ public class DashboardClaimInfoServiceTest {
                                              .individualLastName("Bond")
                                              .type(Party.Type.INDIVIDUAL)
                                              .build())
-                            .claimValue(ClaimValue
-                                            .builder()
-                                            .statementOfValueInPennies(
-                                                new BigDecimal("100000"))
-                                            .build())
+                            .claimValue(new ClaimValue()
+                                            .setStatementOfValueInPennies(
+                                                new BigDecimal("100000")))
                             .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
                             .respondToClaimAdmitPartLRspec(
                                 RespondToClaimAdmitPartLRspec
@@ -486,8 +475,8 @@ public class DashboardClaimInfoServiceTest {
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(
                                 Element.<CaseDocument>builder()
-                                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                                               .createdDatetime(LocalDateTime.now()).build()).build()))
+                                    .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .setCreatedDatetime(LocalDateTime.now())).build()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",

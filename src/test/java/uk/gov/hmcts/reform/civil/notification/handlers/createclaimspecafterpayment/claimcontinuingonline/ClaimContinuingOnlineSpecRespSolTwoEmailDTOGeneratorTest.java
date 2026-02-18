@@ -68,11 +68,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent2ResponseDeadline(LocalDateTime.now())
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID("org2")
-                                .build())
-                        .build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org2")))
                 .build();
 
         Map<String, String> initial = new HashMap<>();

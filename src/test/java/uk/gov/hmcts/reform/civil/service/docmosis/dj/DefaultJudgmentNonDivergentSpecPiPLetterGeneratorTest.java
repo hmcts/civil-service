@@ -65,21 +65,25 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
     private static String fileNameTrial = "PinAndPost.pdf";
     private static final String FILE_NAME = String.format(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER.getDocumentTitle(), CLAIM_REFERENCE);
     private static final String PIN = "1234789";
-    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
-        .documentName(fileNameTrial)
-        .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
-        .documentLink(Document.builder().documentFileName(FILE_NAME).documentBinaryUrl("Binary/url").documentUrl("url").build())
-        .build();
-    private static final Address RESPONDENT_ADDRESS = Address.builder().addressLine1("123 road")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
+    private static final CaseDocument CASE_DOCUMENT_TRIAL = new CaseDocument()
+        .setDocumentName(fileNameTrial)
+        .setDocumentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+        .setDocumentLink(new Document().setDocumentFileName(FILE_NAME).setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
+    private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
     private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
         .type(Party.Type.INDIVIDUAL)
         .individualTitle("Mr.")
         .individualFirstName("Smith")
         .individualLastName("John")
         .build();
+
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
 
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
@@ -91,29 +95,28 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
                         .individualLastName("Smith").build())
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
-        .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
+        .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .defaultJudgmentDocuments(List.of(
             Element.<CaseDocument>builder()
-                .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
-                .documentName("DefendantDJ.pdf")
-                .documentLink(Document.builder().documentFileName("DefendantDJ.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
-                .createdDatetime(LocalDateTime.now()).build()).build()))
+                .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT_DEFENDANT1)
+                .setDocumentName("DefendantDJ.pdf")
+                .setDocumentLink(new Document().setDocumentFileName("DefendantDJ.pdf").setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"))
+                .setCreatedDatetime(LocalDateTime.now())).build()))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
     private static final String DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER_REF = "default-judgment-non-divergent-spec-pin_in_letter";
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build()).build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_IN_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;

@@ -2125,12 +2125,8 @@ public class CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
         addRespondent2 = YES;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -2176,13 +2172,8 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
         defendant1LIPAtClaimIssued = YES;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -2196,13 +2187,8 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -2212,12 +2198,8 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
@@ -2257,9 +2239,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssuedUnregisteredDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -2281,9 +2261,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -2356,12 +2334,8 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
 
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
@@ -2387,12 +2361,8 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
 
         respondent2OrgRegistered = null;
 
@@ -2414,10 +2384,9 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder discontinueClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2429,10 +2398,9 @@ public class CaseDataBuilder {
     public CaseDataBuilder discontinueClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.discontinueClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.discontinueClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2448,20 +2416,18 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder withdrawClaim() {
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
     public CaseDataBuilder withdrawClaimFrom(FlowState.Main flowState) {
         atState(flowState);
         this.ccdState = CASE_DISMISSED;
-        this.withdrawClaim = CloseClaim.builder()
-            .date(LocalDate.now())
-            .reason("My reason")
-            .build();
+        this.withdrawClaim = new CloseClaim()
+            .setDate(LocalDate.now())
+            .setReason("My reason");
         return this;
     }
 
@@ -2476,19 +2442,18 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder courtLocation_old() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127").build();
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127");
         return this;
     }
 
     public CaseDataBuilder courtLocation() {
-        this.courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .caseLocation(new CaseLocationCivil()
+        this.courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("2")
                 .setBaseLocation("000000")
-                )
-            .build();
+                );
         return this;
     }
 
@@ -2523,19 +2488,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2552,22 +2515,14 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -2576,19 +2531,17 @@ public class CaseDataBuilder {
             .applicantSolicitor1Reference("12345")
             .respondentSolicitor1Reference("6789")
             .build();
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("214320")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("214320")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(new CaseLocationCivil()
+            .setCaseLocation(new CaseLocationCivil()
                 .setRegion("10")
                 .setBaseLocation("214320")
-                )
-            .build();
+                );
         uploadParticularsOfClaim = NO;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimType = ClaimType.PERSONAL_INJURY;
         claimTypeUnSpec = ClaimTypeUnspec.CLINICAL_NEGLIGENCE;
         personalInjuryType = ROAD_ACCIDENT;
@@ -2605,22 +2558,14 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[DEFENDANT]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[DEFENDANT]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
-        applicantSolicitor1CheckEmail = CorrectEmail.builder().email("hmcts.civil@gmail.com").correct(YES).build();
+        applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
 
@@ -2807,11 +2752,7 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2SameLegalRepresentative = YES;
         respondent1OrganisationPolicy =
-            OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID("org1").build())
-                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                .orgPolicyReference("org1PolicyReference")
-                .build();
+            organisationPolicy("org1", "[RESPONDENTSOLICITORONE]").setOrgPolicyReference("org1PolicyReference");
         return this;
     }
 
@@ -2966,15 +2907,19 @@ public class CaseDataBuilder {
             .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
 
-        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
-            .documentName("test")
-            .createdDatetime(LocalDateTime.now())
-            .build()));
+        CaseDocument document = new CaseDocument()
+            .setDocumentName("test")
+            .setCreatedDatetime(LocalDateTime.now());
+        this.defaultJudgmentDocuments.addAll(wrapElements(document));
         return this;
     }
 
     private DynamicList getHearingMethodList(String key, String value) {
-        Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
+        Category category = new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(value)
+            .setActiveFlag("Y");
         DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
         hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
         return hearingMethodList;
@@ -3229,8 +3174,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePaymentSuccessfulWithCopyOrganisationOnly() {
         atStatePaymentSuccessful();
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
-        respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
-            .organisation(Organisation.builder().build()).build();
+        respondent1OrganisationPolicy = copyOrganisationPolicy(respondent1OrganisationPolicy)
+            .setOrganisation(new Organisation());
         return this;
     }
 
@@ -3246,12 +3191,8 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3263,12 +3204,8 @@ public class CaseDataBuilder {
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3280,12 +3217,8 @@ public class CaseDataBuilder {
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3310,9 +3243,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent1Represented = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
         addLegalRepDeadline = DEADLINE;
         return this;
     }
@@ -3331,9 +3262,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         addLegalRepDeadline = DEADLINE;
         return this;
     }
@@ -3352,12 +3281,8 @@ public class CaseDataBuilder {
                 .label(caseRole)
                 .build())
             .build());
-        request.setOrganisationToAdd(Organisation.builder()
-            .organisationID(newOrgID)
-            .build());
-        request.setOrganisationToRemove(Organisation.builder()
-            .organisationID(oldOrgId)
-            .build());
+        request.setOrganisationToAdd(new Organisation().setOrganisationID(newOrgID));
+        request.setOrganisationToRemove(new Organisation().setOrganisationID(oldOrgId));
         request.setApprovalStatus(ChangeOrganisationApprovalStatus.APPROVED);
         changeOrganisationRequest = request;
         return this;
@@ -3368,35 +3293,26 @@ public class CaseDataBuilder {
         String caseRole = isApplicant ? CaseRole.APPLICANTSOLICITORONE.getFormattedName() :
             isRespondent2Replaced ? CaseRole.RESPONDENTSOLICITORTWO.getFormattedName() :
                 CaseRole.RESPONDENTSOLICITORONE.getFormattedName();
-        ChangeOfRepresentation.ChangeOfRepresentationBuilder newChangeBuilder = ChangeOfRepresentation.builder()
-            .caseRole(caseRole)
-            .organisationToAddID(newOrgID)
-            .organisationToRemoveID(oldOrgId)
-            .timestamp(LocalDateTime.now());
-        if (oldOrgId != null) {
-            newChangeBuilder.organisationToRemoveID(oldOrgId);
-        }
+        ChangeOfRepresentation newChange = new ChangeOfRepresentation()
+            .setCaseRole(caseRole)
+            .setOrganisationToAddID(newOrgID)
+            .setOrganisationToRemoveID(oldOrgId)
+            .setTimestamp(LocalDateTime.now());
         if (formerSolicitorEmail != null) {
-            newChangeBuilder.formerRepresentationEmailAddress(formerSolicitorEmail);
+            newChange.setFormerRepresentationEmailAddress(formerSolicitorEmail);
         }
-        changeOfRepresentation = newChangeBuilder.build();
+        changeOfRepresentation = newChange;
         return this;
     }
 
     public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2, String newOrgId) {
         if (isApplicant) {
-            applicant1OrganisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID(newOrgId).build())
-                .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build();
+            applicant1OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         } else {
             if (isRespondent2) {
-                respondent2OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID(newOrgId).build())
-                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build();
+                respondent2OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
             } else {
-                respondent1OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID(newOrgId).build())
-                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build();
+                respondent1OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
             }
         }
         return this;
@@ -3435,9 +3351,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent1Represented = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
         defendant1LIPAtClaimIssued = YES;
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         cosNotifyClaimDefendant1 = certificateOfService;
@@ -3449,9 +3363,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
@@ -3698,19 +3610,17 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder takenOfflineByStaff() {
-        claimProceedsInCaseman = ClaimProceedsInCaseman.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCaseman = new ClaimProceedsInCaseman()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
 
     public CaseDataBuilder takenOfflineByStaffSpec() {
-        claimProceedsInCasemanLR = ClaimProceedsInCasemanLR.builder()
-            .date(LocalDate.now())
-            .reason(ReasonForProceedingOnPaper.APPLICATION)
-            .build();
+        claimProceedsInCasemanLR = new ClaimProceedsInCasemanLR()
+            .setDate(LocalDate.now())
+            .setReason(ReasonForProceedingOnPaper.APPLICATION);
         takenOfflineByStaffDate = LocalDateTime.now();
         return this;
     }
@@ -5610,9 +5520,8 @@ public class CaseDataBuilder {
                     .build())
 
                 .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .businessProcess(BusinessProcess.builder()
-                    .camundaEvent("NotifyRoboticsOnCaseHandedOffline")
-                    .build())
+                .businessProcess(new BusinessProcess()
+                    .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline"))
                 .build());
 
         this.generalApplications = generalApplicationValues;
@@ -5992,8 +5901,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6007,7 +5915,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
@@ -6019,18 +5927,16 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithoutServiceRequestReference() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6042,13 +5948,12 @@ public class CaseDataBuilder {
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build()).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6061,7 +5966,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
@@ -6111,19 +6016,16 @@ public class CaseDataBuilder {
     public CaseData withHearingFeePBADetailsNoPaymentStatus() {
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .claimValue(ClaimValue.builder()
-                .statementOfValueInPennies(BigDecimal.valueOf(10800))
-                .build())
+            .claimValue(new ClaimValue()
+                .setStatementOfValueInPennies(BigDecimal.valueOf(10800)))
             .allocatedTrack(SMALL_CLAIM)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
-                Organisation.builder()
-                    .organisationID("OrgId").build()).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                new Organisation().setOrganisationID("OrgId")))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDate() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6136,15 +6038,14 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6157,26 +6058,24 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6189,7 +6088,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
@@ -6203,8 +6102,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildClaimIssuedPaymentCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6215,7 +6113,7 @@ public class CaseDataBuilder {
                     .calculatedAmountInPence(BigDecimal.valueOf(27500))
                     .version("1")
                     .build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .applicant1(Party.builder()
                 .individualFirstName("First name")
                 .individualLastName("Second name")
@@ -6233,14 +6131,13 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildPaymentFailureCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
@@ -6255,19 +6152,18 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildPaymentSuccessfulCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .claimIssuedPBADetails(
                 SRPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(
@@ -6286,7 +6182,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
@@ -6343,6 +6239,14 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress() {
+        Address oldAddress = new Address();
+        oldAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+        oldAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+        oldAddress.setCounty("Line 1 test again for more than 35 characters");
+        oldAddress.setPostCode("Line 1 test again for more than 35 characters");
+        oldAddress.setPostTown("Line 1 test again for more than 35 characters");
+
         return build().toBuilder()
             .ccdState(All_FINAL_ORDERS_ISSUED)
             .joJudgmentRecordReason(JudgmentRecordedReason.JUDGE_ORDER)
@@ -6360,14 +6264,7 @@ public class CaseDataBuilder {
                 .partyName(
                     "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
                 .partyEmail("respondent1@gmail.com")
-                .primaryAddress(Address.builder()
-                    .addressLine1("Line 1 test again for more than 35 characters")
-                    .addressLine2("Line 1 test again for more than 35 characters")
-                    .addressLine3("Line 1 test again for more than 35 characters")
-                    .county("Line 1 test again for more than 35 characters")
-                    .postCode("Line 1 test again for more than 35 characters")
-                    .postTown("Line 1 test again for more than 35 characters")
-                    .build())
+                .primaryAddress(oldAddress)
                 .build())
             .joIsRegisteredWithRTL(YES).build();
     }
@@ -6553,35 +6450,33 @@ public class CaseDataBuilder {
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
                                                       LocalDate cos1Date, LocalDate deemed1Date, LocalDate cos2Date, LocalDate deemed2Date,
                                                       boolean file1, boolean file2) {
-        List<Element<Document>> files = wrapElements(Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build());
-        List<Element<Document>> files2 = wrapElements(Document.builder()
-            .documentUrl("fake-url2")
-            .documentFileName("file-name2")
-            .documentBinaryUrl("binary-url2")
-            .build());
+        List<Element<Document>> files = wrapElements(new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url"));
+        List<Element<Document>> files2 = wrapElements(new Document()
+            .setDocumentUrl("fake-url2")
+            .setDocumentFileName("file-name2")
+            .setDocumentBinaryUrl("binary-url2"));
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
-            CertificateOfService.CertificateOfServiceBuilder cos1Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos1Date)
-                .cosDateDeemedServedForDefendant(deemed1Date);
+            CertificateOfService cos1 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos1Date)
+                .setCosDateDeemedServedForDefendant(deemed1Date);
             if (file1) {
-                cos1Builder.cosEvidenceDocument(files);
+                cos1.setCosEvidenceDocument(files);
             }
-            this.cosNotifyClaimDetails1 = cos1Builder.build();
+            this.cosNotifyClaimDetails1 = cos1;
         }
         if (setCos2) {
-            CertificateOfService.CertificateOfServiceBuilder cos2Builder = CertificateOfService.builder()
-                .cosDateOfServiceForDefendant(cos2Date)
-                .cosDateDeemedServedForDefendant(deemed2Date);
+            CertificateOfService cos2 = new CertificateOfService()
+                .setCosDateOfServiceForDefendant(cos2Date)
+                .setCosDateDeemedServedForDefendant(deemed2Date);
             if (file2) {
-                cos2Builder.cosEvidenceDocument(files2);
+                cos2.setCosEvidenceDocument(files2);
             }
-            this.cosNotifyClaimDetails2 = cos2Builder.build();
+            this.cosNotifyClaimDetails2 = cos2;
         }
         return this;
     }
@@ -7628,9 +7523,8 @@ public class CaseDataBuilder {
     public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
         MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
         statement.setYourName("My name");
-        statement.setDocument(Document.builder()
-            .documentFileName("Mediation non attendance")
-            .build());
+        statement.setDocument(new Document()
+            .setDocumentFileName("Mediation non attendance"));
         statement.setDocumentDate(LocalDate.of(2023, 4, 2));
         statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
         return wrapElements(statement);
@@ -7639,9 +7533,8 @@ public class CaseDataBuilder {
     private List<Element<MediationDocumentsReferredInStatement>> buildMediationDocumentsReferred() {
         MediationDocumentsReferredInStatement statement = new MediationDocumentsReferredInStatement();
         statement.setDocumentType("type");
-        statement.setDocument(Document.builder()
-            .documentFileName("Referred documents")
-            .build());
+        statement.setDocument(new Document()
+            .setDocumentFileName("Referred documents"));
         statement.setDocumentDate(LocalDate.of(2023, 4, 2));
         statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
         return wrapElements(statement);
@@ -8049,5 +7942,26 @@ public class CaseDataBuilder {
     public CaseDataBuilder ccdCaseReference(long ref) {
         this.ccdCaseReference = ref;
         return this;
+    }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
     }
 }

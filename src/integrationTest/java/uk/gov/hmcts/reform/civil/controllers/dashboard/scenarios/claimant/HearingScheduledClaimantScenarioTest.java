@@ -66,9 +66,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                               .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
 
         // When
         handler.handle(callbackParams);
@@ -152,15 +151,14 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
 
         // When
         handler.handle(callbackParams);
@@ -245,9 +243,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         // When
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
 
         // When
         handler.handle(callbackParams);
@@ -319,7 +316,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
-            .businessProcess(BusinessProcess.builder().processInstanceId("").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(""))
             .totalClaimAmount(new BigDecimal(10))
             .responseClaimTrack("SMALL_CLAIM")
             .allocatedTrack(null)
@@ -327,9 +324,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
 
         // When
         handler.handle(callbackParams);

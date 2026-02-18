@@ -1513,13 +1513,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -1551,13 +1549,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -1589,13 +1585,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -1625,13 +1619,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -1674,13 +1666,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -1716,13 +1706,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -2102,13 +2090,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .judicialListForHearing(GAJudgesHearingListGAspec.builder()
                                             .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                             .judicialTimeEstimate(GAHearingDuration.HOURS_2).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -2149,13 +2135,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
         }
@@ -2238,8 +2222,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateFinalOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
-            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(CaseDocument
-                                                                               .builder().documentLink(Document.builder().build()).build());
+            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(new Document()));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
@@ -2917,13 +2900,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
                                                .makeAnOrder(orderOption)
@@ -3173,13 +3154,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     GAApplicationType
                         .builder()
                         .types(types).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.STARTED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.STARTED)
+                                     .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
                                                .makeAnOrder(APPROVE_OR_EDIT)
@@ -3446,13 +3425,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .judicialListForHearing(GAJudgesHearingListGAspec.builder()
                                             .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                             .hearingPreferredLocation(getLocationDynamicList()).build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.FINISHED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.FINISHED)
+                                     .setActivityId(ACTIVITY_ID))
                 .build();
         }
 
@@ -3468,13 +3445,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .judicialListForHearing(GAJudgesHearingListGAspec.builder()
                                             .hearingPreferencesPreferredType(GAJudicialHearingType.TELEPHONE)
                                             .build())
-                .businessProcess(BusinessProcess
-                                     .builder()
-                                     .camundaEvent(CAMUNDA_EVENT)
-                                     .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                     .status(BusinessProcessStatus.FINISHED)
-                                     .activityId(ACTIVITY_ID)
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setCamundaEvent(CAMUNDA_EVENT)
+                                     .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                     .setStatus(BusinessProcessStatus.FINISHED)
+                                     .setActivityId(ACTIVITY_ID))
                 .build();
         }
     }
@@ -3593,13 +3568,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                             GAApplicationType
                                     .builder()
                                     .types(types).build())
-                    .businessProcess(BusinessProcess
-                            .builder()
-                            .camundaEvent(CAMUNDA_EVENT)
-                            .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                            .status(BusinessProcessStatus.STARTED)
-                            .activityId(ACTIVITY_ID)
-                            .build())
+                    .businessProcess(new BusinessProcess()
+                            .setCamundaEvent(CAMUNDA_EVENT)
+                            .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                            .setStatus(BusinessProcessStatus.STARTED)
+                            .setActivityId(ACTIVITY_ID))
                     .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                     .judicialDecision(decision)
                     .build();
@@ -3637,13 +3610,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -3714,13 +3685,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -3757,13 +3726,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -3806,13 +3773,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -3857,13 +3822,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }
@@ -3984,13 +3947,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }

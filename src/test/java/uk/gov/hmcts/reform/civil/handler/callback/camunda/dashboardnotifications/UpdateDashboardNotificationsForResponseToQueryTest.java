@@ -87,7 +87,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             .qmLatestQuery(createLatestQuery("queryId"))
             .queries(claimantQueries)
             .legacyCaseReference("reference")
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 
@@ -132,7 +132,7 @@ public class UpdateDashboardNotificationsForResponseToQueryTest extends BaseCall
             .queries(defendantQueries)
             .legacyCaseReference("reference")
             .respondent1Represented(YesOrNo.NO)
-            .businessProcess(BusinessProcess.builder().processInstanceId("1234").build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId("1234"))
             .ccdCaseReference(1234L)
             .build();
 

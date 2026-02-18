@@ -79,30 +79,24 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument caseDocument =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(DocumentType.RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     @BeforeEach
     void setup() {
         given(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .willReturn(DefendantPinToPostLRspec.builder()
-                            .accessCode(
-                                AccessCodeGenerator.generateAccessCode())
-                            .respondentCaseRole(
-                                CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-                            .expiryDate(LocalDate.now().plusDays(
-                                180))
-                            .build());
+            .willReturn(new DefendantPinToPostLRspec()
+                            .setAccessCode(AccessCodeGenerator.generateAccessCode())
+                            .setRespondentCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+                            .setExpiryDate(LocalDate.now().plusDays(180)));
         given(documentGeneratorService.generateDocmosisDocument(
             any(MappableObject.class),
             eq(RECORD_JUDGMENT_DETERMINATION_OF_MEANS_LIP_DEFENDANT_LETTER)
