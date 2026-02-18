@@ -4,6 +4,7 @@ import com.microsoft.applicationinsights.TelemetryClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,24 +27,19 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 
 @SpringJUnitWebConfig
-@SpringBootTest(properties = {
-    "spring.flyway.enabled=false",
-    "spring.datasource.url=jdbc:h2:mem:testdb",
-    "spring.jpa.hibernate.ddl-auto=none"
-})
+@SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
 class OpenAPIPublisherTest {
 
+    @Autowired
     private MockMvc mvc;
-    private final WebApplicationContext wac;
+
+    @Autowired
+    private WebApplicationContext wac;
 
     @MockBean
     private TelemetryClient telemetryClient;
-
-    OpenAPIPublisherTest(WebApplicationContext wac) {
-        this.wac = wac;
-    }
 
     @BeforeEach
     void setUp() {
