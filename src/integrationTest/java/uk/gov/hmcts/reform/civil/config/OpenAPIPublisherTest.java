@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 
 @SpringJUnitWebConfig
-@SpringBootTest
+@SpringBootTest(properties = "spring.flyway.enabled=false")
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
 class OpenAPIPublisherTest {
