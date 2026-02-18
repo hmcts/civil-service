@@ -11749,8 +11749,8 @@ class EventHistoryMapperTest {
         LocalDate defendantFinalPaymentDate = LocalDate.of(2024, 1, 4);
         LocalDateTime markPaidInFullIssueDate = LocalDateTime.of(2024, 1, 2, 9, 0, 0);
         LocalDateTime joDefendantMarkedPaidInFullIssueDate = LocalDateTime.of(2024, 1, 3, 16, 0, 0);
-        CaseDocument caseDocument =
-                CaseDocument.builder().documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT).build();
+        CaseDocument caseDocument = new CaseDocument()
+                .setDocumentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT);
 
         @BeforeEach
         void setup() {
