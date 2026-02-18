@@ -13,9 +13,9 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.citizenui.FeePaymentOutcomeDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
@@ -28,6 +28,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS_GASPEC;
+
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_DISMISSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_ADDITIONAL_INFORMATION;
@@ -51,14 +52,15 @@ import static uk.gov.hmcts.reform.civil.ga.utils.RespondentsResponsesUtil.isResp
 public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
     private static final List<CaseEvent> EVENTS = List.of(END_BUSINESS_PROCESS_GASPEC);
-
+    private static final String FREE_KEYWORD = "FREE";
+    private static final Set<CaseState> NON_UPDATABLE_STATES = Set.of(
+        AWAITING_DIRECTIONS_ORDER_DOCS,
+        AWAITING_ADDITIONAL_INFORMATION,
+        AWAITING_WRITTEN_REPRESENTATIONS
+    );
     private final CaseDetailsConverter caseDetailsConverter;
     private final GaForLipService gaForLipService;
     private final ParentCaseUpdateHelper parentCaseUpdateHelper;
-    private static final String FREE_KEYWORD = "FREE";
-    private static final Set<CaseState> NON_UPDATABLE_STATES = Set.of(
-        AWAITING_DIRECTIONS_ORDER_DOCS, AWAITING_ADDITIONAL_INFORMATION, AWAITING_WRITTEN_REPRESENTATIONS
-    );
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -71,16 +73,21 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
     }
 
     private CallbackResponse endBusinessProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        Long caseId = data.getCcdCaseReference();
+        var data = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
+        var caseId = data.getCcdCaseReference();
         log.info("End general application business process for caseId: {}", caseId);
 
         if (shouldSyncJudgeAndRespondentAfterPayment(data)) {
+            /*
+            * GA for LIP
+            * When payment is done via Service Request for GA then,
+            * Add GA into collections
+            * */
             log.info("Updating Judge And Respondent Collection After Payment, caseId: {}", caseId);
             parentCaseUpdateHelper.updateJudgeAndRespondentCollectionAfterPayment(data);
         }
 
-        CaseState newState = determineNewState(data, caseId);
+        var newState = determineNewState(data, caseId);
 
         if (isStateUpdateAllowed(data.getCcdState())) {
             log.info("Updating Parent With GA State, newState: {}, caseId: {}", newState.name(), caseId);
@@ -93,8 +100,8 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
     }
 
     private boolean shouldSyncJudgeAndRespondentAfterPayment(GeneralApplicationCaseData data) {
-        boolean isAwaitingPayment = AWAITING_APPLICATION_PAYMENT.equals(data.getCcdState());
-        boolean isFreeFee = hasFreeFeeCode(data);
+        var isAwaitingPayment = AWAITING_APPLICATION_PAYMENT.equals(data.getCcdState());
+        var isFreeFee = hasFreeFeeCode(data);
 
         if (!gaForLipService.isGaForLip(data)) {
             return isAwaitingPayment || isFreeFee;
@@ -105,6 +112,11 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
 
     private void syncHwfCollectionIfRequired(GeneralApplicationCaseData data, Long caseId) {
         if (gaForLipService.isGaForLip(data) && isHelpWithFeesRequested(data)) {
+            /*
+             * GA for LIP
+             * When Caseworker should have access to GA to perform HelpWithFee then,
+             * Add GA into collections
+             * */
             log.info("Updating master collection for HWF, caseId: {}", caseId);
             parentCaseUpdateHelper.updateMasterCollectionForHwf(data);
         }
@@ -112,9 +124,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
 
     private boolean isHelpWithFeesRequested(GeneralApplicationCaseData data) {
         return Optional.ofNullable(data.getGeneralAppHelpWithFees())
-            .map(HelpWithFees::getHelpWithFee)
-            .filter(YES::equals)
-            .isPresent();
+            .map(HelpWithFees::getHelpWithFee).filter(YES::equals).isPresent();
     }
 
     private boolean isStateUpdateAllowed(CaseState currentState) {
@@ -135,7 +145,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
             return determineOrderState(data);
         }
 
-        List<GeneralApplicationTypes> types = Optional.ofNullable(data.getGeneralAppType())
+        var types = Optional.ofNullable(data.getGeneralAppType())
             .map(GAApplicationType::getTypes).orElse(List.of());
 
         if (types.contains(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
@@ -143,7 +153,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         }
 
         var snapshot = data.toBuilder().build();
-        boolean respondentsSatisfied = isRespondentsResponseSatisfied(data, snapshot);
+        var respondentsSatisfied = isRespondentsResponseSatisfied(data, snapshot);
 
         if (isVaryPaymentTermsProceedsInHeritage(data, types, respondentsSatisfied)) {
             return PROCEEDS_IN_HERITAGE;
@@ -153,7 +163,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
     }
 
     private CaseState determineOrderState(GeneralApplicationCaseData data) {
-        boolean needsListing = ASSISTED_ORDER.equals(data.getFinalOrderSelection())
+        var needsListing = ASSISTED_ORDER.equals(data.getFinalOrderSelection())
             && data.getAssistedOrderFurtherHearingDetails() != null;
         return needsListing ? LISTING_FOR_A_HEARING : ORDER_MADE;
     }
@@ -167,23 +177,21 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
     }
 
     private CaseState determineStandardState(GeneralApplicationCaseData data, boolean respondentsSatisfied) {
-        boolean notifyCriteria = isNotificationCriteriaSatisfied(data);
+        var notifyCriteria = isNotificationCriteriaSatisfied(data);
         return (notifyCriteria && !respondentsSatisfied)
-            ? AWAITING_RESPONDENT_RESPONSE : APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
+            ? AWAITING_RESPONDENT_RESPONSE
+            : APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;
     }
 
-    private CallbackResponse prepareResponse(CallbackParams callbackParams,
-                                             CaseState newState) {
-        log.info("Preparing response, newState: {}, for caseId: {}",
-                 newState.name(),
-                 callbackParams.getGeneralApplicationCaseData().getCcdCaseReference());
+    private CallbackResponse prepareResponse(CallbackParams callbackParams, CaseState newState) {
+        log.info(
+            "Preparing response, newState: {}, for caseId: {}",
+            newState.name(),
+            callbackParams.getGeneralApplicationCaseData().getCcdCaseReference()
+        );
 
-        Map<String, Object> output = callbackParams.getRequest().getCaseDetails().getData();
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .state(newState.toString())
-            .data(output)
-            .build();
+        var output = callbackParams.getRequest().getCaseDetails().getData();
+        return AboutToStartOrSubmitCallbackResponse.builder().state(newState.toString()).data(output).build();
     }
 
     private boolean hasFreeFeeCode(GeneralApplicationCaseData data) {
