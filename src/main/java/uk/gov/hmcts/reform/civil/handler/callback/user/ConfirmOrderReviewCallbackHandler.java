@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
@@ -178,14 +178,22 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
     }
 
     private YesOrNo shouldEvidenceUploadEventBeAvailable(CaseData caseData) {
-        AllocatedTrack allocatedTrack = caseData.getAllocatedTrack();
         YesOrNo eaCourtLocation = caseData.getEaCourtLocation();
         boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
-        log.info("Evidence upload event eaCourtLocation {} is for caseId {}", eaFlag, caseData.getCcdCaseReference());
-        boolean result = (AllocatedTrack.MULTI_CLAIM.equals(allocatedTrack) || AllocatedTrack.INTERMEDIATE_CLAIM.equals(allocatedTrack))
-                     && eaFlag;
-        log.info("Evidence upload event is enabled for minti claim {} for caseId {}", result, caseData.getCcdCaseReference());
+        boolean result = isMultiOrIntTrack(caseData) && eaFlag;
+        log.info("Evidence upload event is enabled for minti claim {}, eaCourtLocation {}, for caseId {}",
+                 result, eaFlag, caseData.getCcdCaseReference());
         return result ? YesOrNo.YES : YesOrNo.NO;
+    }
+
+    private boolean isMultiOrIntTrack(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        } else {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack());
+        }
     }
 
     private CallbackResponse fillConfirmationScreen(CallbackParams callbackParams) {

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
@@ -185,8 +186,23 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_v2() {
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_spec_v2() {
             CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+        }
+
+        @Test
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_unspec_v3() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
             caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
             caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(NO);
