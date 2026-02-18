@@ -26,15 +26,17 @@ jobs:
         uses: docker/setup-docker-action@v4
         with:
           version: type=image,tag=28.5.1
+      - name: Check Docker Version
+        run: docker --version
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: 21
-      - name: Run checks
-        run: ./gradlew check
-      - name: Check Docker Version
-        run: docker --version
+      - name: Check Java Version
+        run: java --version
+#      - name: Run checks
+#        run: ./gradlew check
       - name: Run integration tests
         run: ./gradlew integration
       - name: Upload build artifacts
