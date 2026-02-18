@@ -57,9 +57,8 @@ class DjOrderDetailsServiceTest {
             .build();
         DirectionsOrderTaskContext context = new DirectionsOrderTaskContext(
             caseData,
-            CallbackParams.builder()
-                .params(Map.of(BEARER_TOKEN, TOKEN))
-                .build(),
+            new CallbackParams()
+                .params(Map.of(BEARER_TOKEN, TOKEN)),
             DirectionsOrderLifecycleStage.ORDER_DETAILS
         );
         when(locationAndToggleService.prepareLocationsAndToggles(context)).thenReturn(caseData);
@@ -77,7 +76,7 @@ class DjOrderDetailsServiceTest {
     @Test
     void shouldApplyHearingSelectionsViaLocationService() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams params = CallbackParams.builder().version(null).build();
+        CallbackParams params = new CallbackParams().version(null);
 
         service.applyHearingSelections(caseData, params.getVersion());
 

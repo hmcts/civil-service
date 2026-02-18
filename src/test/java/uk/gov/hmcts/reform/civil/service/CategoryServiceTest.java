@@ -45,7 +45,7 @@ class CategoryServiceTest {
         "forbidden response body".getBytes(UTF_8),
         Map.of());
 
-    private final CategorySearchResult categorySearchResult = CategorySearchResult.builder().build();
+    private final CategorySearchResult categorySearchResult = new CategorySearchResult();
 
     @Mock
     private ListOfValuesApi listOfValuesApi;
