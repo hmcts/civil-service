@@ -9,19 +9,18 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
-import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
-import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
-import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
-import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
+import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
+import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
+import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.ga.service.docmosis.GeneralApplicationDraftGenerator;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
-import uk.gov.hmcts.reform.civil.ga.service.docmosis.GeneralApplicationDraftGenerator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
 import java.util.ArrayList;
@@ -36,8 +35,8 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DRAFT_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.RespondentsResponsesUtil.isRespondentsResponseSatisfied;
+import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @Service
@@ -69,7 +68,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
         return EVENTS;
     }
 
-    // Generate Draft Document if it's Urgent application and fee is FREE
+    // Generate Draft Document if it's an Urgent application and the fee is FREE
     private boolean isApplicationUrgentAndFreeFee(GeneralApplicationCaseData caseData) {
         return generalAppFeesService.isFreeApplication(caseData)
             && Optional.ofNullable(caseData.getGeneralAppUrgencyRequirement())
@@ -78,20 +77,18 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             .isPresent();
     }
 
-    // Generate Draft Document if it's Urgent application and after fee is paid
-    // Initiate General application after payment camunda task started
+    // Generate Draft Document if it's an Urgent application and after fee is paid
+    // Initiate General application after a payment camunda task started
     private boolean isApplicationUrgentAndFeePaid(GeneralApplicationCaseData caseData) {
-        return isFeePaid(caseData)
-            && Optional.ofNullable(caseData.getGeneralAppUrgencyRequirement())
+        return isFeePaid(caseData) && Optional.ofNullable(caseData.getGeneralAppUrgencyRequirement())
             .map(GAUrgencyRequirement::getGeneralAppUrgency)
             .filter(YES::equals)
             .isPresent();
     }
 
-    // Generate Draft Document if it's non-urgent, without notice and after fee is paid
+    // Generate a Draft Document if it's non-urgent, without notice and after a fee is paid
     private boolean isGANonUrgentWithOutNoticeFeePaid(GeneralApplicationCaseData caseData) {
-        return isFeePaid(caseData)
-            && Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
+        return isFeePaid(caseData) && Optional.ofNullable(caseData.getGeneralAppInformOtherParty())
             .map(GAInformOtherParty::getIsWithNotice)
             .filter(NO::equals)
             .isPresent();
@@ -99,15 +96,16 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
     private boolean isFeePaid(GeneralApplicationCaseData caseData) {
         return Optional.ofNullable(caseData.getGeneralAppPBADetails())
-            .filter(pba -> pba.getFee() != null && !"FREE".equalsIgnoreCase(pba.getFee().getCode()))
+            .filter(pba ->
+                        pba.getFee() != null && !"FREE".equalsIgnoreCase(pba.getFee().getCode()))
             .map(GeneralApplicationPbaDetails::getPaymentDetails)
             .filter(payment -> payment.getStatus() == PaymentStatus.SUCCESS)
             .isPresent();
     }
 
     private CallbackResponse createPDFdocument(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        var caseData = callbackParams.getGeneralApplicationCaseData();
+        var caseDataBuilder = caseData.toBuilder();
 
         if (gaForLipService.isGaForLip(caseData)) {
             handleLipDraftGeneration(callbackParams, caseData, caseDataBuilder);
@@ -115,17 +113,14 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             handleNonLipDraftGeneration(callbackParams, caseData, caseDataBuilder);
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(objectMapper))
-            .build();
+        return AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
     }
 
     private void handleLipDraftGeneration(CallbackParams callbackParams,
                                           GeneralApplicationCaseData caseData,
                                           GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
         if (generalAppFeesService.isFreeApplication(caseData) || isFeePaid(caseData)) {
-            CaseDocument gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
-
+            var gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
             if (shouldUseWelshTranslation(caseData)) {
                 updateWelshTranslationDocuments(caseData, caseDataBuilder, gaDraftDocument);
             } else {
@@ -143,7 +138,8 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     private void updateWelshTranslationDocuments(GeneralApplicationCaseData caseData,
                                                  GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
                                                  CaseDocument gaDraftDocument) {
-        List<Element<CaseDocument>> preTranslatedDocuments = Optional.ofNullable(caseData.getPreTranslationGaDocuments())
+        var preTranslatedDocuments = Optional.ofNullable(
+            caseData.getPreTranslationGaDocuments())
             .orElseGet(ArrayList::new);
         preTranslatedDocuments.add(element(gaDraftDocument));
 
@@ -153,19 +149,18 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             AssignCategoryId.APPLICATIONS
         );
 
-        PreTranslationGaDocumentType docType = (caseData.getRespondentsResponses() != null && !caseData.getRespondentsResponses().isEmpty())
+        var docType = (caseData.getRespondentsResponses() != null
+            && !caseData.getRespondentsResponses().isEmpty())
             ? PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC
             : PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC;
 
-        caseDataBuilder.preTranslationGaDocumentType(docType)
-            .preTranslationGaDocuments(preTranslatedDocuments);
+        caseDataBuilder.preTranslationGaDocumentType(docType).preTranslationGaDocuments(preTranslatedDocuments);
     }
 
     private void updateDraftApplicationList(GeneralApplicationCaseData caseData,
                                             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseDocument gaDraftDocument) {
-        List<Element<CaseDocument>> draftApplicationList = Optional.ofNullable(caseData.getGaDraftDocument())
-            .orElseGet(ArrayList::new);
+        var draftApplicationList = Optional.ofNullable(caseData.getGaDraftDocument()).orElseGet(ArrayList::new);
         draftApplicationList.add(element(gaDraftDocument));
 
         assignCategoryId.assignCategoryIdToCollection(
@@ -179,9 +174,15 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     private void handleNonLipDraftGeneration(CallbackParams callbackParams,
                                              GeneralApplicationCaseData caseData,
                                              GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+        /*
+        1. Draft document should not be generated if judge had made the decision on application
+        2. Draft document should be generated only if all the respondents responded in Multiparty
+        3. Draft document should be generated only if Free fee application
+        4. Draft document should be generated only after payment is made for urgent application and without notice
+        */
         if (shouldGenerateNonLipDraft(caseData, caseDataBuilder.build())) {
-            CaseDocument gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
-            List<Element<CaseDocument>> draftApplicationList = wrapElements(gaDraftDocument);
+            var gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
+            var draftApplicationList = wrapElements(gaDraftDocument);
 
             assignCategoryId.assignCategoryIdToCollection(
                 draftApplicationList,
@@ -201,10 +202,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     }
 
     private CaseDocument generateDraftDocument(CallbackParams callbackParams, GeneralApplicationCaseData caseData) {
-        return gaDraftGenerator.generate(
-            caseData,
-            callbackParams.getParams().get(BEARER_TOKEN).toString()
-        );
+        return gaDraftGenerator.generate(caseData, callbackParams.getParams().get(BEARER_TOKEN).toString());
     }
 
 }

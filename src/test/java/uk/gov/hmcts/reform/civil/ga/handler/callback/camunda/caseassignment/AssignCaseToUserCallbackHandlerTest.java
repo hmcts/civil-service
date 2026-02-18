@@ -824,7 +824,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response
                     = (AboutToStartOrSubmitCallbackResponse)
                     assignCaseToUserHandler.handle(params);
-            assertThat(response.getData()).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -833,7 +833,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response
                     = (AboutToStartOrSubmitCallbackResponse)
                     assignCaseToUserHandler.handle(params);
-            assertThat(response.getData()).isNotNull();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
@@ -851,7 +851,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
 
-            assertThat(response.getErrors()).isNull();
+            assertThat(response.getErrors()).isEmpty();
         }
 
         @Test
