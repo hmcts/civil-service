@@ -611,11 +611,7 @@ class CaseDataTest {
         //Given
         String organisationId = "1245";
         CaseData caseData = CaseData.builder()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .build();
         //When
         String result = caseData.getApplicantOrganisationId();
@@ -647,7 +643,7 @@ class CaseDataTest {
     void isTranslatedDocumentUploaded_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DEFENCE_TRANSLATED_DOCUMENT).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DEFENCE_TRANSLATED_DOCUMENT))).build();
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
@@ -656,7 +652,7 @@ class CaseDataTest {
     @Test
     void getSDOOrderDocument_WhenItPresent() {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SDO_ORDER))).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
@@ -667,10 +663,10 @@ class CaseDataTest {
     void getSDOOrderDocument_shouldReturnLatest_WhenItPresent() {
         CaseData caseData = CaseData.builder()
             .systemGeneratedCaseDocuments(wrapElements(
-                CaseDocument.builder().documentType(SDO_ORDER)
-                    .createdDatetime(LocalDateTime.now().minusDays(2)).documentName("Doc1").build(),
-                CaseDocument.builder().documentType(SDO_ORDER)
-                    .createdDatetime(LocalDateTime.now().minusDays(1)).documentName("Doc2").build()
+                new CaseDocument().setDocumentType(SDO_ORDER)
+                    .setCreatedDatetime(LocalDateTime.now().minusDays(2)).setDocumentName("Doc1"),
+                new CaseDocument().setDocumentType(SDO_ORDER)
+                    .setCreatedDatetime(LocalDateTime.now().minusDays(1)).setDocumentName("Doc2")
             )).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
@@ -913,12 +909,10 @@ class CaseDataTest {
     void shouldReturnClaimAmountBreakupDetails_whenExists() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimAmountBreakup(List.of(ClaimAmountBreakup.builder()
-                                            .id("1").value(ClaimAmountBreakupDetails.builder()
-                                                               .claimAmount(new BigDecimal("122"))
-                                                               .claimReason("Reason")
-                                                               .build())
-                                            .build()))
+            .claimAmountBreakup(List.of(new ClaimAmountBreakup()
+                                            .setId("1").setValue(new ClaimAmountBreakupDetails()
+                                                               .setClaimAmount(new BigDecimal("122"))
+                                                               .setClaimReason("Reason"))))
             .build();
         //When
         List<ClaimAmountBreakupDetails> result = caseData.getClaimAmountBreakupDetails();
@@ -950,10 +944,8 @@ class CaseDataTest {
     void shouldReturnClaimValueInPounds_whenClaimValuePresent() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimValue(ClaimValue
-                            .builder()
-                            .statementOfValueInPennies(new BigDecimal(1000))
-                            .build())
+            .claimValue(new ClaimValue()
+                            .setStatementOfValueInPennies(new BigDecimal(1000)))
             .build();
         //When
         BigDecimal claimAmount = caseData.getClaimAmountInPounds();
@@ -1334,9 +1326,8 @@ class CaseDataTest {
     class CoSC {
         @Test
         void shouldReturnTrue_CoscCertExists() {
-            CaseDocument caseDocument = CaseDocument.builder()
-                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
-                .build();
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT);
             CaseData caseData = CaseData.builder()
                 .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
@@ -1469,28 +1460,28 @@ class CaseDataTest {
         return Stream.of(
             Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
             Arguments.of(DocumentType.SDO_ORDER,
-                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                         List.of(ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))),
                          Optional.empty()
             ),
             Arguments.of(DocumentType.SDO_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.SDO_ORDER)),
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.SDO_ORDER)))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)),
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)))
             )
         );
     }

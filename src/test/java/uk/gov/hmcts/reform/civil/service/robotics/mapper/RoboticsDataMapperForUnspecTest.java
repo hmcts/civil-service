@@ -417,42 +417,36 @@ class RoboticsDataMapperForUnspecTest {
         caseData.setAllocatedTrack(AllocatedTrack.valueOf(claimTrack));
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
 
-        RoboticsCaseData testHeader = RoboticsCaseData.builder()
-            .header(CaseHeader.builder()
-                        .caseNumber(caseData.getLegacyCaseReference())
-                        .owningCourtCode("807")
-                        .owningCourtName("CCMCC")
-                        .caseType("PERSONAL INJURY")
-                        .preferredCourtCode("121")
-                        .caseAllocatedTo(expectedName)
-                        .build())
-            .build();
+        CaseHeader expectedHeader = new CaseHeader();
+        expectedHeader.setCaseNumber(caseData.getLegacyCaseReference());
+        expectedHeader.setOwningCourtCode("807");
+        expectedHeader.setOwningCourtName("CCMCC");
+        expectedHeader.setCaseType("PERSONAL INJURY");
+        expectedHeader.setPreferredCourtCode("121");
+        expectedHeader.setCaseAllocatedTo(expectedName);
 
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
-        assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
+        assertThat(roboticsCaseData.getHeader()).isEqualTo(expectedHeader);
     }
 
     @Test
     void shouldReturnHeaderWhenPreferredCourtCodeisUnavailableFromLocationRefData() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        RoboticsCaseData testHeader = RoboticsCaseData.builder()
-            .header(CaseHeader.builder()
-                        .caseNumber(caseData.getLegacyCaseReference())
-                        .owningCourtCode("807")
-                        .owningCourtName("CCMCC")
-                        .caseType("CLAIM - UNSPEC ONLY")
-                        .preferredCourtCode("")
-                        .caseAllocatedTo("FAST TRACK")
-                        .build())
-            .build();
+        CaseHeader expectedHeader = new CaseHeader();
+        expectedHeader.setCaseNumber(caseData.getLegacyCaseReference());
+        expectedHeader.setOwningCourtCode("807");
+        expectedHeader.setOwningCourtName("CCMCC");
+        expectedHeader.setCaseType("CLAIM - UNSPEC ONLY");
+        expectedHeader.setPreferredCourtCode("");
+        expectedHeader.setCaseAllocatedTo("FAST TRACK");
 
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
-        assertThat(roboticsCaseData.getHeader()).isEqualTo(testHeader.getHeader());
+        assertThat(roboticsCaseData.getHeader()).isEqualTo(expectedHeader);
     }
 
     @Test
@@ -481,9 +475,9 @@ class RoboticsDataMapperForUnspecTest {
 
         assertThat(roboticsCaseData.getNoticeOfChange()).isEqualTo(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build())
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE)))
         );
     }
 
@@ -513,9 +507,9 @@ class RoboticsDataMapperForUnspecTest {
 
         assertThat(roboticsCaseData.getNoticeOfChange()).isEqualTo(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build())
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE)))
         );
     }
 
@@ -560,8 +554,10 @@ class RoboticsDataMapperForUnspecTest {
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(toDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
     }
 
     private SolicitorOrganisationDetails createSolicitorOrganisationDetails(String orgName, String email, String phone, String fax, String dx) {

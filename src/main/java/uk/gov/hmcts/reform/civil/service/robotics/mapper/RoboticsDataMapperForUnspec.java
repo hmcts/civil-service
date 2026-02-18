@@ -74,51 +74,50 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         var events = eventHistoryMapper.buildEvents(caseData, authToken);
         log.info("RoboticsCaseData Events built: {}", events);
 
-        var roboticsBuilder = RoboticsCaseData.builder()
-            .header(header)
-            .litigiousParties(parties)
-            .claimDetails(claimDetails)
-            .events(events);
+        RoboticsCaseData roboticsCaseData = new RoboticsCaseData()
+            .setHeader(header)
+            .setLitigiousParties(parties)
+            .setClaimDetails(claimDetails)
+            .setEvents(events);
 
         if (!(caseData.isLipvLipOneVOne())) {
-            roboticsBuilder.solicitors(buildSolicitors(caseData));
+            roboticsCaseData.setSolicitors(buildSolicitors(caseData));
         }
 
         if (caseData.getCcdState() == PROCEEDS_IN_HERITAGE_SYSTEM
             || caseData.getCcdState() == CASE_DISMISSED) {
-            roboticsBuilder.noticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
+            roboticsCaseData.setNoticeOfChange(RoboticsDataUtil.buildNoticeOfChange(caseData));
         }
 
-        return roboticsBuilder.build();
+        return roboticsCaseData;
     }
 
     private ClaimDetails buildClaimDetails(CaseData caseData) {
-        ClaimDetails.ClaimDetailsBuilder claimDetailsBuilder = ClaimDetails.builder();
+        ClaimDetails claimDetails = new ClaimDetails();
 
         if (!caseData.isLipvLipOneVOne()) {
-            claimDetailsBuilder.amountClaimed(caseData.getClaimValue().toPounds());
+            claimDetails.setAmountClaimed(caseData.getClaimValue().toPounds());
         }
 
-        return claimDetailsBuilder
-            .courtFee(ofNullable(caseData.getClaimFee())
-                        .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
-                        .orElse(null))
-            .caseIssuedDate(ofNullable(caseData.getIssueDate())
-                        .map(issueDate -> issueDate.format(ISO_DATE))
-                        .orElse(null))
-            .caseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE))
-            .build();
+        claimDetails.setCourtFee(ofNullable(caseData.getClaimFee())
+            .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
+            .orElse(null));
+        claimDetails.setCaseIssuedDate(ofNullable(caseData.getIssueDate())
+            .map(issueDate -> issueDate.format(ISO_DATE))
+            .orElse(null));
+        claimDetails.setCaseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE));
+        return claimDetails;
     }
 
     private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
-        return CaseHeader.builder()
-            .caseNumber(caseData.getLegacyCaseReference())
-            .owningCourtCode("807")
-            .owningCourtName("CCMCC")
-            .caseType(getCaseType(caseData))
-            .preferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true))
-            .caseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack(), caseData.getResponseClaimTrack()))
-            .build();
+        CaseHeader caseHeader = new CaseHeader();
+        caseHeader.setCaseNumber(caseData.getLegacyCaseReference());
+        caseHeader.setOwningCourtCode("807");
+        caseHeader.setOwningCourtName("CCMCC");
+        caseHeader.setCaseType(getCaseType(caseData));
+        caseHeader.setPreferredCourtCode(locationRefDataUtil.getPreferredCourtData(caseData, authToken, true));
+        caseHeader.setCaseAllocatedTo(buildAllocatedTrack(caseData.getAllocatedTrack(), caseData.getResponseClaimTrack()));
+        return caseHeader;
     }
 
     private String getCaseType(CaseData caseData) {
@@ -294,19 +293,18 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         String solicitorId,
         LocalDateTime claimDetailsNotificationDate
     ) {
-        return LitigiousParty.builder()
-            .id(id)
-            .solicitorID(solicitorId)
-            .type(type)
-            .name(PartyUtils.getLitigiousPartyName(party, litigationFriend))
-            .dateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
-            .addresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
-            .dateOfService(ofNullable(claimDetailsNotificationDate)
+        return new LitigiousParty()
+            .setId(id)
+            .setSolicitorID(solicitorId)
+            .setType(type)
+            .setName(PartyUtils.getLitigiousPartyName(party, litigationFriend))
+            .setDateOfBirth(PartyUtils.getDateOfBirth(party).map(d -> d.format(ISO_DATE)).orElse(null))
+            .setAddresses(addressMapper.toRoboticsAddresses(party.getPrimaryAddress()))
+            .setDateOfService(ofNullable(claimDetailsNotificationDate)
                                .map(LocalDateTime::toLocalDate)
                                .map(d -> d.format(ISO_DATE))
                                .orElse(null))
-            .solicitorOrganisationID(organisationId != null ? organisationId : null)
-            .build();
+            .setSolicitorOrganisationID(organisationId);
     }
 
     private Solicitor buildRespondent2Solicitor(CaseData caseData, String id) {

@@ -275,23 +275,24 @@ public class JudgmentsOnlineHelper {
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
 
-        Address newAddress = Address.builder()
-            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
-            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
-            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
-            .postCode(removeWelshCharacters(address.getPostCode()))
-            .postTown(removeWelshCharacters(address.getPostTown()))
-            .county(removeWelshCharacters(address.getCounty()))
-            .country(removeWelshCharacters(address.getCountry())).build();
+        Address newAddress = new Address();
+        newAddress.setAddressLine1(removeWelshCharacters(address.getAddressLine1()));
+        newAddress.setAddressLine2(removeWelshCharacters(address.getAddressLine2()));
+        newAddress.setAddressLine3(removeWelshCharacters(address.getAddressLine3()));
+        newAddress.setPostCode(removeWelshCharacters(address.getPostCode()));
+        newAddress.setPostTown(removeWelshCharacters(address.getPostTown()));
+        newAddress.setCounty(removeWelshCharacters(address.getCounty()));
+        newAddress.setCountry(removeWelshCharacters(address.getCountry()));
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
-        return JudgmentAddress.builder()
-            .defendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()))
-            .defendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()))
-            .defendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()))
-            .defendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()))
-            .defendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()))
-            .defendantPostCode(roboticsAddress.getPostCode()).build();
+        JudgmentAddress judgmentAddress = new JudgmentAddress();
+        judgmentAddress.setDefendantAddressLine1(trimDownTo35(roboticsAddress.getAddressLine1()));
+        judgmentAddress.setDefendantAddressLine2(trimDownTo35(roboticsAddress.getAddressLine2()));
+        judgmentAddress.setDefendantAddressLine3(trimDownTo35(roboticsAddress.getAddressLine3()));
+        judgmentAddress.setDefendantAddressLine4(trimDownTo35(roboticsAddress.getAddressLine4()));
+        judgmentAddress.setDefendantAddressLine5(trimDownTo35(roboticsAddress.getAddressLine5()));
+        judgmentAddress.setDefendantPostCode(roboticsAddress.getPostCode());
+        return judgmentAddress;
     }
 
     public static String removeWelshCharacters(String input) {

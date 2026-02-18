@@ -14,6 +14,7 @@ public class CreateBundleMigrationTask extends MigrationTask<ExcelCaseReference>
     }
 
     public final BundleCreationService bundleCreationService;
+    private static final String BUNDLE_CREATED_NOTIFICATION_EVENT = "BUNDLE_CREATED_NOTIFICATION";
 
     @Override
     protected String getEventSummary() {
@@ -27,6 +28,7 @@ public class CreateBundleMigrationTask extends MigrationTask<ExcelCaseReference>
         }
 
         // Perform the migration
+        caseData.setBundleEvent(BUNDLE_CREATED_NOTIFICATION_EVENT);
         bundleCreationService.createBundle(Long.valueOf(caseReference.getCaseReference()));
         return caseData;
     }

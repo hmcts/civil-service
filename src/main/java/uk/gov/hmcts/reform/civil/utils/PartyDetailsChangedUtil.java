@@ -99,7 +99,7 @@ public class PartyDetailsChangedUtil {
                                          change.getUpdatedValue()))
             .collect(Collectors.joining(" "));
 
-        return ContactDetailsUpdatedEvent.builder().summary(summary).description(description).build();
+        return new ContactDetailsUpdatedEvent().setSummary(summary).setDescription(description);
     }
 
     private boolean hasChanged(Object current, Object updated) {

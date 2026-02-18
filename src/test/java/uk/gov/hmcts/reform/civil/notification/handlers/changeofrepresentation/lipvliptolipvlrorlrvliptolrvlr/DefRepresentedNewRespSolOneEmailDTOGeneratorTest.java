@@ -68,7 +68,7 @@ class DefRepresentedNewRespSolOneEmailDTOGeneratorTest {
                              .individualFirstName("Jane")
                              .individualLastName("Defendant")
                              .partyName("Jane Defendant").build())
-            .changeOfRepresentation(ChangeOfRepresentation.builder().organisationToAddID(orgId).build())
+            .changeOfRepresentation(new ChangeOfRepresentation().setOrganisationToAddID(orgId))
             .build();
 
         Map<String, String> result = generator.addCustomProperties(new HashMap<>(), caseData);

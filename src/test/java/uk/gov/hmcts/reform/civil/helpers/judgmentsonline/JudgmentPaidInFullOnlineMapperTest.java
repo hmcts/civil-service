@@ -33,10 +33,9 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate paymentDate = LocalDate.now();
         LocalDate issueDate = LocalDate.now().minusDays(40);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
         CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
 
@@ -52,14 +51,16 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate defaultPaymentDate = LocalDate.now();
         LocalDate issueDate = LocalDate.now().minusDays(40);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
+
+        JudgmentPaidInFull paidInFull = new JudgmentPaidInFull();
+        paidInFull.setDateOfFullPaymentMade(defaultPaymentDate);
 
         CaseData caseData = CaseData.builder()
             .activeJudgment(activeJudgment)
-            .joJudgmentPaidInFull(JudgmentPaidInFull.builder().dateOfFullPaymentMade(defaultPaymentDate).build())
+            .joJudgmentPaidInFull(paidInFull)
             .build();
 
         JudgmentDetails updatedJudgment = judgmentPaidInFullOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -74,10 +75,9 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate paymentDate = LocalDate.now().minusDays(20);
         LocalDate issueDate = LocalDate.now().minusDays(40);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
         CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
 
@@ -94,10 +94,9 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate paymentDate = LocalDate.now().minusDays(20);
         LocalDate issueDate = LocalDate.now().minusDays(40);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
         CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
 
@@ -113,10 +112,9 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate paymentDate = LocalDate.now().minusDays(35);
         LocalDate issueDate = LocalDate.now().minusDays(70);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
         CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
 
@@ -130,10 +128,9 @@ class JudgmentPaidInFullOnlineMapperTest {
         LocalDate paymentDate = LocalDate.now().minusDays(80);
         LocalDate issueDate = LocalDate.now().minusDays(40);
 
-        JudgmentDetails activeJudgment = JudgmentDetails.builder()
-            .issueDate(issueDate)
-            .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IMMEDIATELY).build())
-            .build();
+        JudgmentDetails activeJudgment = new JudgmentDetails()
+            .setIssueDate(issueDate)
+            .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IMMEDIATELY));
 
         CaseData caseData = CaseData.builder().activeJudgment(activeJudgment).build();
 

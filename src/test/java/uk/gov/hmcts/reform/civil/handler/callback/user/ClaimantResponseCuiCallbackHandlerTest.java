@@ -368,12 +368,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldUpdateCCJRequestPaymentDetails() {
             when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-            CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-                .ccjPaymentPaidSomeOption(YES)
-                .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
-                .ccjJudgmentLipInterest(BigDecimal.valueOf(300))
-                .ccjJudgmentAmountClaimFee(BigDecimal.valueOf(0))
-                .build();
+            CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+                .setCcjPaymentPaidSomeOption(YES)
+                .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(600.0))
+                .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
+                .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build());
             caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build());
@@ -573,10 +572,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddActiveJudgmentWhenClaimantAcceptedRepaymentPlanAndJudgmentOnlineLiveEnabled() {
             when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
-            JudgmentDetails activeJudgment = JudgmentDetails.builder()
-                .totalAmount("10100.00")
-                .claimFeeAmount("100.00")
-                .orderedAmount("10000").build();
+            JudgmentDetails activeJudgment = new JudgmentDetails()
+                .setTotalAmount("10100.00")
+                .setClaimFeeAmount("100.00")
+                .setOrderedAmount("10000");
             given(judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(any()))
                 .willReturn(activeJudgment);
             CaseData caseData = CaseDataBuilder.builder()
@@ -588,11 +587,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .applicant1Represented(NO)
                 .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
                 .applicant1AcceptFullAdmitPaymentPlanSpec(YES)
-                .ccjPaymentDetails(CCJPaymentDetails.builder()
-                                       .ccjPaymentPaidSomeOption(YesOrNo.YES)
-                                       .ccjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
-                                       .ccjJudgmentTotalStillOwed(BigDecimal.valueOf(150))
-                                       .build())
+                .ccjPaymentDetails(new CCJPaymentDetails()
+                                       .setCcjPaymentPaidSomeOption(YesOrNo.YES)
+                                       .setCcjJudgmentFixedCostAmount(BigDecimal.valueOf(10))
+                                       .setCcjJudgmentTotalStillOwed(BigDecimal.valueOf(150)))
                 .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
                 .build();
 

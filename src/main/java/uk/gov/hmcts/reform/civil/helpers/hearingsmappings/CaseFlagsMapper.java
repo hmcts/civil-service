@@ -26,10 +26,10 @@ public class CaseFlagsMapper {
         getAllHearingRelevantCaseFlags(allActiveFlags);
 
         if (allActiveFlags.isEmpty()) {
-            return CaseFlags.builder()
-                .flags(List.of(PartyFlagsModel.builder()
-                           .build()))
-                .build();
+            CaseFlags caseFlags = new CaseFlags();
+            PartyFlagsModel emptyFlag = new PartyFlagsModel();
+            caseFlags.setFlags(List.of(emptyFlag));
+            return caseFlags;
         }
 
         List<PartyFlagsModel> partyFlagsModelList = new ArrayList<>();
@@ -37,22 +37,21 @@ public class CaseFlagsMapper {
         for (PartyFlags activeFlag : allActiveFlags) {
             String partyName = activeFlag.getPartyName();
             for (Element<FlagDetail> flagDetail : activeFlag.getDetails()) {
-                PartyFlagsModel partyFlagModel = PartyFlagsModel.builder()
-                    .partyID(activeFlag.getPartyId())
-                    .partyName(partyName)
-                    .flagParentId("")
-                    .flagId(flagDetail.getValue().getFlagCode())
-                    .flagDescription(flagDetail.getValue().getName())
-                    .flagStatus(ACTIVE_STATUS)
-                    .dateTimeCreated(flagDetail.getValue().getDateTimeCreated())
-                    .dateTimeModified(flagDetail.getValue().getDateTimeModified())
-                    .build();
+                PartyFlagsModel partyFlagModel = new PartyFlagsModel();
+                partyFlagModel.setPartyID(activeFlag.getPartyId());
+                partyFlagModel.setPartyName(partyName);
+                partyFlagModel.setFlagParentId("");
+                partyFlagModel.setFlagId(flagDetail.getValue().getFlagCode());
+                partyFlagModel.setFlagDescription(flagDetail.getValue().getName());
+                partyFlagModel.setFlagStatus(ACTIVE_STATUS);
+                partyFlagModel.setDateTimeCreated(flagDetail.getValue().getDateTimeCreated());
+                partyFlagModel.setDateTimeModified(flagDetail.getValue().getDateTimeModified());
                 partyFlagsModelList.add(partyFlagModel);
             }
         }
 
-        return CaseFlags.builder()
-            .flags(partyFlagsModelList)
-            .build();
+        CaseFlags caseFlags = new CaseFlags();
+        caseFlags.setFlags(partyFlagsModelList);
+        return caseFlags;
     }
 }

@@ -110,9 +110,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -156,9 +156,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -188,8 +188,10 @@ class RoboticsDataMapperForSpecTest {
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(fromDate).build()).build();
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(fromDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
     }
 
     private Party createPartyWithCompany(String companyName) {

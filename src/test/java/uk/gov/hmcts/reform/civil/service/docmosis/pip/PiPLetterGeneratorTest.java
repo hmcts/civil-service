@@ -74,11 +74,7 @@ class PiPLetterGeneratorTest {
 
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
     private static final LocalDateTime RESPONSE_DEADLINE = LocalDateTime.now();
-    private static final Address RESPONDENT_ADDRESS = Address.builder()
-        .addressLine1("123 road")
-        .postTown("London")
-        .postCode("EX12RT")
-        .build();
+    private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
     private static final String CLAIMANT_FULL_NAME = "Mr. John Smith";
     private static final String CLAIM_REFERENCE = "ABC";
     private static final Party DEFENDANT = Party.builder()
@@ -88,6 +84,15 @@ class PiPLetterGeneratorTest {
         .individualFirstName("Smith")
         .individualLastName("John")
         .build();
+
+    private static Address address(String addressLine1, String postTown, String postCode) {
+        Address address = new Address();
+        address.setAddressLine1(addressLine1);
+        address.setPostTown(postTown);
+        address.setPostCode(postCode);
+        return address;
+    }
+
     private static final BigDecimal TOTAL_CLAIM_AMOUNT = new BigDecimal("1000");
     private static final String PIN = "1234789";
     private static final String CUI_URL = "CUI response url";
@@ -166,36 +171,32 @@ class PiPLetterGeneratorTest {
             .respondent1ResponseDeadline(RESPONSE_DEADLINE)
             .totalClaimAmount(TOTAL_CLAIM_AMOUNT)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
-            .respondent1PinToPostLRspec(DefendantPinToPostLRspec.builder().accessCode(PIN).build())
+            .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
             .specRespondent1Represented(respondent1Represented)
             .servedDocumentFiles(servedDocumentFiles)
             .build();
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
-        Document documentLink = Document.builder()
-            .documentUrl("url")
-            .documentFileName("testFileName.pdf")
-            .documentBinaryUrl("binary-url")
-            .build();
-        CaseDocument caseDocumentClaim = CaseDocument.builder()
-            .documentType(SEALED_CLAIM)
-            .documentLink(documentLink)
-            .build();
+        Document documentLink = new Document()
+            .setDocumentUrl("url")
+            .setDocumentFileName("testFileName.pdf")
+            .setDocumentBinaryUrl("binary-url");
+        CaseDocument caseDocumentClaim = new CaseDocument()
+            .setDocumentType(SEALED_CLAIM)
+            .setDocumentLink(documentLink);
         return List.of(ElementUtils.element(caseDocumentClaim));
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
-        Document document1 = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
-        Document document2 = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
+        Document document1 = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
+        Document document2 = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         return ServedDocumentFiles.builder()
             .timelineEventUpload(List.of(ElementUtils.element(document2)))
             .particularsOfClaimDocument(List.of(ElementUtils.element(document1)))
@@ -203,32 +204,28 @@ class PiPLetterGeneratorTest {
     }
 
     private CaseDocument buildClaimFormDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("url")
-                              .documentFileName("testFileName.pdf")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("url")
+                              .setDocumentFileName("testFileName.pdf")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 
     private CaseDocument buildStitchedDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 }

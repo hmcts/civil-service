@@ -118,7 +118,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -157,7 +157,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -450,7 +450,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -481,7 +481,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -580,28 +580,25 @@ class SealedClaimLipResponseFormGeneratorTest {
                                              .loanCardDebtDetail("Card 2")
                                              .totalOwed(BigDecimal.valueOf(1500))
                                              .monthlyPayment(BigDecimal.valueOf(200))
-                                             .build()
+                                     .build()
                                      ))
                                      .debtDetails(ElementUtils.wrapElements(
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.GAS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(30))
-                                             .build(),
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(60))
-                                             .build()
+                                         new DebtLRspec()
+                                             .setDebtType(DebtTypeLRspec.GAS)
+                                             .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                             .setPaymentAmount(BigDecimal.valueOf(30)),
+                                         new DebtLRspec()
+                                             .setDebtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
+                                             .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                             .setPaymentAmount(BigDecimal.valueOf(60))
                                      ))
                                      .build())
             .respondent1PartnerAndDependent(PartnerAndDependentsLRspec.builder()
                                                 .haveAnyChildrenRequired(YesOrNo.YES)
-                                                .howManyChildrenByAgeGroup(ChildrenByAgeGroupLRspec.builder()
-                                                                               .numberOfUnderEleven("1")
-                                                                               .numberOfElevenToFifteen("2")
-                                                                               .numberOfSixteenToNineteen("0")
-                                                                               .build())
+                                                .howManyChildrenByAgeGroup(new ChildrenByAgeGroupLRspec()
+                                                                               .setNumberOfUnderEleven("1")
+                                                                               .setNumberOfElevenToFifteen("2")
+                                                                               .setNumberOfSixteenToNineteen("0"))
                                                 .supportedAnyoneFinancialRequired(YesOrNo.YES)
                                                 .supportPeopleNumber("3")
                                                 .supportPeopleDetails("Supported people details")
@@ -616,14 +613,12 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                      .build())
             .responseClaimAdmitPartEmployer(Respondent1EmployerDetailsLRspec.builder()
                                                 .employerDetails(ElementUtils.wrapElements(
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 1")
-                                                        .jobTitle("Job title 1")
-                                                        .build(),
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 2")
-                                                        .jobTitle("Job title 2")
-                                                        .build()
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 1")
+                                                        .setJobTitle("Job title 1"),
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 2")
+                                                        .setJobTitle("Job title 2")
                                                 ))
                                                 .build());
     }
@@ -647,15 +642,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyPhone("phone " + suffix)
             .partyEmail("email " + suffix)
             .partyName("company " + suffix)
-            .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+            .primaryAddress(address(suffix))
             .build();
     }
 
@@ -668,16 +655,20 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyPhone("phone " + suffix)
             .partyName("Name Surname" + suffix)
             .partyEmail("email " + suffix)
-            .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+            .primaryAddress(address(suffix))
             .build();
+    }
+
+    private Address address(String suffix) {
+        Address address = new Address();
+        address.setPostCode("postCode " + suffix);
+        address.setAddressLine1("line 1 " + suffix);
+        address.setAddressLine2("line 2 " + suffix);
+        address.setAddressLine3("line 3 " + suffix);
+        address.setPostTown("town " + suffix);
+        address.setCounty("county " + suffix);
+        address.setCountry("country " + suffix);
+        return address;
     }
 
     @Test

@@ -120,7 +120,7 @@ public abstract class BaseCallbackHandlerTest {
                                            Map<Params, Object> params,
                                            Map<String, Object> beforeCaseData
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -133,21 +133,21 @@ public abstract class BaseCallbackHandlerTest {
             .caseData(caseData)
             .version(version)
             .params(params)
-            .build();
+            ;
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData,
                                                                 CaseDetails caseDetails,
                                                                 CallbackType type
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .request(CallbackRequest.builder()
                          .caseDetails(caseDetails)
                          .build())
             .caseData(caseData)
             .params(Map.of(Params.BEARER_TOKEN, "BEARER_TOKEN"))
-            .build();
+            ;
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData,
@@ -156,7 +156,7 @@ public abstract class BaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -165,8 +165,7 @@ public abstract class BaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData, CaseData caseDataBefore,
@@ -175,7 +174,7 @@ public abstract class BaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -185,8 +184,7 @@ public abstract class BaseCallbackHandlerTest {
             .caseData(caseData)
             .caseDataBefore(caseDataBefore)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData,
@@ -196,7 +194,7 @@ public abstract class BaseCallbackHandlerTest {
                                            Map<Params, Object> params,
                                            CaseState currentState
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -205,8 +203,7 @@ public abstract class BaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(CaseData caseData,
@@ -215,7 +212,7 @@ public abstract class BaseCallbackHandlerTest {
                                            CallbackVersion version,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .request(CallbackRequest.builder()
                          .eventId(eventId)
@@ -224,8 +221,7 @@ public abstract class BaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
@@ -235,13 +231,12 @@ public abstract class BaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
@@ -252,14 +247,13 @@ public abstract class BaseCallbackHandlerTest {
                                            Map<Params, Object> params,
                                            CaseData caseData
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
             .version(version)
             .params(params)
-            .caseData(caseData)
-            .build();
+            .caseData(caseData);
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
@@ -270,13 +264,12 @@ public abstract class BaseCallbackHandlerTest {
                                            Map<Params, Object> params,
                                            String eventId
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name(), eventId))
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams specCallbackParamsOf(CaseData caseData,
@@ -286,7 +279,7 @@ public abstract class BaseCallbackHandlerTest {
                                                String eventId,
                                                Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -296,7 +289,7 @@ public abstract class BaseCallbackHandlerTest {
             .caseData(caseData)
             .version(version)
             .params(params)
-            .build();
+            ;
     }
 
     private CallbackRequest toCallbackRequest(Map<String, Object> data, String state) {

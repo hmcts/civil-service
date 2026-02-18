@@ -271,10 +271,10 @@ public class HearingDetailsMapperTest {
                                         )
             .build();
 
-        List<HearingLocationModel> expected = List.of(HearingLocationModel.builder()
-                                                       .locationId("12345")
-                                                       .locationType(COURT)
-                                                       .build());
+        HearingLocationModel expectedLocation = new HearingLocationModel();
+        expectedLocation.setLocationId("12345");
+        expectedLocation.setLocationType(COURT);
+        List<HearingLocationModel> expected = List.of(expectedLocation);
 
         List<HearingLocationModel> actual = HearingDetailsMapper.getHearingLocations(caseData);
 
@@ -309,7 +309,7 @@ public class HearingDetailsMapperTest {
 
     @Test
     void shouldReturnJudiciaryObject_whenInvoked() {
-        JudiciaryModel expected = JudiciaryModel.builder().build();
+        JudiciaryModel expected = new JudiciaryModel();
         assertThat(HearingDetailsMapper.getJudiciary()).isEqualTo(expected);
     }
 
@@ -510,10 +510,23 @@ public class HearingDetailsMapperTest {
 
         @BeforeEach
         void setUp() {
-            Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-            Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+            Category inPerson = new Category()
+                .setCategoryKey("HearingChannel")
+                .setKey("INTER")
+                .setValueEn("In Person")
+                .setActiveFlag("Y");
+            Category video = new Category()
+                .setCategoryKey("HearingChannel")
+                .setKey("VID")
+                .setValueEn("Video")
+                .setActiveFlag("Y");
+            Category telephone = new Category()
+                .setCategoryKey("HearingChannel")
+                .setKey("TEL")
+                .setValueEn("Telephone")
+                .setActiveFlag("Y");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(inPerson, video, telephone));
             when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
                 Optional.of(categorySearchResult));
         }

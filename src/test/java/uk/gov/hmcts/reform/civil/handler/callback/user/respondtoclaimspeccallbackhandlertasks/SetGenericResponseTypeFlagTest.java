@@ -557,10 +557,9 @@ class SetGenericResponseTypeFlagTest {
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
-        return CallbackParams.builder()
+        return new CallbackParams()
                 .caseData(caseData)
-                .params(Map.of(BEARER_TOKEN, BEARER_TOKEN_VALUE))
-                .build();
+                .params(Map.of(BEARER_TOKEN, BEARER_TOKEN_VALUE));
     }
 
     private AboutToStartOrSubmitCallbackResponse executeWithMockedScenario(CaseData caseData, MultiPartyScenario scenario) {

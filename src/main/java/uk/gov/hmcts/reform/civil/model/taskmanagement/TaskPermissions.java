@@ -1,21 +1,17 @@
 package uk.gov.hmcts.reform.civil.model.taskmanagement;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.Set;
 
-@ToString
-@EqualsAndHashCode
+@Data
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
 public class TaskPermissions {
 
-    Set<PermissionTypes> values;
-
-    public Set<PermissionTypes> getValues() {
-        return values;
-    }
+    private Set<PermissionTypes> values;
 }
