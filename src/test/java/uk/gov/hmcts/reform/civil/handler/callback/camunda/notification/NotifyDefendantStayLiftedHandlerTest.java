@@ -108,8 +108,8 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .respondent1Represented(YesOrNo.YES)
                 .respondent2Represented(YesOrNo.YES)
                 .build();
-            CallbackParams params = CallbackParams.builder().caseData(caseData)
-                .request(CallbackRequest.builder().eventId(caseEvent.toString()).build()).build();
+            CallbackParams params = new CallbackParams().caseData(caseData)
+                .request(CallbackRequest.builder().eventId(caseEvent.toString()).build());
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLRStayLifted()).thenReturn("solicitor-template");
@@ -189,11 +189,10 @@ class NotifyDefendantStayLiftedHandlerTest {
                 .builder()
                 .eventId(CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name())
                 .build();
-            final CallbackParams params = CallbackParams.builder()
+            final CallbackParams params = new CallbackParams()
                 .request(callbackRequest)
                 .caseData(caseData)
-                .type(ABOUT_TO_SUBMIT)
-                .build();
+                .type(ABOUT_TO_SUBMIT);
 
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
@@ -260,8 +259,8 @@ class NotifyDefendantStayLiftedHandlerTest {
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_LIFTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendantStayLifted", response);
     }
@@ -271,8 +270,8 @@ class NotifyDefendantStayLiftedHandlerTest {
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_LIFTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendant2StayLifted", response);
     }

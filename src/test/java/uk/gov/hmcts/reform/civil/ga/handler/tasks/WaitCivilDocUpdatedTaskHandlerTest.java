@@ -80,16 +80,16 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @BeforeEach
     void init() {
-        CaseDocument caseDocumentNow = CaseDocument.builder().documentName("current")
-                .documentLink(Document.builder().documentUrl("url")
-                        .documentFileName("filename").documentHash("hash")
-                        .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.GENERAL_APPLICATION_DRAFT).documentSize(12L).build();
-        CaseDocument caseDocumentOld = CaseDocument.builder().documentName("old")
-                .documentLink(Document.builder().documentUrl("url")
-                        .documentFileName("filename").documentHash("hash")
-                        .documentBinaryUrl("binaryUrl").build())
-                .documentType(DocumentType.GENERAL_APPLICATION_DRAFT).documentSize(12L).build();
+        CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
+                .setDocumentLink(new Document().setDocumentUrl("url")
+                        .setDocumentFileName("filename").setDocumentHash("hash")
+                        .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT).setDocumentSize(12L);
+        CaseDocument caseDocumentOld = new CaseDocument().setDocumentName("old")
+                .setDocumentLink(new Document().setDocumentUrl("url")
+                        .setDocumentFileName("filename").setDocumentHash("hash")
+                        .setDocumentBinaryUrl("binaryUrl"))
+                .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT).setDocumentSize(12L);
         gaCaseData = GeneralApplicationCaseData.builder()
                 .generalAppParentCaseLink(
                         GeneralAppParentCaseLink.builder().caseReference("123").build())
@@ -264,57 +264,45 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         var draftDocumentsList = List.of(
             Element.<CaseDocument>builder()
                 .id(UUID.fromString(uid1))
-                .value(CaseDocument.builder()
-                           .documentName("Draft_application_2024-12-02 14:48:26.pdf")
-                           .createdDatetime(LocalDateTime.parse("2024-12-02T14:48:26"))
-                           .documentLink(Document.builder()
-                                             .documentUrl("fake-url-draft-1")
-                                             .documentFileName("Draft_application_2024-12-02 14:48:26.pdf")
-                                             .documentBinaryUrl("binary-url-draft-1")
-                                             .build())
-                           .build())
-                .build(),
+                .value(new CaseDocument()
+                           .setDocumentName("Draft_application_2024-12-02 14:48:26.pdf")
+                           .setCreatedDatetime(LocalDateTime.parse("2024-12-02T14:48:26"))
+                           .setDocumentLink(new Document()
+                                             .setDocumentUrl("fake-url-draft-1")
+                                             .setDocumentFileName("Draft_application_2024-12-02 14:48:26.pdf")
+                                             .setDocumentBinaryUrl("binary-url-draft-1"))).build(),
 
             Element.<CaseDocument>builder()
                 .id(UUID.fromString(uid2))
-                .value(CaseDocument.builder()
-                           .documentName("Translated_draft_application_2024-12-02 14:54:15.pdf")
-                           .createdDatetime(LocalDateTime.parse("2024-12-02T14:54:15"))
-                           .documentLink(Document.builder()
-                                             .documentUrl("fake-url-translated-1")
-                                             .documentFileName(
+                .value(new CaseDocument()
+                           .setDocumentName("Translated_draft_application_2024-12-02 14:54:15.pdf")
+                           .setCreatedDatetime(LocalDateTime.parse("2024-12-02T14:54:15"))
+                           .setDocumentLink(new Document()
+                                             .setDocumentUrl("fake-url-translated-1")
+                                             .setDocumentFileName(
                                                  "Translated_draft_application_2024-12-02 14:54:15.pdf")
-                                             .documentBinaryUrl("binary-url-translated-1")
-                                             .build())
-                           .build())
-                .build(),
+                                             .setDocumentBinaryUrl("binary-url-translated-1"))).build(),
 
             Element.<CaseDocument>builder()
                 .id(UUID.fromString(uid3))
-                .value(CaseDocument.builder()
-                           .documentName("Draft_application_2024-12-02 15:27:01.pdf")
-                           .createdDatetime(LocalDateTime.parse("2024-12-02T15:27:01"))
-                           .documentLink(Document.builder()
-                                             .documentUrl("fake-url-draft-2")
-                                             .documentFileName("Draft_application_2024-12-02 15:27:01.pdf")
-                                             .documentBinaryUrl("binary-url-draft-2")
-                                             .build())
-                           .build())
-                .build(),
+                .value(new CaseDocument()
+                           .setDocumentName("Draft_application_2024-12-02 15:27:01.pdf")
+                           .setCreatedDatetime(LocalDateTime.parse("2024-12-02T15:27:01"))
+                           .setDocumentLink(new Document()
+                                             .setDocumentUrl("fake-url-draft-2")
+                                             .setDocumentFileName("Draft_application_2024-12-02 15:27:01.pdf")
+                                             .setDocumentBinaryUrl("binary-url-draft-2"))).build(),
 
             Element.<CaseDocument>builder()
                 .id(UUID.fromString(uid4))
-                .value(CaseDocument.builder()
-                           .documentName("Translated_draft_application_2024-12-02 15:45:15.pdf")
-                           .createdDatetime(LocalDateTime.parse("2024-12-02T15:45:15"))
-                           .documentLink(Document.builder()
-                                             .documentUrl("fake-url-translated-2")
-                                             .documentFileName(
+                .value(new CaseDocument()
+                           .setDocumentName("Translated_draft_application_2024-12-02 15:45:15.pdf")
+                           .setCreatedDatetime(LocalDateTime.parse("2024-12-02T15:45:15"))
+                           .setDocumentLink(new Document()
+                                             .setDocumentUrl("fake-url-translated-2")
+                                             .setDocumentFileName(
                                                  "Translated_draft_application_2024-12-02 15:45:15.pdf")
-                                             .documentBinaryUrl("binary-url-translated-2")
-                                             .build())
-                           .build())
-                .build()
+                                             .setDocumentBinaryUrl("binary-url-translated-2"))).build()
         );
         GeneralApplicationCaseData gaLipCaseData = GeneralApplicationCaseData.builder()
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -332,16 +320,14 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         verify(caseDetailsConverter).toGeneralApplicationCaseData(any());
     }
 
-    public final CaseDocument pdfDocument = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("documentName")
-        .documentSize(0L)
-        .documentType(DocumentType.GENERAL_APPLICATION_DRAFT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public final CaseDocument pdfDocument = new CaseDocument()
+        .setCreatedBy("John")
+        .setDocumentName("documentName")
+        .setDocumentSize(0L)
+        .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name")
+                          .setDocumentBinaryUrl("binary-url"));
 }

@@ -66,11 +66,12 @@ public class GaRespondentResponseDeadlineCallbackHandlerTest extends GeneralAppl
         void shouldDeleteNotifications_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT)
-                .toBuilder()
+                .copy()
                 .request(
                     CallbackRequest.builder().caseDetails(CaseDetails.builder().id(123456L).build())
-                        .eventId(RESPONDENT_RESPONSE_DEADLINE_CHECK.name()).build()
-                ).build();
+                        .eventId(RESPONDENT_RESPONSE_DEADLINE_CHECK.name())
+                        .build()
+                );
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("respondentResponseDeadlineChecked")

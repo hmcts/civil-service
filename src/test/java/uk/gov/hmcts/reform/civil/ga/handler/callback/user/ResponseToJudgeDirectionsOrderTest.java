@@ -89,13 +89,13 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
         List<Element<Document>> generalAppDirOrderUpload = new ArrayList<>();
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
         generalAppDirOrderUpload.add(element(document1));
         generalAppDirOrderUpload.add(element(document2));
@@ -121,13 +121,13 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
         List<Element<Document>> generalAppDirOrderUpload = new ArrayList<>();
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
         generalAppDirOrderUpload.add(element(document1));
         generalAppDirOrderUpload.add(element(document2));
@@ -160,13 +160,13 @@ public class ResponseToJudgeDirectionsOrderTest extends GeneralApplicationBaseCa
 
         List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
-        Document document2 = Document.builder().documentFileName(TEST_STRING).documentUrl(TEST_STRING)
-            .documentBinaryUrl(TEST_STRING)
-            .documentHash(TEST_STRING).build();
+        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+            .setDocumentBinaryUrl(TEST_STRING)
+            .setDocumentHash(TEST_STRING);
 
         generalAppAddlnInfoUpload.add(element(document1));
         generalAppAddlnInfoUpload.add(element(document2));

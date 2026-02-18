@@ -71,7 +71,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -84,7 +84,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -96,7 +96,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -108,7 +108,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -120,7 +120,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
@@ -133,7 +133,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(ADDITIONAL_RESPONSE_TIME_EXPIRED, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -145,7 +145,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(ADDITIONAL_RESPONSE_TIME_EXPIRED, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

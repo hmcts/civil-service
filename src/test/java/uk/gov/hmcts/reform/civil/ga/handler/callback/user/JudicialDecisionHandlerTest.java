@@ -2211,8 +2211,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateFinalOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
-            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(CaseDocument
-                                                                               .builder().documentLink(Document.builder().build()).build());
+            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(new Document()));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 

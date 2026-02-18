@@ -1,15 +1,17 @@
 package uk.gov.hmcts.reform.ccd.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
-@Jacksonized
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class CaseAssignedUserRolesResource {
 
     @JsonProperty("case_users")

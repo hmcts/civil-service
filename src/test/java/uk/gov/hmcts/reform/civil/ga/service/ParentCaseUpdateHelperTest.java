@@ -182,8 +182,7 @@ class ParentCaseUpdateHelperTest {
     void checkIfDocumentExists() {
         Element<?> same = Element.<CaseDocument>builder()
             .id(UUID.randomUUID())
-            .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
-                       .build()).build();
+            .value(new CaseDocument().setDocumentLink(new Document().setDocumentUrl("string"))).build();
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(same);
@@ -196,7 +195,7 @@ class ParentCaseUpdateHelperTest {
     void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
         Element<Document> documentElement = Element.<Document>builder()
             .id(UUID.randomUUID())
-            .value(Document.builder().documentUrl("string").build()).build();
+            .value(new Document().setDocumentUrl("string")).build();
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(documentElement);
@@ -811,18 +810,16 @@ class ParentCaseUpdateHelperTest {
 
     private GeneralApplicationCaseData getCaseWithApplicationDataAndGeneralOrder() {
         String uid = "f000aa01-0451-4000-b000-000000000000";
-        CaseDocument pdfDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("documentName")
-            .documentSize(0L)
-            .documentType(GENERAL_ORDER)
-            .createdDatetime(now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument pdfDocument = new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("documentName")
+            .setDocumentSize(0L)
+            .setDocumentType(GENERAL_ORDER)
+            .setCreatedDatetime(now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
         return getCaseWithApplicationData(false)
             .toBuilder().ccdState(PENDING_APPLICATION_ISSUED)
             .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
@@ -838,11 +835,10 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        Document pdfDocument = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
+        Document pdfDocument = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(singletonList(Element.<Document>builder()
                                                              .id(UUID.fromString(uid))
@@ -887,17 +883,15 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        CaseDocument pdfDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("documentName")
-            .documentSize(0L)
-            .createdDatetime(now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument pdfDocument = new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("documentName")
+            .setDocumentSize(0L)
+            .setCreatedDatetime(now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.gaAddlDoc(singletonList(Element.<CaseDocument>builder()
                                             .id(UUID.fromString(uid))
@@ -943,11 +937,10 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        Document pdfDocument = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
+        Document pdfDocument = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(singletonList(Element.<Document>builder()
                                                              .id(UUID.fromString(uid))
@@ -1030,14 +1023,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1099,14 +1092,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1166,14 +1159,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1215,7 +1208,7 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
                 break;
@@ -1288,7 +1281,7 @@ class ParentCaseUpdateHelperTest {
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList =
             Lists.newArrayList(element(respondentSolOneElement01), element(respondentSolOneElement02));
 
-        builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+        builder.respondent1OrganisationPolicy(new OrganisationPolicy())
             .respondent1OrganisationIDCopy("RespondentSol");
         builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
@@ -1307,7 +1300,7 @@ class ParentCaseUpdateHelperTest {
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList2 =
             Lists.newArrayList(element(respondentSolTwoGA1));
 
-        builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+        builder.respondent2OrganisationPolicy(new OrganisationPolicy())
             .respondent2OrganisationIDCopy("RespondentSolTwo")
             .respondent2SameLegalRepresentative(NO)
             .addApplicant2(NO);

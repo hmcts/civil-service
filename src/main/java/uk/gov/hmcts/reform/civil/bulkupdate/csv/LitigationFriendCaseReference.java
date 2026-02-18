@@ -7,13 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@SuperBuilder
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonPropertyOrder({"caseReference"})

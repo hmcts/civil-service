@@ -462,12 +462,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 }))
                 .build();
 
-            return CallbackParams.builder()
+            return new CallbackParams()
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .caseData(caseData)
-                .build();
+                .caseData(caseData);
         }
 
         public CallbackParams getCallbackParamsGaForLipCaseDataFullRemission() {
@@ -487,12 +486,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 }))
                 .build();
 
-            return CallbackParams.builder()
+            return new CallbackParams()
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .caseData(caseData)
-                .build();
+                .caseData(caseData);
         }
 
         public CallbackParams getCallbackParamsGaForLipCaseDataPartRemission() {
@@ -513,12 +511,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 }))
                 .build();
 
-            return CallbackParams.builder()
+            return new CallbackParams()
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder().caseDetails(caseDetails)
                              .build())
-                .caseData(caseData)
-                .build();
+                .caseData(caseData);
         }
 
         public StartEventResponse getStartEventResponse() {
@@ -1472,7 +1469,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         private CallbackParams getCallbackParamsMulti(YesOrNo isConsented, YesOrNo isTobeNotified,
                                                       List<Element<GARespondentResponse>> respondentResponses,
                                                       List<Element<GASolicitorDetailsGAspec>> respondentDetails) {
-            return CallbackParams.builder()
+            return new CallbackParams()
                 .type(ABOUT_TO_SUBMIT)
                 .pageId(null)
                 .request(CallbackRequest.builder()
@@ -1487,13 +1484,12 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .caseData(getSampleGeneralApplicationCaseDataMulti(isConsented, isTobeNotified,
                                                                    respondentResponses, respondentDetails))
                 .version(null)
-                .params(null)
-                .build();
+                .params(null);
         }
 
         private CallbackParams getCallbackParamsOfVary(YesOrNo isConsented, YesOrNo isTobeNotified) {
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
-            return CallbackParams.builder()
+            return new CallbackParams()
                 .type(ABOUT_TO_SUBMIT)
                 .pageId(null)
                 .request(CallbackRequest.builder()
@@ -1506,12 +1502,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                              .build())
                 .caseData(getSampleGeneralApplicationCaseDataForVaryJudgement(isConsented, isTobeNotified, respondentsResponses))
                 .version(null)
-                .params(null)
-                .build();
+                .params(null);
         }
 
         private CallbackParams getCallbackParams(YesOrNo isConsented, YesOrNo isTobeNotified) {
-            return CallbackParams.builder()
+            return new CallbackParams()
                     .type(ABOUT_TO_SUBMIT)
                     .pageId(null)
                     .request(CallbackRequest.builder()
@@ -1524,8 +1519,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                             .build())
                     .caseData(getSampleGeneralApplicationCaseData(isConsented, isTobeNotified))
                     .version(null)
-                    .params(null)
-                    .build();
+                    .params(null);
         }
 
         private StartEventResponse getStartEventResponse(YesOrNo isConsented, YesOrNo isTobeNotified) {
