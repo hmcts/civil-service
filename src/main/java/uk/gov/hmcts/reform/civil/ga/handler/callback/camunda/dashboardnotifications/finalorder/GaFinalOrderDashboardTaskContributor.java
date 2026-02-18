@@ -6,10 +6,10 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskIds;
 
 @Component
-public class FinalOrderDashboardTaskContributor extends DashboardTaskContributor {
+public class GaFinalOrderDashboardTaskContributor extends DashboardTaskContributor {
 
-    public FinalOrderDashboardTaskContributor(FinalOrderApplicantDashboardTask applicantTask,
-                                              FinalOrderRespondentDashboardTask respondentTask) {
+    public GaFinalOrderDashboardTaskContributor(FinalOrderApplicantDashboardTask applicantTask,
+                                                FinalOrderRespondentDashboardTask respondentTask) {
         super(
             DashboardCaseType.GENERAL_APPLICATION,
             DashboardTaskIds.GA_FINAL_ORDER,

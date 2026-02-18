@@ -47,12 +47,8 @@ public final class DashboardTaskIds {
     public static final String FINAL_ORDER = "GenerateDashboardNotificationFinalOrder";
     public static final String STAY_LIFTED = "GenerateDashboardNotificationStayLifted";
     public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
-    public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
     public static final String GA_APPLICATION_SUBMITTED = "GenerateDashboardNotificationsGaApplicationSubmitted";
-    public static final String GA_HWF_OUTCOME = "GenerateDashboardNotificationsGaHwfOutcome";
-    public static final String GA_APPLICATION_ISSUED = "GenerateDashboardNotificationsGaApplicationIssued";
     public static final String GA_APPLICATION_RESPONDED = "GenerateDashboardNotificationsGaApplicationResponded";
-    public static final String GA_APPLICATION_SUBMITTED = "GenerateDashboardNotificationsGaApplicationSubmitted";
     public static final String GA_FINAL_ORDER = "GenerateDashboardNotificationsGaFinalOrder";
     public static final String GA_HWF_OUTCOME = "GenerateDashboardNotificationsGaHwfOutcome";
     public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
