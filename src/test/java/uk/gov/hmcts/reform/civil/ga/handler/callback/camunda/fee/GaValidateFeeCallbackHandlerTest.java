@@ -42,7 +42,7 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
         void returnsCorrectTaskId() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE108, false, false);
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(TASK_ID);
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
         }
 
         @Test

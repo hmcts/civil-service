@@ -38,8 +38,8 @@ public class CCJRequestedScenarioTest extends DashboardBaseIntegrationTest {
             .ccdCaseReference(Long.valueOf(caseId))
             .defaultJudgmentDocuments(List.of(
                 Element.<CaseDocument>builder()
-                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                               .createdDatetime(LocalDateTime.now()).build()).build()))
+                    .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                               .setCreatedDatetime(LocalDateTime.now())).build()))
             .build();
 
         handler.handle(callbackParams(caseData));

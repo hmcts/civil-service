@@ -31,8 +31,9 @@ class HearingMethodUtilsTest {
     @Test
     void shouldReturnListOfHearingMethods_WhenCategorySearchResultProvided() {
         String value = "In Person";
-        Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn(value).activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+        Category category = hearingChannel("INTER", value);
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(category));
 
         DynamicList hearingMethodList = HearingMethodUtils.getHearingMethodList(categorySearchResult);
         assertEquals(value, hearingMethodList.getListItems().get(0).getLabel());
@@ -46,10 +47,11 @@ class HearingMethodUtilsTest {
 
     @Test
     void shouldReturnMapOfCodes_WhenCategorySearchResultNotNull() {
-        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        Category inPerson = hearingChannel("INTER", "In Person");
+        Category video = hearingChannel("VID", "Video");
+        Category telephone = hearingChannel("TEL", "Telephone");
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, video, telephone));
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
 
@@ -60,10 +62,20 @@ class HearingMethodUtilsTest {
 
     @Test
     void shouldReturnNull_WhenCategorySearchResultNull() {
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(emptyList());
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
-            Optional.of(CategorySearchResult.builder().categories(emptyList()).build()));
+            Optional.of(categorySearchResult));
 
         Map<String, String> actual = HearingMethodUtils.getHearingMethodCodes(categoryService, "", "");
         assertThat(actual).isEqualTo(emptyMap());
+    }
+
+    private Category hearingChannel(String key, String valueEn) {
+        return new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(valueEn)
+            .setActiveFlag("Y");
     }
 }

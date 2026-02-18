@@ -110,8 +110,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
         OrganisationPolicy policy = new OrganisationPolicy();
@@ -127,8 +126,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResponseClaimTrack(FAST_CLAIM.name());
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
@@ -153,8 +151,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -177,8 +174,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -201,8 +197,7 @@ class PaymentsServiceTest {
         hfPbaDetails.setServiceReqReference("request-reference");
         hfPbaDetails.setApplicantsPbaAccounts(applicantsPbaAccounts);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
