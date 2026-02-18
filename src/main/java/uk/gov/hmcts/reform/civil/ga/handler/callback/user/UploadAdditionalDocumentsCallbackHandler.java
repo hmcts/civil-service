@@ -93,11 +93,14 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler im
             List<Element<CaseDocument>> bundle = caseData.getUploadDocument()
                 .stream().filter(x -> x.getValue().getDocumentType().toLowerCase()
                     .contains(BUNDLE))
-                .map(byType -> ElementUtils.element(CaseDocument.builder()
-                                                        .documentLink(byType.getValue().getAdditionalDocument())
-                                                        .documentName(byType.getValue().getDocumentType())
-                                                        .createdBy(role)
-                                                        .createdDatetime(LocalDateTime.now()).build()))
+                .map(byType -> {
+                    CaseDocument caseDocument = new CaseDocument()
+                        .setDocumentLink(byType.getValue().getAdditionalDocument())
+                        .setDocumentName(byType.getValue().getDocumentType())
+                        .setCreatedBy(role)
+                        .setCreatedDatetime(LocalDateTime.now());
+                    return ElementUtils.element(caseDocument);
+                })
                 .collect(Collectors.toList());
             assignCategoryId.assignCategoryIdToCollection(
                 bundle,

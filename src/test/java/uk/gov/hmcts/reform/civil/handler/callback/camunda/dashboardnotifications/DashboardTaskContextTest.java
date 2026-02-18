@@ -14,10 +14,9 @@ class DashboardTaskContextTest {
     @Test
     void shouldExposeCaseDataAndAuthToken() {
         CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "token"));
 
         DashboardTaskContext context = DashboardTaskContext.from(params);
 
@@ -29,9 +28,8 @@ class DashboardTaskContextTest {
     @Test
     void shouldReturnNullTokenWhenMissing() {
         CaseData caseData = CaseData.builder().build();
-        CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData);
 
         DashboardTaskContext context = DashboardTaskContext.from(params);
 

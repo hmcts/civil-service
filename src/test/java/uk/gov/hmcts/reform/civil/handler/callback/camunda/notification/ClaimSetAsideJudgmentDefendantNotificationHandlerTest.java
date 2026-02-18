@@ -113,13 +113,12 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -141,13 +140,12 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT2.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -181,13 +179,12 @@ public class ClaimSetAsideJudgmentDefendantNotificationHandlerTest extends BaseC
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_CLAIM_SET_ASIDE_JUDGMENT_DEFENDANT1_LIP.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

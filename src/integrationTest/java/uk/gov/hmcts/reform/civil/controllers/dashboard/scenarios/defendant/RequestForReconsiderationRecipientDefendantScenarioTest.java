@@ -39,9 +39,8 @@ public class RequestForReconsiderationRecipientDefendantScenarioTest extends Das
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .requestForReconsiderationDeadline(LocalDateTime.of(2024, 6, 14, 16, 0))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url")))))
+            .requestForReconsiderationDeadline(LocalDateTime.of(2024, 6, 14, 16, 0)).build();
 
         handler.handle(callbackParams(caseData));
 

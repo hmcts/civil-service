@@ -33,19 +33,17 @@ class BaseNotifierTest {
     @Test
     void shouldSendNotificationsSuccessfully() {
         // Arrange
-        EmailDTO email1 = EmailDTO.builder()
-            .targetEmail("recipient1@example.com")
-            .emailTemplate("template1")
-            .parameters(Map.of("key1", "value1"))
-            .reference("ref1")
-            .build();
+        EmailDTO email1 = new EmailDTO();
+        email1.setTargetEmail("recipient1@example.com");
+        email1.setEmailTemplate("template1");
+        email1.setParameters(Map.of("key1", "value1"));
+        email1.setReference("ref1");
 
-        EmailDTO email2 = EmailDTO.builder()
-            .targetEmail("recipient2@example.com")
-            .emailTemplate("template2")
-            .parameters(Map.of("key2", "value2"))
-            .reference("ref2")
-            .build();
+        EmailDTO email2 = new EmailDTO();
+        email2.setTargetEmail("recipient2@example.com");
+        email2.setEmailTemplate("template2");
+        email2.setParameters(Map.of("key2", "value2"));
+        email2.setReference("ref2");
 
         Set<EmailDTO> recipients = Set.of(email1, email2);
 
@@ -65,19 +63,17 @@ class BaseNotifierTest {
     @Test
     void shouldHandleNotificationExceptions() {
         // Arrange
-        EmailDTO email1 = EmailDTO.builder()
-            .targetEmail("recipient1@example.com")
-            .emailTemplate("template1")
-            .parameters(Map.of("key1", "value1"))
-            .reference("ref1")
-            .build();
+        EmailDTO email1 = new EmailDTO();
+        email1.setTargetEmail("recipient1@example.com");
+        email1.setEmailTemplate("template1");
+        email1.setParameters(Map.of("key1", "value1"));
+        email1.setReference("ref1");
 
-        EmailDTO email2 = EmailDTO.builder()
-            .targetEmail("recipient2@example.com")
-            .emailTemplate("template2")
-            .parameters(Map.of("key2", "value2"))
-            .reference("ref2")
-            .build();
+        EmailDTO email2 = new EmailDTO();
+        email2.setTargetEmail("recipient2@example.com");
+        email2.setEmailTemplate("template2");
+        email2.setParameters(Map.of("key2", "value2"));
+        email2.setReference("ref2");
 
         Set<EmailDTO> recipients = Set.of(email1, email2);
 
