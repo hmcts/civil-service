@@ -47,8 +47,10 @@ class RespondToQueryDateHelperTest {
     void shouldAddLatestFollowUpQueryDate() {
         OffsetDateTime now = OffsetDateTime.now();
         CaseData caseData = createCaseData(now);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
         when(runtimeService.getProcessVariables("process-id"))
-            .thenReturn(QueryManagementVariables.builder().queryId("response-id").build());
+            .thenReturn(queryManagementVariables);
         when(coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), "LR"))
             .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
 
@@ -68,14 +70,15 @@ class RespondToQueryDateHelperTest {
             createCaseMessage("response-id", "admin", now, "parent-id")
         ));
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-            .queries(caseQueries)
-            .businessProcess(new BusinessProcess().setProcessInstanceId("process-id"))
-            .ccdCaseReference(1234567890L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setQueries(caseQueries);
+        caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId("process-id"));
+        caseData.setCcdCaseReference(1234567890L);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
 
         when(runtimeService.getProcessVariables("process-id"))
-            .thenReturn(QueryManagementVariables.builder().queryId("response-id").build());
+            .thenReturn(queryManagementVariables);
         when(coreCaseUserService.getUserCaseRoles(any(), any()))
             .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
 
@@ -94,11 +97,11 @@ class RespondToQueryDateHelperTest {
             createCaseMessage("follow-up", "LR", now.minusDays(1), "parent-id")
         ));
 
-        return CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-            .queries(caseQueries)
-            .businessProcess(new BusinessProcess().setProcessInstanceId("process-id"))
-            .ccdCaseReference(1234567890L)
-            .build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setQueries(caseQueries);
+        caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId("process-id"));
+        caseData.setCcdCaseReference(1234567890L);
+        return caseData;
     }
 
     private CaseMessage createCaseMessage(String id, String createdBy, OffsetDateTime createdOn, String parentId) {
