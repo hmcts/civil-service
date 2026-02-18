@@ -79,7 +79,7 @@ public class CallbackController {
                  version
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
@@ -88,8 +88,7 @@ public class CallbackController {
             .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
             .isGeneralApplicationCaseType(generalApplicationCaseType)
-            .isCivilCaseType(!generalApplicationCaseType)
-            .build();
+            .isCivilCaseType(!generalApplicationCaseType);
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
         responseHeadersService.addClientContextHeader(callbackResponse, response);

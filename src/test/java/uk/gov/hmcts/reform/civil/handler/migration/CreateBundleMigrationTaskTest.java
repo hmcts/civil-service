@@ -31,9 +31,7 @@ class CreateBundleMigrationTaskTest {
     @BeforeEach
     void setUp() {
         caseData = CaseData.builder().build();
-        caseReference = ExcelCaseReference.builder()
-            .caseReference("1234567890123456")
-            .build();
+        caseReference = excelCaseReference("1234567890123456");
     }
 
     @Test
@@ -93,14 +91,17 @@ class CreateBundleMigrationTaskTest {
 
     @Test
     void shouldThrowNumberFormatExceptionForInvalidCaseReference() {
-        ExcelCaseReference badRef = ExcelCaseReference.builder()
-            .caseReference("NOT_A_NUMBER")
-            .build();
-
+        ExcelCaseReference badRef = excelCaseReference("NOT_A_NUMBER");
         assertThrows(NumberFormatException.class,
                      () -> task.migrateCaseData(caseData, badRef)
         );
 
         verifyNoInteractions(bundleCreationService);
+    }
+
+    private ExcelCaseReference excelCaseReference(String value) {
+        ExcelCaseReference reference = new ExcelCaseReference();
+        reference.setCaseReference(value);
+        return reference;
     }
 }

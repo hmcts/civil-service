@@ -62,12 +62,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -112,12 +111,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -169,12 +167,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -225,12 +222,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -281,12 +277,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -433,12 +428,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -488,12 +482,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -536,12 +529,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -584,12 +576,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -631,12 +622,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -677,12 +667,11 @@ public class DocUploadDashboardNotificationServiceTest {
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
             uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
                                                       .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")
-                                                                              .build()).build()));
+                                                      .additionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl(
+                                                                                  "http://dm-store:8080/documents")).build()));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
