@@ -110,13 +110,12 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
                 .applicant1Represented(YesOrNo.YES)
                 .buildJudmentOnlineCaseDataWithPaymentImmediately();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_CLAIMANT_JUDGMENT_BY_ADMISSION.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

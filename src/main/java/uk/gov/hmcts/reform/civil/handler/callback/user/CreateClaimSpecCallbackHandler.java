@@ -187,9 +187,8 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData caseData = callbackParams.getCaseData();
         if (InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE.equals(caseData.getInterestClaimFrom())) {
             caseData.setInterestClaimUntil(InterestClaimUntilType.UNTIL_SETTLED_OR_JUDGEMENT_MADE);
-            CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.toBuilder()
-                .caseData(caseData)
-                .build();
+            CallbackParams callbackParamsWithUpdatedCaseData = callbackParams.copy()
+                .caseData(caseData);
             return calculateInterest(callbackParamsWithUpdatedCaseData);
         }
         return AboutToStartOrSubmitCallbackResponse.builder()

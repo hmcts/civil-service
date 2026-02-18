@@ -57,14 +57,13 @@ public class ElementUtils {
 
     public static Element<CaseDocument> buildElemCaseDocument(Document document, String createdBy,
                                                         LocalDateTime createdAt, DocumentType type) {
-        return ElementUtils.element(CaseDocument.builder()
-                                        .documentLink(document)
-                                        .documentName(document.getDocumentFileName())
-                                        .documentType(type)
-                                        .createdDatetime(createdAt)
-                                        .createdBy(createdBy)
-                                        .build()
-        );
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(document)
+            .setDocumentName(document.getDocumentFileName())
+            .setDocumentType(type)
+            .setCreatedDatetime(createdAt)
+            .setCreatedBy(createdBy);
+        return ElementUtils.element(caseDocument);
     }
 
     private static <T> Collection<T> nullSafeCollection(Collection<T> collection) {
