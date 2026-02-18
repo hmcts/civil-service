@@ -431,9 +431,14 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldPopulateLocationListsWhenTransferredOnlineHearingLocationShouldBeNewCaseManagementLocaion() {
-            Category category = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag(
-                "Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(category)).build();
+            Category category = new Category();
+            category.setCategoryKey("HearingChannel");
+            category.setKey("INTER");
+            category.setValueEn("In Person");
+            category.setActiveFlag("Y");
+
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(category));
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
                 LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
