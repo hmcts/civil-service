@@ -5,10 +5,11 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialMakeAnOrder;
 import uk.gov.hmcts.reform.civil.ga.service.search.CaseStateSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,48 +39,41 @@ import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption.APP
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_FROM_SANCTIONS;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STAY_THE_CLAIM;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    CheckStayOrderDeadlineEndTaskHandler.class})
+@ExtendWith(MockitoExtension.class)
 class CheckStayOrderDeadlineEndTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseStateSearchService searchService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private CheckStayOrderDeadlineEndTaskHandler gaOrderMadeTaskHandler;
 
-    @Autowired
-    private ObjectMapper mapper;
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
 
     private CaseDetails caseDetailsWithTodayDeadlineNotProcessed;
-    private CaseDetails caseDetailsWithTodayDeadlineProcessed;
     private CaseDetails caseDetailsWithTodayDeadlineReliefFromSanctionOrder;
     private CaseDetails caseDetailsWithDeadlineCrossedNotProcessed;
     private CaseDetails caseDetailsWithDeadlineCrossedProcessed;
-    private CaseDetails caseDetailsWithTodayDeadLineWithOrderProcessedNull;
 
     private CaseDetails caseDetailsWithNoDeadline;
     private CaseDetails caseDetailsWithFutureDeadline;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedNotProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineNotProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadlineProcessed;
     private GeneralApplicationCaseData caseDataWithTodayDeadlineReliefFromSanctionOrder;
     private GeneralApplicationCaseData caseDataWithDeadlineCrossedProcessed;
-    private GeneralApplicationCaseData caseDataWithTodayDeadLineWithOrderProcessedNull;
     private GeneralApplicationCaseData caseDataWithNoDeadline;
     private GeneralApplicationCaseData caseDataWithFutureDeadline;
 
@@ -92,11 +87,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                                   YesOrNo.NO);
         caseDataWithTodayDeadlineNotProcessed = getCaseData(1L, STAY_THE_CLAIM, deadLineToday,
                                                             YesOrNo.NO);
-
-        caseDetailsWithTodayDeadlineProcessed = getCaseDetails(1L, STAY_THE_CLAIM, deadLineToday,
-                                                               YesOrNo.YES);
-        caseDataWithTodayDeadlineProcessed = getCaseData(1L, STAY_THE_CLAIM, deadLineToday,
-                                                         YesOrNo.YES);
 
         caseDetailsWithTodayDeadlineReliefFromSanctionOrder = getCaseDetails(2L, RELIEF_FROM_SANCTIONS,
                                                                              deadLineToday, YesOrNo.NO);
@@ -122,10 +112,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
                                                        deadlineInFuture, YesOrNo.NO);
         caseDataWithFutureDeadline = getCaseData(6L, STAY_THE_CLAIM,
                                                  deadlineInFuture, YesOrNo.NO);
-        caseDetailsWithTodayDeadLineWithOrderProcessedNull = getCaseDetails(7L, STAY_THE_CLAIM,
-                                                                             deadLineToday, null);
-        caseDataWithTodayDeadLineWithOrderProcessedNull = getCaseData(7L, STAY_THE_CLAIM,
-                                                                  deadLineToday, null);
     }
 
     @Test
@@ -142,10 +128,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     @Test
     void shouldNotSendMessageAndTriggerGaEvent_whenCasesPastDeadlineFoundAndDifferentAppType() {
         when(searchService.getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM)).thenReturn(Set.of());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithDeadlineCrossedProcessed))
-            .thenReturn(caseDataWithDeadlineCrossedProcessed);
         gaOrderMadeTaskHandler.execute(externalTask, externalTaskService);
 
         verify(searchService).getOrderMadeGeneralApplications(ORDER_MADE, STAY_THE_CLAIM);
@@ -161,8 +143,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
             caseDetailsWithFutureDeadline
         ));
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithFutureDeadline))
             .thenReturn(caseDataWithFutureDeadline);
 
@@ -206,8 +186,6 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineNotProcessed))
             .thenReturn(caseDataWithTodayDeadlineNotProcessed);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithTodayDeadlineReliefFromSanctionOrder))
-            .thenReturn(caseDataWithTodayDeadlineReliefFromSanctionOrder);
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetailsWithDeadlineCrossedNotProcessed))
             .thenReturn(caseDataWithDeadlineCrossedNotProcessed);

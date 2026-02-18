@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.search.GaEvidenceUploadNotificationSearchService;
@@ -22,28 +22,25 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GA_EVIDENCE_UPLOAD_CHECK;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    DocUploadNotifyTaskHandler.class})
+@ExtendWith(MockitoExtension.class)
 public class DocUploadNotifyTaskHandlerTest {
 
-    @MockBean
+    @Mock
     private ExternalTask externalTask;
 
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private GaEvidenceUploadNotificationSearchService searchService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private DocUploadNotifyTaskHandler handler;
 
     @Test
@@ -61,16 +58,18 @@ public class DocUploadNotifyTaskHandlerTest {
     void shouldEmitBusinessProcessEvent_whenCasesFound() {
         long caseId = 1L;
         when(searchService.getApplications())
-                .thenReturn(Set.of(CaseDetails.builder().build()));
+            .thenReturn(Set.of(CaseDetails.builder().build()));
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
-                .thenReturn(GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(caseId).build());
+            .thenReturn(GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(caseId).build());
 
         handler.execute(externalTask, externalTaskService);
 
         verify(searchService).getApplications();
-        verify(coreCaseDataService).triggerGaEvent(1L, GA_EVIDENCE_UPLOAD_CHECK,
-                Map.of());
+        verify(coreCaseDataService).triggerGaEvent(
+            1L, GA_EVIDENCE_UPLOAD_CHECK,
+            Map.of()
+        );
         verify(externalTaskService).complete(any(), any());
     }
 }
