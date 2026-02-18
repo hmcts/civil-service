@@ -2130,12 +2130,8 @@ public class CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
         addRespondent2 = YES;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent1OrgRegistered = null;
         respondent2OrgRegistered = null;
         return this;
@@ -2181,13 +2177,8 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
         defendant1LIPAtClaimIssued = YES;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -2201,13 +2192,8 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondentSolicitor1OrganisationDetails = null;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -2217,12 +2203,8 @@ public class CaseDataBuilder {
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
         respondent1Represented = YES;
@@ -2262,9 +2244,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssuedUnregisteredDefendant();
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -2286,9 +2266,7 @@ public class CaseDataBuilder {
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         respondent2Represented = YES;
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
@@ -2361,12 +2339,8 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
 
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
@@ -2392,12 +2366,8 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = NO;
         respondent2SameLegalRepresentative = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
 
         respondent2OrgRegistered = null;
 
@@ -2550,17 +2520,9 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
@@ -2601,17 +2563,9 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[DEFENDANT]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[DEFENDANT]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
@@ -2803,11 +2757,7 @@ public class CaseDataBuilder {
         respondent2Represented = YES;
         respondent2SameLegalRepresentative = YES;
         respondent1OrganisationPolicy =
-            OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID("org1").build())
-                .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                .orgPolicyReference("org1PolicyReference")
-                .build();
+            organisationPolicy("org1", "[RESPONDENTSOLICITORONE]").setOrgPolicyReference("org1PolicyReference");
         return this;
     }
 
@@ -2962,15 +2912,19 @@ public class CaseDataBuilder {
             .hearingDates(wrapElements(List.of(singleDate, dateRange)))
             .build();
 
-        this.defaultJudgmentDocuments.addAll(wrapElements(CaseDocument.builder()
-            .documentName("test")
-            .createdDatetime(LocalDateTime.now())
-            .build()));
+        CaseDocument document = new CaseDocument()
+            .setDocumentName("test")
+            .setCreatedDatetime(LocalDateTime.now());
+        this.defaultJudgmentDocuments.addAll(wrapElements(document));
         return this;
     }
 
     private DynamicList getHearingMethodList(String key, String value) {
-        Category category = Category.builder().categoryKey("HearingChannel").key(key).valueEn(value).activeFlag("Y").build();
+        Category category = new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(value)
+            .setActiveFlag("Y");
         DynamicList hearingMethodList = DynamicList.fromList(List.of(category), Category::getValueEn, null, false);
         hearingMethodList.setValue(hearingMethodList.getListItems().get(0));
         return hearingMethodList;
@@ -3225,8 +3179,8 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStatePaymentSuccessfulWithCopyOrganisationOnly() {
         atStatePaymentSuccessful();
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
-        respondent1OrganisationPolicy = respondent1OrganisationPolicy.toBuilder()
-            .organisation(Organisation.builder().build()).build();
+        respondent1OrganisationPolicy = copyOrganisationPolicy(respondent1OrganisationPolicy)
+            .setOrganisation(new Organisation());
         return this;
     }
 
@@ -3242,12 +3196,8 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2OrgRegistered = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3259,12 +3209,8 @@ public class CaseDataBuilder {
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
 
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3276,12 +3222,8 @@ public class CaseDataBuilder {
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
         respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy(null, "[RESPONDENTSOLICITORTWO]");
         return this;
     }
 
@@ -3306,9 +3248,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent1Represented = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
         addLegalRepDeadline = DEADLINE;
         return this;
     }
@@ -3327,9 +3267,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         addLegalRepDeadline = DEADLINE;
         return this;
     }
@@ -3348,12 +3286,8 @@ public class CaseDataBuilder {
                 .label(caseRole)
                 .build())
             .build());
-        request.setOrganisationToAdd(Organisation.builder()
-            .organisationID(newOrgID)
-            .build());
-        request.setOrganisationToRemove(Organisation.builder()
-            .organisationID(oldOrgId)
-            .build());
+        request.setOrganisationToAdd(new Organisation().setOrganisationID(newOrgID));
+        request.setOrganisationToRemove(new Organisation().setOrganisationID(oldOrgId));
         request.setApprovalStatus(ChangeOrganisationApprovalStatus.APPROVED);
         changeOrganisationRequest = request;
         return this;
@@ -3378,18 +3312,12 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder updateOrgPolicyAfterNoC(boolean isApplicant, boolean isRespondent2, String newOrgId) {
         if (isApplicant) {
-            applicant1OrganisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder().organisationID(newOrgId).build())
-                .orgPolicyCaseAssignedRole(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build();
+            applicant1OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.APPLICANTSOLICITORONE.getFormattedName());
         } else {
             if (isRespondent2) {
-                respondent2OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID(newOrgId).build())
-                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build();
+                respondent2OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
             } else {
-                respondent1OrganisationPolicy = OrganisationPolicy.builder()
-                    .organisation(Organisation.builder().organisationID(newOrgId).build())
-                    .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build();
+                respondent1OrganisationPolicy = organisationPolicy(newOrgId, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
             }
         }
         return this;
@@ -3428,9 +3356,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent1Represented = NO;
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
-            .build();
+        respondent1OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
         defendant1LIPAtClaimIssued = YES;
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         cosNotifyClaimDefendant1 = certificateOfService;
@@ -3442,9 +3368,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         ccdState = CASE_ISSUED;
         respondent2Represented = NO;
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .orgPolicyCaseAssignedRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
-            .build();
+        respondent2OrganisationPolicy = organisationPolicy(null, CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
         legacyCaseReference = LEGACY_CASE_REFERENCE;
         claimDetailsNotificationDeadline = DEADLINE;
         defendant2LIPAtClaimIssued = YES;
@@ -5982,8 +5906,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -5997,7 +5920,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
@@ -6009,18 +5932,16 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildMakePaymentsCaseDataWithoutClaimIssuedPbaDetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithoutServiceRequestReference() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6032,13 +5953,12 @@ public class CaseDataBuilder {
                             .calculatedAmountInPence(BigDecimal.valueOf(27500))
                             .version("1")
                             .build()).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6051,7 +5971,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
@@ -6104,15 +6024,13 @@ public class CaseDataBuilder {
             .claimValue(new ClaimValue()
                 .setStatementOfValueInPennies(BigDecimal.valueOf(10800)))
             .allocatedTrack(SMALL_CLAIM)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(
-                Organisation.builder()
-                    .organisationID("OrgId").build()).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                new Organisation().setOrganisationID("OrgId")))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDate() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6125,15 +6043,14 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDueDateWithoutClaimIssuedPbaDetails() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6146,26 +6063,24 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithoutClaimIssuedPbaDetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDueDate(LocalDate.now().plusWeeks(2))
             .build();
     }
 
     public CaseData buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6178,7 +6093,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .hearingDate(LocalDate.now().plusWeeks(2))
             .hearingFeePBADetails(SRPbaDetails.builder()
                 .fee(
@@ -6192,8 +6107,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildClaimIssuedPaymentCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6204,7 +6118,7 @@ public class CaseDataBuilder {
                     .calculatedAmountInPence(BigDecimal.valueOf(27500))
                     .version("1")
                     .build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .applicant1(Party.builder()
                 .individualFirstName("First name")
                 .individualLastName("Second name")
@@ -6222,8 +6136,7 @@ public class CaseDataBuilder {
     }
 
     public CaseData buildPaymentFailureCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6244,13 +6157,12 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
     public CaseData buildPaymentSuccessfulCaseData() {
-        Organisation orgId = Organisation.builder()
-            .organisationID("OrgId").build();
+        Organisation orgId = new Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -6275,7 +6187,7 @@ public class CaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .build();
     }
 
@@ -6543,16 +6455,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder setCoSClaimDetailsWithDate(boolean setCos1, boolean setCos2,
                                                       LocalDate cos1Date, LocalDate deemed1Date, LocalDate cos2Date, LocalDate deemed2Date,
                                                       boolean file1, boolean file2) {
-        List<Element<Document>> files = wrapElements(Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build());
-        List<Element<Document>> files2 = wrapElements(Document.builder()
-            .documentUrl("fake-url2")
-            .documentFileName("file-name2")
-            .documentBinaryUrl("binary-url2")
-            .build());
+        List<Element<Document>> files = wrapElements(new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url"));
+        List<Element<Document>> files2 = wrapElements(new Document()
+            .setDocumentUrl("fake-url2")
+            .setDocumentFileName("file-name2")
+            .setDocumentBinaryUrl("binary-url2"));
         ArrayList<String> cosUIStatement = new ArrayList<>();
         cosUIStatement.add("CERTIFIED");
         if (setCos1) {
@@ -7618,9 +7528,8 @@ public class CaseDataBuilder {
     public List<Element<MediationNonAttendanceStatement>> buildMediationNonAttendanceStatement() {
         MediationNonAttendanceStatement statement = new MediationNonAttendanceStatement();
         statement.setYourName("My name");
-        statement.setDocument(Document.builder()
-            .documentFileName("Mediation non attendance")
-            .build());
+        statement.setDocument(new Document()
+            .setDocumentFileName("Mediation non attendance"));
         statement.setDocumentDate(LocalDate.of(2023, 4, 2));
         statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
         return wrapElements(statement);
@@ -7629,9 +7538,8 @@ public class CaseDataBuilder {
     private List<Element<MediationDocumentsReferredInStatement>> buildMediationDocumentsReferred() {
         MediationDocumentsReferredInStatement statement = new MediationDocumentsReferredInStatement();
         statement.setDocumentType("type");
-        statement.setDocument(Document.builder()
-            .documentFileName("Referred documents")
-            .build());
+        statement.setDocument(new Document()
+            .setDocumentFileName("Referred documents"));
         statement.setDocumentDate(LocalDate.of(2023, 4, 2));
         statement.setDocumentUploadedDatetime(LocalDateTime.of(2023, 1, 1, 1, 1, 1));
         return wrapElements(statement);
@@ -8039,5 +7947,26 @@ public class CaseDataBuilder {
     public CaseDataBuilder ccdCaseReference(long ref) {
         this.ccdCaseReference = ref;
         return this;
+    }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
     }
 }

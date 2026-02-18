@@ -88,13 +88,12 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -115,13 +114,12 @@ class ClaimReconsiderationUpheldClaimantNotificationHandlerTest extends BaseCall
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.DECISION_ON_RECONSIDERATION_REQUEST.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

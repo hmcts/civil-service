@@ -34,10 +34,9 @@ class DjOrderDetailsTaskTest {
         CaseData original = CaseDataBuilder.builder().build();
         CaseData updated = CaseDataBuilder.builder().build();
         updated.setLegacyCaseReference("updated");
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Collections.emptyMap())
-            .pageId("trial-disposal-screen")
-            .build();
+            .pageId("trial-disposal-screen");
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
         when(orderDetailsService.populateTrialDisposalScreen(context)).thenReturn(updated);
@@ -54,11 +53,10 @@ class DjOrderDetailsTaskTest {
         CaseData original = CaseDataBuilder.builder().build();
         CaseData updated = CaseDataBuilder.builder().build();
         updated.setCcdCaseReference(123L);
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Collections.emptyMap())
             .pageId("create-order")
-            .version(CallbackVersion.V_2)
-            .build();
+            .version(CallbackVersion.V_2);
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
         when(orderDetailsService.applyHearingSelections(
@@ -77,10 +75,9 @@ class DjOrderDetailsTaskTest {
     void shouldReturnOriginalCaseDataWhenPageNotHandled() {
         CaseData original = CaseDataBuilder.builder().build();
         original.setLegacyCaseReference("original");
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Collections.emptyMap())
-            .pageId("unknown-page")
-            .build();
+            .pageId("unknown-page");
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
