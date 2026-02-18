@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -171,25 +173,31 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(CONFIRM_ORDER_REVIEW.name(), "READY");
         }
 
-        @Test
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder(AllocatedTrack allocatedTrack) {
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
+            caseData.setAllocatedTrack(allocatedTrack);
             caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(YesOrNo.YES);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
+            } else {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+            }
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
         }
 
-        @Test
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_spec_v2() {
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_spec_v2(AllocatedTrack allocatedTrack) {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
-            caseData.setResponseClaimTrack(AllocatedTrack.MULTI_CLAIM.name());
+            caseData.setResponseClaimTrack(allocatedTrack.name());
             caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(NO);
 
@@ -199,11 +207,12 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
         }
 
-        @Test
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_unspec_v3() {
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_unspec_v3(AllocatedTrack allocatedTrack) {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
-            caseData.setAllocatedTrack(AllocatedTrack.MULTI_CLAIM);
+            caseData.setAllocatedTrack(allocatedTrack);
             caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(NO);
 
