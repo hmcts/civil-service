@@ -8,10 +8,7 @@ class CaseNoteReferenceTest {
 
     @Test
     void shouldCreateCaseNoteReference() {
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("1234567890123456")
-            .caseNoteElementId("note-id-123")
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("1234567890123456", "note-id-123");
 
         assertThat(caseNoteReference.getCaseReference()).isEqualTo("1234567890123456");
         assertThat(caseNoteReference.getCaseNoteElementId()).isEqualTo("note-id-123");
@@ -38,21 +35,19 @@ class CaseNoteReferenceTest {
 
     @Test
     void shouldTestEqualsAndHashCode() {
-        CaseNoteReference ref1 = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId("note-1")
-            .build();
+        CaseNoteReference ref1 = caseNoteReference("123", "note-1");
 
-        CaseNoteReference ref2 = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId("note-1")
-            .build();
+        CaseNoteReference ref2 = caseNoteReference("123", "note-1");
 
-        CaseNoteReference ref3 = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId("note-2")
-            .build();
+        CaseNoteReference ref3 = caseNoteReference("123", "note-2");
 
         assertThat(ref1).isEqualTo(ref2).hasSameHashCodeAs(ref2).isNotEqualTo(ref3);
+    }
+
+    private CaseNoteReference caseNoteReference(String caseReference, String noteId) {
+        CaseNoteReference reference = new CaseNoteReference();
+        reference.setCaseReference(caseReference);
+        reference.setCaseNoteElementId(noteId);
+        return reference;
     }
 }

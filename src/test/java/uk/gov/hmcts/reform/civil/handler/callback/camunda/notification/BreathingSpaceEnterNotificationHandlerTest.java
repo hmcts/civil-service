@@ -85,19 +85,14 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .companyName("company name")
                              .build())
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -144,19 +139,14 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .companyName("company name")
                              .build())
             .respondentSolicitor2EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -204,20 +194,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .build())
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -265,20 +250,15 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .build())
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -323,22 +303,17 @@ class BreathingSpaceEnterNotificationHandlerTest {
             .applicantSolicitor1UserDetails(IdamUserDetails.builder()
                                                 .email(recipient)
                                                 .build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
                                                           .name(solicitorName)
                                                           .build())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 

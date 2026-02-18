@@ -35,9 +35,8 @@ class SdoSubmissionTaskTest {
         updatedCaseData.setCcdCaseReference(456L);
         when(submissionService.prepareSubmission(caseData, AUTH_TOKEN)).thenReturn(updatedCaseData);
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.SUBMISSION);
 

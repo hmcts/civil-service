@@ -63,7 +63,7 @@ class HandleDefendAllClaimTest {
     @Test
     void shouldReturnErrorResponseWhenPaymentsAreInvalid() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         when(paymentDateValidator.validate(any())).thenReturn(List.of("Error"));
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -78,7 +78,7 @@ class HandleDefendAllClaimTest {
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -96,7 +96,7 @@ class HandleDefendAllClaimTest {
         respondToClaim.setHowMuchWasPaid(BigDecimal.valueOf(50_000));
         caseData.setRespondToClaim(respondToClaim);
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -118,7 +118,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -140,7 +140,7 @@ class HandleDefendAllClaimTest {
                 .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -162,7 +162,7 @@ class HandleDefendAllClaimTest {
                 .build();
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -184,7 +184,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -208,7 +208,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
         CallbackResponse response = handleDefendAllClaim.execute(callbackParams);
@@ -232,7 +232,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired2("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -255,7 +255,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -279,7 +279,7 @@ class HandleDefendAllClaimTest {
         caseData.setRespondToClaim(respondToClaim);
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -304,7 +304,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired2("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -331,7 +331,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -361,7 +361,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired2("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -391,7 +391,7 @@ class HandleDefendAllClaimTest {
         caseData.setShowConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_1));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -421,7 +421,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired2("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -451,7 +451,7 @@ class HandleDefendAllClaimTest {
         caseData.setShowConditionFlags(Collections.singleton(DefendantResponseShowTag.CAN_ANSWER_RESPONDENT_2));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -476,7 +476,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -493,7 +493,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -510,7 +510,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -532,10 +532,9 @@ class HandleDefendAllClaimTest {
         CallbackRequest callbackRequest = CallbackRequest.builder()
                 .eventId(DEFENDANT_RESPONSE_SPEC)
                 .build();
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
                 .caseData(caseData)
-                .request(callbackRequest)
-                .build();
+                .request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -552,7 +551,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId("HAS_PAID_THE_AMOUNT_CLAIMED").build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -573,7 +572,7 @@ class HandleDefendAllClaimTest {
         caseData.setDefenceRouteRequired2("DISPUTES_THE_CLAIM");
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -602,7 +601,7 @@ class HandleDefendAllClaimTest {
         caseData.setRespondToClaim(respondToClaim);
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 
@@ -623,7 +622,7 @@ class HandleDefendAllClaimTest {
         caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
 
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
 
         when(paymentDateValidator.validate(any())).thenReturn(Collections.emptyList());
 

@@ -33,9 +33,8 @@ class SdoValidationTaskTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(validationService.validate(caseData)).thenReturn(List.of("validation-error"));
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Collections.emptyMap())
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Collections.emptyMap());
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.MID_EVENT);
 
