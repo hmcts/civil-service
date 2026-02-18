@@ -366,6 +366,7 @@ public class CaseDataBuilder {
     protected String personalInjuryTypeOther;
     protected DynamicList applicantSolicitor1PbaAccounts;
     protected Fee claimFee;
+    protected Fee otherRemedyFee;
     protected Fee hearingFee;
     protected StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     protected StatementOfTruth uiStatementOfTruth;
@@ -411,6 +412,7 @@ public class CaseDataBuilder {
     protected YesOrNo applicant1ProceedWithClaimMultiParty2v1;
     protected YesOrNo applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2;
     protected YesOrNo applicant1ProceedWithClaimAgainstRespondent2MultiParty1v2;
+    protected YesOrNo isClaimDeclarationAdded;
     protected ResponseDocument applicant1DefenceResponseDocument;
     protected ResponseDocument applicant2DefenceResponseDocument;
     protected BusinessProcess businessProcess;
@@ -2571,6 +2573,20 @@ public class CaseDataBuilder {
         applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
         applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
+        return this;
+    }
+
+    public CaseDataBuilder otherRemedyFee(BigDecimal amount) {
+        otherRemedyFee =  Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(amount)
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder otherRemedyClaimDeclarationAdded() {
+        isClaimDeclarationAdded = YES;
         return this;
     }
 
@@ -7605,6 +7621,8 @@ public class CaseDataBuilder {
             .personalInjuryTypeOther(personalInjuryTypeOther)
             .applicantSolicitor1PbaAccounts(applicantSolicitor1PbaAccounts)
             .claimFee(claimFee)
+            .otherRemedyFee(otherRemedyFee)
+            .isClaimDeclarationAdded(isClaimDeclarationAdded)
             .hearingFee(hearingFee)
             .applicant1(applicant1)
             .applicant2(applicant2)

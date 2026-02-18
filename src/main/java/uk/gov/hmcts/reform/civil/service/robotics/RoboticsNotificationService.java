@@ -71,7 +71,7 @@ public class RoboticsNotificationService {
 
     private Optional<EmailData> prepareEmailData(RoboticsEmailParams params) {
 
-        log.info(String.format("Start prepareEmailData %s", params.getCaseData().getLegacyCaseReference()));
+        log.info("Start prepareEmailData {}", params.getCaseData().getLegacyCaseReference());
         byte[] roboticsJsonData;
         try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTO(
