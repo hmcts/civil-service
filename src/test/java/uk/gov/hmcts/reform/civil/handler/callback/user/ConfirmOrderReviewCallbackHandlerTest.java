@@ -175,9 +175,30 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @ParameterizedTest
         @EnumSource(value = AllocatedTrack.class)
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder(AllocatedTrack allocatedTrack) {
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrderUnspec(AllocatedTrack allocatedTrack) {
             CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
             caseData.setAllocatedTrack(allocatedTrack);
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(YesOrNo.YES);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
+            } else {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+            }
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrderSpec(AllocatedTrack allocatedTrack) {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setResponseClaimTrack(allocatedTrack.name());
             caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(YesOrNo.YES);
 
