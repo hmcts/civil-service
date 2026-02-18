@@ -384,7 +384,7 @@ class RoboticsDataMapperForSpecTest {
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
             .respondent2(createPartyWithCompany("Respondent2"))
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com"))
             .respondent2OrganisationPolicy(respondent2Policy)
             .build();
         caseData.setSpecRespondent2Represented(YesOrNo.YES);

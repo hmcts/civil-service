@@ -46,10 +46,9 @@ public class RepresentedLitigantPopulatorTest {
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
         addMediationInfoRepresented(buildClaimant1(YES));
 
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
 
         MediationContactInformation contactInfo = new MediationContactInformation()
             .setFirstName("John")
@@ -77,10 +76,9 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNullableContactInformation() {
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -107,10 +105,9 @@ public class RepresentedLitigantPopulatorTest {
             .setTelephoneNumber("0123456789")
             .setEmailAddress("john.doe@example.com");
 
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
         UnavailableDate unavailableDate = UnavailableDate.builder()
