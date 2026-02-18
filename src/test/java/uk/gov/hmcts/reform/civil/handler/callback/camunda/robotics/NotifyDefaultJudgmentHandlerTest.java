@@ -29,9 +29,9 @@ public class NotifyDefaultJudgmentHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void whenAboutToSubmitCallbackInvoked_thenCallDefaultJudgementRoboticsNotifier() {
         CaseData caseData = CaseData.builder().build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
+        CallbackParams params = new CallbackParams().caseData(caseData)
             .type(CallbackType.ABOUT_TO_SUBMIT).params(Map.of(
-            CallbackParams.Params.BEARER_TOKEN, TOKEN)).build();
+            CallbackParams.Params.BEARER_TOKEN, TOKEN));
 
         handler.handle(params);
 

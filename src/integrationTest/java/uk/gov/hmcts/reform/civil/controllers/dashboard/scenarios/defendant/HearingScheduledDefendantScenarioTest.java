@@ -49,9 +49,8 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT").build());
 
         // When
         handler.handle(callbackParams);

@@ -511,9 +511,8 @@ class SetApplicantResponseDeadlineSpecTest {
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
-        return CallbackParams.builder()
+        return new CallbackParams()
                 .caseData(caseData)
-                .params(Map.of(BEARER_TOKEN, "Bearer token"))
-                .build();
+                .params(Map.of(BEARER_TOKEN, "Bearer token"));
     }
 }
