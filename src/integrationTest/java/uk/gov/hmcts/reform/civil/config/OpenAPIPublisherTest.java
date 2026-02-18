@@ -27,7 +27,14 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 
 @SpringJUnitWebConfig
-@SpringBootTest
+@SpringBootTest(
+    properties = {
+        "spring.flyway.enabled=false",
+        "spring.datasource.url=jdbc:h2:mem:openapi;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
+        "spring.datasource.driver-class-name=org.h2.Driver",
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+    }
+)
 @AutoConfigureMockMvc
 @ActiveProfiles("integration-test")
 class OpenAPIPublisherTest {
