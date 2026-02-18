@@ -103,13 +103,13 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppWrittenRepUpload.add(element(document1));
             generalAppWrittenRepUpload.add(element(document2));
@@ -138,13 +138,13 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
             List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppWrittenRepUpload.add(element(document1));
             generalAppWrittenRepUpload.add(element(document2));
@@ -181,15 +181,15 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
         void shouldPopulateDocListWithExitingDocElementWhenGaForWelshEnabled() {
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
 
-        List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            List<Element<Document>> generalAppWrittenRepUpload = new ArrayList<>();
+            when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppWrittenRepUpload.add(element(document1));
             generalAppWrittenRepUpload.add(element(document2));
@@ -255,13 +255,13 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -302,13 +302,13 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -345,20 +345,20 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
 
-        GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
-            .preTranslationGaDocuments(List.of(element(new CaseDocument().setDocumentName("Written representation").setCreatedBy("Applicant")))).build();
+            GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
+            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+                .preTranslationGaDocuments(List.of(element(new CaseDocument().setDocumentName("Written representation").setCreatedBy("Applicant")))).build();
 
             Map<String, Object> dataMap = objectMapper.convertValue(
                 caseData, new TypeReference<>() {

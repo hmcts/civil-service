@@ -103,13 +103,13 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -136,13 +136,13 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -182,13 +182,13 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -254,13 +254,13 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -290,13 +290,13 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
                 .thenReturn(new CaseDocument().setDocumentLink(new Document()));
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
@@ -323,20 +323,20 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
 
             List<Element<Document>> generalAppAddlnInfoUpload = new ArrayList<>();
 
-        Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document1 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
-        Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
-            .setDocumentBinaryUrl(TEST_STRING)
-            .setDocumentHash(TEST_STRING);
+            Document document2 = new Document().setDocumentFileName(TEST_STRING).setDocumentUrl(TEST_STRING)
+                .setDocumentBinaryUrl(TEST_STRING)
+                .setDocumentHash(TEST_STRING);
 
             generalAppAddlnInfoUpload.add(element(document1));
             generalAppAddlnInfoUpload.add(element(document2));
 
-        GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-        caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
-            .preTranslationGaDocuments(List.of(element(new CaseDocument().setDocumentName("Additional information").setCreatedBy("Applicant")))).build();
+            GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
+            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+                .preTranslationGaDocuments(List.of(element(new CaseDocument().setDocumentName("Additional information").setCreatedBy("Applicant")))).build();
 
             Map<String, Object> dataMap = objectMapper.convertValue(
                 caseData, new TypeReference<>() {
