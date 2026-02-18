@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
 
 import java.util.HashMap;
@@ -32,70 +35,108 @@ class DashboardScenarioServiceTest {
     @Mock
     private DashboardScenariosService dashboardScenariosService;
 
-    private TestDashboardScenarioService scenarioService;
+    @Nested
+    class DashboardScenarioServiceWithoutParameter {
 
-    @BeforeEach
-    void setup() {
-        scenarioService = new TestDashboardScenarioService(dashboardScenariosService, mapper);
-        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        private TestDashboardScenarioService scenarioService;
+
+        @BeforeEach
+        void setup() {
+            scenarioService = new TestDashboardScenarioService(dashboardScenariosService, mapper);
+            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
+        }
+
+        @Test
+        void shouldRecordPrimaryExtraAndAdditionalScenarios() {
+            scenarioService.primaryScenario = PRIMARY_SCENARIO;
+            scenarioService.extraScenario = EXTRA_SCENARIO;
+            scenarioService.additionalScenarios = Map.of(
+                "AdditionalTrue", true,
+                "AdditionalFalse", false
+            );
+
+            CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+
+            scenarioService.record(caseData, AUTH_TOKEN);
+
+            verify(mapper).mapCaseDataToParams(caseData);
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(PRIMARY_SCENARIO),
+                eq("123"),
+                ArgumentMatchers.any()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(EXTRA_SCENARIO),
+                eq("123"),
+                ArgumentMatchers.any()
+            );
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq("AdditionalTrue"),
+                eq("123"),
+                ArgumentMatchers.any()
+            );
+            verify(dashboardScenariosService, never()).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq("AdditionalFalse"),
+                any(),
+                any()
+            );
+            assertThat(scenarioService.beforeHookCalled).isTrue();
+        }
+
+        @Test
+        void shouldSkipScenariosWhenNotEligible() {
+            scenarioService.primaryScenario = PRIMARY_SCENARIO;
+            scenarioService.extraScenario = EXTRA_SCENARIO;
+            scenarioService.shouldRecordPrimary = false;
+            scenarioService.shouldRecordExtra = false;
+            scenarioService.additionalScenarios = Map.of("Additional", false);
+
+            CaseData caseData = CaseData.builder().build();
+
+            scenarioService.record(caseData, AUTH_TOKEN);
+
+            verify(mapper).mapCaseDataToParams(caseData);
+            verifyNoInteractions(dashboardScenariosService);
+            assertThat(scenarioService.beforeHookCalled).isFalse();
+        }
     }
 
-    @Test
-    void shouldRecordPrimaryExtraAndAdditionalScenarios() {
-        scenarioService.primaryScenario = PRIMARY_SCENARIO;
-        scenarioService.extraScenario = EXTRA_SCENARIO;
-        scenarioService.additionalScenarios = Map.of(
-            "AdditionalTrue", true,
-            "AdditionalFalse", false
-        );
+    @Nested
+    class DashboardScenarioServiceWithParameter {
 
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
+        @Test
+        void shouldSetParametersBeforeRecord() {
+            ScenarioRequestParams scenarioRequestParams = getScenarioRequestParams();
+            TestDashboardScenarioWithParamService scenarioService = new TestDashboardScenarioWithParamService(
+                dashboardScenariosService,
+                mapper
+            );
+            scenarioService.primaryScenario = PRIMARY_SCENARIO;
+            scenarioService.scenarioRequestParams = scenarioRequestParams;
 
-        scenarioService.record(caseData, AUTH_TOKEN);
+            CaseData caseData = new CaseDataBuilder().ccdCaseReference(123L).build();
 
-        verify(mapper).mapCaseDataToParams(caseData);
-        verify(dashboardScenariosService).recordScenarios(
-            eq(AUTH_TOKEN),
-            eq(PRIMARY_SCENARIO),
-            eq("123"),
-            ArgumentMatchers.any()
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            eq(AUTH_TOKEN),
-            eq(EXTRA_SCENARIO),
-            eq("123"),
-            ArgumentMatchers.any()
-        );
-        verify(dashboardScenariosService).recordScenarios(
-            eq(AUTH_TOKEN),
-            eq("AdditionalTrue"),
-            eq("123"),
-            ArgumentMatchers.any()
-        );
-        verify(dashboardScenariosService, never()).recordScenarios(
-            eq(AUTH_TOKEN),
-            eq("AdditionalFalse"),
-            any(),
-            any()
-        );
-        assertThat(scenarioService.beforeHookCalled).isTrue();
-    }
+            scenarioService.record(caseData, AUTH_TOKEN);
 
-    @Test
-    void shouldSkipScenariosWhenNotEligible() {
-        scenarioService.primaryScenario = PRIMARY_SCENARIO;
-        scenarioService.extraScenario = EXTRA_SCENARIO;
-        scenarioService.shouldRecordPrimary = false;
-        scenarioService.shouldRecordExtra = false;
-        scenarioService.additionalScenarios = Map.of("Additional", false);
+            verify(dashboardScenariosService).recordScenarios(
+                eq(AUTH_TOKEN),
+                eq(PRIMARY_SCENARIO),
+                eq("123"),
+                eq(scenarioRequestParams)
+            );
+        }
 
-        CaseData caseData = CaseData.builder().build();
-
-        scenarioService.record(caseData, AUTH_TOKEN);
-
-        verify(mapper).mapCaseDataToParams(caseData);
-        verifyNoInteractions(dashboardScenariosService);
-        assertThat(scenarioService.beforeHookCalled).isFalse();
+        private static ScenarioRequestParams getScenarioRequestParams() {
+            HashMap<String, Object> parameters = new HashMap<>();
+            parameters.put("param1", "value1");
+            return ScenarioRequestParams.builder()
+                .params(parameters)
+                .build();
+        }
     }
 
     private static class TestDashboardScenarioService extends DashboardScenarioService {
@@ -144,6 +185,31 @@ class DashboardScenarioServiceTest {
         @Override
         protected void beforeRecordScenario(CaseData caseData, String authToken) {
             beforeHookCalled = true;
+        }
+    }
+
+    private static class TestDashboardScenarioWithParamService extends DashboardScenarioService {
+
+        private String primaryScenario;
+        private ScenarioRequestParams scenarioRequestParams;
+
+        TestDashboardScenarioWithParamService(DashboardScenariosService dashboardScenariosService,
+                                              DashboardNotificationsParamsMapper mapper) {
+            super(dashboardScenariosService, mapper);
+        }
+
+        void record(CaseData caseData, String authToken) {
+            recordScenario(caseData, authToken);
+        }
+
+        @Override
+        protected String getScenario(CaseData caseData) {
+            return primaryScenario;
+        }
+
+        @Override
+        protected ScenarioRequestParams scenarioRequestParamsFrom(CaseData caseData) {
+            return scenarioRequestParams;
         }
     }
 }
