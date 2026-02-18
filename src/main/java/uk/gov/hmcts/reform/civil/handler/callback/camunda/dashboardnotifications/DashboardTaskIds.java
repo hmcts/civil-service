@@ -53,5 +53,8 @@ public final class DashboardTaskIds {
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
     public static final String TRIAL_READY_CHECK = "GenerateDashboardNotificationsTrialReadyCheck";
     public static final String TRIAL_READY_CHECK_RESPONDENT1 = "GenerateDashboardNotificationsTrialReadyCheckRespondent1";
+    public static final String CREATE_SDO = "GenerateDashboardNotificationCreateSDO";
+    public static final String FINAL_ORDER = "GenerateDashboardNotificationFinalOrder";
+    public static final String STAY_LIFTED = "GenerateDashboardNotificationStayLifted";
 
 }
