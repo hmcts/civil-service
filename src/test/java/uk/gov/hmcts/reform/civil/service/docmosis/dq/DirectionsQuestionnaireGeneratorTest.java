@@ -2146,16 +2146,15 @@ class DirectionsQuestionnaireGeneratorTest {
                 respondent1LitigationFriend.setFullName("respondent LF");
                 caseData.setRespondent1LitigationFriend(respondent1LitigationFriend);
                 caseData.getSystemGeneratedCaseDocuments().add(element(
-                    CaseDocument.builder()
-                        .createdDatetime(createdDate)
-                        .documentName(
+                    new CaseDocument()
+                        .setCreatedDatetime(createdDate)
+                        .setDocumentName(
                             format(
                                 DQ_RESPONSE_1V1.getDocumentTitle(),
                                 "defendant",
                                 caseData.getLegacyCaseReference()
                             )
-                        )
-                        .build()));
+                        )));
                 Optional<CaseDocument> caseDocument = generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN,
                     "ONE"
                 );
@@ -2677,7 +2676,7 @@ class DirectionsQuestionnaireGeneratorTest {
         void whenIntermediateClaim_shouldUseFixedRecoverableCosts_ClaimantDQ() {
             FixedRecoverableCosts frcIntermediate = new FixedRecoverableCosts()
                 .setIsSubjectToFixedRecoverableCostRegime(YES)
-                .setFrcSupportingDocument(Document.builder().build())
+                .setFrcSupportingDocument(new Document())
                 .setComplexityBandingAgreed(YES)
                 .setBand(ComplexityBand.BAND_1)
                 .setReasons("Reasoning");

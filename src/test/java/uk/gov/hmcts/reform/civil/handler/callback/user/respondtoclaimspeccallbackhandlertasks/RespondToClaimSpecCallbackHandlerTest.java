@@ -254,7 +254,7 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .eventId(SpecJourneyConstantLRSpec.DEFENDANT_RESPONSE_SPEC)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "specCorrespondenceAddress")
-                .toBuilder().request(request).build();
+                .copy().request(request);
 
         List<String> errors = Collections.singletonList("error 1");
         Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
