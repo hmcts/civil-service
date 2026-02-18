@@ -19,8 +19,9 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     private static final String CALLBACK_VERSION_URL = "/cases/callbacks/version/{version}/{callback-type}";
     private static final String CALLBACK_VERSION_PAGE_ID_URL =
         "/cases/callbacks/version/{version}/{callback-type}/{page-id}";
-    private static final String VALID_CALLBACK_TYPE = "about-to-submit";
+    private static final String VALID_CALLBACK_TYPE = "mid";
     private static final String VALID_CALLBACK_TYPE2 = "about-to-start";
+    private static final String VALID_CALLBACK_TYPE_VERSION = "about-to-start";
     private static final String INVALID_CALLBACK_TYPE = "invalid-callback-type";
     private static final String VALID_PAGE_ID = "start-claim";
     private static final String INVALID_PAGE_ID = "invalid-page-id";
@@ -85,7 +86,7 @@ public class CallbackControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnOkWithValidCallbackTypeAndVersion() {
-        doPost(BEARER_TOKEN, callbackRequest, CALLBACK_VERSION_URL, V1, VALID_CALLBACK_TYPE)
+        doPost(BEARER_TOKEN, callbackRequest, CALLBACK_VERSION_URL, V1, VALID_CALLBACK_TYPE_VERSION)
             .andExpect(status().isOk());
     }
 
