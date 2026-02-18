@@ -38,10 +38,9 @@ class SdoDocumentTaskTest {
         SdoDocumentTask task = new SdoDocumentTask(sdoDocumentService);
         CaseData caseData = CaseDataBuilder.builder().build();
         CaseDocument document = new CaseDocument();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
-            .type(CallbackType.MID)
-            .build();
+            .type(CallbackType.MID);
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
@@ -60,9 +59,8 @@ class SdoDocumentTaskTest {
     void shouldSkipCategoryAssignmentWhenDocumentMissing() {
         SdoDocumentTask task = new SdoDocumentTask(sdoDocumentService);
         CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
