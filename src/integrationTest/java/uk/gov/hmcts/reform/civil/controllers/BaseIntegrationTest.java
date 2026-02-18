@@ -49,13 +49,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("integration-test")
-@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class},
-    properties = {
-        "spring.flyway.enabled=false",
-        "spring.datasource.url=jdbc:h2:mem:openapi;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
-        "spring.datasource.driver-class-name=org.h2.Driver",
-        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
-    })
+@SpringBootTest(classes = {Application.class, TestIdamConfiguration.class})
 @AutoConfigureMockMvc
 public abstract class BaseIntegrationTest {
 
