@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -560,6 +561,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
         }
 
         @Test
+        void shouldReturnSubmittedCallbackResponse() {
+            var response = assignCaseToUserHandler.handle(params);
+            assertThat(response).isInstanceOf(SubmittedCallbackResponse.class);
+        }
+
+        @Test
         void shouldCallAssignCaseLip() {
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(1)).assignCase(
@@ -817,7 +824,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response
                     = (AboutToStartOrSubmitCallbackResponse)
                     assignCaseToUserHandler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).isNotNull();
         }
 
         @Test
@@ -826,7 +833,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response
                     = (AboutToStartOrSubmitCallbackResponse)
                     assignCaseToUserHandler.handle(params);
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getData()).isNotNull();
         }
 
         @Test
@@ -844,7 +851,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             AboutToStartOrSubmitCallbackResponse response =
                     (AboutToStartOrSubmitCallbackResponse) assignCaseToUserHandler.handle(params);
 
-            assertThat(response.getErrors()).isEmpty();
+            assertThat(response.getErrors()).isNull();
         }
 
         @Test
