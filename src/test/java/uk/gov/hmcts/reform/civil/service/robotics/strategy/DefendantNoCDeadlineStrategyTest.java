@@ -1,0 +1,91 @@
+package uk.gov.hmcts.reform.civil.service.robotics.strategy;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+class DefendantNoCDeadlineStrategyTest {
+
+    @Mock
+    private RoboticsEventTextFormatter textFormatter;
+    @Mock
+    private RoboticsSequenceGenerator sequenceGenerator;
+
+    @InjectMocks
+    private DefendantNoCDeadlineStrategy strategy;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        when(textFormatter.claimMovedOfflineAfterNocDeadline())
+            .thenReturn("RPA Reason: Claim moved offline after defendant NoC deadline has passed");
+    }
+
+    @Test
+    void supportsReturnsFalseWhenTakenOfflineDateMissing() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        assertThat(strategy.supports(caseData)).isFalse();
+    }
+
+    @Test
+    void supportsReturnsTrueWhenRespondent1MissesDeadline() {
+        LocalDateTime offline = LocalDateTime.of(2024, 5, 1, 10, 0);
+        CaseData caseData = CaseDataBuilder.builder()
+            .takenOfflineDate(offline)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        caseData.setAddLegalRepDeadlineRes1(offline.minusDays(1));
+
+        assertThat(strategy.supports(caseData)).isTrue();
+    }
+
+    @Test
+    void contributeAddsEventWhenDeadlineMissed() {
+        LocalDateTime offline = LocalDateTime.of(2024, 6, 1, 9, 0);
+        CaseData caseData = CaseDataBuilder.builder()
+            .takenOfflineDate(offline)
+            .respondent2Represented(YesOrNo.NO)
+            .build();
+        caseData.setAddLegalRepDeadlineRes2(offline.minusDays(2));
+
+        when(sequenceGenerator.nextSequence(any())).thenReturn(7);
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getMiscellaneous()).hasSize(1);
+        assertThat(builder.getMiscellaneous().getFirst().getEventSequence()).isEqualTo(7);
+        assertThat(builder.getMiscellaneous().getFirst().getDateReceived()).isEqualTo(offline);
+        assertThat(builder.getMiscellaneous().getFirst().getEventDetailsText())
+            .isEqualTo("RPA Reason: Claim moved offline after defendant NoC deadline has passed");
+    }
+
+    @Test
+    void contributeNoopsWhenDeadlinesNotBreached() {
+        LocalDateTime offline = LocalDateTime.of(2024, 6, 1, 9, 0);
+        CaseData caseData = CaseDataBuilder.builder()
+            .takenOfflineDate(offline)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        caseData.setAddLegalRepDeadlineRes1(offline.plusDays(2));
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getMiscellaneous()).isNullOrEmpty();
+    }
+}
