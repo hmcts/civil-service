@@ -126,11 +126,10 @@ class CaseDismissDefendantNotificationHandlerTest {
                          ? CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name()
                          : CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

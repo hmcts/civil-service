@@ -70,10 +70,9 @@ class ValidateUnavailableDatesTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ).build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) validateUnavailableDates.execute(callbackParams);
@@ -94,10 +93,9 @@ class ValidateUnavailableDatesTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1DQ(respondent1DQ).build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(unavailableDateValidator.validate(any(Hearing.class)))
             .thenReturn(List.of("Unavailable date cannot be in the past"));
@@ -125,10 +123,9 @@ class ValidateUnavailableDatesTest {
             .build();
         caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
@@ -172,10 +169,9 @@ class ValidateUnavailableDatesTest {
         caseData.setRespondent2SameLegalRepresentative(YES);
         caseData.setRespondentResponseIsSame(NO);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());

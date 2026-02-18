@@ -436,10 +436,7 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                     .organisationID("Resp_2_Org_Id")
-                                                                     .build()).build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("Resp_2_Org_Id")))
                 .respondentSolicitor2EmailAddress("resp2_sol_email")
                 .setMultiTrackClaim()
                 .build();
@@ -471,9 +468,9 @@ class ClaimantResponseConfirmsToProceedRespondentNotificationHandlerTest extends
                 .applicant1Represented(YesOrNo.NO)
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy())
+                .respondent2OrganisationPolicy(new OrganisationPolicy())
+                .applicant1OrganisationPolicy(new OrganisationPolicy())
                 .setMultiTrackClaim()
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
