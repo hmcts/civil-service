@@ -189,8 +189,10 @@ class RoboticsDataMapperForSpecTest {
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(fromDate).build()).build();
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(fromDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
     }
 
     private Party createPartyWithCompany(String companyName) {

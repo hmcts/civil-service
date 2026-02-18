@@ -20,120 +20,35 @@ public final class PDFBuilder {
     private PDFBuilder() {
     }
 
-    public static final CaseDocument GENERAL_ORDER_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(GENERAL_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument GENERAL_ORDER_DOCUMENT = buildCaseDocument(GENERAL_ORDER);
 
-    public static final CaseDocument DIRECTION_ORDER_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(DIRECTION_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument DIRECTION_ORDER_DOCUMENT = buildCaseDocument(DIRECTION_ORDER);
 
-    public static final CaseDocument DISMISSAL_ORDER_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(DISMISSAL_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument DISMISSAL_ORDER_DOCUMENT = buildCaseDocument(DISMISSAL_ORDER);
 
-    public static final CaseDocument HEARING_ORDER_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(HEARING_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument HEARING_ORDER_DOCUMENT = buildCaseDocument(HEARING_ORDER);
 
-    public static final CaseDocument WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(WRITTEN_REPRESENTATION_SEQUENTIAL)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT = buildCaseDocument(WRITTEN_REPRESENTATION_SEQUENTIAL);
 
-    public static final CaseDocument WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(WRITTEN_REPRESENTATION_CONCURRENT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT = buildCaseDocument(WRITTEN_REPRESENTATION_CONCURRENT);
 
-    public static final CaseDocument REQUEST_FOR_INFORMATION_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(REQUEST_FOR_INFORMATION)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument REQUEST_FOR_INFORMATION_DOCUMENT = buildCaseDocument(REQUEST_FOR_INFORMATION);
 
-    public static final CaseDocument CONSENT_ORDER_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(CONSENT_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument CONSENT_ORDER_DOCUMENT = buildCaseDocument(CONSENT_ORDER);
 
-    public static final CaseDocument APPLICATION_DRAFT_DOCUMENT = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(GENERAL_APPLICATION_DRAFT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument APPLICATION_DRAFT_DOCUMENT = buildCaseDocument(GENERAL_APPLICATION_DRAFT);
+
+    private static CaseDocument buildCaseDocument(uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType documentType) {
+        Document documentLink = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("document name")
+            .setDocumentSize(0L)
+            .setDocumentType(documentType)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(documentLink);
+    }
 }

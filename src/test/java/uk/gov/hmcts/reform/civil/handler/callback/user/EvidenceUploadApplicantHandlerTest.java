@@ -295,7 +295,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnError_whenBundleUploadDatePast() {
-        Document emptyDocument = Document.builder().build();
+        Document emptyDocument = new Document();
         var documentUpload = createUploadEvidenceDocumentType(
             LocalDate.of(2022, 2, 10),
             "test",
@@ -318,7 +318,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnError_whenBundleUploadDatePastAndNewBundleUploadedHasPastDate() {
-        Document emptyDocument = Document.builder().build();
+        Document emptyDocument = new Document();
         var documentUpload = createUploadEvidenceDocumentType(
             LocalDate.of(2022, 2, 10),
             "test",
@@ -326,7 +326,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(createElement(documentUpload));
 
-        Document emptyDocument2 = Document.builder().build();
+        Document emptyDocument2 = new Document();
         var documentUpload2 = createUploadEvidenceDocumentType(
             LocalDate.of(2022, 2, 10),
             "test",
@@ -351,7 +351,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldNotReturnError_whenBundleUploadDatePastAndNewBundleUploadedHasNotPastDate() {
-        Document emptyDocument = Document.builder().build();
+        Document emptyDocument = new Document();
         var documentUpload = createUploadEvidenceDocumentType(
             LocalDate.of(2022, 2, 10),
             "test",
@@ -359,7 +359,7 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
         List<Element<UploadEvidenceDocumentType>> documentList = new ArrayList<>();
         documentList.add(createElement(documentUpload));
 
-        Document emptyDocument2 = Document.builder().build();
+        Document emptyDocument2 = new Document();
         var documentUpload2 = createUploadEvidenceDocumentType(
             LocalDate.now().plusMonths(2L),
             "test",
@@ -798,19 +798,17 @@ class EvidenceUploadApplicantHandlerTest extends BaseCallbackHandlerTest {
     }
 
     private Document createDocument(String binaryUrl, String fileName) {
-        Document document = Document.builder()
-            .documentBinaryUrl(binaryUrl)
-            .documentFileName(fileName)
-            .build();
+        Document document = new Document()
+            .setDocumentBinaryUrl(binaryUrl)
+            .setDocumentFileName(fileName);
         return document;
     }
 
     private Document createDocumentWithUrl(String binaryUrl, String fileName, String url) {
-        Document document = Document.builder()
-            .documentBinaryUrl(binaryUrl)
-            .documentFileName(fileName)
-            .documentUrl(url)
-            .build();
+        Document document = new Document()
+            .setDocumentBinaryUrl(binaryUrl)
+            .setDocumentFileName(fileName)
+            .setDocumentUrl(url);
         return document;
     }
 

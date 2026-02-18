@@ -267,11 +267,7 @@ class NotificationUtilsTest {
 
     @Test
     void shouldReturnOrgName_whenOrgIsPresent() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID("ORG123")
-                              .build())
-            .build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("ORG123"));
 
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
                                                                                          .name("org name")
@@ -287,11 +283,7 @@ class NotificationUtilsTest {
 
     @Test
     void shouldReturnNull_whenOrgIsNotPresent() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID("ORG123")
-                              .build())
-            .build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("ORG123"));
 
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.ofNullable(null));
 

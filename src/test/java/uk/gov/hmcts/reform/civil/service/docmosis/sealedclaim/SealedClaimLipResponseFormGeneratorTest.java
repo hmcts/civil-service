@@ -118,7 +118,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -157,7 +157,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -450,7 +450,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -481,7 +481,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);

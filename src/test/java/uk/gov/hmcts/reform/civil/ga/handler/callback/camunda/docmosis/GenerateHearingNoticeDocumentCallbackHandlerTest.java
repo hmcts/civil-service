@@ -72,13 +72,13 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GenerateHearingNoticeDocument");
+        assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GenerateHearingNoticeDocument");
     }
 
     @Test
     void shouldGenerateHearingNoticeDocument_whenAndWelseToggleEnabledAboutToSubmitEventIsCalled() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
@@ -98,8 +98,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocument_whenAboutToSubmitEventIsCalled() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
@@ -115,8 +115,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocumentWithCoverLetterTwice() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
@@ -141,8 +141,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocumentWithCoverLetterTwiceWhenWithoutNotice() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
@@ -167,8 +167,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldNotGenerateHearingNoticeDocumentWithCoverLetterWhenLanguagePreference() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
