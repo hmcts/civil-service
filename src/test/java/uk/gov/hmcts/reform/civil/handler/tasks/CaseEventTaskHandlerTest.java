@@ -828,12 +828,12 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
                         .respondent1OrgRegistered(NO)
                         .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]"))
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
                         .respondent2OrgRegistered(NO)
                         .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]"));
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
