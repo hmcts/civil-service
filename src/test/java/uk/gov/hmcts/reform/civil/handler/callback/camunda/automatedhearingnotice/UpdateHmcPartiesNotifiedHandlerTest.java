@@ -72,11 +72,10 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     }
 
     private CallbackParams buildParams(CaseData caseData) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(ABOUT_TO_SUBMIT)
             .caseData(caseData)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     private HearingNoticeVariables sampleCamundaVars() {

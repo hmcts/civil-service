@@ -39,9 +39,8 @@ class SdoOrderDetailsTaskTest {
 
         CaseData caseData = CaseDataBuilder.builder().build();
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, "token"));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 
@@ -63,9 +62,8 @@ class SdoOrderDetailsTaskTest {
         updated.setLegacyCaseReference("updated");
         when(orderDetailsService.updateOrderDetails(any())).thenReturn(updated);
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Collections.emptyMap())
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Collections.emptyMap());
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(original, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
 

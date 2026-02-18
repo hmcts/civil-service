@@ -31,9 +31,8 @@ class SdoPrePopulateTaskTest {
         SdoPrePopulateTask task = new SdoPrePopulateTask(prePopulateService);
         CaseData caseData = CaseDataBuilder.builder().build();
         when(prePopulateService.prePopulate(any())).thenReturn(caseData);
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, "token"));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
 

@@ -220,10 +220,9 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains("# Judgment marked as paid in full"));

@@ -492,10 +492,9 @@ class DetermineNextStateTest extends BaseCallbackHandlerTest {
 
     private CallbackParams callbackParams(CaseData caseData) {
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
             .version(CallbackVersion.V_2)
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }
