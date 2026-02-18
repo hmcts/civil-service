@@ -356,6 +356,110 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     }
 
     @Test
+    void shouldUpdateTaskListActionNeeded_whenParentClaimantIsApplicantNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.toBuilder()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
+                                              .value(GeneralApplicationsDetails.builder()
+                                                         .parentClaimantIsApplicant(NO)
+                                                         .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
+                                                         .build())
+                                              .build()))
+            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
+                                                   .value(GADetailsRespondentSol.builder()
+                                                              .parentClaimantIsApplicant(NO)
+                                                              .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
+                                                              .build())
+                                                   .build()))
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldUpdateTaskListInProgress_whenParentClaimantIsApplicantNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.toBuilder()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
+                                              .value(GeneralApplicationsDetails.builder()
+                                                         .parentClaimantIsApplicant(NO)
+                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
+                                                         .build())
+                                              .build()))
+            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
+                                                   .value(GADetailsRespondentSol.builder()
+                                                              .parentClaimantIsApplicant(NO)
+                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
+                                                              .build())
+                                                   .build()))
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldNotUpdateTaskList_whenGaDetailsAreNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.toBuilder()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(null)
+            .respondentSolGaAppDetails(null)
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        handler.handle(params);
+
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
+    }
+
+    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
     }
@@ -673,6 +777,77 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
 
         verifyNoInteractions(parentCaseUpdateHelper);
         verifyNoInteractions(dashboardApiClient);
+    }
+
+    @Test
+    void shouldProceedWhenPaymentFailedButNotLip() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .isMultiParty(YesOrNo.NO)
+            .generalAppRespondentSolicitors(getRespondentSolicitors())
+            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
+                .email("test@gmail.com").organisationIdentifier("org1").build())
+            .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
+            .ccdCaseReference(CCD_CASE_REFERENCE)
+            .build();
+        caseData = caseData.toBuilder()
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
+                .additionalPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build()).build())
+            .build();
+
+        when(gaForLipService.isLipApp(caseData)).thenReturn(false);
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.toString());
+        verify(assignCaseToRespondentSolHelper, times(1)).assignCaseToRespondentSolicitor(any(), any());
+    }
+
+    @Test
+    void shouldPreferActionNeededOverInProgress_whenBothPresent() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.toBuilder()
+            .parentCaseReference("1234")
+            .build();
+
+        // Parent case data with both Action Needed and In Progress for the claimant
+        GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        parentCaseData = parentCaseData.toBuilder()
+            .claimantGaAppDetails(List.of(
+                Element.<GeneralApplicationsDetails>builder().value(
+                    GeneralApplicationsDetails.builder()
+                        .parentClaimantIsApplicant(YES)
+                        .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()) // Action needed
+                        .build()).build(),
+                Element.<GeneralApplicationsDetails>builder().value(
+                    GeneralApplicationsDetails.builder()
+                        .parentClaimantIsApplicant(YES)
+                        .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()) // In progress
+                        .build()).build()
+            ))
+            .respondentSolGaAppDetails(null)
+            .build();
+
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parentCaseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
     }
 
     public List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {
