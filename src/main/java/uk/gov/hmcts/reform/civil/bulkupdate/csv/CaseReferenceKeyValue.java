@@ -7,12 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 @EqualsAndHashCode(callSuper = false)
-@SuperBuilder
 @JsonPropertyOrder(value = {"caseReference", "previousHCKey", "previousHCValue", "previousCourtListKey", "previousCourtListValue"})
 @AllArgsConstructor
 @NoArgsConstructor

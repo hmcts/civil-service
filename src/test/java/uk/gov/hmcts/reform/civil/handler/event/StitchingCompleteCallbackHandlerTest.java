@@ -67,10 +67,9 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
             .setTitle("Trial Bundle")
             .setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
-            .setStitchedDocument(Optional.of(Document.builder()
-                                              .documentUrl("url")
-                                              .documentFileName("name")
-                                              .build()))));
+            .setStitchedDocument(Optional.of(new Document()
+                                              .setDocumentUrl("url")
+                                              .setDocumentFileName("name")))));
         CaseData caseData = CaseData.builder().caseBundles(caseBundles).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -86,10 +85,9 @@ public class StitchingCompleteCallbackHandlerTest extends BaseCallbackHandlerTes
         caseBundles.add(new IdValue<>("1", new Bundle().setId("1")
             .setTitle("Trial Bundle")
             .setStitchStatus(Optional.of("SUCCESS")).setDescription("Trial Bundle")
-            .setStitchedDocument(Optional.of(Document.builder()
-                                              .documentUrl("url")
-                                              .documentFileName("name")
-                                              .build()))));
+            .setStitchedDocument(Optional.of(new Document()
+                                              .setDocumentUrl("url")
+                                              .setDocumentFileName("name")))));
         CaseData caseData = CaseData.builder().caseBundles(caseBundles)
             .bundleEvent("BUNDLE_CREATED_NOTIFICATION").build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -14,6 +16,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.ga.service.HearingScheduledNotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationException;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,16 +29,17 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_HEARING_NOTICE
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@SpringBootTest(classes = {
-    NotifyHearingNoticeDefendantHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class NotifyHearingNoticeDefendantHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private NotifyHearingNoticeDefendantHandler handler;
-    @MockBean
+
+    @Mock
     HearingScheduledNotificationService hearingScheduledNotificationService;
+
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
     private CallbackParams params;
 
     @Test
