@@ -143,10 +143,6 @@ def checkForEnableHelmLabel(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
 }
 
-def checkForFullDeploymentLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "prValues: fullDeployment").contains("prValues: fullDeployment")
-}
-
 def getCivilCcdDefinitionBranch() {
   def githubApi = new GithubAPI(this)
   for (label in githubApi.getLabelsbyPattern(env.BRANCH_NAME, "civilDefinitionBranch:")) {
@@ -308,11 +304,7 @@ def setPreviewEnvVars() {
   env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  if (checkForFullDeploymentLabel(env.BRANCH_NAME)) {
-    env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  } else {
-    env.ROLE_ASSIGNMENT_URL = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-  }
+  env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
   env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
   env.FT_TYPE = getFunctionalTestsType()
 }
