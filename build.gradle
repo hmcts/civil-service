@@ -414,9 +414,9 @@ dependencies {
 
   // JAX-B dependencies for JDK 9+
   implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.8'
+  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.9'
   runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
@@ -429,8 +429,8 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
 
-  implementation 'org.apache.poi:poi:5.4.0'
-  implementation 'org.apache.poi:poi-ooxml:5.4.0'
+  implementation 'org.apache.poi:poi:5.5.1'
+  implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
