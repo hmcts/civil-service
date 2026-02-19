@@ -31,7 +31,7 @@ public class SendGridAutoConfiguration {
     }
 
     private SendGrid createSendGrid(SendGridProperties properties) {
-        if (properties.getTest() != null) {
+        if (properties.getTest() != null && properties.getTest()) {
             return new SendGrid(properties.getApiKey(), properties.getTest());
         }
         return new SendGrid(properties.getApiKey());
