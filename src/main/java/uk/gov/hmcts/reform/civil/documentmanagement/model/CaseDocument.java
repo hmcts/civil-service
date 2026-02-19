@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 
 @Accessors(chain = true)
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class CaseDocument {
@@ -27,23 +25,21 @@ public class CaseDocument {
 
     @JsonIgnore
     public static CaseDocument toCaseDocument(Document document, DocumentType documentType) {
-        return CaseDocument.builder()
-            .documentLink(document)
-            .documentName(document.documentFileName)
-            .documentType(documentType)
-            .createdDatetime(LocalDateTime.now())
-            .build();
+        return new CaseDocument()
+            .setDocumentLink(document)
+            .setDocumentName(document.documentFileName)
+            .setDocumentType(documentType)
+            .setCreatedDatetime(LocalDateTime.now());
     }
 
     @JsonIgnore
     public static CaseDocument toCaseDocumentGA(Document document, DocumentType documentType, String translator) {
-        return CaseDocument.builder()
-            .documentLink(document)
-            .documentName(document.documentFileName)
-            .documentType(setOnlyCCDDocumentTypes(documentType))
-            .createdDatetime(LocalDateTime.now())
-            .createdBy(translator)
-            .build();
+        return new CaseDocument()
+            .setDocumentLink(document)
+            .setDocumentName(document.documentFileName)
+            .setDocumentType(setOnlyCCDDocumentTypes(documentType))
+            .setCreatedDatetime(LocalDateTime.now())
+            .setCreatedBy(translator);
     }
 
     public static DocumentType setOnlyCCDDocumentTypes(DocumentType documentType) {

@@ -136,9 +136,8 @@ class BuildConfirmationTaskTest {
 
     private CallbackParams callbackParams(CaseData caseData) {
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }
