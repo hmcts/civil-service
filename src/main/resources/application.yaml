@@ -567,8 +567,6 @@ notifications:
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
-  host: ${SENDGRID_HOST:}
-  test: ${SENDGRID_TEST:false}
 
 os-postcode-lookup:
   url: https://api.os.uk/search/names/v1/find
