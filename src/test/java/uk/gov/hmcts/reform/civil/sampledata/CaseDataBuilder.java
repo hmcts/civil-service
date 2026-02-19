@@ -367,6 +367,8 @@ public class CaseDataBuilder {
     protected DynamicList applicantSolicitor1PbaAccounts;
     protected Fee claimFee;
     protected Fee hearingFee;
+    protected Fee otherRemedyFee;
+    protected YesOrNo isClaimDeclarationAdded;
     protected StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     protected StatementOfTruth uiStatementOfTruth;
     protected String paymentReference;
@@ -7925,6 +7927,8 @@ public class CaseDataBuilder {
             .nextDeadline(nextDeadline)
             .fixedCosts(fixedCosts)
             .queries(queries)
+            .otherRemedyFee(otherRemedyFee)
+            .isClaimDeclarationAdded(isClaimDeclarationAdded)
             .build();
     }
 
@@ -7979,4 +7983,19 @@ public class CaseDataBuilder {
         }
         return policy.setOrgPolicyCaseAssignedRole(role);
     }
+
+    public CaseDataBuilder otherRemedyFee(BigDecimal amount) {
+        otherRemedyFee =  Fee.builder()
+            .version("1")
+            .code("CODE")
+            .calculatedAmountInPence(amount)
+            .build();
+        return this;
+    }
+
+    public CaseDataBuilder otherRemedyClaimDeclarationAdded() {
+        isClaimDeclarationAdded = YES;
+        return this;
+    }
+
 }
