@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.sendgrid.config;
 
 import com.sendgrid.SendGrid;
 import com.sendgrid.SendGridAPI;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,10 +19,10 @@ public class SendGridAutoConfiguration {
     @ConditionalOnMissingBean(SendGridAPI.class)
     public SendGrid sendGrid(SendGridProperties properties) {
         SendGrid sendGrid = createSendGrid(properties);
-        if (StringUtils.isNotBlank(properties.getHost())) {
+        if (properties.getHost() != null) {
             sendGrid.setHost(properties.getHost());
         }
-        if (StringUtils.isNotBlank(properties.getVersion())) {
+        if (properties.getVersion() != null) {
             sendGrid.setVersion(properties.getVersion());
         }
 
