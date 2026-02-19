@@ -30,7 +30,15 @@ jobs:
           distribution: 'temurin'
           java-version: 21
       - name: Run checks
-        run: ./gradlew check
+        run: ./gradlew check --parallel
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            build/reports/tests/test
+            build/reports/checkstyle
 
   integration:
     runs-on: ubuntu-latest
@@ -70,7 +78,7 @@ jobs:
           SPRING_DATASOURCE_JDBC_URL: jdbc:postgresql://localhost:5432/cmc
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: postgres
-        run: ./gradlew integration
+        run: ./gradlew integration --parallel
       - name: Upload build artifacts
         if: always()
         uses: actions/upload-artifact@v4
