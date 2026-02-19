@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery;
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -11,24 +10,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
 
 @Component
-public class RespondToQueryRespSolOneEmailDTOGenerator extends RespSolOneEmailDTOGenerator {
+public class RespondToQueryRespSolOneEmailDTOGenerator extends AbstractRespondToQueryRespSolOneEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
-
-    private final NotificationsProperties notificationsProperties;
-    private final RespondToQueryHelper respondToQueryHelper;
 
     public RespondToQueryRespSolOneEmailDTOGenerator(OrganisationService organisationService,
                                                      NotificationsProperties notificationsProperties,
                                                      RespondToQueryHelper respondToQueryHelper) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
-        this.respondToQueryHelper = respondToQueryHelper;
-    }
-
-    @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getQueryLrPublicResponseReceived();
+        super(organisationService, notificationsProperties, respondToQueryHelper);
     }
 
     @Override
@@ -38,7 +27,8 @@ public class RespondToQueryRespSolOneEmailDTOGenerator extends RespSolOneEmailDT
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData, true, organisationService));
+        String orgName = getLegalOrganizationNameForRespondent(caseData, true, organisationService);
+        respondToQueryHelper.addCustomProperties(properties, caseData, orgName, false);
         respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
     }

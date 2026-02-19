@@ -2,31 +2,20 @@ package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.otherpart
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.DefendantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.AbstractRespondToQueryDefendantEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
 @Component
-public class OtherPartyQueryResponseDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
+public class OtherPartyQueryResponseDefendantEmailDTOGenerator extends AbstractRespondToQueryDefendantEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "other-party-response-to-query-notification-%s";
 
-    private final NotificationsProperties notificationsProperties;
-    private final RespondToQueryHelper respondToQueryHelper;
-
     public OtherPartyQueryResponseDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties,
                                                             RespondToQueryHelper respondToQueryHelper) {
-        this.notificationsProperties = notificationsProperties;
-        this.respondToQueryHelper = respondToQueryHelper;
-    }
-
-    @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return caseData.isRespondentResponseBilingual()
-            ? notificationsProperties.getQueryLipWelshPublicResponseReceived()
-            : notificationsProperties.getQueryLipPublicResponseReceived();
+        super(notificationsProperties, respondToQueryHelper);
     }
 
     @Override

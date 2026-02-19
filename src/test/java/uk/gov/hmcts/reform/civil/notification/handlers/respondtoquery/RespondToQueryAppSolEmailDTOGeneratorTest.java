@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 
 @ExtendWith(MockitoExtension.class)
 class RespondToQueryAppSolEmailDTOGeneratorTest {
@@ -62,9 +61,12 @@ class RespondToQueryAppSolEmailDTOGeneratorTest {
         when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(organisation));
         Map<String, String> properties = new HashMap<>();
 
+        when(respondToQueryHelper.addCustomProperties(properties, caseData, "Applicant Org", false))
+            .thenReturn(properties);
+
         generator.addCustomProperties(properties, caseData);
 
-        assertThat(properties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Applicant Org");
+        verify(respondToQueryHelper).addCustomProperties(properties, caseData, "Applicant Org", false);
         verify(respondToQueryHelper).addQueryDateProperty(properties, caseData);
     }
 

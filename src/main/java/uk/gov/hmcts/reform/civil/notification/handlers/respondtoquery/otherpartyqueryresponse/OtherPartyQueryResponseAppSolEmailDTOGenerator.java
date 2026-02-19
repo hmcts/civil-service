@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.otherpart
 
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.notification.handlers.AppSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.AbstractRespondToQueryAppSolEmailDTOGenerator;
 import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -12,24 +12,14 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
 
 @Component
-public class OtherPartyQueryResponseAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
+public class OtherPartyQueryResponseAppSolEmailDTOGenerator extends AbstractRespondToQueryAppSolEmailDTOGenerator {
 
     private static final String REFERENCE_TEMPLATE = "other-party-response-to-query-notification-%s";
-
-    private final NotificationsProperties notificationsProperties;
-    private final RespondToQueryHelper respondToQueryHelper;
 
     public OtherPartyQueryResponseAppSolEmailDTOGenerator(OrganisationService organisationService,
                                                           NotificationsProperties notificationsProperties,
                                                           RespondToQueryHelper respondToQueryHelper) {
-        super(organisationService);
-        this.notificationsProperties = notificationsProperties;
-        this.respondToQueryHelper = respondToQueryHelper;
-    }
-
-    @Override
-    protected String getEmailTemplateId(CaseData caseData) {
-        return notificationsProperties.getQueryLrPublicResponseReceived();
+        super(organisationService, notificationsProperties, respondToQueryHelper);
     }
 
     @Override
