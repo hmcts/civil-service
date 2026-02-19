@@ -30,6 +30,16 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 
 - Per-state allowed CCD events: [flowstate_allowed_events.md](docs/flowstate_allowed_events.md)
 - Spec-only allowed CCD events: [flowstate_allowed_spec_events.md](docs/flowstate_allowed_spec_events.md)
+-
+## Github Labels
+
+For manual testing:
+
+`enable_keep_helm` is necessary so the Jenkins pipeline doesn't delete the deployment at the end of it.
+
+`prValues: fullDeployment` is recommended, otherwise the vast majority of downstream components calls will be just mocked responses,
+effectively turning off some functionality like Hearings. Also, some often required components won't be active like Elasticsearch
+The standard preview deployment, i.e. without the github label present, intends to serve FT performance.
 
 #### Predicate Business Rules
 
