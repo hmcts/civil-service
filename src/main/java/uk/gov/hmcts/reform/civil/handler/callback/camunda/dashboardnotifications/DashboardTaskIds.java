@@ -30,15 +30,12 @@ public final class DashboardTaskIds {
     public static final String RAISE_QUERY = "GenerateDashboardNotificationsRaiseQuery";
     public static final String RESPOND_TO_QUERY = "GenerateDashboardNotificationsRespondToQuery";
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
-<<<<<<< dashboardnotification-civil
     public static final String HELP_WITH_HEARING_FEES = "GenerateDashboardNotificationsLipHelpWithHearingFees";
-=======
     public static final String CITIZEN_HEARING_FEE_PAYMENT = "GenerateDashboardNotificationsCitizenHearingFeePayment";
     public static final String DEFENDANT_SIGN_SETTLEMENT_AGREEMENT = "GenerateDashboardNotificationsSignSettlementAgreement";
     public static final String DISCONTINUE_CLAIM_CLAIMANT = "GenerateDashboardNotificationsDiscontinueClaimClaimant";
     public static final String NOTIFY_LIP_CLAIMANT_HWF_OUTCOME = "GenerateDashboardNotificationsNotifyLipClaimantHwfOutcome";
     public static final String DEFENDANT_RESPONSE_DEADLINE_CHECK = "GenerateDashboardNotificationsDefendantResponseDeadlineCheck";
->>>>>>> master
     public static final String HEARING_SCHEDULED_HMC = "GenerateDashboardNotificationsHearingScheduledHmc";
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
     public static final String TRIAL_READY_CHECK = "GenerateDashboardNotificationsTrialReadyCheck";
