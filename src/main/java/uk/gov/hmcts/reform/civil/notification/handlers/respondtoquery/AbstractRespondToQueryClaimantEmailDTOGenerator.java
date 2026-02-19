@@ -16,7 +16,7 @@ public abstract class AbstractRespondToQueryClaimantEmailDTOGenerator extends Cl
     }
 
     @Override
-    protected String getEmailTemplateId(CaseData caseData) {
+    public String getEmailTemplateId(CaseData caseData) {
         return caseData.isClaimantBilingual()
             ? notificationsProperties.getQueryLipWelshPublicResponseReceived()
             : notificationsProperties.getQueryLipPublicResponseReceived();
