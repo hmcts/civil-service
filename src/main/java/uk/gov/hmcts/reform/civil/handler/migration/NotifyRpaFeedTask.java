@@ -40,6 +40,8 @@ public class NotifyRpaFeedTask extends MigrationTask<NotifyRpaFeedCaseReference>
         final String accessToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         if ("NOTIFY_RPA_DJ_SPEC".equals(obj.getNotifyEventId()) || "NOTIFY_RPA_DJ_UNSPEC".equals(obj.getNotifyEventId())) {
             defaultJudgmentRoboticsNotifier.sendNotifications(caseData, MultiPartyScenario.isMultiPartyScenario(caseData), accessToken);
+            log.info("Notified to RPA via migration task for caseId {} for event type {}", obj.getCaseReference(),
+                     obj.getNotifyEventId());
         } else {
             roboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
