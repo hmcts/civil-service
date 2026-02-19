@@ -429,8 +429,8 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
 
-  implementation 'org.apache.poi:poi:5.4.0'
-  implementation 'org.apache.poi:poi-ooxml:5.4.0'
+  implementation 'org.apache.poi:poi:5.5.1'
+  implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
