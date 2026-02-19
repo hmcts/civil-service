@@ -37,9 +37,9 @@ For manual testing:
 
 `enable_keep_helm` is necessary so the Jenkins pipeline doesn't delete the deployment at the end of it.
 
-`prValues: noMocks` is recommended, otherwise the vast majority of downstream components calls will be just mocked responses,
-effectively turning off some functionality like Hearings.
-The standard preview deployment, i.e. without the github label present, intends to improve on FT performance.
+`prValues: fullDeployment` is recommended, otherwise the vast majority of downstream components calls will be just mocked responses,
+effectively turning off some functionality like Hearings. Also, some often required components won't be active like Elasticsearch
+The standard preview deployment, i.e. without the github label present, intends to serve FT performance.
 
 #### Predicate Business Rules
 
