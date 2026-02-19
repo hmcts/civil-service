@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -163,6 +166,7 @@ class MakeDecisionApplicantDashboardServiceTest {
     private GeneralApplicationCaseData baseCase() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(123L)
+            .isGaApplicantLip(YesOrNo.YES)
             .build();
     }
 
@@ -178,5 +182,28 @@ class MakeDecisionApplicantDashboardServiceTest {
             AUTH_TOKEN,
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenApplicantIsLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
     }
 }

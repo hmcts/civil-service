@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_HWF_FEE_PAID_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_HWF_FULL_REMISSION_APPLICANT;
@@ -24,6 +25,12 @@ public class ApplicationSubmittedApplicantDashboardService extends GaDashboardSc
 
     public void notifyApplicationSubmitted(GeneralApplicationCaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getIsGaApplicantLip())
+            && caseData.getIsGaApplicantLip().equals(YES);
     }
 
     @Override

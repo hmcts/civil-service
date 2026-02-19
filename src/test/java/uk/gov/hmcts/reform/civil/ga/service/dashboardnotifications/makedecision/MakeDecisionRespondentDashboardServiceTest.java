@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -169,6 +171,8 @@ class MakeDecisionRespondentDashboardServiceTest {
     private GeneralApplicationCaseData baseCase() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(456L)
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .isMultiParty(YesOrNo.NO)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .build();
     }
@@ -185,5 +189,60 @@ class MakeDecisionRespondentDashboardServiceTest {
             AUTH_TOKEN,
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenRespondentOneLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.NO)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenMultiPartyAndRespondentTwoLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .isGaRespondentTwoLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenMultiPartyAndRespondentTwoLipNoAndRespondentOneLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .isGaRespondentTwoLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenMultiPartyRespondentOneLipYesEvenIfRespondentTwoLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .isGaRespondentTwoLip(YesOrNo.NO)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
     }
 }

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.client.DashboardApiClient;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
@@ -14,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT;
@@ -39,7 +42,10 @@ class ApplicationIssuedApplicantDashboardServiceTest {
     @Test
     void shouldRecordSubmittedScenarioWhenApplicationIsFree() {
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseDataBuilder.builder()
+                .isGaApplicantLip(YesOrNo.YES)
+                .atStateClaimDraft()
+                .withNoticeCaseData();
         HashMap<String, Object> params = new HashMap<>();
         when(generalAppFeesService.isFreeApplication(caseData)).thenReturn(true);
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
@@ -57,7 +63,10 @@ class ApplicationIssuedApplicantDashboardServiceTest {
     @Test
     void shouldRecordFeeRequiredScenarioWhenApplicationIsNotFree() {
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseDataBuilder.builder()
+                .isGaApplicantLip(YesOrNo.YES)
+                .atStateClaimDraft()
+                .withNoticeCaseData();
         HashMap<String, Object> params = new HashMap<>();
         when(generalAppFeesService.isFreeApplication(caseData)).thenReturn(false);
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
@@ -70,5 +79,28 @@ class ApplicationIssuedApplicantDashboardServiceTest {
             AUTH_TOKEN,
             ScenarioRequestParams.builder().params(params).build()
         );
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenApplicantIsLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
     }
 }
