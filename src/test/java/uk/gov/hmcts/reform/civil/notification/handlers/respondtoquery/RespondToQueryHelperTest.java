@@ -23,24 +23,58 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 
 @ExtendWith(MockitoExtension.class)
-class RespondToQueryDateHelperTest {
+class RespondToQueryHelperTest {
 
     @Mock
     private QueryManagementCamundaService runtimeService;
     @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    private RespondToQueryDateHelper helper;
+    private RespondToQueryHelper helper;
 
     @BeforeEach
     void setUp() {
-        helper = new RespondToQueryDateHelper(runtimeService, coreCaseUserService);
+        helper = new RespondToQueryHelper(runtimeService, coreCaseUserService);
+    }
+
+    @Test
+    void shouldAddLipProperties() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        Map<String, String> properties = new HashMap<>();
+
+        helper.addCustomProperties(properties, caseData, "John Smith", true);
+
+        assertThat(properties)
+            .containsEntry(PARTY_NAME, "John Smith")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString())
+            .doesNotContainKey(CLAIM_LEGAL_ORG_NAME_SPEC);
+    }
+
+    @Test
+    void shouldAddLegalRepProperties() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        Map<String, String> properties = new HashMap<>();
+
+        helper.addCustomProperties(properties, caseData, "Signer Name", false);
+
+        assertThat(properties)
+            .containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name")
+            .containsEntry(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString())
+            .containsEntry(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData))
+            .containsEntry(CASEMAN_REF, caseData.getLegacyCaseReference())
+            .doesNotContainKey(PARTY_NAME);
     }
 
     @Test

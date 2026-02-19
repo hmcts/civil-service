@@ -32,7 +32,7 @@ class RespondToQueryAppSolEmailDTOGeneratorTest {
     @Mock
     private OrganisationService organisationService;
     @Mock
-    private RespondToQueryDateHelper respondToQueryDateHelper;
+    private RespondToQueryHelper respondToQueryHelper;
 
     @InjectMocks
     private RespondToQueryAppSolEmailDTOGenerator generator;
@@ -65,7 +65,7 @@ class RespondToQueryAppSolEmailDTOGeneratorTest {
         generator.addCustomProperties(properties, caseData);
 
         assertThat(properties).containsEntry(CLAIM_LEGAL_ORG_NAME_SPEC, "Applicant Org");
-        verify(respondToQueryDateHelper).addQueryDateProperty(properties, caseData);
+        verify(respondToQueryHelper).addQueryDateProperty(properties, caseData);
     }
 
     private CaseData createBaseCaseData() {

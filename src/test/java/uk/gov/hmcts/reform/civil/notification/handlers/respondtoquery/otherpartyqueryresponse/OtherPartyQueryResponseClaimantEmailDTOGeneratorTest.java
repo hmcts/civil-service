@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -27,7 +28,7 @@ class OtherPartyQueryResponseClaimantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
     @Mock
-    private OtherPartyQueryResponseHelper helper;
+    private RespondToQueryHelper respondToQueryHelper;
 
     @InjectMocks
     private OtherPartyQueryResponseClaimantEmailDTOGenerator generator;
@@ -61,7 +62,7 @@ class OtherPartyQueryResponseClaimantEmailDTOGeneratorTest {
         assertThat(properties)
             .containsEntry(PARTY_NAME, "Applicant Test")
             .containsEntry(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        verify(helper).addCustomProperties(properties, caseData, "Applicant Test", true);
+        verify(respondToQueryHelper).addCustomProperties(properties, caseData, "Applicant Test", true);
     }
 
     private Party createParty(String name) {

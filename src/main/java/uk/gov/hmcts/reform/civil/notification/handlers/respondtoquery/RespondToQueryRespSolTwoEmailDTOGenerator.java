@@ -16,14 +16,14 @@ public class RespondToQueryRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final RespondToQueryDateHelper respondToQueryDateHelper;
+    private final RespondToQueryHelper respondToQueryHelper;
 
     public RespondToQueryRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
                                                      NotificationsProperties notificationsProperties,
-                                                     RespondToQueryDateHelper respondToQueryDateHelper) {
+                                                     RespondToQueryHelper respondToQueryHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.respondToQueryDateHelper = respondToQueryDateHelper;
+        this.respondToQueryHelper = respondToQueryHelper;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class RespondToQueryRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDT
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationNameForRespondent(caseData, false, organisationService));
-        respondToQueryDateHelper.addQueryDateProperty(properties, caseData);
+        respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
     }
 }
