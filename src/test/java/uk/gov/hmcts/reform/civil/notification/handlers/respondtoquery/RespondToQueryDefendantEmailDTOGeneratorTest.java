@@ -27,7 +27,7 @@ class RespondToQueryDefendantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
     @Mock
-    private RespondToQueryDateHelper respondToQueryDateHelper;
+    private RespondToQueryHelper respondToQueryHelper;
 
     @InjectMocks
     private RespondToQueryDefendantEmailDTOGenerator generator;
@@ -66,7 +66,7 @@ class RespondToQueryDefendantEmailDTOGeneratorTest {
         assertThat(properties)
             .containsEntry(PARTY_NAME, "Respondent Test")
             .containsEntry(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        verify(respondToQueryDateHelper).addQueryDateProperty(properties, caseData);
+        verify(respondToQueryHelper).addQueryDateProperty(properties, caseData);
     }
 
     private Party createParty(String name) {

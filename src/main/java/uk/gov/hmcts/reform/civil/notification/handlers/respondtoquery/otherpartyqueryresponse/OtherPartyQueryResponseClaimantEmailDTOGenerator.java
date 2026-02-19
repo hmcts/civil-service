@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.otherpart
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.ClaimantEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
@@ -15,12 +16,12 @@ public class OtherPartyQueryResponseClaimantEmailDTOGenerator extends ClaimantEm
     private static final String REFERENCE_TEMPLATE = "other-party-response-to-query-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OtherPartyQueryResponseHelper otherPartyQueryResponseHelper;
+    private final RespondToQueryHelper respondToQueryHelper;
 
     public OtherPartyQueryResponseClaimantEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                           OtherPartyQueryResponseHelper otherPartyQueryResponseHelper) {
+                                                           RespondToQueryHelper respondToQueryHelper) {
         this.notificationsProperties = notificationsProperties;
-        this.otherPartyQueryResponseHelper = otherPartyQueryResponseHelper;
+        this.respondToQueryHelper = respondToQueryHelper;
     }
 
     @Override
@@ -40,7 +41,7 @@ public class OtherPartyQueryResponseClaimantEmailDTOGenerator extends ClaimantEm
         String partyName = caseData.getApplicant1().getPartyName();
         properties.put(PARTY_NAME, partyName);
         properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        otherPartyQueryResponseHelper.addCustomProperties(properties, caseData, partyName, true);
+        respondToQueryHelper.addCustomProperties(properties, caseData, partyName, true);
         return properties;
     }
 }

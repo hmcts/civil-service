@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.otherpart
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.RespSolOneEmailDTOGenerator;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -16,14 +17,14 @@ public class OtherPartyQueryResponseRespSolOneEmailDTOGenerator extends RespSolO
     private static final String REFERENCE_TEMPLATE = "other-party-response-to-query-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final OtherPartyQueryResponseHelper otherPartyQueryResponseHelper;
+    private final RespondToQueryHelper respondToQueryHelper;
 
     public OtherPartyQueryResponseRespSolOneEmailDTOGenerator(OrganisationService organisationService,
                                                               NotificationsProperties notificationsProperties,
-                                                              OtherPartyQueryResponseHelper otherPartyQueryResponseHelper) {
+                                                              RespondToQueryHelper respondToQueryHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
-        this.otherPartyQueryResponseHelper = otherPartyQueryResponseHelper;
+        this.respondToQueryHelper = respondToQueryHelper;
     }
 
     @Override
@@ -39,7 +40,7 @@ public class OtherPartyQueryResponseRespSolOneEmailDTOGenerator extends RespSolO
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
         String orgName = getLegalOrganizationNameForRespondent(caseData, true, organisationService);
-        otherPartyQueryResponseHelper.addCustomProperties(properties, caseData, orgName, false);
+        respondToQueryHelper.addCustomProperties(properties, caseData, orgName, false);
         return properties;
     }
 }

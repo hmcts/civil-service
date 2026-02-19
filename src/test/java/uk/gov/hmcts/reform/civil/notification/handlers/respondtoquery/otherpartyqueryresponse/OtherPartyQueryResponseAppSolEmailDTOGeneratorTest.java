@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
@@ -31,7 +32,7 @@ class OtherPartyQueryResponseAppSolEmailDTOGeneratorTest {
     @Mock
     private OrganisationService organisationService;
     @Mock
-    private OtherPartyQueryResponseHelper helper;
+    private RespondToQueryHelper respondToQueryHelper;
 
     @InjectMocks
     private OtherPartyQueryResponseAppSolEmailDTOGenerator generator;
@@ -64,7 +65,7 @@ class OtherPartyQueryResponseAppSolEmailDTOGeneratorTest {
 
         generator.addCustomProperties(properties, caseData);
 
-        verify(helper).addCustomProperties(properties, caseData, "Applicant Org", false);
+        verify(respondToQueryHelper).addCustomProperties(properties, caseData, "Applicant Org", false);
     }
 
     private Party createParty(String name) {

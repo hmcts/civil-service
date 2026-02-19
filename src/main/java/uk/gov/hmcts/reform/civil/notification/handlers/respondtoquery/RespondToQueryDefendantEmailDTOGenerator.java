@@ -15,12 +15,12 @@ public class RespondToQueryDefendantEmailDTOGenerator extends DefendantEmailDTOG
     private static final String REFERENCE_TEMPLATE = "response-to-query-notification-%s";
 
     private final NotificationsProperties notificationsProperties;
-    private final RespondToQueryDateHelper respondToQueryDateHelper;
+    private final RespondToQueryHelper respondToQueryHelper;
 
     public RespondToQueryDefendantEmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                    RespondToQueryDateHelper respondToQueryDateHelper) {
+                                                    RespondToQueryHelper respondToQueryHelper) {
         this.notificationsProperties = notificationsProperties;
-        this.respondToQueryDateHelper = respondToQueryDateHelper;
+        this.respondToQueryHelper = respondToQueryHelper;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class RespondToQueryDefendantEmailDTOGenerator extends DefendantEmailDTOG
         String partyName = caseData.getRespondent1().getPartyName();
         properties.put(PARTY_NAME, partyName);
         properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        respondToQueryDateHelper.addQueryDateProperty(properties, caseData);
+        respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
     }
 }
