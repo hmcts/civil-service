@@ -31,7 +31,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
-    version: 0.0.5
+    version: 0.0.6
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wiremock.enabled
   - name: ccd-case-document-am-api
