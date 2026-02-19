@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -8,12 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -27,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
@@ -39,13 +39,7 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LINK_GENERAL_APPLICAT
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_FLAGS;
 import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE;
 
-@SpringBootTest(classes = {
-    GeneralApplicationTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GaStateFlowEngine.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private static final String GA_CASE_ID = "1";
@@ -56,29 +50,30 @@ public class GeneralApplicationTaskHandlerTest extends GeneralApplicationBaseCal
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private GaStateFlowEngine stateFlowEngine;
 
     @Mock
     private GaStateFlow mockedStateFlow;
 
-    @Autowired
+    @InjectMocks
     private GeneralApplicationTaskHandler generalApplicationTaskHandler;
+
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     private final CaseDataContent caseDataContent = CaseDataContent.builder().build();
 
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
         when(mockTask.getActivityId()).thenReturn("activityId");
-        when(mockedStateFlow.isFlagSet(any())).thenReturn(true);
         when(mockedStateFlow.getState()).thenReturn(State.from("PENDING"));
         when(stateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(mockedStateFlow);
     }

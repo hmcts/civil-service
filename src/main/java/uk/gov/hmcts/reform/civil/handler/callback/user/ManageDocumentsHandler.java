@@ -79,9 +79,13 @@ public class ManageDocumentsHandler extends CallbackHandler {
                     Document previousDocumentLink = manageDocument.getDocumentLink();
                     if (previousDocumentLink != null
                         && documentLink.getDocumentBinaryUrl().equals(previousDocumentLink.getDocumentBinaryUrl())) {
-                        return documentLink.toBuilder()
-                            .categoryID(previousDocumentLink.getCategoryID())
-                            .build();
+                        return new Document()
+                            .setDocumentUrl(documentLink.getDocumentUrl())
+                            .setDocumentBinaryUrl(documentLink.getDocumentBinaryUrl())
+                            .setDocumentFileName(documentLink.getDocumentFileName())
+                            .setDocumentHash(documentLink.getDocumentHash())
+                            .setCategoryID(previousDocumentLink.getCategoryID())
+                            .setUploadTimestamp(documentLink.getUploadTimestamp());
                     }
                 }
             }

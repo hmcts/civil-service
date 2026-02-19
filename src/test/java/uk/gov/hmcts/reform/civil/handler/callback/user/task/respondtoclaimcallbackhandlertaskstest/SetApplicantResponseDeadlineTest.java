@@ -145,11 +145,10 @@ class SetApplicantResponseDeadlineTest {
             .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -199,11 +198,10 @@ class SetApplicantResponseDeadlineTest {
             .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -250,11 +248,10 @@ class SetApplicantResponseDeadlineTest {
             .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         callbackParams.getRequest().getCaseDetailsBefore().setState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
@@ -302,11 +299,10 @@ class SetApplicantResponseDeadlineTest {
             .respondent2Copy(PartyBuilder.builder().individual().build())
             .build();
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
             .params(Map.of(BEARER_TOKEN, "BearerToken"))
-            .request(callbackRequest)
-            .build();
+            .request(callbackRequest);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) setApplicantResponseDeadline.execute(callbackParams);

@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.event.TakeCaseOfflineEvent;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 
 import java.util.HashMap;
 
@@ -23,6 +24,7 @@ public class TakeCaseOfflineEventHandler {
 
     private final CoreCaseDataService coreCaseDataService;
     private final CaseDetailsConverter caseDetailsConverter;
+    private final RoboticsEventTextFormatter textFormatter;
 
     @EventListener
     public void takeCaseOffline(TakeCaseOfflineEvent event) {
@@ -34,9 +36,9 @@ public class TakeCaseOfflineEventHandler {
     }
 
     private CaseDataContent getCaseContent(CaseData caseData, StartEventResponse startEventResponse) {
-        String rpaReason = "RPA Reason: Claim dismissed after no response from applicant past response deadline.";
+        String rpaReason = textFormatter.claimDismissedAfterNoApplicantResponse();
         if (caseData.getAddLegalRepDeadlineRes1() != null || caseData.getAddLegalRepDeadlineRes2() != null) {
-            rpaReason = "RPA Reason: No Defendant Solicitor appointed.";
+            rpaReason = textFormatter.noDefendantSolicitorAppointed();
         }
         return CaseDataContent.builder()
             .eventToken(startEventResponse.getToken())
