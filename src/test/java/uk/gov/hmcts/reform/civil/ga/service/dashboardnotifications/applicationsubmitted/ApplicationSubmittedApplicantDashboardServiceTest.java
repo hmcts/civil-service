@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -107,6 +109,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
     private GeneralApplicationCaseData baseCase() {
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(123456L)
+            .isGaApplicantLip(YesOrNo.YES)
             .build();
     }
 
@@ -132,4 +135,29 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
         );
         verifyNoMoreInteractions(dashboardApiClient);
     }
+
+    @Test
+    void shouldRecordScenario_true_whenApplicantIsLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaApplicantLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenApplicantIsLipNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
 }
+
+

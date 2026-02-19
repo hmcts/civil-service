@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.makedecision.
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.makedecision.scenario.WrittenRepresentationsRule;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_HEARING_SCHEDULED_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_RESPONDENT;
@@ -39,6 +41,15 @@ public class MakeDecisionRespondentDashboardService extends GaDashboardScenarioS
 
     public void notifyMakeDecision(GeneralApplicationCaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
+        return (Objects.nonNull(caseData.getIsGaRespondentOneLip())
+            && caseData.getIsGaRespondentOneLip().equals(YES))
+            || (caseData.getIsMultiParty().equals(YES)
+            && Objects.nonNull(caseData.getIsGaRespondentTwoLip())
+            && caseData.getIsGaRespondentTwoLip().equals(YES));
     }
 
     @Override

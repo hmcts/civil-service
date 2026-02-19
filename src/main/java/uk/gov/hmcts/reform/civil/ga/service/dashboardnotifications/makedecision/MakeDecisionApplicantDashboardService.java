@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.makedecision.
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.makedecision.scenario.WrittenRepresentationsRule;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_HEARING_SCHEDULED_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_APPLICANT;
@@ -39,6 +41,12 @@ public class MakeDecisionApplicantDashboardService extends GaDashboardScenarioSe
 
     public void notifyMakeDecision(GeneralApplicationCaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getIsGaApplicantLip())
+            && caseData.getIsGaApplicantLip().equals(YES);
     }
 
     @Override

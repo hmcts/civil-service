@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,11 @@ class FinalOrderRespondentDashboardServiceTest {
     @Test
     void shouldRecordRespondentFinalOrderScenarioWhenWithNotice() {
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseDataBuilder.builder()
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .isMultiParty(YesOrNo.NO)
+                .atStateClaimDraft()
+                .withNoticeCaseData();
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
 
@@ -54,7 +60,11 @@ class FinalOrderRespondentDashboardServiceTest {
     @Test
     void shouldRecordRespondentFinalOrderScenarioWhenConsentOrder() {
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseDataBuilder.builder()
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .isMultiParty(YesOrNo.NO)
+                .atStateClaimDraft()
+                .withNoticeCaseData();
         caseData = caseData.toBuilder()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppConsentOrder(YesOrNo.YES)
@@ -75,7 +85,10 @@ class FinalOrderRespondentDashboardServiceTest {
     @Test
     void shouldNotRecordRespondentFinalOrderScenarioWhenWithoutNoticeOrConsent() {
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().withoutNoticeCaseData();
+            GeneralApplicationCaseDataBuilder.builder()
+                .isGaRespondentOneLip(YesOrNo.YES)
+                .isMultiParty(YesOrNo.NO)
+                .withoutNoticeCaseData();
         caseData = caseData.toBuilder()
             .generalAppConsentOrder(YesOrNo.NO)
             .build();
@@ -83,5 +96,60 @@ class FinalOrderRespondentDashboardServiceTest {
         service.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardApiClient);
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenRespondentOneLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.NO)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenMultiPartyAndRespondentTwoLipYes() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .isGaRespondentTwoLip(YesOrNo.YES)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_false_whenMultiPartyAndRespondentTwoLipNoAndRespondentOneLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.NO)
+            .isGaRespondentTwoLip(YesOrNo.NO)
+            .build();
+        assertFalse(service.shouldRecordScenario(caseData));
+    }
+
+    @Test
+    void shouldRecordScenario_true_whenMultiPartyRespondentOneLipYesEvenIfRespondentTwoLipNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            .isMultiParty(YesOrNo.YES)
+            .isGaRespondentOneLip(YesOrNo.YES)
+            .isGaRespondentTwoLip(YesOrNo.NO)
+            .build();
+        assertTrue(service.shouldRecordScenario(caseData));
     }
 }
