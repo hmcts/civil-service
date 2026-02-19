@@ -62,17 +62,17 @@ class UpdatePaymentStatusServiceTest {
 
         when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
-        when(gaCoreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+        when(gaCoreCaseDataService.startGaUpdate(any(), any())).thenReturn(startEventResponse(
             caseDetails,
             INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT
         ));
-        when(gaCoreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(gaCoreCaseDataService.submitGaUpdate(any(), any())).thenReturn(caseData);
 
         updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
         verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
-        verify(gaCoreCaseDataService).startUpdate(String.valueOf(CASE_ID), INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
-        verify(gaCoreCaseDataService).submitUpdate(any(), any());
+        verify(gaCoreCaseDataService).startGaUpdate(String.valueOf(CASE_ID), INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT);
+        verify(gaCoreCaseDataService).submitGaUpdate(any(), any());
 
     }
 
@@ -94,17 +94,17 @@ class UpdatePaymentStatusServiceTest {
 
         when(gaCoreCaseDataService.getCase(CASE_ID)).thenReturn(caseDetails);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
-        when(gaCoreCaseDataService.startUpdate(any(), any())).thenReturn(startEventResponse(
+        when(gaCoreCaseDataService.startGaUpdate(any(), any())).thenReturn(startEventResponse(
             caseDetails,
             MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID
         ));
-        when(gaCoreCaseDataService.submitUpdate(any(), any())).thenReturn(caseData);
+        when(gaCoreCaseDataService.submitGaUpdate(any(), any())).thenReturn(caseData);
 
         updatePaymentStatusService.updatePaymentStatus(String.valueOf(CASE_ID), getCardPaymentStatusResponse());
 
         verify(gaCoreCaseDataService, times(1)).getCase(CASE_ID);
-        verify(gaCoreCaseDataService).startUpdate(String.valueOf(CASE_ID), MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
-        verify(gaCoreCaseDataService).submitUpdate(any(), any());
+        verify(gaCoreCaseDataService).startGaUpdate(String.valueOf(CASE_ID), MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
+        verify(gaCoreCaseDataService).submitGaUpdate(any(), any());
 
     }
 

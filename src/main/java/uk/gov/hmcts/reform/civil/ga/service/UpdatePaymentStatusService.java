@@ -52,7 +52,7 @@ public class UpdatePaymentStatusService {
             ? CaseEvent.MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID
             : CaseEvent.INITIATE_GENERAL_APPLICATION_AFTER_PAYMENT;
         log.info("Starting event creation with caseEvent: {} for caseReference: {}", caseEvent, caseReference);
-        StartEventResponse startEventResponse = gaCoreCaseDataService.startUpdate(
+        StartEventResponse startEventResponse = gaCoreCaseDataService.startGaUpdate(
             caseReference,
             caseEvent
         );
@@ -63,7 +63,7 @@ public class UpdatePaymentStatusService {
         );
 
         log.info("Submitting case update with new data for caseReference: {}", caseReference);
-        gaCoreCaseDataService.submitUpdate(caseReference, caseDataContent);
+        gaCoreCaseDataService.submitGaUpdate(caseReference, caseDataContent);
     }
 
     private CaseDataContent buildCaseDataContent(StartEventResponse startEventResponse, GeneralApplicationCaseData caseData) {
