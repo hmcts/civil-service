@@ -8,10 +8,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
-
 @Component
 public class OtherPartyQueryResponseDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
@@ -40,10 +36,10 @@ public class OtherPartyQueryResponseDefendantEmailDTOGenerator extends Defendant
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        String partyName = caseData.getRespondent1().getPartyName();
-        properties.put(PARTY_NAME, partyName);
-        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        respondToQueryHelper.addCustomProperties(properties, caseData, partyName, true);
-        return properties;
+        return respondToQueryHelper.addLipOtherPartyProperties(
+            properties,
+            caseData,
+            caseData.getRespondent1().getPartyName()
+        );
     }
 }

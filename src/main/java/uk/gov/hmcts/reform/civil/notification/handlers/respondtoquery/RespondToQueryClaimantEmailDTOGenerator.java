@@ -7,8 +7,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
-
 @Component
 public class RespondToQueryClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
@@ -37,9 +35,7 @@ public class RespondToQueryClaimantEmailDTOGenerator extends ClaimantEmailDTOGen
 
     @Override
     protected Map<String, String> addCustomProperties(Map<String, String> properties, CaseData caseData) {
-        String partyName = caseData.getApplicant1().getPartyName();
-        properties.put(PARTY_NAME, partyName);
-        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+        respondToQueryHelper.addLipOtherPartyProperties(properties, caseData, caseData.getApplicant1().getPartyName());
         respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
     }
