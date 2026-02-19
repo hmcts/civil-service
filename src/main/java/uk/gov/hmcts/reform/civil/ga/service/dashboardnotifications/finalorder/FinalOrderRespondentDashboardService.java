@@ -6,6 +6,8 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.GaDashboardScenarioService;
 
+import java.util.Objects;
+
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_RESPONDENT;
 
@@ -19,6 +21,15 @@ public class FinalOrderRespondentDashboardService extends GaDashboardScenarioSer
 
     public void notifyFinalOrder(GeneralApplicationCaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
+        return (Objects.nonNull(caseData.getIsGaRespondentOneLip())
+            && caseData.getIsGaRespondentOneLip().equals(YES))
+            || (caseData.getIsMultiParty().equals(YES)
+            && Objects.nonNull(caseData.getIsGaRespondentTwoLip())
+            && caseData.getIsGaRespondentTwoLip().equals(YES));
     }
 
     @Override

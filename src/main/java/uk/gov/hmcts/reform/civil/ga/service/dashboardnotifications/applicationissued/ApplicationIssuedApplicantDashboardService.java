@@ -7,6 +7,9 @@ import uk.gov.hmcts.reform.civil.ga.service.GaDashboardNotificationsParamsMapper
 import uk.gov.hmcts.reform.civil.ga.service.dashboardnotifications.GaDashboardScenarioService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 
+import java.util.Objects;
+
+import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_GENERAL_APPS_APPLICATION_FEE_REQUIRED_APPLICANT;
 
@@ -24,6 +27,12 @@ public class ApplicationIssuedApplicantDashboardService extends GaDashboardScena
 
     public void notifyApplicationIssued(GeneralApplicationCaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    @Override
+    protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
+        return Objects.nonNull(caseData.getIsGaApplicantLip())
+            && caseData.getIsGaApplicantLip().equals(YES);
     }
 
     @Override
