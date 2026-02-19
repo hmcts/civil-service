@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -60,6 +62,14 @@ public class RespondToQueryHelper {
         getOriginalQueryCreatedDate(caseData)
             .map(date -> formatLocalDate(date, DATE))
             .ifPresent(formattedDate -> properties.put(QUERY_DATE, formattedDate));
+    }
+
+    public Map<String, String> addLipOtherPartyProperties(Map<String, String> properties,
+                                                          CaseData caseData,
+                                                          String partyName) {
+        properties.put(PARTY_NAME, partyName);
+        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+        return addCustomProperties(properties, caseData, partyName, true);
     }
 
     private Optional<LocalDate> getOriginalQueryCreatedDate(CaseData caseData) {

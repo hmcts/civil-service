@@ -20,9 +20,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
 class OtherPartyQueryResponseDefendantEmailDTOGeneratorTest {
@@ -63,12 +60,12 @@ class OtherPartyQueryResponseDefendantEmailDTOGeneratorTest {
         caseData.setRespondent1(createParty("Respondent"));
         Map<String, String> properties = new HashMap<>();
 
+        when(respondToQueryHelper.addLipOtherPartyProperties(properties, caseData, "Respondent Test"))
+            .thenReturn(properties);
+
         generator.addCustomProperties(properties, caseData);
 
-        assertThat(properties)
-            .containsEntry(PARTY_NAME, "Respondent Test")
-            .containsEntry(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
-        verify(respondToQueryHelper).addCustomProperties(properties, caseData, "Respondent Test", true);
+        verify(respondToQueryHelper).addLipOtherPartyProperties(properties, caseData, "Respondent Test");
     }
 
     private Party createParty(String name) {
