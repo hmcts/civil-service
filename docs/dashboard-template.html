@@ -92,11 +92,24 @@
         return;
       }
 
+      const isValidPath = /^[A-Za-z0-9._/-]+$/.test(path) && !path.includes("..");
+      if (!isValidPath) {
+        title.textContent = "Dashboard template viewer";
+        content.textContent = "Invalid template path.";
+        content.className = "error";
+        return;
+      }
+
       const name = path.split("/").pop();
       title.textContent = name || "Dashboard template";
       pathEl.textContent = path;
-      const rawUrl = base + path;
-      rawLink.innerHTML = "<a href='" + rawUrl + "'>Raw JSON</a>";
+      const rawUrl = new URL(path, base).toString();
+      const rawAnchor = document.createElement("a");
+      rawAnchor.href = rawUrl;
+      rawAnchor.textContent = "Raw JSON";
+      rawAnchor.rel = "noopener noreferrer";
+      rawAnchor.target = "_blank";
+      rawLink.replaceChildren(rawAnchor);
 
       fetch(rawUrl)
         .then((resp) => {
