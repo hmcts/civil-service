@@ -68,34 +68,31 @@ class DocumentRemovalServiceTest {
     }
 
     private CaseDocument buildCaseDocument(String url, String fileName, String binaryUrl, String uploadTimeStamp, String createdBy) {
-        return CaseDocument.builder()
-            .documentLink(Document.builder()
-                .documentUrl(url)
-                .documentFileName(fileName)
-                .documentBinaryUrl(binaryUrl)
-                .uploadTimestamp(uploadTimeStamp)
-                .build())
-            .createdBy(createdBy)
-            .build();
+        return new CaseDocument()
+            .setDocumentLink(new Document()
+                .setDocumentUrl(url)
+                .setDocumentFileName(fileName)
+                .setDocumentBinaryUrl(binaryUrl)
+                .setUploadTimestamp(uploadTimeStamp))
+            .setCreatedBy(createdBy);
     }
 
     private CaseDocumentToKeep buildCaseDocumentToKeep(String url, String fileName, String binaryUrl, LocalDateTime uploadTimeStamp) {
-        return CaseDocumentToKeep.builder()
-            .documentUrl(url)
-            .documentFilename(fileName)
-            .documentBinaryUrl(binaryUrl)
-            .uploadTimestamp(uploadTimeStamp)
-            .build();
+        CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+        caseDocumentToKeep.setDocumentUrl(url);
+        caseDocumentToKeep.setDocumentFilename(fileName);
+        caseDocumentToKeep.setDocumentBinaryUrl(binaryUrl);
+        caseDocumentToKeep.setUploadTimestamp(uploadTimeStamp);
+        return caseDocumentToKeep;
     }
 
     private Document buildDocument(String url, String fileName, String binaryUrl, String uploadTimeStamp) {
         return
-            Document.builder()
-                .documentUrl(url)
-                .documentFileName(fileName)
-                .documentBinaryUrl(binaryUrl)
-                .uploadTimestamp(uploadTimeStamp)
-                .build();
+            new Document()
+                .setDocumentUrl(url)
+                .setDocumentFileName(fileName)
+                .setDocumentBinaryUrl(binaryUrl)
+                .setUploadTimestamp(uploadTimeStamp);
     }
 
     @Nested
@@ -448,11 +445,10 @@ class DocumentRemovalServiceTest {
 
             List<IdValue<Bundle>> bundles = List.of(
                 new IdValue<>("1", new Bundle().setStitchStatus(Optional.of("NEW")).setDescription("Trial Bundle")
-                    .setStitchedDocument(Optional.of(Document.builder()
-                        .documentUrl("https://example1.com/1234")
-                        .documentBinaryUrl("https://example1.com/1234/binary")
-                        .documentFileName("Trial-Bundle.pdf")
-                        .build()))));
+                    .setStitchedDocument(Optional.of(new Document()
+                        .setDocumentUrl("https://example1.com/1234")
+                        .setDocumentBinaryUrl("https://example1.com/1234/binary")
+                        .setDocumentFileName("Trial-Bundle.pdf")))));
 
             CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CASE_ID)
