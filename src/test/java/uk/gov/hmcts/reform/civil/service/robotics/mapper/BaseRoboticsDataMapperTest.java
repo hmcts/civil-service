@@ -112,7 +112,7 @@ class BaseRoboticsDataMapperTest {
     @Test
     void shouldReturnOrganisationId() {
         uk.gov.hmcts.reform.ccd.model.Organisation org =
-            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("ORG123").build();
+            new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG123");
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(org);
 
