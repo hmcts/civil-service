@@ -68,7 +68,7 @@ class ElementUtilsTest {
 
         @Test
         void shouldBuildElement_whenObjectIsProvided() {
-            CaseDocument document = CaseDocument.builder().build();
+            CaseDocument document = new CaseDocument();
 
             Element<CaseDocument> element = ElementUtils.element(document);
 

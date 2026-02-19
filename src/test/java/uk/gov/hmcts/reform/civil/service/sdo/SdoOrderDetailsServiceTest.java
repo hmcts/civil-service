@@ -204,10 +204,9 @@ class SdoOrderDetailsServiceTest {
     }
 
     private DirectionsOrderTaskContext orderDetailsContext(CaseData caseData, CallbackVersion version) {
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Collections.emptyMap())
-            .version(version)
-            .build();
+            .version(version);
 
         return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
     }

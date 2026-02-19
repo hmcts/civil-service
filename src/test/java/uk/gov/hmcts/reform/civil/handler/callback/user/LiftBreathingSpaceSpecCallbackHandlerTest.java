@@ -37,10 +37,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
         public void cantEnterIfNoBreathingSpaceYet() {
             CaseData caseData = CaseDataBuilder.builder().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.ABOUT_TO_START)
-                .build();
+                .type(CallbackType.ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
@@ -53,10 +52,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             breathingSpaceInfo.setEnter(new BreathingSpaceEnterInfo());
             caseData.setBreathing(breathingSpaceInfo);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.ABOUT_TO_START)
-                .build();
+                .type(CallbackType.ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertTrue(response.getErrors() == null || response.getErrors().isEmpty());
@@ -70,10 +68,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             breathingSpaceInfo.setLift(new BreathingSpaceLiftInfo());
             caseData.setBreathing(breathingSpaceInfo);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.ABOUT_TO_START)
-                .build();
+                .type(CallbackType.ABOUT_TO_START);
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
@@ -93,11 +90,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.MID)
-                .pageId("enter-info")
-                .build();
+                .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
@@ -113,11 +109,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.MID)
-                .pageId("enter-info")
-                .build();
+                .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertTrue(response.getErrors().isEmpty());
@@ -135,11 +130,10 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setBreathing(breathingSpaceInfo);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.MID)
-                .pageId("enter-info")
-                .build();
+                .pageId("enter-info");
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) callbackHandler.handle(params);
             Assertions.assertFalse(response.getErrors().isEmpty());
@@ -173,10 +167,9 @@ public class LiftBreathingSpaceSpecCallbackHandlerTest extends BaseCallbackHandl
                 .legacyCaseReference(claimNumber)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) callbackHandler.handle(params);
             Assertions.assertTrue(response.getConfirmationHeader().contains(claimNumber));

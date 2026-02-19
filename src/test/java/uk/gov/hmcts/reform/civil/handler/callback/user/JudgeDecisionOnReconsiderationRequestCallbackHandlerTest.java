@@ -485,10 +485,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
             caseData.setDecisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.YES);
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);
@@ -504,10 +503,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
             caseData.setUpholdingPreviousOrderReason(upholdingPreviousOrderReason);
             caseData.setDecisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_SDO);
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);
@@ -524,10 +522,9 @@ class JudgeDecisionOnReconsiderationRequestCallbackHandlerTest extends BaseCallb
                     upholdingPreviousOrderReason);
             caseData.setDecisionOnRequestReconsiderationOptions(
                     DecisionOnRequestReconsiderationOptions.CREATE_GENERAL_ORDER);
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response.getConfirmationHeader()).isEqualTo(CONFIRMATION_HEADER);

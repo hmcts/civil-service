@@ -1169,7 +1169,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
             caseData.setDrawDirectionsOrderRequired(NO);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                params.toBuilder().caseData(caseData).build()
+                params.copy().caseData(caseData)
             );
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
