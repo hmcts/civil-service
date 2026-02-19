@@ -34,7 +34,7 @@ public class SdoFastTrackTemplateService {
                                        SdoCaseClassificationService caseClassificationService,
                                        SdoFastTrackDirectionsService fastTrackDirectionsService,
                                        SdoFastTrackTemplateFieldService fastTrackTemplateFieldService,
-                                       @Value("${other_remedy.enabled:true}") boolean otherRemedyEnabled) {
+                                       @Value("${other_remedy.enabled:false}") boolean otherRemedyEnabled) {
         this.locationHelper = locationHelper;
         this.caseClassificationService = caseClassificationService;
         this.fastTrackDirectionsService = fastTrackDirectionsService;

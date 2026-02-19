@@ -67,7 +67,7 @@ public class SdoFastTrackSpecialistDirectionsService {
         if (otherRemedyEnabled) {
             caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
         } else {
-            caseData.setFastTrackHousingDisrepair(buildFastTrackHousingDisrepairAsHousingDisrepair());
+            caseData.setFastTrackHousingDisrepair(buildFastTrackHousingDisrepair());
         }
         caseData.setFastTrackPersonalInjury(buildPersonalInjury());
         caseData.setFastTrackRoadTrafficAccident(buildRoadTrafficAccident());
@@ -133,7 +133,7 @@ public class SdoFastTrackSpecialistDirectionsService {
         return creditHireDetails;
     }
 
-    private HousingDisrepair buildFastTrackHousingDisrepairAsHousingDisrepair() {
+    private HousingDisrepair buildFastTrackHousingDisrepair() {
         HousingDisrepair housingDisrepair = new HousingDisrepair();
         housingDisrepair.setInput1(HOUSING_SCHEDULE_INTRO_SDO);
         housingDisrepair.setInput2(HOUSING_SCHEDULE_COLUMNS_SDO);
