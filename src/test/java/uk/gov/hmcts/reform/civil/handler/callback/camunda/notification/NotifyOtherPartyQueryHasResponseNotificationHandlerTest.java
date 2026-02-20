@@ -119,7 +119,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -332,7 +332,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
             when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP);

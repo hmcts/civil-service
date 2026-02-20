@@ -88,7 +88,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryRaised()).thenReturn(TEMPLATE_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));

@@ -227,7 +227,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
             when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);

@@ -80,22 +80,22 @@ public class MediationJsonServiceTest {
     @BeforeEach
     void setUp() {
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_NAME)
-                                        .companyNumber(APPLICANT_LR_TELEPHONE)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_NAME)
+                                        .setCompanyNumber(APPLICANT_LR_TELEPHONE)
+                                        ));
 
         when(organisationService.findOrganisationById("QWERTY R"))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT1_LR_NAME)
-                                        .companyNumber(RESPONDENT1_LR_TELEPHONE)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT1_LR_NAME)
+                                        .setCompanyNumber(RESPONDENT1_LR_TELEPHONE)
+                                        ));
 
         when(organisationService.findOrganisationById("QWERTY R2"))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT2_LR_NAME)
-                                        .companyNumber(RESPONDENT2_LR_TELEPHONE)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT2_LR_NAME)
+                                        .setCompanyNumber(RESPONDENT2_LR_TELEPHONE)
+                                        ));
     }
 
     @Nested

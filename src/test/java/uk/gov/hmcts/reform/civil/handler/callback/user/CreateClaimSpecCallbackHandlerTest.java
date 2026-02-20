@@ -178,9 +178,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         + "to : <a href=\"mailto:contactocmc@justice.gov.uk\">contactocmc@justice.gov.uk</a>. The Certificate of Service form can be found here:"
         + "%n%n<ul><li><a href=\"%s\" target=\"_blank\">N215</a></li></ul>";
 
-    private final Organisation bulkOrganisation = Organisation.builder()
-        .paymentAccount(List.of("12345", "98765"))
-        .build();
+    private final Organisation bulkOrganisation = new Organisation()
+        .setPaymentAccount(List.of("12345", "98765"));
 
     @MockBean
     private Time time;
@@ -790,9 +789,8 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private final String pageId = "fee";
         private Fee feeData;
-        private final Organisation organisation = Organisation.builder()
-            .paymentAccount(List.of("12345", "98765"))
-            .build();
+        private final Organisation organisation = new Organisation()
+            .setPaymentAccount(List.of("12345", "98765"));
         private final ObjectMapper mapper = new ObjectMapper();
 
         @BeforeEach

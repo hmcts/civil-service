@@ -810,9 +810,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private final String pageId = "fee";
         private Fee feeData;
-        private final Organisation organisation = Organisation.builder()
-            .paymentAccount(List.of("12345", "98765"))
-            .build();
+        private final Organisation organisation = new Organisation()
+            .setPaymentAccount(List.of("12345", "98765"));
         private final ObjectMapper mapper = new ObjectMapper();
 
         @BeforeEach
@@ -1332,11 +1331,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().build();
 
-            Organisation organisation = Organisation.builder()
-                .organisationIdentifier("1")
-                .companyNumber("1")
-                .name("Organisation1")
-                .build();
+            Organisation organisation = new Organisation()
+                .setOrganisationIdentifier("1")
+                .setCompanyNumber("1")
+                .setName("Organisation1");
 
             CallbackParams params = callbackParamsOf(caseData, MID, "populateClaimantSolicitor");
 

@@ -120,7 +120,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             @BeforeEach
             void setUp() {
                 when(organisationService.findOrganisationById(any()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
                 when(notificationsProperties.getNotifyOtherPartyQueryRaised()).thenReturn(TEMPLATE_ID);
                 when(notificationsProperties.getNotifyOtherPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
                 when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID_LIP);
@@ -256,7 +256,7 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
             @BeforeEach
             void setUp() {
                 when(organisationService.findOrganisationById(any()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
                 when(notificationsProperties.getNotifyOtherPartyQueryRaised()).thenReturn(TEMPLATE_ID);
                 when(notificationsProperties.getNotifyOtherPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID);
                 when(notificationsProperties.getNotifyOtherLipPartyPublicQueryRaised()).thenReturn(TEMPLATE_ID_LIP);

@@ -188,8 +188,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
 
         when(organisationApi.findUserOrganisation(any(), any()))
-            .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
-                            .builder().organisationIdentifier("OrgId1").build());
+            .thenReturn(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                            .setOrganisationIdentifier("OrgId1"));
 
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
@@ -1334,4 +1334,3 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         return policy;
     }
 }
-

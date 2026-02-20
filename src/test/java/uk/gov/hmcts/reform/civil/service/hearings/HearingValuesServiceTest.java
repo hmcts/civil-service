@@ -161,13 +161,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -257,13 +257,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -293,13 +293,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -330,13 +330,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -387,13 +387,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -488,13 +488,13 @@ public class HearingValuesServiceTest {
             respondent1DQ = new Respondent1DQ();
             respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(APPLICANT_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(APPLICANT_LR_ORG_NAME)
+                                            ));
             when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                            ));
             given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
             given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
