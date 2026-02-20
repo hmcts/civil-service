@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
@@ -39,12 +38,14 @@ public class NotifyRpaFeedTask extends MigrationTask<NotifyRpaFeedCaseReference>
     protected CaseData migrateCaseData(CaseData caseData, NotifyRpaFeedCaseReference obj) {
         final String accessToken = userService.getAccessToken(userConfig.getUserName(), userConfig.getPassword());
         if ("NOTIFY_RPA_DJ_SPEC".equals(obj.getNotifyEventId()) || "NOTIFY_RPA_DJ_UNSPEC".equals(obj.getNotifyEventId())) {
-            defaultJudgmentRoboticsNotifier.sendNotifications(caseData, MultiPartyScenario.isMultiPartyScenario(caseData), accessToken);
+            defaultJudgmentRoboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {} for event type {}", obj.getCaseReference(),
                      obj.getNotifyEventId());
-        } else {
+        } else if ("NOTIFY_RPA_ON_CONTINUOUS_FEED".equals(obj.getNotifyEventId()) || "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE".equals(obj.getNotifyEventId())) {
             roboticsNotifier.notifyRobotics(caseData, accessToken);
             log.info("Notified to RPA via migration task for caseId {}", obj.getCaseReference());
+        } else {
+            log.info("Not to send RPA via migration task for caseId {}", obj.getCaseReference());
         }
         return caseData;
     }

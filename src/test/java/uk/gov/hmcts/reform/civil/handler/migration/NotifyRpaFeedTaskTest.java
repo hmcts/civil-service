@@ -3,11 +3,12 @@ package uk.gov.hmcts.reform.civil.handler.migration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
-import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.notification.robotics.DefaultJudgmentRoboticsNotifier;
@@ -37,11 +38,12 @@ class NotifyRpaFeedTaskTest {
         notifyRpaFeedTask = new NotifyRpaFeedTask(roboticsNotifier, userConfig, userService, defaultJudgmentRoboticsNotifier);
     }
 
-    @Test
-    void shouldNotifyRobotics_whenEventIsNotDjSpecOrUnspec() {
+    @ParameterizedTest
+    @ValueSource(strings = {"NOTIFY_RPA_ON_CONTINUOUS_FEED", "NOTIFY_RPA_ON_CASE_HANDED_OFFLINE"})
+    void shouldNotifyRobotics_whenEventIsNotDjSpecOrUnspec(String notifyEventId) {
         NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
         caseReference.setCaseReference("1234567890123456");
-        caseReference.setNotifyEventId("OTHER_EVENT");
+        caseReference.setNotifyEventId(notifyEventId);
         String accessToken = "accessToken";
         String userName = "userName";
         String password = "password";
@@ -58,10 +60,10 @@ class NotifyRpaFeedTaskTest {
     }
 
     @Test
-    void shouldNotifyDefaultJudgmentRobotics_whenEventIsDjSpec() {
+    void shouldNotNotifyRobotics_whenEventIsNotUnknown() {
         NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
         caseReference.setCaseReference("1234567890123456");
-        caseReference.setNotifyEventId("NOTIFY_RPA_DJ_SPEC");
+        caseReference.setNotifyEventId("UNKNOWN");
         String accessToken = "accessToken";
         String userName = "userName";
         String password = "password";
@@ -73,15 +75,16 @@ class NotifyRpaFeedTaskTest {
         CaseData caseData = CaseData.builder().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
-        verify(defaultJudgmentRoboticsNotifier).sendNotifications(caseData, MultiPartyScenario.isMultiPartyScenario(caseData), accessToken);
         verifyNoInteractions(roboticsNotifier);
+        verifyNoInteractions(defaultJudgmentRoboticsNotifier);
     }
 
-    @Test
-    void shouldNotifyDefaultJudgmentRobotics_whenEventIsDjUnspec() {
+    @ParameterizedTest
+    @ValueSource(strings = {"NOTIFY_RPA_DJ_SPEC", "NOTIFY_RPA_DJ_UNSPEC"})
+    void shouldNotifyDefaultJudgmentRobotics_whenEventIsDjSpec(String notifyEventId) {
         NotifyRpaFeedCaseReference caseReference = new NotifyRpaFeedCaseReference();
         caseReference.setCaseReference("1234567890123456");
-        caseReference.setNotifyEventId("NOTIFY_RPA_DJ_UNSPEC");
+        caseReference.setNotifyEventId(notifyEventId);
         String accessToken = "accessToken";
         String userName = "userName";
         String password = "password";
@@ -93,7 +96,7 @@ class NotifyRpaFeedTaskTest {
         CaseData caseData = CaseData.builder().build();
         notifyRpaFeedTask.migrateCaseData(caseData, caseReference);
 
-        verify(defaultJudgmentRoboticsNotifier).sendNotifications(caseData, MultiPartyScenario.isMultiPartyScenario(caseData), accessToken);
+        verify(defaultJudgmentRoboticsNotifier).notifyRobotics(caseData, accessToken);
         verifyNoInteractions(roboticsNotifier);
     }
 
