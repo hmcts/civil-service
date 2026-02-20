@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackOrderWithoutJudgement;
@@ -63,6 +63,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private boolean hasCreditHire;
     private boolean hasEmployersLiability;
     private boolean hasHousingDisrepair;
+    private boolean isOtherRemedyEnabled;
     private boolean hasPersonalInjury;
     private boolean hasRoadTrafficAccident;
     private boolean hasPaymentProtectionInsurance;
@@ -89,7 +90,7 @@ public class SdoDocumentFormFast implements MappableObject {
     private FastTrackBuildingDispute fastTrackBuildingDispute;
     private FastTrackClinicalNegligence fastTrackClinicalNegligence;
     private FastTrackCreditHire fastTrackCreditHire;
-    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
+    private HousingDisrepair fastTrackHousingDisrepair;
     private FastTrackPersonalInjury fastTrackPersonalInjury;
     private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
     private SdoR2WitnessOfFact sdoR2WitnessesOfFact;

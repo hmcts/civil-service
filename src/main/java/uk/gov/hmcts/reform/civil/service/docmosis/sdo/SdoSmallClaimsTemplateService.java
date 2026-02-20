@@ -52,6 +52,8 @@ public class SdoSmallClaimsTemplateService {
             .setClaimsTrack(caseData.getClaimsTrack())
             .setSmallClaims(caseData.getSmallClaims())
             .setHasCreditHire(hasAdditionalDirection(caseData, SmallTrack.smallClaimCreditHire))
+            .setHasHousingDisrepair(hasAdditionalDirection(caseData, SmallTrack.smallClaimHousingDisrepair))
+            .setSmallClaimsHousingDisrepair(caseData.getSmallClaimsHousingDisrepair())
             .setHasRoadTrafficAccident(hasAdditionalDirection(caseData, SmallTrack.smallClaimRoadTrafficAccident))
             .setHasPaymentProtectionInsurance(hasPpi)
             .setSmallClaimsPPI(hasPpi ? caseData.getSmallClaimsPPI() : null)

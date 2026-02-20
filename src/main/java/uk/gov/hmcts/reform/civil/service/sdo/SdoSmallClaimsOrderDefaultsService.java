@@ -28,6 +28,7 @@ public class SdoSmallClaimsOrderDefaultsService {
         smallClaimsNarrativeService.applyNotesSection(caseData);
         smallClaimsNarrativeService.applyCreditHire(caseData);
         smallClaimsNarrativeService.applyRoadTrafficAccident(caseData);
+        smallClaimsNarrativeService.applyHousingDisrepair(caseData);
 
         if (CaseState.CASE_PROGRESSION.equals(caseData.getCcdState())
             && DecisionOnRequestReconsiderationOptions.CREATE_SDO.equals(caseData.getDecisionOnRequestReconsiderationOptions())) {
