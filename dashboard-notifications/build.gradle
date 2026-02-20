@@ -32,10 +32,10 @@ dependencies {
   implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
   implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
-  implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.42'
+  implementation group: 'io.swagger.core.v3', name: 'swagger-annotations', version: '2.2.43'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
 
-  runtimeOnly 'org.postgresql:postgresql:42.7.9'
+  runtimeOnly 'org.postgresql:postgresql:42.7.10'
   compileOnly 'org.projectlombok:lombok'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   annotationProcessor 'org.projectlombok:lombok'
