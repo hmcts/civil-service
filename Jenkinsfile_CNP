@@ -140,7 +140,10 @@ def checkForRunAllFunctionalTests(branch_name) {
 }
 
 def checkForFullDeploymentLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "fullDeployment").contains("fullDeployment")
+  def labels = new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values:")
+  return labels.any { label ->
+    label?.toLowerCase()?.replaceAll("\\s+", "") == "pr-values:fulldeployment"
+  }
 }
 
 def getCivilCcdDefinitionBranch() {
