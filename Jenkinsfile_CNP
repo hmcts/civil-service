@@ -215,12 +215,14 @@ withPipeline(type, product, component) {
         env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
         retry(3) {
           sh """
+            echo "fullDeployment present"
             ./bin/add-org-roles-to-users.sh
           """
         }
       } else {
         retry(3) {
           sh """
+            echo "fullDeployment absent"
            ./bin/load-wiremock-mappings.sh
           """
         }
