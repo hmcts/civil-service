@@ -30,16 +30,6 @@ Each image links to an SVG whose source (`docs/*.mmd`) is produced by `python3 s
 
 - Per-state allowed CCD events: [flowstate_allowed_events.md](docs/flowstate_allowed_events.md)
 - Spec-only allowed CCD events: [flowstate_allowed_spec_events.md](docs/flowstate_allowed_spec_events.md)
--
-## Github Labels
-
-`enable_keep_helm` is necessary so the Jenkins pipeline doesn't delete the deployment at the end of it.
-
-`pr-values: fullDeployment` is recommended, otherwise the vast majority of downstream components calls will be just mocked responses,
-effectively turning off some functionality like Hearings. Also, some often required components won't be active like Elasticsearch
-The standard preview deployment, i.e. without the github label present, intends to serve FT performance.
-
-`civilDefinitionBranch:????` where ???? is the civil-ccd-definition branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
 
 #### Predicate Business Rules
 
@@ -269,6 +259,24 @@ Example
 ./gradlew -DdependencyCheck.failBuild=true -Dnvd.api.check.validforhours=24 -Dnvd.api.key=<YOUR_API_KEY_HERE> dependencyCheckAggregate
 ```
 
+## CFTLib- Running Locally
+```
+./gradlew bootWithCCD
+```
+If you're seeing errors when pulling images, run the following command:
+
+```shell
+az acr login --name hmctspublic --subscription 8999dec3-0104-4a27-94ee-6588559729d1
+```
+If you're seeing errors after importing bpmn files then run it again.
+XUI will be running on http://localhost:3000/
+
+After creating a case in XUI, complete the payment using service request.
+To update the payment success callback on a created case, please use [[civil-operation]](https://github.com/hmcts/civil-operations/)
+http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease to generate token
+then use http://localhost:4000/service-request-update-claim-issued endpoint with above token and then
+update body with case id and payment reference no
+
 ## Development / Debugging Environment - Preview with Mirrord
 
   As an alternative for a development environment there is a procedure in place where after running the command
@@ -330,6 +338,16 @@ For that you should have such file as this:
   }
 }
 ```
+## Point CCD definitions to a specific branch
+
+Add the following label to your GitHub PR.
+
+```
+civilDefinitionBranch:????
+
+where ???? is the branch name you want to point to. e.g civilDefinitionBranch:DTSCCI-1699
+```
+
 
 ## License
 

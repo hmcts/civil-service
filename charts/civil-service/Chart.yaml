@@ -2,7 +2,7 @@ apiVersion: v2
 description: A Helm chart for civil-service App
 name: civil-service
 home: https://github.com/hmcts/civil-service
-version: 0.0.98
+version: 0.0.97
 maintainers:
   - name: HMCTS Civil team
 
@@ -31,7 +31,7 @@ dependencies:
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: aac-manage-case-assignment.enabled
   - name: wiremock
-    version: 0.0.5
+    version: 0.0.6
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: wiremock.enabled
   - name: ccd-case-document-am-api
@@ -46,8 +46,3 @@ dependencies:
     version: 1.1.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: em-stitching.enabled
-  - name: servicebus
-    version: 1.2.2-beta
-    repository: 'oci://hmctsprod.azurecr.io/helm'
-    condition: servicebus.enabled
-    alias: hmcsb
