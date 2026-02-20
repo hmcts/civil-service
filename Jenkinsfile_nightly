@@ -1,7 +1,7 @@
 #!groovy
 
 properties([
-  // copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
+  copyArtifactPermission('/HMCTS_a_to_c_Nightly/civil-service/*'),
   parameters([
     choice(name: 'FORCE_GREEN_BUILD', choices: ['false', 'true'],
       description: 'Should force pipeline to go green by not running any functional tests'),
