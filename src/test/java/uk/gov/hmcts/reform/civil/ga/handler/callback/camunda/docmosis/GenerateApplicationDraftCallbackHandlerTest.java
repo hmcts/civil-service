@@ -1,13 +1,14 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.docmosis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocu
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
@@ -69,30 +69,26 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFE
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateApplicationDraftCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private Time time;
-    @MockBean
+    @Mock
     private GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
-    @Autowired
+    @InjectMocks
     private GenerateApplicationDraftCallbackHandler handler;
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
-    private AssignCategoryId assignCategoryId;
-    @MockBean
+    @Spy
+    private ObjectMapper mapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
     private final LocalDate submittedOn = now();
@@ -115,7 +111,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
     @Test
     void shouldReturnCorrectTaskId() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo(TASK_ID);
+        assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
     }
 
     @Test
@@ -136,14 +132,13 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -153,6 +148,8 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
+
+        handler.handle(params);
 
         verifyNoInteractions(generalApplicationDraftGenerator);
     }
@@ -169,7 +166,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -177,7 +173,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -193,7 +189,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -202,7 +197,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -222,11 +217,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+        assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getPreTranslationGaDocumentType()).isEqualTo(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC);
     }
@@ -247,11 +241,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+        assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getPreTranslationGaDocumentType()).isEqualTo(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC);
     }
@@ -273,11 +266,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+        assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getPreTranslationGaDocumentType()).isEqualTo(PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC);
     }
@@ -299,11 +291,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         verify(generalApplicationDraftGenerator).generate(any(GeneralApplicationCaseData.class), eq("BEARER_TOKEN"));
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(updatedData.getPreTranslationGaDocuments().get(0).getValue())
+        assertThat(updatedData.getPreTranslationGaDocuments().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
     }
 
@@ -319,7 +310,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(generalAppFeesService.isFreeApplication(any(GeneralApplicationCaseData.class))).thenReturn(true);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -328,7 +318,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -338,8 +328,9 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, NO);
         when(generalAppFeesService.isFreeApplication(any(GeneralApplicationCaseData.class))).thenReturn(false);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
 
         verifyNoInteractions(generalApplicationDraftGenerator);
     }
@@ -352,9 +343,8 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder().code("NotFree").build()).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
-            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
+
+        handler.handle(params);
 
         verifyNoInteractions(generalApplicationDraftGenerator);
     }
@@ -371,7 +361,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -379,7 +368,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -397,7 +386,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -405,7 +393,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -423,7 +411,6 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -431,7 +418,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
 
         GeneralApplicationCaseData updatedData = mapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
-        assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+        assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
             .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         assertThat(updatedData.getSubmittedOn()).isEqualTo(submittedOn);
     }
@@ -445,11 +432,8 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .fee(Fee.builder().code("Free").build()).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
-            .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
-        when(time.now()).thenReturn(submittedOn.atStartOfDay());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+        handler.handle(params);
         verifyNoInteractions(generalApplicationDraftGenerator);
     }
 

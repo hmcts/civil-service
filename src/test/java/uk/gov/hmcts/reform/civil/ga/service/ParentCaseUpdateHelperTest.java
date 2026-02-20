@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.ArrayList;
@@ -63,22 +66,19 @@ import static uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper.DOCUME
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    ParentCaseUpdateHelper.class,
-    ObjectMapper.class,
-})
+@ExtendWith(MockitoExtension.class)
 class ParentCaseUpdateHelperTest {
 
-    @Autowired
-    ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
-    GaCoreCaseDataService coreCaseDataService;
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @Autowired
-    ObjectMapper objectMapper;
+    @InjectMocks
+    private ParentCaseUpdateHelper parentCaseUpdateHelper;
+    @Mock
+    private GaCoreCaseDataService coreCaseDataService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
     @Captor
     private ArgumentCaptor<Map<String, Object>> mapCaptor;
 
@@ -182,8 +182,7 @@ class ParentCaseUpdateHelperTest {
     void checkIfDocumentExists() {
         Element<?> same = Element.<CaseDocument>builder()
             .id(UUID.randomUUID())
-            .value(CaseDocument.builder().documentLink(Document.builder().documentUrl("string").build())
-                       .build()).build();
+            .value(new CaseDocument().setDocumentLink(new Document().setDocumentUrl("string"))).build();
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(same);
@@ -196,7 +195,7 @@ class ParentCaseUpdateHelperTest {
     void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
         Element<Document> documentElement = Element.<Document>builder()
             .id(UUID.randomUUID())
-            .value(Document.builder().documentUrl("string").build()).build();
+            .value(new Document().setDocumentUrl("string")).build();
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(documentElement);
@@ -643,7 +642,6 @@ class ParentCaseUpdateHelperTest {
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "Claimant",
             AWAITING_APPLICATION_PAYMENT,
@@ -669,7 +667,6 @@ class ParentCaseUpdateHelperTest {
                                                                                   .build()).build()).build());
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "RespondentSol",
             AWAITING_APPLICATION_PAYMENT,
@@ -813,18 +810,16 @@ class ParentCaseUpdateHelperTest {
 
     private GeneralApplicationCaseData getCaseWithApplicationDataAndGeneralOrder() {
         String uid = "f000aa01-0451-4000-b000-000000000000";
-        CaseDocument pdfDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("documentName")
-            .documentSize(0L)
-            .documentType(GENERAL_ORDER)
-            .createdDatetime(now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument pdfDocument = new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("documentName")
+            .setDocumentSize(0L)
+            .setDocumentType(GENERAL_ORDER)
+            .setCreatedDatetime(now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
         return getCaseWithApplicationData(false)
             .toBuilder().ccdState(PENDING_APPLICATION_ISSUED)
             .directionOrderDocument(singletonList(Element.<CaseDocument>builder()
@@ -840,11 +835,10 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        Document pdfDocument = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
+        Document pdfDocument = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(singletonList(Element.<Document>builder()
                                                              .id(UUID.fromString(uid))
@@ -889,17 +883,15 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        CaseDocument pdfDocument = CaseDocument.builder()
-            .createdBy("John")
-            .documentName("documentName")
-            .documentSize(0L)
-            .createdDatetime(now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        CaseDocument pdfDocument = new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("documentName")
+            .setDocumentSize(0L)
+            .setCreatedDatetime(now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.gaAddlDoc(singletonList(Element.<CaseDocument>builder()
                                             .id(UUID.fromString(uid))
@@ -945,11 +937,10 @@ class ParentCaseUpdateHelperTest {
             .generalAppParentCaseLink(GeneralAppParentCaseLink
                                           .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
             .ccdState(state);
-        Document pdfDocument = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
+        Document pdfDocument = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(singletonList(Element.<Document>builder()
                                                              .id(UUID.fromString(uid))
@@ -1032,14 +1023,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1101,14 +1092,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1168,14 +1159,14 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
                 break;
             case "RespondentSolTwo":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build());
-                builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy());
+                builder.respondent2OrganisationPolicy(new OrganisationPolicy())
                     .respondent2OrganisationIDCopy("RespondentSolTwo")
                     .respondent2SameLegalRepresentative(NO)
                     .addApplicant2(NO);
@@ -1217,7 +1208,7 @@ class ParentCaseUpdateHelperTest {
                 builder.claimantGaAppDetails(generalApplicationsDetailsList);
                 break;
             case "RespondentSol":
-                builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                builder.respondent1OrganisationPolicy(new OrganisationPolicy())
                     .respondent1OrganisationIDCopy("RespondentSol");
                 builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
                 break;
@@ -1290,7 +1281,7 @@ class ParentCaseUpdateHelperTest {
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList =
             Lists.newArrayList(element(respondentSolOneElement01), element(respondentSolOneElement02));
 
-        builder.respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+        builder.respondent1OrganisationPolicy(new OrganisationPolicy())
             .respondent1OrganisationIDCopy("RespondentSol");
         builder.respondentSolGaAppDetails(gaDetailsRespondentSolList);
 
@@ -1309,7 +1300,7 @@ class ParentCaseUpdateHelperTest {
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList2 =
             Lists.newArrayList(element(respondentSolTwoGA1));
 
-        builder.respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+        builder.respondent2OrganisationPolicy(new OrganisationPolicy())
             .respondent2OrganisationIDCopy("RespondentSolTwo")
             .respondent2SameLegalRepresentative(NO)
             .addApplicant2(NO);

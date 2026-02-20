@@ -10,7 +10,7 @@ public final class DashboardTaskIds {
     public static final String DISMISS_CASE = "GenerateDashboardNotificationsDismissCase";
     public static final String AMEND_RESTITCH_BUNDLE = "GenerateDashboardNotificationsAmendRestitchBundle";
     public static final String TRIAL_ARRANGEMENTS_NOTIFY_OTHER_PARTY =
-        "GenerateDashboardNotificationsTrialArrangementsNotifyParty";
+        "GenerateDashboardNotificationsRespondent1TrialReadyNotifyOthers";
     public static final String BUNDLE_CREATION = "GenerateDashboardNotificationsBundleCreation";
     public static final String CLAIM_SETTLED = "GenerateDashboardNotificationsClaimSettled";
     public static final String EVIDENCE_UPLOADED = "GenerateDashboardNotificationsEvidenceUploaded";
@@ -25,10 +25,20 @@ public final class DashboardTaskIds {
     public static final String DEFENDANT_RESPONSE = "GenerateDashboardNotificationsDefendantResponse";
     public static final String CLAIM_ISSUE = "GenerateDashboardNotificationsClaimIssue";
     public static final String DJ_NON_DIVERGENT = "GenerateDashboardNotificationsDJNonDivergent";
+    public static final String RAISE_QUERY = "GenerateDashboardNotificationsRaiseQuery";
+    public static final String RESPOND_TO_QUERY = "GenerateDashboardNotificationsRespondToQuery";
     public static final String HEARING_FEE_UNPAID = "GenerateDashboardNotificationsHearingFeeUnpaid";
+    public static final String CITIZEN_HEARING_FEE_PAYMENT = "GenerateDashboardNotificationsCitizenHearingFeePayment";
+    public static final String DEFENDANT_SIGN_SETTLEMENT_AGREEMENT = "GenerateDashboardNotificationsSignSettlementAgreement";
+    public static final String DISCONTINUE_CLAIM_CLAIMANT = "GenerateDashboardNotificationsDiscontinueClaimClaimant";
+    public static final String NOTIFY_LIP_CLAIMANT_HWF_OUTCOME = "GenerateDashboardNotificationsNotifyLipClaimantHwfOutcome";
+    public static final String DEFENDANT_RESPONSE_DEADLINE_CHECK = "GenerateDashboardNotificationsDefendantResponseDeadlineCheck";
     public static final String HEARING_SCHEDULED_HMC = "GenerateDashboardNotificationsHearingScheduledHmc";
     public static final String HEARING_SCHEDULED = "GenerateDashboardNotificationsHearingScheduled";
     public static final String TRIAL_READY_CHECK = "GenerateDashboardNotificationsTrialReadyCheck";
     public static final String TRIAL_READY_CHECK_RESPONDENT1 = "GenerateDashboardNotificationsTrialReadyCheckRespondent1";
+    public static final String CREATE_SDO = "GenerateDashboardNotificationCreateSDO";
+    public static final String FINAL_ORDER = "GenerateDashboardNotificationFinalOrder";
+    public static final String STAY_LIFTED = "GenerateDashboardNotificationStayLifted";
 
 }
