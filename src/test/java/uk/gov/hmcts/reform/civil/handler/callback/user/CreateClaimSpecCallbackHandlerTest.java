@@ -735,7 +735,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
             return objMapper.convertValue(
                 objMapper.convertValue(baseCaseData, java.util.Map.class),
                 CaseData.class
-            );
+                );
         }
 
         @Test
@@ -1432,7 +1432,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     " |---|---| \n" +
                     " | Claim amount | £ 1000.00 | \n" +
                     " | Interest amount | £ 0 | \n" +
-                    " | Total amount | £ 1000.00 |"
+                " | Total amount | £ 1000.00 |"
             );
         }
     }
@@ -2588,8 +2588,7 @@ class  CreateClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .willReturn("36791");
 
                 List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().regionId("Site Name").epimmsId("36791")
-                                  .build());
+                locations.add(new LocationRefData().setRegionId("Site Name").setEpimmsId("36791"));
                 given(locationRefDataService.getCourtLocationsForDefaultJudgments(any()))
                     .willReturn(locations);
             }

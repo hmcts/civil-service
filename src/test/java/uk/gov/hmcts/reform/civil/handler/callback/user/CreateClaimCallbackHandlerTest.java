@@ -1942,12 +1942,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldHandleCourtLocationData() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1")
-                    .epimmsId("epimmsId1")
-                    .courtLocationCode("312")
-                    .siteName("Test Court")
-                    .build();
+                LocationRefData locationA = new LocationRefData()
+                    .setRegionId("regionId1")
+                    .setEpimmsId("epimmsId1")
+                    .setCourtLocationCode("312")
+                    .setSiteName("Test Court");
 
                 given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
                     .willReturn(locationA);

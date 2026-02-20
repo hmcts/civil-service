@@ -76,7 +76,7 @@ class GeneralOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_ORDER)))
             .thenReturn(new DocmosisDocument(GENERAL_ORDER.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
         generalOrderGenerator.generate(caseData, BEARER_TOKEN);
 
@@ -115,7 +115,7 @@ class GeneralOrderGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(POST_JUDGE_GENERAL_ORDER_LIP)))
                 .thenReturn(new DocmosisDocument(POST_JUDGE_GENERAL_ORDER_LIP.getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
             generalOrderGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
@@ -141,7 +141,7 @@ class GeneralOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             var templateData = generalOrderGenerator.getTemplateData(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
                                                                      caseData,
@@ -195,7 +195,7 @@ class GeneralOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             var templateData = generalOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -240,7 +240,7 @@ class GeneralOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             var templateData = generalOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -287,7 +287,7 @@ class GeneralOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcdef ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = generalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -345,7 +345,7 @@ class GeneralOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn(StringUtils.EMPTY);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = generalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -396,7 +396,7 @@ class GeneralOrderGeneratorTest {
 
             when(docmosisService.populateJudgeReason(any())).thenReturn(StringUtils.EMPTY);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = generalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 

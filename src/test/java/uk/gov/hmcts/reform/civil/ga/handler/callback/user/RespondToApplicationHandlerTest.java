@@ -295,8 +295,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceeding() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -312,8 +312,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceedingForUrgentLip() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseData =
@@ -340,8 +340,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         mockIdamClient(DEF_UID);
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
@@ -367,8 +367,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         mockIdamClient(DEF_UID);
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
@@ -392,8 +392,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackAddsLocationDetails() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(AWAITING_RESPONDENT_RESPONSE),
