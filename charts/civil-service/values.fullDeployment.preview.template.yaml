@@ -1,0 +1,164 @@
+wiremock:
+  enabled: false
+
+java:
+  environment:
+    HMC_HEARINGS_SUBSCRIPTION_ENABLED: true
+    HMC_HEARINGS_TOPIC_NAME: "hmc-to-cft-aat"
+    HMC_HEARINGS_TOPIC_SUBSCRIPTION_NAME: "${SERVICE_NAME}-hmcsb-civil"
+    HMC_HEARINGS_TOPIC_NAMESPACE: "hmc-servicebus-aat"
+    RD_PROFESSIONAL_API_URL: http://rd-professional-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCMOSIS_TORNADO_URL: https://docmosis.aat.platform.hmcts.net
+    FEES_API_URL: http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    SEND_LETTER_URL: http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
+  postgresql:
+    primary:
+      initdb:
+        scripts:
+          init.sql: |
+            CREATE DATABASE cmc WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "data-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "definition-store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "camunda" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role-assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "emstitch" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+
+xui-webapp:
+  nodejs:
+    image: hmctspublic.azurecr.io/xui/webapp:pr-4912
+    environment:
+      SERVICES_CCD_DATA_STORE_API: https://ccd-data-store-api-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net
+      HEARINGS_JURISDICTIONS: CIVIL
+      LAUNCH_DARKLY_CLIENT_ID: 5de6610b23ce5408280f2268
+      SERVICES_HEARINGS_COMPONENT_API_CIVIL: http://${SERVICE_NAME}-java
+      ENABLE_HEARING_DATA_SOURCE_HEADERS: "true"
+      PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
+
+ccd:
+  ccd:
+    elastic:
+      enabled: true
+  global:
+    postgresUsername: hmcts
+    postgresPassword: ${POSTGRES_PASSWORD}
+    postgresHostname: ${SERVICE_NAME}-postgresql
+
+  ccd-data-store-api:
+    java:
+      environment:
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_gw,ccd_ps,bulk_scan_orchestrator,ccpay_bubble,ctsc_work_allocation,em_ccd_orchestrator,xui_webapp,civil_service,ccd_case_document_am_api,aac_manage_case_assignment,hmc_cft_hearing_service
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+        ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
+
+  ccd-definition-store-api:
+    java:
+      environment:
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_CASE_INDEX_MAPPING_FIELDS_LIMIT: 12000
+
+  am-role-assignment-service:
+    java:
+      devmemoryRequests: 2048Mi
+      devcpuRequests: 2000m
+      devmemoryLimits: 4096Mi
+      devcpuLimits: 4000m
+      imagePullPolicy: Always
+      image: hmctspublic.azurecr.io/am/role-assignment-service:latest
+      ingressHost: am-role-assignment-service-${SERVICE_FQDN}
+      environment:
+        RELEASE_REVISION: "{{ .Release.Revision }}"
+        ROLE_ASSIGNMENT_DB_PASSWORD: ${POSTGRES_PASSWORD}
+        ROLE_ASSIGNMENT_DB_OPTIONS: "?stringtype=unspecified"
+        CCD_DATA_STORE_URL: http://${SERVICE_NAME}-ccd-data-store-api
+        ROLE_ASSIGNMENT_S2S_AUTHORISED_SERVICES: ccd_gw,am_role_assignment_service,am_org_role_mapping_service,wa_task_management_api,wa_task_configuration_api,xui_webapp,aac_manage_case_assignment,ccd_data,wa_workflow_api,wa_task_monitor,wa_case_event_handler,iac,hmc_cft_hearing_service,ccd_case_disposer,sscs,fis_hmc_api,et_cos,civil_service,civil_general_applications
+        RUN_LD_ON_STARTUP: false
+      keyVaults:
+        am:
+          secrets:
+            - name: am-role-assignment-service-s2s-secret
+              alias: AM_ROLE_ASSIGNMENT_SERVICE_SECRET
+            - name: app-insights-connection-string
+              alias: app-insights-connection-string
+            - name: role-assignment-service-IDAM-CLIENT-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_CLIENT_SECRET
+            - name: role-assignment-service-IDAM-ADMIN-SECRET
+              alias: ROLE_ASSIGNMENT_IDAM_ADMIN_PASSWORD
+            - name: role-assignment-service-LD-SDK-KEY
+              alias: LD_SDK_KEY
+
+  elasticsearch:
+    nameOverride: ${SERVICE_NAME}-es
+    imageTag: "7.17.1"
+    initResources:
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+      requests:
+        cpu: "25m"
+        memory: "512Mi"
+
+  logstash:
+    image: hmctspublic.azurecr.io/ccd/logstash
+    imageTag: "latest"
+    extraEnvs:
+      - name: DATA_STORE_URL
+        value: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
+      - name: DATA_STORE_USER
+        value: ${POSTGRES_USER}
+      - name: DATA_STORE_PASS
+        value: ${POSTGRES_PASSWORD}
+      - name: DB_URL
+        value: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
+      - name: DB_USER
+        value: ${POSTGRES_USER}
+      - name: DB_PWD
+        value: ${POSTGRES_PASSWORD}
+      - name: ES_HOSTS
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ES_DATA_NODES_URL
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        value: http://${SERVICE_NAME}-es-master:9200
+      - name: ES_URL
+        value: http://${SERVICE_NAME}-es-master:9200
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1024Mi"
+      limits:
+        cpu: "2500m"
+        memory: "1024Mi"
+    configTpl:
+      db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?ssl=disable&stringtype=unspecified
+      db.user: ${POSTGRES_USER}
+      db.pwd: ${POSTGRES_PASSWORD}
+      es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+    livenessProbe:
+      initialDelaySeconds: 90
+
+aac-manage-case-assignment:
+  java:
+    environment:
+      ROLE_ASSIGNMENT_URL: ${ROLE_ASSIGNMENT_URL}
+
+hmcsb:
+  enabled: true
+  resourceGroup: hmc-shared-aat
+  sbNamespace: hmc-servicebus-aat
+  #Each topic/queue matches up to one used in the config above
+  setup:
+    topics:
+      - name: civil
+        fullName: hmc-to-cft-aat
+        create: false
+        subscriptionNeeded: yes
+        ignoreSubscriptionDeletion: true
+        rules:
+          - name: "servicefilter"
+            filterType: SqlFilter
+            sqlFilter:
+              sqlExpression: "hmctsServiceId IN ('AAA7','AAA6') AND hmctsDeploymentId = 'civil-${CHANGE_ID}'"
