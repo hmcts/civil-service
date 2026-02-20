@@ -36,10 +36,10 @@ xui-webapp:
       PREVIEW_DEPLOYMENT_ID: "civil-${CHANGE_ID}"
 
 ccd:
-  ras:
-    enabled: true
   ccd:
     elastic:
+      enabled: true
+    ras:
       enabled: true
   global:
     postgresUsername: hmcts
