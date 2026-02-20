@@ -139,8 +139,8 @@ def checkForRunAllFunctionalTests(branch_name) {
   return new GithubAPI(this).getLabelsbyPattern(branch_name, "runAllFunctionalTests").contains("runAllFunctionalTests")
 }
 
-def checkForEnableHelmLabel(branch_name) {
-  return new GithubAPI(this).getLabelsbyPattern(branch_name, "pr-values: enableHelm").contains("pr-values: enableHelm")
+def checkForFullDeploymentLabel(branch_name) {
+  return new GithubAPI(this).getLabelsbyPattern(branch_name, "fullDeployment").contains("fullDeployment")
 }
 
 def getCivilCcdDefinitionBranch() {
@@ -159,6 +159,16 @@ def getGenAppsCcdDefinitionBranch() {
   return "master"
 }
 
+def setPreviewEnvVars() {
+  env.ENVIRONMENT = "preview"
+  env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+  env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+  env.FT_TYPE = getFunctionalTestsType()
+}
+
 withPipeline(type, product, component) {
   env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
   env.PACT_BROKER_PORT = "443"
@@ -166,7 +176,6 @@ withPipeline(type, product, component) {
   env.ENABLE_SECURE_URL = true
 
   onPR {
-    setPreviewEnvVars()
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
     loadVaultSecrets(secrets)
     before('build') {
@@ -189,6 +198,7 @@ withPipeline(type, product, component) {
   }
 
   before('smoketest:preview') {
+    setPreviewEnvVars()
     retry(3) {
       sh """
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
@@ -201,8 +211,15 @@ withPipeline(type, product, component) {
         ./bin/pull-latest-gen-apps-ccd-files.sh ${getGenAppsCcdDefinitionBranch()}
         ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
         ./bin/import-gen-apps-ccd-definition.sh "-e *-nonprod.json"
-        ./bin/add-org-roles-to-users.sh
       """
+      if (checkForFullDeploymentLabel(env.BRANCH_NAME)) {
+        env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+        retry(3) {
+          sh """
+            ./bin/add-org-roles-to-users.sh
+          """
+        }
+      }
     }
 
     if (env.FT_TYPE == "GENERAL_APPS_FT") {
@@ -219,9 +236,6 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/smokeTest/**/*'
-    if (checkForEnableHelmLabel(env.BRANCH_NAME)) {
-      error "The 'pr-values: enableHelm' label is active on the PR. The build will be interrupted to avoid wasting build time needlessly."
-    }
   }
 
   afterAlways('pact-provider-verification') {
@@ -296,15 +310,4 @@ withPipeline(type, product, component) {
     ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
-}
-
-def setPreviewEnvVars() {
-  env.ENVIRONMENT = "preview"
-  env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-  env.URL = "https://xui-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  env.CIVIL_SERVICE_URL = "https://civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  env.WIREMOCK_URL = "https://wiremock-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-service-civil-service-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-  env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-  env.FT_TYPE = getFunctionalTestsType()
 }
