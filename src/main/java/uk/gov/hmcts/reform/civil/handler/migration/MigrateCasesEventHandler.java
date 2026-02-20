@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
@@ -66,6 +67,7 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
         String scenario = externalTask.getVariable("scenario");
         String camundaProcessIdentifier = externalTask.getVariable("notificationCamundaProcessIdentifier");
         String caseNoteElementId = externalTask.getVariable("caseNoteElementId");
+        String notifyEventId = externalTask.getVariable("notifyEventId");
 
         FileValue excelFileValue = externalTask.getVariableTyped("excelFile", false);
 
@@ -112,6 +114,11 @@ public class MigrateCasesEventHandler extends BaseExternalTaskHandler {
                         caseNoteReference.setCaseReference(id);
                         caseNoteReference.setCaseNoteElementId(caseNoteElementId);
                         instance = caseNoteReference;
+                    } else if (notifyEventId != null) {
+                        NotifyRpaFeedCaseReference notifyRpaFeedCaseReference = new NotifyRpaFeedCaseReference();
+                        notifyRpaFeedCaseReference.setCaseReference(id);
+                        notifyRpaFeedCaseReference.setNotifyEventId(notifyEventId);
+                        instance = notifyRpaFeedCaseReference;
                     } else {
                         CaseReference caseRef = new CaseReference();
                         caseRef.setCaseReference(id);
