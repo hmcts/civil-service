@@ -85,7 +85,7 @@ static Map<String, Object> secret(String secretName, String envVariable) {
 }
 
 def secrets = [
-  'rpx-${env}': [
+  'rpx-${env}'  : [
     secret('mc-idam-client-secret', 'IDAM_CLIENT_SECRET'),
   ],
   's2s-${env}'  : [
@@ -117,7 +117,7 @@ def secrets = [
     secret('generic-docker-pact-broker-password', 'GENERIC_DOCKER_PACT_BROKER_YAML_PASS'),
     secret('civil-judge-password', 'JUDGE_PASSWORD'),
     secret('citizen-ui-test-password', 'CITIZEN_PASSWORD'),
-    secret('wlu-default-password','WLU_DEFAULT_PASSWORD')
+    secret('wlu-default-password', 'WLU_DEFAULT_PASSWORD')
 
   ],
   'aac-${env}'  : [
@@ -204,7 +204,6 @@ withPipeline(type, product, component) {
         eval \$(./bin/variables/load-preview-environment-variables.sh ${CHANGE_ID})
         ./bin/wait-for.sh definition-store
         ./bin/add-roles.sh
-        ./bin/load-wiremock-mappings.sh
         ./bin/pull-latest-camunda-files.sh ${camundaBranch}
         ./bin/pull-latest-dmn-files.sh ${dmnBranch}
         ./bin/pull-latest-civil-ccd-files.sh ${getCivilCcdDefinitionBranch()}
@@ -217,6 +216,12 @@ withPipeline(type, product, component) {
         retry(3) {
           sh """
             ./bin/add-org-roles-to-users.sh
+          """
+        }
+      } else {
+        retry(3) {
+          sh """
+           ./bin/load-wiremock-mappings.sh
           """
         }
       }
@@ -243,7 +248,7 @@ withPipeline(type, product, component) {
   }
 
   before('functionalTest:preview') {
-    if(checkForRunAllFunctionalTests(env.BRANCH_NAME)) {
+    if (checkForRunAllFunctionalTests(env.BRANCH_NAME)) {
       env.RUN_ALL_FUNCTIONAL_TESTS = true
     } else {
       copyPrevFailedAndNotExecutedTestFilesJson()
@@ -254,12 +259,12 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:preview') {
     steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
     publishHTML([
-      allowMissing: false,
+      allowMissing         : false,
       alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
+      keepAll              : true,
+      reportDir            : 'test-results/functional/allure-report',
+      reportFiles          : 'index.html',
+      reportName           : 'Non-Prod E2E Allure Report'
     ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
@@ -301,12 +306,12 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:aat') {
     steps.sh 'npx allure generate test-results/functional/allure-results --clean -o test-results/functional/allure-report'
     publishHTML([
-      allowMissing: false,
+      allowMissing         : false,
       alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: 'test-results/functional/allure-report',
-      reportFiles: 'index.html',
-      reportName: 'Non-Prod E2E Allure Report'
+      keepAll              : true,
+      reportDir            : 'test-results/functional/allure-report',
+      reportFiles          : 'index.html',
+      reportName           : 'Non-Prod E2E Allure Report'
     ])
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'test-results/functional/**/*'
   }
