@@ -398,7 +398,7 @@ dependencies {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
