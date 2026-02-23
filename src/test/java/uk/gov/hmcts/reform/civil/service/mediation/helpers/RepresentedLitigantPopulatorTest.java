@@ -46,10 +46,15 @@ public class RepresentedLitigantPopulatorTest {
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
         addMediationInfoRepresented(buildClaimant1(YES));
 
-        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
-
         Organisation organisation = new Organisation();
-        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
+
+        MediationContactInformation contactInfo = new MediationContactInformation()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setTelephoneNumber("0123456789")
+            .setEmailAddress("john.doe@example.com");
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -72,7 +77,8 @@ public class RepresentedLitigantPopulatorTest {
     @Test
     void shouldHandleNullableContactInformation() {
         Organisation organisation = new Organisation();
-        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -93,10 +99,15 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleUnavailableDatesCorrectly() {
-        Organisation organisation = new Organisation();
-        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
+        MediationContactInformation contactInfo = new MediationContactInformation()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setTelephoneNumber("0123456789")
+            .setEmailAddress("john.doe@example.com");
 
-        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy()
+            .setOrganisation(organisation);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
         UnavailableDate unavailableDate = UnavailableDate.builder()

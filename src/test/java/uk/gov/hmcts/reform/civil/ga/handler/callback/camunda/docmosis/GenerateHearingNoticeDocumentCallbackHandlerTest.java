@@ -115,7 +115,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .applicationIsUncloakedOnce(YesOrNo.YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -140,7 +140,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -165,7 +165,7 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
             .build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
