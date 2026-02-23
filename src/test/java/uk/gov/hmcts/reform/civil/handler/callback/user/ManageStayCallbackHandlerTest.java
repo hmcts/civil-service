@@ -23,9 +23,13 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -212,5 +216,82 @@ public class ManageStayCallbackHandlerTest {
                     .confirmationBody("&nbsp;")
                     .build());
         }
+    }
+
+    @Test
+    void shouldUpdateRespondentDeadlines_whenLiftingStayAndStateIsAwaitingRespondentAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        caseData.setCaseStayDate(LocalDate.now().minusDays(5));
+        caseData.setRespondent1ResponseDeadline(LocalDate.now().plusDays(10).atStartOfDay());
+        caseData.setRespondent2ResponseDeadline(LocalDate.now().plusDays(15).atStartOfDay());
+
+        when(deadlinesCalculator.plusDaysAt4pmDeadline(any(), eq(5L)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updated =
+            mapper.convertValue(response.getData(), CaseData.class);
+
+        verify(deadlinesCalculator, times(2))
+            .plusDaysAt4pmDeadline(any(), eq(5L));
+
+        assertThat(updated.getRespondent1ResponseDeadline()).isNotNull();
+        assertThat(updated.getRespondent2ResponseDeadline()).isNotNull();
+    }
+
+    @Test
+    void shouldUpdateApplicantDeadline_whenLiftingStayAndStateIsAwaitingApplicantIntention() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        caseData.setCaseStayDate(LocalDate.now().minusDays(3));
+        caseData.setApplicant1ResponseDeadline(LocalDate.now().plusDays(7).atStartOfDay());
+
+        when(deadlinesCalculator.plusDaysAt4pmDeadline(any(), eq(3L)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updated =
+            mapper.convertValue(response.getData(), CaseData.class);
+
+        verify(deadlinesCalculator)
+            .plusDaysAt4pmDeadline(any(), eq(3L));
+
+        assertThat(updated.getApplicant1ResponseDeadline()).isNotNull();
+    }
+
+    @Test
+    void shouldNotUpdateDeadlines_whenCaseStayDateIsNull() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_APPLICANT_INTENTION.name());
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(params);
+
+        verifyNoInteractions(deadlinesCalculator);
     }
 }
