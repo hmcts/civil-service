@@ -82,15 +82,16 @@ public class ManageStayCallbackHandler extends CallbackHandler {
 
     private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseState newState = nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)
-            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), CaseState.valueOf(caseData.getPreStayState()))
-            : caseData.getCcdState();
-        caseData.setBusinessProcess(BusinessProcess.ready(
-            LIFT_STAY.equals(caseData.getManageStayOption()) ? STAY_LIFTED : STAY_UPDATE_REQUESTED
-        ));
-        caseData.setManageStayUpdateRequestDate(
-            REQUEST_UPDATE.equals(caseData.getManageStayOption()) ? LocalDate.now() : null
-        );
+        CaseState newState;
+        if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
+            newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), CaseState.valueOf(caseData.getPreStayState()));
+            caseData.setBusinessProcess(BusinessProcess.ready(STAY_LIFTED));
+            caseData.setManageStayUpdateRequestDate(null);
+        } else {
+            newState = caseData.getCcdState();
+            caseData.setBusinessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
+            caseData.setManageStayUpdateRequestDate(LocalDate.now());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .state(newState.name())

@@ -134,6 +134,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  CaseState ccdState;
     private  CaseState previousCCDState;
     private  String preStayState;
+    private  LocalDate caseStayDate;
     private  String manageStayOption;
     private  LocalDate manageStayUpdateRequestDate;
     private  GAApplicationType generalAppType;
