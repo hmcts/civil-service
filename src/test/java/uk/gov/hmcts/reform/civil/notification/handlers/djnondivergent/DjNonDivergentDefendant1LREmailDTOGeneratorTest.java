@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.DEFENDANT_NAME_INTERIM;
 
 @ExtendWith(MockitoExtension.class)
-public class DjNonDivergentDefendant1LREmailDTOGeneratorTest {
+class DjNonDivergentDefendant1LREmailDTOGeneratorTest {
 
     @Mock
     private NotificationsProperties notificationsProperties;

@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.NotifierTestBase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DjNonDivergentNotifierTest extends NotifierTestBase {
+class DjNonDivergentNotifierTest extends NotifierTestBase {
 
     @InjectMocks
     private DjNonDivergentNotifier notifier;
@@ -15,6 +15,6 @@ public class DjNonDivergentNotifierTest extends NotifierTestBase {
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
 
-        assertThat(taskId).isEqualTo("DjNonDivergentNotifier");
+        assertThat(taskId).isEqualTo("DJNonDivergentNotifier");
     }
 }
