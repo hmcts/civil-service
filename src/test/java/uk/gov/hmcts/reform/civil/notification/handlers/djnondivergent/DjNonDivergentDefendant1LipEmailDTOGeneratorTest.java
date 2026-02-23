@@ -38,6 +38,4 @@ public class DjNonDivergentDefendant1LipEmailDTOGeneratorTest {
         assertThat(referenceTemplate).isEqualTo("dj-non-divergent-defendant-notification-lip-%s");
     }
 
-    // getShouldNotify() is inherited from DefendantEmailDTOGenerator
-    // and tested in its own test class
 }
