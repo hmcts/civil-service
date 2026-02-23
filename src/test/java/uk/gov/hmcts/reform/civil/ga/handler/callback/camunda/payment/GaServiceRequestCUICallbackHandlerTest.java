@@ -53,9 +53,9 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
         caseData = GeneralApplicationCaseData.builder()
              .ccdCaseReference(1644495739087775L)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .code("CODE").build()).build())
+                        .fee(new Fee()
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+                                .setCode("CODE")).build())
             .build();
     }
 
