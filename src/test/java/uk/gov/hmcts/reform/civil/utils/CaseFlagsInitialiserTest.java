@@ -63,8 +63,8 @@ class CaseFlagsInitialiserTest {
         var applicant2 = PartyBuilder.builder().company().build();
         var respondent1 = PartyBuilder.builder().soleTrader().build();
         var respondent2 = PartyBuilder.builder().organisation().build();
-        var applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        var applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        var applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        var applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
         var expected = CaseData.builder()
             .applicant1(
@@ -80,20 +80,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                     new Flags()
                         .setPartyName("Jason Wilson")
                         .setRoleOnCase("Claimant 1 Litigation Friend")
                         .setDetails(List.of()))
-                    .build()
+                    
                 )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -123,25 +123,25 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldInitialiseCaseFlagsForAddLitigationFriendEvent() {
-        var respondent1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        var respondent2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        var respondent1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        var respondent2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
         var expected = CaseData.builder()
             .respondent1LitigationFriend(
-                respondent1LitFriend.toBuilder().flags(
+                respondent1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Defendant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .respondent2LitigationFriend(
-                respondent2LitFriend.toBuilder().flags(
+                respondent2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Defendant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .build();
 
         var caseData = CaseData.builder()
@@ -172,8 +172,8 @@ class CaseFlagsInitialiserTest {
         Party applicant1 = PartyBuilder.builder().individual().build();
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -195,20 +195,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -336,8 +336,8 @@ class CaseFlagsInitialiserTest {
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         Party respondent2 = PartyBuilder.builder().organisation().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -359,20 +359,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -589,8 +589,8 @@ class CaseFlagsInitialiserTest {
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         Party respondent2 = PartyBuilder.builder().organisation().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -612,20 +612,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
