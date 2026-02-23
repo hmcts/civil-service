@@ -549,11 +549,11 @@ class JudgmentByAdmissionMapperTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .paymentAmount(new BigDecimal("200"))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          .firstRepaymentDate(LocalDate.now())
-                                          .build())
+            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setPaymentAmount(new BigDecimal("200"))
+                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          .setFirstRepaymentDate(LocalDate.now())
+                                          )
             .build();
 
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -570,11 +570,11 @@ class JudgmentByAdmissionMapperTest {
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(null)
-            .respondent2RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .paymentAmount(new BigDecimal("300"))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_TWO_WEEKS)
-                                          .firstRepaymentDate(LocalDate.now())
-                                          .build())
+            .respondent2RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setPaymentAmount(new BigDecimal("300"))
+                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_TWO_WEEKS)
+                                          .setFirstRepaymentDate(LocalDate.now())
+                                          )
             .build();
 
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -596,11 +596,11 @@ class JudgmentByAdmissionMapperTest {
             .respondent1(PartyBuilder.builder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .paymentAmount(new BigDecimal("250"))
-                                          .repaymentFrequency(repFreq)
-                                          .firstRepaymentDate(LocalDate.now())
-                                          .build())
+            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setPaymentAmount(new BigDecimal("250"))
+                                          .setRepaymentFrequency(repFreq)
+                                          .setFirstRepaymentDate(LocalDate.now())
+                                          )
             .build();
 
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
