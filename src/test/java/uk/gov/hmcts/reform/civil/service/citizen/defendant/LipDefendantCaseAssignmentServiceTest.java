@@ -74,10 +74,10 @@ class LipDefendantCaseAssignmentServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         Party respondent1 = caseData.getRespondent1()
             .toBuilder().partyEmail(EMAIL).build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails,
                                           "respondent1", respondent1);
 
@@ -126,10 +126,10 @@ class LipDefendantCaseAssignmentServiceTest {
                              .type(Party.Type.INDIVIDUAL)
                              .build())
             .build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         data.put("defendantUserDetails", defendantUserDetails);
         data.put("respondent1", caseData.getRespondent1().toBuilder().partyEmail(EMAIL).build());
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);

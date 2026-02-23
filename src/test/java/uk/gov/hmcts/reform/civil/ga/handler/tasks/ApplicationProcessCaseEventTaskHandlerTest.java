@@ -106,7 +106,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
 
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
                 .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
@@ -195,7 +195,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitGaUpdate(any(), any()))
                 .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
-                    GeneralAppParentCaseLink.builder().caseReference("123").build()).build());
+                    new GeneralAppParentCaseLink().setCaseReference("123")).build());
 
             assertThrows(CompleteTaskException.class,
                 () -> applicationProcessCaseEventTaskHandler.execute(mockTask, externalTaskService));

@@ -51,10 +51,10 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
             .hearingReferenceNumber("REFERENCE_NUM")
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .legacyCaseReference(CASE_REFERENCE)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(SOLICITOR_EMAIL).build())
-            .hearingFee(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal("23212"))
-                            .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(SOLICITOR_EMAIL))
+            .hearingFee(new Fee()
+                            .setCalculatedAmountInPence(new BigDecimal("23212"))
+                            )
             .build();
     }
 
@@ -82,7 +82,7 @@ class NoCHearingFeeUnpaidAppSolEmailDTOGeneratorTest {
             .hearingReferenceNumber("REFERENCE_NUM")
             .listingOrRelisting(ListingOrRelisting.LISTING)
             .legacyCaseReference(CASE_REFERENCE)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(SOLICITOR_EMAIL).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(SOLICITOR_EMAIL))
             .hearingFee(null)
             .build();
 

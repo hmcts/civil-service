@@ -64,7 +64,7 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .claimantBilingualLanguagePreference("WELSH")
                 .build();
             caseData.setClaimantLanguagePreferenceDisplay(PreferredLanguage.WELSH);
@@ -83,7 +83,7 @@ public class ResetLanguagePreferenceCallbackHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
                 .changeOfRepresentation(false, false, NEW_ORG_ID, null, null)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .build();
             caseData.setCaseDataLiP(new CaseDataLiP()
                                  .setRespondent1LiPResponse(

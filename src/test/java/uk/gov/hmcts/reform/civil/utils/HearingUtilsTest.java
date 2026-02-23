@@ -44,7 +44,7 @@ class HearingUtilsTest {
     @DisplayName("HearingUtils.formatHearingFee should return <null> when the hearing fee is zero.")
     void shouldReturnNull_when0ClaimFee() {
         assertThat(HearingUtils.formatHearingFee(
-            Fee.builder().calculatedAmountInPence(new BigDecimal(0)).build())).isNull();
+            new Fee().setCalculatedAmountInPence(new BigDecimal(0)))).isNull();
     }
 
     @ParameterizedTest
@@ -54,7 +54,7 @@ class HearingUtilsTest {
     void shouldReturnFormattedFee_whenGivenAnyClaimFee(int amount, String expectedOutput) {
         BigDecimal feeAmount = new BigDecimal(amount);
         assertThat(HearingUtils.formatHearingFee(
-            Fee.builder().calculatedAmountInPence(feeAmount).build())).isEqualTo(expectedOutput);
+            new Fee().setCalculatedAmountInPence(feeAmount))).isEqualTo(expectedOutput);
     }
 
     @ParameterizedTest
@@ -94,10 +94,10 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnExpectedHearingNotes_whenDisposalHearingHearingNotesAreProvided() {
-        HearingNotes expected = HearingNotes.builder()
-            .notes("test notes")
-            .date(LocalDate.now())
-            .build();
+        HearingNotes expected = new HearingNotes()
+            .setNotes("test notes")
+            .setDate(LocalDate.now())
+            ;
         CaseData caseData = CaseData.builder()
             .disposalHearingHearingNotes("test notes")
             .build();
@@ -109,10 +109,10 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnExpectedHearingNotes_whenFastTrackHearingNotesAreProvided() {
-        HearingNotes expected = HearingNotes.builder()
-            .notes("test notes")
-            .date(LocalDate.now())
-            .build();
+        HearingNotes expected = new HearingNotes()
+            .setNotes("test notes")
+            .setDate(LocalDate.now())
+            ;
         CaseData caseData = CaseData.builder()
             .fastTrackHearingNotes(new FastTrackHearingNotes().setInput("test notes"))
             .build();
@@ -124,10 +124,10 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnExpectedHearingNotes_whenDisposalHearingHearingNotesDJAreProvided() {
-        HearingNotes expected = HearingNotes.builder()
-            .notes("test notes")
-            .date(LocalDate.now())
-            .build();
+        HearingNotes expected = new HearingNotes()
+            .setNotes("test notes")
+            .setDate(LocalDate.now())
+            ;
         CaseData caseData = CaseData.builder()
             .disposalHearingHearingNotesDJ(new DisposalHearingHearingNotesDJ().setInput("test notes"))
             .build();
@@ -139,10 +139,10 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnExpectedHearingNotes_whenSdoHearingNotesAreProvided() {
-        HearingNotes expected = HearingNotes.builder()
-            .notes("test notes")
-            .date(LocalDate.now())
-            .build();
+        HearingNotes expected = new HearingNotes()
+            .setNotes("test notes")
+            .setDate(LocalDate.now())
+            ;
         CaseData caseData = CaseData.builder()
             .sdoHearingNotes(SDOHearingNotes.builder().input("test notes").build())
             .build();
@@ -154,10 +154,10 @@ class HearingUtilsTest {
 
     @Test
     void shouldReturnExpectedHearingNotes_whenTrialHearingHearingNotesDJAreProvided() {
-        HearingNotes expected = HearingNotes.builder()
-            .notes("test notes")
-            .date(LocalDate.now())
-            .build();
+        HearingNotes expected = new HearingNotes()
+            .setNotes("test notes")
+            .setDate(LocalDate.now())
+            ;
         CaseData caseData = CaseData.builder()
             .trialHearingHearingNotesDJ(new TrialHearingHearingNotesDJ().setInput("test notes"))
             .build();
