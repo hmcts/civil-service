@@ -143,10 +143,9 @@ public class JudgmentByAdmissionOnlineMapper extends JudgmentOnlineMapper {
 
     private JudgmentInstalmentDetails getInstalmentDetails(CaseData caseData) {
         if (caseData.hasApplicant1CourtDecisionInFavourOfClaimant()) {
-            BigInteger instalmentsAmount =
-                MonetaryConversions.poundsToPennies(caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec());
+            BigDecimal instalmentsAmount = caseData.getApplicant1SuggestInstalmentsPaymentAmountForDefendantSpec();
             return buildJudgmentInstalmentDetails(
-                String.valueOf(instalmentsAmount),
+                instalmentsAmount != null ? instalmentsAmount.toPlainString() : null,
                 getClaimantLipSuggestedPaymentFrequency(
                     caseData.getApplicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec()),
                 caseData.getApplicant1SuggestInstalmentsFirstRepaymentDateForDefendantSpec()
