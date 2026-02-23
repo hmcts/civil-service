@@ -222,16 +222,14 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                  new PartyFlagStructure()
                      .setFirstName("Second")
                      .setLastName("witness")
                      .setFlags(new Flags()
                                 .setPartyName("Second witness")
                                 .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                                .setDetails(List.of()))
-                     ,
+                                .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("witnessy")
@@ -247,16 +245,14 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
                     .setFlags(new Flags()
                                .setPartyName("Second expert")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("experto")
@@ -272,8 +268,7 @@ class CaseFlagsInitialiserTest {
                         .setFlags(new Flags()
                                    .setPartyName("First Name")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                                   .setDetails(List.of()))
-                        ,
+                                   .setDetails(List.of())),
                     new PartyFlagStructure()
                         .setFirstName("Second")
                         .setLastName("witness")
@@ -289,8 +284,7 @@ class CaseFlagsInitialiserTest {
                         .setFlags(new Flags()
                                    .setPartyName("First Name")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                                   .setDetails(List.of()))
-                        ,
+                                   .setDetails(List.of())),
                     new PartyFlagStructure()
                         .setFirstName("Second")
                         .setLastName("expert")
@@ -392,16 +386,14 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
                     .setFlags(new Flags()
                                .setPartyName("Second witness")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("witnessy")
@@ -417,16 +409,14 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
                     .setFlags(new Flags()
                                .setPartyName("Second expert")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    ,
+                               .setDetails(List.of())),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("experto")
@@ -443,8 +433,7 @@ class CaseFlagsInitialiserTest {
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS))
-                    ,
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
@@ -462,8 +451,7 @@ class CaseFlagsInitialiserTest {
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT))
-                    ,
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
@@ -527,8 +515,7 @@ class CaseFlagsInitialiserTest {
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
-                                                                 .setFlagCode("123")))))
-                    ,
+                                                                 .setFlagCode("123"))))),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
@@ -546,8 +533,7 @@ class CaseFlagsInitialiserTest {
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
-                                                                 .setFlagCode("123")))))
-                    ,
+                                                                 .setFlagCode("123"))))),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
@@ -647,8 +633,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
@@ -657,8 +642,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("witnessy")
@@ -678,8 +662,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
@@ -688,8 +671,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("experto")
@@ -707,8 +689,7 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                               .setDetails(wrapElements(List.of())))
-                    ,
+                               .setDetails(wrapElements(List.of()))),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
@@ -724,8 +705,7 @@ class CaseFlagsInitialiserTest {
                     .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                               .setDetails(wrapElements(List.of())))
-                    ,
+                               .setDetails(wrapElements(List.of()))),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
@@ -790,8 +770,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("witness")
@@ -800,8 +779,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("witnessy")
@@ -822,8 +800,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Second")
                     .setLastName("expert")
@@ -832,8 +809,7 @@ class CaseFlagsInitialiserTest {
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    ,
+                    ),
                 new PartyFlagStructure()
                     .setFirstName("Third")
                     .setLastName("experto")

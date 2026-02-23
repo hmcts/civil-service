@@ -5666,9 +5666,13 @@ public class CaseDataBuilder {
         respondent1ResponseDate = LocalDateTime.now();
         respondent1ClaimResponseTypeForSpec = RespondentResponseTypeSpec.PART_ADMISSION;
 
-        respondToClaimAdmitPartUnemployedLRspec = new UnemployedComplexTypeLRspec("No", new LengthOfUnemploymentComplexTypeLRspec().setNumberOfMonthsInUnemployment("1.5")
-                .setNumberOfYearsInUnemployment("2.6")
-                , null);
+        respondToClaimAdmitPartUnemployedLRspec = new UnemployedComplexTypeLRspec(
+            "No",
+            new LengthOfUnemploymentComplexTypeLRspec()
+                .setNumberOfMonthsInUnemployment("1.5")
+                .setNumberOfYearsInUnemployment("2.6"),
+            null
+        );
 
         return this;
     }
