@@ -263,7 +263,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                     .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
                                      .individualLastName("b").partyEmail("applicant@email.com").build())
                     .qmLatestQuery(createLatestQuery("5"))
-                    .defendantUserDetails(IdamUserDetails.builder().email("applicant@email.com").build())
+                    .defendantUserDetails(new IdamUserDetails().setEmail("applicant@email.com"))
                     .respondent1Represented(YesOrNo.NO)
                     .build();
 
@@ -296,9 +296,9 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(publicQueries)

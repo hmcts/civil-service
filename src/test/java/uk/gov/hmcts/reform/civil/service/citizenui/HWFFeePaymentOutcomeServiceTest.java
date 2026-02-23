@@ -145,7 +145,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenItsPartRemissionUpdateOutstandingAmountForClaimIssue() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.CLAIMISSUED)
@@ -161,7 +161,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenItsPartRemissionUpdateOutstandingAmountForClaimIssueWithNullDetails() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
@@ -177,7 +177,7 @@ class HWFFeePaymentOutcomeServiceTest {
     void whenItsPartRemissionUpdateOutstandingAmountFoeHearingFee() {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .hearingHwfDetails(new HelpWithFeesDetails()
                                    .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.HEARING)
@@ -194,7 +194,7 @@ class HWFFeePaymentOutcomeServiceTest {
     void whenItsPartRemissionUpdateOutstandingAmountForHearingFeeWithNullDetails() {
         CaseData caseData = CaseData.builder()
             .hearingReferenceNumber("000HN001")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .hwfFeeType(FeeType.HEARING)
             .build();
 
@@ -209,7 +209,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenNoRemissionHwfForClaimIssue_shouldSetRemissionToZero() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setRemissionAmount(BigDecimal.valueOf(5000)))
             .hwfFeeType(FeeType.CLAIMISSUED)
@@ -226,7 +226,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenNoRemissionHwfForHearingFee_shouldSetRemissionToZero() {
         CaseData caseData = CaseData.builder()
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .hearingHwfDetails(new HelpWithFeesDetails()
                                    .setRemissionAmount(BigDecimal.valueOf(10000)))
             .hwfFeeType(FeeType.HEARING)
@@ -243,7 +243,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenClaimFeeIsZero_shouldNotUpdateOutstandingAmount() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.ZERO))
             .claimIssuedHwfDetails(new HelpWithFeesDetails()
                                        .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.CLAIMISSUED)
@@ -257,7 +257,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenHearingFeeIsZero_shouldNotUpdateOutstandingAmount() {
         CaseData caseData = CaseData.builder()
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ZERO).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.ZERO))
             .hearingHwfDetails(new HelpWithFeesDetails()
                                    .setRemissionAmount(BigDecimal.valueOf(1000)))
             .hwfFeeType(FeeType.HEARING)
@@ -295,7 +295,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenNeitherClaimIssuedNorHearingTypeIsSet_shouldNotUpdateAnything() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .build();
 
         caseData = feePaymentOutcomeService.updateOutstandingFee(caseData, PARTIAL_REMISSION_HWF_GRANTED.name());
@@ -307,7 +307,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenRemissionAmountIsNull_shouldHandleGracefullyForClaimIssue() {
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .hwfFeeType(FeeType.CLAIMISSUED)
             .build();
 
@@ -319,7 +319,7 @@ class HWFFeePaymentOutcomeServiceTest {
     @Test
     void whenRemissionAmountIsNull_shouldHandleGracefullyForHearingFee() {
         CaseData caseData = CaseData.builder()
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .hwfFeeType(FeeType.HEARING)
             .build();
 

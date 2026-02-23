@@ -291,7 +291,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1L)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
+                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();
@@ -306,7 +306,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .ccdCaseReference(1L)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build()).build())
+                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();
