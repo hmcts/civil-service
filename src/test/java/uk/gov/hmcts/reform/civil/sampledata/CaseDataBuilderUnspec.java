@@ -213,17 +213,9 @@ public class CaseDataBuilderUnspec {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-            .build();
-        respondent2OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R2").build())
-            .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]")
-            .build();
+        applicant1OrganisationPolicy = organisationPolicy("QWERTY A", null);
+        respondent1OrganisationPolicy = organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]");
+        respondent2OrganisationPolicy = organisationPolicy("QWERTY R2", "[RESPONDENTSOLICITORTWO]");
         respondent1OrganisationIDCopy = respondent1OrganisationPolicy.getOrganisation().getOrganisationID();
         respondent2OrganisationIDCopy = respondent2OrganisationPolicy.getOrganisation().getOrganisationID();
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
@@ -444,5 +436,13 @@ public class CaseDataBuilderUnspec {
             .respondent1OrganisationIDCopy(respondent1OrganisationIDCopy)
             .respondent2OrganisationIDCopy(respondent2OrganisationIDCopy)
             .build();
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
     }
 }

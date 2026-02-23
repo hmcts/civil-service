@@ -107,7 +107,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
@@ -130,7 +130,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Deadline to file Acknowledgement of Service has passed, option is not available.");
 
@@ -154,7 +154,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("error 1");
             Mockito.when(postcodeValidator.validate(postCode)).thenReturn(errors);
@@ -172,7 +172,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackRequest request = CallbackRequest.builder()
                 .eventId("NOT_ACKNOWLEDGEMENT_OF_SERVICE")
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             CallbackResponse response = handler.handle(params);
             assertThat(((AboutToStartOrSubmitCallbackResponse) response).getErrors()).isNull();
@@ -188,7 +188,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Error 1");
             Mockito.when(dateOfBirthValidator.validate(caseData.getRespondent1())).thenReturn(errors);
@@ -211,7 +211,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "confirm-details");
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             List<String> errors = Collections.singletonList("Error 1");
             Mockito.when(dateOfBirthValidator.validate(caseData.getRespondent1())).thenReturn(errors);
@@ -258,7 +258,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
                                             .thenReturn(caseData.getRespondent1ResponseDeadline()
@@ -304,7 +304,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             CallbackRequest request = CallbackRequest.builder()
                 .build();
-            params = params.toBuilder().request(request).build();
+            params = paramsWithRequest(params, request);
 
             Mockito.when(deadlinesCalculator.plus14DaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline()))
                 .thenReturn(caseData.getRespondent1ResponseDeadline()
@@ -352,6 +352,11 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
 
+    }
+
+    private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
+        return params.copy()
+            .request(request);
     }
 
 }

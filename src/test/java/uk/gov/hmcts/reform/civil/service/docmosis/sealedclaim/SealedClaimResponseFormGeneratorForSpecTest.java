@@ -275,7 +275,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
             .thenReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
-            .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
 
         generator.generate(base1v1, AUTH);
 
@@ -306,7 +306,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
             .thenReturn(new DocmosisDocument().setBytes(new byte[]{9}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
-            .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
 
         generator.generate(multipartySame, AUTH);
 

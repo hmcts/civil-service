@@ -48,10 +48,8 @@ public class RepresentedLitigantPopulatorTest {
 
         MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
 
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -73,10 +71,8 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNullableContactInformation() {
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
 
         MediationAvailability mediationAvailability = new MediationAvailability();
         mediationAvailability.setIsMediationUnavailablityExists(YES);
@@ -97,10 +93,8 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleUnavailableDatesCorrectly() {
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
 
         MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
 
