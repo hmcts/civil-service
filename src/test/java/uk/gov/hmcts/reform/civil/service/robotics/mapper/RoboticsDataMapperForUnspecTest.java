@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -50,13 +53,16 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSuppor
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -611,5 +617,47 @@ class RoboticsDataMapperForUnspecTest {
         details.setDx("Dx");
         details.setAddress(new Address());
         return details;
+    }
+
+    @Nested
+    class OtherRemedy {
+        @ParameterizedTest
+        @MethodSource("housingDisrepairClaimTypes")
+        void shouldReturnCorrectHeaderAndRoboticDataWithOtherRemedyFeeAppliedWhenDeclarationAdded(ClaimTypeUnspec claimTypeUnspec, ClaimType claimType) {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+                .otherRemedyClaimDeclarationAdded()
+                .otherRemedyFee(BigDecimal.valueOf(100))
+                .build();
+            caseData.setClaimTypeUnSpec(claimTypeUnspec);
+            caseData.setClaimType(claimType);
+            when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
+            RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+
+            assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(2);
+        }
+
+        @ParameterizedTest
+        @MethodSource("housingDisrepairClaimTypes")
+        void shouldReturnCorrectHeaderAndOnlyCourtFeeWithoutOtherRemedyFeeWhenDeclarationIsNotAdded(ClaimTypeUnspec claimTypeUnspec, ClaimType claimType) {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+                .otherRemedyFee(BigDecimal.valueOf(100))
+                .build();
+            caseData.setClaimTypeUnSpec(claimTypeUnspec);
+            caseData.setClaimType(claimType);
+            when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
+            RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+
+            assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(1);
+        }
+
+        private static Stream<Arguments> housingDisrepairClaimTypes() {
+            return Stream.of(arguments(ClaimTypeUnspec.HOUSING_DISREPAIR, ClaimType.HOUSING_DISREPAIR),
+                             arguments(ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY, ClaimType.DAMAGES_AND_OTHER_REMEDY));
+        }
+
     }
 }
