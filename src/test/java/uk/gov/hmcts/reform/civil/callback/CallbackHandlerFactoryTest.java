@@ -134,12 +134,11 @@ class CallbackHandlerFactoryTest {
             .builder()
             .eventId("nope")
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .version(V_1)
-            .build();
+            .version(V_1);
 
         assertThatThrownBy(() -> callbackHandlerFactory.dispatch(params))
             .isInstanceOf(CallbackException.class)
@@ -152,12 +151,11 @@ class CallbackHandlerFactoryTest {
             .builder()
             .eventId(CREATE_CLAIM.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .version(V_2)
-            .build();
+            .version(V_2);
 
         assertThatThrownBy(() -> callbackHandlerFactory.dispatch(params))
             .isInstanceOf(CallbackException.class)
@@ -173,12 +171,11 @@ class CallbackHandlerFactoryTest {
             .caseDetailsBefore(CaseDetails.builder().data(Map.of("state", "created")).build())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -192,16 +189,15 @@ class CallbackHandlerFactoryTest {
             .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1").build()
+                new BusinessProcess().setActivityId("CreateClaimPaymentSuccessfulNotifyRespondentSolicitor1")
             )).build())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -215,16 +211,15 @@ class CallbackHandlerFactoryTest {
             .eventId(NOTIFY_EVENT.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("unProcessedTask").build()
+                new BusinessProcess().setActivityId("unProcessedTask")
             )).build())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -238,16 +233,15 @@ class CallbackHandlerFactoryTest {
             .eventId(CREATE_CLAIM.name())
             .caseDetailsBefore(CaseDetails.builder().data(Map.of(
                 "businessProcess",
-                BusinessProcess.builder().activityId("unProcessedTask").build()
+                new BusinessProcess().setActivityId("unProcessedTask")
             )).build())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -261,12 +255,11 @@ class CallbackHandlerFactoryTest {
             .eventId(CREATE_CLAIM.name())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -280,11 +273,10 @@ class CallbackHandlerFactoryTest {
             .eventId(DEFENDANT_RESPONSE.name())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 
@@ -298,12 +290,11 @@ class CallbackHandlerFactoryTest {
             .eventId(DEFENDANT_RESPONSE.name())
             .build();
 
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .type(ABOUT_TO_SUBMIT)
             .version(V_1)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, BEARER_TOKEN));
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(params);
 

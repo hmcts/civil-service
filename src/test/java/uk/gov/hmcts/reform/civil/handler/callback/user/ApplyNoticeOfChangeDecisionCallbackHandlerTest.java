@@ -289,10 +289,8 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         @Test
         void testGetChangedOrgReturnsOrganisationToRemoveId() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build()).build())
-                .organisationToRemove(Organisation.builder().organisationID(ORG_ID).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+            request.setOrganisationToRemove(new Organisation().setOrganisationID(ORG_ID));
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request))
                 .isEqualTo(ORG_ID);
@@ -300,9 +298,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         @Test
         void testGetChangedOrgReturnsRespondent1OrgIdCopy() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build()).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
             CaseData caseData = CaseData.builder().respondent1OrganisationIDCopy(ORG_ID).build();
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(caseData, request)).isEqualTo(ORG_ID);
@@ -310,9 +306,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         @Test
         void testGetChangedOrgReturnsRespondent2OrgIdCopy() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build()).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
             CaseData caseData = CaseData.builder().respondent2OrganisationIDCopy(ORG_ID).build();
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(caseData, request)).isEqualTo(ORG_ID);
@@ -320,29 +314,31 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
 
         @Test
         void testGetChangedOrgReturnsRespondent1OrgIdCopyNull() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.RESPONDENTSOLICITORONE.getFormattedName()).build()).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORONE.getFormattedName());
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
         }
 
         @Test
         void testGetChangedOrgReturnsRespondent2OrgIdCopyNull() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build()).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName());
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
         }
 
         @Test
         void testGetChangedOrgApplicant() {
-            ChangeOrganisationRequest request = ChangeOrganisationRequest.builder()
-                .caseRoleId(DynamicList.builder().value(DynamicListElement.builder()
-                                                            .code(CaseRole.APPLICANTSOLICITORONE.getFormattedName()).build()).build()).build();
+            ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+        }
+
+        private ChangeOrganisationRequest createRequest(String caseRole) {
+            ChangeOrganisationRequest request = new ChangeOrganisationRequest();
+            request.setCaseRoleId(DynamicList.builder()
+                .value(DynamicListElement.builder().code(caseRole).build())
+                .build());
+            return request;
         }
     }
 

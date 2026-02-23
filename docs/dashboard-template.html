@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard template viewer</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --accent: #0f766e;
+      --border: #e5e7eb;
+      --code-bg: #0b1020;
+      --code-text: #e2e8f0;
+    }
+    body {
+      margin: 1.5rem;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.5rem;
+      align-items: baseline;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+    .meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+    .error {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+    pre {
+      margin: 0;
+      padding: 1rem;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="title">Dashboard template</h1>
+    <span class="meta" id="path"></span>
+    <span class="meta" id="raw-link"></span>
+  </header>
+  <div class="panel">
+    <pre id="content">Loading…</pre>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const path = params.get("path");
+      const title = document.getElementById("title");
+      const pathEl = document.getElementById("path");
+      const rawLink = document.getElementById("raw-link");
+      const content = document.getElementById("content");
+      const base = "https://raw.githubusercontent.com/hmcts/civil-service/master/";
+
+      if (!path) {
+        title.textContent = "Dashboard template viewer";
+        content.textContent = "Provide a ?path=... query string to load a template.";
+        content.className = "error";
+        return;
+      }
+
+      const isValidPath = /^[A-Za-z0-9._/-]+$/.test(path) && !path.includes("..");
+      if (!isValidPath) {
+        title.textContent = "Dashboard template viewer";
+        content.textContent = "Invalid template path.";
+        content.className = "error";
+        return;
+      }
+
+      const name = path.split("/").pop();
+      title.textContent = name || "Dashboard template";
+      pathEl.textContent = path;
+      const rawUrl = new URL(path, base).toString();
+      const rawAnchor = document.createElement("a");
+      rawAnchor.href = rawUrl;
+      rawAnchor.textContent = "Raw JSON";
+      rawAnchor.rel = "noopener noreferrer";
+      rawAnchor.target = "_blank";
+      rawLink.replaceChildren(rawAnchor);
+
+      fetch(rawUrl)
+        .then((resp) => {
+          if (!resp.ok) {
+            throw new Error("HTTP " + resp.status);
+          }
+          return resp.json();
+        })
+        .then((data) => {
+          content.textContent = JSON.stringify(data, null, 2);
+        })
+        .catch((err) => {
+          content.textContent = "Failed to load JSON: " + err.message;
+          content.className = "error";
+        });
+    })();
+  </script>
+</body>
+</html>

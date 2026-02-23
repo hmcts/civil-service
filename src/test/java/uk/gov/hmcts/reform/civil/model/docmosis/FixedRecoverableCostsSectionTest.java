@@ -13,22 +13,20 @@ class FixedRecoverableCostsSectionTest {
     @Test
     public void testFrom_withNonNullFixedRecoverableCosts_returnsExpectedFixedRecoverableCostsSection() {
         var fixedRecoverableCosts =
-            FixedRecoverableCosts.builder()
-                .isSubjectToFixedRecoverableCostRegime(YES)
-                .complexityBandingAgreed(YES)
-                .band(BAND_1)
-                .reasons("Reasons")
-                .build();
+            new FixedRecoverableCosts()
+                .setIsSubjectToFixedRecoverableCostRegime(YES)
+                .setComplexityBandingAgreed(YES)
+                .setBand(BAND_1)
+                .setReasons("Reasons");
 
-        var actual = FixedRecoverableCostsSection.from(fixedRecoverableCosts);
+        final var actual = FixedRecoverableCostsSection.from(fixedRecoverableCosts);
 
-        FixedRecoverableCostsSection expected = FixedRecoverableCostsSection.builder()
-            .isSubjectToFixedRecoverableCostRegime(YES)
-            .complexityBandingAgreed(YES)
-            .band(BAND_1)
-            .bandText(BAND_1.getLabel())
-            .reasons("Reasons")
-            .build();
+        FixedRecoverableCostsSection expected = new FixedRecoverableCostsSection();
+        expected.setIsSubjectToFixedRecoverableCostRegime(YES);
+        expected.setComplexityBandingAgreed(YES);
+        expected.setBand(BAND_1);
+        expected.setReasons("Reasons");
+        expected.setBandText(BAND_1.getLabel());
 
         assertEquals(expected, actual);
     }

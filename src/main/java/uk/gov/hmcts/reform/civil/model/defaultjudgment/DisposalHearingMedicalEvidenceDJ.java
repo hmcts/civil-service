@@ -1,17 +1,17 @@
 package uk.gov.hmcts.reform.civil.model.defaultjudgment;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+import jakarta.validation.constraints.Future;
 import java.time.LocalDate;
-import javax.validation.constraints.Future;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class DisposalHearingMedicalEvidenceDJ {
 
     private String input1;

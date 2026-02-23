@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContext;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContextWrapper;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 
 @Service
@@ -31,7 +31,7 @@ public class HttpResponseHeadersService {
                     taskToComplete.getId()
                 );
                 String encodedClientContext = encodeClientContext(
-                    ClientContextWrapper.builder().clientContext(clientContext).build());
+                    new ClientContextWrapper().setClientContext(clientContext));
                 response.addHeader("client-context", encodedClientContext);
             }
         } catch (Exception e) {

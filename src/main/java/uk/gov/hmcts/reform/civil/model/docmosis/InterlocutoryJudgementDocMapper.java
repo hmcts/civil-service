@@ -43,19 +43,18 @@ public class InterlocutoryJudgementDocMapper implements MappableObject {
     }
 
     public InterlocutoryJudgementDoc toInterlocutoryJudgementDoc(CaseData caseData) {
-        return InterlocutoryJudgementDoc.builder()
-            .claimIssueDate(caseData.getIssueDate())
-            .claimNumber(caseData.getLegacyCaseReference())
-            .claimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
-            .claimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
-            .claimantResponseSubmitDateTime(caseData.getApplicant1ResponseDate())
-            .claimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))
-            .courtDecisionRepaymentBy(claimantResponseUtils.getDefendantRepaymentOption(caseData))
-            .courtDecisionRepaymentLastDateBy(getDefendantRepaymentLastDateBy(caseData))
-            .formalisePaymentBy(REFER_TO_JUDGE)
-            .formattedDisposableIncome(getFormattedDisposableIncome(caseData))
-            .rejectionReason(getApplicant1RejectedRepaymentReason(caseData))
-            .build();
+        return new InterlocutoryJudgementDoc()
+            .setClaimIssueDate(caseData.getIssueDate())
+            .setClaimNumber(caseData.getLegacyCaseReference())
+            .setClaimantRequestRepaymentBy(claimantResponseUtils.getClaimantRepaymentType(caseData))
+            .setClaimantRequestRepaymentLastDateBy(getClaimantRequestRepaymentLastDateBy(caseData))
+            .setClaimantResponseSubmitDateTime(caseData.getApplicant1ResponseDate())
+            .setClaimantResponseToDefendantAdmission(getClaimantResponseToDefendantAdmission(caseData))
+            .setCourtDecisionRepaymentBy(claimantResponseUtils.getDefendantRepaymentOption(caseData))
+            .setCourtDecisionRepaymentLastDateBy(getDefendantRepaymentLastDateBy(caseData))
+            .setFormalisePaymentBy(REFER_TO_JUDGE)
+            .setFormattedDisposableIncome(getFormattedDisposableIncome(caseData))
+            .setRejectionReason(getApplicant1RejectedRepaymentReason(caseData));
     }
 
     private LocalDate getClaimantRequestRepaymentLastDateBy(CaseData caseData) {

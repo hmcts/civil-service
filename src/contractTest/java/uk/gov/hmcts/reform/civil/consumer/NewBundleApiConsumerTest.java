@@ -164,15 +164,15 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     }
 
     private Address getTestAddress(String rua) {
-        return Address.builder()
-            .addressLine1(rua)
-            .addressLine2(rua)
-            .addressLine3(rua)
-            .postTown("town")
-            .country("UK")
-            .county("Shire")
-            .postCode("KT1 3ER")
-            .build();
+        Address address = new Address();
+        address.setAddressLine1(rua);
+        address.setAddressLine2(rua);
+        address.setAddressLine3(rua);
+        address.setPostTown("town");
+        address.setCountry("UK");
+        address.setCounty("Shire");
+        address.setPostCode("KT1 3ER");
+        return address;
     }
 
     private Element<BundlingRequestDocument> getTestElement() {

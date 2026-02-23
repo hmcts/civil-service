@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ACKNOWLEDGE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CREATE_CLAIM;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPLICATION;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REMOVE_DOCUMENT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.START_BUSINESS_PROCESS;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_DATA;
 
@@ -101,7 +103,7 @@ class NoOngoingBusinessProcessAspectTest {
                 CREATE_CLAIM.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -129,7 +131,7 @@ class NoOngoingBusinessProcessAspectTest {
                 CREATE_CLAIM.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -151,7 +153,28 @@ class NoOngoingBusinessProcessAspectTest {
                 UPDATE_CASE_DATA.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
+                    .build()
+            );
+
+            Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);
+
+            assertThat(result).isEqualTo(response);
+            verify(proceedingJoinPoint).proceed();
+        }
+
+        @ParameterizedTest
+        @SneakyThrows
+        @EnumSource(value = BusinessProcessStatus.class, names = "FINISHED", mode = EnumSource.Mode.EXCLUDE)
+        void shouldProceedWhenOngoingBusinessProcessUpdateCaseData(BusinessProcessStatus status) {
+            AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
+            mockProceedingJoinPoint(response);
+
+            CallbackParams callbackParams = createCallbackParams(
+                REMOVE_DOCUMENT.name(),
+                CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -170,7 +193,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
                 .build();
@@ -214,7 +237,7 @@ class NoOngoingBusinessProcessAspectTest {
                 START_BUSINESS_PROCESS.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -256,7 +279,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
@@ -277,7 +300,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
@@ -299,7 +322,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(SUBMITTED, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
@@ -315,16 +338,17 @@ class NoOngoingBusinessProcessAspectTest {
     @Nested
     class CamundaEvent {
 
-        @Test
+        @ParameterizedTest
+        @EnumSource(value = CaseEvent.class, names = {"INITIATE_GENERAL_APPLICATION", "APPLICATION_PROCEEDS_IN_HERITAGE"})
         @SneakyThrows
-        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess() {
+        void shouldProceedToMethodInvocation_whenNoOngoingBusinessProcess(CaseEvent event) {
             AboutToStartOrSubmitCallbackResponse response = AboutToStartOrSubmitCallbackResponse.builder().build();
             when(proceedingJoinPoint.proceed()).thenReturn(response);
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder().build())
                 .isGeneralApplicationCase(true)
-                .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
+                .request(CallbackRequest.builder().eventId(event.name()).build())
                 .build();
 
             Object result = aspect.checkOngoingBusinessProcess(proceedingJoinPoint, callbackParams);

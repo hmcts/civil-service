@@ -163,15 +163,15 @@ class SealedClaimResponseFormGeneratorForSpecTest {
 
         // Minimal stubs for the two "populator" collaborators to keep this unit test atomic
         lenient().doAnswer(inv -> {
-            SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder b = inv.getArgument(0);
+            SealedClaimResponseFormForSpec b = inv.getArgument(0);
             CaseData cd = inv.getArgument(1);
-            b.referenceNumber(cd.getLegacyCaseReference());
-            b.ccdCaseReference(cd.getCcdCaseReference() == null ? null : cd.getCcdCaseReference().toString());
+            b.setReferenceNumber(cd.getLegacyCaseReference());
+            b.setCcdCaseReference(cd.getCcdCaseReference() == null ? null : cd.getCcdCaseReference().toString());
             return null;
         }).when(referenceNumberPopulator).populateReferenceNumberDetails(any(), any(), any());
 
         lenient().doAnswer(inv -> {
-            SealedClaimResponseFormForSpec.SealedClaimResponseFormForSpecBuilder b = inv.getArgument(0);
+            SealedClaimResponseFormForSpec b = inv.getArgument(0);
             CaseData cd = inv.getArgument(1);
             StatementOfTruth sot = cd.getRespondent2DQ() != null && cd.getRespondent2ResponseDate() != null
                 && (cd.getRespondent1ResponseDate() == null
@@ -179,7 +179,7 @@ class SealedClaimResponseFormGeneratorForSpecTest {
                 ? cd.getRespondent2DQ().getRespondent2DQStatementOfTruth()
                 : (cd.getRespondent1DQ() != null ? cd.getRespondent1DQ().getRespondent1DQStatementOfTruth() : null);
             if (sot != null) {
-                b.statementOfTruth(sot);
+                b.setStatementOfTruth(sot);
             }
             return null;
         }).when(statementOfTruthPopulator).populateStatementOfTruthDetails(any(), any());
@@ -273,11 +273,9 @@ class SealedClaimResponseFormGeneratorForSpecTest {
     @Test
     void generate_1v1_uses_lr_admission_bulk_template_and_uploads_pdf() {
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
-            .thenReturn(DocmosisDocument.builder()
-                            .bytes(new byte[]{1, 2, 3})
-                            .build());
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{1, 2, 3}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
-            .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
 
         generator.generate(base1v1, AUTH);
 
@@ -306,9 +304,9 @@ class SealedClaimResponseFormGeneratorForSpecTest {
         multipartySame.setRespondentResponseIsSame(YesOrNo.YES);
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
-            .thenReturn(DocmosisDocument.builder().bytes(new byte[]{9}).build());
+            .thenReturn(new DocmosisDocument().setBytes(new byte[]{9}));
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class)))
-            .thenReturn(CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).build());
+            .thenReturn(new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM));
 
         generator.generate(multipartySame, AUTH);
 

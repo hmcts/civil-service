@@ -76,7 +76,7 @@ class BundleCreationTriggerEventHandlerTest {
             .setTitle("Trial Bundle")
             .setDescription("This is trial bundle")
             .setStitchStatus("new")
-            .setStitchedDocument(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build())
+            .setStitchedDocument(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME))
             .setStitchingFailureMessage(null)
             .setFileName("Trial Bundle.pdf")
             .setCreatedOn(LocalDateTime.of(2023, 11, 12, 1, 1, 1))
@@ -142,48 +142,46 @@ class BundleCreationTriggerEventHandlerTest {
 
     private List<Element<UploadEvidenceWitness>> setupWitnessEvidenceDocs() {
         List<Element<UploadEvidenceWitness>> witnessEvidenceDocs = new ArrayList<>();
-        witnessEvidenceDocs.add(ElementUtils.element(UploadEvidenceWitness
-                                                         .builder()
-                                                         .witnessOptionDocument(Document.builder().documentBinaryUrl(
-                                                                 TEST_URL)
-                                                                                    .documentFileName(TEST_FILE_NAME).build()).build()));
+        witnessEvidenceDocs.add(ElementUtils.element(new UploadEvidenceWitness()
+                                                         .setWitnessOptionDocument(new Document().setDocumentBinaryUrl(
+                                                             TEST_URL)
+                                                                                         .setDocumentFileName(TEST_FILE_NAME))));
         return witnessEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceExpert>> setupExpertEvidenceDocs() {
         List<Element<UploadEvidenceExpert>> expertEvidenceDocs = new ArrayList<>();
-        expertEvidenceDocs.add(ElementUtils.element(UploadEvidenceExpert
-                                                        .builder()
-                                                        .expertDocument(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                            .documentFileName(TEST_FILE_NAME).build()).build()));
+        expertEvidenceDocs.add(ElementUtils.element(new UploadEvidenceExpert()
+                                                        .setExpertDocument(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                                .setDocumentFileName(TEST_FILE_NAME))));
         return expertEvidenceDocs;
     }
 
     private List<Element<UploadEvidenceDocumentType>> setupOtherEvidenceDocs() {
         List<Element<UploadEvidenceDocumentType>> otherEvidenceDocs = new ArrayList<>();
         otherEvidenceDocs.add(ElementUtils.element(new UploadEvidenceDocumentType()
-                                                       .setDocumentUpload(Document.builder().documentBinaryUrl(TEST_URL)
-                                                                           .documentFileName(TEST_FILE_NAME).build())));
+                                                       .setDocumentUpload(new Document().setDocumentBinaryUrl(TEST_URL)
+                                                                           .setDocumentFileName(TEST_FILE_NAME))));
         return otherEvidenceDocs;
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         CaseDocument caseDocumentClaim =
-            CaseDocument.builder().documentType(DocumentType.SEALED_CLAIM).documentLink(Document.builder().documentUrl(
-                TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+            new CaseDocument().setDocumentType(DocumentType.SEALED_CLAIM).setDocumentLink(new Document().setDocumentUrl(
+                TEST_URL).setDocumentFileName(TEST_FILE_NAME));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentClaim));
         CaseDocument caseDocumentDQ =
-            CaseDocument.builder()
-                .documentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
-                .documentLink(Document.builder().documentUrl(TEST_URL).documentFileName(TEST_FILE_NAME).build()).build();
+            new CaseDocument()
+                .setDocumentType(DocumentType.DIRECTIONS_QUESTIONNAIRE)
+                .setDocumentLink(new Document().setDocumentUrl(TEST_URL).setDocumentFileName(TEST_FILE_NAME));
         systemGeneratedCaseDocuments.add(ElementUtils.element(caseDocumentDQ));
         return systemGeneratedCaseDocuments;
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
-        Document document = Document.builder().documentFileName(TEST_FILE_NAME).documentUrl(TEST_URL).build();
+        Document document = new Document().setDocumentFileName(TEST_FILE_NAME).setDocumentUrl(TEST_URL);
         particularsOfClaim.add(ElementUtils.element(document));
         return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
     }

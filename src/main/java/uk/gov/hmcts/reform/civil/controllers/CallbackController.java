@@ -26,8 +26,10 @@ import uk.gov.hmcts.reform.civil.service.http.HttpResponseHeadersService;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
+
+import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
 import static uk.gov.hmcts.reform.civil.helpers.CaseTypeIdentifier.isGeneralApplication;
 
@@ -77,7 +79,7 @@ public class CallbackController {
                  version
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .request(callback)
             .type(CallbackType.fromValue(callbackType))
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, authorisation))
@@ -86,8 +88,7 @@ public class CallbackController {
             .caseData(caseDetailsConverter.toBaseCaseData(caseDetails))
             .caseDataBefore(caseDetailsBefore != null ? caseDetailsConverter.toBaseCaseData(caseDetailsBefore) : null)
             .isGeneralApplicationCaseType(generalApplicationCaseType)
-            .isCivilCaseType(!generalApplicationCaseType)
-            .build();
+            .isCivilCaseType(!generalApplicationCaseType);
 
         CallbackResponse callbackResponse = callbackHandlerFactory.dispatch(callbackParams);
         responseHeadersService.addClientContextHeader(callbackResponse, response);

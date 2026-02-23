@@ -44,24 +44,16 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldPopulateLitigantWithCorrectInfo_whenAllFieldsProvided() {
-        MediationContactInformation contactInfo = MediationContactInformation.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .telephoneNumber("0123456789")
-            .emailAddress("john.doe@example.com")
-            .build();
-
         addMediationInfoRepresented(buildClaimant1(YES));
 
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
 
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(Collections.emptyList())
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
+
+        MediationAvailability mediationAvailability = new MediationAvailability();
+        mediationAvailability.setIsMediationUnavailablityExists(YES);
+        mediationAvailability.setUnavailableDatesForMediation(Collections.emptyList());
 
         String solicitorEmail = "solicitor@example.com";
 
@@ -79,15 +71,12 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleNullableContactInformation() {
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
 
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(Collections.emptyList())
-            .build();
+        MediationAvailability mediationAvailability = new MediationAvailability();
+        mediationAvailability.setIsMediationUnavailablityExists(YES);
+        mediationAvailability.setUnavailableDatesForMediation(Collections.emptyList());
 
         String solicitorEmail = "solicitor@example.com";
 
@@ -104,17 +93,10 @@ public class RepresentedLitigantPopulatorTest {
 
     @Test
     void shouldHandleUnavailableDatesCorrectly() {
-        MediationContactInformation contactInfo = MediationContactInformation.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .telephoneNumber("0123456789")
-            .emailAddress("john.doe@example.com")
-            .build();
+        Organisation organisation = new Organisation();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(organisation);
 
-        Organisation organisation = Organisation.builder().build();
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(organisation)
-            .build();
+        MediationContactInformation contactInfo = new MediationContactInformation("John", "Doe", "john.doe@example.com", "0123456789");
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
         UnavailableDate unavailableDate = UnavailableDate.builder()
@@ -123,10 +105,9 @@ public class RepresentedLitigantPopulatorTest {
             .build();
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
 
-        MediationAvailability mediationAvailability = MediationAvailability.builder()
-            .isMediationUnavailablityExists(YES)
-            .unavailableDatesForMediation(List.of(elementUnavailableDate))
-            .build();
+        MediationAvailability mediationAvailability = new MediationAvailability();
+        mediationAvailability.setIsMediationUnavailablityExists(YES);
+        mediationAvailability.setUnavailableDatesForMediation(List.of(elementUnavailableDate));
 
         String solicitorEmail = "solicitor@example.com";
 

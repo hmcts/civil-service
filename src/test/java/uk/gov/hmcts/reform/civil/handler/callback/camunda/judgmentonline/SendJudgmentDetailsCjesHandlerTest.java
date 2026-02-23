@@ -52,12 +52,11 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldSendJudgmentDetailsWhenCaseEventIsSendJudgmentDetailsCJES() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(YES)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(YES))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -74,11 +73,10 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldSendJudgmentDetailsWhenNoRecordedReasonAndCaseEventIsSendJudgmentDetailsCJES() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(YES)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(YES))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -95,12 +93,11 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSendJudgmentDetails_whenRTLisNo() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joJudgmentRecordReason(DETERMINATION_OF_MEANS)
-            .activeJudgment(JudgmentDetails.builder()
-                                .isRegisterWithRTL(NO)
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setIsRegisterWithRTL(NO))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -117,12 +114,11 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldSendJudgmentDetailsWhenCaseEventIsSendJudgmentDetailsCjesSetAside() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)
-            .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
-                                                            .isRegisterWithRTL(YES)
-                                                            .build()))
+            .historicJudgment(ElementUtils.wrapElements(new JudgmentDetails()
+                                                            .setIsRegisterWithRTL(YES)))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -139,12 +135,11 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSendJudgmentDetailsSA_WhenRTLisNo() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joIsRegisteredWithRTL(YES)
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
-            .historicJudgment(ElementUtils.wrapElements(JudgmentDetails.builder()
-                                                            .isRegisterWithRTL(NO)
-                                                            .build()))
+            .historicJudgment(ElementUtils.wrapElements(new JudgmentDetails()
+                                                            .setIsRegisterWithRTL(NO)))
             .build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -161,7 +156,7 @@ class SendJudgmentDetailsCjesHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotSendJudgmentDetailsWhenIsRegisteredWithRTLIsNull() {
         String processId = "process-id";
         CaseData caseData = CaseData.builder()
-            .businessProcess(BusinessProcess.builder().processInstanceId(processId).build())
+            .businessProcess(new BusinessProcess().setProcessInstanceId(processId))
             .joSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR)
             .build();
 

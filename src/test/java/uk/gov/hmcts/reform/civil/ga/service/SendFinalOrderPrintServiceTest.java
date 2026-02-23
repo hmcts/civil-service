@@ -81,21 +81,17 @@ class SendFinalOrderPrintServiceTest {
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .legacyCaseReference("00MC2")
                 .applicant1(GeneralApplicationParty.builder()
-                        .primaryAddress(Address.builder()
-                                .postCode("postcode")
-                                .postTown("posttown")
-                                .addressLine1("address1")
-                                .addressLine2("address2")
-                                .addressLine3("address3").build())
+                        .primaryAddress(buildAddress("postcode", "posttown", "address1", "address2", "address3"))
                         .type(GeneralApplicationParty.Type.INDIVIDUAL)
                         .partyName("applicant1partyname").build())
                 .respondent1(GeneralApplicationParty.builder()
-                        .primaryAddress(Address.builder()
-                                .postCode("respondent1postcode")
-                                .postTown("respondent1posttown")
-                                .addressLine1("respondent1address1")
-                                .addressLine2("respondent1address2")
-                                .addressLine3("respondent1address3").build())
+                        .primaryAddress(buildAddress(
+                            "respondent1postcode",
+                            "respondent1posttown",
+                            "respondent1address1",
+                            "respondent1address2",
+                            "respondent1address3"
+                        ))
                         .type(GeneralApplicationParty.Type.INDIVIDUAL)
                         .partyName("respondent1partyname").build())
                 .build();
@@ -104,16 +100,11 @@ class SendFinalOrderPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                .documentBinaryUrl("binaryUrl").build();
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                .setDocumentBinaryUrl("binaryUrl");
 
         GeneralApplicationParty applicant = GeneralApplicationParty.builder()
-                .primaryAddress(Address.builder()
-                        .postCode("postcode")
-                        .postTown("posttown")
-                        .addressLine1("address1")
-                        .addressLine2("address2")
-                        .addressLine3("address3").build())
+                .primaryAddress(buildAddress("postcode", "posttown", "address1", "address2", "address3"))
                 .type(GeneralApplicationParty.Type.INDIVIDUAL)
                 .partyName("applicant1partyname").build();
 
@@ -132,16 +123,17 @@ class SendFinalOrderPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyRespondent() {
         // given
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                .documentBinaryUrl("binaryUrl").build();
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                .setDocumentBinaryUrl("binaryUrl");
 
         GeneralApplicationParty respondent = GeneralApplicationParty.builder()
-                .primaryAddress(Address.builder()
-                        .postCode("respondent1postcode")
-                        .postTown("respondent1posttown")
-                        .addressLine1("respondent1address1")
-                        .addressLine2("respondent1address2")
-                        .addressLine3("respondent1address3").build())
+                .primaryAddress(buildAddress(
+                    "respondent1postcode",
+                    "respondent1posttown",
+                    "respondent1address1",
+                    "respondent1address2",
+                    "respondent1address3"
+                ))
                 .type(GeneralApplicationParty.Type.INDIVIDUAL)
                 .partyName("respondent1partyname").build();
 
@@ -157,6 +149,16 @@ class SendFinalOrderPrintServiceTest {
         verifyPrintLetter(civilCaseData, caseData, respondent, List.of(document.getDocumentFileName()));
     }
 
+    private static Address buildAddress(String postCode, String postTown, String addressLine1, String addressLine2, String addressLine3) {
+        Address address = new Address();
+        address.setPostCode(postCode);
+        address.setPostTown(postTown);
+        address.setAddressLine1(addressLine1);
+        address.setAddressLine2(addressLine2);
+        address.setAddressLine3(addressLine3);
+        return address;
+    }
+
     @Test
     void shouldNotStitchAndPrintTranslatedLetterWhenStitchingNotEnabled() {
         // given
@@ -164,10 +166,10 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
-        given(documentManagementService.uploadDocument(any(), (PDF) any())).willReturn(CaseDocument.builder().build());
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-                .documentBinaryUrl("binaryUrl").build();
+                new DocmosisDocument());
+        given(documentManagementService.uploadDocument(any(), (PDF) any())).willReturn(new CaseDocument());
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+                .setDocumentBinaryUrl("binaryUrl");
         GeneralApplicationCaseData caseData = buildCaseData();
         // when
         sendFinalOrderPrintService.sendJudgeTranslatedOrderToPrintForLIP(BEARER_TOKEN, document, document, caseData, CaseEvent.SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT);
@@ -183,12 +185,12 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
-        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-            .documentBinaryUrl("binaryUrl").build();
-        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
-                .documentLink(document).build());
+                new DocmosisDocument());
+        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(new CaseDocument());
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+            .setDocumentBinaryUrl("binaryUrl");
+        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(new CaseDocument()
+                .setDocumentLink(document));
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();
@@ -210,12 +212,12 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
-        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-            .documentBinaryUrl("binaryUrl").build();
-        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
-                .documentLink(document).build());
+                new DocmosisDocument());
+        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(new CaseDocument());
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+            .setDocumentBinaryUrl("binaryUrl");
+        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(new CaseDocument()
+                .setDocumentLink(document));
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();
@@ -238,12 +240,12 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
-        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-            .documentBinaryUrl("binaryUrl").build();
-        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
-                .documentLink(document).build());
+                new DocmosisDocument());
+        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(new CaseDocument());
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+            .setDocumentBinaryUrl("binaryUrl");
+        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(new CaseDocument()
+                .setDocumentLink(document));
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();
@@ -266,12 +268,12 @@ class SendFinalOrderPrintServiceTest {
         given(coreCaseDataService.getCase(any())).willReturn(CaseDetails.builder().build());
         given(caseDetailsConverter.toGeneralApplicationCaseData(any())).willReturn(civilCaseData);
         given(documentGeneratorService.generateDocmosisDocument(any(PostOrderCoverLetter.class), eq(POST_ORDER_COVER_LETTER_LIP))).willReturn(
-                DocmosisDocument.builder().build());
-        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(CaseDocument.builder().build());
-        Document document = Document.builder().documentUrl("url").documentFileName("filename").documentHash("hash")
-            .documentBinaryUrl("binaryUrl").build();
-        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(CaseDocument.builder()
-                .documentLink(document).build());
+                new DocmosisDocument());
+        given(documentManagementService.uploadDocument((String) any(), (PDF) any())).willReturn(new CaseDocument());
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("filename").setDocumentHash("hash")
+            .setDocumentBinaryUrl("binaryUrl");
+        given(civilStitchService.generateStitchedCaseDocument(any(), any(), any(), any(), any())).willReturn(new CaseDocument()
+                .setDocumentLink(document));
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();

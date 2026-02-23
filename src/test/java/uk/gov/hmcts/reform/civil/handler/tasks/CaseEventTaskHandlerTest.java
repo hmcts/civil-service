@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
@@ -99,6 +100,8 @@ class CaseEventTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @InjectMocks
@@ -124,10 +127,9 @@ class CaseEventTaskHandlerTest {
         @Test
         void shouldTriggerCCDEvent_whenHandlerIsExecuted() {
             CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder()
-                                     .status(BusinessProcessStatus.READY)
-                                     .processInstanceId("processInstanceId")
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(BusinessProcessStatus.READY)
+                                     .setProcessInstanceId("processInstanceId"))
                 .build();
             VariableMap variables = Variables.createVariables();
             variables.putValue(FLOW_STATE, "MAIN.DRAFT");
@@ -476,10 +478,9 @@ class CaseEventTaskHandlerTest {
         @Nested
         class FullDefenceProceed {
             FlowState.Main state = FULL_DEFENCE_PROCEED;
-            BusinessProcess businessProcess = BusinessProcess.builder()
-                .status(BusinessProcessStatus.READY)
-                .processInstanceId("processInstanceId")
-                .build();
+            BusinessProcess businessProcess = new BusinessProcess()
+                .setStatus(BusinessProcessStatus.READY)
+                .setProcessInstanceId("processInstanceId");
 
             @BeforeEach
             void initForFullDefence() {
@@ -799,7 +800,7 @@ class CaseEventTaskHandlerTest {
         }
 
         private CaseData getCaseData(FlowState.Main state) {
-            BusinessProcess businessProcess = BusinessProcess.builder().status(BusinessProcessStatus.READY).build();
+            BusinessProcess businessProcess = new BusinessProcess().setStatus(BusinessProcessStatus.READY);
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder().businessProcess(businessProcess);
             switch (state) {
                 case FULL_ADMISSION:
@@ -827,12 +828,12 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
                         .respondent1OrgRegistered(NO)
                         .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]"))
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
                         .respondent2OrgRegistered(NO)
                         .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]"));
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();

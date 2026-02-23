@@ -174,11 +174,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @Test
     void shouldNotDispatchCamundaMessage_whenHearingIsNotInListedStatus() {
-        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(
-            HearingNoticeSchedulerVars.builder()
-                .serviceId(SERVICE_ID)
-                .dispatchedHearingIds(List.of())
-                .build());
+        HearingNoticeSchedulerVars hearingNoticeSchedulerVars = new HearingNoticeSchedulerVars();
+        hearingNoticeSchedulerVars.setServiceId(SERVICE_ID);
+        hearingNoticeSchedulerVars.setDispatchedHearingIds(List.of());
+        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(hearingNoticeSchedulerVars);
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.CASE_CLOSED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
@@ -202,11 +201,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @Test
     void shouldDispatchCamundaMessage_whenHearingVenueDoesNotMatchLatestPartiesNotifiedResponseHearingDate() {
-        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(
-            HearingNoticeSchedulerVars.builder()
-                .serviceId(SERVICE_ID)
-                .dispatchedHearingIds(new ArrayList<>())
-                .build());
+        HearingNoticeSchedulerVars schedulerVars = new HearingNoticeSchedulerVars();
+        schedulerVars.setServiceId(SERVICE_ID);
+        schedulerVars.setDispatchedHearingIds(new ArrayList<>());
+        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(schedulerVars);
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
             new HearingNoticeMessageVars()
                 .setCaseId(CASE_ID)
@@ -244,11 +242,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @Test
     void shouldDispatchCamundaMessage_whenHearingVenueDoesNotMatchLatestPartiesNotifiedResponseHearingVenue() {
-        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(
-            HearingNoticeSchedulerVars.builder()
-                .serviceId(SERVICE_ID)
-                .dispatchedHearingIds(new ArrayList<>())
-                .build());
+        HearingNoticeSchedulerVars schedulerVars = new HearingNoticeSchedulerVars();
+        schedulerVars.setServiceId(SERVICE_ID);
+        schedulerVars.setDispatchedHearingIds(new ArrayList<>());
+        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(schedulerVars);
         when(mapper.convertValue(any(), eq(HearingNoticeMessageVars.class))).thenReturn(
             new HearingNoticeMessageVars()
                 .setCaseId(CASE_ID)
@@ -289,11 +286,10 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     @Test
     void shouldNotDispatchCamundaMessage_whenHearingDataMatchesLatestHearingResponseData() {
-        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(
-            HearingNoticeSchedulerVars.builder()
-                .serviceId(SERVICE_ID)
-                .dispatchedHearingIds(List.of())
-                .build());
+        HearingNoticeSchedulerVars hearingNoticeSchedulerVars = new HearingNoticeSchedulerVars();
+        hearingNoticeSchedulerVars.setServiceId(SERVICE_ID);
+        hearingNoticeSchedulerVars.setDispatchedHearingIds(List.of());
+        when(mapper.convertValue(any(), eq(HearingNoticeSchedulerVars.class))).thenReturn(hearingNoticeSchedulerVars);
 
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
@@ -350,13 +346,14 @@ class HearingNoticeSchedulerEventHandlerTest {
     }
 
     private HearingGetResponse createHearing(ListAssistCaseStatus hearingStatus) {
+        PartyDetailsModel partyDetailsModel = new PartyDetailsModel();
         return HearingGetResponse.builder()
             .hearingDetails(HearingDetails.builder().build())
             .requestDetails(HearingRequestDetails.builder()
                                 .versionNumber(VERSION.longValue())
                                 .build())
             .caseDetails(CaseDetailsHearing.builder().caseRef(HearingNoticeSchedulerEventHandlerTest.CASE_ID).build())
-            .partyDetails(List.of(PartyDetailsModel.builder().build()))
+            .partyDetails(List.of(partyDetailsModel))
             .hearingResponse(
                 HearingResponse.builder()
                     .receivedDateTime(RECEIVED_DATETIME)

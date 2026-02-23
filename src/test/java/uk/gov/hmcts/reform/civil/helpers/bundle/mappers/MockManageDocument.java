@@ -21,16 +21,14 @@ public class MockManageDocument {
                                                                             DocumentCategory docCategory) {
         return new Element<>(
             UUID.randomUUID(),
-            ManageDocument.builder()
-                .documentType(manageDocumentType)
-                .documentName("test_file")
-                .documentLink(Document.builder().documentFileName("test_file.pdf")
-                                  .documentUrl("http://localhost:9090/documents")
-                                  .documentBinaryUrl("http://localhost:9090/documents/binary")
-                                  .categoryID(docCategory.getCategoryId())
-                                  .uploadTimestamp("2025-12-10T12:39:50.823836740")
-                                  .build())
-                .build()
+            new ManageDocument()
+                .setDocumentType(manageDocumentType)
+                .setDocumentName("test_file")
+                .setDocumentLink(new Document().setDocumentFileName("test_file.pdf")
+                                  .setDocumentUrl("http://localhost:9090/documents")
+                                  .setDocumentBinaryUrl("http://localhost:9090/documents/binary")
+                                  .setCategoryID(docCategory.getCategoryId())
+                                  .setUploadTimestamp("2025-12-10T12:39:50.823836740"))
         );
     }
 
@@ -38,16 +36,14 @@ public class MockManageDocument {
                                                                             DocCategory docCategory) {
         return new Element<>(
             UUID.randomUUID(),
-            ManageDocument.builder()
-                .documentType(manageDocumentType)
-                .documentName("test_file")
-                .documentLink(Document.builder().documentFileName("test_file.pdf")
-                                  .documentUrl("http://localhost:9090/documents")
-                                  .documentBinaryUrl("http://localhost:9090/documents/binary")
-                                  .categoryID(docCategory.getValue())
-                                  .uploadTimestamp("2025-12-10T12:39:50.823836740")
-                                  .build())
-                .build()
+            new ManageDocument()
+                .setDocumentType(manageDocumentType)
+                .setDocumentName("test_file")
+                .setDocumentLink(new Document().setDocumentFileName("test_file.pdf")
+                                  .setDocumentUrl("http://localhost:9090/documents")
+                                  .setDocumentBinaryUrl("http://localhost:9090/documents/binary")
+                                  .setCategoryID(docCategory.getValue())
+                                  .setUploadTimestamp("2025-12-10T12:39:50.823836740"))
         );
     }
 }

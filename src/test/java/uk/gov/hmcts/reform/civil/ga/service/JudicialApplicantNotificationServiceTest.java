@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.DirtiesContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
@@ -55,6 +55,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.quality.Strictness.LENIENT;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
@@ -68,43 +69,40 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 import static uk.gov.hmcts.reform.civil.ga.utils.JudicialDecisionNotificationUtil.isNotificationCriteriaSatisfied;
 
-@SpringBootTest(classes = {
-    JudicialNotificationService.class,
-    JacksonAutoConfiguration.class
-})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = LENIENT)
 class JudicialApplicantNotificationServiceTest {
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
-    @MockBean
+    @Mock
     private Time time;
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
-    @Autowired
+    @InjectMocks
     private JudicialNotificationService judicialNotificationService;
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private SolicitorEmailValidation solicitorEmailValidation;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private JudicialDecisionHelper judicialDecisionHelper;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
 
     private static final String APPLICANT = "applicant";
@@ -591,7 +589,7 @@ class JudicialApplicantNotificationServiceTest {
                                                .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -614,16 +612,15 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeSummeryJudgement()).build())
                 .isMultiParty(NO)
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION)
-                                     .activityId("StartRespondentNotificationProcessMakeDecision")
-                                     .build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION)
+                                     .setActivityId("StartRespondentNotificationProcessMakeDecision"))
                 .build();
         }
 
@@ -653,7 +650,7 @@ class JudicialApplicantNotificationServiceTest {
                 .applicantPartyName("App")
                 .claimant1PartyName("CL")
                 .defendant1PartyName("DEF")
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -679,7 +676,7 @@ class JudicialApplicantNotificationServiceTest {
                 .isGaRespondentOneLip(NO)
                 .isGaApplicantLip(YES)
 
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
@@ -716,7 +713,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(isGaLip.equals(YES) ? lipRespondent() : respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -745,7 +742,7 @@ class JudicialApplicantNotificationServiceTest {
                                                .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -810,7 +807,7 @@ class JudicialApplicantNotificationServiceTest {
                                           .decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -838,7 +835,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -1640,7 +1637,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -1662,7 +1659,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -1680,7 +1677,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
                 .generalAppRespondentSolicitors(respondentSolicitors())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -1712,7 +1709,7 @@ class JudicialApplicantNotificationServiceTest {
                                                .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1731,7 +1728,7 @@ class JudicialApplicantNotificationServiceTest {
                                                .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1751,7 +1748,7 @@ class JudicialApplicantNotificationServiceTest {
                                       .decision(GAJudgeDecisionOption.MAKE_AN_ORDER).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1778,7 +1775,7 @@ class JudicialApplicantNotificationServiceTest {
                 .isGaRespondentOneLip(isRespondentLip)
                 .isGaApplicantLip(isApplicantLip)
 
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(orderAgreement).build())
@@ -1804,7 +1801,7 @@ class JudicialApplicantNotificationServiceTest {
                                       .decision(GAJudgeDecisionOption.MAKE_AN_ORDER).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .isMultiParty(NO)
@@ -1823,7 +1820,7 @@ class JudicialApplicantNotificationServiceTest {
                                                .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1842,7 +1839,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1861,7 +1858,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1893,7 +1890,7 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppRespondentSolicitors(isGaLip.equals(YES) ? lipRespondent() : respondentSolicitors())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
@@ -1918,7 +1915,7 @@ class JudicialApplicantNotificationServiceTest {
                     .applicationIsCloaked(isCloaked)
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
@@ -1940,7 +1937,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -1965,7 +1962,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
@@ -1986,7 +1983,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecision(GAJudicialDecision.builder()
@@ -2011,7 +2008,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecision(GAJudicialDecision.builder()
@@ -2035,7 +2032,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppSuperClaimType(superClaimType)
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(
@@ -2058,7 +2055,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(
@@ -2081,7 +2078,7 @@ class JudicialApplicantNotificationServiceTest {
                     .generalAppRespondentSolicitors(respondentSolicitors())
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                                   .email(DUMMY_EMAIL).build())
-                    .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                    .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                     .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                                   .caseReference(CASE_REFERENCE.toString()).build())
                     .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(
@@ -2111,16 +2108,15 @@ class JudicialApplicantNotificationServiceTest {
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                               .email(DUMMY_EMAIL).build())
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
                 .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                               .caseReference(CASE_REFERENCE.toString()).build())
                 .generalAppType(GAApplicationType.builder()
                                     .types(applicationTypeSummeryJudgement()).build())
                 .isMultiParty(NO)
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION)
-                                     .activityId("StartRespondentNotificationProcessMakeDecision")
-                                     .build())
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION)
+                                     .setActivityId("StartRespondentNotificationProcessMakeDecision"))
                 .build();
         }
 
@@ -2442,9 +2438,8 @@ class JudicialApplicantNotificationServiceTest {
             GeneralApplicationCaseData caseData = caseDataForJudicialRequestForInformationOfApplication(NO, YES, NO, YES, YES,
                                                                                       REQUEST_MORE_INFORMATION
             ).toBuilder().ccdState(ORDER_MADE)
-                .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION)
-                                     .activityId("StartRespondentNotificationProcessMakeDecision")
-                                     .build()).judicialDecision(GAJudicialDecision.builder()
+                .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION)
+                                     .setActivityId("StartRespondentNotificationProcessMakeDecision")).judicialDecision(GAJudicialDecision.builder()
                                                                     .decision(GAJudgeDecisionOption.MAKE_AN_ORDER)
                                                                     .build())
                 .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(APPROVE_OR_EDIT)
@@ -2536,7 +2531,7 @@ class JudicialApplicantNotificationServiceTest {
             .applicantPartyName("App")
             .claimant1PartyName("CL")
             .defendant1PartyName("DEF")
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
                                           .caseReference(CASE_REFERENCE.toString()).build())
             .generalAppType(GAApplicationType.builder()

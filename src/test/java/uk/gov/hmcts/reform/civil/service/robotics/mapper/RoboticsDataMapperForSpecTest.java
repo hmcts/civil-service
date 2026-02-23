@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisation;
 import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
@@ -18,17 +22,25 @@ import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceEnterInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceLiftInfo;
 import uk.gov.hmcts.reform.civil.model.breathing.BreathingSpaceType;
+import uk.gov.hmcts.reform.civil.model.robotics.LitigiousParty;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
 import uk.gov.hmcts.reform.civil.model.robotics.RoboticsCaseDataSpec;
+import uk.gov.hmcts.reform.civil.model.robotics.Solicitor;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForSpecTest {
@@ -44,7 +56,38 @@ class RoboticsDataMapperForSpecTest {
     private OrganisationService organisationService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private RoboticsCaseDataSupport caseDataSupport;
     private static final String BEARER_TOKEN = "Bearer Token";
+
+    @BeforeEach
+    void setUp() {
+        when(caseDataSupport.organisationId(any())).thenReturn(Optional.empty());
+        when(caseDataSupport.buildLitigiousParty(
+            any(),
+            any(),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(String.class),
+            nullable(LocalDate.class)
+        )).thenAnswer(invocation -> {
+            Party party = invocation.getArgument(0);
+            String type = invocation.getArgument(2);
+            String id = invocation.getArgument(3);
+            String solicitorId = invocation.getArgument(4);
+            String solicitorOrganisationId = invocation.getArgument(5);
+            LocalDate dateOfService = invocation.getArgument(6);
+            return new LitigiousParty()
+                .setId(id)
+                .setSolicitorID(solicitorId)
+                .setType(type)
+                .setName(party != null ? party.getPartyName() : null)
+                .setSolicitorOrganisationID(solicitorOrganisationId)
+                .setDateOfService(dateOfService != null ? dateOfService.format(ISO_DATE) : null);
+        });
+        when(caseDataSupport.buildSolicitor(any())).thenReturn(Solicitor.builder().build());
+    }
 
     @Test
     void whenSpecEnabled_includeBS() {
@@ -109,9 +152,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -155,9 +198,9 @@ class RoboticsDataMapperForSpecTest {
 
         Assertions.assertEquals(
             List.of(
-                NoticeOfChange.builder().litigiousPartyID("001").dateOfNoC(app1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("002").dateOfNoC(res1NocDate.format(ISO_DATE)).build(),
-                NoticeOfChange.builder().litigiousPartyID("003").dateOfNoC(res2NocDate.format(ISO_DATE)).build()
+                new NoticeOfChange().setLitigiousPartyID("001").setDateOfNoC(app1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("002").setDateOfNoC(res1NocDate.format(ISO_DATE)),
+                new NoticeOfChange().setLitigiousPartyID("003").setDateOfNoC(res2NocDate.format(ISO_DATE))
             ),
             roboticsCaseData.getNoticeOfChange()
         );
@@ -187,8 +230,10 @@ class RoboticsDataMapperForSpecTest {
     }
 
     private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime fromDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(fromDate).build()).build();
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(fromDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
     }
 
     private Party createPartyWithCompany(String companyName) {
@@ -242,9 +287,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(fullFee)
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .remissionAmount(fullFee)
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setRemissionAmount(fullFee))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
@@ -264,9 +308,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(BigDecimal.valueOf(30000)) // £300
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .outstandingFeeInPounds(BigDecimal.valueOf(120))
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setOutstandingFeeInPounds(BigDecimal.valueOf(120)))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
@@ -289,9 +332,8 @@ class RoboticsDataMapperForSpecTest {
             .claimFee(uk.gov.hmcts.reform.civil.model.Fee.builder()
                           .calculatedAmountInPence(fullFee)
                           .build())
-            .claimIssuedHwfDetails(uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFeesDetails.builder()
-                                       .remissionAmount(remission)
-                                       .build())
+            .claimIssuedHwfDetails(new HelpWithFeesDetails()
+                                       .setRemissionAmount(remission))
             .totalClaimAmount(BigDecimal.valueOf(5000))
             .applicant1(createPartyWithCompany("Applicant"))
             .respondent1(createPartyWithCompany("Respondent"))
@@ -302,5 +344,62 @@ class RoboticsDataMapperForSpecTest {
         RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         Assertions.assertEquals(0, roboticsCaseData.getClaimDetails().getCourtFee().compareTo(BigDecimal.valueOf(250)));
+    }
+
+    @Test
+    void shouldSkipApplicantSolicitorWhenLipVlipEnabled() {
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference("reference")
+            .totalClaimAmount(BigDecimal.valueOf(10000))
+            .applicant1(createPartyWithCompany("Applicant"))
+            .respondent1(createPartyWithCompany("Respondent"))
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        caseData.setSubmittedDate(LocalDateTime.now());
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertTrue(roboticsCaseData.getSolicitors().isEmpty());
+    }
+
+    @Test
+    void shouldIncludeRespondent2SolicitorAndAssignSolicitorIdWhenRepresented() {
+        Organisation respondent2Organisation = new Organisation();
+        respondent2Organisation.setOrganisationID("ORG2");
+        OrganisationPolicy respondent2Policy = new OrganisationPolicy();
+        respondent2Policy.setOrganisation(respondent2Organisation);
+        when(organisationService.findOrganisationById("ORG2")).thenReturn(Optional.empty());
+        when(caseDataSupport.buildSolicitor(any())).thenAnswer(invocation -> {
+            RoboticsCaseDataSupport.SolicitorData data = invocation.getArgument(0);
+            return Solicitor.builder().id(data.id()).build();
+        });
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .legacyCaseReference("reference")
+            .totalClaimAmount(BigDecimal.valueOf(10000))
+            .applicant1(createPartyWithCompany("Applicant"))
+            .respondent1(createPartyWithCompany("Respondent"))
+            .respondent2(createPartyWithCompany("Respondent2"))
+            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build())
+            .respondent2OrganisationPolicy(respondent2Policy)
+            .build();
+        caseData.setSpecRespondent2Represented(YesOrNo.YES);
+        caseData.setRespondent2SameLegalRepresentative(YesOrNo.NO);
+        caseData.setSubmittedDate(LocalDateTime.now());
+
+        RoboticsCaseDataSpec roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+        Assertions.assertTrue(
+            roboticsCaseData.getSolicitors().stream()
+                .anyMatch(solicitor -> RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID.equals(solicitor.getId()))
+        );
+        Assertions.assertTrue(
+            roboticsCaseData.getLitigiousParties().stream()
+                .anyMatch(party -> "003".equals(party.getId())
+                    && RoboticsDataUtil.RESPONDENT2_SOLICITOR_ID.equals(party.getSolicitorID()))
+        );
     }
 }

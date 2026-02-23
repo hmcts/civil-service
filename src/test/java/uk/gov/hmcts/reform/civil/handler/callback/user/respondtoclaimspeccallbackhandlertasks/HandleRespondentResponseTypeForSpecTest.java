@@ -34,7 +34,7 @@ class HandleRespondentResponseTypeForSpecTest {
     }
 
     private void assertSpecDefenceFullAdmittedRequired(CaseData caseData, Object expectedValue) {
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         CallbackResponse response = handleRespondentResponseTypeForSpec.execute(callbackParams);
 
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();

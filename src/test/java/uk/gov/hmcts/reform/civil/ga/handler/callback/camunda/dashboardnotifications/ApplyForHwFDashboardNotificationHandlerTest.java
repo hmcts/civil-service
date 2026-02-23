@@ -56,7 +56,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -76,7 +76,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
             caseData = caseData.toBuilder()
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-234-456").build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-234-456"))
                 .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
                 .isGaApplicantLip(YesOrNo.YES)
                 .build();
@@ -110,7 +110,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
-                .generalAppHelpWithFees(HelpWithFees.builder().helpWithFeesReferenceNumber("HWF-111-222").build())
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
                 .isGaApplicantLip(YesOrNo.YES)
                 .build();
 

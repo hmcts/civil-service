@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.civil.utils.InterestCalculator;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -118,7 +118,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -157,7 +157,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -450,7 +450,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -481,7 +481,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -533,14 +533,14 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     private static CaseData.CaseDataBuilder<?, ?> financialDetails(CaseData.CaseDataBuilder<?, ?> builder) {
-        return builder.respondent1DQ(Respondent1DQ.builder()
-                                         .respondent1DQHomeDetails(
-                                             HomeDetails.builder().type(HomeTypeOptionLRspec.OWNED_HOME).build())
-                                         .respondent1BankAccountList(ElementUtils.wrapElements(
+        return builder.respondent1DQ(new Respondent1DQ()
+                                         .setRespondent1DQHomeDetails(
+                                             new HomeDetails(HomeTypeOptionLRspec.OWNED_HOME, null))
+                                         .setRespondent1BankAccountList(ElementUtils.wrapElements(
                                              account(AccountType.CURRENT, YesOrNo.YES, BigDecimal.valueOf(2000)),
                                              account(AccountType.ISA, YesOrNo.NO, BigDecimal.valueOf(500))
                                          ))
-                                         .respondent1DQRecurringIncome(ElementUtils.wrapElements(
+                                         .setRespondent1DQRecurringIncome(ElementUtils.wrapElements(
                                              new RecurringIncomeLRspec(
                                                  IncomeTypeLRspec.INCOME_SUPPORT,
                                                  null,
@@ -554,7 +554,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                  PaymentFrequencyLRspec.ONCE_ONE_MONTH
                                              )
                                          ))
-                                         .respondent1DQRecurringExpenses(ElementUtils.wrapElements(
+                                         .setRespondent1DQRecurringExpenses(ElementUtils.wrapElements(
                                              new RecurringExpenseLRspec(
                                                  ExpenseTypeLRspec.COUNCIL_TAX,
                                                  null,
@@ -567,8 +567,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                  BigDecimal.valueOf(400),
                                                  PaymentFrequencyLRspec.ONCE_ONE_MONTH
                                              )
-                                         ))
-                                         .build())
+                                         )))
             .specDefendant1Debts(Respondent1DebtLRspec.builder()
                                      .hasLoanCardDebt(YesOrNo.YES)
                                      .loanCardDebtDetails(ElementUtils.wrapElements(
@@ -581,28 +580,25 @@ class SealedClaimLipResponseFormGeneratorTest {
                                              .loanCardDebtDetail("Card 2")
                                              .totalOwed(BigDecimal.valueOf(1500))
                                              .monthlyPayment(BigDecimal.valueOf(200))
-                                             .build()
+                                     .build()
                                      ))
                                      .debtDetails(ElementUtils.wrapElements(
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.GAS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(30))
-                                             .build(),
-                                         DebtLRspec.builder()
-                                             .debtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
-                                             .paymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                             .paymentAmount(BigDecimal.valueOf(60))
-                                             .build()
+                                         new DebtLRspec()
+                                             .setDebtType(DebtTypeLRspec.GAS)
+                                             .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                             .setPaymentAmount(BigDecimal.valueOf(30)),
+                                         new DebtLRspec()
+                                             .setDebtType(DebtTypeLRspec.MAINTENANCE_PAYMENTS)
+                                             .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                             .setPaymentAmount(BigDecimal.valueOf(60))
                                      ))
                                      .build())
             .respondent1PartnerAndDependent(PartnerAndDependentsLRspec.builder()
                                                 .haveAnyChildrenRequired(YesOrNo.YES)
-                                                .howManyChildrenByAgeGroup(ChildrenByAgeGroupLRspec.builder()
-                                                                               .numberOfUnderEleven("1")
-                                                                               .numberOfElevenToFifteen("2")
-                                                                               .numberOfSixteenToNineteen("0")
-                                                                               .build())
+                                                .howManyChildrenByAgeGroup(new ChildrenByAgeGroupLRspec()
+                                                                               .setNumberOfUnderEleven("1")
+                                                                               .setNumberOfElevenToFifteen("2")
+                                                                               .setNumberOfSixteenToNineteen("0"))
                                                 .supportedAnyoneFinancialRequired(YesOrNo.YES)
                                                 .supportPeopleNumber("3")
                                                 .supportPeopleDetails("Supported people details")
@@ -617,14 +613,12 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                      .build())
             .responseClaimAdmitPartEmployer(Respondent1EmployerDetailsLRspec.builder()
                                                 .employerDetails(ElementUtils.wrapElements(
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 1")
-                                                        .jobTitle("Job title 1")
-                                                        .build(),
-                                                    EmployerDetailsLRspec.builder()
-                                                        .employerName("Employer 2")
-                                                        .jobTitle("Job title 2")
-                                                        .build()
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 1")
+                                                        .setJobTitle("Job title 1"),
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 2")
+                                                        .setJobTitle("Job title 2")
                                                 ))
                                                 .build());
     }
@@ -648,15 +642,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyPhone("phone " + suffix)
             .partyEmail("email " + suffix)
             .partyName("company " + suffix)
-            .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+            .primaryAddress(address(suffix))
             .build();
     }
 
@@ -669,16 +655,20 @@ class SealedClaimLipResponseFormGeneratorTest {
             .partyPhone("phone " + suffix)
             .partyName("Name Surname" + suffix)
             .partyEmail("email " + suffix)
-            .primaryAddress(Address.builder()
-                                .postCode("postCode " + suffix)
-                                .addressLine1("line 1 " + suffix)
-                                .addressLine2("line 2 " + suffix)
-                                .addressLine3("line 3 " + suffix)
-                                .postTown("town " + suffix)
-                                .county("county " + suffix)
-                                .country("country " + suffix)
-                                .build())
+            .primaryAddress(address(suffix))
             .build();
+    }
+
+    private Address address(String suffix) {
+        Address address = new Address();
+        address.setPostCode("postCode " + suffix);
+        address.setAddressLine1("line 1 " + suffix);
+        address.setAddressLine2("line 2 " + suffix);
+        address.setAddressLine3("line 3 " + suffix);
+        address.setPostTown("town " + suffix);
+        address.setCounty("county " + suffix);
+        address.setCountry("country " + suffix);
+        return address;
     }
 
     @Test
@@ -689,13 +679,12 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.YES)
-                                                                      .isMediationEmailCorrect(YesOrNo.YES)
-                                                                      .isMediationPhoneCorrect(YesOrNo.YES)
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
-                                                                      .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YesOrNo.YES)
+                                                                      .setIsMediationEmailCorrect(YesOrNo.YES)
+                                                                      .setIsMediationPhoneCorrect(YesOrNo.YES)
+                                                                      .setHasUnavailabilityNextThreeMonths(YesOrNo.NO)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -718,16 +707,15 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.NO)
-                                                                      .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationContactPerson("Jake")
+                                                                      .setIsMediationEmailCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationEmail("test@gmail.com")
+                                                                      .setIsMediationPhoneCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationTelephone("23454656")
+                                                                      .setHasUnavailabilityNextThreeMonths(YesOrNo.NO)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -755,17 +743,16 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationContactPerson("Jake")
+                                                                      .setIsMediationEmailCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationEmail("test@gmail.com")
+                                                                      .setIsMediationPhoneCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationTelephone("23454656")
+                                                                      .setHasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                      .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -795,17 +782,16 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationContactNameCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationContactPerson("Jake")
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationContactNameCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationContactPerson("Jake")
+                                                                      .setIsMediationEmailCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationEmail("test@gmail.com")
+                                                                      .setIsMediationPhoneCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationTelephone("23454656")
+                                                                      .setHasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                      .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -830,8 +816,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .build())
+            .caseDataLiP(new CaseDataLiP())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -876,8 +861,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP().setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -910,15 +894,14 @@ class SealedClaimLipResponseFormGeneratorTest {
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1MediationLiPResponseCarm(MediationLiPCarm.builder()
-                                                                      .isMediationEmailCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationEmail("test@gmail.com")
-                                                                      .isMediationPhoneCorrect(YesOrNo.NO)
-                                                                      .alternativeMediationTelephone("23454656")
-                                                                      .hasUnavailabilityNextThreeMonths(YesOrNo.YES)
-                                                                      .unavailableDatesForMediation(def1UnavailabilityDates)
-                                                                      .build()).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()
+                                                                      .setIsMediationEmailCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationEmail("test@gmail.com")
+                                                                      .setIsMediationPhoneCorrect(YesOrNo.NO)
+                                                                      .setAlternativeMediationTelephone("23454656")
+                                                                      .setHasUnavailabilityNextThreeMonths(YesOrNo.YES)
+                                                                      .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
                 RespondToClaimAdmitPartLRspec.builder()
@@ -947,8 +930,7 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1Represented(YesOrNo.NO)
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
-            .caseDataLiP(CaseDataLiP.builder().respondent1MediationLiPResponseCarm(MediationLiPCarm.builder().build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP().setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1LiPStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
             .respondToClaimAdmitPartLRspec(

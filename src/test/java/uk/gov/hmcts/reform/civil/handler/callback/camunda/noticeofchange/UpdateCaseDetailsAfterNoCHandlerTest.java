@@ -149,7 +149,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .setUnassignedCaseListDisplayOrganisationReferences()
                 .anyRepresented(NO)
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -422,7 +424,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep")
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -460,7 +464,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .addApplicantLRIndividual("Legal", "Rep")
                 .addRespondent1LRIndividual("Legal", "Rep1")
                 .build();
-            caseData.setQmRespondentSolicitor1Queries(CaseQueriesCollection.builder().partyName("Defendant").build());
+            CaseQueriesCollection defendantQueries = new CaseQueriesCollection();
+            defendantQueries.setPartyName("Defendant");
+            caseData.setQmRespondentSolicitor1Queries(defendantQueries);
 
             final var originalRespondent1LRIndividuals = caseData.getRespondent1LRIndividuals();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -678,13 +684,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .anyRepresented(NO)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
-                                                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                                                    .build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build(),
-                                                           CaseDocument.builder().documentType(CLAIMANT_CLAIM_FORM).build()))
-                .build();
+                .respondent1OrganisationPolicy(organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]"))
+                .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SEALED_CLAIM),
+                                                           new CaseDocument().setDocumentType(CLAIMANT_CLAIM_FORM))).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -992,5 +994,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
             assertThat(response.getData()).extracting("previousCCDState").isNotNull();
         }
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        return new OrganisationPolicy()
+            .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(organisationId))
+            .setOrgPolicyCaseAssignedRole(role);
     }
 }

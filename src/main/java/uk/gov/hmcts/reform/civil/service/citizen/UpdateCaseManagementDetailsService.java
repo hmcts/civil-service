@@ -104,8 +104,7 @@ public class UpdateCaseManagementDetailsService {
         Optional.ofNullable(caseData.getApplicant1DQ())
             .ifPresent(dq -> Optional.ofNullable(dq.getApplicant1DQRequestedCourt())
                 .ifPresent(requestedCourt -> caseData.setApplicant1DQ(
-                    dq.toBuilder().applicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                        .build())));
+                    dq.copy().setApplicant1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations)))));
     }
 
     public void updateRespondent1RequestedCourtDetails(CaseData caseData, List<LocationRefData> availableLocations) {
@@ -113,8 +112,7 @@ public class UpdateCaseManagementDetailsService {
             Optional.ofNullable(caseData.getRespondent1DQ())
                 .ifPresent(dq -> Optional.ofNullable(dq.getRespondent1DQRequestedCourt())
                     .ifPresent(requestedCourt -> caseData.setRespondent1DQ(
-                        dq.toBuilder().respondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations))
-                            .build())));
+                        dq.copy().setRespondent1DQRequestedCourt(correctCaseLocation(requestedCourt, availableLocations)))));
         }
     }
 
@@ -126,10 +124,9 @@ public class UpdateCaseManagementDetailsService {
         LocationRefData preferredLocation = locations.stream()
             .filter(locationRefData -> courtLocationUtils.checkLocation(locationRefData, locationLabel))
             .findFirst().orElseThrow(RuntimeException::new);
-        return requestedCourt.toBuilder()
-            .responseCourtCode(preferredLocation.getCourtLocationCode())
-            .caseLocation(LocationHelper.buildCaseLocation(preferredLocation))
-            .build();
+        return requestedCourt.copy()
+            .setResponseCourtCode(preferredLocation.getCourtLocationCode())
+            .setCaseLocation(LocationHelper.buildCaseLocation(preferredLocation));
     }
 
     public List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {

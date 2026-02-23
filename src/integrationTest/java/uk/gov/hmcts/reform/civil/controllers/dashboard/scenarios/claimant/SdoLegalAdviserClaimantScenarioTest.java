@@ -52,10 +52,9 @@ public class SdoLegalAdviserClaimantScenarioTest extends DashboardBaseIntegratio
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         handler.handle(callbackParamsTestSDO(caseData));
 

@@ -79,18 +79,16 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
         .courtTypeId("10").courtLocationCode("121")
         .epimmsId("000000").build();
-    public static final CaseDocument courtOfficerOrder = CaseDocument.builder()
-        .createdBy("Test")
-        .documentName("Court Officer Order test name")
-        .documentSize(0L)
-        .documentType(COURT_OFFICER_ORDER)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name.pdf")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public static final CaseDocument courtOfficerOrder = new CaseDocument()
+        .setCreatedBy("Test")
+        .setDocumentName("Court Officer Order test name")
+        .setDocumentSize(0L)
+        .setDocumentType(COURT_OFFICER_ORDER)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name.pdf")
+                          .setDocumentBinaryUrl("binary-url"));
 
     @BeforeEach
     void setup() {
@@ -146,15 +144,14 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         void shouldAssignCategoryId_whenInvoked() {
             String fileName = LocalDate.now() + "_Court OfficerName.pdf";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(null).build())
+                .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                       .setListFromDate(null))
                 .build();
 
-            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(CaseDocument.builder().documentLink(
-                Document.builder()
-                    .documentFileName(fileName)
-                    .categoryID("caseManagementOrders")
-                    .build()).createdDatetime(LocalDateTime.now()).build());
+            when(courtOfficerOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(
+                new Document()
+                    .setDocumentFileName(fileName)
+                    .setCategoryID("caseManagementOrders")).setCreatedDatetime(LocalDateTime.now()));
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -174,8 +171,8 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotReturnError_whenNoDate() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(null).build())
+                .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                       .setListFromDate(null))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -186,8 +183,8 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNoError_whenDateInFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(LocalDate.now().plusDays(7)).build())
+                .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                       .setListFromDate(LocalDate.now().plusDays(7)))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -198,8 +195,8 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldError_whenDateInPast() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .courtOfficerFurtherHearingComplex(FinalOrderFurtherHearing.builder()
-                                                       .listFromDate(LocalDate.now().minusDays(7)).build())
+                .courtOfficerFurtherHearingComplex(new FinalOrderFurtherHearing()
+                                                       .setListFromDate(LocalDate.now().minusDays(7)))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

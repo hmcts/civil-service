@@ -51,19 +51,18 @@ class UpdateVisibilityNoticeOfDiscontinuanceHandlerTest extends BaseCallbackHand
         void shouldUpdateCamundaVariables_whenInvoked(Boolean toggleState) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .businessProcess(BusinessProcess.builder().processInstanceId(processId).build()).build();
+                .businessProcess(new BusinessProcess().setProcessInstanceId(processId)).build();
             caseData.setConfirmOrderGivesPermission(
                 toggleState ? ConfirmOrderGivesPermission.YES : ConfirmOrderGivesPermission.NO);
             caseData.setRespondent1NoticeOfDiscontinueCWViewDoc(caseDocument);
             caseData.setApplicant1NoticeOfDiscontinueCWViewDoc(caseDocument);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.UPDATE_VISIBILITY_NOTICE_OF_DISCONTINUANCE.name())
-                             .build())
-                .build();
+                             .build());
             //When
             handler.handle(params);
             //Then

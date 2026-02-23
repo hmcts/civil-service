@@ -97,8 +97,8 @@ class NotifyDefendantCaseStayedHandlerTest {
     void sendNotificationShouldSendEmail(boolean isRespondentLiP, boolean isRespondentBilingual, boolean isRespondent1, String template, String email) {
         caseData = caseData.toBuilder()
             .respondent1Represented(isRespondentLiP ? YesOrNo.NO : YesOrNo.YES)
-            .caseDataLiP(CaseDataLiP.builder().respondent1LiPResponse(RespondentLiPResponse.builder().respondent1ResponseLanguage(
-                isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString()).build()).build())
+            .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(
+                isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())))
             .respondentSolicitor1EmailAddress(email)
             .respondent2(!isRespondent1
                              ? Party.builder().individualFirstName("John").individualLastName("Johnson").type(Party.Type.INDIVIDUAL).build()
@@ -115,7 +115,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .build();
         CallbackRequest request = CallbackRequest.builder()
             .eventId(isRespondent1 ? CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name() : CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE.name()).build();
-        CallbackParams params = CallbackParams.builder().request(request).caseData(caseData).build();
+        CallbackParams params = new CallbackParams().request(request).caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

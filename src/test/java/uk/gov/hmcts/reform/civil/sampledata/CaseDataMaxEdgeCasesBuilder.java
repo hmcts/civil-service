@@ -45,37 +45,30 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
     }
 
     public CaseDataMaxEdgeCasesBuilder atStateClaimDraftWithMaximumData() {
-        courtLocation = CourtLocation.builder()
-            .applicantPreferredCourt("127")
-            .applicantPreferredCourtLocationList(
+        courtLocation = new CourtLocation()
+            .setApplicantPreferredCourt("127")
+            .setApplicantPreferredCourtLocationList(
                 DynamicList.builder().value(DynamicListElement.builder().label("sitename").build()).build())
-            .caseLocation(CaseLocationCivil.builder()
-                              .region("4")
-                              .baseLocation("000000")
-                              .build())
-            .build();
+            .setCaseLocation(new CaseLocationCivil()
+                              .setRegion("4")
+                              .setBaseLocation("000000")
+                              );
         solicitorReferences = SolicitorReferences.builder()
             .applicantSolicitor1Reference(Strings.repeat('A', 24))
             .respondentSolicitor1Reference(Strings.repeat('R', 24))
             .build();
         applicant1 = PartyBuilder.builder().companyWithMaxData().build();
         applicant1LitigationFriendRequired = NO;
-        applicantSolicitor1CheckEmail = CorrectEmail.builder()
-            .email("hmcts.civil@gmail.com")
-            .correct(YES)
-            .build();
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
+        applicantSolicitor1CheckEmail = new CorrectEmail()
+            .setEmail("hmcts.civil@gmail.com")
+            .setCorrect(YES);
+        applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
+        respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
-        claimValue = ClaimValue.builder()
-            .statementOfValueInPennies(BigDecimal.valueOf(10000000))
-            .build();
+        claimValue = new ClaimValue()
+            .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         claimFee = Fee.builder()
             .calculatedAmountInPence(TEN)
             .code("fee code")

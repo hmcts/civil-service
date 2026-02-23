@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 
 import java.util.Map;
 
@@ -42,7 +43,11 @@ class TakeCaseOfflineEventHandlerTest {
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
-        takeCaseOfflineEventHandler = new TakeCaseOfflineEventHandler(coreCaseDataService, caseDetailsConverter);
+        takeCaseOfflineEventHandler = new TakeCaseOfflineEventHandler(
+            coreCaseDataService,
+            caseDetailsConverter,
+            new RoboticsEventTextFormatter()
+        );
     }
 
     @Test
@@ -50,7 +55,7 @@ class TakeCaseOfflineEventHandlerTest {
         Long caseId = 1633357679902210L;
 
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         VariableMap variables = Variables.createVariables();
         variables.putValue(FLOW_STATE, "MAIN.DRAFT");

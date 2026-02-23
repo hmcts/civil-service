@@ -86,15 +86,15 @@ class NotifyClaimantStayLiftedHandlerTest {
     private CaseData getCaseData(boolean isClaimantLiP, boolean isClaimantBilingual) {
         String claimantBilingualLanguagePreference = isClaimantBilingual ? Language.BOTH.toString()
             : Language.ENGLISH.toString();
-        RespondentLiPResponse respondentLip = RespondentLiPResponse.builder()
-            .respondent1ResponseLanguage(claimantBilingualLanguagePreference).build();
+        RespondentLiPResponse respondentLip = new RespondentLiPResponse()
+            .setRespondent1ResponseLanguage(claimantBilingualLanguagePreference);
         return commonCaseData()
             .applicant1Represented(isClaimantLiP ? YesOrNo.NO : YesOrNo.YES)
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@example.com").build())
             .claimantBilingualLanguagePreference(claimantBilingualLanguagePreference)
             .build().toBuilder()
-            .caseDataLiP(CaseDataLiP.builder()
-                             .respondent1LiPResponse(respondentLip).build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setRespondent1LiPResponse(respondentLip))
             .build();
     }
 
@@ -126,7 +126,7 @@ class NotifyClaimantStayLiftedHandlerTest {
     @Test
     void checkCamundaActivityTest() {
         caseData = caseData.toBuilder().build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyClaimantStayLifted", response);
     }
@@ -146,7 +146,7 @@ class NotifyClaimantStayLiftedHandlerTest {
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
         CallbackResponse response = handler.sendNotification(params);
         assertNotNull(response);
 
@@ -185,11 +185,10 @@ class NotifyClaimantStayLiftedHandlerTest {
             .builder()
             .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
         final CallbackResponse response = handler.sendNotification(params);
 
         Map<String, String> commonProps = addCommonProperties(true);

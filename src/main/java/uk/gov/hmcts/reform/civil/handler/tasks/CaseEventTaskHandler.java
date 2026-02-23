@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -49,6 +50,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
     private final FeatureToggleService featureToggleService;
+    private final RoboticsEventTextFormatter textFormatter;
 
     @Override
     public ExternalTaskData handleTask(ExternalTask externalTask) {
@@ -57,6 +59,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             ExternalTaskInput variables = mapper.convertValue(externalTask.getAllVariables(), ExternalTaskInput.class);
             String caseId = ofNullable(variables.getCaseId())
                 .orElseThrow(() -> new InvalidCaseDataException("The caseId was not provided"));
+            log.info("Start Event {} for caseId {} activityId {}", variables.getCaseEvent(), caseId, externalTask.getActivityId());
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(caseId, variables.getCaseEvent());
             CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
             BusinessProcess businessProcess = startEventData.getBusinessProcess()
@@ -73,6 +76,7 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
                 flowState,
                 startEventData
             );
+            log.info("Submit Event {} for caseId {}", startEventResponse.getEventId(), caseId);
             var data = coreCaseDataService.submitUpdate(caseId, caseDataContent);
             return new ExternalTaskData().setCaseData(data);
         } catch (ValueMapperException | IllegalArgumentException e) {
@@ -110,12 +114,12 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
     private String getFullOrPartAdmission(CaseData caseData, String state) {
         FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
         if (caseData.isLipvLROneVOne()) {
-            return "RPA Reason: LiP vs LR - full/part admission received.";
+            return textFormatter.lipVsLrFullOrPartAdmissionReceived();
         } else {
             if (flowState.equals(FlowState.Main.FULL_ADMISSION)) {
-                return "RPA Reason: Defendant fully admits.";
+                return textFormatter.defendantFullyAdmits();
             } else {
-                return "RPA Reason: Defendant partial admission.";
+                return textFormatter.defendantPartialAdmission();
             }
         }
     }
@@ -125,30 +129,30 @@ public class CaseEventTaskHandler extends BaseExternalTaskHandler {
             FlowState.Main flowState = (FlowState.Main) FlowState.fromFullName(state);
             return switch (flowState) {
                 case DIVERGENT_RESPOND_GENERATE_DQ_GO_OFFLINE, DIVERGENT_RESPOND_GO_OFFLINE ->
-                    "RPA Reason: Divergent respond.";
+                    textFormatter.divergentRespond();
                 case FULL_ADMISSION -> getFullOrPartAdmission(caseData, state);
                 case PART_ADMISSION -> getFullOrPartAdmission(caseData, state);
-                case COUNTER_CLAIM -> "RPA Reason: Defendant rejects and counter claims.";
+                case COUNTER_CLAIM -> textFormatter.defendantRejectsAndCounterClaims();
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT_ONE_V_ONE_SPEC, PENDING_CLAIM_ISSUED_UNREPRESENTED_DEFENDANT ->
-                    "RPA Reason: Unrepresented defendant(s).";
+                    textFormatter.unrepresentedDefendants();
                 case PENDING_CLAIM_ISSUED_UNREGISTERED_DEFENDANT ->
-                    "RPA Reason: Unregistered defendant solicitor firm(s).";
+                    textFormatter.unregisteredDefendantSolicitorFirms();
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT ->
-                    "RPA Reason: Unrepresented defendant and unregistered defendant solicitor firm";
+                    textFormatter.unrepresentedAndUnregisteredDefendantSolicitorFirm();
                 case FULL_DEFENCE_PROCEED, FULL_ADMIT_PROCEED, FULL_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PAY_IMMEDIATELY, PART_ADMIT_PROCEED ->
-                    "RPA Reason: Claimant(s) proceeds.";
+                    textFormatter.claimantsProceed();
                 case FULL_DEFENCE_NOT_PROCEED, FULL_ADMIT_NOT_PROCEED, PART_ADMIT_NOT_PROCEED ->
                     "RPA Reason: Claimant(s) intends not to proceed.";
                 case TAKEN_OFFLINE_AFTER_CLAIM_NOTIFIED, TAKEN_OFFLINE_AFTER_CLAIM_DETAILS_NOTIFIED ->
-                    "RPA Reason: Only one of the defendants is notified.";
-                case TAKEN_OFFLINE_BY_STAFF -> "RPA Reason: Case taken offline by staff.";
+                    textFormatter.onlyOneDefendantNotified();
+                case TAKEN_OFFLINE_BY_STAFF -> textFormatter.caseTakenOfflineByStaff();
                 case CLAIM_DETAILS_NOTIFIED, NOTIFICATION_ACKNOWLEDGED_TIME_EXTENSION,
                     CLAIM_DETAILS_NOTIFIED_TIME_EXTENSION, NOTIFICATION_ACKNOWLEDGED,
                     PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA ->
-                    "RPA Reason: Not suitable for SDO.";
+                    textFormatter.notSuitableForSdo();
                 case FULL_ADMIT_AGREE_REPAYMENT, PART_ADMIT_AGREE_REPAYMENT, FULL_ADMIT_JUDGMENT_ADMISSION ->
-                    "RPA Reason: Judgement by Admission requested and claim moved offline.";
-                case SPEC_DEFENDANT_NOC -> "RPA Reason: Notice of Change filed.";
+                    textFormatter.judgementByAdmissionRequested();
+                case SPEC_DEFENDANT_NOC -> textFormatter.withRpaPrefix("Notice of Change filed.");
                 default -> {
                     log.info("Unexpected flow state {}", flowState.fullName());
                     yield null;

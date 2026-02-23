@@ -156,11 +156,7 @@ class CaseFlagsInitialiserTest {
     @Test
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
         CaseData caseData = CaseData.builder()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                .organisationID("id")
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("id")))
             .updateDetailsForm(UpdateDetailsForm.builder()
                                    .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
                                    .build())
@@ -178,12 +174,12 @@ class CaseFlagsInitialiserTest {
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
         LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
-        Witness witness1 = Witness.builder().firstName("First").lastName("Name").build();
-        Witness witness2 = Witness.builder().firstName("Second").lastName("witness").build();
-        Witness witness3 = Witness.builder().firstName("Third").lastName("witnessy").build();
-        Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
-        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-        Expert expert3 = Expert.builder().firstName("Third").lastName("experto").build();
+        Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
+        Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
+        Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
+        Expert expert1 = new Expert().setFirstName("First").setLastName("Name");
+        Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
+        Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
         CaseData expected = CaseData.builder()
             .applicant1(
@@ -312,36 +308,21 @@ class CaseFlagsInitialiserTest {
             .addApplicant2(YES)
             .addRespondent2(YES)
             .applicant2LitigationFriend(applicant2LitFriend)
-            .applicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness1, witness2))
-                                                         .build())
-                              .applicant1DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert1, expert2))
-                                                       .build())
-                              .build())
-            .applicant2DQ(Applicant2DQ.builder()
-                              .applicant2DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness3))
-                                                         .build())
-                              .applicant2DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert3))
-                                                       .build())
-                              .build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQExperts(Experts
-                                                         .builder()
-                                                         .details(wrapElements(expert1, expert2))
-                                                         .build())
-                               .respondent1DQWitnesses(Witnesses
-                                                           .builder()
-                                                           .details(wrapElements(witness1, witness2))
-                                                           .build())
-                               .build())
+            .applicant1DQ(new Applicant1DQ()
+                              .setApplicant1DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness1, witness2)))
+                              .setApplicant1DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert1, expert2))))
+            .applicant2DQ(new Applicant2DQ()
+                              .setApplicant2DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness3)))
+                              .setApplicant2DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert3))))
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQExperts(new Experts()
+                                                            .setDetails(wrapElements(expert1, expert2)))
+                               .setRespondent1DQWitnesses(new Witnesses()
+                                                              .setDetails(wrapElements(witness1, witness2))))
             .respondent1(respondent1).build();
 
         caseFlagsInitialiser.initialiseMissingCaseFlags(caseData);
@@ -357,12 +338,12 @@ class CaseFlagsInitialiserTest {
         Party respondent2 = PartyBuilder.builder().organisation().build();
         LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
         LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
-        Witness witness1 = Witness.builder().firstName("First").lastName("Name").build();
-        Witness witness2 = Witness.builder().firstName("Second").lastName("witness").build();
-        Witness witness3 = Witness.builder().firstName("Third").lastName("witnessy").build();
-        Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
-        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-        Expert expert3 = Expert.builder().firstName("Third").lastName("experto").build();
+        Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
+        Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
+        Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
+        Expert expert1 = new Expert().setFirstName("First").setLastName("Name");
+        Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
+        Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
         CaseData expected = CaseData.builder()
             .applicant1(
@@ -517,45 +498,26 @@ class CaseFlagsInitialiserTest {
             .applicant2(applicant2)
             .addApplicant2(YES)
             .applicant2LitigationFriend(applicant2LitFriend)
-            .applicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness1, witness2))
-                                                         .build())
-                              .applicant1DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert1, expert2))
-                                                       .build())
-                              .build())
-            .applicant2DQ(Applicant2DQ.builder()
-                              .applicant2DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness3))
-                                                         .build())
-                              .applicant2DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert3))
-                                                       .build())
-                              .build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQExperts(Experts
-                                                         .builder()
-                                                         .details(wrapElements(expert1, expert2))
-                                                         .build())
-                               .respondent1DQWitnesses(Witnesses
-                                                           .builder()
-                                                           .details(wrapElements(witness1, witness2))
-                                                           .build())
-                               .build())
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQExperts(Experts.builder()
-                                                         .details(wrapElements(expert3))
-                                                         .build())
-                               .respondent2DQWitnesses(Witnesses
-                                                           .builder()
-                                                           .details(wrapElements(witness3))
-                                                           .build())
-                               .build())
+            .applicant1DQ(new Applicant1DQ()
+                              .setApplicant1DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness1, witness2)))
+                              .setApplicant1DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert1, expert2))))
+            .applicant2DQ(new Applicant2DQ()
+                              .setApplicant2DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness3)))
+                              .setApplicant2DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert3))))
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQExperts(new Experts()
+                                                            .setDetails(wrapElements(expert1, expert2)))
+                               .setRespondent1DQWitnesses(new Witnesses()
+                                                              .setDetails(wrapElements(witness1, witness2))))
+            .respondent2DQ(new Respondent2DQ()
+                               .setRespondent2DQExperts(new Experts()
+                                                            .setDetails(wrapElements(expert3)))
+                               .setRespondent2DQWitnesses(new Witnesses()
+                                                              .setDetails(wrapElements(witness3))))
             .addRespondent2(YES)
             .respondent1Witnesses(wrapElements(List.of(
                 PartyFlagStructure.builder()
@@ -629,12 +591,12 @@ class CaseFlagsInitialiserTest {
         Party respondent2 = PartyBuilder.builder().organisation().build();
         LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
         LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
-        Witness witness1 = Witness.builder().firstName("First").lastName("Name").build();
-        Witness witness2 = Witness.builder().firstName("Second").lastName("witness").build();
-        Witness witness3 = Witness.builder().firstName("Third").lastName("witnessy").build();
-        Expert expert1 = Expert.builder().firstName("First").lastName("Name").build();
-        Expert expert2 = Expert.builder().firstName("Second").lastName("expert").build();
-        Expert expert3 = Expert.builder().firstName("Third").lastName("experto").build();
+        Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
+        Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
+        Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
+        Expert expert1 = new Expert().setFirstName("First").setLastName("Name");
+        Expert expert2 = new Expert().setFirstName("Second").setLastName("expert");
+        Expert expert3 = new Expert().setFirstName("Third").setLastName("experto");
 
         CaseData expected = CaseData.builder()
             .applicant1(
@@ -797,45 +759,26 @@ class CaseFlagsInitialiserTest {
             .applicant1LitigationFriend(applicant1LitFriend)
             .applicant2(applicant2)
             .applicant2LitigationFriend(applicant2LitFriend)
-            .applicant1DQ(Applicant1DQ.builder()
-                              .applicant1DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness1, witness2))
-                                                         .build())
-                              .applicant1DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert1, expert2))
-                                                       .build())
-                              .build())
-            .applicant2DQ(Applicant2DQ.builder()
-                              .applicant2DQWitnesses(Witnesses
-                                                         .builder()
-                                                         .details(wrapElements(witness3))
-                                                         .build())
-                              .applicant2DQExperts(Experts
-                                                       .builder()
-                                                       .details(wrapElements(expert3))
-                                                       .build())
-                              .build())
-            .respondent1DQ(Respondent1DQ.builder()
-                               .respondent1DQExperts(Experts
-                                                         .builder()
-                                                         .details(wrapElements(expert1, expert2))
-                                                         .build())
-                               .respondent1DQWitnesses(Witnesses
-                                                           .builder()
-                                                           .details(wrapElements(witness1, witness2))
-                                                           .build())
-                               .build())
-            .respondent2DQ(Respondent2DQ.builder()
-                               .respondent2DQExperts(Experts.builder()
-                                                         .details(wrapElements(expert3))
-                                                         .build())
-                               .respondent2DQWitnesses(Witnesses
-                                                           .builder()
-                                                           .details(wrapElements(witness3))
-                                                           .build())
-                               .build())
+            .applicant1DQ(new Applicant1DQ()
+                              .setApplicant1DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness1, witness2)))
+                              .setApplicant1DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert1, expert2))))
+            .applicant2DQ(new Applicant2DQ()
+                              .setApplicant2DQWitnesses(new Witnesses()
+                                                            .setDetails(wrapElements(witness3)))
+                              .setApplicant2DQExperts(new Experts()
+                                                          .setDetails(wrapElements(expert3))))
+            .respondent1DQ(new Respondent1DQ()
+                               .setRespondent1DQExperts(new Experts()
+                                                            .setDetails(wrapElements(expert1, expert2)))
+                               .setRespondent1DQWitnesses(new Witnesses()
+                                                              .setDetails(wrapElements(witness1, witness2))))
+            .respondent2DQ(new Respondent2DQ()
+                               .setRespondent2DQExperts(new Experts()
+                                                            .setDetails(wrapElements(expert3)))
+                               .setRespondent2DQWitnesses(new Witnesses()
+                                                              .setDetails(wrapElements(witness3))))
             .respondent1(respondent1)
             .respondent2(respondent2)
             .applicantWitnesses(wrapElements(List.of(

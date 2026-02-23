@@ -450,15 +450,14 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildMakePaymentsCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(
@@ -469,14 +468,13 @@ public class GeneralApplicationCaseDataBuilder {
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppSuperClaimType("UNSPEC_CLAIM")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData buildPaymentFailureCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
@@ -486,7 +484,7 @@ public class GeneralApplicationCaseDataBuilder {
                                             .isWithNotice(YES).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build())
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .paymentDetails(PaymentDetails.builder()
@@ -501,21 +499,20 @@ public class GeneralApplicationCaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .parentClaimantIsApplicant(YES)
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData withNoticeCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         List<GeneralApplicationTypes> types = Arrays.asList(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         return build().toBuilder()
             .generalAppType(GAApplicationType.builder().types(types).build())
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -536,20 +533,19 @@ public class GeneralApplicationCaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData withoutNoticeCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -570,27 +566,24 @@ public class GeneralApplicationCaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
-    public final CaseDocument pdfDocument = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("documentName")
-        .documentSize(0L)
-        .documentType(DocumentType.GENERAL_APPLICATION_DRAFT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public final CaseDocument pdfDocument = new CaseDocument()
+        .setCreatedBy("John")
+        .setDocumentName("documentName")
+        .setDocumentSize(0L)
+        .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name")
+                          .setDocumentBinaryUrl("binary-url"));
 
     public GeneralApplicationCaseData withNoticeDraftAppCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
@@ -602,7 +595,7 @@ public class GeneralApplicationCaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
@@ -623,20 +616,19 @@ public class GeneralApplicationCaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData buildPaymentSuccessfulCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         return build().toBuilder()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
@@ -653,7 +645,7 @@ public class GeneralApplicationCaseDataBuilder {
                             .version("1")
                             .build())
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
@@ -679,6 +671,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentSolicitors(application.getGeneralAppRespondentSolicitors())
             .isCcmccLocation(application.getIsCcmccLocation())
             .caseManagementLocation(application.getCaseManagementLocation())
+            .generalAppSubmittedDateGAspec(application.getGeneralAppSubmittedDateGAspec())
             .build();
     }
 
@@ -743,8 +736,7 @@ public class GeneralApplicationCaseDataBuilder {
 
     public GeneralApplicationCaseData buildFeeValidationCaseData(Fee fee, boolean isConsented, boolean isWithNotice) {
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         GAInformOtherParty gaInformOtherParty = null;
         if (!isConsented) {
@@ -756,7 +748,7 @@ public class GeneralApplicationCaseDataBuilder {
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(isConsented ? YES : NO).build())
             .generalAppInformOtherParty(gaInformOtherParty)
@@ -764,7 +756,7 @@ public class GeneralApplicationCaseDataBuilder {
                 GeneralApplicationPbaDetails.builder()
                     .fee(fee)
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
@@ -819,31 +811,34 @@ public class GeneralApplicationCaseDataBuilder {
             .freeFormRecitalText("abcd")
             .freeFormOrderedText("abcd")
             .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
-            .orderOnCourtInitiative(FreeFormOrderValues.builder()
-                                        .onInitiativeSelectionTextArea("abcd")
-                                        .onInitiativeSelectionDate(now()).build())
+            .orderOnCourtInitiative(new FreeFormOrderValues()
+                                        .setOnInitiativeSelectionTextArea("abcd")
+                                        .setOnInitiativeSelectionDate(now()))
             .createdDate(SUBMITTED_DATE_TIME)
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
     public GeneralApplicationCaseData getCivilCaseData() {
+        Address applicantAddress = new Address();
+        applicantAddress.setPostCode("postcode");
+        applicantAddress.setPostTown("posttown");
+        applicantAddress.setAddressLine1("address1");
+        applicantAddress.setAddressLine2("address2");
+        applicantAddress.setAddressLine3("address3");
+
+        Address respondentAddress = new Address();
+        respondentAddress.setPostCode("respondent1postcode");
+        respondentAddress.setPostTown("respondent1posttown");
+        respondentAddress.setAddressLine1("respondent1address1");
+        respondentAddress.setAddressLine2("respondent1address2");
+        respondentAddress.setAddressLine3("respondent1address3");
 
         return GeneralApplicationCaseData.builder()
             .applicant1(GeneralApplicationParty.builder()
-                            .primaryAddress(Address.builder()
-                                                .postCode("postcode")
-                                                .postTown("posttown")
-                                                .addressLine1("address1")
-                                                .addressLine2("address2")
-                                                .addressLine3("address3").build())
+                            .primaryAddress(applicantAddress)
                             .partyName("applicant1partyname").build())
             .respondent1(GeneralApplicationParty.builder()
-                             .primaryAddress(Address.builder()
-                                                 .postCode("respondent1postcode")
-                                                 .postTown("respondent1posttown")
-                                                 .addressLine1("respondent1address1")
-                                                 .addressLine2("respondent1address2")
-                                                 .addressLine3("respondent1address3").build())
+                             .primaryAddress(respondentAddress)
                              .partyName("respondent1partyname").build()).build();
     }
 
@@ -1092,8 +1087,8 @@ public class GeneralApplicationCaseDataBuilder {
                     .builder()
                     .caseReference(CASE_REFERENCE.toString())
                     .build())
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
-                                 .camundaEvent(HEARING_SCHEDULED).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(HEARING_SCHEDULED))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
@@ -1104,15 +1099,9 @@ public class GeneralApplicationCaseDataBuilder {
                                 .build())
             .generalAppApplnSolicitor(
                 GASolicitorDetailsGAspec.builder().email(DUMMY_EMAIL).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder().organisationID("1").build())
-                                              .build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("2").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("3").build())
-                                               .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
             .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
@@ -1120,7 +1109,7 @@ public class GeneralApplicationCaseDataBuilder {
                                         .postcode("BA 117").build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(HEARING_SCHEDULED).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(HEARING_SCHEDULED))
             .applicationIsCloaked(isCloak)
             .generalAppRespondentSolicitors(respondentSols)
             .gaDetailsMasterCollection(wrapElements(GeneralApplicationsDetails.builder()
@@ -1256,7 +1245,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant1PartyName("Test Defendant1 Name")
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE275)
@@ -1286,8 +1275,8 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant1PartyName("Test Defendant1 Name")
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
-                                 .camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(JUDGES_DECISION))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
@@ -1303,7 +1292,7 @@ public class GeneralApplicationCaseDataBuilder {
                                                  .requestMoreInfoOption(requestMoreInfoOption)
                                                  .judgeRequestMoreInfoByDate(LocalDate.now())
                                                  .judgeRequestMoreInfoText("test").build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(isCloak)
             .isMultiParty(NO)
             .submittedOn(APPLICATION_SUBMITTED_DATE);
@@ -1323,8 +1312,8 @@ public class GeneralApplicationCaseDataBuilder {
                     .builder()
                     .caseReference(CASE_REFERENCE.toString())
                     .build())
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
-                                 .camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(JUDGES_DECISION))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
@@ -1336,7 +1325,7 @@ public class GeneralApplicationCaseDataBuilder {
             .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(isCloak)
             .submittedOn(APPLICATION_SUBMITTED_DATE)
             .gaDetailsMasterCollection(wrapElements(GeneralApplicationsDetails.builder()
@@ -1360,8 +1349,7 @@ public class GeneralApplicationCaseDataBuilder {
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
-                                 .build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE108)
@@ -1373,7 +1361,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppHearingDate(generalAppHearingDate)
             .generalAppRespondentAgreement(GARespondentOrderAgreement
                                                .builder().hasAgreed(isRespondentAgreed).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
@@ -1382,8 +1370,7 @@ public class GeneralApplicationCaseDataBuilder {
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY)
-                                 .build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
                     .fee(FEE14)
@@ -1394,7 +1381,7 @@ public class GeneralApplicationCaseDataBuilder {
                                 .build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement
                                                .builder().hasAgreed(NO).build())
-            .businessProcess(BusinessProcess.builder().camundaEvent(JUDGES_DECISION).build())
+            .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 

@@ -333,66 +333,78 @@ public class HearingsPartyMapper {
             ? flags.getDetails().stream().map(Element::getValue).toList() : List.of();
         List<String> hearingChannelEmail = email == null ? emptyList() : List.of(email);
         List<String> hearingChannelPhone = phone == null ? emptyList() : List.of(phone);
-        IndividualDetailsModel individualDetails = IndividualDetailsModel.builder()
-            .firstName(firstName)
-            .lastName(lastName)
-            .interpreterLanguage(getInterpreterLanguage(flagDetails))
-            .reasonableAdjustments(getReasonableAdjustments(flagDetails))
-            .vulnerableFlag(hasVulnerableFlag(flagDetails))
-            .vulnerabilityDetails(getVulnerabilityDetails(flagDetails))
-            .hearingChannelEmail(hearingChannelEmail)
-            .hearingChannelPhone(hearingChannelPhone)
-            .relatedParties(emptyList())
-            .custodyStatus(getCustodyStatus(flagDetails))
-            .otherReasonableAdjustmentDetails(getOtherReasonableAdjustmentDetails(flagDetails))
-            .build();
+        IndividualDetailsModel individualDetails = new IndividualDetailsModel();
+        individualDetails.setFirstName(firstName);
+        individualDetails.setLastName(lastName);
+        individualDetails.setInterpreterLanguage(getInterpreterLanguage(flagDetails));
+        individualDetails.setReasonableAdjustments(getReasonableAdjustments(flagDetails));
+        individualDetails.setVulnerableFlag(hasVulnerableFlag(flagDetails));
+        individualDetails.setVulnerabilityDetails(getVulnerabilityDetails(flagDetails));
+        individualDetails.setHearingChannelEmail(hearingChannelEmail);
+        individualDetails.setHearingChannelPhone(hearingChannelPhone);
+        individualDetails.setRelatedParties(emptyList());
+        individualDetails.setCustodyStatus(getCustodyStatus(flagDetails));
+        individualDetails.setOtherReasonableAdjustmentDetails(getOtherReasonableAdjustmentDetails(flagDetails));
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(IND)
-            .partyName(partyName)
-            .partyRole(partyRole)
-            .individualDetails(individualDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date)).toList() : null)
-            .hearingSubChannel(null)
-            .build();
+        List<UnavailabilityRangeModel> unavailabilityRanges = null;
+        if (unavailableDates != null) {
+            unavailabilityRanges = unwrapElements(unavailableDates).stream()
+                .map(date -> mapUnAvailableDateToRange(date))
+                .toList();
+        }
+
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(IND);
+        partyDetails.setPartyName(partyName);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setIndividualDetails(individualDetails);
+        partyDetails.setUnavailabilityRanges(unavailabilityRanges);
+
+        return partyDetails;
     }
 
     public static PartyDetailsModel buildOrganisationPartyObject(String partyId, String name,
                                                                  String partyRole,
                                                                  String cftOrganisationID,
                                                                  List<Element<UnavailableDate>> unavailableDates) {
-        OrganisationDetailsModel organisationDetails = OrganisationDetailsModel.builder()
-            .name(name)
-            .organisationType(ORG.getLabel())
-            .cftOrganisationID(cftOrganisationID)
-            .build();
+        OrganisationDetailsModel organisationDetails = new OrganisationDetailsModel();
+        organisationDetails.setName(name);
+        organisationDetails.setOrganisationType(ORG.getLabel());
+        organisationDetails.setCftOrganisationID(cftOrganisationID);
 
-        return PartyDetailsModel.builder()
-            .partyID(partyId)
-            .partyType(ORG)
-            .partyName(name)
-            .partyRole(partyRole)
-            .organisationDetails(organisationDetails)
-            .unavailabilityDOW(null)
-            .unavailabilityRanges(unavailableDates != null ? unwrapElements(unavailableDates).stream().map(date -> mapUnAvailableDateToRange(date))
-                    .toList() : null)
-            .hearingSubChannel(null)
-            .build();
+        List<UnavailabilityRangeModel> unavailabilityRanges = null;
+        if (unavailableDates != null) {
+            unavailabilityRanges = unwrapElements(unavailableDates).stream()
+                .map(date -> mapUnAvailableDateToRange(date))
+                .toList();
+        }
+
+        PartyDetailsModel partyDetails = new PartyDetailsModel();
+        partyDetails.setPartyID(partyId);
+        partyDetails.setPartyType(ORG);
+        partyDetails.setPartyName(name);
+        partyDetails.setPartyRole(partyRole);
+        partyDetails.setOrganisationDetails(organisationDetails);
+        partyDetails.setUnavailabilityRanges(unavailabilityRanges);
+
+        return partyDetails;
     }
 
     static final String DATE_STRING = "yyyy-MM-dd";
 
     private static UnavailabilityRangeModel mapUnAvailableDateToRange(UnavailableDate date) {
-        return UnavailabilityRangeModel.builder()
-            .unavailabilityType(ALL_DAY)
-            .unavailableFromDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getFromDate()
-                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
-            .unavailableToDate(SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
-                .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getToDate()
-                .format(DateTimeFormatter.ofPattern(DATE_STRING)))
-            .build();
+        String unavailableFrom = SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
+            .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getFromDate()
+            .format(DateTimeFormatter.ofPattern(DATE_STRING));
+        String unavailableTo = SINGLE_DATE.equals(date.getUnavailableDateType()) ? date.getDate()
+            .format(DateTimeFormatter.ofPattern(DATE_STRING)) : date.getToDate()
+            .format(DateTimeFormatter.ofPattern(DATE_STRING));
+
+        UnavailabilityRangeModel unavailabilityRangeModel = new UnavailabilityRangeModel();
+        unavailabilityRangeModel.setUnavailabilityType(ALL_DAY);
+        unavailabilityRangeModel.setUnavailableFromDate(unavailableFrom);
+        unavailabilityRangeModel.setUnavailableToDate(unavailableTo);
+        return unavailabilityRangeModel;
     }
 }

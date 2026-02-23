@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.civil.model.taskmanagement.ClientContextWrapper;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.Task;
 import uk.gov.hmcts.reform.civil.model.taskmanagement.UserTask;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.HashMap;
 
@@ -83,14 +83,16 @@ class HttpResponseHeadersServiceTest {
     }
 
     private ClientContextWrapper buildClientContext() {
-        return ClientContextWrapper.builder()
-            .clientContext(ClientContext.builder()
-                               .userTask(
-                                   UserTask.builder()
-                                       .taskData(Task.builder().taskTitle("My Task").build())
-                                       .build())
-                               .build())
-            .build();
+        Task task = new Task();
+        task.setTaskTitle("My Task");
+
+        UserTask userTask = new UserTask();
+        userTask.setTaskData(task);
+
+        ClientContext clientContext = new ClientContext()
+            .setUserTask(userTask);
+
+        return new ClientContextWrapper().setClientContext(clientContext);
     }
 
     private HashMap<String, Object> decodeClientContext(String encodedClientContext) throws Exception {

@@ -73,14 +73,14 @@ public class CasesControllerTest extends BaseIntegrationTest {
     private static final String SUBMIT_EVENT_URL = "/cases/{caseId}/citizen/{submitterId}/event";
     private static final String CASEWORKER_SUBMIT_EVENT_URL = "/cases/caseworkers/create-case/{userId}";
     private static final String CASEWORKER_SEARCH_CASE_URL = "/cases/caseworker/searchCaseForSDT/{userId}?sdtRequestId=isUnique";
-    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin/?postCode=rfft";
+    private static final String VALIDATE_POSTCODE_URL = "/cases/caseworker/validatePin?postCode=rfft";
 
     private static final String CALCULATE_DEADLINE_URL = "/cases/response/deadline";
     private static final String AGREED_RESPONSE_DEADLINE_DATE_URL = "/cases/response/agreeddeadline/{claimId}";
     private static final String USER_CASE_ROLES = "/cases/{caseId}/userCaseRoles";
     private static final String COURT_DECISION_URL = "/cases/{caseId}/courtDecision";
 
-    private static final String GA_CLAIMS_LIST_URL = "/cases/ga/";
+    private static final String GA_CLAIMS_LIST_URL = "/cases/ga";
     private static final String GA_SUBMIT_EVENT_URL = "/cases/{caseId}/ga/citizen/{submitterId}/event";
     private static final String GA_CASE_APP_URL = "/cases/{caseId}/ga/applications";
 
@@ -202,7 +202,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForClaimantSuccessfully() {
-        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = new DashboardResponse().setTotalPages(1).setClaims(claimResults);
         when(dashboardClaimInfoService.getDashboardClaimantResponse(any(), any(), eq(1))).thenReturn(dashBoardResponse);
         doGet(BEARER_TOKEN, CLAIMANT_CLAIMS_URL, "123")
             .andExpect(content().json(toJson(dashBoardResponse)))
@@ -212,7 +212,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     void shouldReturnClaimsForDefendantSuccessfully() {
-        var dashBoardResponse = DashboardResponse.builder().totalPages(1).claims(claimResults).build();
+        var dashBoardResponse = new DashboardResponse().setTotalPages(1).setClaims(claimResults);
         when(dashboardClaimInfoService.getDashboardDefendantResponse(
             any(),
             any(),
@@ -230,7 +230,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(caseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
         doPost(
             BEARER_TOKEN,
-            EventDto.builder().event(CaseEvent.DEFENDANT_RESPONSE_SPEC).caseDataUpdate(Map.of()).build(),
+            new EventDto().setEvent(CaseEvent.DEFENDANT_RESPONSE_SPEC).setCaseDataUpdate(Map.of()),
             SUBMIT_EVENT_URL,
             "123",
             "123"
@@ -245,7 +245,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
         when(deadlineExtensionCalculatorService.calculateExtendedDeadline(any(LocalDate.class), anyInt())).thenReturn(extensionDate);
         doPost(
             BEARER_TOKEN,
-            ExtendedDeadlineDto.builder().responseDate(extensionDate).plusDays(5).build(),
+            new ExtendedDeadlineDto().setResponseDate(extensionDate).setPlusDays(5),
             CALCULATE_DEADLINE_URL
         )
             .andExpect(content().json(toJson(extensionDate)))
@@ -442,7 +442,9 @@ public class CasesControllerTest extends BaseIntegrationTest {
         //Given
         given(repaymentPlanDecisionService.getCalculatedDecision(any(), any())).willReturn(IN_FAVOUR_OF_CLAIMANT);
         //When
-        doPost(BEARER_TOKEN, ClaimantProposedPlan.builder().proposedRepaymentType(IMMEDIATELY).build(), COURT_DECISION_URL, "1")
+        ClaimantProposedPlan proposedPlan = new ClaimantProposedPlan();
+        proposedPlan.setProposedRepaymentType(IMMEDIATELY);
+        doPost(BEARER_TOKEN, proposedPlan, COURT_DECISION_URL, "1")
             .andExpect(status().isOk());
     }
 
@@ -482,7 +484,7 @@ public class CasesControllerTest extends BaseIntegrationTest {
             when(gaCaseEventService.submitEvent(any())).thenReturn(expectedCaseDetails);
             doPost(
                 BEARER_TOKEN,
-                EventDto.builder().event(CaseEvent.RESPOND_TO_APPLICATION).caseDataUpdate(Map.of()).build(),
+                new EventDto().setEvent(CaseEvent.RESPOND_TO_APPLICATION).setCaseDataUpdate(Map.of()),
                 GA_SUBMIT_EVENT_URL,
                 "123",
                 "123"

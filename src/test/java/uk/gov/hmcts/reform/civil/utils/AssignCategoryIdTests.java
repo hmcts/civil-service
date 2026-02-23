@@ -21,51 +21,45 @@ public class AssignCategoryIdTests {
 
     private AssignCategoryId assignCategoryId;
 
-    private CaseDocument testCaseDocument = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("document name")
-        .documentSize(0L)
-        .documentType(SEALED_CLAIM)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    private CaseDocument testCaseDocument = new CaseDocument()
+        .setCreatedBy("John")
+        .setDocumentName("document name")
+        .setDocumentSize(0L)
+        .setDocumentType(SEALED_CLAIM)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name")
+                          .setDocumentBinaryUrl("binary-url"));
 
-    private Document testDocument = Document.builder()
-        .documentUrl("testUrl")
-        .documentBinaryUrl("testBinUrl")
-        .documentFileName("testFileName")
-        .documentHash("testDocumentHash")
-        .build();
+    private Document testDocument = new Document()
+        .setDocumentUrl("testUrl")
+        .setDocumentBinaryUrl("testBinUrl")
+        .setDocumentFileName("testFileName")
+        .setDocumentHash("testDocumentHash");
 
-    private MediationNonAttendanceStatement testMediationNonAttDocument = MediationNonAttendanceStatement.builder()
-        .yourName("Joe Bloggs")
-        .documentDate(LocalDate.of(2023, 10, 7))
-        .documentUploadedDatetime(LocalDateTime.of(2024, 01, 10, 12, 13, 12))
-        .document(Document.builder()
-                      .documentUrl("fake-url")
-                      .documentFileName("file-name")
-                      .documentBinaryUrl("binary-url")
-                      .build())
-        .build();
+    private MediationNonAttendanceStatement testMediationNonAttDocument = new MediationNonAttendanceStatement();
 
-    private MediationDocumentsReferredInStatement testMediationDocRefDocument = MediationDocumentsReferredInStatement.builder()
-        .documentType("doc-type")
-        .documentDate(LocalDate.of(2023, 10, 7))
-        .documentUploadedDatetime(LocalDateTime.of(2024, 01, 10, 12, 13, 12))
-        .document(Document.builder()
-                      .documentUrl("fake-url")
-                      .documentFileName("file-name")
-                      .documentBinaryUrl("binary-url")
-                      .build())
-        .build();
+    private MediationDocumentsReferredInStatement testMediationDocRefDocument = new MediationDocumentsReferredInStatement();
 
     @BeforeEach
     void setup() {
         assignCategoryId = new AssignCategoryId();
+        testMediationNonAttDocument.setYourName("Joe Bloggs");
+        testMediationNonAttDocument.setDocumentDate(LocalDate.of(2023, 10, 7));
+        testMediationNonAttDocument.setDocumentUploadedDatetime(LocalDateTime.of(2024, 1, 10, 12, 13, 12));
+        testMediationNonAttDocument.setDocument(new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url"));
+
+        testMediationDocRefDocument.setDocumentType("doc-type");
+        testMediationDocRefDocument.setDocumentDate(LocalDate.of(2023, 10, 7));
+        testMediationDocRefDocument.setDocumentUploadedDatetime(LocalDateTime.of(2024, 1, 10, 12, 13, 12));
+        testMediationDocRefDocument.setDocument(new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url"));
     }
 
     @Test

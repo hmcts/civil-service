@@ -54,10 +54,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTest(caseData));
@@ -91,13 +90,12 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url")))))
             .responseClaimTrack(FAST_CLAIM.name())
             .totalClaimAmount(BigDecimal.valueOf(999))
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE))
-                           .build())
+                           .mediationUnsuccessfulReasonsMultiSelect(List.of(NOT_CONTACTABLE_CLAIMANT_ONE, NOT_CONTACTABLE_DEFENDANT_ONE)).build())
             .build();
 
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
@@ -129,10 +127,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
         handler.handle(callbackParamsTest(caseData));
@@ -165,10 +162,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTestFinalOrders(caseData));
@@ -211,10 +207,9 @@ public class OrderMadeDefendantScenarioTest extends DashboardBaseIntegrationTest
             .respondent1Represented(YesOrNo.NO)
             .claimsTrack(ClaimsTrack.fastTrack)
             .drawDirectionsOrderRequired(YesOrNo.NO)
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation(selectedCourt.getCode()).build())
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation(selectedCourt.getCode()))
             .finalOrderDocumentCollection(List.of(ElementUtils.element(
-                CaseDocument.builder().documentLink(Document.builder().documentBinaryUrl("url").build()).build())))
-            .build();
+                new CaseDocument().setDocumentLink(new Document().setDocumentBinaryUrl("url"))))).build();
 
         when(featureToggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(true);
         handler.handle(callbackParamsTestFinalOrders(caseData));

@@ -30,10 +30,9 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
         String caseId = "994321234";
         String claimantFirstName = "John";
         String claimantLastName = "Smith";
-        CCJPaymentDetails ccjPaymentDetails = CCJPaymentDetails.builder()
-            .ccjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
-            .ccjPaymentPaidSomeOption(YesOrNo.YES)
-            .build();
+        CCJPaymentDetails ccjPaymentDetails = new CCJPaymentDetails()
+            .setCcjPaymentPaidSomeAmount(BigDecimal.valueOf(10000))
+            .setCcjPaymentPaidSomeOption(YesOrNo.YES);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
@@ -52,11 +51,10 @@ public class CCJRequestedCourtAgreedWithClaimantScenarioTest extends DashboardBa
                              .individualLastName(claimantLastName)
                              .type(Party.Type.INDIVIDUAL)
                              .build())
-            .caseDataLiP(CaseDataLiP.builder()
-                             .applicant1LiPResponse(ClaimantLiPResponse.builder()
-                                                        .claimantCourtDecision(RepaymentDecisionType
-                                                                                   .IN_FAVOUR_OF_CLAIMANT).build())
-                             .build())
+            .caseDataLiP(new CaseDataLiP()
+                             .setApplicant1LiPResponse(new ClaimantLiPResponse()
+                                                        .setClaimantCourtDecision(RepaymentDecisionType
+                                                                                   .IN_FAVOUR_OF_CLAIMANT)))
             .build();
 
         handler.handle(callbackParams(caseData));

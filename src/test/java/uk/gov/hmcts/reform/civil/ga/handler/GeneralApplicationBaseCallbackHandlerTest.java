@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.handler;
 
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -22,9 +22,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.PENDING_APPLICATION_ISSU
 public abstract class GeneralApplicationBaseCallbackHandlerTest {
 
     public static final Long CASE_ID = 1594901956117591L;
-    @MockBean
+    @Mock
     protected AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @Mock
     protected UserService userService;
 
     public CallbackParams callbackParamsOf(Map<String, Object> data, CallbackType type, CaseState state) {
@@ -91,7 +91,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -99,8 +99,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOf(Map<String, Object> data,
@@ -110,13 +109,12 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                            String pageId,
                                            Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(toCallbackRequest(data, state.name()))
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     public CallbackParams callbackParamsOfPendingState(Map<String, Object> data, CallbackType type) {
@@ -137,7 +135,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                                                String eventId,
                                                Map<Params, Object> params
     ) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .pageId(pageId)
             .request(CallbackRequest.builder()
@@ -146,8 +144,7 @@ public abstract class GeneralApplicationBaseCallbackHandlerTest {
                          .build())
             .caseData(caseData)
             .version(version)
-            .params(params)
-            .build();
+            .params(params);
     }
 
     private CallbackRequest toCallbackRequest(Map<String, Object> data, String state) {

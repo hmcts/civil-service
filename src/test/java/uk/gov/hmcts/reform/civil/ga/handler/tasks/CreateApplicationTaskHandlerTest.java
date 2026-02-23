@@ -10,12 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -27,11 +25,13 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.flowstate.GaStateFlowEngine;
+import uk.gov.hmcts.reform.civil.ga.stateflow.GaStateFlow;
 import uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
+import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -62,6 +63,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,13 +77,7 @@ import static uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FL
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    CreateApplicationTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GaStateFlowEngine.class
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class CreateApplicationTaskHandlerTest {
 
     private static final String STRING_CONSTANT = "this is a string";
@@ -106,25 +102,25 @@ public class CreateApplicationTaskHandlerTest {
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private GaStateFlowEngine gaStateFlowEngine;
 
-    @Autowired
+    @InjectMocks
     private CreateApplicationTaskHandler createApplicationTaskHandler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-        when(mockTask.getActivityId()).thenReturn("activityId");
 
         Map<String, Object> variables = Map.of(
             "caseId", CASE_ID,
@@ -132,6 +128,13 @@ public class CreateApplicationTaskHandlerTest {
         );
 
         when(mockTask.getAllVariables()).thenReturn(variables);
+
+        GaStateFlow stateFlow = mock(GaStateFlow.class);
+        State state = mock(State.class);
+        when(state.getName()).thenReturn("MAIN.DRAFT");
+        when(stateFlow.getState()).thenReturn(state);
+        when(stateFlow.getFlags()).thenReturn(Map.of());
+        when(gaStateFlowEngine.evaluate(any(GeneralApplicationCaseData.class))).thenReturn(stateFlow);
     }
 
     @Nested
@@ -260,11 +263,10 @@ public class CreateApplicationTaskHandlerTest {
                                                   .build())
                 .isMultiParty(YES)
                 .isDocumentVisibleGA(isDocumentVisible)
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
     }
@@ -463,7 +465,7 @@ public class CreateApplicationTaskHandlerTest {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, YES, YES, YES, null);
             GeneralApplicationCaseData caseData = buildOnlyData(generalApplication, NO, NO).toBuilder()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(null).build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent1OrganisationIDCopy("respondent1").build();
 
             CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
@@ -573,11 +575,10 @@ public class CreateApplicationTaskHandlerTest {
                 .isMultiParty(isMultiParty)
                 .isDocumentVisibleGA(isDocumentVisible)
                 .generalAppEvidenceDocument(generalAppEvidenceDocument)
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
 
@@ -639,8 +640,8 @@ public class CreateApplicationTaskHandlerTest {
         void shouldNotTriggerCCDEvent() {
 
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-                .businessProcess(BusinessProcess.builder().status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+                .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
 
             VariableMap variables = Variables.createVariables();
             variables.putValue(uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -811,11 +812,10 @@ public class CreateApplicationTaskHandlerTest {
                 .isDocumentVisibleGA(NO)
                 .parentClaimantIsApplicant(YES)
                 .caseNameGaInternal("applicant v respondent")
-                .businessProcess(BusinessProcess.builder()
-                                     .status(STARTED)
-                                     .processInstanceId(PROCESS_INSTANCE_ID)
-                                     .camundaEvent(CREATE_GENERAL_APPLICATION_CASE.name())
-                                     .build())
+                .businessProcess(new BusinessProcess()
+                                     .setStatus(STARTED)
+                                     .setProcessInstanceId(PROCESS_INSTANCE_ID)
+                                     .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
                 .build();
         }
 
@@ -849,16 +849,8 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsMasterCollection.add(element(generalApplicationsDetails));
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -868,8 +860,8 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-                                 .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                 .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
 
         VariableMap variables = Variables.createVariables();
         variables.putValue(uk.gov.hmcts.reform.civil.handler.tasks.BaseExternalTaskHandler.FLOW_STATE, "MAIN.DRAFT");
@@ -933,23 +925,15 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
         Element<Document> same = Element.<Document>builder()
                 .id(DOC_ID)
-                .value(Document.builder().documentUrl("string").build()).build();
+                .value(new Document().setDocumentUrl("string")).build();
         List<Element<Document>> generalAppEvidenceDocument = addEvidenceDoc ? (new ArrayList<>() {{
                 add(same);
             }
         }) : null;
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -959,14 +943,14 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-            .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+            .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
         caseData = caseData.toBuilder()
                 .generalAppEvidenceDocument(generalAppEvidenceDocument).build();
         caseData = caseData.toBuilder()
             .claimantBilingualLanguagePreference(claimantBilingual ? "BOTH" : null)
             .respondent1LiPResponse(defendantBilingual
-            ? RespondentLiPResponse.builder().respondent1ResponseLanguage("BOTH").build()
+            ? new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")
             : null)
             .build();
         VariableMap variables = Variables.createVariables();
@@ -1039,16 +1023,8 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
 
         return new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .respondent1OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent1").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy
-                                               .builder().organisation(Organisation
-                                                                           .builder()
-                                                                           .organisationID("respondent2").build())
-                                               .build())
+            .respondent1OrganisationPolicy(respondentOrganisationPolicy("respondent1"))
+            .respondent2OrganisationPolicy(respondentOrganisationPolicy("respondent2"))
             .ccdState(CaseState.PENDING_APPLICATION_ISSUED)
             .generalApplications(generalApplications)
             .isMultiParty(YES)
@@ -1058,7 +1034,13 @@ public class CreateApplicationTaskHandlerTest {
             .generalApplicationsDetails(generalApplicationsDetailsList)
             .gaDetailsRespondentSol(gaDetailsRespondentSolList)
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
-            .businessProcess(BusinessProcess.builder().status(STARTED)
-                                 .processInstanceId(PROCESS_INSTANCE_ID).build()).build();
+            .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                 .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
+    }
+
+    private OrganisationPolicy respondentOrganisationPolicy(String organisationId) {
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
+        organisationPolicy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        return organisationPolicy;
     }
 }

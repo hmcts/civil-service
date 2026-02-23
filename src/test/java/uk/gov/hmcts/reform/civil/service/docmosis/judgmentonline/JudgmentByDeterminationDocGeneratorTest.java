@@ -94,16 +94,14 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
-                                .orderedAmount("150001")
-                                .instalmentDetails(JudgmentInstalmentDetails.builder()
-                                                       .amount("20001")
-                                                       .paymentFrequency(PaymentFrequency.MONTHLY)
-                                                       .startDate(LocalDate.now())
-                                                       .build())
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setState(ISSUED)
+                                .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IN_INSTALMENTS))
+                                .setOrderedAmount("150001")
+                                .setInstalmentDetails(new JudgmentInstalmentDetails()
+                                                       .setAmount("20001")
+                                                       .setPaymentFrequency(PaymentFrequency.MONTHLY)
+                                                       .setStartDate(LocalDate.now())))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -129,16 +127,14 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_IN_INSTALMENTS).build())
-                                .orderedAmount("150001")
-                                .instalmentDetails(JudgmentInstalmentDetails.builder()
-                                                       .amount("20001")
-                                                       .paymentFrequency(PaymentFrequency.MONTHLY)
-                                                       .startDate(LocalDate.now())
-                                                       .build())
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setState(ISSUED)
+                                .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IN_INSTALMENTS))
+                                .setOrderedAmount("150001")
+                                .setInstalmentDetails(new JudgmentInstalmentDetails()
+                                                       .setAmount("20001")
+                                                       .setPaymentFrequency(PaymentFrequency.MONTHLY)
+                                                       .setStartDate(LocalDate.now())))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -164,11 +160,10 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
-            .activeJudgment(JudgmentDetails.builder()
-                                .state(ISSUED)
-                                .paymentPlan(JudgmentPaymentPlan.builder().type(PAY_BY_DATE).paymentDeadlineDate(LocalDate.now()).build())
-                                .orderedAmount("150001")
-                                .build())
+            .activeJudgment(new JudgmentDetails()
+                                .setState(ISSUED)
+                                .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_BY_DATE).setPaymentDeadlineDate(LocalDate.now()))
+                                .setOrderedAmount("150001"))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -195,8 +190,7 @@ class JudgmentByDeterminationDocGeneratorTest {
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -261,8 +255,7 @@ class JudgmentByDeterminationDocGeneratorTest {
             .respondent1(PartyBuilder.builder().soleTrader().build())
             .respondent2(PartyBuilder.builder().soleTrader().build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
 
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,

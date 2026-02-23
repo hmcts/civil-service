@@ -29,4 +29,13 @@ public class DynamicListUtils {
         }
         return null;
     }
+
+    public static DynamicList trimToSelectedValue(DynamicList dynamicList) {
+        if (dynamicList == null) {
+            return null;
+        }
+        return DynamicList.builder()
+            .value(dynamicList.getValue())
+            .build();
+    }
 }

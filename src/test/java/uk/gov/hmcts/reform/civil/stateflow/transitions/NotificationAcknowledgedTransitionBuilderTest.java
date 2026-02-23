@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.sdo.ReasonNotSuitableSDO;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.DismissedPredicate;
+import uk.gov.hmcts.reform.civil.service.flowstate.predicate.TakenOfflinePredicate;
 import uk.gov.hmcts.reform.civil.stateflow.model.Transition;
 
 import java.util.List;
@@ -21,11 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.service.flowstate.FlowPredicate.takenOfflineAfterSDO;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTransitionBuilder.caseDismissedAfterClaimAcknowledged;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTransitionBuilder.reasonNotSuitableForSdo;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTransitionBuilder.takenOfflineByStaffAfterNotificationAcknowledged;
-import static uk.gov.hmcts.reform.civil.stateflow.transitions.NotificationAcknowledgedTransitionBuilder.takenOfflineSDONotDrawnAfterNotificationAcknowledged;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationAcknowledgedTransitionBuilderTest {
@@ -62,8 +59,10 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -71,15 +70,18 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_ONE, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_ONE)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -87,8 +89,10 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, true)
             .build();
-        assertTrue(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
-        assertFalse(takenOfflineAfterSDO.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
@@ -96,22 +100,26 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP, false)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenTakenOfflineAsSdoNotDrawnAfterNotificationAcknowledged1v2() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineAfterSDO(MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP)
             .build();
-        assertFalse(takenOfflineSDONotDrawnAfterNotificationAcknowledged.test(caseData));
-        assertTrue(takenOfflineAfterSDO.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotDrawn
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff.negate()
+            .and(TakenOfflinePredicate.afterSdo.and(TakenOfflinePredicate.bySystem)).test(caseData));
     }
 
     @Test
     void shouldReturnTrue_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged() {
         CaseData caseData = CaseDataBuilder.builder().atStateTakenOfflineByStaffAfterNotificationAcknowledged()
             .build();
-        assertTrue(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
@@ -122,7 +130,8 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(now().minusDays(1))
             .build();
-        assertTrue(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
+        assertTrue(TakenOfflinePredicate.byStaff
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
@@ -132,7 +141,8 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent2(Party.builder().partyName("Respondent 2").build())
             .respondent2SameLegalRepresentative(YES)
             .build();
-        assertFalse(takenOfflineByStaffAfterNotificationAcknowledged.test(caseData));
+        assertFalse(TakenOfflinePredicate.byStaff
+            .and(TakenOfflinePredicate.afterClaimNotifiedAckNoResponseNoExtension).test(caseData));
     }
 
     @Test
@@ -143,7 +153,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent1ResponseDate(null)
             .respondent2ResponseDate(now())
             .build();
-        assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
@@ -155,7 +165,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent2ResponseDate(now())
             .takenOfflineByStaffDate(now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
@@ -166,7 +176,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent1ResponseDate(now())
             .respondent2ResponseDate(now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
@@ -176,7 +186,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .claimDismissedDeadline(now().minusDays(5))
             .respondent1ResponseDate(null)
             .build();
-        assertTrue(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertTrue(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
@@ -187,7 +197,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .respondent1ResponseDate(null)
             .takenOfflineByStaffDate(now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
@@ -197,21 +207,23 @@ public class NotificationAcknowledgedTransitionBuilderTest {
             .claimDismissedDeadline(now().minusDays(5))
             .respondent1ResponseDate(now())
             .build();
-        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
     void shouldReturnFalse_whenCaseDataAtStateClaimAcknowledge() {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        assertFalse(caseDismissedAfterClaimAcknowledged.test(caseData));
+        assertFalse(DismissedPredicate.afterClaimAcknowledged.test(caseData));
     }
 
     @Test
     void reasonNotSuitableForSdo() {
+        ReasonNotSuitableSDO reasonNotSuitableSDO = new ReasonNotSuitableSDO();
+        reasonNotSuitableSDO.setInput("Test");
         CaseData caseData = CaseData.builder()
-            .reasonNotSuitableSDO(ReasonNotSuitableSDO.builder().input("Test").build())
+            .reasonNotSuitableSDO(reasonNotSuitableSDO)
             .build();
-        assertTrue(reasonNotSuitableForSdo.test(caseData));
+        assertTrue(TakenOfflinePredicate.sdoNotSuitable.test(caseData));
     }
 
     @Test
@@ -219,7 +231,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .reasonNotSuitableSDO(null)
             .build();
-        assertFalse(reasonNotSuitableForSdo.test(caseData));
+        assertFalse(TakenOfflinePredicate.sdoNotSuitable.test(caseData));
     }
 
     private void assertTransition(Transition transition, String sourceState, String targetState) {

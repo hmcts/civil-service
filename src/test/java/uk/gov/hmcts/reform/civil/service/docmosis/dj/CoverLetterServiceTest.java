@@ -96,9 +96,9 @@ class CoverLetterServiceTest {
     @Test
     void shouldGenerateBinaryDocument_whenStitchingEnabled() {
         byte[] expectedBytes = "pdf-content".getBytes();
-        CaseDocument stitchedDoc = CaseDocument.builder().documentLink(Document.builder().documentUrl(
-            "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
-        Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
+        CaseDocument stitchedDoc = new CaseDocument().setDocumentLink(new Document().setDocumentUrl(
+            "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
+        Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
@@ -135,9 +135,9 @@ class CoverLetterServiceTest {
 
     @Test
     void shouldThrowException_whenDownloadFails() {
-        CaseDocument stitchedDoc = CaseDocument.builder().documentLink(Document.builder().documentUrl(
-            "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
-        Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
+        CaseDocument stitchedDoc = new CaseDocument().setDocumentLink(new Document().setDocumentUrl(
+            "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
+        Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
@@ -178,27 +178,23 @@ class CoverLetterServiceTest {
         JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
 
         assertThat(result).isEqualTo(
-            JudgementCoverLetter.builder()
-                .claimNumber(caseData.getLegacyCaseReference())
-                .partyName(party.getPartyName())
-                .address(party.getPrimaryAddress())
-                .build());
+            new JudgementCoverLetter()
+                .setClaimNumber(caseData.getLegacyCaseReference())
+                .setPartyName(party.getPartyName())
+                .setAddress(party.getPrimaryAddress()));
     }
 
     @Test
     void shouldThrowDocumentDownloadException_whenReadAllBytesFails() throws IOException {
         byte[] dummyBytes = "dummy".getBytes();
-        CaseDocument stitchedDoc = CaseDocument.builder()
-            .documentLink(Document.builder()
-                              .documentUrl("http://docstore/documents/1234")
-                              .documentFileName("file.pdf")
-                              .build())
-            .build();
+        CaseDocument stitchedDoc = new CaseDocument()
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("http://docstore/documents/1234")
+                              .setDocumentFileName("file.pdf"));
 
-        Document document = Document.builder()
-            .documentUrl("http://docstore/documents/1234")
-            .documentFileName("file.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://docstore/documents/1234")
+            .setDocumentFileName("file.pdf");
 
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()

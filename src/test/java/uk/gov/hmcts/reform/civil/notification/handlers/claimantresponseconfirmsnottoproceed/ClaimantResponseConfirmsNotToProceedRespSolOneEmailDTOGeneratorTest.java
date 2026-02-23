@@ -97,7 +97,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGeneratorTest
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsUnspec() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(UNSPEC_CLAIM)
@@ -120,7 +120,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGeneratorTest
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsSpecAndNotPartAdmitPayImmediatelyAccepted() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
@@ -149,7 +149,7 @@ public class ClaimantResponseConfirmsNotToProceedRespSolOneEmailDTOGeneratorTest
 
     @Test
     void shouldAddCustomPropertiesWhenCaseIsSpecAndPartAdmitPayImmediatelyAccepted() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)

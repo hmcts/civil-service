@@ -43,18 +43,16 @@ class ConversionToBundleRequestDocsTest {
             .type(Party.Type.INDIVIDUAL)
             .build();
 
-        Document witnessDocument = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document witnessDocument = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessOptionName1")
-            .witnessOptionDocument(witnessDocument)
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessOptionName1")
+            .setWitnessOptionDocument(witnessDocument)
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
             List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
 
@@ -75,18 +73,16 @@ class ConversionToBundleRequestDocsTest {
         boolean isWitnessSelf = true;
         PartyType partyType = PartyType.CLAIMANT1;
 
-        Document witnessDocument = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document witnessDocument = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
-        UploadEvidenceWitness uploadEvidenceWitness = UploadEvidenceWitness.builder()
-            .witnessOptionName("WitnessOptionName1")
-            .witnessOptionDocument(witnessDocument)
-            .witnessOptionUploadDate(LocalDate.of(2023, 2, 5))
-            .build();
+        UploadEvidenceWitness uploadEvidenceWitness = new UploadEvidenceWitness()
+            .setWitnessOptionName("WitnessOptionName1")
+            .setWitnessOptionDocument(witnessDocument)
+            .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
 
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
             List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
@@ -104,12 +100,11 @@ class ConversionToBundleRequestDocsTest {
         String documentType = EvidenceUploadType.SKELETON_ARGUMENT.name();
         PartyType partyType = PartyType.CLAIMANT1;
 
-        Document document = Document.builder()
-            .documentUrl("http://example.com/document.pdf")
-            .documentBinaryUrl("http://example.com/documentBinary.pdf")
-            .documentFileName("document.pdf")
-            .categoryID("SomeCategoryID")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://example.com/document.pdf")
+            .setDocumentBinaryUrl("http://example.com/documentBinary.pdf")
+            .setDocumentFileName("document.pdf")
+            .setCategoryID("SomeCategoryID");
 
         UploadEvidenceDocumentType uploadEvidenceDocumentType1 = new UploadEvidenceDocumentType()
             .setDocumentIssuedDate(LocalDate.of(2023, 4, 24))

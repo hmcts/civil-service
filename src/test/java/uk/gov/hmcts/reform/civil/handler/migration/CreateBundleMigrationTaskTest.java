@@ -31,17 +31,7 @@ class CreateBundleMigrationTaskTest {
     @BeforeEach
     void setUp() {
         caseData = CaseData.builder().build();
-        caseReference = ExcelCaseReference.builder()
-            .caseReference("1234567890123456")
-            .build();
-    }
-
-    @Test
-    void shouldCreateBundleAndReturnSameCaseData() {
-        CaseData result = task.migrateCaseData(caseData, caseReference);
-
-        assertSame(caseData, result);
-        verify(bundleCreationService).createBundle(1234567890123456L);
+        caseReference = excelCaseReference("1234567890123456");
     }
 
     @Test
@@ -88,5 +78,30 @@ class CreateBundleMigrationTaskTest {
             "CreateBundleMigrationTask",
             task.getTaskName()
         );
+    }
+
+    @Test
+    void shouldCreateBundleAndReturnSameCaseData() {
+        CaseData result = task.migrateCaseData(caseData, caseReference);
+
+        assertSame(caseData, result);
+        assertEquals("BUNDLE_CREATED_NOTIFICATION", result.getBundleEvent()); // 👈 add this
+        verify(bundleCreationService).createBundle(1234567890123456L);
+    }
+
+    @Test
+    void shouldThrowNumberFormatExceptionForInvalidCaseReference() {
+        ExcelCaseReference badRef = excelCaseReference("NOT_A_NUMBER");
+        assertThrows(NumberFormatException.class,
+                     () -> task.migrateCaseData(caseData, badRef)
+        );
+
+        verifyNoInteractions(bundleCreationService);
+    }
+
+    private ExcelCaseReference excelCaseReference(String value) {
+        ExcelCaseReference reference = new ExcelCaseReference();
+        reference.setCaseReference(value);
+        return reference;
     }
 }

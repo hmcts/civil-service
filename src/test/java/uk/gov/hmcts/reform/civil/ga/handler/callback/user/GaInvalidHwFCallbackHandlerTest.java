@@ -43,12 +43,11 @@ class GaInvalidHwFCallbackHandlerTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
-                .generalAppHelpWithFees(HelpWithFees.builder().build()).build();
+                .generalAppHelpWithFees(new HelpWithFees()).build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .type(CallbackType.ABOUT_TO_SUBMIT)
-                .caseData(caseData)
-                .build();
+                .caseData(caseData);
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
