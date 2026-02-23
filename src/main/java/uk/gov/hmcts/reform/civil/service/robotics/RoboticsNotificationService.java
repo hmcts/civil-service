@@ -87,15 +87,14 @@ public class RoboticsNotificationService {
             } else {
                 triggerEvent = findLatestEventTriggerReason(roboticsCaseDataDTO.getEvents());
             }
-            return Optional.of(EmailData.builder()
-                                   .message(getMessage(params.getCaseData(), params.isMultiParty()))
-                                   .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(getRoboticsEmailRecipient(
+            return Optional.of(new EmailData()
+                                   .setMessage(getMessage(params.getCaseData(), params.isMultiParty()))
+                                   .setSubject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
+                                   .setTo(getRoboticsEmailRecipient(
                                        params.isMultiParty(),
                                        SPEC_CLAIM.equals(params.getCaseData().getCaseAccessCategory())
                                    ))
-                                   .attachments(of(json(roboticsJsonData, fileName)))
-                                   .build());
+                                   .setAttachments(of(json(roboticsJsonData, fileName))));
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }
@@ -230,15 +229,14 @@ public class RoboticsNotificationService {
         try {
             RoboticsCaseDataDTO roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(params.getCaseData(), params.getAuthToken());
             String triggerEvent = findLatestEventTriggerReasonSpec(roboticsCaseDataDTO.getEvents());
-            return Optional.of(EmailData.builder()
-                                   .message(getMessage(params.getCaseData(), params.isMultiParty()))
-                                   .subject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
-                                   .to(roboticsEmailConfiguration.getLipJRecipient())
-                                   .attachments(of(json(
+            return Optional.of(new EmailData()
+                                   .setMessage(getMessage(params.getCaseData(), params.isMultiParty()))
+                                   .setSubject(getSubject(params.getCaseData(), triggerEvent, params.isMultiParty()))
+                                   .setTo(roboticsEmailConfiguration.getLipJRecipient())
+                                   .setAttachments(of(json(
                                        roboticsCaseDataDTO.getJsonRawData(),
                                        getFileName(params.getCaseData())
-                                   )))
-                                   .build());
+                                   ))));
         } catch (JsonProcessingException e) {
             throw new RoboticsDataException(e.getMessage(), e);
         }

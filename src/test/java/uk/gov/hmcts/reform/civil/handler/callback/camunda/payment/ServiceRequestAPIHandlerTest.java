@@ -271,9 +271,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId(""));
@@ -300,9 +299,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setAllocatedTrack(null);
@@ -366,9 +364,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldHandleException_whenPaymentRequestFails() {
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId(""));

@@ -94,11 +94,10 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
     }
 
     private Optional<EmailData> prepareEmail(MediationDTO mediationDTO) {
-        return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getJsonRecipient())
-                               .subject(SUBJECT)
-                               .attachments(of(json(mediationDTO.getJsonRawData(), FILENAME)))
-                               .build());
+        return Optional.of(new EmailData()
+                               .setTo(mediationCSVEmailConfiguration.getJsonRecipient())
+                               .setSubject(SUBJECT)
+                               .setAttachments(of(json(mediationDTO.getJsonRawData(), FILENAME))));
     }
 
     private MediationCase generateJsonForCase(CaseData caseData) {

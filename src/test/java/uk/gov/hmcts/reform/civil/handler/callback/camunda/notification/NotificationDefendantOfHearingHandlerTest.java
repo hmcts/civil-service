@@ -357,13 +357,12 @@ public class NotificationDefendantOfHearingHandlerTest {
         void shouldNotifyRespondentLip_whenInvokedAnd1v1HMC() {
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(13, 0)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-defendant-lip-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -587,13 +586,12 @@ public class NotificationDefendantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
 
@@ -638,13 +636,12 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING_HMC").build()).build();
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
             handler.handle(params);

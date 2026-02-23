@@ -67,7 +67,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         CallbackParams callbackParams = callbackParams(caseData);
         callbackParams = callbackParams.copy().request(CallbackRequest.builder()
-                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
+                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT"));
 
         // When
         handler.handle(callbackParams);
@@ -138,10 +138,9 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(10)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingId("HER1234")
+                            .setHearingType("AAA7-TRI"));
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
         DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
@@ -158,7 +157,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         CallbackParams callbackParams = callbackParams(caseData);
         callbackParams = callbackParams.copy().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC"));
 
         // When
         handler.handle(callbackParams);
@@ -244,7 +243,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         // When
         CallbackParams callbackParams = callbackParams(caseData);
         callbackParams = callbackParams.copy().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT"));
 
         // When
         handler.handle(callbackParams);
@@ -303,10 +302,9 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
             .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(20000)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingId("HER1234")
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingId("HER1234")
+                            .setHearingType("AAA7-TRI"));
 
         DynamicListElement location = DynamicListElement.builder().label("Name - Loc - 1").build();
         DynamicList list = DynamicList.builder().value(location).listItems(List.of(location)).build();
@@ -325,7 +323,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         CallbackParams callbackParams = callbackParams(caseData);
         callbackParams = callbackParams.copy().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC"));
 
         // When
         handler.handle(callbackParams);
