@@ -14,20 +14,20 @@ public class UpdatePartyLitigationFriendTask extends MigrationTask<LitigationFri
     // Centralized BiFunction to update LitigationFriend non-null fields
     private static final BiFunction<LitigationFriend, LitigationFriend, LitigationFriend> UPDATE_NON_NULL_FIELDS =
         (source, target) -> {
-            LitigationFriend.LitigationFriendBuilder builder = target.toBuilder();
+            LitigationFriend updated = target.copy();
 
-            Optional.ofNullable(source.getPartyID()).ifPresent(builder::partyID);
-            Optional.ofNullable(source.getFirstName()).ifPresent(builder::firstName);
-            Optional.ofNullable(source.getLastName()).ifPresent(builder::lastName);
-            Optional.ofNullable(source.getFullName()).ifPresent(builder::fullName);
-            Optional.ofNullable(source.getEmailAddress()).ifPresent(builder::emailAddress);
-            Optional.ofNullable(source.getPhoneNumber()).ifPresent(builder::phoneNumber);
-            Optional.ofNullable(source.getHasSameAddressAsLitigant()).ifPresent(builder::hasSameAddressAsLitigant);
-            Optional.ofNullable(source.getPrimaryAddress()).ifPresent(builder::primaryAddress);
-            Optional.ofNullable(source.getCertificateOfSuitability()).ifPresent(builder::certificateOfSuitability);
-            Optional.ofNullable(source.getFlags()).ifPresent(builder::flags);
+            Optional.ofNullable(source.getPartyID()).ifPresent(updated::setPartyID);
+            Optional.ofNullable(source.getFirstName()).ifPresent(updated::setFirstName);
+            Optional.ofNullable(source.getLastName()).ifPresent(updated::setLastName);
+            Optional.ofNullable(source.getFullName()).ifPresent(updated::setFullName);
+            Optional.ofNullable(source.getEmailAddress()).ifPresent(updated::setEmailAddress);
+            Optional.ofNullable(source.getPhoneNumber()).ifPresent(updated::setPhoneNumber);
+            Optional.ofNullable(source.getHasSameAddressAsLitigant()).ifPresent(updated::setHasSameAddressAsLitigant);
+            Optional.ofNullable(source.getPrimaryAddress()).ifPresent(updated::setPrimaryAddress);
+            Optional.ofNullable(source.getCertificateOfSuitability()).ifPresent(updated::setCertificateOfSuitability);
+            Optional.ofNullable(source.getFlags()).ifPresent(updated::setFlags);
 
-            return builder.build();
+            return updated;
         };
 
     protected UpdatePartyLitigationFriendTask() {
