@@ -27,7 +27,7 @@ compare_ft_groups() {
 }
 
 run_functional_test_groups() {
-  command="yarn test:api-nonprod --grep "
+  command="yarn test:civil-service-pr --grep "
   pr_ft_groups=$(echo "$PR_FT_GROUPS" | awk '{print tolower($0)}')
 
   regex_pattern=""
@@ -38,7 +38,7 @@ run_functional_test_groups() {
       if [ -n "$regex_pattern" ]; then
           regex_pattern+="|"
       fi
-      regex_pattern+="@api-$ft_group"
+      regex_pattern+="@$ft_group"
   done
 
   command+="'$regex_pattern'"
@@ -49,9 +49,9 @@ run_functional_test_groups() {
 run_functional_tests() {
   echo "Running functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
-    yarn test:api-prod 
+    yarn test:civil-service-master 
   elif [ -z "$PR_FT_GROUPS" ]; then
-    yarn test:api-nonprod
+    yarn test:civil-service-pr
   else
     run_functional_test_groups
   fi
