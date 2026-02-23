@@ -26,6 +26,4 @@ public class DjNonDivergentApplicantLipEmailDTOGenerator extends ClaimantEmailDT
         return REFERENCE_TEMPLATE_LIP;
     }
 
-    // getShouldNotify() is inherited from ClaimantEmailDTOGenerator
-    // Returns TRUE when applicant IS LiP
 }

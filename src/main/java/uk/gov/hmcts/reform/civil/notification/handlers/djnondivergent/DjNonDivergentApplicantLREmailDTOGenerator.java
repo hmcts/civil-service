@@ -18,7 +18,7 @@ public class DjNonDivergentApplicantLREmailDTOGenerator extends AppSolOneEmailDT
     private final NotificationsProperties notificationsProperties;
 
     public DjNonDivergentApplicantLREmailDTOGenerator(NotificationsProperties notificationsProperties,
-                                                       OrganisationService organisationService) {
+                                                      OrganisationService organisationService) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
     }
@@ -40,6 +40,4 @@ public class DjNonDivergentApplicantLREmailDTOGenerator extends AppSolOneEmailDT
         return properties;
     }
 
-    // getShouldNotify() is inherited from AppSolOneEmailDTOGenerator
-    // Returns TRUE when applicant is NOT LiP (i.e., legally represented)
 }
