@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.stream.Stream;
@@ -39,8 +40,12 @@ public class ManageStayCallbackHandlerTest {
 
     @InjectMocks
     private ManageStayCallbackHandler handler;
+
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -49,6 +54,7 @@ public class ManageStayCallbackHandlerTest {
         mapper.registerModules(new JavaTimeModule(), new Jdk8Module());
         handler = new ManageStayCallbackHandler(
             featureToggleService,
+            deadlinesCalculator,
             mapper
         );
     }
@@ -61,8 +67,8 @@ public class ManageStayCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
         }
@@ -71,9 +77,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldSetManageStayOptionToNull_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             caseData.setManageStayOption("LIFT_STAY");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getManageStayOption()).isNull();
@@ -88,8 +96,8 @@ public class ManageStayCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
         }
@@ -101,10 +109,11 @@ public class ManageStayCallbackHandlerTest {
             caseData.setManageStayOption("LIFT_STAY");
             caseData.setCcdState(preStayState);
             caseData.setPreStayState(preStayState.name());
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("status", "camundaEvent")
@@ -118,29 +127,33 @@ public class ManageStayCallbackHandlerTest {
 
         @ParameterizedTest
         @MethodSource("provideCaseStatesForLiftStay")
-        void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(CaseState preStayState, CaseState expectedState) {
+        void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(
+            CaseState preStayState,
+            CaseState expectedState
+        ) {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("LIFT_STAY");
             caseData.setCcdState(preStayState);
             caseData.setPreStayState(preStayState.name());
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(expectedState.name());
         }
 
         @Test
         void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay() {
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("REQUEST_UPDATE");
             caseData.setCcdState(CASE_STAYED);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
             assertThat(response.getData()).extracting("businessProcess")
@@ -170,8 +183,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStay() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("LIFT_STAY");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -184,8 +200,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithRequestUpdate() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("REQUEST_UPDATE");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
