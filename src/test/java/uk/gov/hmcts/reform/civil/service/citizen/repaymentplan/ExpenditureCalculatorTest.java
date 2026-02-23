@@ -112,9 +112,8 @@ class ExpenditureCalculatorTest {
     }
 
     private List<Element<LoanCardDebtLRspec>> createLoanCardDents() {
-        return wrapElements(LoanCardDebtLRspec.builder()
-                                .monthlyPayment(new BigDecimal(30000))
-                                .build());
+        return wrapElements(new LoanCardDebtLRspec().setMonthlyPayment(new BigDecimal(30000))
+                                );
     }
 
     private List<Element<Respondent1CourtOrderDetails>> createCourtOrders() {
