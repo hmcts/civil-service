@@ -101,7 +101,7 @@ class MediationCSVLrvLrServiceTest {
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(APP_LR_ORG_ID)))
             .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(DEF_LR_ORG_ID)))
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name(LR_APPLICANT_COMPANY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(LR_APPLICANT_COMPANY_EMAIL).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(LR_APPLICANT_COMPANY_EMAIL))
             .respondentSolicitor1EmailAddress(LR_DEFENDANT_COMPANY_EMAIL)
             .build();
     }

@@ -37,9 +37,9 @@ public class HelpWithFeesForTabServiceTest {
             .caseDataLip(new CaseDataLiP()
                 .setHelpWithFees(new HelpWithFees()
                 .setHelpWithFeesReferenceNumber("HWF-REF")))
-            .claimFee(Fee.builder()
-                .calculatedAmountInPence(new BigDecimal("1000"))
-                .code("CODE").build())
+            .claimFee(new Fee()
+                .setCalculatedAmountInPence(new BigDecimal("1000"))
+                .setCode("CODE"))
             .build();
 
         // When
@@ -66,9 +66,9 @@ public class HelpWithFeesForTabServiceTest {
             .caseDataLip(new CaseDataLiP()
                 .setHelpWithFees(new HelpWithFees()
                 .setHelpWithFeesReferenceNumber("HWF-REF")))
-            .hearingFee(Fee.builder()
-                .calculatedAmountInPence(new BigDecimal("1000"))
-                .code("CODE").build())
+            .hearingFee(new Fee()
+                .setCalculatedAmountInPence(new BigDecimal("1000"))
+                .setCode("CODE"))
             .build();
         caseData.setHearingHelpFeesReferenceNumber("HWF-REF");
 

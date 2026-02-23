@@ -125,7 +125,7 @@ class GaStartGeneralApplicationBusinessProcessTaskHandlerTest {
 
         BusinessProcess businessProcess = new BusinessProcess().setStatus(status);
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().atStateClaimDraft()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .businessProcess(businessProcess).build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
