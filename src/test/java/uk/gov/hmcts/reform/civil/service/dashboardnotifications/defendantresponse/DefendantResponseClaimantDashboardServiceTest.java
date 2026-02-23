@@ -474,6 +474,19 @@ class DefendantResponseClaimantDashboardServiceTest {
         );
     }
 
+    @Test
+    void shouldNotRecordScenarioWhenRespondent1ClaimResponseTypeForSpecIsNull() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .ccdCaseReference(1234L)
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(null)
+            .build();
+
+        service.notifyDefendantResponse(caseData, AUTH_TOKEN);
+
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
     private CaseDataLiP caseDataLiPWithResponseLanguage(Language language) {
         RespondentLiPResponse response = new RespondentLiPResponse();
         response.setRespondent1ResponseLanguage(language.toString());
