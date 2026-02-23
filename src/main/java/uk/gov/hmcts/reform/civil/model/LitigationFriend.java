@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.caseflags.Flags;
@@ -15,8 +13,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
-@JsonDeserialize(builder = LitigationFriend.LitigationFriendBuilder.class)
+@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,8 +32,17 @@ public class LitigationFriend {
     private List<Element<DocumentWithRegex>> certificateOfSuitability;
     private Flags flags;
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class LitigationFriendBuilder {
-
+    public LitigationFriend copy() {
+        return new LitigationFriend()
+            .setPartyID(partyID)
+            .setFullName(fullName)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setEmailAddress(emailAddress)
+            .setPhoneNumber(phoneNumber)
+            .setHasSameAddressAsLitigant(hasSameAddressAsLitigant)
+            .setPrimaryAddress(primaryAddress)
+            .setCertificateOfSuitability(certificateOfSuitability)
+            .setFlags(flags);
     }
 }
