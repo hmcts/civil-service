@@ -103,11 +103,10 @@ abstract class DQTest {
     }
 
     protected Document draftDirections() {
-        return Document.builder()
-            .documentBinaryUrl("binary url")
-            .documentFileName("Order")
-            .documentUrl("url")
-            .build();
+        return new Document()
+            .setDocumentBinaryUrl("binary url")
+            .setDocumentFileName("Order")
+            .setDocumentUrl("url");
     }
 
     protected DisclosureReport disclosureReport() {

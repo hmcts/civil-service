@@ -36,7 +36,7 @@ class UpdatePartyWitnessTaskTest {
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseRef = CaseReference.builder().caseReference(null).build();
+        CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
 
@@ -52,7 +52,7 @@ class UpdatePartyWitnessTaskTest {
             ))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         List<Element<PartyFlagStructure>> updatedList = updated.getApplicantWitnesses();
@@ -72,7 +72,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         PartyFlagStructure updatedWitness = updated.getRespondent1Witnesses().get(0).getValue();
@@ -88,7 +88,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent2Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         PartyFlagStructure updatedWitness = updated.getRespondent2Witnesses().get(0).getValue();
@@ -117,7 +117,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent2DQ(new Respondent2DQ().setRespondent2DQWitnesses(dqWitnesses))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("CASE123").build();
+        CaseReference ref = caseReference("CASE123");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         List<Element<Witness>> updatedApp1 = updated.getApplicant1DQ().getApplicant1DQWitnesses().getDetails();
@@ -143,7 +143,7 @@ class UpdatePartyWitnessTaskTest {
             .applicantWitnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-1").build();
+        CaseReference ref = caseReference("REF-1");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         String newPartyId = updated.getApplicantWitnesses().get(0).getValue().getPartyID();
@@ -166,7 +166,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-2").build();
+        CaseReference ref = caseReference("REF-2");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         assertThat(updated.getRespondent1Witnesses().get(0).getValue().getPartyID())
@@ -187,7 +187,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent2DQ(null)
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-3").build();
+        CaseReference ref = caseReference("REF-3");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         assertThat(updated.getApplicantWitnesses()).isEmpty();
@@ -202,5 +202,11 @@ class UpdatePartyWitnessTaskTest {
         assertThat(task.getTaskName()).isEqualTo("UpdatePartyWitnessTask");
         assertThat(task.getEventSummary()).contains("Update case party witness via migration task");
         assertThat(task.getEventDescription()).contains("UpdatePartyWitnessTask updates witness");
+    }
+
+    private CaseReference caseReference(String value) {
+        CaseReference caseReference = new CaseReference();
+        caseReference.setCaseReference(value);
+        return caseReference;
     }
 }

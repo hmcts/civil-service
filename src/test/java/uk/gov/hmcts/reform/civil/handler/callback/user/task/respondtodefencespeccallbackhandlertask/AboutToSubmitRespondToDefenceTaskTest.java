@@ -377,11 +377,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetApplicant1DefenceResponseDocumentCategory() {
         // Given
-        Document document = Document.builder()
-            .documentUrl("http://dm-store/documents/123")
-            .documentBinaryUrl("http://dm-store/documents/123/binary")
-            .documentFileName("defence-response.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://dm-store/documents/123")
+            .setDocumentBinaryUrl("http://dm-store/documents/123/binary")
+            .setDocumentFileName("defence-response.pdf");
 
         ResponseDocument responseDocument = new ResponseDocument(document);
 
@@ -416,12 +415,11 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .caseDetailsBefore(caseDetails)
                          .build())
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }

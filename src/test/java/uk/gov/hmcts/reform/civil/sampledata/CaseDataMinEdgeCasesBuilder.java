@@ -49,13 +49,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
 
-        respondentSolicitor1OrganisationDetails = new SolicitorOrganisationDetails()
-            .setEmail("testorg@email.com")
-            .setOrganisationName("test org name")
-            .setFax("123123123")
-            .setDx("test org dx")
-            .setPhoneNumber("0123456789")
-            .setAddress(AddressBuilder.defaults().build());
+        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
+            .email("testorg@email.com")
+            .organisationName("test org name")
+            .fax("123123123")
+            .dx("test org dx")
+            .phoneNumber("0123456789")
+            .address(AddressBuilder.defaults().build())
+            .build();
         return this;
     }
 
@@ -73,12 +74,8 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         applicantSolicitor1CheckEmail = new CorrectEmail()
             .setEmail("hmcts.civil@gmail.com")
             .setCorrect(YES);
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
+        applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
+        respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
@@ -92,7 +89,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         paymentReference = "some reference";
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal().build();
         submittedDate = LocalDateTime.now();
         return this;
     }
@@ -116,10 +113,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
-        claimIssuedPaymentDetails = new PaymentDetails()
-            .setStatus(SUCCESS)
-            .setReference("RC-1604-0739-2145-4711")
-            ;
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
         paymentSuccessfulDate = LocalDateTime.now();
         claimDetailsNotificationDeadline = LocalDateTime.now().plusDays(1);
         return this;
@@ -203,10 +200,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulMinimumData() {
         atStateClaimSubmittedMinimumData();
-        claimIssuedPaymentDetails = new PaymentDetails()
-            .setStatus(SUCCESS)
-            .setReference("RC-1604-0739-2145-4711")
-            ;
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .status(SUCCESS)
+            .reference("RC-1604-0739-2145-4711")
+            .build();
         paymentReference = "12345";
         paymentSuccessfulDate = LocalDateTime.now();
         return this;
@@ -219,19 +216,21 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
-        claimIssuedPaymentDetails = new PaymentDetails()
-            .setCustomerReference("r")
-            ;
+        claimIssuedPaymentDetails = PaymentDetails.builder()
+            .customerReference("r")
+            .build();
         return this;
     }
 
     public CaseDataMinEdgeCasesBuilder atStateApplicantRespondToDefenceAndProceed() {
         atStateRespondentFullDefenceMinimumData();
         applicant1ProceedWithClaim = YES;
-        applicant1DefenceResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("claimant-response.pdf").build());
+        applicant1DefenceResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
+            .build();
         applicant1DQ();
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = new StatementOfTruth().setName("J").setRole("S");
+        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
         return this;
     }
 
@@ -239,13 +238,15 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         atStateRespondentFullDefenceMinimumData();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = new StatementOfTruth().setName("J").setRole("S");
+        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
         return this;
     }
 
     public CaseDataMinEdgeCasesBuilder atStateRespondentFullDefenceMinimumData() {
         atStateRespondentRespondToClaimMinimumData(RespondentResponseType.FULL_DEFENCE);
-        respondent1ClaimResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("defendant-response.pdf").build());
+        respondent1ClaimResponseDocument = ResponseDocument.builder()
+            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
+            .build();
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now();
         return this;

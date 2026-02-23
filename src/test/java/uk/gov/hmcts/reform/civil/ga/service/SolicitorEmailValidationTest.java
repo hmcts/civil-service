@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,15 +24,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    SolicitorEmailValidation.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class SolicitorEmailValidationTest {
 
-    @Autowired
+    @InjectMocks
     private SolicitorEmailValidation solicitorEmailValidation;
+
+    @Spy
+    private GaForLipService gaForLipService;
 
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
     private static final String CLAIM_CL_LIP_EMAIL = "hmcts.civil.cl@gmail.com";
@@ -230,16 +230,13 @@ public class SolicitorEmailValidationTest {
             .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                 .setId("123")
                                                 .setEmail(applicantEmail))
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder().organisationID("1").build())
-                                              .build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("2").build())
-                                               .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("2")))
             .respondent2SameLegalRepresentative(NO)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("3").build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("3")))
             .build();
         var builder = caseData.toBuilder();
         if (Objects.nonNull(lipClEmail)) {

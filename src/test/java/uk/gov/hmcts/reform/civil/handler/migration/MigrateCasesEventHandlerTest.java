@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.civil.bulkupdate.csv.CaseReferenceCsvLoader;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.DashboardScenarioCaseReference;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.ExcelMappable;
 import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotificationCaseReference;
+import uk.gov.hmcts.reform.civil.bulkupdate.csv.NotifyRpaFeedCaseReference;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.utils.CaseMigrationEncryptionUtil;
 
@@ -69,6 +70,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("");
         when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
@@ -98,6 +100,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("scenario")).thenReturn("SCENARIO_1");
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
@@ -122,10 +125,36 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn("1234567");
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn(null);
 
         MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
         when(migrationTask.getType()).thenReturn((Class) CaseNoteReference.class);
+        doReturn(Optional.of(migrationTask))
+            .when(migrationTaskFactory)
+            .getMigrationTask("testTask");
+
+        ExternalTaskData result = handler.handleTask(externalTask);
+
+        assertNotNull(result);
+        verify(asyncCaseMigrationService, times(1))
+            .migrateCasesAsync(eq(migrationTask), anyList(), isNull());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Test
+    void shouldHandleTaskWithNotifyEventId() {
+        ExternalTask externalTask = mock(ExternalTask.class);
+        when(externalTask.getVariable("taskName")).thenReturn("testTask");
+        when(externalTask.getVariable("caseIds")).thenReturn("123, 456");
+        when(externalTask.getVariable("scenario")).thenReturn(null);
+        when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
+        when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn("NOTIFY_RPA_DJ_SPEC");
+        when(externalTask.getVariable("state")).thenReturn(null);
+
+        MigrationTask<? extends CaseReference> migrationTask = mock(MigrationTask.class);
+        when(migrationTask.getType()).thenReturn((Class) NotifyRpaFeedCaseReference.class);
         doReturn(Optional.of(migrationTask))
             .when(migrationTaskFactory)
             .getMigrationTask("testTask");
@@ -165,6 +194,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("state")).thenReturn("IN_PROGRESS"); // state is present
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
 
         @SuppressWarnings("unchecked")
         MigrationTask<CaseReference> migrationTask = mock(MigrationTask.class);
@@ -210,6 +240,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("state")).thenReturn(null);
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null);
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("test.csv");
 
         @SuppressWarnings("unchecked")
@@ -244,6 +275,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("scenario")).thenReturn(null);
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn(null);
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null); // stub caseNoteItemId
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("csvFileName")).thenReturn("empty.csv"); // stub csvFileName
 
         @SuppressWarnings("unchecked")
@@ -295,6 +327,7 @@ class MigrateCasesEventHandlerTest {
         when(externalTask.getVariable("caseIds")).thenReturn("111,222");
         when(externalTask.getVariable("scenario")).thenReturn(null); // scenario is null
         when(externalTask.getVariable("caseNoteElementId")).thenReturn(null); // caseNoteElementId is null
+        when(externalTask.getVariable("notifyEventId")).thenReturn(null);
         when(externalTask.getVariable("notificationCamundaProcessIdentifier")).thenReturn("CAMUNDA_123");
         when(externalTask.getVariable("state")).thenReturn("PENDING");
 

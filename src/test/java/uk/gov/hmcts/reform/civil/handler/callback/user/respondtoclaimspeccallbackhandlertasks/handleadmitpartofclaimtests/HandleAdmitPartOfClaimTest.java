@@ -57,7 +57,7 @@ class HandleAdmitPartOfClaimTest {
     @Test
     void shouldReturnErrorResponseWhenPaymentDateIsInvalid() {
         CaseData caseData = CaseDataBuilder.builder().build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         List<String> errors = Collections.singletonList("Invalid payment date");
 
         when(paymentDateValidator.validate(any(RespondToClaim.class))).thenReturn(errors);
@@ -73,7 +73,7 @@ class HandleAdmitPartOfClaimTest {
     void shouldUpdateCaseDataWhenPaymentDateIsValid() {
         CaseData caseData = CaseDataBuilder.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         List<String> errors = Collections.emptyList();
 
         when(paymentDateValidator.validate(any(RespondToClaim.class))).thenReturn(errors);
@@ -89,7 +89,7 @@ class HandleAdmitPartOfClaimTest {
     void shouldUpdateResponseClaimTrackWhenEventIsDefendantResponseSpec() {
         CaseData caseData = CaseDataBuilder.builder().totalClaimAmount(BigDecimal.valueOf(1000)).build();
         CallbackRequest callbackRequest = CallbackRequest.builder().eventId(DEFENDANT_RESPONSE_SPEC).build();
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).request(callbackRequest).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData).request(callbackRequest);
         List<String> errors = Collections.emptyList();
 
         when(paymentDateValidator.validate(any(RespondToClaim.class))).thenReturn(errors);

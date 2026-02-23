@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -16,7 +19,6 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAHearingDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAspec;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,19 +42,17 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
-@SpringBootTest(classes = {
-    CaseDetailsConverter.class,
-    ReferToJudgeOrLegalAdvisorHandler.class,
-    JacksonAutoConfiguration.class,
-    },
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
 public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    ReferToJudgeOrLegalAdvisorHandler handler;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @Autowired
-    CaseDetailsConverter caseDetailsConverter;
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
+    private ReferToJudgeOrLegalAdvisorHandler handler;
 
     public static final String COURT_ASSIGNE_ERROR_MESSAGE = "A Court has already been assigned";
 
@@ -70,7 +71,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -83,7 +84,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -95,7 +96,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -107,7 +108,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -119,7 +120,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
@@ -132,7 +133,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(ADDITIONAL_RESPONSE_TIME_EXPIRED, YES),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_JUDGE").build());
         List<String> errors = new ArrayList<>();
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
         assertThat(response).isNotNull();
@@ -144,7 +145,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         CallbackParams params = callbackParamsOf(
             getCase(ADDITIONAL_RESPONSE_TIME_EXPIRED, NO),
             CallbackType.ABOUT_TO_START
-        ).toBuilder().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build()).build();
+        ).copy().request(CallbackRequest.builder().eventId("REFER_TO_LEGAL_ADVISOR").build());
         List<String> errors = new ArrayList<>();
         errors.add(COURT_ASSIGNE_ERROR_MESSAGE);
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

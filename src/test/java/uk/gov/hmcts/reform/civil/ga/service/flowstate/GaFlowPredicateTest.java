@@ -152,8 +152,8 @@ public class GaFlowPredicateTest {
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                        .paymentDetails(new PaymentDetails()
-                                                            .setStatus(PaymentStatus.SUCCESS))
+                                        .paymentDetails(PaymentDetails.builder()
+                                                            .status(PaymentStatus.SUCCESS).build())
                                         .fee(new Fee().setCode("FREE")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
@@ -168,8 +168,8 @@ public class GaFlowPredicateTest {
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
-                                                          .setStatus(PaymentStatus.SUCCESS))
+                                      .paymentDetails(PaymentDetails.builder()
+                                                          .status(PaymentStatus.SUCCESS).build())
                                       .fee(new Fee().setCode("Not_Free")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 

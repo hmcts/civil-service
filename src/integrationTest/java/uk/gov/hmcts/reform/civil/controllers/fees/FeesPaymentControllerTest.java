@@ -63,9 +63,9 @@ public class FeesPaymentControllerTest extends BaseIntegrationTest {
         CaseDetails expectedCaseDetails = CaseDetails.builder().id(CASE_REFERENCE)
                 .data(Map.of(
                         "hearingFeePBADetails",
-                        new SRPbaDetails()
-                                .setServiceReqReference("2023-1701090705688")
-                                .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))),
+                        SRPbaDetails.builder().serviceReqReference("2023-1701090705688")
+                                .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                                .build(),
                         "hearingFee",
                         new Fee().setCalculatedAmountInPence(new BigDecimal("23200"))
                 )).build();

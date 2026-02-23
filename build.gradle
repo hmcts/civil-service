@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '6.2.0.5505'
   id 'au.com.dius.pact' version '4.6.17'
   id "io.freefair.lombok" version "8.14.4"
-  id 'com.github.hmcts.rse-cft-lib' version '0.19.1903'
+  id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
 }
@@ -20,8 +20,8 @@ group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
 def versions = [
-  junit             : '5.14.2',
-  junitPlatform     : '1.14.2',
+  junit             : '5.14.3',
+  junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
   lombok            : '1.18.38',
@@ -150,15 +150,6 @@ sourceSets {
 
 tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Xlint:-removal" << "-Werror"
-}
-
-tasks.withType(Test) {
-  useJUnitPlatform()
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-  jvmArgs '-Xshare:off'
-  testLogging {
-    exceptionFormat = 'full'
-  }
 }
 
 test {
@@ -349,7 +340,7 @@ dependencies {
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
   implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
-  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.9'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
@@ -397,7 +388,7 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-client'
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
-  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
+  implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.8'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.12.6'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
@@ -407,7 +398,7 @@ dependencies {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
@@ -422,10 +413,10 @@ dependencies {
   implementation group: 'org.apiguardian', name: 'apiguardian-api', version: '1.1.2'
 
   // JAX-B dependencies for JDK 9+
-  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
+  implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.5'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.8'
+  runtimeOnly group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.9'
   runtimeOnly group: 'com.sun.activation', name: 'javax.activation', version: '1.2.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.3.0'
@@ -438,8 +429,8 @@ dependencies {
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
 
-  implementation 'org.apache.poi:poi:5.4.0'
-  implementation 'org.apache.poi:poi-ooxml:5.4.0'
+  implementation 'org.apache.poi:poi:5.5.1'
+  implementation 'org.apache.poi:poi-ooxml:5.5.1'
   implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
@@ -467,18 +458,18 @@ dependencies {
   contractTestImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   contractTestImplementation 'au.com.dius.pact.provider:junit5spring:4.6.17'
   contractTestImplementation group: 'org.hamcrest', name: 'java-hamcrest', version: '2.0.0.0'
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.2')
-  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.2')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.3')
+  contractTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.3')
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
 
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.2')
-  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.2')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-api:5.14.3')
+  integrationTestImplementation('org.junit.jupiter:junit-jupiter-engine:5.14.3')
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-  testImplementation group: 'com.h2database', name: 'h2', version: '2.3.232'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.4.240'
   // dashboard specific changes ends
 
 
@@ -486,7 +477,7 @@ dependencies {
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
   // https://mvnrepository.com/artifact/com.opencsv/opencsv
-  implementation group: 'com.opencsv', name: 'opencsv', version: '5.11.2', {
+  implementation group: 'com.opencsv', name: 'opencsv', version: '5.12.0', {
     exclude group: 'commons-collections', module: 'commons-collections'
   }
 }
@@ -618,14 +609,14 @@ tasks.register('runProviderPactVerification') {
 tasks.withType(Test).configureEach { t ->
   useJUnitPlatform()
 
-  // Pipeline-stable settings with JaCoCo enabled
-  maxParallelForks = 2
-  forkEvery = 50
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  jvmArgs '-Xshare:off'
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"
   maxHeapSize = "1536m"
   jvmArgs "-XX:MaxMetaspaceSize=512m"
+  jvmArgs '-XX:ReservedCodeCacheSize=512m'
   // Temurin 21.0.7 occasionally crashes in C2 (BoolNode::Ideal SIGSEGV); stay on C1 until upstream fix.
   jvmArgs "-XX:TieredStopAtLevel=1"
 

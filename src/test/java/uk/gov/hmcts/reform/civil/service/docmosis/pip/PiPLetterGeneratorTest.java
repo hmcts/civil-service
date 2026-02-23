@@ -178,61 +178,54 @@ class PiPLetterGeneratorTest {
     }
 
     private List<Element<CaseDocument>> setupSystemGeneratedCaseDocs() {
-        Document documentLink = Document.builder()
-            .documentUrl("url")
-            .documentFileName("testFileName.pdf")
-            .documentBinaryUrl("binary-url")
-            .build();
-        CaseDocument caseDocumentClaim = CaseDocument.builder()
-            .documentType(SEALED_CLAIM)
-            .documentLink(documentLink)
-            .build();
+        Document documentLink = new Document()
+            .setDocumentUrl("url")
+            .setDocumentFileName("testFileName.pdf")
+            .setDocumentBinaryUrl("binary-url");
+        CaseDocument caseDocumentClaim = new CaseDocument()
+            .setDocumentType(SEALED_CLAIM)
+            .setDocumentLink(documentLink);
         return List.of(ElementUtils.element(caseDocumentClaim));
     }
 
     private ServedDocumentFiles setupParticularsOfClaimDocs() {
-        Document document1 = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
+        Document document1 = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
+        Document document2 = new Document()
+            .setDocumentUrl("fake-url")
+            .setDocumentFileName("file-name")
+            .setDocumentBinaryUrl("binary-url");
+        return ServedDocumentFiles.builder()
+            .timelineEventUpload(List.of(ElementUtils.element(document2)))
+            .particularsOfClaimDocument(List.of(ElementUtils.element(document1)))
             .build();
-        Document document2 = Document.builder()
-            .documentUrl("fake-url")
-            .documentFileName("file-name")
-            .documentBinaryUrl("binary-url")
-            .build();
-        return new ServedDocumentFiles()
-            .setTimelineEventUpload(List.of(ElementUtils.element(document2)))
-            .setParticularsOfClaimDocument(List.of(ElementUtils.element(document1)));
     }
 
     private CaseDocument buildClaimFormDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName(String.format(N1.getDocumentTitle(), "000DC001"))
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("url")
-                              .documentFileName("testFileName.pdf")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName(String.format(N1.getDocumentTitle(), "000DC001"))
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("url")
+                              .setDocumentFileName("testFileName.pdf")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 
     private CaseDocument buildStitchedDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 }

@@ -61,9 +61,9 @@ public class SdoJourneyToggleService {
 
     public void applySmallClaimsMediationStatement(CaseData caseData) {
         if (sdoFeatureToggleService.isCarmEnabled(caseData)) {
-            caseData.setSmallClaimsMediationSectionStatement(
-                new SmallClaimsMediation().setInput(SMALL_CLAIMS_MEDIATION_TEXT)
-            );
+            caseData.setSmallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
+                                                               .input(SMALL_CLAIMS_MEDIATION_TEXT)
+                                                               .build());
             log.debug("Applied small claims mediation statement for caseId {}", caseData.getCcdCaseReference());
         }
     }

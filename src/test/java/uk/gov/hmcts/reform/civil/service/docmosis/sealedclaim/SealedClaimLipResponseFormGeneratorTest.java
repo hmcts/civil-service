@@ -118,7 +118,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -149,15 +149,15 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
         String fileName = "someName";
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -186,9 +186,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -205,11 +205,11 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
-                                          .setFirstRepaymentDate(LocalDate.now().plusDays(5))
-                                          .setPaymentAmount(BigDecimal.valueOf(200))
-                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          )
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .firstRepaymentDate(LocalDate.now().plusDays(5))
+                                          .paymentAmount(BigDecimal.valueOf(200))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = financialDetails(builder).build();
@@ -228,9 +228,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
-                                               .setWhenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
-                                               )
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
+                                               .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = financialDetails(builder).build();
@@ -271,9 +271,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -320,11 +320,11 @@ class SealedClaimLipResponseFormGeneratorTest {
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
-                                          .setFirstRepaymentDate(LocalDate.now().plusDays(5))
-                                          .setPaymentAmount(BigDecimal.valueOf(200))
-                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          )
+            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
+                                          .firstRepaymentDate(LocalDate.now().plusDays(5))
+                                          .paymentAmount(BigDecimal.valueOf(200))
+                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -349,9 +349,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
             .defenceAdmitPartPaymentTimeRouteRequired(
                 RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
-                                               .setWhenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
-                                               )
+            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
+                                               .whenWillThisAmountBePaid(LocalDate.now().plusMonths(3))
+                                               .build())
             .responseToClaimAdmitPartWhyNotPayLRspec("Reason not to pay immediately");
 
         CaseData caseData = timeline(financialDetails(builder))
@@ -370,11 +370,11 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.YES)
-            .respondToClaim(new RespondToClaim()
-                                .setHowMuchWasPaid(BigDecimal.valueOf(10_000))
-                                .setHowWasThisAmountPaid(PaymentMethod.CHEQUE)
-                                .setWhenWasThisAmountPaid(LocalDate.now().minusMonths(1))
-                                )
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                                .build())
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
 
         CaseData caseData = timeline(builder)
@@ -393,11 +393,11 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent2(individual("C"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.HAS_PAID_THE_AMOUNT_CLAIMED)
-            .respondToClaim(new RespondToClaim()
-                                .setHowMuchWasPaid(BigDecimal.valueOf(10_000))
-                                .setHowWasThisAmountPaid(PaymentMethod.CHEQUE)
-                                .setWhenWasThisAmountPaid(LocalDate.now().minusMonths(1))
-                                )
+            .respondToClaim(RespondToClaim.builder()
+                                .howMuchWasPaid(BigDecimal.valueOf(10_000))
+                                .howWasThisAmountPaid(PaymentMethod.CHEQUE)
+                                .whenWasThisAmountPaid(LocalDate.now().minusMonths(1))
+                                .build())
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim");
 
         CaseData caseData = timeline(builder)
@@ -450,7 +450,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -461,8 +461,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             )
             .build();
         generator.getTemplateData(caseData);
@@ -480,7 +481,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -495,10 +496,10 @@ class SealedClaimLipResponseFormGeneratorTest {
             .detailsOfWhyDoesYouDisputeTheClaim("Reason to dispute the claim")
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-            )
-            .build();
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
+            ).build();
         generator.getTemplateData(caseData);
         //When
         CaseDocument result = generator.generate(caseData, AUTHORIZATION);
@@ -516,14 +517,18 @@ class SealedClaimLipResponseFormGeneratorTest {
 
     private static CaseData.CaseDataBuilder<?, ?> timeline(CaseData.CaseDataBuilder<?, ?> builder) {
         return builder.specResponseTimelineOfEvents(List.of(
-            new TimelineOfEvents(
-                new TimelineOfEventDetails(LocalDate.now().minusMonths(7), "Event 1"),
-                null
-            ),
-            new TimelineOfEvents(
-                new TimelineOfEventDetails(LocalDate.now().minusMonths(5), "Event 2"),
-                null
-            )
+            TimelineOfEvents.builder()
+                .value(TimelineOfEventDetails.builder()
+                           .timelineDate(LocalDate.now().minusMonths(7))
+                           .timelineDescription("Event 1")
+                           .build())
+                .build(),
+            TimelineOfEvents.builder()
+                .value(TimelineOfEventDetails.builder()
+                           .timelineDate(LocalDate.now().minusMonths(5))
+                           .timelineDescription("Event 2")
+                           .build())
+                .build()
         ));
     }
 
@@ -563,9 +568,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                  PaymentFrequencyLRspec.ONCE_ONE_MONTH
                                              )
                                          )))
-            .specDefendant1Debts(new Respondent1DebtLRspec()
-                                     .setHasLoanCardDebt(YesOrNo.YES)
-                                     .setLoanCardDebtDetails(ElementUtils.wrapElements(
+            .specDefendant1Debts(Respondent1DebtLRspec.builder()
+                                     .hasLoanCardDebt(YesOrNo.YES)
+                                     .loanCardDebtDetails(ElementUtils.wrapElements(
                                          new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 1")
                                              .setTotalOwed(BigDecimal.valueOf(500))
                                              .setMonthlyPayment(BigDecimal.valueOf(50)),
@@ -574,7 +579,7 @@ class SealedClaimLipResponseFormGeneratorTest {
                                              .setMonthlyPayment(BigDecimal.valueOf(200))
                                      
                                      ))
-                                     .setDebtDetails(ElementUtils.wrapElements(
+                                     .debtDetails(ElementUtils.wrapElements(
                                          new DebtLRspec()
                                              .setDebtType(DebtTypeLRspec.GAS)
                                              .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
@@ -584,41 +589,45 @@ class SealedClaimLipResponseFormGeneratorTest {
                                              .setPaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
                                              .setPaymentAmount(BigDecimal.valueOf(60))
                                      ))
-                                     )
-            .respondent1PartnerAndDependent(new PartnerAndDependentsLRspec()
-                                                .setHaveAnyChildrenRequired(YesOrNo.YES)
-                                                .setHowManyChildrenByAgeGroup(new ChildrenByAgeGroupLRspec()
-                                                                                 .setNumberOfUnderEleven("1")
-                                                                                 .setNumberOfElevenToFifteen("2")
-                                                                                 .setNumberOfSixteenToNineteen("0"))
-                                                .setSupportedAnyoneFinancialRequired(YesOrNo.YES)
-                                                .setSupportPeopleNumber("3")
-                                                .setSupportPeopleDetails("Supported people details"))
+                                     .build())
+            .respondent1PartnerAndDependent(PartnerAndDependentsLRspec.builder()
+                                                .haveAnyChildrenRequired(YesOrNo.YES)
+                                                .howManyChildrenByAgeGroup(new ChildrenByAgeGroupLRspec()
+                                                                               .setNumberOfUnderEleven("1")
+                                                                               .setNumberOfElevenToFifteen("2")
+                                                                               .setNumberOfSixteenToNineteen("0"))
+                                                .supportedAnyoneFinancialRequired(YesOrNo.YES)
+                                                .supportPeopleNumber("3")
+                                                .supportPeopleDetails("Supported people details")
+                                                .build())
 
-            .specDefendant1SelfEmploymentDetails(new Respondent1SelfEmploymentLRspec()
-                                                     .setJobTitle("job title")
-                                                     .setAnnualTurnover(BigDecimal.valueOf(30000))
-                                                     .setIsBehindOnTaxPayment(YesOrNo.YES)
-                                                     .setAmountOwed(BigDecimal.valueOf(10000))
-                                                     .setReason("reason to owe tax")
-                                                     )
-            .responseClaimAdmitPartEmployer(new Respondent1EmployerDetailsLRspec(ElementUtils.wrapElements(
-                new EmployerDetailsLRspec()
-                    .setEmployerName("Employer 1")
-                    .setJobTitle("Job title 1"),
-                new EmployerDetailsLRspec()
-                    .setEmployerName("Employer 2")
-                    .setJobTitle("Job title 2")
-            )));
+            .specDefendant1SelfEmploymentDetails(Respondent1SelfEmploymentLRspec.builder()
+                                                     .jobTitle("job title")
+                                                     .annualTurnover(BigDecimal.valueOf(30000))
+                                                     .isBehindOnTaxPayment(YesOrNo.YES)
+                                                     .amountOwed(BigDecimal.valueOf(10000))
+                                                     .reason("reason to owe tax")
+                                                     .build())
+            .responseClaimAdmitPartEmployer(Respondent1EmployerDetailsLRspec.builder()
+                                                .employerDetails(ElementUtils.wrapElements(
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 1")
+                                                        .setJobTitle("Job title 1"),
+                                                    new EmployerDetailsLRspec()
+                                                        .setEmployerName("Employer 2")
+                                                        .setJobTitle("Job title 2")
+                                                ))
+                                                .build());
     }
 
     private CaseData.CaseDataBuilder<?, ?> commonData() {
         return CaseData.builder()
             .legacyCaseReference("reference")
             .ccdCaseReference(1234567890123456L)
-            .solicitorReferences(new SolicitorReferences()
-                .setApplicantSolicitor1Reference("claimant reference")
-                .setRespondentSolicitor1Reference("defendant reference"))
+            .solicitorReferences(SolicitorReferences.builder()
+                                     .applicantSolicitor1Reference("claimant reference")
+                                     .respondentSolicitor1Reference("defendant reference")
+                                     .build())
             .applicant1(company("A"))
             .totalClaimAmount(BigDecimal.valueOf(10_000));
     }
@@ -675,9 +684,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                                       .setHasUnavailabilityNextThreeMonths(YesOrNo.NO)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -706,9 +715,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                                       .setHasUnavailabilityNextThreeMonths(YesOrNo.NO)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -743,9 +752,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                                       .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -782,9 +791,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                                       .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -807,9 +816,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .caseDataLiP(new CaseDataLiP())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -829,9 +838,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -852,9 +861,9 @@ class SealedClaimLipResponseFormGeneratorTest {
             .caseDataLiP(new CaseDataLiP().setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -892,9 +901,9 @@ class SealedClaimLipResponseFormGeneratorTest {
                                                                       .setUnavailableDatesForMediation(def1UnavailabilityDates)))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build()
             );
 
         SealedClaimLipResponseForm templateData = generator
@@ -920,13 +929,13 @@ class SealedClaimLipResponseFormGeneratorTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .caseDataLiP(new CaseDataLiP().setRespondent1MediationLiPResponseCarm(new MediationLiPCarm()))
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1LiPStatementOfTruth(new StatementOfTruth().setName("Test").setRole("Test"))
+            .respondent1LiPStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
             .respondToClaimAdmitPartLRspec(
-                new RespondToClaimAdmitPartLRspec()
-                    .setWhenWillThisAmountBePaid(whenWillPay)
-                    )
+                RespondToClaimAdmitPartLRspec.builder()
+                    .whenWillThisAmountBePaid(whenWillPay)
+                    .build())
             .totalClaimAmount(BigDecimal.valueOf(10_000))
-            .uiStatementOfTruth(new StatementOfTruth().setName("Test").setRole("Test"));
+            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build());
 
         //Then
         SealedClaimLipResponseForm templateData = generator

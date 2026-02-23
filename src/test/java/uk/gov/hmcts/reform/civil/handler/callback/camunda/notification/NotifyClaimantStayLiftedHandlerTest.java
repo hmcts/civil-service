@@ -126,7 +126,7 @@ class NotifyClaimantStayLiftedHandlerTest {
     @Test
     void checkCamundaActivityTest() {
         caseData = caseData.toBuilder().build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyClaimantStayLifted", response);
     }
@@ -146,7 +146,7 @@ class NotifyClaimantStayLiftedHandlerTest {
         caseData = caseData.toBuilder()
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
         CallbackResponse response = handler.sendNotification(params);
         assertNotNull(response);
 
@@ -185,11 +185,10 @@ class NotifyClaimantStayLiftedHandlerTest {
             .builder()
             .eventId(CaseEvent.NOTIFY_CLAIMANT_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
         final CallbackResponse response = handler.sendNotification(params);
 
         Map<String, String> commonProps = addCommonProperties(true);

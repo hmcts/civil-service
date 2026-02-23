@@ -3,19 +3,18 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -36,49 +35,40 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.ga.enums.welshenhancements.PreTranslationGaDocumentType.HEARING_NOTICE_DOC;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GenerateHearingNoticeDocumentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @InjectMocks
     private GenerateHearingNoticeDocumentCallbackHandler handler;
-    @MockBean
+    @Mock
     private GaHearingFormGenerator hearingFormGenerator;
-    @Autowired
-    private ObjectMapper mapper;
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+    @Mock
     private SendFinalOrderPrintService sendFinalOrderPrintService;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
+    @Spy
+    private AssignCategoryId assignCategoryId = new AssignCategoryId();
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
     void shouldReturnCorrectActivityId_whenRequested() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build();
-
-        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GenerateHearingNoticeDocument");
+        assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GenerateHearingNoticeDocument");
     }
 
     @Test
     void shouldGenerateHearingNoticeDocument_whenAndWelseToggleEnabledAboutToSubmitEventIsCalled() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
@@ -98,8 +88,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocument_whenAboutToSubmitEventIsCalled() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
@@ -115,16 +105,14 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocumentWithCoverLetterTwice() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
 
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .applicationIsUncloakedOnce(YesOrNo.YES)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
@@ -141,8 +129,8 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldGenerateHearingNoticeDocumentWithCoverLetterTwiceWhenWithoutNotice() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
@@ -150,8 +138,6 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
         when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
 
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
@@ -167,17 +153,14 @@ class GenerateHearingNoticeDocumentCallbackHandlerTest extends GeneralApplicatio
 
     @Test
     void shouldNotGenerateHearingNoticeDocumentWithCoverLetterWhenLanguagePreference() {
-        CaseDocument caseDocument = CaseDocument.builder()
-            .documentLink(Document.builder().documentUrl("doc").build()).build();
+        CaseDocument caseDocument = new CaseDocument()
+            .setDocumentLink(new Document().setDocumentUrl("doc"));
 
         when(hearingFormGenerator.generate(any(), any())).thenReturn(caseDocument);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        when(hearingFormGenerator.generate(any(), any(), any(), any())).thenReturn(caseDocument);
 
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)

@@ -154,10 +154,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .respondent1(Party.builder().type(Party.Type.COMPANY).build())
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
                 .respondent1Represented(YesOrNo.YES)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder().organisationID("ORG_ID").build())
-                                                   .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                                                   .build())
+                .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
                 .solicitorReferences(new SolicitorReferences()
                     .setRespondentSolicitor1Reference(referenceWasProvided ? "Def Ref Num" : null))
@@ -199,10 +196,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
                     DEFENDANT_LIP_EMAIL_ADDRESS).build())
                 .respondent1Represented(YesOrNo.YES)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                   .organisation(Organisation.builder().organisationID("ORG_ID").build())
-                                                   .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                                                   .build())
+                .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
                 .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference(null))
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
@@ -226,5 +220,13 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             );
             assertThat(targetEmail.getAllValues().get(0)).isEqualTo(DEFENDANT_LR_EMAIL_ADDRESS);
         }
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
     }
 }
