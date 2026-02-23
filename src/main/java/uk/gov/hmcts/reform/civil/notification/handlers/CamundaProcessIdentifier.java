@@ -60,5 +60,5 @@ public enum CamundaProcessIdentifier {
     CreateSDONotify,
     RaiseQueryNotifier,
     OtherPartyQueryRaisedNotifier,
-    DJNonDivergentNotifier;
+    DJ_NON_DIVERGENT_NOTIFIER;
 }

@@ -15,6 +15,6 @@ class DjNonDivergentNotifierTest extends NotifierTestBase {
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
 
-        assertThat(taskId).isEqualTo("DJNonDivergentNotifier");
+        assertThat(taskId).isEqualTo("DJ_NON_DIVERGENT_NOTIFIER");
     }
 }

@@ -19,6 +19,6 @@ public class DjNonDivergentNotifier extends Notifier {
 
     @Override
     protected String getTaskId() {
-        return CamundaProcessIdentifier.DJNonDivergentNotifier.toString();
+        return CamundaProcessIdentifier.DJ_NON_DIVERGENT_NOTIFIER.toString();
     }
 }
