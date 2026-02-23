@@ -832,8 +832,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         Document pdfDocument = new Document()
             .setDocumentUrl("fake-url")
@@ -880,8 +880,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         CaseDocument pdfDocument = new CaseDocument()
             .setCreatedBy("John")
@@ -934,8 +934,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         Document pdfDocument = new Document()
             .setDocumentUrl("fake-url")

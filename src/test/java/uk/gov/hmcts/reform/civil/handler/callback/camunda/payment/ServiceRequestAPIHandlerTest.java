@@ -205,7 +205,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
             caseData.setHearingDueDate(LocalDate.now());
-            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
+            caseData.setHearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE));
             caseData.setClaimValue(new ClaimValue().setStatementOfValueInPennies(BigDecimal.TEN));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //When
@@ -268,7 +268,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull_allocatedTrackIsDefined() {
-            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
@@ -287,7 +287,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
             SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
                 .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
                 .build();
 
@@ -297,7 +297,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull_responseTrackIsDefined() {
-            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
                 .thenReturn(HearingNoticeVariables.builder()
@@ -318,7 +318,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
             SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
+                .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
                 .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
                 .build();
 

@@ -59,19 +59,17 @@ class HearingFeesServiceTest {
             keywordCaptor.capture(),
             any(BigDecimal.class)
         ))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS_14)
-                            .code("test_fee_code")
-                            .version(2)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS_14)
+                            .setCode("test_fee_code")
+                            .setVersion(2));
 
         BigDecimal claimAmount = new BigDecimal(125);
 
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
-            .code("test_fee_code")
-            .version("2")
-            .build();
+        Fee expectedFeeDto = new Fee()
+            .setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
+            .setCode("test_fee_code")
+            .setVersion("2");
         // When
         Fee feeDto = feesService.getFeeForHearingSmallClaims(claimAmount);
         // Then
@@ -98,19 +96,17 @@ class HearingFeesServiceTest {
             keywordCaptor.capture(),
             any(BigDecimal.class)
         ))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS_14)
-                            .code("test_fee_code")
-                            .version(2)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS_14)
+                            .setCode("test_fee_code")
+                            .setVersion(2));
 
         BigDecimal claimAmount = new BigDecimal(125);
 
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
-            .code("test_fee_code")
-            .version("2")
-            .build();
+        Fee expectedFeeDto = new Fee()
+            .setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
+            .setCode("test_fee_code")
+            .setVersion("2");
         // When
         Fee feeDto = feesService.getFeeForHearingFastTrackClaims(claimAmount);
         // Then
@@ -137,19 +133,17 @@ class HearingFeesServiceTest {
             keywordCaptor.capture(),
             any(BigDecimal.class)
         ))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS_14)
-                            .code("test_fee_code")
-                            .version(2)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS_14)
+                            .setCode("test_fee_code")
+                            .setVersion(2));
 
         BigDecimal claimAmount = new BigDecimal(125);
 
-        Fee expectedFeeDto = Fee.builder()
-            .calculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
-            .code("test_fee_code")
-            .version("2")
-            .build();
+        Fee expectedFeeDto = new Fee()
+            .setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE_14)
+            .setCode("test_fee_code")
+            .setVersion("2");
         // When
         Fee feeDto = feesService.getFeeForHearingMultiClaims(claimAmount);
         // Then
