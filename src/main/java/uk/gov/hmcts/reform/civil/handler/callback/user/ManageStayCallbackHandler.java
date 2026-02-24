@@ -90,6 +90,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
             caseData.setBusinessProcess(BusinessProcess.ready(STAY_LIFTED));
             caseData.setManageStayUpdateRequestDate(null);
             updateDeadlinesAfterLiftingStay(caseData);
+            caseData.setCaseStayDate(null);
         } else {
             newState = caseData.getCcdState();
             caseData.setBusinessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
