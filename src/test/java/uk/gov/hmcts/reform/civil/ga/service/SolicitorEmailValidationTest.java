@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -23,15 +24,14 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    SolicitorEmailValidation.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class SolicitorEmailValidationTest {
 
-    @Autowired
+    @InjectMocks
     private SolicitorEmailValidation solicitorEmailValidation;
+
+    @Spy
+    private GaForLipService gaForLipService;
 
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
     private static final String CLAIM_CL_LIP_EMAIL = "hmcts.civil.cl@gmail.com";
@@ -227,27 +227,27 @@ public class SolicitorEmailValidationTest {
                                           .email(DUMMY_EMAIL).organisationIdentifier("1").build())
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email(applicantEmail)
-                                                .build())
-            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
-            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail(applicantEmail))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("2")))
             .respondent2SameLegalRepresentative(NO)
-            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("3")))
             .build();
         var builder = caseData.toBuilder();
         if (Objects.nonNull(lipClEmail)) {
-            builder.claimantUserDetails(IdamUserDetails.builder()
-                    .id("123")
-                    .email(lipClEmail)
-                    .build());
+            builder.claimantUserDetails(new IdamUserDetails()
+                    .setId("123")
+                    .setEmail(lipClEmail));
         }
         if (Objects.nonNull(lipDefEmail)) {
-            builder.defendantUserDetails(IdamUserDetails.builder()
-                    .id("1")
-                    .email(lipDefEmail)
-                    .build());
+            builder.defendantUserDetails(new IdamUserDetails()
+                    .setId("1")
+                    .setEmail(lipDefEmail));
         }
         return builder.build();
     }

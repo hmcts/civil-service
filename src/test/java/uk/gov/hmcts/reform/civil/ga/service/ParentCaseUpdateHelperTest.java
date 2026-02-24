@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -30,6 +32,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.ArrayList;
@@ -63,22 +66,19 @@ import static uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper.DOCUME
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    ParentCaseUpdateHelper.class,
-    ObjectMapper.class,
-})
+@ExtendWith(MockitoExtension.class)
 class ParentCaseUpdateHelperTest {
 
-    @Autowired
-    ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
-    GaCoreCaseDataService coreCaseDataService;
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
-    @MockBean
-    FeatureToggleService featureToggleService;
-    @Autowired
-    ObjectMapper objectMapper;
+    @InjectMocks
+    private ParentCaseUpdateHelper parentCaseUpdateHelper;
+    @Mock
+    private GaCoreCaseDataService coreCaseDataService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private FeatureToggleService featureToggleService;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
     @Captor
     private ArgumentCaptor<Map<String, Object>> mapCaptor;
 
@@ -642,7 +642,6 @@ class ParentCaseUpdateHelperTest {
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "Claimant",
             AWAITING_APPLICATION_PAYMENT,
@@ -668,7 +667,6 @@ class ParentCaseUpdateHelperTest {
                                                                                   .build()).build()).build());
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
             "RespondentSol",
             AWAITING_APPLICATION_PAYMENT,
@@ -834,8 +832,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         Document pdfDocument = new Document()
             .setDocumentUrl("fake-url")
@@ -882,8 +880,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         CaseDocument pdfDocument = new CaseDocument()
             .setCreatedBy("John")
@@ -936,8 +934,8 @@ class ParentCaseUpdateHelperTest {
         builder.generalAppType(GAApplicationType.builder()
                                    .types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink
-                                          .builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .ccdState(state);
         Document pdfDocument = new Document()
             .setDocumentUrl("fake-url")

@@ -8,11 +8,11 @@ import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -31,7 +32,6 @@ import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 
 import java.time.LocalDateTime;
@@ -52,31 +52,24 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.WAIT_GA_DRAFT;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    WaitCivilDocUpdatedTaskHandler.class
-})
+@ExtendWith(MockitoExtension.class)
 public class WaitCivilDocUpdatedTaskHandlerTest {
 
-    @MockBean
-    private ExternalTask externalTask;
-
-    @MockBean
+    @Mock
     private ExternalTaskService externalTaskService;
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
-    private ObjectMapper mapper;
-    @MockBean
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
     @Mock
     private ExternalTask mockTask;
-    @Autowired
+    @InjectMocks
     private WaitCivilDocUpdatedTaskHandler waitCivilDocUpdatedTaskHandler;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     private GeneralApplicationCaseData gaCaseData;
@@ -87,8 +80,6 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @BeforeEach
     void init() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
-        when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         CaseDocument caseDocumentNow = new CaseDocument().setDocumentName("current")
                 .setDocumentLink(new Document().setDocumentUrl("url")
                         .setDocumentFileName("filename").setDocumentHash("hash")
@@ -101,7 +92,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
                 .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT).setDocumentSize(12L);
         gaCaseData = GeneralApplicationCaseData.builder()
                 .generalAppParentCaseLink(
-                        GeneralAppParentCaseLink.builder().caseReference("123").build())
+                        new GeneralAppParentCaseLink().setCaseReference("123"))
                 .gaDraftDocument(ElementUtils.wrapElements(caseDocumentNow))
                 .build();
         civilCaseDataEmpty = GeneralApplicationCaseData.builder().build();
@@ -115,9 +106,6 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @Test
     void should_handle_task_fail() {
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId("1")
-                .caseEvent(WAIT_GA_DRAFT).build();
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         CaseDetails caseDetails = CaseDetailsBuilder.builder().id(1L).data(gaCaseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -129,7 +117,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         when(caseDetailsConverter.toGeneralApplicationCaseData(civil)).thenReturn(civilCaseDataOld);
         WaitCivilDocUpdatedTaskHandler.maxWait = 1;
         WaitCivilDocUpdatedTaskHandler.waitGap = 1;
-        waitCivilDocUpdatedTaskHandler.execute(externalTask, externalTaskService);
+        waitCivilDocUpdatedTaskHandler.execute(mockTask, externalTaskService);
         WaitCivilDocUpdatedTaskHandler.maxWait = 10;
         WaitCivilDocUpdatedTaskHandler.waitGap = 6;
         verify(coreCaseDataService, times(1)).startGaUpdate(any(), any());
@@ -165,9 +153,6 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         int status = 422;
         Request.HttpMethod requestType = Request.HttpMethod.POST;
         String exampleUrl = "example url";
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId("1")
-                .caseEvent(WAIT_GA_DRAFT).build();
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         CaseDetails ga = CaseDetails.builder().id(1L).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(ga).build();
 
@@ -199,9 +184,12 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     @Test
     void shouldUpdateGaDraftList_whenHandlerIsExecuted() {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId(CASE_ID)
-            .caseEvent(WAIT_GA_DRAFT).build();
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
+        Map<String, Object> variables = Map.of(
+            "caseId", CASE_ID,
+            "caseEvent", WAIT_GA_DRAFT.name()
+        );
+
+        when(mockTask.getAllVariables()).thenReturn(variables);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
@@ -215,10 +203,8 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
-        when(coreCaseDataService.startGaUpdate(CASE_ID, WAIT_GA_DRAFT))
-            .thenReturn(startEventResponse);
+        when(coreCaseDataService.startGaUpdate(CASE_ID, WAIT_GA_DRAFT)).thenReturn(startEventResponse);
         when(caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails())).thenReturn(caseData);
-
         when(coreCaseDataService.submitGaUpdate(anyString(), any(CaseDataContent.class))).thenReturn(updatedCaseData);
 
         waitCivilDocUpdatedTaskHandler.execute(mockTask, externalTaskService);
@@ -230,9 +216,12 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
     @Test
     void shouldUpdateGaDraftList_whenHandlerIsExecuted_pass() {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder().caseId(CASE_ID)
-            .caseEvent(WAIT_GA_DRAFT).build();
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
+        Map<String, Object> variables = Map.of(
+            "caseId", CASE_ID,
+            "caseEvent", WAIT_GA_DRAFT.name()
+        );
+
+        when(mockTask.getAllVariables()).thenReturn(variables);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
@@ -264,12 +253,13 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         String uid3 = "f000aa01-0451-4000-b000-000000000003";
         String uid4 = "f000aa01-0451-4000-b000-000000000004";
 
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder()
-            .caseId(CASE_ID)
-            .caseEvent(WAIT_GA_DRAFT)
-            .build();
+        Map<String, Object> variables = Map.of(
+            "caseId", CASE_ID,
+            "caseEvent", WAIT_GA_DRAFT.name()
+        );
 
-        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
+        when(mockTask.getAllVariables()).thenReturn(variables);
+
         when(gaForLipService.isGaForLip(any())).thenReturn(true); // GA for LIP condition
         var draftDocumentsList = List.of(
             Element.<CaseDocument>builder()
@@ -320,18 +310,13 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
             .build();
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(gaLipCaseData).build();
 
-        Map<String, Object> mockOutputMap = new HashMap<>();
-        mockOutputMap.put("gaDraftDocument", gaLipCaseData.getGaDraftDocument());
-        mockOutputMap.put("applicantBilingualLanguagePreference", YesOrNo.YES);
-
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
-        when(gaLipCaseData.toMap(mapper)).thenReturn(mockOutputMap);
         when(coreCaseDataService.startGaUpdate(anyString(), eq(WAIT_GA_DRAFT))).thenReturn(startEventResponse);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(gaLipCaseData);
 
         waitCivilDocUpdatedTaskHandler.execute(mockTask, externalTaskService);
 
-        verify(coreCaseDataService).startGaUpdate(anyString(), eq(WAIT_GA_DRAFT));
+        verify(coreCaseDataService).startGaUpdate(CASE_ID, WAIT_GA_DRAFT);
         verify(caseDetailsConverter).toGeneralApplicationCaseData(any());
     }
 

@@ -123,7 +123,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -154,7 +154,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -186,7 +186,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -218,7 +218,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
@@ -255,7 +255,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress(null)
                 .hearingReferenceNumber("000HN001")
@@ -292,7 +292,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
                 .hearingDate(LocalDate.of(2022, 10, 7))
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("1530")
@@ -599,7 +599,7 @@ public class NotificationDefendantOfHearingHandlerTest {
 
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
@@ -625,7 +625,7 @@ public class NotificationDefendantOfHearingHandlerTest {
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantemail@hmcts.net").build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .respondentSolicitor2EmailAddress("respondent2email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)

@@ -106,7 +106,7 @@ public class HearingUtils {
     }
 
     public static HearingNotes formatHearingNote(String hearingNotes) {
-        return HearingNotes.builder().date(LocalDate.now()).notes(hearingNotes).build();
+        return new HearingNotes().setDate(LocalDate.now()).setNotes(hearingNotes);
     }
 
     public static HearingNotes getHearingNotes(CaseData caseData) {

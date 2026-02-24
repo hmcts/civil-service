@@ -5,12 +5,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.HelpWithFeesDetails;
 import uk.gov.hmcts.reform.civil.ga.service.GaPaymentRequestUpdateCallbackService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
@@ -30,7 +30,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.service.HwfNotificationService;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,22 +47,20 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.INITIATE_GENERAL_APPL
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_GA_ADD_HWF;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.STRIKE_OUT;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GaFeePaymentOutcomeHWFCallBackHandler.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
+
+    @InjectMocks
     private GaFeePaymentOutcomeHWFCallBackHandler handler;
-    @Autowired
-    private ObjectMapper mapper = new ObjectMapper();
-    @MockBean
+
+    @Mock
     private GaPaymentRequestUpdateCallbackService service;
-    @MockBean
+    @Mock
     private HwfNotificationService hwfNotificationService;
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
     @Test
@@ -82,9 +79,9 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                 .generalAppHelpWithFees(new HelpWithFees())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                    Fee.builder()
-                        .calculatedAmountInPence(BigDecimal.valueOf(180))
-                        .code("FEE123").build()).build())
+                    new Fee()
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(180))
+                        .setCode("FEE123")).build())
                 .build();
 
             // Act
@@ -123,9 +120,9 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                    Fee.builder()
-                        .calculatedAmountInPence(BigDecimal.valueOf(180))
-                        .code("FEE123").build()).build())
+                    new Fee()
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(180))
+                        .setCode("FEE123")).build())
                 .build();
 
             // Act
@@ -207,11 +204,11 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
     class AboutToSubmitCallback {
         @Test
         void shouldTrigger_after_payment_GaFee() {
-            List<GeneralApplicationTypes> types = Arrays.asList(STRIKE_OUT);
+            List<GeneralApplicationTypes> types = List.of(STRIKE_OUT);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                             .build())
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
                     .gaHwfDetails(HelpWithFeesDetails.builder().build())
@@ -238,8 +235,8 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
                                         .types(List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
                                         .build())
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                             .build())
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
                     .gaHwfDetails(HelpWithFeesDetails.builder().build())
@@ -262,8 +259,8 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         void shouldTrigger_modify_state_additioanlFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                             .build())
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
                     .gaHwfDetails(HelpWithFeesDetails.builder().build())

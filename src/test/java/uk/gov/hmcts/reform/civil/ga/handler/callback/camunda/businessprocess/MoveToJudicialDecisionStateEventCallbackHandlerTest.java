@@ -4,11 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -17,9 +16,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GAHearingType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeDecisionOption;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -34,10 +31,10 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAStatementOfTruth;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
-import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.GeneralApplicationDraftGenerator;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 
@@ -63,34 +60,22 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    MoveToJudicialDecisionStateEventCallbackHandler.class,
-    CaseDetailsConverter.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-})
+@ExtendWith(MockitoExtension.class)
 class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+    @Mock
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
-    @MockBean
-    private Time time;
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
+    @Mock
+    private AssignCategoryId assignCategoryId;
+    @Mock
     private GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
-    @MockBean
-    private FeatureToggleService featureToggleService;
-
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
-    @Autowired
+    @InjectMocks
     private MoveToJudicialDecisionStateEventCallbackHandler handler;
+
     private static final String STRING_CONSTANT = "STRING_CONSTANT";
     private static final Long CHILD_CCD_REF = 1646003133062762L;
     private static final Long PARENT_CCD_REF = 1645779506193000L;
@@ -114,7 +99,7 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
             GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(updatedData.getGaDraftDocument().get(0).getValue())
+            assertThat(updatedData.getGaDraftDocument().getFirst().getValue())
                 .isEqualTo(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
             assertThat(response.getState()).isEqualTo(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString());
         }
@@ -122,15 +107,12 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
         @Test
         void shouldRespondWithStateChangedWithNoDocumentGeneration() {
             GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
             GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
                                                                                  .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                                                  .build()).build();
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
             assertThat(response.getErrors()).isNull();
             verifyNoInteractions(generalApplicationDraftGenerator);
@@ -140,15 +122,12 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
         @Test
         void shouldRespondWithStateChangedWithNoDocumentGenerationWhenLipCaseWithJudicial() {
             GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
             GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
                                                                                  .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                                                  .build()).build();
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
             assertThat(response.getErrors()).isNull();
             verifyNoInteractions(generalApplicationDraftGenerator);
@@ -162,8 +141,6 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            GeneralApplicationCaseData updatedData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
             assertThat(response.getErrors()).isNull();
             verifyNoInteractions(generalApplicationDraftGenerator);
@@ -192,11 +169,11 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -216,8 +193,8 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .build();
     }
 
