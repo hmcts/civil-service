@@ -162,7 +162,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .build();
 
         when(organisationService.findOrganisationById("org-id"))
-            .thenReturn(Optional.of(Organisation.builder().name("Org Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Org Name")));
 
         // When
         String organisationName = notifier.getLegalOrganisationName(caseData);

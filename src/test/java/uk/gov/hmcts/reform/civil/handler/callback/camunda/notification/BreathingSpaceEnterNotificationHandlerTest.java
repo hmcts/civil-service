@@ -73,9 +73,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -129,9 +129,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -185,9 +185,8 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -243,9 +242,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")

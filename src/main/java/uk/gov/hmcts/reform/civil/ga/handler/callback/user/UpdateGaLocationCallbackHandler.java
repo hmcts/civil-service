@@ -56,7 +56,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         if (locationDetails != null && !locationDetails.isEmpty()) {
             return locationDetails.get(0);
         } else {
-            return LocationRefData.builder().build();
+            return new LocationRefData();
         }
     }
 

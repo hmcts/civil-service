@@ -103,7 +103,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -127,7 +127,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothSelected() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -157,7 +157,7 @@ class DJApplicantReceivedNotificationHandlerTest {
         @Test
         void shouldNotifyApplicantSolicitor_whenInvokedAnd1v1AndBothNotSelected() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             when(notificationsProperties.getApplicantSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();

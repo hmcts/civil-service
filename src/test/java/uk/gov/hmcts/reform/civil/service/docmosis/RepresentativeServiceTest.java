@@ -59,15 +59,14 @@ class RepresentativeServiceTest {
     }
 
     private ContactInformation createContactInformation(String prefix) {
-        return ContactInformation.builder()
-            .addressLine1(prefix + " address line 1")
-            .addressLine2(prefix + " address line 2")
-            .addressLine3(prefix + " address line 3")
-            .postCode("SW1 1AA " + prefix)
-            .county("London " + prefix)
-            .country("UK " + prefix)
-            .dxAddress(List.of(DxAddress.builder().dxNumber("DX12345" + prefix).build()))
-            .build();
+        return new ContactInformation()
+            .setAddressLine1(prefix + " address line 1")
+            .setAddressLine2(prefix + " address line 2")
+            .setAddressLine3(prefix + " address line 3")
+            .setPostCode("SW1 1AA " + prefix)
+            .setCounty("London " + prefix)
+            .setCountry("UK " + prefix)
+            .setDxAddress(List.of(new DxAddress().setDxNumber("DX12345" + prefix)));
     }
 
     private Address createAddress(String prefix) {
@@ -82,10 +81,9 @@ class RepresentativeServiceTest {
     }
 
     private Organisation createOrganisation(String name, ContactInformation contactInformation) {
-        return Organisation.builder()
-            .name(name)
-            .contactInformation(List.of(contactInformation))
-            .build();
+        return new Organisation()
+            .setName(name)
+            .setContactInformation(List.of(contactInformation));
     }
 
     @Nested

@@ -99,13 +99,13 @@ class NoCHelperTest {
     void getProperties_shouldReturnExpectedMap() {
 
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         when(organisationService.findOrganisationById("orgAdd"))
-            .thenReturn(Optional.of(Organisation.builder().name("New Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("New Org")));
 
         when(organisationService.findOrganisationById("orgRemove"))
-            .thenReturn(Optional.of(Organisation.builder().name("Old Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Old Org")));
 
         Map<String, String> props = noCHelper.getProperties(baseCaseData, false);
 
@@ -134,7 +134,7 @@ class NoCHelperTest {
     @Test
     void getHearingFeeEmailProperties_shouldReturnExpectedMap() {
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         Map<String, String> props = noCHelper.getHearingFeeEmailProperties(baseCaseData);
 

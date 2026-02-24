@@ -62,8 +62,13 @@ public class RepresentedLitigantPopulatorTest {
 
         String solicitorEmail = "solicitor@example.com";
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = representedLitigantPopulator.populator(builder, contactInfo, mediationAvailability, organisationPolicy, solicitorEmail).build();
+        MediationLitigant litigant = representedLitigantPopulator.populator(
+            new MediationLitigant(),
+            contactInfo,
+            mediationAvailability,
+            organisationPolicy,
+            solicitorEmail
+        );
 
         assertThat(litigant.isRepresented()).isTrue();
         assertThat(litigant.getLitigantEmail()).isEqualTo(solicitorEmail);
@@ -86,8 +91,13 @@ public class RepresentedLitigantPopulatorTest {
 
         String solicitorEmail = "solicitor@example.com";
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = representedLitigantPopulator.populator(builder, null, mediationAvailability, organisationPolicy, solicitorEmail).build();
+        MediationLitigant litigant = representedLitigantPopulator.populator(
+            new MediationLitigant(),
+            null,
+            mediationAvailability,
+            organisationPolicy,
+            solicitorEmail
+        );
 
         assertThat(litigant.isRepresented()).isTrue();
         assertThat(litigant.getLitigantEmail()).isEqualTo(solicitorEmail);
@@ -122,8 +132,13 @@ public class RepresentedLitigantPopulatorTest {
 
         String solicitorEmail = "solicitor@example.com";
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
-        MediationLitigant litigant = representedLitigantPopulator.populator(builder, contactInfo, mediationAvailability, organisationPolicy, solicitorEmail).build();
+        MediationLitigant litigant = representedLitigantPopulator.populator(
+            new MediationLitigant(),
+            contactInfo,
+            mediationAvailability,
+            organisationPolicy,
+            solicitorEmail
+        );
 
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
         assertThat(litigant.getDateRangeToAvoid().get(0).getDateFrom()).isEqualTo("2024-06-10");
@@ -131,61 +146,57 @@ public class RepresentedLitigantPopulatorTest {
     }
 
     private MediationLitigant addMediationInfoRepresented(MediationLitigant litigant) {
-        return litigant.toBuilder()
-            .mediationContactName(MEDIATION_CONTACT_NAME)
-            .mediationContactNumber(MEDIATION_CONTACT_NUMBER)
-            .mediationContactEmail(MEDIATION_CONTACT_EMAIL)
-            .dateRangeToAvoid(List.of(MediationUnavailability.builder()
-                                          .dateFrom("2024-06-01")
-                                          .dateTo("2024-06-01")
-                                          .build(),
-                                      MediationUnavailability.builder()
-                                          .dateFrom("2024-06-07")
-                                          .dateTo("2024-06-07")
-                                          .build(),
-                                      MediationUnavailability.builder()
-                                          .dateFrom("2024-06-10")
-                                          .dateTo("2024-06-15")
-                                          .build(),
-                                      MediationUnavailability.builder()
-                                          .dateFrom("2024-06-20")
-                                          .dateTo("2024-06-25")
-                                          .build())).build();
+        return litigant
+            .setMediationContactName(MEDIATION_CONTACT_NAME)
+            .setMediationContactNumber(MEDIATION_CONTACT_NUMBER)
+            .setMediationContactEmail(MEDIATION_CONTACT_EMAIL)
+            .setDateRangeToAvoid(List.of(
+                new MediationUnavailability()
+                    .setDateFrom("2024-06-01")
+                    .setDateTo("2024-06-01"),
+                new MediationUnavailability()
+                    .setDateFrom("2024-06-07")
+                    .setDateTo("2024-06-07"),
+                new MediationUnavailability()
+                    .setDateFrom("2024-06-10")
+                    .setDateTo("2024-06-15"),
+                new MediationUnavailability()
+                    .setDateFrom("2024-06-20")
+                    .setDateTo("2024-06-25")
+            ));
     }
 
     private MediationLitigant buildClaimant1(YesOrNo represented) {
         if (YES.equals(represented)) {
-            return MediationLitigant.builder()
-                .partyID("app-1-party-id")
-                .partyRole("Claimant 1")
-                .partyName("Mr. John Rambo")
-                .partyType(INDIVIDUAL)
-                .paperResponse(PAPER_RESPONSE)
-                .represented(true)
-                .solicitorOrgName(APPLICANT_LR_NAME)
-                .litigantTelephone(null)
-                .litigantEmail(APPLICANT_LR_EMAIL)
-                .mediationContactName(null)
-                .mediationContactNumber(null)
-                .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
-                .build();
+            return new MediationLitigant()
+                .setPartyID("app-1-party-id")
+                .setPartyRole("Claimant 1")
+                .setPartyName("Mr. John Rambo")
+                .setPartyType(INDIVIDUAL)
+                .setPaperResponse(PAPER_RESPONSE)
+                .setRepresented(true)
+                .setSolicitorOrgName(APPLICANT_LR_NAME)
+                .setLitigantTelephone(null)
+                .setLitigantEmail(APPLICANT_LR_EMAIL)
+                .setMediationContactName(null)
+                .setMediationContactNumber(null)
+                .setMediationContactEmail(null)
+                .setDateRangeToAvoid(List.of(new MediationUnavailability()));
         } else {
-            return MediationLitigant.builder()
-                .partyID("app-1-party-id")
-                .partyRole("Claimant 1")
-                .partyName("Mr. John Rambo")
-                .partyType(INDIVIDUAL)
-                .paperResponse(PAPER_RESPONSE)
-                .represented(false)
-                .solicitorOrgName(null)
-                .litigantTelephone("0123456789")
-                .litigantEmail("rambo@email.com")
-                .mediationContactName(null)
-                .mediationContactNumber(null)
-                .mediationContactEmail(null)
-                .dateRangeToAvoid(List.of(MediationUnavailability.builder().build()))
-                .build();
+            return new MediationLitigant()
+                .setPartyID("app-1-party-id")
+                .setPartyRole("Claimant 1")
+                .setPartyName("Mr. John Rambo")
+                .setPartyType(INDIVIDUAL)
+                .setPaperResponse(PAPER_RESPONSE)
+                .setRepresented(false)
+                .setSolicitorOrgName(null)
+                .setLitigantTelephone("0123456789")
+                .setLitigantEmail("rambo@email.com")
+                .setMediationContactName(null)
+                .setMediationContactNumber(null)
+                .setMediationContactEmail(null)
+                .setDateRangeToAvoid(List.of(new MediationUnavailability()));
         }
     }
 
