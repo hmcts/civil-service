@@ -105,9 +105,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyApplicantLR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("1")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("1"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -125,9 +123,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyRespondent1LR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("2")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("2"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -145,9 +141,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyRespondent2LR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("3")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("3"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -181,9 +175,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyClaimantLip_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -215,9 +207,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyClaimantLipBilingual_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -250,9 +240,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyDefendantLipLip_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()

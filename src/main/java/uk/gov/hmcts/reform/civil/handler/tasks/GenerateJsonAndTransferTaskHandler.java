@@ -105,11 +105,7 @@ public class GenerateJsonAndTransferTaskHandler extends GenerateMediationFileAnd
     }
 
     private MediationDTO convertToMediationDTO(List<MediationCase> list) throws JsonProcessingException {
-        MediationCases cases = MediationCases.builder()
-            .cases(list)
-            .build();
-        return MediationDTO.builder()
-            .jsonRawData(cases.toJsonString().getBytes())
-            .build();
+        MediationCases cases = new MediationCases(list);
+        return new MediationDTO(cases.toJsonString().getBytes());
     }
 }

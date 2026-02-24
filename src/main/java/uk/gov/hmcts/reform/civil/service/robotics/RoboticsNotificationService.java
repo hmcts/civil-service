@@ -52,8 +52,7 @@ public class RoboticsNotificationService {
     public void notifyRobotics(@NotNull CaseData caseData, boolean isMultiParty, String authToken) {
         requireNonNull(caseData);
         log.info(String.format("Start notifyRobotics and case data is not null %s", caseData.getLegacyCaseReference()));
-        Optional<EmailData> emailData = prepareEmailData(RoboticsEmailParams.builder().caseData(caseData).authToken(
-            authToken).isMultiParty(isMultiParty).build());
+        Optional<EmailData> emailData = prepareEmailData(new RoboticsEmailParams(caseData, isMultiParty, authToken));
 
         emailData.ifPresent(data -> {
             log.info(String.format("Sending email via client to %s", data.getTo()));
@@ -62,9 +61,7 @@ public class RoboticsNotificationService {
     }
 
     public void notifyJudgementLip(@NotNull CaseData caseData, String authToken) {
-        Optional<EmailData> emailData = prepareJudgementLipEmail(RoboticsEmailParams.builder()
-                                                              .caseData(caseData).authToken(authToken)
-                                                              .isMultiParty(false).build());
+        Optional<EmailData> emailData = prepareJudgementLipEmail(new RoboticsEmailParams(caseData, false, authToken));
         log.info(String.format("Start notifyDefaultJudgementLip and case data is not null %s", caseData.getLegacyCaseReference()));
         emailData.ifPresent(data -> sendGridClient.sendEmail(roboticsEmailConfiguration.getSender(), data));
     }
@@ -110,9 +107,7 @@ public class RoboticsNotificationService {
             roboticsCaseDataDTO = getRoboticsCaseDataDTOForSpec(caseData, authToken);
         } else {
             RoboticsCaseData roboticsCaseData = roboticsDataMapper.toRoboticsCaseData(caseData, authToken);
-            roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseData.toJsonString().getBytes())
-                .events(roboticsCaseData.getEvents())
-                .build();
+            roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseData.toJsonString().getBytes(), roboticsCaseData.getEvents());
         }
         return roboticsCaseDataDTO;
     }
@@ -120,9 +115,7 @@ public class RoboticsNotificationService {
     private RoboticsCaseDataDTO getRoboticsCaseDataDTOForSpec(CaseData caseData, String authToken) throws JsonProcessingException {
         RoboticsCaseDataDTO roboticsCaseDataDTO;
         RoboticsCaseDataSpec roboticsCaseDataSpec = roboticsDataMapperForSpec.toRoboticsCaseData(caseData, authToken);
-        roboticsCaseDataDTO = RoboticsCaseDataDTO.builder().jsonRawData(roboticsCaseDataSpec.toJsonString().getBytes())
-            .events(roboticsCaseDataSpec.getEvents())
-            .build();
+        roboticsCaseDataDTO = new RoboticsCaseDataDTO(roboticsCaseDataSpec.toJsonString().getBytes(), roboticsCaseDataSpec.getEvents());
         return roboticsCaseDataDTO;
     }
 
