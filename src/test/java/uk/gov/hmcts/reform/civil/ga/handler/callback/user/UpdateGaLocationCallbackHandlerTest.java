@@ -134,10 +134,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
-                LocationRefData.builder()
-                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
-                    .postcode("M5 4RR")
-                    .courtLocationCode("court1").build()
+                new LocationRefData()
+                    .setEpimmsId("00000").setSiteName("locationOfRegion2").setCourtAddress("Prince William House, Peel Cross Road, Salford")
+                    .setPostcode("M5 4RR")
+                    .setCourtLocationCode("court1")
             ));
         }
 
@@ -199,11 +199,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .customerReference(CUSTOMER_REFERENCE)
                                             .build())
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -218,8 +218,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 

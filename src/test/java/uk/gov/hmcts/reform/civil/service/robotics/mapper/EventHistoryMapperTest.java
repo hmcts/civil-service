@@ -242,18 +242,18 @@ class EventHistoryMapperTest {
         when(time.now()).thenReturn(localDateTime);
         courtLocations = new ArrayList<>();
         courtLocations.add(
-                LocationRefData.builder()
-                        .siteName("SiteName")
-                        .courtAddress("1")
-                        .postcode("1")
-                        .courtName("Court Name")
-                        .region("Region")
-                        .regionId("4")
-                        .courtVenueId("000")
-                        .courtTypeId("10")
-                        .courtLocationCode("121")
-                        .epimmsId("000000")
-                        .build());
+                new LocationRefData()
+                        .setSiteName("SiteName")
+                        .setCourtAddress("1")
+                        .setPostcode("1")
+                        .setCourtName("Court Name")
+                        .setRegion("Region")
+                        .setRegionId("4")
+                        .setCourtVenueId("000")
+                        .setCourtTypeId("10")
+                        .setCourtLocationCode("121")
+                        .setEpimmsId("000000")
+        );
         when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("121");
     }
 
@@ -10250,7 +10250,7 @@ class EventHistoryMapperTest {
             caseData.setRespondent2(PartyBuilder.builder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(
                     DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
@@ -10271,7 +10271,7 @@ class EventHistoryMapperTest {
             caseData.setRespondent2(PartyBuilder.builder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetails(
                     DynamicList.builder()
@@ -10319,7 +10319,7 @@ class EventHistoryMapperTest {
                      £1072.00
                     """);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
                     DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
@@ -10359,7 +10359,7 @@ class EventHistoryMapperTest {
                      £1072.00
                     """);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
@@ -10408,7 +10408,7 @@ class EventHistoryMapperTest {
                     """);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
                     DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
@@ -10466,7 +10466,7 @@ class EventHistoryMapperTest {
                      £1072.00
                     """);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
                     DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());
@@ -10524,7 +10524,7 @@ class EventHistoryMapperTest {
                      £1072.00
                     """);
             caseData.setRespondent2SameLegalRepresentative(YES);
-            caseData.setHearingSupportRequirementsDJ(HearingSupportRequirementsDJ.builder().build());
+            caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
             caseData.setDefendantDetailsSpec(
                     DynamicList.builder().value(DynamicListElement.builder().label("Both").build()).build());

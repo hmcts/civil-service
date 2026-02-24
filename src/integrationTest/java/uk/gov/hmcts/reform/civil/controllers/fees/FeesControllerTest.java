@@ -105,18 +105,12 @@ public class FeesControllerTest extends BaseIntegrationTest {
 
     private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{
-            Fee2Dto
-                .builder()
-                .minRange(new BigDecimal("0.1"))
-                .maxRange(new BigDecimal("300"))
-                .currentVersion(FeeVersionDto
-                                    .builder()
-                                    .flatAmount(FlatAmountDto
-                                                    .builder()
-                                                    .amount(new BigDecimal("35"))
-                                                    .build())
-                                    .build())
-                .build()
+            new Fee2Dto()
+                .setMinRange(new BigDecimal("0.1"))
+                .setMaxRange(new BigDecimal("300"))
+                .setCurrentVersion(new FeeVersionDto()
+                                       .setFlatAmount(new FlatAmountDto()
+                                                          .setAmount(new BigDecimal("35"))))
         };
     }
 

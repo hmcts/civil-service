@@ -149,7 +149,7 @@ class AssistedOrderFormGeneratorTest {
             assertThrows(
                 IllegalArgumentException.class, ()
                     -> generator.generate(caseData, BEARER_TOKEN)
-            );
+        );
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -158,10 +158,11 @@ class AssistedOrderFormGeneratorTest {
     @Test
     void shouldGenerateAssistedOrderDocument() {
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("Reading")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("Reading")
+            );
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
@@ -209,10 +210,11 @@ class AssistedOrderFormGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("London")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("London")
+            );
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(YES).toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
@@ -258,7 +260,7 @@ class AssistedOrderFormGeneratorTest {
         appealShowOption.add(FinalOrderShowToggle.SHOW);
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775"))
             .claimant1PartyName("ClaimantName")
             .defendant1PartyName("defendant1PartyName")
             .claimant2PartyName("Test Claimant2 Name")
@@ -2370,10 +2372,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldGenerateAssistedOrderDocument() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder()
-                                .epimmsId("2")
-                                .externalShortName("Reading")
-                                .build());
+                .thenReturn(
+                    new LocationRefData()
+                        .setEpimmsId("2")
+                        .setExternalShortName("Reading")
+                );
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class),
                 eq(POST_JUDGE_ASSISTED_ORDER_FORM_LIP)

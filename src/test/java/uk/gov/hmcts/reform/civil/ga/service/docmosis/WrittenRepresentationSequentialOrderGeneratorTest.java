@@ -82,7 +82,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         writtenRepresentationSequentialOrderGenerator.generate(caseData, BEARER_TOKEN);
 
@@ -132,7 +132,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             writtenRepresentationSequentialOrderGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
                                                                    caseData,
@@ -157,7 +157,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
 
             var templateData = writtenRepresentationSequentialOrderGenerator
                 .getTemplateData(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
@@ -209,7 +209,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
 
             var templateData = writtenRepresentationSequentialOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -245,7 +245,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationSequentialData_Option2() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication()
                 .build()
                 .toBuilder()
@@ -308,7 +308,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             when(listGeneratorService.applicationType(updateData)).thenReturn("Extend time");
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             var templateData = writtenRepresentationSequentialOrderGenerator
                 .getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
@@ -353,7 +353,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
 
             when(listGeneratorService.applicationType(updateData)).thenReturn("Extend time");
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
 
             var templateData = writtenRepresentationSequentialOrderGenerator
                 .getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);

@@ -295,8 +295,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceeding() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -312,8 +312,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceedingForUrgentLip() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseData =
@@ -340,8 +340,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         mockIdamClient(DEF_UID);
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
@@ -367,8 +367,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         mockIdamClient(DEF_UID);
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
@@ -392,8 +392,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackAddsLocationDetails() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(AWAITING_RESPONDENT_RESPONSE),
@@ -922,7 +922,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -972,7 +972,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .defendant2PartyName("Defendant Two")
                 .defendant1PartyName("Defendant One")
                 .claimant1PartyName("Claimant One")
@@ -1111,7 +1111,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .gaRespondentDebtorOffer(
                 GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
                     GARespondentDebtorOfferOptionsGAspec.DECLINE)
@@ -1274,7 +1274,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithNullFromAndToDate() {
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1289,9 +1289,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithPreferredTypeInPersonLocationNull() {
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1307,7 +1307,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithUnavailableDates() {
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1321,7 +1321,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithUnavailableDatesBeforeToday() {
         return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1413,7 +1413,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1455,7 +1455,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1478,7 +1478,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         return GeneralApplicationCaseData.builder()
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(respondentSols)
@@ -1493,7 +1493,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .generalAppRespondent1Representative(YES)
                     .build())
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1521,7 +1521,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         return GeneralApplicationCaseData.builder()
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(respondentSols)
@@ -1575,10 +1575,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                           .email(DUMMY_EMAIL).organisationIdentifier("1").build())
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email(applicantEmail)
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail(applicantEmail)
+                                                )
             .respondent2SameLegalRepresentative(NO)
             .build();
     }

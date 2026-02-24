@@ -84,9 +84,8 @@ class GenerateHearingNoticeHMCRespSolOneEmailDTOGeneratorTest {
                 .build();
 
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingStartDateTime(HEARING_START_DATE_TIME)
-                        .build());
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingStartDateTime(HEARING_START_DATE_TIME));
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {
             utils.when(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VALUE))
