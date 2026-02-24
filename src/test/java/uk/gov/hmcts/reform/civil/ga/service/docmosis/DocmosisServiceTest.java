@@ -34,10 +34,10 @@ public class DocmosisServiceTest {
 
     private static final List<LocationRefData> locationRefData = Arrays
         .asList(
-            LocationRefData.builder().epimmsId("1").venueName("Reading").build(),
-            LocationRefData.builder().epimmsId("2").venueName("London").build(),
-            LocationRefData.builder().epimmsId("3").venueName("Manchester").build(),
-            LocationRefData.builder().epimmsId("420219").venueName("CNBC").build()
+            new LocationRefData().setEpimmsId("1").setVenueName("Reading"),
+            new LocationRefData().setEpimmsId("2").setVenueName("London"),
+            new LocationRefData().setEpimmsId("3").setVenueName("Manchester"),
+            new LocationRefData().setEpimmsId("420219").setVenueName("CNBC")
         );
     @InjectMocks
     private DocmosisService docmosisService;

@@ -82,13 +82,12 @@ class LipDefendantCaseAssignmentServiceTest {
                                           "respondent1", respondent1);
 
         when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,
@@ -135,13 +134,12 @@ class LipDefendantCaseAssignmentServiceTest {
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
         Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,

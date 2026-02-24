@@ -137,8 +137,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
@@ -213,8 +213,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
@@ -295,8 +295,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
@@ -359,8 +359,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
@@ -427,8 +427,8 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
@@ -504,7 +504,7 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setHearingId(HEARING_ID);
         inputVariables.setCaseId(CASE_ID);
 
-        List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId(EPIMS).build());
+        List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
         HearingDay hearingDay = HearingDay.builder()

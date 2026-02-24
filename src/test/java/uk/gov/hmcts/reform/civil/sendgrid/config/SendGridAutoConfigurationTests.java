@@ -9,7 +9,6 @@ import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.civil.sendgrid.config.SendGridAutoConfiguration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -68,6 +67,34 @@ class SendGridAutoConfigurationTests {
         loadContext("sendgrid.api-key:" + API_KEY, "sendgrid.version:v2");
         SendGrid sendGrid = this.context.getBean(SendGrid.class);
         assertThat(sendGrid).extracting("version").isEqualTo("v2");
+    }
+
+    @Test
+    void shouldUseDefaultHost_whenHostPropertyIsEmpty() {
+        loadContext("sendgrid.api-key:" + API_KEY, "sendgrid.host:");
+        SendGrid sendGrid = this.context.getBean(SendGrid.class);
+        assertThat(sendGrid).extracting("host").isEqualTo("api.sendgrid.com");
+    }
+
+    @Test
+    void shouldUseDefaultHost_whenHostPropertyIsBlank() {
+        loadContext("sendgrid.api-key:" + API_KEY, "sendgrid.host:  ");
+        SendGrid sendGrid = this.context.getBean(SendGrid.class);
+        assertThat(sendGrid).extracting("host").isEqualTo("api.sendgrid.com");
+    }
+
+    @Test
+    void shouldUseDefaultHost_whenHostPropertyIsNotSet() {
+        loadContext("sendgrid.api-key:" + API_KEY);
+        SendGrid sendGrid = this.context.getBean(SendGrid.class);
+        assertThat(sendGrid).extracting("host").isEqualTo("api.sendgrid.com");
+    }
+
+    @Test
+    void shouldUseDefaultVersion_whenVersionPropertyIsEmpty() {
+        loadContext("sendgrid.api-key:" + API_KEY, "sendgrid.version:");
+        SendGrid sendGrid = this.context.getBean(SendGrid.class);
+        assertThat(sendGrid).extracting("version").isEqualTo("v3");
     }
 
     private void loadContext(String... environment) {

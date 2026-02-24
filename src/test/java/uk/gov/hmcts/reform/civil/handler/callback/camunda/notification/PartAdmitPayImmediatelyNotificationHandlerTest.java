@@ -94,7 +94,7 @@ class PartAdmitPayImmediatelyNotificationHandlerTest {
         void shouldSendClaimantEmail_whenInvoked() {
             when(notificationsProperties.getPartAdmitPayImmediatelyAgreedClaimant()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
                 .build();
@@ -119,7 +119,7 @@ class PartAdmitPayImmediatelyNotificationHandlerTest {
         void shouldSendDefendantEmail_whenInvoked() {
             when(notificationsProperties.getPartAdmitPayImmediatelyAgreedDefendant()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmission().build().toBuilder()
                 .build();
