@@ -498,21 +498,19 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> getOrganisation() {
-        return Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                               .name("Organisation name")
-                               .contactInformation(List.of(ContactInformation.builder()
-                                                               .addressLine1("Address 1")
-                                                               .postCode("Post Code")
-                                                               .build()))
-                               .build());
+        return Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                               .setName("Organisation name")
+                               .setContactInformation(List.of(new ContactInformation()
+                                                               .setAddressLine1("Address 1")
+                                                               .setPostCode("Post Code")))
+                               );
     }
 
     private Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> getOrganisationWithoutName() {
-        return Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                               .contactInformation(List.of(ContactInformation.builder()
-                                                               .addressLine1("Address 1")
-                                                               .postCode("Post Code")
-                                                               .build()))
-                               .build());
+        return Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                               .setContactInformation(List.of(new ContactInformation()
+                                                               .setAddressLine1("Address 1")
+                                                               .setPostCode("Post Code")))
+                               );
     }
 }

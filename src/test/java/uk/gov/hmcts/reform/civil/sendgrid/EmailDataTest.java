@@ -15,12 +15,11 @@ class EmailDataTest {
 
     @Test
     void shouldReturnTrue_whenHasAnAttachment() {
-        EmailData emailData = EmailData.builder()
-            .to("to@server.net")
-            .subject("my email")
-            .message("My email message")
-            .attachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf")))
-            .build();
+        EmailData emailData = new EmailData()
+            .setTo("to@server.net")
+            .setSubject("my email")
+            .setMessage("My email message")
+            .setAttachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf")));
 
         assertTrue(emailData.hasAttachments());
     }
@@ -28,12 +27,11 @@ class EmailDataTest {
     @ParameterizedTest
     @NullAndEmptySource
     void shouldReturnFalse_whenHasNoAttachment(List<EmailAttachment> attachments) {
-        EmailData emailData = EmailData.builder()
-            .to("to@server.net")
-            .subject("my email")
-            .message("My email message")
-            .attachments(attachments)
-            .build();
+        EmailData emailData = new EmailData()
+            .setTo("to@server.net")
+            .setSubject("my email")
+            .setMessage("My email message")
+            .setAttachments(attachments);
 
         assertFalse(emailData.hasAttachments());
     }

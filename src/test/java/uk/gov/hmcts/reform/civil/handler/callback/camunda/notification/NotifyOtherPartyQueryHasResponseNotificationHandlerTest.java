@@ -119,7 +119,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -141,9 +141,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         })
         void shouldNotifyOtherParty_whenQueryResponseOnCase_OneRespondentRepresentative(String caseRole, String email) {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("7")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("7"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries1v1();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -164,9 +162,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         })
         void shouldNotifyOtherParty_whenQueryResponseOnCase_OneRespondentRepresentative_atStateClaimIssued(String caseRole, String email) {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("7")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("7"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries1v1AtStateClaimIssued();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -183,9 +179,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         })
         void shouldNotifyOtherParty_whenQueryResponseOnCase_OneRespondentRepresentative_applicantIsOtherParty(String caseRole, String email) {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("11")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("11"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries1v2SameSol();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -208,9 +202,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         })
         void shouldNotifyOtherParty_whenQueryResponseOnCase_TwoRespondentRepresentative(String caseRole, String email, String emailDef2) {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("11")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("11"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(caseRole));
             CaseData caseData = createCaseDataWithMultipleFollowUpQueries1v2DiffSol();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -332,7 +324,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getNotifyOtherPartyQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_QUERY_ID);
             when(notificationsProperties.getQueryLipPublicResponseReceived()).thenReturn(TEMPLATE_ID_LIP);
@@ -361,7 +353,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                     createCaseMessage("13", "admin", OffsetDateTime.now().minusHours(2), "3")
                 )
             );
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
 
             CaseData caseData;
@@ -407,7 +399,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                     createCaseMessage("13", "admin", OffsetDateTime.now().minusHours(2), "3")
                 )
             );
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
 
             CaseData caseData;
@@ -455,7 +447,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
@@ -488,7 +480,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("DEFENDANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
@@ -521,7 +513,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
@@ -552,7 +544,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
@@ -595,7 +587,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
@@ -629,7 +621,7 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
                 )
             );
 
-            when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("13").build());
+            when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("13"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
