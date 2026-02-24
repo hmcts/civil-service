@@ -216,7 +216,7 @@ class StayLiftedDefendantDashboardServiceTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setRespondent1Represented(YesOrNo.NO);
-        caseData.setPreStayState("AWAITING_RESPONDENT_RESPONSE");
+        caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
         stayLiftedDefendantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 

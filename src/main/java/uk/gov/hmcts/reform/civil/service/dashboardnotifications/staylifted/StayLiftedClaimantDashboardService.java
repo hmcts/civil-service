@@ -55,7 +55,7 @@ public class StayLiftedClaimantDashboardService extends DashboardScenarioService
 
     private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
         return switch (CaseState.valueOf(caseData.getPreStayState())) {
-            case AWAITING_RESPONDENT_RESPONSE -> Map.of(
+            case AWAITING_RESPONDENT_ACKNOWLEDGEMENT -> Map.of(
                 SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario(), true);
             case AWAITING_APPLICANT_INTENTION, IN_MEDIATION, JUDICIAL_REFERRAL, CASE_PROGRESSION, DECISION_OUTCOME,
                  All_FINAL_ORDERS_ISSUED -> Map.of(
