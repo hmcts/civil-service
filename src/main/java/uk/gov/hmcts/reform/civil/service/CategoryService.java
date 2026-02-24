@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.civil.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ public class CategoryService {
 
     private final ListOfValuesApi listOfValuesApi;
     private final AuthTokenGenerator authTokenGenerator;
+    private final ObjectMapper objectMapper;
 
     @Cacheable(
         value = "civilCaseCategoryCache",
@@ -25,11 +28,18 @@ public class CategoryService {
     )
     public Optional<CategorySearchResult> findCategoryByCategoryIdAndServiceId(String authToken, String categoryId, String serviceId) {
         try {
-            log.info("[CategoryService] Cache MISS → calling RD Common Data API to fetch all case categories");
+            log.info("[CategoryService] Cache MISS → calling RD Common Data API for categoryId={}, serviceId={}", categoryId, serviceId);
             var result = listOfValuesApi.findCategoryByCategoryIdAndServiceId(categoryId, serviceId, authToken,
                                                                               authTokenGenerator.generate());
             if (result == null) {
                 log.warn("[CategoryService] API returned null for categoryId={}, serviceId={}", categoryId, serviceId);
+            } else {
+                try {
+                    log.info("[CategoryService] API returned result for categoryId={}, serviceId={}: {}",
+                             categoryId, serviceId, objectMapper.writeValueAsString(result));
+                } catch (JsonProcessingException e) {
+                    log.info("[CategoryService] API returned result for categoryId={}, serviceId={}: {}", categoryId, serviceId, result);
+                }
             }
 
             return Optional.ofNullable(result);
