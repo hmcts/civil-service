@@ -60,7 +60,7 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -75,9 +75,9 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder()
-                                                   .calculatedAmountInPence(new BigDecimal(100000))
-                                                   .build())
+                                          .fee(new Fee()
+                                                   .setCalculatedAmountInPence(new BigDecimal(100000))
+                                                   )
                                           .build())
                 .build();
 
@@ -109,9 +109,9 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(LocalDate.now().minusDays(20)).build())
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder()
-                                                   .calculatedAmountInPence(new BigDecimal(0))
-                                                   .build())
+                                          .fee(new Fee()
+                                                   .setCalculatedAmountInPence(new BigDecimal(0))
+                                                   )
                                           .build())
                 .build();
 

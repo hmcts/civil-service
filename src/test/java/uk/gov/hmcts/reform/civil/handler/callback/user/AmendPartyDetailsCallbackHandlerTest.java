@@ -66,7 +66,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             String validEmail = "john@example.com";
 
             CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                 .respondentSolicitor1EmailAddress(validEmail)
                 .build();
 
@@ -82,7 +82,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             String invalidEmail = "a@a";
 
             CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(invalidEmail).build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(invalidEmail))
                 .respondentSolicitor1EmailAddress(invalidEmail)
                 .build();
 
@@ -96,27 +96,18 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class SetOrganisationPolicy {
-            OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-                .organisation(Organisation.builder()
-                                  .organisationID(null)
-                                  .build())
-                .orgPolicyReference("orgreference")
-                .orgPolicyCaseAssignedRole("orgassignedrole")
-                .build();
+            OrganisationPolicy organisationPolicy = organisationPolicy(null, "orgreference", "orgassignedrole");
 
-            OrganisationPolicy expectedOrganisationPolicy1 = OrganisationPolicy.builder()
-                .organisation(Organisation.builder()
-                                  .organisationID("QWERTY R")
-                                  .build())
-                .orgPolicyReference("orgreference")
-                .orgPolicyCaseAssignedRole("orgassignedrole")
-                .build();
+            OrganisationPolicy expectedOrganisationPolicy1 = organisationPolicy(
+                "QWERTY R",
+                "orgreference",
+                "orgassignedrole");
             String validEmail = "john@example.com";
 
             @Test
             void shouldSetOrganisationPolicy_1v1() {
                 CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                    .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                     .respondentSolicitor1EmailAddress(validEmail)
                     .respondent1OrganisationIDCopy("QWERTY R")
                     .respondent1OrganisationPolicy(organisationPolicy)
@@ -142,7 +133,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 expectedOrganisationPolicy2.setOrgPolicyCaseAssignedRole("orgassignedrole");
 
                 CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                    .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                     .respondentSolicitor1EmailAddress(validEmail)
                     .respondent1OrganisationIDCopy("QWERTY R")
                     .respondent1OrganisationPolicy(organisationPolicy)
@@ -190,5 +181,14 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     private static String respondentError() {
         return "Enter an email address in the correct format, for example john.smith@example.com";
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String reference, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy().setOrgPolicyReference(reference)
+            .setOrgPolicyCaseAssignedRole(role);
+        Organisation organisation = new Organisation();
+        organisation.setOrganisationID(organisationId);
+        policy.setOrganisation(organisation);
+        return policy;
     }
 }

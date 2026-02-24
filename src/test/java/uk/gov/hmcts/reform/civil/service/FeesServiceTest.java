@@ -43,11 +43,11 @@ class FeesServiceTest {
 
     @BeforeEach
     void setUp() {
-        FeeLookupResponseDto feeLookupResponse = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-            .code("test_fee_code")
-            .version(1)
-            .build();
+        FeeLookupResponseDto feeLookupResponse = new FeeLookupResponseDto()
+            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .setCode("test_fee_code")
+            .setVersion(1)
+            ;
         given(feesClient.lookupFee(any(), any(), any()))
             .willReturn(feeLookupResponse);
         given(feesClient.findRangeGroup(any(), any())).willReturn(buildFeeRangeResponse());
@@ -109,13 +109,13 @@ class FeesServiceTest {
 
     private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{
-            Fee2Dto.builder()
-                .minRange(MIN_RANGE)
-                .maxRange(MAX_RANGE)
-                .currentVersion(FeeVersionDto.builder()
-                    .flatAmount(FlatAmountDto.builder().amount(TEST_FEE_AMOUNT_POUNDS).build())
-                    .build())
-                .build()
+            new Fee2Dto()
+                .setMinRange(MIN_RANGE)
+                .setMaxRange(MAX_RANGE)
+                .setCurrentVersion(new FeeVersionDto()
+                    .setFlatAmount(new FlatAmountDto().setAmount(TEST_FEE_AMOUNT_POUNDS))
+                    )
+                
         };
     }
 }

@@ -79,11 +79,9 @@ class MediationCSVLrvLipServiceTest {
             .respondent1(buildParty(partyType, RESPONDENT_COMPANY_NAME, RESPONDENT_PHONE_NUMBER, RESPONDENT_EMAIL_ADDRESS,
                                     RESPONDENT_INDIVIDUAL_FIRST_NAME, RESPONDENT_INDIVIDUAL_LAST_NAME,
                                     RESPONDENT_SOLE_TRADER_FIRST_NAME, RESPONDENT_SOLE_TRADER_LAST_NAME, RESPONDENT_ORGANISATION_NAME))
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder().organisationID("123").build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("123")))
             .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name(LR_COMPANY_NAME).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(LR_COMPANY_EMAIL).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(LR_COMPANY_EMAIL))
             .caseNamePublic(CASE_TITLE)
             .build();
     }

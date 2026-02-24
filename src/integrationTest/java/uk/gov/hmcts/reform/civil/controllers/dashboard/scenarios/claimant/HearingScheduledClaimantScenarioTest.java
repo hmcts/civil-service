@@ -66,9 +66,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                               .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                               .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
 
         // When
         handler.handle(callbackParams);
@@ -137,7 +136,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(10)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -158,9 +157,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
 
         // When
         handler.handle(callbackParams);
@@ -237,7 +235,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .ccdCaseReference(Long.valueOf(caseId))
             .hearingDate(LocalDate.of(2024, 4, 1))
             .hearingDueDate(LocalDate.of(2024, 4, 1))
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(20000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(20000)))
             .ccdState(HEARING_READINESS)
             .listingOrRelisting(LISTING)
             .applicant1Represented(YesOrNo.NO)
@@ -245,9 +243,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
 
         // When
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT").build());
 
         // When
         handler.handle(callbackParams);
@@ -304,7 +301,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
         when(hearingFeesService.getFeeForHearingSmallClaims(any()))
-            .thenReturn(Fee.builder().calculatedAmountInPence(new BigDecimal(20000)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(20000)));
         when(hearingNoticeCamundaService.getProcessVariables(any()))
             .thenReturn(HearingNoticeVariables.builder()
                             .hearingId("HER1234")
@@ -327,9 +324,8 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_CLAIMANT_HMC").build());
 
         // When
         handler.handle(callbackParams);

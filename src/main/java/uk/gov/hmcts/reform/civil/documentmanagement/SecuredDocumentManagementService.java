@@ -79,22 +79,23 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
 
-            return CaseDocument.builder()
-                .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
-                                  .documentUrl(document.links.self.href)
-                                  .documentBinaryUrl(document.links.binary.href)
-                                  .documentFileName(originalFileName)
-                                  .documentHash(document.hashToken)
-                                  .build())
-                .documentName(originalFileName)
-                .documentType(pdf.getDocumentType())
-                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
-                                                                 .toInstant()
-                                                                 .atZone(ZoneId.systemDefault())
-                                                                 .toLocalDateTime()))
-                .documentSize(document.size)
-                .createdBy(CREATED_BY)
-                .build();
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document documentLink =
+                new uk.gov.hmcts.reform.civil.documentmanagement.model.Document()
+                    .setDocumentUrl(document.links.self.href)
+                    .setDocumentBinaryUrl(document.links.binary.href)
+                    .setDocumentFileName(originalFileName)
+                    .setDocumentHash(document.hashToken);
+
+            return new CaseDocument()
+                .setDocumentLink(documentLink)
+                .setDocumentName(originalFileName)
+                .setDocumentType(pdf.getDocumentType())
+                .setCreatedDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
+                                                                   .toInstant()
+                                                                   .atZone(ZoneId.systemDefault())
+                                                                   .toLocalDateTime()))
+                .setDocumentSize(document.size)
+                .setCreatedBy(CREATED_BY);
         } catch (Exception ex) {
             log.error("Failed uploading file {}", originalFileName, ex);
             throw new DocumentUploadException(originalFileName, ex);
@@ -129,21 +130,22 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
                 .findFirst()
                 .orElseThrow(() -> new DocumentUploadException(originalFileName));
 
-            return CaseDocument.builder()
-                .documentLink(uk.gov.hmcts.reform.civil.documentmanagement.model.Document.builder()
-                                  .documentUrl(document.links.self.href)
-                                  .documentBinaryUrl(document.links.binary.href)
-                                  .documentFileName(originalFileName)
-                                  .documentHash(document.hashToken)
-                                  .build())
-                .documentName(originalFileName)
-                .createdDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
-                                                                 .toInstant()
-                                                                 .atZone(ZoneId.systemDefault())
-                                                                 .toLocalDateTime()))
-                .documentSize(document.size)
-                .createdBy(CREATED_BY)
-                .build();
+            uk.gov.hmcts.reform.civil.documentmanagement.model.Document documentLink =
+                new uk.gov.hmcts.reform.civil.documentmanagement.model.Document()
+                    .setDocumentUrl(document.links.self.href)
+                    .setDocumentBinaryUrl(document.links.binary.href)
+                    .setDocumentFileName(originalFileName)
+                    .setDocumentHash(document.hashToken);
+
+            return new CaseDocument()
+                .setDocumentLink(documentLink)
+                .setDocumentName(originalFileName)
+                .setCreatedDatetime(LocalDateTimeHelper.fromUTC(document.createdOn
+                                                                   .toInstant()
+                                                                   .atZone(ZoneId.systemDefault())
+                                                                   .toLocalDateTime()))
+                .setDocumentSize(document.size)
+                .setCreatedBy(CREATED_BY);
 
         } catch (Exception ex) {
             throw new DocumentUploadException(originalFileName, ex);

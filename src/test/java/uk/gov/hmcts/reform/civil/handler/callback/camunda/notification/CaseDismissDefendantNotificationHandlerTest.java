@@ -78,7 +78,7 @@ class CaseDismissDefendantNotificationHandlerTest {
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
@@ -126,11 +126,10 @@ class CaseDismissDefendantNotificationHandlerTest {
                          ? CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name()
                          : CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

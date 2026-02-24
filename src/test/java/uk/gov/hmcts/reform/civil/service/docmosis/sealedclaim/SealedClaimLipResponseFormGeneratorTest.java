@@ -118,7 +118,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -157,7 +157,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -450,7 +450,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -481,7 +481,7 @@ class SealedClaimLipResponseFormGeneratorTest {
         DocmosisDocument docmosisDocument = mock(DocmosisDocument.class);
         byte[] bytes = {};
         given(docmosisDocument.getBytes()).willReturn(bytes);
-        CaseDocument caseDocument = CaseDocument.builder().documentName(fileName).build();
+        CaseDocument caseDocument = new CaseDocument().setDocumentName(fileName);
         given(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any())).willReturn(
             docmosisDocument);
         given(documentManagementService.uploadDocument(anyString(), any(PDF.class))).willReturn(caseDocument);
@@ -571,16 +571,13 @@ class SealedClaimLipResponseFormGeneratorTest {
             .specDefendant1Debts(Respondent1DebtLRspec.builder()
                                      .hasLoanCardDebt(YesOrNo.YES)
                                      .loanCardDebtDetails(ElementUtils.wrapElements(
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 1")
-                                             .totalOwed(BigDecimal.valueOf(500))
-                                             .monthlyPayment(BigDecimal.valueOf(50))
-                                             .build(),
-                                         LoanCardDebtLRspec.builder()
-                                             .loanCardDebtDetail("Card 2")
-                                             .totalOwed(BigDecimal.valueOf(1500))
-                                             .monthlyPayment(BigDecimal.valueOf(200))
-                                     .build()
+                                         new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 1")
+                                             .setTotalOwed(BigDecimal.valueOf(500))
+                                             .setMonthlyPayment(BigDecimal.valueOf(50)),
+                                         new LoanCardDebtLRspec().setLoanCardDebtDetail("Card 2")
+                                             .setTotalOwed(BigDecimal.valueOf(1500))
+                                             .setMonthlyPayment(BigDecimal.valueOf(200))
+                                     
                                      ))
                                      .debtDetails(ElementUtils.wrapElements(
                                          new DebtLRspec()

@@ -62,25 +62,21 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
         applicantSolicitor1CheckEmail = new CorrectEmail()
             .setEmail("hmcts.civil@gmail.com")
             .setCorrect(YES);
-        applicant1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY A").build())
-            .build();
-        respondent1OrganisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("QWERTY R").build())
-            .build();
+        applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
+        respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
         respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
         claimValue = new ClaimValue()
             .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
-        claimFee = Fee.builder()
-            .calculatedAmountInPence(TEN)
-            .code("fee code")
-            .version("version 1")
-            .build();
+        claimFee = new Fee()
+            .setCalculatedAmountInPence(TEN)
+            .setCode("fee code")
+            .setVersion("version 1")
+            ;
         paymentReference = "some reference";
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
-        applicantSolicitor1UserDetails = IdamUserDetails.builder().email("applicantsolicitor@example.com").build();
+        applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
         applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.maximal().build();
         submittedDate = LocalDateTime.now();
         return this;

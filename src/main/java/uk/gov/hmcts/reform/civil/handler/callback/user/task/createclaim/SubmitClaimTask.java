@@ -279,16 +279,15 @@ public class SubmitClaimTask {
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
         if (caseData.getRespondent2SameLegalRepresentative() == YES) {
-            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
-
+            OrganisationPolicy respondent2OrganisationPolicy = new OrganisationPolicy();
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
             if (respondent1OrganisationPolicy != null) {
-                organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                    .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                    .build();
+                respondent2OrganisationPolicy
+                    .setOrganisation(respondent1OrganisationPolicy.getOrganisation())
+                    .setOrgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference());
             }
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
-            caseData.setRespondent2OrganisationPolicy(organisationPolicy2Builder.build());
+            respondent2OrganisationPolicy.setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            caseData.setRespondent2OrganisationPolicy(respondent2OrganisationPolicy);
         }
     }
 

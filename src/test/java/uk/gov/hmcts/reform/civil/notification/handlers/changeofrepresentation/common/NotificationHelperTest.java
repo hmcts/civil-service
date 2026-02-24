@@ -38,9 +38,7 @@ class NotificationHelperTest {
                             .individualFirstName("Applicant")
                             .individualLastName("A")
                             .partyName("Applicant A").build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY A").build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("QWERTY A")))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualFirstName("Respondent")
@@ -62,7 +60,7 @@ class NotificationHelperTest {
             .hearingDate(LocalDate.of(2024, 6, 1))
             .hearingDueDate(LocalDate.of(2024, 5, 20))
             .hearingTimeHourMinute("10:30")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .build();
@@ -112,10 +110,7 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor2_shouldReturnRespondent1SolicitorData_whenRespondent2IsNewSolicitor_andRespondent1IsNotLip() {
-        OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("RESP1_ORG_ID").build())
-            .build();
+        OrganisationPolicy respondent1Policy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("RESP1_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .respondent1OrganisationPolicy(respondent1Policy)
@@ -136,15 +131,12 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor2_shouldReturnApplicantSolicitorData_whenScenarioIsTwoVOne() {
-        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("APP_ORG_ID").build())
-            .build();
+        OrganisationPolicy applicantPolicy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("APP_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .addApplicant2(YesOrNo.YES)
             .build();
 
@@ -157,10 +149,7 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor2_shouldReturnRespondent2SolicitorData_whenRespondent2NotLipAndNotTwoVOne() {
-        OrganisationPolicy respondent2Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("RESP2_ORG_ID").build())
-            .build();
+        OrganisationPolicy respondent2Policy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("RESP2_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .respondent2OrganisationPolicy(respondent2Policy)
@@ -185,10 +174,7 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor1_shouldReturnRespondent1Solicitor_whenApplicant1IsNewSolicitor_andRespondent1IsNotLip() {
-        OrganisationPolicy respondent1Policy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("RESP1_ORG_ID").build())
-            .build();
+        OrganisationPolicy respondent1Policy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("RESP1_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .respondent1OrganisationPolicy(respondent1Policy)
@@ -209,15 +195,12 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent2IsNewSolicitor() {
-        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("APP_ORG_ID").build())
-            .build();
+        OrganisationPolicy applicantPolicy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("APP_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                                         .setOrganisationToAddID("orgAdd")
@@ -234,15 +217,12 @@ class NotificationHelperTest {
 
     @Test
     void getOtherSolicitor1_shouldReturnApplicantSolicitor_whenRespondent1IsNewSolicitor_andApplicantIsNotLip() {
-        OrganisationPolicy applicantPolicy = OrganisationPolicy.builder()
-            .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                              .organisationID("APP_ORG_ID").build())
-            .build();
+        OrganisationPolicy applicantPolicy = new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("APP_ORG_ID"));
 
         CaseData caseData = baseCaseData.toBuilder()
             .applicant1OrganisationPolicy(applicantPolicy)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("appsol@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("appsol@example.com"))
             .changeOfRepresentation(new ChangeOfRepresentation()
                                         .setCaseRole(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())
                                         .setOrganisationToAddID("orgAdd")

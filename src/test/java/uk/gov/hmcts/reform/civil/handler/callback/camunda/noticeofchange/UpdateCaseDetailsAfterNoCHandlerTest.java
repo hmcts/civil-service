@@ -172,7 +172,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails())
-                .isEqualTo(IdamUserDetails.builder().email("requester@example.com").build());
+                .isEqualTo(new IdamUserDetails().setEmail("requester@example.com"));
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
@@ -684,13 +684,9 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOrganisationRequestField(false, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
                 .anyRepresented(NO)
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("QWERTY R").build())
-                                                    .orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]")
-                                                    .build())
-                .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SEALED_CLAIM).build(),
-                                                           CaseDocument.builder().documentType(CLAIMANT_CLAIM_FORM).build()))
-                .build();
+                .respondent1OrganisationPolicy(organisationPolicy("QWERTY R", "[RESPONDENTSOLICITORONE]"))
+                .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SEALED_CLAIM),
+                                                           new CaseDocument().setDocumentType(CLAIMANT_CLAIM_FORM))).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -904,7 +900,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .build();
@@ -987,7 +983,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .claimantBilingualLanguagePreference("WELSH")
@@ -998,5 +994,11 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
 
             assertThat(response.getData()).extracting("previousCCDState").isNotNull();
         }
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        return new OrganisationPolicy()
+            .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(organisationId))
+            .setOrgPolicyCaseAssignedRole(role);
     }
 }

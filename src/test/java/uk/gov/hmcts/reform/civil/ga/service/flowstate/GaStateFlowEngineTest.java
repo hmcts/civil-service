@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.ga.service.flowstate;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
@@ -41,19 +41,16 @@ import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.LI
 import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.PROCEED_GENERAL_APPLICATION;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GaStateFlowEngine.class
-})
-
+@ExtendWith(MockitoExtension.class)
 public class GaStateFlowEngineTest {
 
-    @Autowired
+    @InjectMocks
     private GaStateFlowEngine stateFlowEngine;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsFailed() {
@@ -118,7 +115,7 @@ public class GaStateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -146,7 +143,7 @@ public class GaStateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -342,7 +339,7 @@ public class GaStateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .isGaApplicantLip(YES)
@@ -457,7 +454,7 @@ public class GaStateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -489,7 +486,7 @@ public class GaStateFlowEngineTest {
                     .paymentDetails(PaymentDetails.builder()
                                         .status(PaymentStatus.SUCCESS)
                                         .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
