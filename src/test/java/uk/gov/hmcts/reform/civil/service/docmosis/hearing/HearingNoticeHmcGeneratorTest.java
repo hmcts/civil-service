@@ -116,16 +116,16 @@ class HearingNoticeHmcGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         when(locationRefDataService
-                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(LocationRefData.builder()
-                                                                                             .epimmsId(EPIMS)
-                                                                                             .externalShortName("VenueName")
-                                                                                             .welshExternalShortName("WelshVenueValue")
-                                                                                             .siteName("CML-Site")
-                                                                                             .welshSiteName("CML-Site-Welsh")
-                                                                                             .courtAddress(
+                 .getHearingCourtLocations(BEARER_TOKEN)).thenReturn(List.of(new LocationRefData()
+                                                                                             .setEpimmsId(EPIMS)
+                                                                                             .setExternalShortName("VenueName")
+                                                                                             .setWelshExternalShortName("WelshVenueValue")
+                                                                                             .setSiteName("CML-Site")
+                                                                                             .setWelshSiteName("CML-Site-Welsh")
+                                                                                             .setCourtAddress(
                                                                                                  "CourtAddress")
-                                                                                             .postcode("Postcode")
-                                                                                             .build()));
+                                                                                             .setPostcode("Postcode")
+                                                                                             ));
 
         List<HearingIndividual> hearingIndividuals = List.of(
                 HearingIndividual.attendingHearingInPerson("Chloe", "Landale"),

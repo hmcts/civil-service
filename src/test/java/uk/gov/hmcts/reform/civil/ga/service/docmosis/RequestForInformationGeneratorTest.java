@@ -66,7 +66,7 @@ class RequestForInformationGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(REQUEST_FOR_INFORMATION)))
             .thenReturn(new DocmosisDocument(REQUEST_FOR_INFORMATION.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         requestForInformationGenerator.generate(caseData, BEARER_TOKEN);
 
@@ -84,7 +84,7 @@ class RequestForInformationGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY)))
             .thenReturn(new DocmosisDocument(REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
             .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
@@ -130,7 +130,7 @@ class RequestForInformationGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(POST_JUDGE_REQUEST_FOR_INFORMATION_ORDER_LIP)))
                 .thenReturn(new DocmosisDocument(POST_JUDGE_REQUEST_FOR_INFORMATION_ORDER_LIP.getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             requestForInformationGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
                                                     caseData, BEARER_TOKEN, FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);
@@ -150,7 +150,7 @@ class RequestForInformationGeneratorTest {
                 .thenReturn(new DocmosisDocument(POST_JUDGE_REQUEST_FOR_INFORMATION_SEND_TO_OTHER_PARTY_LIP
                                                      .getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
@@ -175,7 +175,7 @@ class RequestForInformationGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .parentClaimantIsApplicant(YES)
                 .requestForInformationApplication().build().toBuilder()
@@ -218,7 +218,7 @@ class RequestForInformationGeneratorTest {
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData_LIP_Send_to_other_party() {
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .parentClaimantIsApplicant(YES)
                 .requestForInformationApplication().build().toBuilder()
@@ -263,7 +263,7 @@ class RequestForInformationGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .build();
 
@@ -295,7 +295,7 @@ class RequestForInformationGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData_1v1() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
@@ -331,7 +331,7 @@ class RequestForInformationGeneratorTest {
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData_LIP_Send_to_other_party() {
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
                                                      .judgeRecitalText("test")
@@ -361,7 +361,7 @@ class RequestForInformationGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData_LIP_Send_to_other_WelshParty() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").welshExternalShortName("Manceinion").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester").setWelshExternalShortName("Manceinion"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
                                                      .judgeRecitalText("test")
@@ -394,7 +394,7 @@ class RequestForInformationGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetRequestForInformationData_LIP_Send_to_other_WelshParty_EnglishCourtName() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").welshExternalShortName(null).build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester").setWelshExternalShortName(null));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication().build().toBuilder()
                 .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
                                                      .judgeRecitalText("test")

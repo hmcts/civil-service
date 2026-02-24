@@ -57,7 +57,7 @@ class JudgmentVariedDeterminationOfMeansRespSolOneEmailDTOGeneratorTest {
                 .build();
 
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(TEST_ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(TEST_ORG_NAME)));
 
         Map<String, String> properties = new HashMap<>();
 

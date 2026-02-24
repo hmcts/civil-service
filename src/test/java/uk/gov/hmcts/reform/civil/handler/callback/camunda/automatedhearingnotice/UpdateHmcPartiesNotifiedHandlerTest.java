@@ -79,13 +79,12 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     }
 
     private HearingNoticeVariables sampleCamundaVars() {
-        return HearingNoticeVariables.builder()
-            .hearingId("H123")
-            .hearingLocationEpims("LOC123")
-            .days(List.of())
-            .requestVersion(10L)
-            .responseDateTime(LocalDateTime.now())
-            .build();
+        return new HearingNoticeVariables()
+            .setHearingId("H123")
+            .setHearingLocationEpims("LOC123")
+            .setDays(List.of())
+            .setRequestVersion(10L)
+            .setResponseDateTime(LocalDateTime.now());
     }
 
     @Test
