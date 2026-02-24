@@ -541,7 +541,7 @@ public class UploadTranslatedDocumentServiceTest {
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("F1234").build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("F1234")).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When
@@ -560,7 +560,7 @@ public class UploadTranslatedDocumentServiceTest {
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When

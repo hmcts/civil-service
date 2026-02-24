@@ -199,11 +199,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .customerReference(CUSTOMER_REFERENCE)
                                             .build())
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -218,8 +218,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 

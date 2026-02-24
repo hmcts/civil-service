@@ -22,20 +22,20 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnApplicantEmailWhenUserDetailsIsNotPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email("applicantEmail@test.com")
-                                                .build()).build();
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail("applicantEmail@test.com")
+                                                ).build();
         assertEquals("applicantEmail@test.com", gaForLipService.getApplicant1Email(civilCaseData));
     }
 
     @Test
     void shouldReturnApplicantEmailWhenUserDetailsIsPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .claimantUserDetails(IdamUserDetails.builder()
-                                     .id("123")
-                                     .email("applicantEmail@test.com")
-                                     .build()).build();
+            .claimantUserDetails(new IdamUserDetails()
+                                     .setId("123")
+                                     .setEmail("applicantEmail@test.com")
+                                     ).build();
         assertEquals("applicantEmail@test.com", gaForLipService.getApplicant1Email(civilCaseData));
     }
 
@@ -55,10 +55,10 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnDefendantEmailWhenUserDetailsIsPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .defendantUserDetails(IdamUserDetails.builder()
-                                      .id("123")
-                                      .email("defendantEmail@test.com")
-                                      .build()).build();
+            .defendantUserDetails(new IdamUserDetails()
+                                      .setId("123")
+                                      .setEmail("defendantEmail@test.com")
+                                      ).build();
         assertEquals("defendantEmail@test.com", gaForLipService.getDefendant1Email(civilCaseData));
     }
 

@@ -29,7 +29,7 @@ public class PartyDetailsChangedUtil {
     private LitigationFriend updateLitigationFriendAddress(LitigationFriend litigationFriend, Party party) {
         if (litigationFriend != null && litigationFriend.getHasSameAddressAsLitigant() != null
             && litigationFriend.getHasSameAddressAsLitigant().equals(YesOrNo.YES)) {
-            return litigationFriend.toBuilder().primaryAddress(party.getPrimaryAddress()).build();
+            return litigationFriend.copy().setPrimaryAddress(party.getPrimaryAddress());
         }
         return litigationFriend;
     }

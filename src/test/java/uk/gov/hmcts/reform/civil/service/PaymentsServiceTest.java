@@ -254,10 +254,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .version("1")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setVersion("1")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -273,10 +273,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .code("FEE0442")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setCode("FEE0442")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -292,10 +292,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .code("FEE0442")
-                                               .version("1")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCode("FEE0442")
+                                               .setVersion("1")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -310,7 +310,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()).build())
             .build();
 
         Exception exception = assertThrows(
@@ -323,7 +323,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 
@@ -339,10 +339,10 @@ class PaymentsServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.TEN)
-                                               .version("version")
-                                               .code("code").build()).build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.TEN)
+                                               .setVersion("version")
+                                               .setCode("code")).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 

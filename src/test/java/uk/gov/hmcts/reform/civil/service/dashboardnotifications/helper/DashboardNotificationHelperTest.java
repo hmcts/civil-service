@@ -103,8 +103,8 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnTrue_whenReasonMatch() {
             CaseData caseData = CaseDataBuilder.builder()
-                .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
-                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build())
+                .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
+                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)))
                 .build();
 
             assertTrue(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(
@@ -114,8 +114,8 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnFalse_whenReasonNotMatched() {
             CaseData caseData = CaseDataBuilder.builder()
-                .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
-                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE)).build())
+                .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
+                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE)))
                 .build();
 
             assertFalse(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableClaimantOne(
@@ -129,8 +129,8 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnTrue_whenReasonMatch() {
             CaseData caseData = CaseDataBuilder.builder()
-                .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
-                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE)).build())
+                .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
+                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_DEFENDANT_ONE)))
                 .build();
 
             assertTrue(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(
@@ -140,8 +140,8 @@ class DashboardNotificationHelperTest {
         @Test
         void shouldReturnFalse_whenReasonNotMatched() {
             CaseData caseData = CaseDataBuilder.builder()
-                .mediation(Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(
-                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)).build())
+                .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(
+                    List.of(MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE)))
                 .build();
 
             assertFalse(dashboardDecisionHelper.isMediationUnsuccessfulReasonEqualToNotContactableDefendantOne(
