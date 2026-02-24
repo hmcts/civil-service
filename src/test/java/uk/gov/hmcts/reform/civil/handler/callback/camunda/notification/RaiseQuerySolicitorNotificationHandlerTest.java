@@ -88,7 +88,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryRaised()).thenReturn(TEMPLATE_ID);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -105,9 +105,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyApplicantLR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("1")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("1"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -125,9 +123,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyRespondent1LR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("2")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("2"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORONE.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -145,9 +141,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyRespondent2LR_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("3")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("3"));
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.RESPONDENTSOLICITORTWO.toString()));
             CaseData caseData = createCaseDataWithQueries();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -181,9 +175,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyClaimantLip_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -215,9 +207,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyClaimantLipBilingual_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -250,9 +240,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
         @Test
         void shouldNotifyDefendantLipLip_whenApplicantRaisedLatestQuery() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId(null)
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId(null));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -263,7 +251,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
                     .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
                                      .individualLastName("b").partyEmail("applicant@email.com").build())
                     .qmLatestQuery(createLatestQuery("5"))
-                    .defendantUserDetails(IdamUserDetails.builder().email("applicant@email.com").build())
+                    .defendantUserDetails(new IdamUserDetails().setEmail("applicant@email.com"))
                     .respondent1Represented(YesOrNo.NO)
                     .build();
 
@@ -296,9 +284,9 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(publicQueries)

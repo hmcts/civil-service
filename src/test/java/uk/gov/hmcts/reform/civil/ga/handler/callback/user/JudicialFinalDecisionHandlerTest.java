@@ -114,7 +114,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .atStateClaimDraft()
             .build().toBuilder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .build();
@@ -169,10 +169,8 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
             .thenReturn(localDatePlus21days);
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                          .build());
-        locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                          .build());
+        locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+        locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
             .build().toBuilder().locationName("County Court Money Centre")
@@ -249,10 +247,8 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
             .thenReturn(localDatePlus21days);
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                          .build());
-        locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                          .build());
+        locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+        locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
             .build().toBuilder().locationName("County Court Money Centre")
@@ -381,7 +377,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .build()
             .toBuilder()
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(

@@ -1410,7 +1410,7 @@ class HmcDataUtilsTest {
 
         @Test
         void shouldReturnLocation_whenInvoked() {
-            List<LocationRefData> locations = List.of(LocationRefData.builder().epimmsId("venue").build());
+            List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId("venue"));
             when(locationRefDataService.getHearingCourtLocations("authToken"))
                 .thenReturn(locations);
             LocationRefData locationRefData = HmcDataUtils.getLocationRefData(
@@ -1420,7 +1420,7 @@ class HmcDataUtilsTest {
                 locationRefDataService
             );
 
-            assertThat(locationRefData).isEqualTo(LocationRefData.builder().epimmsId("venue").build());
+            assertThat(locationRefData).isEqualTo(new LocationRefData().setEpimmsId("venue"));
         }
 
         @Test

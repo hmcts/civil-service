@@ -151,13 +151,12 @@ class GaCoreCaseDataServiceTest {
         @Test
         void triggerUpdateLocationEpimdsIdEvent_WhenApplicant1DQRequestedCourtCalled() {
             List<LocationRefData> mockLocation = new ArrayList<>();
-            LocationRefData locationRefData = LocationRefData.builder()
-                .region("1")
-                .epimmsId("12345")
-                .courtAddress("Central London")
-                .postcode("LJ09 EMM")
-                .siteName("London SX12 2345")
-                .build();
+            LocationRefData locationRefData = new LocationRefData()
+                .setRegion("1")
+                .setEpimmsId("12345")
+                .setCourtAddress("Central London")
+                .setPostcode("LJ09 EMM")
+                .setSiteName("London SX12 2345");
             mockLocation.add(locationRefData);
             when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
 

@@ -44,7 +44,7 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
                     .individualFirstName("James")
                     .individualLastName("John")
                     .build())
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .totalClaimAmount(BigDecimal.valueOf(300))

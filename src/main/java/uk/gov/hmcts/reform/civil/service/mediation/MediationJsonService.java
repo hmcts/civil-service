@@ -46,14 +46,13 @@ public class MediationJsonService {
 
         buildLitigantFields(caseData, litigantList);
 
-        return MediationCase.builder()
-            .ccdCaseNumber(caseData.getCcdCaseReference())
-            .casemanCaseNumber(caseData.getLegacyCaseReference())
-            .caseTitle(caseData.getCaseNameHmctsInternal())
-            .caseFlags(activeCaseFlags)
-            .claimValue(caseData.getTotalClaimAmount())
-            .litigants(litigantList)
-            .build();
+        return new MediationCase()
+            .setCcdCaseNumber(caseData.getCcdCaseReference())
+            .setCasemanCaseNumber(caseData.getLegacyCaseReference())
+            .setCaseTitle(caseData.getCaseNameHmctsInternal())
+            .setCaseFlags(activeCaseFlags)
+            .setClaimValue(caseData.getTotalClaimAmount())
+            .setLitigants(litigantList);
     }
 
     private boolean buildCaseFlags(CaseData caseData) {
@@ -234,10 +233,9 @@ public class MediationJsonService {
 
     private MediationLitigant buildUnrepresentedLitigant(Party party, String originalMediationContactPerson,
                                                          MediationLiPCarm mediationLiPCarm) {
-        var unrepresentedLitigantBuilder = MediationLitigant.builder();
-        partyDetailsPopulator.populator(unrepresentedLitigantBuilder, party);
-        unrepresentedLitigantPopulator.populator(unrepresentedLitigantBuilder, party, originalMediationContactPerson, mediationLiPCarm);
-        return unrepresentedLitigantBuilder.build();
+        MediationLitigant litigant = new MediationLitigant();
+        partyDetailsPopulator.populator(litigant, party);
+        return unrepresentedLitigantPopulator.populator(litigant, party, originalMediationContactPerson, mediationLiPCarm);
     }
 
     private MediationLitigant buildRepresentedLitigant(Party party,
@@ -245,10 +243,9 @@ public class MediationJsonService {
                                                        MediationAvailability mediationAvailability,
                                                        OrganisationPolicy organisationPolicy, String solicitorEmail) {
 
-        var representedLitigantBuilder = MediationLitigant.builder();
-        partyDetailsPopulator.populator(representedLitigantBuilder, party);
-        representedLitigantPopulator.populator(representedLitigantBuilder, mediationContactInformation, mediationAvailability, organisationPolicy, solicitorEmail);
-        return representedLitigantBuilder.build();
+        MediationLitigant litigant = new MediationLitigant();
+        partyDetailsPopulator.populator(litigant, party);
+        return representedLitigantPopulator.populator(litigant, mediationContactInformation, mediationAvailability, organisationPolicy, solicitorEmail);
     }
 
 }

@@ -94,10 +94,10 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder().applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                                                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                                                            .email("applicantsolicitor@example.com")
-                                                                                            .build())
+            caseData = caseData.toBuilder().applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                                                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                                                                            .setEmail("applicantsolicitor@example.com")
+                                                                                            )
                 .addApplicant2(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
@@ -111,7 +111,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 

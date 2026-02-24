@@ -176,7 +176,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_1115)
                     .hearingFeePaymentDetails(null)
-                    .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(25000)).build())
+                    .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(25000)))
                     .hearingDueDate(null)
                     .hearingDate(DATE_2025_07_01)
                     .build();
@@ -206,7 +206,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_1500)
                     .hearingFeePaymentDetails(null)
-                    .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(20000)).build())
+                    .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(20000)))
                     .hearingDueDate(DATE_2025_06_30)
                     .hearingDate(DATE_2025_07_01)
                     .build();
@@ -234,7 +234,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0800)
                     .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
-                    .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(10000)).build())
+                    .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(10000)))
                     .hearingDueDate(DATE_2025_07_01)
                     .hearingDate(DATE_2025_07_01)
                     .build();
@@ -268,7 +268,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0900)
                     .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
-                    .hearingFee(Fee.builder().calculatedAmountInPence(valueOf(15000)).build())
+                    .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(15000)))
                     .hearingDueDate(DATE_2025_08_15)
                     .hearingDate(DATE_2025_07_01)
                     .build();
