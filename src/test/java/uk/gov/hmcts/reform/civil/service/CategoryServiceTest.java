@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.crd.client.ListOfValuesApi;
@@ -54,9 +52,6 @@ class CategoryServiceTest {
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
-
-    @Spy
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks
     private CategoryService categoryService;
