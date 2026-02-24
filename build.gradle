@@ -98,7 +98,7 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.3.2'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
@@ -343,7 +343,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
