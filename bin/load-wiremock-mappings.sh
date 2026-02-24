@@ -76,9 +76,8 @@ for file in "$MAPPINGS_DIR"/*.json; do
           rm "$TMP_BASE64"
         else
           echo "Inlining JSON/text body"
-          BODY_CONTENT=$(<"$BODY_FILE_PATH")
           TMP_JSON=$(mktemp)
-          jq --arg body "$BODY_CONTENT" '
+          jq --rawfile body "$BODY_FILE_PATH" '
             del(.response.bodyFileName) |
             .response.body = $body
           ' "$file" > "$TMP_JSON"
