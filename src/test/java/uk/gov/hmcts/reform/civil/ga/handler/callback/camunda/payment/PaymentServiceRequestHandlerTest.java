@@ -194,7 +194,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         void shouldReturnFreeLipGa_True() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(Fee.builder().code("FREE").build()).build()).build();
+                                                                     .fee(new Fee().setCode("FREE")).build()).build();
             assertThat(handler.isFreeGaLip(caseData)).isTrue();
         }
 
@@ -217,7 +217,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         void shouldReturnFreeLipGa_whenFeeCodeIsNotFree_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(Fee.builder().code("1").build()).build())
+                                                                     .fee(new Fee().setCode("1")).build())
                                                                      .build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }

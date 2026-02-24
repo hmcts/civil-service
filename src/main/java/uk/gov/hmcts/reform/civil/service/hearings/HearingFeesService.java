@@ -26,41 +26,41 @@ public class HearingFeesService {
     private final HearingFeeConfiguration feesConfiguration;
 
     public Fee getFeeForHearingSmallClaims(BigDecimal amount) {
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getSmallClaimHrgKey())
-            .amount(amount).build();
+        FeesApiRequest builder = new FeesApiRequest()
+            .setChannel(feesConfiguration.getChannel())
+            .setEvent(feesConfiguration.getHearingEvent())
+            .setJurisdiction(feesConfiguration.getJurisdiction1())
+            .setJurisdiction2(feesConfiguration.getJurisdiction2())
+            .setService(feesConfiguration.getService())
+            .setKeyword(feesConfiguration.getSmallClaimHrgKey())
+            .setAmount(amount);
 
         return getRespond(builder);
     }
 
     public Fee getFeeForHearingFastTrackClaims(BigDecimal amount) {
 
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2Hearing())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getFastTrackHrgKey())
-            .amount(amount).build();
+        FeesApiRequest builder = new FeesApiRequest()
+            .setChannel(feesConfiguration.getChannel())
+            .setEvent(feesConfiguration.getHearingEvent())
+            .setJurisdiction(feesConfiguration.getJurisdiction1())
+            .setJurisdiction2(feesConfiguration.getJurisdiction2Hearing())
+            .setService(feesConfiguration.getService())
+            .setKeyword(feesConfiguration.getFastTrackHrgKey())
+            .setAmount(amount);
 
         return getRespond(builder);
     }
 
     public Fee getFeeForHearingMultiClaims(BigDecimal amount) {
-        FeesApiRequest builder = FeesApiRequest.builder()
-            .channel(feesConfiguration.getChannel())
-            .event(feesConfiguration.getHearingEvent())
-            .jurisdiction(feesConfiguration.getJurisdiction1())
-            .jurisdiction2(feesConfiguration.getJurisdiction2Hearing())
-            .service(feesConfiguration.getService())
-            .keyword(feesConfiguration.getMultiClaimKey())
-            .amount(amount).build();
+        FeesApiRequest builder = new FeesApiRequest()
+            .setChannel(feesConfiguration.getChannel())
+            .setEvent(feesConfiguration.getHearingEvent())
+            .setJurisdiction(feesConfiguration.getJurisdiction1())
+            .setJurisdiction2(feesConfiguration.getJurisdiction2Hearing())
+            .setService(feesConfiguration.getService())
+            .setKeyword(feesConfiguration.getMultiClaimKey())
+            .setAmount(amount);
 
         return getRespond(builder);
     }
@@ -94,10 +94,10 @@ public class HearingFeesService {
             .multiply(PENCE_PER_POUND)
             .setScale(0, RoundingMode.UNNECESSARY);
 
-        return Fee.builder()
-            .calculatedAmountInPence(calculatedAmount)
-            .code(feeLookupResponseDto.getCode())
-            .version(feeLookupResponseDto.getVersion().toString())
-            .build();
+        return new Fee()
+            .setCalculatedAmountInPence(calculatedAmount)
+            .setCode(feeLookupResponseDto.getCode())
+            .setVersion(feeLookupResponseDto.getVersion().toString())
+            ;
     }
 }

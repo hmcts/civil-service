@@ -68,7 +68,7 @@ class NotifyDefendantCaseStayedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
             .build();

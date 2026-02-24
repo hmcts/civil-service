@@ -187,9 +187,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
@@ -250,9 +248,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
@@ -310,9 +306,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
@@ -374,9 +368,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId", isWelsh
@@ -439,9 +431,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId", isWelsh
@@ -511,9 +501,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
@@ -576,9 +564,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.getHearingNoticeTemplateData(caseData, hearing, BEARER_TOKEN,
                                                             "SiteName - CourtAddress - Postcode", "hearingId",
@@ -635,9 +621,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
@@ -680,9 +664,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",
@@ -723,9 +705,7 @@ class HearingNoticeHmcGeneratorTest {
 
         when(hearingFeesService
                  .getFeeForHearingFastTrackClaims(caseData.getClaimValue().toPounds()))
-            .thenReturn(Fee.builder()
-                            .calculatedAmountInPence(new BigDecimal(123))
-                            .build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(new BigDecimal(123)));
 
         var actual = generator.generate(caseData, hearing, BEARER_TOKEN,
                                         "SiteName - CourtAddress - Postcode", "hearingId",

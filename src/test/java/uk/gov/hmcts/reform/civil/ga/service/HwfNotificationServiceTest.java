@@ -113,7 +113,7 @@ public class HwfNotificationServiceTest {
     private HwfNotificationService service;
 
     private static final GeneralApplicationCaseData  GA_CASE_DATA = GeneralApplicationCaseDataBuilder.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .ccdCaseReference(1111222233334444L)
@@ -127,13 +127,13 @@ public class HwfNotificationServiceTest {
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
+                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
                     .build())
             .hwfFeeType(FeeType.APPLICATION)
             .build();
 
     private static final GeneralApplicationCaseData  ADDITIONAL_CASE_DATA = GeneralApplicationCaseDataBuilder.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .ccdState(APPLICATION_ADD_PAYMENT)
             .ccdCaseReference(1111222233334444L)
             .parentClaimantIsApplicant(YesOrNo.YES)
@@ -147,7 +147,7 @@ public class HwfNotificationServiceTest {
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
+                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
                     .build())
             .hwfFeeType(FeeType.ADDITIONAL)
             .build();
