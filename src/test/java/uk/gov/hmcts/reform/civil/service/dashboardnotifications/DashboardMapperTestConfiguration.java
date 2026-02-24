@@ -62,7 +62,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.hearingscheduled.*"),
         @Filter(type = FilterType.REGEX,
-            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.informagreedextensiondatespec.*")
+            pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.informagreedextensiondatespec.*"),
         @Filter(type = FilterType.REGEX,
             pattern = "uk\\.gov\\.hmcts\\.reform\\.civil\\.service\\.dashboardnotifications\\.respondtoquery.*"),
         @Filter(type = FilterType.REGEX,
