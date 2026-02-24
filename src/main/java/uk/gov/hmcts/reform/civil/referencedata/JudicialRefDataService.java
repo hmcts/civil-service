@@ -30,9 +30,8 @@ public class JudicialRefDataService {
     private final AuthTokenGenerator authTokenGenerator;
 
     public List<JudgeRefData> getJudgeReferenceData(String searchString, String authToken) {
-        JudgeSearchRequest jsr = JudgeSearchRequest.builder()
-            .searchString(searchString)
-            .build();
+        JudgeSearchRequest jsr = new JudgeSearchRequest();
+        jsr.setSearchString(searchString);
 
         HttpEntity<JudgeSearchRequest> request = new HttpEntity<>(jsr, getHeaders(authToken));
 

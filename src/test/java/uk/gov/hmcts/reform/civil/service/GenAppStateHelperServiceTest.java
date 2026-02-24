@@ -440,19 +440,19 @@ class GenAppStateHelperServiceTest {
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
-                LocationRefData.builder()
-                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
-                    .postcode("M5 4RR")
-                    .courtLocationCode("court1").build()
+                new LocationRefData()
+                    .setEpimmsId("00000").setSiteName("locationOfRegion2").setCourtAddress("Prince William House, Peel Cross Road, Salford")
+                    .setPostcode("M5 4RR")
+                    .setCourtLocationCode("court1")
             ));
         }
 
         protected LocationRefData getSampleCourLocationsRefObject1() {
             return
-                LocationRefData.builder()
-                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
-                    .postcode("M5 4RR")
-                    .courtLocationCode("court1").build();
+                new LocationRefData()
+                    .setEpimmsId("00000").setSiteName("locationOfRegion2").setCourtAddress("Prince William House, Peel Cross Road, Salford")
+                    .setPostcode("M5 4RR")
+                    .setCourtLocationCode("court1");
         }
 
         @Test

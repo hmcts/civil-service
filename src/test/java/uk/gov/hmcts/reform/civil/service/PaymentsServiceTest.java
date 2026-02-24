@@ -57,10 +57,9 @@ class PaymentsServiceTest {
         .paymentReference("RC-1234-1234-1234-1234").build();
     private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
         .serviceRequestReference("RC-1234-1234-1234-1234").build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .name("test org")
-        .contactInformation(List.of(ContactInformation.builder().build()))
-        .build();
+    private static final Organisation ORGANISATION = new Organisation()
+        .setName("test org")
+        .setContactInformation(List.of(new ContactInformation()));
     private static final String CUSTOMER_REFERENCE = "12345";
     private static final String FEE_NOT_SET_CORRECTLY_ERROR = "Fees are not set correctly.";
 

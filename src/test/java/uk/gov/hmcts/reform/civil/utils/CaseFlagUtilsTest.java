@@ -80,7 +80,7 @@ class CaseFlagUtilsTest {
     void setUp() {
         organisationService = mock(OrganisationService.class);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Civil - Organisation")));
     }
 
     @Nested

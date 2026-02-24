@@ -117,7 +117,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -148,7 +148,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1AndNoSolicitorReferences() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -180,7 +180,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1AndNoSolicitorReferencesForDef1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -212,7 +212,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvokedNoFeeAnd1v2() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -249,7 +249,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvokedNoFeeAnd1v2WithSameSolicitor() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -286,7 +286,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd2v1() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -357,13 +357,12 @@ public class NotificationDefendantOfHearingHandlerTest {
         void shouldNotifyRespondentLip_whenInvokedAnd1v1HMC() {
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(13, 0)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-defendant-lip-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -582,18 +581,17 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v1HMC() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             // When
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
 
@@ -620,7 +618,7 @@ public class NotificationDefendantOfHearingHandlerTest {
         @Test
         void shouldNotifyRespondentSolicitor_whenInvokedNoFeeAnd1v2DS_HMC() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             // Given
@@ -638,13 +636,12 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING_HMC").build()).build();
             // When
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables.builder()
-                                .hearingStartDateTime(java.time.LocalDateTime.of(
+                .thenReturn(new uk.gov.hmcts.reform.civil.service.hearingnotice.HearingNoticeVariables()
+                                .setHearingStartDateTime(java.time.LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     java.time.LocalTime.of(15, 30)
                                 ))
-                                .hearingId("123456")
-                                .build());
+                                .setHearingId("123456"));
             when(notificationsProperties.getHearingListedNoFeeDefendantLrTemplateHMC())
                 .thenReturn("test-template-no-fee-defendant-id-hmc");
             handler.handle(params);

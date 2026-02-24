@@ -54,7 +54,7 @@ class CaseFlagsInitialiserTest {
         organisationService = mock(OrganisationService.class);
         caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation 1").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Civil - Organisation 1")));
     }
 
     @Test

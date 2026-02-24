@@ -143,7 +143,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         void shouldSendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail(boolean referenceWasProvided) {
             //When
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+                .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("Legal Rep Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -208,7 +208,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
             //When
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+                .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("Legal Rep Name")));
             given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
             notificationHandler.handle(params);
             //Then

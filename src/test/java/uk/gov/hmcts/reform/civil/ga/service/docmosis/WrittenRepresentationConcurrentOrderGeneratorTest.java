@@ -78,7 +78,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
             .thenReturn(new DocmosisDocument(WRITTEN_REPRESENTATION_CONCURRENT.getDocumentTitle(), bytes));
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
         when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
         writtenRepresentationConcurrentOrderGenerator.generate(caseData, BEARER_TOKEN);
@@ -127,7 +127,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
                 .thenReturn(new DocmosisDocument(POST_JUDGE_WRITTEN_REPRESENTATION_CONCURRENT_LIP.getDocumentTitle(), bytes));
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
             writtenRepresentationConcurrentOrderGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
@@ -146,7 +146,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationConcurrentData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .parentClaimantIsApplicant(NO)
                 .writtenRepresentationConcurrentApplication().build()
@@ -203,7 +203,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationConcurrentData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().build()
                 .toBuilder()
                 .isMultiParty(YesOrNo.YES)
@@ -262,7 +262,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
                         .orderWithoutNoticeDate(LocalDate.now()).build()).build();
             GeneralApplicationCaseData updateDate = caseDataBuilder.build();
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
             when(listGeneratorService.applicationType(updateDate)).thenReturn("Extend time");
 
             var templateData = writtenRepresentationConcurrentOrderGenerator
@@ -309,7 +309,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
             GeneralApplicationCaseData updateDate = caseDataBuilder.build();
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             when(listGeneratorService.applicationType(updateDate)).thenReturn("Extend time");
 
             var templateData = writtenRepresentationConcurrentOrderGenerator
@@ -351,7 +351,7 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_3).build();
             GeneralApplicationCaseData updateDate = caseDataBuilder.build();
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));
             when(listGeneratorService.applicationType(updateDate)).thenReturn("Extend time");
 
             var templateData = writtenRepresentationConcurrentOrderGenerator

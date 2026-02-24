@@ -105,7 +105,7 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
+                .thenReturn(Optional.of(new Organisation().setName("test solicatior")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
@@ -134,7 +134,7 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
         void shouldNotifyRespondent2Solicitor_whenInvoked() {
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
+                .thenReturn(Optional.of(new Organisation().setName("test solicatior")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
                 .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
@@ -163,7 +163,7 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
         void shouldNotNotifyRespondent2SolicitorIf2ndDefendantSameLegalRep_whenInvoked() {
             when(notificationsProperties.getRespondentSolicitorClaimContinuingOnlineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicatior").build()));
+                .thenReturn(Optional.of(new Organisation().setName("test solicatior")));
             ;
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
