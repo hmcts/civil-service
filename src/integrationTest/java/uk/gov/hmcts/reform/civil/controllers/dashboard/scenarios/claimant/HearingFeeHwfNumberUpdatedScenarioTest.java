@@ -33,7 +33,7 @@ public class HearingFeeHwfNumberUpdatedScenarioTest extends DashboardBaseIntegra
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(45500)))
             .hearingHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER))
             .hwfFeeType(FeeType.HEARING)
             .build();

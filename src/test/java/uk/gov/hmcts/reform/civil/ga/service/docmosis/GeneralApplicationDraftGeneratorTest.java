@@ -387,8 +387,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
@@ -431,11 +431,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE)
                     .paymentSuccessfulDate(LocalDateTime.now())
                     .build())
@@ -458,8 +458,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
@@ -479,11 +479,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -506,8 +506,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .build();
     }
 

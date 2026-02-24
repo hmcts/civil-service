@@ -167,9 +167,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("FREE").build()).build())
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .build();
 
             GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
@@ -214,8 +214,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("PAY")).build())
                 .build();
 
             GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
@@ -262,8 +262,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().code("PAY").build()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
+                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("PAY")).build())
                 .build();
 
             GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
@@ -310,10 +310,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .generalAppType(GAApplicationType.builder().types(types).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAY").build())
+                                          .fee(new Fee().setCode("PAY"))
                                           .paymentDetails(PaymentDetails.builder().build())
                                           .build())
                 .build();
@@ -361,10 +361,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .generalAppType(GAApplicationType.builder().types(types).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAY").build())
+                                          .fee(new Fee().setCode("PAY"))
                                           .paymentDetails(PaymentDetails.builder().build())
                                           .build())
                 .build();
@@ -411,9 +411,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(Fee.builder().code("PAY").build()).build())
+                                          .fee(new Fee().setCode("PAY")).build())
                 .ccdCaseReference(1234L)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("0000").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .build();
 
             GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
@@ -1285,11 +1285,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                             .customerReference(CUSTOMER_REFERENCE)
                                             .build())
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                     .generalAppDetailsOfOrder(STRING_CONSTANT)
                     .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1300,8 +1300,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                             .email("abc@gmail.com").build()))
                     .isMultiParty(NO)
                     .parentClaimantIsApplicant(isConsented)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                            .caseReference(PARENT_CCD_REF.toString()).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                            .setCaseReference(PARENT_CCD_REF.toString()))
                     .build();
         }
 
@@ -1320,11 +1320,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                             .customerReference(CUSTOMER_REFERENCE)
                                             .build())
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1336,8 +1336,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .respondentsResponses(respondentsResponses)
                 .isMultiParty(NO)
                 .parentClaimantIsApplicant(isConsented)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 
@@ -1357,11 +1357,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                             .customerReference(CUSTOMER_REFERENCE)
                                             .build())
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1372,8 +1372,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .respondentsResponses(respondentResponses)
                 .generalAppRespondentSolicitors(respondentDetails)
                 .parentClaimantIsApplicant(isConsented)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 
@@ -1386,11 +1386,11 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppPBADetails(
                     GAPbaDetails.builder()
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -1401,8 +1401,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                                                  .email("abc@gmail.com").build()))
                 .isMultiParty(NO)
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 
@@ -1595,8 +1595,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             return GeneralApplicationCaseData.builder()
                 .ccdCaseReference(CHILD_CCD_REF)
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                                                                                 .customerReference("1336546")
                                                                                 .build()).build())
@@ -1631,8 +1631,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             return GeneralApplicationCaseData.builder()
                 .ccdCaseReference(CHILD_CCD_REF)
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
                                                                                 .customerReference("1336546")
                                                                                 .build()).build())
