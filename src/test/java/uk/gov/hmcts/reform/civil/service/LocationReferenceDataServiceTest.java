@@ -44,44 +44,41 @@ class LocationReferenceDataServiceTest {
     void setup() {
         lenient().when(authTokenGenerator.generate()).thenReturn(generatedAuth);
 
-        loc1 = LocationRefData.builder()
-            .siteName("Site A")
-            .welshSiteName("Welsh A")
-            .courtAddress("Address A")
-            .postcode("AA1 1AA")
-            .region("England")
-            .regionId("1")
-            .epimmsId("111")
-            .courtLocationCode("AAA")
-            .courtStatus("Open")
-            .isCaseManagementLocation("Y")
-            .isHearingLocation("Y")
-            .build();
+        loc1 = new LocationRefData()
+            .setSiteName("Site A")
+            .setWelshSiteName("Welsh A")
+            .setCourtAddress("Address A")
+            .setPostcode("AA1 1AA")
+            .setRegion("England")
+            .setRegionId("1")
+            .setEpimmsId("111")
+            .setCourtLocationCode("AAA")
+            .setCourtStatus("Open")
+            .setIsCaseManagementLocation("Y")
+            .setIsHearingLocation("Y");
 
-        loc2 = LocationRefData.builder()
-            .siteName("Site B")
-            .courtAddress("Address B")
-            .postcode("BB1 1BB")
-            .region("Wales")
-            .regionId("2")
-            .epimmsId("222")
-            .courtLocationCode("BBB")
-            .courtStatus("Open")
-            .isCaseManagementLocation("Y")
-            .isHearingLocation("Y")
-            .build();
+        loc2 = new LocationRefData()
+            .setSiteName("Site B")
+            .setCourtAddress("Address B")
+            .setPostcode("BB1 1BB")
+            .setRegion("Wales")
+            .setRegionId("2")
+            .setEpimmsId("222")
+            .setCourtLocationCode("BBB")
+            .setCourtStatus("Open")
+            .setIsCaseManagementLocation("Y")
+            .setIsHearingLocation("Y");
 
-        loc3 = LocationRefData.builder()
-            .siteName("Site C")
-            .courtAddress("Address C")
-            .postcode("CC1 1CC")
-            .region("Scotland")
-            .epimmsId("333")
-            .courtLocationCode("CCC")
-            .courtStatus("Closed")
-            .isCaseManagementLocation("N")
-            .isHearingLocation("N")
-            .build();
+        loc3 = new LocationRefData()
+            .setSiteName("Site C")
+            .setCourtAddress("Address C")
+            .setPostcode("CC1 1CC")
+            .setRegion("Scotland")
+            .setEpimmsId("333")
+            .setCourtLocationCode("CCC")
+            .setCourtStatus("Closed")
+            .setIsCaseManagementLocation("N")
+            .setIsHearingLocation("N");
     }
 
     @Test
@@ -220,16 +217,15 @@ class LocationReferenceDataServiceTest {
     @Test
     void shouldThrowExceptionWhenMoreThanOneCourtFound() {
         // Duplicate court with the same location code "AAA"
-        LocationRefData duplicateLoc = LocationRefData.builder()
-            .siteName("Site D")
-            .courtAddress("Address D")
-            .postcode("DD1 1DD")
-            .epimmsId("444")
-            .courtLocationCode("AAA") // same as loc1
-            .courtStatus("Open")
-            .isCaseManagementLocation("Y")
-            .isHearingLocation("Y")
-            .build();
+        LocationRefData duplicateLoc = new LocationRefData()
+            .setSiteName("Site D")
+            .setCourtAddress("Address D")
+            .setPostcode("DD1 1DD")
+            .setEpimmsId("444")
+            .setCourtLocationCode("AAA") // same as loc1
+            .setCourtStatus("Open")
+            .setIsCaseManagementLocation("Y")
+            .setIsHearingLocation("Y");
 
         when(courtVenueService.getCourtVenueByLocationCode(any(), any(), any()))
             .thenReturn(List.of(loc1, duplicateLoc));

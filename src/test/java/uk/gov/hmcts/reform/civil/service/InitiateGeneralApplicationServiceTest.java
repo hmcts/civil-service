@@ -188,8 +188,8 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         when(workingDayIndicator.isWorkingDay(any())).thenReturn(true);
 
         when(organisationApi.findUserOrganisation(any(), any()))
-            .thenReturn(uk.gov.hmcts.reform.civil.prd.model.Organisation
-                            .builder().organisationIdentifier("OrgId1").build());
+            .thenReturn(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                            .setOrganisationIdentifier("OrgId1"));
 
         when(caseAssignmentApi.getUserRoles(any(), any(), any()))
             .thenReturn(CaseAssignmentUserRolesResource.builder()
@@ -818,11 +818,11 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("11111").siteName("locationOfRegion2").courtAddress(
+            new LocationRefData()
+                .setEpimmsId("11111").setSiteName("locationOfRegion2").setCourtAddress(
                     "Prince William House, Peel Cross Road, Salford")
-                .postcode("M5 4RR")
-                .courtLocationCode("court1").build()
+                .setPostcode("M5 4RR")
+                .setCourtLocationCode("court1")
         ));
     }
 
@@ -861,7 +861,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
 
     protected List<LocationRefData> getEmptyCourLocationsRefObject() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder().build()
+            new LocationRefData()
         ));
     }
 
@@ -1334,4 +1334,3 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         return policy;
     }
 }
-

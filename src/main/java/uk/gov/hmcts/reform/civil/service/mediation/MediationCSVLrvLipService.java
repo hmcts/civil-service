@@ -23,9 +23,11 @@ public class MediationCSVLrvLipService extends MediationCSVService {
 
     @Override
     protected MediationParams getMediationParams(CaseData caseData) {
-        return MediationParams.builder()
-            .applicantOrganisation(organisationService.findOrganisationById(caseData.getApplicantOrganisationId()))
-            .caseData(caseData)
-            .build();
+        MediationParams mediationParams = new MediationParams();
+        mediationParams.setApplicantOrganisation(
+            organisationService.findOrganisationById(caseData.getApplicantOrganisationId())
+        );
+        mediationParams.setCaseData(caseData);
+        return mediationParams;
     }
 }

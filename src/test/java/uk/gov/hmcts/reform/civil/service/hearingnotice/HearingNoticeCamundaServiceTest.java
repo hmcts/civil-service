@@ -49,16 +49,15 @@ public class HearingNoticeCamundaServiceTest {
             .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
             .build();
 
-        HearingNoticeVariables expected = HearingNoticeVariables.builder()
-            .caseId(1L)
-            .hearingId("hearing-id")
-            .caseState(CASE_PROGRESSION.name())
-            .requestVersion(1L)
-            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-            .hearingLocationEpims("000000")
-            .responseDateTime(LocalDateTime.of(2023, 02, 02, 0, 0, 0))
-            .days(List.of(hearingDay))
-            .build();
+        HearingNoticeVariables expected = new HearingNoticeVariables()
+            .setCaseId(1L)
+            .setHearingId("hearing-id")
+            .setCaseState(CASE_PROGRESSION.name())
+            .setRequestVersion(1L)
+            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+            .setHearingLocationEpims("000000")
+            .setResponseDateTime(LocalDateTime.of(2023, 02, 02, 0, 0, 0))
+            .setDays(List.of(hearingDay));
 
         Map<String, Object> expectedVariablesMap = expected.toMap(mapper);
         when(runtimeClient.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(expectedVariablesMap);
@@ -75,16 +74,16 @@ public class HearingNoticeCamundaServiceTest {
             .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
             .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
             .build();
-        HearingNoticeVariables variables = HearingNoticeVariables.builder()
-            .caseId(1L)
-            .hearingId("hearing-id")
-            .caseState(CASE_PROGRESSION.name())
-            .requestVersion(1L)
-            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-            .hearingLocationEpims("000000")
-            .responseDateTime(LocalDateTime.of(2023, 02, 02, 0, 0, 0))
-            .days(List.of(hearingDay))
-            .build();
+
+        HearingNoticeVariables variables = new HearingNoticeVariables()
+            .setCaseId(1L)
+            .setHearingId("hearing-id")
+            .setCaseState(CASE_PROGRESSION.name())
+            .setRequestVersion(1L)
+            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+            .setHearingLocationEpims("000000")
+            .setResponseDateTime(LocalDateTime.of(2023, 02, 02, 0, 0, 0))
+            .setDays(List.of(hearingDay));
 
         hearingNoticeCamundaService.setProcessVariables(PROCESS_INSTANCE_ID, variables);
 
