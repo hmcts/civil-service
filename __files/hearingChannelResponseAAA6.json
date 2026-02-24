@@ -43,10 +43,10 @@
     {
       "active_flag": "Y",
       "category_key": "HearingChannel",
-      "key": "WIREMOCK",
+      "key": "WIREMOCK_AAA6",
       "lov_order": 999,
-      "value_cy": "WireMock",
-      "value_en": "WireMock"
+      "value_cy": "WireMock AAA6",
+      "value_en": "WireMock AAA6"
     }
   ]
 }
