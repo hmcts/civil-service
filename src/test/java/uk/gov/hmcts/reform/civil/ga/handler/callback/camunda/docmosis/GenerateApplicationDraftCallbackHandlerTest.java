@@ -432,7 +432,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
-                                      .fee(Fee.builder().code("FREE").build()).build()).build();
+                                      .fee(new Fee().setCode("FREE")).build()).build();
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -454,7 +454,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                       .paymentDetails(PaymentDetails.builder()
                                                           .status(PaymentStatus.SUCCESS).build())
-                                      .fee(Fee.builder().code("NotFree").build()).build()).build();
+                                      .fee(new Fee().setCode("NotFree")).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
