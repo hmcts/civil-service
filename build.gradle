@@ -431,7 +431,7 @@ dependencies {
 
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
-  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
+  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4
