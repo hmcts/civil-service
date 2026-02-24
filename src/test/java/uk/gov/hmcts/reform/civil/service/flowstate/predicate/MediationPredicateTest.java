@@ -247,37 +247,37 @@ class MediationPredicateTest {
 
         @Test
         void should_return_true_for_beforeUnsuccessful_when_no_reasons_present() {
-            Mediation mediation = Mediation.builder().unsuccessfulMediationReason(null).mediationUnsuccessfulReasonsMultiSelect(null).build();
+            Mediation mediation = new Mediation().setUnsuccessfulMediationReason(null).setMediationUnsuccessfulReasonsMultiSelect(null);
             when(caseData.getMediation()).thenReturn(mediation);
             assertTrue(MediationPredicate.beforeUnsuccessful.test(caseData));
         }
 
         @Test
         void should_return_false_for_beforeUnsuccessful_when_single_reason_present() {
-            Mediation mediation = Mediation.builder().unsuccessfulMediationReason("Some reason").build();
+            Mediation mediation = new Mediation().setUnsuccessfulMediationReason("Some reason");
             when(caseData.getMediation()).thenReturn(mediation);
             assertFalse(MediationPredicate.beforeUnsuccessful.test(caseData));
         }
 
         @Test
         void should_return_true_for_unsuccessful_when_single_reason_present() {
-            Mediation mediation = Mediation.builder().unsuccessfulMediationReason("Some reason").build();
+            Mediation mediation = new Mediation().setUnsuccessfulMediationReason("Some reason");
             when(caseData.getMediation()).thenReturn(mediation);
             assertTrue(MediationPredicate.unsuccessful.test(caseData));
         }
 
         @Test
         void should_return_true_for_unsuccessful_when_multi_select_has_values() {
-            Mediation mediation = Mediation.builder().mediationUnsuccessfulReasonsMultiSelect(List.of(
+            Mediation mediation = new Mediation().setMediationUnsuccessfulReasonsMultiSelect(List.of(
                 uk.gov.hmcts.reform.civil.enums.mediation.MediationUnsuccessfulReason.NOT_CONTACTABLE_CLAIMANT_ONE
-            )).build();
+            ));
             when(caseData.getMediation()).thenReturn(mediation);
             assertTrue(MediationPredicate.unsuccessful.test(caseData));
         }
 
         @Test
         void should_return_false_for_unsuccessful_when_no_reasons_present() {
-            Mediation mediation = Mediation.builder().unsuccessfulMediationReason(null).mediationUnsuccessfulReasonsMultiSelect(null).build();
+            Mediation mediation = new Mediation().setUnsuccessfulMediationReason(null).setMediationUnsuccessfulReasonsMultiSelect(null);
             when(caseData.getMediation()).thenReturn(mediation);
             assertFalse(MediationPredicate.unsuccessful.test(caseData));
         }

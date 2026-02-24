@@ -92,7 +92,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
                             .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234567"))
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
                     .parentCaseReference("56789")
@@ -132,7 +132,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
                             .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234567"))
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
                     .parentCaseReference("56789")
@@ -175,7 +175,7 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
                     .generalAppRespondentSolicitors(List.of(
                         Element.<GASolicitorDetailsGAspec>builder()
                             .value(GASolicitorDetailsGAspec.builder().email("respondent@gmail.com").build()).build()))
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1234567").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234567"))
                     .generalAppConsentOrder(YES)
                     .ccdCaseReference(Long.valueOf("56786"))
                     .parentCaseReference("56789")
@@ -190,9 +190,9 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest extends 
             when(coreCaseDataService.getCase(any())).thenReturn(civil);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
             when(gaForLipService.isLipApp(caseData)).thenReturn(false);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("LegalRep")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("LegalRep")
+                                                                                             ));
             when(notificationsProperties.getNotifyLRTranslatedDocumentUploaded()).thenReturn(
                 "template-id");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

@@ -26,7 +26,7 @@ public class OrganisationDetailsServiceTest {
     @InjectMocks
     private OrganisationDetailsService organisationDetailsService;
 
-    private final Organisation organisation = Organisation.builder().name("test org").build();
+    private final Organisation organisation = new Organisation().setName("test org");
 
     @Test
     void shouldReturnApplicantOrgNameWhenOrgNameExist() {

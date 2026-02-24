@@ -80,7 +80,7 @@ class CaseFlagUtilsTest {
     void setUp() {
         organisationService = mock(OrganisationService.class);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Civil - Organisation")));
     }
 
     @Nested
@@ -131,9 +131,9 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldUpdateLitigationFriendWithFlagsMeta() {
-            LitigationFriend litFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build();
+            LitigationFriend litFriend = new LitigationFriend().setFirstName("John").setLastName("Rambo");
             Flags flags = new Flags().setPartyName("John Rambo").setRoleOnCase("applicant").setDetails(List.of());
-            LitigationFriend expected = litFriend.toBuilder().flags(flags).build();
+            LitigationFriend expected = litFriend.copy().setFlags(flags);
 
             LitigationFriend actual = CaseFlagUtils.updateLitFriend("applicant", litFriend);
 
@@ -142,9 +142,9 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldNotUpdateLitigationFriendFlagsIfFlagsExist() {
-            LitigationFriend existingLitFriend = LitigationFriend.builder().firstName("John").lastName("Rambo").build()
-                .toBuilder()
-                .flags(new Flags().setPartyName("John Rambo").setRoleOnCase("applicant").setDetails(List.of())).build();
+            LitigationFriend existingLitFriend = new LitigationFriend().setFirstName("John").setLastName("Rambo")
+                .copy()
+                .setFlags(new Flags().setPartyName("John Rambo").setRoleOnCase("applicant").setDetails(List.of()));
 
             LitigationFriend actual = CaseFlagUtils.updateLitFriend("updatedField", existingLitFriend);
 
@@ -897,15 +897,14 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LITIGATION_FRIEND_ID).build())
                     .build();
 
-                caseData.setApplicant1LitigationFriend(caseData.getApplicant1LitigationFriend().toBuilder()
-                                                           .flags(new Flags()
+                caseData.setApplicant1LitigationFriend(caseData.getApplicant1LitigationFriend().copy()
+                                                           .setFlags(new Flags()
                                                                       .setPartyName("Mr. Applicant Litigation Friend")
                                                                       .setRoleOnCase("litigation friend")
                                                                       .setDetails(wrapElements(List.of(
                                                                           new FlagDetail().setName("flag name")))))
-                                                           .fullName(null)
-                                                           .firstName("Johnny").lastName("Rambo new")
-                                                           .build());
+                                                           .setFullName(null)
+                                                           .setFirstName("Johnny").setLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -926,15 +925,14 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_LITIGATION_FRIEND_ID).build())
                     .build();
 
-                caseData.setApplicant2LitigationFriend(caseData.getApplicant2LitigationFriend().toBuilder()
-                                                           .flags(new Flags()
+                caseData.setApplicant2LitigationFriend(caseData.getApplicant2LitigationFriend().copy()
+                                                           .setFlags(new Flags()
                                                                       .setPartyName("Applicant Two Litigation Friend")
                                                                       .setRoleOnCase("litigation friend")
                                                                       .setDetails(wrapElements(List.of(
                                                                           new FlagDetail().setName("flag name")))))
-                                                           .fullName(null)
-                                                           .firstName("Johnny").lastName("Rambo new")
-                                                           .build());
+                                                           .setFullName(null)
+                                                           .setFirstName("Johnny").setLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -955,15 +953,14 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LITIGATION_FRIEND_ID).build())
                     .build();
 
-                caseData.setRespondent1LitigationFriend(caseData.getRespondent1LitigationFriend().toBuilder()
-                                                            .flags(new Flags()
+                caseData.setRespondent1LitigationFriend(caseData.getRespondent1LitigationFriend().copy()
+                                                            .setFlags(new Flags()
                                                                        .setPartyName("Litigation Friend")
                                                                        .setRoleOnCase("litigation friend")
                                                                        .setDetails(wrapElements(List.of(
                                                                            new FlagDetail().setName("flag name")))))
-                                                            .fullName(null)
-                                                            .firstName("Johnny").lastName("Rambo new")
-                                                            .build());
+                                                            .setFullName(null)
+                                                            .setFirstName("Johnny").setLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -985,15 +982,14 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LITIGATION_FRIEND_ID).build())
                     .build();
 
-                caseData.setRespondent2LitigationFriend(caseData.getRespondent2LitigationFriend().toBuilder()
-                                                            .flags(new Flags()
+                caseData.setRespondent2LitigationFriend(caseData.getRespondent2LitigationFriend().copy()
+                                                            .setFlags(new Flags()
                                                                        .setPartyName("Litigation Friend")
                                                                        .setRoleOnCase("litigation friend")
                                                                        .setDetails(wrapElements(List.of(
                                                                            new FlagDetail().setName("flag name")))))
-                                                            .fullName(null)
-                                                            .firstName("Johnny").lastName("Rambo new")
-                                                            .build());
+                                                            .setFullName(null)
+                                                            .setFirstName("Johnny").setLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 

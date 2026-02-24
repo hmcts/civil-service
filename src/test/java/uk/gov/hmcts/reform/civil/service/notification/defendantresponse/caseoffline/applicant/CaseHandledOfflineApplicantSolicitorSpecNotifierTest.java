@@ -171,7 +171,7 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         @Test
         void shouldNotifyApplicantSolicitor_when1v1Case() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
                 .thenReturn(TEMPLATE);
 
@@ -192,7 +192,7 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         @Test
         void shouldNotifyApplicantSolicitor_when2v1Case() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
                 .thenReturn(TEMPLATE);
 
@@ -215,7 +215,7 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         @Test
         void shouldNotifyApplicantSolicitor_when2v1CaseSpec() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
                 .thenReturn(TEMPLATE);
 
@@ -239,7 +239,7 @@ class CaseHandledOfflineApplicantSolicitorSpecNotifierTest {
         @Test
         void shouldReturnAddPropertiesSpec_whenInvoked() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()

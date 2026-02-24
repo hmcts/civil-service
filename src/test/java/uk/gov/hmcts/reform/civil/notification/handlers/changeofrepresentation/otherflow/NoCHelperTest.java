@@ -89,7 +89,7 @@ class NoCHelperTest {
             .hearingDate(LocalDate.of(2024, 6, 1))
             .hearingDueDate(LocalDate.of(2024, 5, 20))
             .hearingTimeHourMinute("10:30")
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10000)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
             .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
             .build();
@@ -99,13 +99,13 @@ class NoCHelperTest {
     void getProperties_shouldReturnExpectedMap() {
 
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         when(organisationService.findOrganisationById("orgAdd"))
-            .thenReturn(Optional.of(Organisation.builder().name("New Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("New Org")));
 
         when(organisationService.findOrganisationById("orgRemove"))
-            .thenReturn(Optional.of(Organisation.builder().name("Old Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Old Org")));
 
         Map<String, String> props = noCHelper.getProperties(baseCaseData, false);
 
@@ -134,7 +134,7 @@ class NoCHelperTest {
     @Test
     void getHearingFeeEmailProperties_shouldReturnExpectedMap() {
         when(organisationService.findOrganisationById("QWERTY A"))
-            .thenReturn(Optional.of(Organisation.builder().name("App Legal Org").build()));
+            .thenReturn(Optional.of(new Organisation().setName("App Legal Org")));
 
         Map<String, String> props = noCHelper.getHearingFeeEmailProperties(baseCaseData);
 

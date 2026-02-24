@@ -245,10 +245,11 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("test solicitor")
-                                        .contactInformation(List.of(ContactInformation.builder().addressLine1("Test").country(
-                                            "Test").build()))
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("test solicitor")
+                                        .setContactInformation(List.of(new ContactInformation()
+                                                                        .setAddressLine1("Test")
+                                                                        .setCountry("Test")))
+                                        ));
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
             .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())

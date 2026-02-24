@@ -108,8 +108,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldReturnLocationList_whenLocationsAreQueried(String pageId) {
         // Given
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Site Name").courtAddress("Address").postcode("28000")
-                          .build());
+        locations.add(new LocationRefData().setSiteName("Site Name").setCourtAddress("Address").setPostcode("28000"));
         given(locationRefDataService.getHearingCourtLocations(any())).willReturn(locations);
 
         // When
@@ -358,8 +357,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Fee expectedFee = Fee.builder()
-            .calculatedAmountInPence(new BigDecimal(34600)).code("FEE0225").version("7").build();
+        Fee expectedFee = new Fee()
+            .setCalculatedAmountInPence(new BigDecimal(34600)).setCode("FEE0225").setVersion("7");
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -439,8 +438,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Fee expectedFee = Fee.builder()
-            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        Fee expectedFee = new Fee()
+            .setCalculatedAmountInPence(new BigDecimal(54500)).setCode("FEE0441").setVersion("1");
         given(feesService.getFeeForHearingFastTrackClaims(any())).willReturn(expectedFee);
         // When
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -471,8 +470,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setTotalClaimAmount(new BigDecimal(1000));
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Fee expectedFee = Fee.builder()
-            .calculatedAmountInPence(new BigDecimal(54500)).code("FEE0441").version("1").build();
+        Fee expectedFee = new Fee()
+            .setCalculatedAmountInPence(new BigDecimal(54500)).setCode("FEE0441").setVersion("1");
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         // When
@@ -501,8 +500,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Fee expectedFee = Fee.builder()
-            .calculatedAmountInPence(new BigDecimal(2700)).code("FEE0221").version("7").build();
+        Fee expectedFee = new Fee()
+            .setCalculatedAmountInPence(new BigDecimal(2700)).setCode("FEE0221").setVersion("7");
         given(feesService.getFeeForHearingSmallClaims(any())).willReturn(expectedFee);
 
         // When
@@ -530,8 +529,8 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
         caseData.setCcdState(CaseState.CASE_PROGRESSION);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-        Fee expectedFee = Fee.builder()
-            .calculatedAmountInPence(new BigDecimal(117500)).code("FEE0440").version("2").build();
+        Fee expectedFee = new Fee()
+            .setCalculatedAmountInPence(new BigDecimal(117500)).setCode("FEE0440").setVersion("2");
         given(feesService.getFeeForHearingMultiClaims(any())).willReturn(expectedFee);
 
         // When
@@ -549,7 +548,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotOverwriteCaseState_listingNonOther_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 
-        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        Fee fee = new Fee().setCode("code").setCalculatedAmountInPence(BigDecimal.valueOf(100)).setVersion("999");
         LocalDate hearingDueDate = LocalDate.of(2030, 1, 1);
 
         // Given
@@ -580,7 +579,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotOverwriteCaseState_reListing_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 
-        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        Fee fee = new Fee().setCode("code").setCalculatedAmountInPence(BigDecimal.valueOf(100)).setVersion("999");
         LocalDate hearingDueDate = LocalDate.of(2030, 1, 1);
 
         // Given
@@ -611,7 +610,7 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
     void shouldNotOverwriteCaseState_listingOther_whenAboutToSubmit(CaseState caseState) {
         given(time.now()).willReturn(LocalDateTime.now());
 
-        Fee fee = Fee.builder().code("code").calculatedAmountInPence(BigDecimal.valueOf(100)).version("999").build();
+        Fee fee = new Fee().setCode("code").setCalculatedAmountInPence(BigDecimal.valueOf(100)).setVersion("999");
         LocalDate hearingDueDate = LocalDate.of(2030, 1, 1);
 
         // Given

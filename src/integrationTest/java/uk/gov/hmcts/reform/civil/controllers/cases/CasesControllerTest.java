@@ -155,16 +155,12 @@ public class CasesControllerTest extends BaseIntegrationTest {
     @Test
     @SneakyThrows
     public void shouldReturnRASAssignment() {
-        var rasResponse = RoleAssignmentServiceResponse
-            .builder()
-            .roleAssignmentResponse(
-                List.of(RoleAssignmentResponse
-                            .builder()
-                            .actorId(ACTORID)
-                            .build()
+        var rasResponse = new RoleAssignmentServiceResponse()
+            .setRoleAssignmentResponse(
+                List.of(new RoleAssignmentResponse()
+                            .setActorId(ACTORID)
                 )
-            )
-            .build();
+            );
 
         when(roleAssignmentsService.getRoleAssignments(anyString(), anyString()))
             .thenReturn(rasResponse);

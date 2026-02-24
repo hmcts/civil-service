@@ -82,14 +82,14 @@ public class HearingFormGeneratorTest {
         .documentType(DEFAULT_JUDGMENT)
         .build();
     private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("000000");
-    private static LocationRefData locationRefData = LocationRefData.builder()
-        .siteName("SiteName")
-        .externalShortName("ExternalShortName")
-        .venueName("VenueName")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData = new LocationRefData()
+        .setSiteName("SiteName")
+        .setExternalShortName("ExternalShortName")
+        .setVenueName("VenueName")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
 
     @MockBean
     private SecuredDocumentManagementService documentManagementService;

@@ -63,15 +63,18 @@ public class RolesAndAccessAssignmentService {
             gaCaseId, ROLE_TYPE, ROLE_NAMES, bearerToken
         );
 
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(systemUserId)
+            .setReplaceExisting(false);
+
+        RoleAssignmentRequest assignmentRequest = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(buildRoleAssignments(gaCaseId, rolesToAssign, existingGaRoleAssignments));
+
         roleAssignmentService.assignUserRoles(
             systemUserId,
             bearerToken,
-            RoleAssignmentRequest.builder()
-                .roleRequest(RoleRequest.builder()
-                                 .assignerId(systemUserId)
-                                 .replaceExisting(false)
-                                 .build())
-                .requestedRoles(buildRoleAssignments(gaCaseId, rolesToAssign, existingGaRoleAssignments)).build());
+            assignmentRequest);
         log.info("Assigned roles from main case, to GA successfully");
     }
 
@@ -97,19 +100,18 @@ public class RolesAndAccessAssignmentService {
                     roleAssignmentAttributes.put("caseType", "GENERALAPPLICATION");
                     roleAssignmentAttributes.put("jurisdiction", "CIVIL");
 
-                    roleAssignments.add(RoleAssignment.builder()
-                                            .actorId(roleResponse.getActorId())
-                                            .actorIdType(roleResponse.getActorIdType())
-                                            .grantType(GrantType.valueOf(roleResponse.getGrantType()))
-                                            .roleCategory(RoleCategory.valueOf(roleResponse.getRoleCategory()))
-                                            .roleType(RoleType.valueOf(roleResponse.getRoleType()))
-                                            .classification(roleResponse.getClassification())
-                                            .roleName(roleResponse.getRoleName())
-                                            .beginTime(roleResponse.getBeginTime())
-                                            .endTime(roleResponse.getEndTime())
-                                            .readOnly(false)
-                                            .attributes(roleAssignmentAttributes)
-                                            .build());
+                    roleAssignments.add(new RoleAssignment()
+                                            .setActorId(roleResponse.getActorId())
+                                            .setActorIdType(roleResponse.getActorIdType())
+                                            .setGrantType(GrantType.valueOf(roleResponse.getGrantType()))
+                                            .setRoleCategory(RoleCategory.valueOf(roleResponse.getRoleCategory()))
+                                            .setRoleType(RoleType.valueOf(roleResponse.getRoleType()))
+                                            .setClassification(roleResponse.getClassification())
+                                            .setRoleName(roleResponse.getRoleName())
+                                            .setBeginTime(roleResponse.getBeginTime())
+                                            .setEndTime(roleResponse.getEndTime())
+                                            .setReadOnly(false)
+                                            .setAttributes(roleAssignmentAttributes));
                 }
             });
         });
