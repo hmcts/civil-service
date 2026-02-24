@@ -98,7 +98,7 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.3.2'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
@@ -356,7 +356,7 @@ dependencies {
   implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '7.0.0'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.7'
 
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
