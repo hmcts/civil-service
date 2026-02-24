@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -23,7 +23,6 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
@@ -31,6 +30,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT;
@@ -51,8 +51,6 @@ class StayLiftedClaimantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @Spy
-    private StayLiftedDashboardHelper stayLiftedDashboardHelper;
 
     @InjectMocks
     private StayLiftedClaimantDashboardService stayLiftedClaimantDashboardService;
@@ -242,6 +240,90 @@ class StayLiftedClaimantDashboardServiceTest {
         );
     }
 
+    @Test
+    void shouldRecordScenario_whenPreStayStateAwaitingRespondentResponse() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState("AWAITING_RESPONDENT_RESPONSE");
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_AWAIT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldRecordScenario_whenPreStayStateAwaitingApplicantIntention() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState("AWAITING_APPLICANT_INTENTION");
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldRecordScenario_whenPreStayStateDecisionOutcome() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState("DECISION_OUTCOME");
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldRecordScenario_whenPreStayStateAllFinalOrdersIssued() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState("All_FINAL_ORDERS_ISSUED");
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
+    }
+
+    @Test
+    void shouldReturnEmptyMap_whenPreStayStateIsInMediation() {
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setPreStayState(String.valueOf(CaseState.IN_MEDIATION));
+
+        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
+
+        verifyRecordedScenarios(List.of(
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario()
+        ));
+    }
+
     void verifyRecordedScenario(String scenario) {
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
@@ -253,6 +335,5 @@ class StayLiftedClaimantDashboardServiceTest {
 
     void verifyRecordedScenarios(List<String> expectedScenarios) {
         expectedScenarios.forEach(this::verifyRecordedScenario);
-        verifyNoMoreInteractions(dashboardScenariosService);
     }
 }

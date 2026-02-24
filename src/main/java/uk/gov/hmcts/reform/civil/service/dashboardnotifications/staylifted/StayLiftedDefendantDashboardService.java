@@ -13,25 +13,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_DEFENDANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.*;
 
 @Service
 public class StayLiftedDefendantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
-    private final StayLiftedDashboardHelper stayLiftedDashboardHelper;
 
     protected StayLiftedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
-                                                  FeatureToggleService featureToggleService,
-                                                  StayLiftedDashboardHelper stayLiftedDashboardHelper) {
+                                                  FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
         this.featureToggleService = featureToggleService;
-        this.stayLiftedDashboardHelper = stayLiftedDashboardHelper;
     }
 
     public void notifyStayLifted(CaseData caseData, String authToken) {
@@ -46,19 +39,27 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented() && featureToggleService.isLipVLipEnabled()) {
-            return Map.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
-                true,
-                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
-                stayLiftedDashboardHelper.hadHearingScheduled(caseData),
-                getViewDocumentsScenario(caseData).getScenario(),
-                stayLiftedDashboardHelper.isNotPreCaseProgression(caseData),
-                SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(),
-                CaseState.AWAITING_RESPONDENT_RESPONSE.toString().equals(caseData.getPreStayState())
-            );
+            Map<String, Boolean> scenarios = new HashMap<>();
+            scenarios.put(SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(), true);
+            scenarios.putAll(getScenariosBasedOnPreStayState(caseData));
+            return scenarios;
         }
 
         return new HashMap<>();
+    }
+
+    private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
+        return switch (CaseState.valueOf(caseData.getPreStayState())) {
+            case AWAITING_RESPONDENT_RESPONSE -> Map.of(
+                SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(), true);
+            case AWAITING_APPLICANT_INTENTION, IN_MEDIATION, JUDICIAL_REFERRAL, CASE_PROGRESSION, DECISION_OUTCOME,
+                 All_FINAL_ORDERS_ISSUED -> Map.of(
+                getViewDocumentsScenario(caseData).getScenario(), true);
+            case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING -> Map.of(
+                getViewDocumentsScenario(caseData).getScenario(), true,
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), true);
+            default -> Map.of();
+        };
     }
 
     private DashboardScenarios getViewDocumentsScenario(CaseData caseData) {
