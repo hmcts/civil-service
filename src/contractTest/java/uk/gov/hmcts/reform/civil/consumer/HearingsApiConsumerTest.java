@@ -205,17 +205,14 @@ public class HearingsApiConsumerTest extends BaseContractTest {
     }
 
     private PartiesNotified getPartiesNotifiedPayload() {
-        return PartiesNotified.builder()
-            .serviceData(PartiesNotifiedServiceData.builder()
-                .hearingNoticeGenerated(false)
-                .hearingDate(LocalDate.of(2024, 10, 20).atStartOfDay())
-                .hearingLocation("Central Court")
-                .days(List.of(HearingDay.builder()
-                    .hearingStartDateTime(HEARING_START)
-                    .hearingEndDateTime(HEARING_END)
-                    .build()))
-                .build())
-            .build();
+        return new PartiesNotified()
+            .setServiceData(new PartiesNotifiedServiceData()
+                .setHearingNoticeGenerated(false)
+                .setHearingDate(LocalDate.of(2024, 10, 20).atStartOfDay())
+                .setHearingLocation("Central Court")
+                .setDays(List.of(new HearingDay()
+                    .setHearingStartDateTime(HEARING_START)
+                    .setHearingEndDateTime(HEARING_END))));
     }
 
     private DslPart buildGetHearingResponseBody() {
