@@ -53,12 +53,8 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
     }
 
-    public LocalDateTime plusDaysAt4pmDeadline(LocalDateTime startDate, long days) {
-        LocalDateTime dateTime = startDate;
-        if (is4pmOrAfter(startDate)) {
-            dateTime = startDate.plusDays(1);
-        }
-        LocalDate notificationDeadline = dateTime.plusDays(days).toLocalDate();
+    public LocalDateTime plusDaysSetAt4PMDeadline(LocalDateTime startDate, long days) {
+        LocalDate notificationDeadline = startDate.plusDays(days).toLocalDate();
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
     }
 

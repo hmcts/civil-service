@@ -598,7 +598,7 @@ class DeadlinesCalculatorTest {
         @Test
         void shouldAddDaysBefore4pm() {
             LocalDateTime start = LocalDate.of(2023, 1, 10).atTime(10, 0);
-            LocalDateTime result = calculator.plusDaysAt4pmDeadline(start, 5);
+            LocalDateTime result = calculator.plusDaysSetAt4PMDeadline(start, 5);
 
             assertThat(result)
                 .isWeekday()
@@ -608,7 +608,7 @@ class DeadlinesCalculatorTest {
         @Test
         void shouldAddExtraDayWhenAfter4pm() {
             LocalDateTime start = LocalDate.of(2023, 1, 10).atTime(17, 0);
-            LocalDateTime result = calculator.plusDaysAt4pmDeadline(start, 5);
+            LocalDateTime result = calculator.plusDaysSetAt4PMDeadline(start, 5);
 
             assertThat(result)
                 .isWeekday()

@@ -233,7 +233,7 @@ public class ManageStayCallbackHandlerTest {
         caseData.setRespondent1ResponseDeadline(LocalDate.now().plusDays(10).atStartOfDay());
         caseData.setRespondent2ResponseDeadline(LocalDate.now().plusDays(15).atStartOfDay());
 
-        when(deadlinesCalculator.plusDaysAt4pmDeadline(any(), eq(5L)))
+        when(deadlinesCalculator.plusDaysSetAt4PMDeadline(any(), eq(5L)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         CallbackParams params = CallbackParamsBuilder.builder()
@@ -247,7 +247,7 @@ public class ManageStayCallbackHandlerTest {
             mapper.convertValue(response.getData(), CaseData.class);
 
         verify(deadlinesCalculator, times(2))
-            .plusDaysAt4pmDeadline(any(), eq(5L));
+            .plusDaysSetAt4PMDeadline(any(), eq(5L));
 
         assertThat(updated.getRespondent1ResponseDeadline()).isNotNull();
         assertThat(updated.getRespondent2ResponseDeadline()).isNotNull();
@@ -264,7 +264,7 @@ public class ManageStayCallbackHandlerTest {
         caseData.setCaseStayDate(LocalDate.now().minusDays(3));
         caseData.setApplicant1ResponseDeadline(LocalDate.now().plusDays(7).atStartOfDay());
 
-        when(deadlinesCalculator.plusDaysAt4pmDeadline(any(), eq(3L)))
+        when(deadlinesCalculator.plusDaysSetAt4PMDeadline(any(), eq(3L)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         CallbackParams params = CallbackParamsBuilder.builder()
@@ -278,7 +278,7 @@ public class ManageStayCallbackHandlerTest {
             mapper.convertValue(response.getData(), CaseData.class);
 
         verify(deadlinesCalculator)
-            .plusDaysAt4pmDeadline(any(), eq(3L));
+            .plusDaysSetAt4PMDeadline(any(), eq(3L));
 
         assertThat(updated.getApplicant1ResponseDeadline()).isNotNull();
     }

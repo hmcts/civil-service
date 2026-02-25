@@ -131,19 +131,19 @@ public class ManageStayCallbackHandler extends CallbackHandler {
                 case AWAITING_RESPONDENT_ACKNOWLEDGEMENT -> {
                     if (nonNull(caseData.getRespondent1ResponseDeadline())) {
                         caseData.setRespondent1ResponseDeadline(
-                            deadlinesCalculator.plusDaysAt4pmDeadline(caseData.getRespondent1ResponseDeadline(), daysSinceCaseStay)
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getRespondent1ResponseDeadline(), daysSinceCaseStay)
                         );
                     }
                     if (nonNull(caseData.getRespondent2ResponseDeadline())) {
                         caseData.setRespondent2ResponseDeadline(
-                            deadlinesCalculator.plusDaysAt4pmDeadline(caseData.getRespondent2ResponseDeadline(), daysSinceCaseStay)
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getRespondent2ResponseDeadline(), daysSinceCaseStay)
                         );
                     }
                 }
                 case AWAITING_APPLICANT_INTENTION -> {
                     if (nonNull(caseData.getApplicant1ResponseDeadline())) {
                         caseData.setApplicant1ResponseDeadline(
-                            deadlinesCalculator.plusDaysAt4pmDeadline(caseData.getApplicant1ResponseDeadline(), daysSinceCaseStay)
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getApplicant1ResponseDeadline(), daysSinceCaseStay)
                         );
                     }
                 }
