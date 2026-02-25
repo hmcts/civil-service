@@ -25,6 +25,7 @@ java:
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
     HMC_API_URL: http://${SERVICE_NAME}-wiremock
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
+    RD_COMMONDATA_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     SEND_LETTER_URL: http://${SERVICE_NAME}-wiremock
     FEES_API_URL: http://${SERVICE_NAME}-wiremock
