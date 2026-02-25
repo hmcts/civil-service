@@ -124,7 +124,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             any(CaseData.class)
         )).willReturn(documents);
         //When
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
         //Then
@@ -189,7 +189,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
             any(CaseData.class)
         )).willReturn(documents);
         //When
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
         //Then
@@ -214,7 +214,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseDataLiP.setTranslatedDocuments(List.of(element(translatedDoc)));
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -240,7 +240,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setCaseDataLiP(caseDataLiP);
 
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
                 callbackParams);
@@ -268,7 +268,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setCaseDataLiP(caseDataLiP);
 
         when(featureToggleService.isDefendantNoCOnlineForCase(any())).thenReturn(true);
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -312,7 +312,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setPreTranslationDocuments(preTranslationDocuments);
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -354,7 +354,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -396,7 +396,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -439,7 +439,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -481,7 +481,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -523,7 +523,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setFinalOrderDocumentCollection(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -563,7 +563,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -605,7 +605,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -644,7 +644,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -688,7 +688,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -743,7 +743,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -802,7 +802,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -844,7 +844,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -889,7 +889,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -932,7 +932,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -976,7 +976,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1018,7 +1018,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1068,7 +1068,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);
@@ -1122,7 +1122,7 @@ class UploadTranslatedDocumentDefaultStrategyTest {
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
         caseData.setCcdCaseReference(123L);
 
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         var response = (AboutToStartOrSubmitCallbackResponse) uploadTranslatedDocumentDefaultStrategy.uploadDocument(
             callbackParams);

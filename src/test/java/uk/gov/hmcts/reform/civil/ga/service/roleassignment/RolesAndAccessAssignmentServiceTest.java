@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.config.SystemUpdateUserConfiguration;
 import uk.gov.hmcts.reform.civil.ras.model.Attributes;
 import uk.gov.hmcts.reform.civil.ras.model.GrantType;
@@ -39,7 +37,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService.ROLE_NAMES;
 import static uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService.ROLE_TYPE;
 
-@MockitoSettings(strictness = Strictness.LENIENT)
 @ExtendWith(MockitoExtension.class)
 class RolesAndAccessAssignmentServiceTest {
 
@@ -66,102 +63,93 @@ class RolesAndAccessAssignmentServiceTest {
     @BeforeEach
     void setUp() {
         when(userService.getAccessToken(any(), any())).thenReturn(bearerToken);
-        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
 
-        RoleAssignmentResponse allocatedJudgeRoleAssignment = RoleAssignmentResponse.builder()
-            .actorId(judgeUserToCopyInto)
-            .actorIdType("IDAM")
-            .roleType("CASE")
-            .roleName("allocated-judge")
-            .roleLabel("Allocated Judge")
-            .classification("RESTRICTED")
-            .grantType("SPECIFIC")
-            .roleCategory("JUDICIAL")
-            .readOnly(false)
-            .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .created(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .attributes(Attributes.builder()
-                            .substantive("Y")
-                            .caseId(mainCaseId)
-                            .caseType("CIVIL")
-                            .primaryLocation(null)
-                            .contractType(null)
-                            .region(null)
-                            .build())
-            .build();
-        RoleAssignmentResponse leadJudgeRoleAssignment = RoleAssignmentResponse.builder()
-            .actorId(judgeUserToCopyInto)
-            .actorIdType("IDAM")
-            .roleType("CASE")
-            .roleName("lead-judge")
-            .roleLabel("Lead Judge")
-            .classification("RESTRICTED")
-            .grantType("SPECIFIC")
-            .roleCategory("JUDICIAL")
-            .readOnly(false)
-            .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .created(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .attributes(Attributes.builder()
-                            .substantive("Y")
-                            .caseId(mainCaseId)
-                            .caseType("CIVIL")
-                            .primaryLocation(null)
-                            .contractType(null)
-                            .region(null)
-                            .build())
-            .build();
-        RoleAssignmentResponse adminRoleAssignment = RoleAssignmentResponse.builder()
-            .actorId(adminUserToCopyInto)
-            .actorIdType("IDAM")
-            .roleType("CASE")
-            .roleName("allocated-admin-caseworker")
-            .roleLabel("allocated admin")
-            .classification("RESTRICTED")
-            .grantType("SPECIFIC")
-            .roleCategory("ADMIN")
-            .readOnly(false)
-            .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .created(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .attributes(Attributes.builder()
-                            .substantive("Y")
-                            .caseId(mainCaseId)
-                            .caseType("CIVIL")
-                            .region(null)
-                            .build())
-            .build();
+        RoleAssignmentResponse allocatedJudgeRoleAssignment = new RoleAssignmentResponse()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setRoleType("CASE")
+            .setRoleName("allocated-judge")
+            .setRoleLabel("Allocated Judge")
+            .setClassification("RESTRICTED")
+            .setGrantType("SPECIFIC")
+            .setRoleCategory("JUDICIAL")
+            .setReadOnly(false)
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setCreated(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setAttributes(new Attributes()
+                            .setSubstantive("Y")
+                            .setCaseId(mainCaseId)
+                            .setCaseType("CIVIL")
+                            .setPrimaryLocation(null)
+                            .setContractType(null)
+                            .setRegion(null));
+        RoleAssignmentResponse leadJudgeRoleAssignment = new RoleAssignmentResponse()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setRoleType("CASE")
+            .setRoleName("lead-judge")
+            .setRoleLabel("Lead Judge")
+            .setClassification("RESTRICTED")
+            .setGrantType("SPECIFIC")
+            .setRoleCategory("JUDICIAL")
+            .setReadOnly(false)
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setCreated(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setAttributes(new Attributes()
+                            .setSubstantive("Y")
+                            .setCaseId(mainCaseId)
+                            .setCaseType("CIVIL")
+                            .setPrimaryLocation(null)
+                            .setContractType(null)
+                            .setRegion(null));
+        RoleAssignmentResponse adminRoleAssignment = new RoleAssignmentResponse()
+            .setActorId(adminUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setRoleType("CASE")
+            .setRoleName("allocated-admin-caseworker")
+            .setRoleLabel("allocated admin")
+            .setClassification("RESTRICTED")
+            .setGrantType("SPECIFIC")
+            .setRoleCategory("ADMIN")
+            .setReadOnly(false)
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setCreated(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setAttributes(new Attributes()
+                            .setSubstantive("Y")
+                            .setCaseId(mainCaseId)
+                            .setCaseType("CIVIL")
+                            .setRegion(null));
 
         List<RoleAssignmentResponse> roleList = new ArrayList<>();
         roleList.add(allocatedJudgeRoleAssignment);
         roleList.add(leadJudgeRoleAssignment);
         roleList.add(adminRoleAssignment);
-        allocatedCaseRoles = RoleAssignmentServiceResponse.builder().roleAssignmentResponse(roleList).build();
+        allocatedCaseRoles = new RoleAssignmentServiceResponse().setRoleAssignmentResponse(roleList);
 
         // pre-existing copies should not be re-copied
-        RoleAssignmentResponse preExistingCopiedAdminRoleAssignment = RoleAssignmentResponse.builder()
-            .actorId(adminUserToCopyInto)
-            .actorIdType("IDAM")
-            .roleType("CASE")
-            .roleName("allocated-admin-caseworker")
-            .roleLabel("allocated admin")
-            .classification("RESTRICTED")
-            .grantType("SPECIFIC")
-            .roleCategory("ADMIN")
-            .readOnly(false)
-            .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .created(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-            .attributes(Attributes.builder()
-                            .substantive("Y")
-                            .caseId(gaCaseId)
-                            .caseType("GENERALAPPLICATION")
-                            .region(null)
-                            .build())
-            .build();
+        RoleAssignmentResponse preExistingCopiedAdminRoleAssignment = new RoleAssignmentResponse()
+            .setActorId(adminUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setRoleType("CASE")
+            .setRoleName("allocated-admin-caseworker")
+            .setRoleLabel("allocated admin")
+            .setClassification("RESTRICTED")
+            .setGrantType("SPECIFIC")
+            .setRoleCategory("ADMIN")
+            .setReadOnly(false)
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setCreated(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setAttributes(new Attributes()
+                            .setSubstantive("Y")
+                            .setCaseId(gaCaseId)
+                            .setCaseType("GENERALAPPLICATION")
+                            .setRegion(null));
 
         List<RoleAssignmentResponse> existingGaRoleList = new ArrayList<>();
         existingGaRoleList.add(preExistingCopiedAdminRoleAssignment);
-        prexistingGAallocatedCaseRoles = RoleAssignmentServiceResponse.builder().roleAssignmentResponse(existingGaRoleList).build();
+        prexistingGAallocatedCaseRoles = new RoleAssignmentServiceResponse().setRoleAssignmentResponse(existingGaRoleList);
     }
 
     @Test
@@ -191,6 +179,7 @@ class RolesAndAccessAssignmentServiceTest {
 
     @Test
     void shouldCopyCaseRolesFromMainCaseIntoGaCase() {
+        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(mainCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
             .thenReturn(allocatedCaseRoles);
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(gaCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
@@ -198,59 +187,57 @@ class RolesAndAccessAssignmentServiceTest {
 
         rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(mainCaseId, gaCaseId);
 
-        RoleAssignmentRequest expectedCopiedRole = RoleAssignmentRequest.builder()
-            .roleRequest(RoleRequest.builder()
-                             .assignerId(systemUserAuth)
-                             .replaceExisting(false)
-                             .build())
-            .requestedRoles(List.of(
-                RoleAssignment.builder()
-                    .actorId(judgeUserToCopyInto)
-                    .actorIdType("IDAM")
-                    .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                    .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                    .roleType(RoleType.CASE)
-                    .classification("RESTRICTED")
-                    .grantType(GrantType.SPECIFIC)
-                    .roleCategory(RoleCategory.JUDICIAL)
-                    .roleName("allocated-judge")
-                    .attributes(Map.of("jurisdiction", "CIVIL",
-                                       "caseType", "GENERALAPPLICATION",
-                                       "caseId", gaCaseId))
-                    .readOnly(false)
-                    .build(),
-                RoleAssignment.builder()
-                    .actorId(judgeUserToCopyInto)
-                    .actorIdType("IDAM")
-                    .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                    .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                    .roleType(RoleType.CASE)
-                    .classification("RESTRICTED")
-                    .grantType(GrantType.SPECIFIC)
-                    .roleCategory(RoleCategory.JUDICIAL)
-                    .roleName("lead-judge")
-                    .attributes(Map.of("jurisdiction", "CIVIL",
-                                       "caseType", "GENERALAPPLICATION",
-                                       "caseId", gaCaseId))
-                    .readOnly(false)
-                    .build(),
-                RoleAssignment.builder()
-                    .actorId(adminUserToCopyInto)
-                    .actorIdType("IDAM")
-                    .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                    .roleType(RoleType.CASE)
-                    .classification("RESTRICTED")
-                    .grantType(GrantType.SPECIFIC)
-                    .roleCategory(RoleCategory.ADMIN)
-                    .roleName("allocated-admin-caseworker")
-                    .attributes(Map.of("jurisdiction", "CIVIL",
-                                       "caseType", "GENERALAPPLICATION",
-                                       "caseId", gaCaseId))
-                    .readOnly(false)
-                    .build()
+        RoleRequest expectedRoleRequest = new RoleRequest()
+            .setAssignerId(systemUserAuth)
+            .setReplaceExisting(false);
 
-            )
-            ).build();
+        RoleAssignment allocatedJudge = new RoleAssignment()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setRoleType(RoleType.CASE)
+            .setClassification("RESTRICTED")
+            .setGrantType(GrantType.SPECIFIC)
+            .setRoleCategory(RoleCategory.JUDICIAL)
+            .setRoleName("allocated-judge")
+            .setAttributes(Map.of("jurisdiction", "CIVIL",
+                                   "caseType", "GENERALAPPLICATION",
+                                   "caseId", gaCaseId))
+            .setReadOnly(false);
+
+        RoleAssignment leadJudge = new RoleAssignment()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setRoleType(RoleType.CASE)
+            .setClassification("RESTRICTED")
+            .setGrantType(GrantType.SPECIFIC)
+            .setRoleCategory(RoleCategory.JUDICIAL)
+            .setRoleName("lead-judge")
+            .setAttributes(Map.of("jurisdiction", "CIVIL",
+                                   "caseType", "GENERALAPPLICATION",
+                                   "caseId", gaCaseId))
+            .setReadOnly(false);
+
+        RoleAssignment allocatedAdmin = new RoleAssignment()
+            .setActorId(adminUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setRoleType(RoleType.CASE)
+            .setClassification("RESTRICTED")
+            .setGrantType(GrantType.SPECIFIC)
+            .setRoleCategory(RoleCategory.ADMIN)
+            .setRoleName("allocated-admin-caseworker")
+            .setAttributes(Map.of("jurisdiction", "CIVIL",
+                                   "caseType", "GENERALAPPLICATION",
+                                   "caseId", gaCaseId))
+            .setReadOnly(false);
+
+        RoleAssignmentRequest expectedCopiedRole = new RoleAssignmentRequest()
+            .setRoleRequest(expectedRoleRequest)
+            .setRequestedRoles(List.of(allocatedJudge, leadJudge, allocatedAdmin));
 
         verify(roleAssignmentService, times(1))
             .assignUserRoles(eq(systemUserAuth), eq(bearerToken), eq(expectedCopiedRole));
@@ -258,6 +245,7 @@ class RolesAndAccessAssignmentServiceTest {
 
     @Test
     void shouldNotCopyCaseRolesFromMainCaseIntoGaCase_if_alreadyExist() {
+        when(userService.getUserInfo(bearerToken)).thenReturn(UserInfo.builder().uid(systemUserAuth).build());
         when(roleAssignmentService.queryRoleAssignmentsByCaseIdAndRole(eq(mainCaseId), eq(ROLE_TYPE), eq(ROLE_NAMES), eq(bearerToken)))
             .thenReturn(allocatedCaseRoles);
         // GA role assignments already contain allocated-admin-caseworker
@@ -266,44 +254,43 @@ class RolesAndAccessAssignmentServiceTest {
 
         rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(mainCaseId, gaCaseId);
 
-        RoleAssignmentRequest expectedCopiedRole = RoleAssignmentRequest.builder()
-            .roleRequest(RoleRequest.builder()
-                             .assignerId(systemUserAuth)
-                             .replaceExisting(false)
-                             .build())
-            .requestedRoles(List.of(
-                                RoleAssignment.builder()
-                                    .actorId(judgeUserToCopyInto)
-                                    .actorIdType("IDAM")
-                                    .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                                    .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                                    .roleType(RoleType.CASE)
-                                    .classification("RESTRICTED")
-                                    .grantType(GrantType.SPECIFIC)
-                                    .roleCategory(RoleCategory.JUDICIAL)
-                                    .roleName("allocated-judge")
-                                    .attributes(Map.of("jurisdiction", "CIVIL",
-                                                       "caseType", "GENERALAPPLICATION",
-                                                       "caseId", gaCaseId))
-                                    .readOnly(false)
-                                    .build(),
-                                RoleAssignment.builder()
-                                    .actorId(judgeUserToCopyInto)
-                                    .actorIdType("IDAM")
-                                    .beginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                                    .endTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
-                                    .roleType(RoleType.CASE)
-                                    .classification("RESTRICTED")
-                                    .grantType(GrantType.SPECIFIC)
-                                    .roleCategory(RoleCategory.JUDICIAL)
-                                    .roleName("lead-judge")
-                                    .attributes(Map.of("jurisdiction", "CIVIL",
-                                                       "caseType", "GENERALAPPLICATION",
-                                                       "caseId", gaCaseId))
-                                    .readOnly(false)
-                                    .build()
-                            )
-            ).build();
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(systemUserAuth)
+            .setReplaceExisting(false);
+
+        RoleAssignment judgeAllocated = new RoleAssignment()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setRoleType(RoleType.CASE)
+            .setClassification("RESTRICTED")
+            .setGrantType(GrantType.SPECIFIC)
+            .setRoleCategory(RoleCategory.JUDICIAL)
+            .setRoleName("allocated-judge")
+            .setAttributes(Map.of("jurisdiction", "CIVIL",
+                                   "caseType", "GENERALAPPLICATION",
+                                   "caseId", gaCaseId))
+            .setReadOnly(false);
+
+        RoleAssignment judgeLead = new RoleAssignment()
+            .setActorId(judgeUserToCopyInto)
+            .setActorIdType("IDAM")
+            .setBeginTime(ZonedDateTime.of(2025, 1, 1, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setEndTime(ZonedDateTime.of(2025, 1, 7, 12, 0, 0, 0, ZoneId.of("Europe/London")))
+            .setRoleType(RoleType.CASE)
+            .setClassification("RESTRICTED")
+            .setGrantType(GrantType.SPECIFIC)
+            .setRoleCategory(RoleCategory.JUDICIAL)
+            .setRoleName("lead-judge")
+            .setAttributes(Map.of("jurisdiction", "CIVIL",
+                                   "caseType", "GENERALAPPLICATION",
+                                   "caseId", gaCaseId))
+            .setReadOnly(false);
+
+        RoleAssignmentRequest expectedCopiedRole = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(List.of(judgeAllocated, judgeLead));
 
         verify(roleAssignmentService, times(1))
             .assignUserRoles(eq(systemUserAuth), eq(bearerToken), eq(expectedCopiedRole));

@@ -33,27 +33,27 @@ class PaymentDateValidatorTest {
 
     @Test
     void shouldBeValidDate_whenToday() {
-        RespondToClaim respondToClaim = RespondToClaim.builder()
-            .whenWasThisAmountPaid(LocalDate.now().minusDays(1))
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim()
+            .setWhenWasThisAmountPaid(LocalDate.now().minusDays(1))
+            ;
 
         assertTrue(paymentDateValidator.validate(respondToClaim).isEmpty());
     }
 
     @Test
     void shouldBeValidDate_whenPastDate() {
-        RespondToClaim respondToClaim = RespondToClaim.builder()
-            .whenWasThisAmountPaid(LocalDate.now())
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim()
+            .setWhenWasThisAmountPaid(LocalDate.now())
+            ;
 
         assertTrue(paymentDateValidator.validate(respondToClaim).isEmpty());
     }
 
     @Test
     void shouldBeValidDate_whenFutureDate() {
-        RespondToClaim respondToClaim = RespondToClaim.builder()
-            .whenWasThisAmountPaid(LocalDate.now().plusDays(1))
-            .build();
+        RespondToClaim respondToClaim = new RespondToClaim()
+            .setWhenWasThisAmountPaid(LocalDate.now().plusDays(1))
+            ;
 
         assertEquals(1, paymentDateValidator.validate(respondToClaim).size());
         assertEquals("Date for when amount was paid must be today or in the past",

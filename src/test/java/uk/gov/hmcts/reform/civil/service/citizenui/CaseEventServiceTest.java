@@ -85,14 +85,12 @@ public class CaseEventServiceTest {
     @Test
     void shouldSubmitEventForExistingClaimSuccessfully() {
         InOrder orderVerifier = inOrder(coreCaseDataApi);
-        CaseDetails caseDetails = caseEventService.submitEvent(EventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.DEFENDANT_RESPONSE_SPEC)
-                                                                   .caseId(CASE_ID)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails caseDetails = caseEventService.submitEvent(new EventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.DEFENDANT_RESPONSE_SPEC)
+                                                                   .setCaseId(CASE_ID)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
         orderVerifier.verify(coreCaseDataApi).startEventForCitizen(
             AUTHORISATION,
@@ -115,14 +113,12 @@ public class CaseEventServiceTest {
     @Test
     void shouldSubmitEventForNewClaimSuccessfully() {
         InOrder orderVerifier = inOrder(coreCaseDataApi);
-        CaseDetails caseDetails = caseEventService.submitEvent(EventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.DEFENDANT_RESPONSE_SPEC)
-                                                                   .caseId(DRAFT)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails caseDetails = caseEventService.submitEvent(new EventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.DEFENDANT_RESPONSE_SPEC)
+                                                                   .setCaseId(DRAFT)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
         orderVerifier.verify(coreCaseDataApi).startForCitizen(
             AUTHORISATION,
@@ -165,14 +161,12 @@ public class CaseEventServiceTest {
             .willReturn(eventResponse);
         given(caseDetailsConverter.toCaseData(anyMap())).willReturn(caseData);
 
-        CaseDetails response = caseEventService.submitEvent(EventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.DEFENDANT_RESPONSE_SPEC)
-                                                                   .caseId(CASE_ID)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails response = caseEventService.submitEvent(new EventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.DEFENDANT_RESPONSE_SPEC)
+                                                                   .setCaseId(CASE_ID)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(response).isEqualTo(CASE_DETAILS);
     }
 }

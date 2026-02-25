@@ -267,15 +267,11 @@ class NotificationUtilsTest {
 
     @Test
     void shouldReturnOrgName_whenOrgIsPresent() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID("ORG123")
-                              .build())
-            .build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("ORG123"));
 
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                                                                         .name("org name")
-                                                                                         .build()));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                                                                         .setName("org name")
+                                                                                         ));
 
         String actual = NotificationUtils.getRespondentLegalOrganizationName(
             organisationPolicy,
@@ -287,11 +283,7 @@ class NotificationUtilsTest {
 
     @Test
     void shouldReturnNull_whenOrgIsNotPresent() {
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder()
-                              .organisationID("ORG123")
-                              .build())
-            .build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("ORG123"));
 
         when(organisationService.findOrganisationById(any())).thenReturn(Optional.ofNullable(null));
 
@@ -325,9 +317,9 @@ class NotificationUtilsTest {
     void shouldReturnApplicantOrgName_whenOrgIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                                                                         .name("org name")
-                                                                                         .build()));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                                                                         .setName("org name")
+                                                                                         ));
 
         String actual = NotificationUtils.getApplicantLegalOrganizationName(
             caseData,
@@ -356,7 +348,7 @@ class NotificationUtilsTest {
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLR(boolean isApplicantLip) {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmitted().applicant1(Party.builder().partyEmail(null).build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicantsolicitor@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantsolicitor@example.com"))
             .build();
 
         if (isApplicantLip) {
@@ -371,7 +363,7 @@ class NotificationUtilsTest {
     void shouldReturnTheCorrectApplicantEmail_ForApplicantLiP(boolean isApplicantLip) {
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(Party.builder().partyEmail("lipapplicant@example.com").build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(null).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(null))
             .build();
 
         if (!isApplicantLip) {

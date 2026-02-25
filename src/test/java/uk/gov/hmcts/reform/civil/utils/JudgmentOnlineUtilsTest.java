@@ -30,13 +30,12 @@ class JudgmentOnlineUtilsTest {
     void testShouldGetOrganisationByPolicy() {
         organisationService = mock(OrganisationService.class);
 
-        uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg = uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().organisationIdentifier("123").build();
+        uk.gov.hmcts.reform.civil.prd.model.Organisation testOrg = new uk.gov.hmcts.reform.civil.prd.model.Organisation().setOrganisationIdentifier("123");
 
         when(organisationService.findOrganisationById("1234"))
             .thenReturn(Optional.of(testOrg));
 
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("1234").build()).build();
+        OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1234"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
@@ -77,11 +76,9 @@ class JudgmentOnlineUtilsTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void testShouldCheckAreRespondentLegalOrgsEqual(boolean sameLegalOrgs) {
-        OrganisationPolicy organisation1Policy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("1234").build()).build();
+        OrganisationPolicy organisation1Policy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1234"));
 
-        OrganisationPolicy organisation2Policy = OrganisationPolicy.builder()
-            .organisation(Organisation.builder().organisationID("3456").build()).build();
+        OrganisationPolicy organisation2Policy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3456"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
@@ -111,8 +108,7 @@ class JudgmentOnlineUtilsTest {
     @Test
     void testShouldReturnAddress() {
 
-        ContactInformation contact =  ContactInformation.builder().addressLine1("Test").country(
-            "Test").build();
+        ContactInformation contact = new ContactInformation().setAddressLine1("Test").setCountry("Test");
         Address address = new Address();
         address.setAddressLine1("Test");
         address.setCountry("Test");

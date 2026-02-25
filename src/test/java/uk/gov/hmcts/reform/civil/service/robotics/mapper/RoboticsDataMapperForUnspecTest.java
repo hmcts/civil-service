@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.Address;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorOrganisationDetails;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
 import uk.gov.hmcts.reform.civil.model.robotics.NoticeOfChange;
@@ -34,7 +35,6 @@ import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.DxAddress;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -42,9 +42,15 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.flowstate.SimpleStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.flowstate.TransitionsTestConfiguration;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsRespondentResponseSupport;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsPartyLookup;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSupport;
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -69,25 +75,39 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     RoboticsDataMapperForUnspec.class,
     RoboticsAddressMapper.class,
     AddressLinesMapper.class,
-    OrganisationService.class
+    OrganisationService.class,
+    RoboticsRespondentResponseSupport.class,
+    RoboticsEventTextFormatter.class,
+    RoboticsTimelineHelper.class,
+    RoboticsPartyLookup.class,
+    RoboticsCaseDataSupport.class
 })
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForUnspecTest {
 
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-            .dxNumber("DX 12345")
-            .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+            .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
+
+    private ContactInformation copyContactInformation(ContactInformation source) {
+        return new ContactInformation()
+            .setAddressLine1(source.getAddressLine1())
+            .setAddressLine2(source.getAddressLine2())
+            .setAddressLine3(source.getAddressLine3())
+            .setPostCode(source.getPostCode())
+            .setCounty(source.getCounty())
+            .setCountry(source.getCountry())
+            .setTownCity(source.getTownCity())
+            .setDxAddress(source.getDxAddress());
+    }
 
     @MockBean
     OrganisationApi organisationApi;
@@ -132,7 +152,7 @@ class RoboticsDataMapperForUnspecTest {
     void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
-            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails("My Organisation", "me@server.net", "0123456789", "9999999999", "Dx"))
+            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails())
             .build();
 
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
@@ -147,7 +167,7 @@ class RoboticsDataMapperForUnspecTest {
     void shouldMapToRoboticsCaseData_whenDefendantIsNotRegistered_DtsCci_1478() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStatePaymentSuccessful()
-            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails("My Organisation", "me@server.net", "0123456789", "9999999999", "Dx"))
+            .respondentSolicitor1OrganisationDetails(createSolicitorOrganisationDetails())
             .build();
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.CLINICAL_NEGLIGENCE);
         caseData.setClaimType(ClaimType.PERSONAL_INJURY);
@@ -164,7 +184,7 @@ class RoboticsDataMapperForUnspecTest {
 
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -191,7 +211,7 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -229,13 +249,14 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(2);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
         assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
 
-        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
+        ContactInformation contactInformation = copyContactInformation(CONTACT_INFORMATION)
+            .setAddressLine1("line 1 provided");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -258,7 +279,7 @@ class RoboticsDataMapperForUnspecTest {
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
 
         assertThat(roboticsCaseData.getSolicitors()).hasSize(1);
-        var applicantSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var applicantSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(applicantSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(applicantSolicitor.getName()).isEqualTo("Org Name");
         assertThat(applicantSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -278,7 +299,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndClaimantIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setApplicant2(PartyBuilder.builder().individual().build());
+        caseData.setApplicant2(createIndividualParty());
         caseData.setAddApplicant2(YES);
         RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
         assertThat(roboticsCaseData.getLitigiousParties()).hasSize(3);
@@ -287,7 +308,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
         caseData.setClaimType(ClaimType.PERSONAL_INJURY);
@@ -299,7 +320,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(YES);
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
@@ -312,7 +333,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedSameSolicitor() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(YES);
         caseData.setRespondent2SameLegalRepresentative(YES);
@@ -326,7 +347,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldCheck_whenFeignException() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(YES);
         caseData.setRespondent2SameLegalRepresentative(YES);
@@ -342,7 +363,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedDifferentSolicitor() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(YES);
         caseData.setRespondent2SameLegalRepresentative(NO);
@@ -352,7 +373,7 @@ class RoboticsDataMapperForUnspecTest {
         CustomAssertions.assertThat(roboticsCaseData).isEqualTo(caseData);
         assertThat(roboticsCaseData.getSolicitors()).hasSize(3);
 
-        var firstSolicitor = roboticsCaseData.getSolicitors().get(0);
+        var firstSolicitor = roboticsCaseData.getSolicitors().getFirst();
         assertThat(firstSolicitor.getOrganisationId()).isEqualTo("QWERTY A");
         assertThat(firstSolicitor.getName()).isEqualTo("Org Name");
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
@@ -380,7 +401,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsRepresentedNotRegistered() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(YES);
         caseData.setRespondent2OrgRegistered(NO);
@@ -395,7 +416,7 @@ class RoboticsDataMapperForUnspecTest {
     @Test
     void shouldMapToRoboticsCaseDataWhen2ndDefendantIsNotRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStatePaymentSuccessful().build();
-        caseData.setRespondent2(PartyBuilder.builder().company().build());
+        caseData.setRespondent2(createCompanyParty());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2Represented(NO);
         caseData.setClaimTypeUnSpec(ClaimTypeUnspec.PERSONAL_INJURY);
@@ -553,18 +574,51 @@ class RoboticsDataMapperForUnspecTest {
         assertThat(roboticsCaseData.getHeader().getCaseAllocatedTo()).isEqualTo(expectedTrack);
     }
 
-    private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
-        return PreviousOrganisationCollectionItem.builder().value(
-            PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
+    private Party createIndividualParty() {
+        Party party = new Party();
+        party.setType(Party.Type.INDIVIDUAL);
+        party.setIndividualTitle("Mr.");
+        party.setIndividualFirstName("John");
+        party.setIndividualLastName("Rambo");
+        party.setIndividualDateOfBirth(LocalDate.now().minusYears(30));
+        party.setPartyName("Mr. John Rambo");
+        Address address = new Address();
+        address.setAddressLine1("1 Example Street");
+        address.setPostCode("AB1 1AB");
+        party.setPrimaryAddress(address);
+        party.setPartyPhone("01234 567890");
+        party.setPartyEmail("john.rambo@example.com");
+        return party;
     }
 
-    private SolicitorOrganisationDetails createSolicitorOrganisationDetails(String orgName, String email, String phone, String fax, String dx) {
+    private Party createCompanyParty() {
+        Party party = new Party();
+        party.setType(Party.Type.COMPANY);
+        party.setCompanyName("Company ltd");
+        party.setPartyName("Company ltd");
+        Address address = new Address();
+        address.setAddressLine1("1 Example Street");
+        address.setPostCode("AB1 1AB");
+        party.setPrimaryAddress(address);
+        party.setPartyPhone("01234 567890");
+        party.setPartyEmail("company@example.com");
+        return party;
+    }
+
+    private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
+        PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+        previousOrganisation.setOrganisationName(name);
+        previousOrganisation.setToTimestamp(toDate);
+        return new PreviousOrganisationCollectionItem(null, previousOrganisation);
+    }
+
+    private SolicitorOrganisationDetails createSolicitorOrganisationDetails() {
         SolicitorOrganisationDetails details = new SolicitorOrganisationDetails();
-        details.setOrganisationName(orgName);
-        details.setEmail(email);
-        details.setPhoneNumber(phone);
-        details.setFax(fax);
-        details.setDx(dx);
+        details.setOrganisationName("My Organisation");
+        details.setEmail("me@server.net");
+        details.setPhoneNumber("0123456789");
+        details.setFax("9999999999");
+        details.setDx("Dx");
         details.setAddress(new Address());
         return details;
     }

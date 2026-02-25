@@ -74,7 +74,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .partyEmail("lipEmail@mail.com").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
@@ -95,7 +95,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @Test
     void checkCamundaActivityTest() {
         caseData = caseData.toBuilder().build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyClaimantStayUpdateRequested", response);
     }
@@ -109,9 +109,9 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @Test
     void sendNotificationShouldSendEmail() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams params = new CallbackParams().caseData(caseData);
 
         when(notificationsProperties.getNotifyLRStayUpdateRequested()).thenReturn("solicitor-template");
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -151,8 +151,8 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
             .applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(language)
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_CLAIMANT_STAY_UPDATE_REQUESTED.toString()).build());
 
         CallbackResponse response = handler.sendNotification(params);
 

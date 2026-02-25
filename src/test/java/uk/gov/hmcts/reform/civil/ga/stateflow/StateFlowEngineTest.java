@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.civil.ga.stateflow;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeMakeAnOrderOption;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption;
@@ -41,19 +41,16 @@ import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.LI
 import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.ORDER_MADE;
 import static uk.gov.hmcts.reform.civil.ga.service.flowstate.GaFlowState.Main.PROCEED_GENERAL_APPLICATION;
 
-@SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-    GaStateFlowEngine.class
-})
-
+@ExtendWith(MockitoExtension.class)
 public class StateFlowEngineTest {
 
-    @Autowired
+    @InjectMocks
     private GaStateFlowEngine stateFlowEngine;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsFailed() {
@@ -88,9 +85,9 @@ public class StateFlowEngineTest {
             .generalOrderApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        ).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(NO)
@@ -115,10 +112,10 @@ public class StateFlowEngineTest {
             .generalOrderFreeFormApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        )
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -143,10 +140,10 @@ public class StateFlowEngineTest {
             .judgeFinalOrderApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        )
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -171,9 +168,9 @@ public class StateFlowEngineTest {
             .writtenRepresentationSequentialApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        ).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(NO)
@@ -198,9 +195,9 @@ public class StateFlowEngineTest {
             .approveApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        ).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -339,10 +336,10 @@ public class StateFlowEngineTest {
             .writtenRepresentationSequentialApplication()
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        )
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .isGaApplicantLip(YES)
@@ -454,10 +451,10 @@ public class StateFlowEngineTest {
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        )
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -486,10 +483,10 @@ public class StateFlowEngineTest {
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build())
-                    .fee(Fee.builder().code("FEE23").build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        )
+                    .fee(new Fee().setCode("FEE23")).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -519,9 +516,9 @@ public class StateFlowEngineTest {
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
                 GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .build()).build())
+                    .paymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        ).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)

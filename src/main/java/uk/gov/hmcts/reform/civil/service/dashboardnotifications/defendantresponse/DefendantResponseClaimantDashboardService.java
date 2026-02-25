@@ -62,6 +62,7 @@ public class DefendantResponseClaimantDashboardService extends DashboardScenario
         }
 
         return switch (caseData.getRespondent1ClaimResponseTypeForSpec()) {
+            case null -> null;
             case FULL_DEFENCE -> getFullDefenceScenario(caseData);
             case FULL_ADMISSION -> getFullAdmissionScenario(caseData);
             case PART_ADMISSION -> getPartAdmissionScenario(caseData);

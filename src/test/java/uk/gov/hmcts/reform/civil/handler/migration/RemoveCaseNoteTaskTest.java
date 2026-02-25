@@ -55,10 +55,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(noteId.toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", noteId.toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -84,10 +81,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(noteId.toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", noteId.toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -109,10 +103,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(UUID.randomUUID().toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", UUID.randomUUID().toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -123,13 +114,17 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldHandleNullCaseNotes() {
         CaseData caseData = CaseData.builder().build();
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(UUID.randomUUID().toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", UUID.randomUUID().toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
         assertThat(result.getCaseNotes()).isNull();
+    }
+
+    private CaseNoteReference caseNoteReference(String caseRef, String noteId) {
+        CaseNoteReference reference = new CaseNoteReference();
+        reference.setCaseReference(caseRef);
+        reference.setCaseNoteElementId(noteId);
+        return reference;
     }
 }

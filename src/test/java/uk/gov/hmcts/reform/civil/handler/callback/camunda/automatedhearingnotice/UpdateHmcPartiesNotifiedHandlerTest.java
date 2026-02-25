@@ -72,21 +72,19 @@ class UpdateHmcPartiesNotifiedHandlerTest {
     }
 
     private CallbackParams buildParams(CaseData caseData) {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(ABOUT_TO_SUBMIT)
             .caseData(caseData)
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
-            .build();
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"));
     }
 
     private HearingNoticeVariables sampleCamundaVars() {
-        return HearingNoticeVariables.builder()
-            .hearingId("H123")
-            .hearingLocationEpims("LOC123")
-            .days(List.of())
-            .requestVersion(10L)
-            .responseDateTime(LocalDateTime.now())
-            .build();
+        return new HearingNoticeVariables()
+            .setHearingId("H123")
+            .setHearingLocationEpims("LOC123")
+            .setDays(List.of())
+            .setRequestVersion(10L)
+            .setResponseDateTime(LocalDateTime.now());
     }
 
     @Test
@@ -115,14 +113,11 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
 
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder()
-                            .responses(List.of(
-                                PartiesNotifiedResponse.builder()
-                                    .requestVersion(10)
-                                    .responseReceivedDateTime(LocalDateTime.now())
-                                    .build()
-                            ))
-                            .build());
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(10)
+                                    .setResponseReceivedDateTime(LocalDateTime.now()))));
 
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString()))
@@ -145,7 +140,7 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
 
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder().build());
+            .thenReturn(new PartiesNotifiedResponses());
 
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString()))

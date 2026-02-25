@@ -6,8 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
@@ -71,7 +69,6 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class HwfNotificationServiceTest {
 
     private static final String EMAIL_TEMPLATE_MORE_INFO_HWF = "test-hwf-more-info-id";
@@ -116,7 +113,7 @@ public class HwfNotificationServiceTest {
     private HwfNotificationService service;
 
     private static final GeneralApplicationCaseData  GA_CASE_DATA = GeneralApplicationCaseDataBuilder.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .ccdCaseReference(1111222233334444L)
@@ -130,13 +127,13 @@ public class HwfNotificationServiceTest {
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
+                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
                     .build())
             .hwfFeeType(FeeType.APPLICATION)
             .build();
 
     private static final GeneralApplicationCaseData  ADDITIONAL_CASE_DATA = GeneralApplicationCaseDataBuilder.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .ccdState(APPLICATION_ADD_PAYMENT)
             .ccdCaseReference(1111222233334444L)
             .parentClaimantIsApplicant(YesOrNo.YES)
@@ -150,7 +147,7 @@ public class HwfNotificationServiceTest {
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(100000)).build())
+                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
                     .build())
             .hwfFeeType(FeeType.ADDITIONAL)
             .build();
@@ -162,30 +159,6 @@ public class HwfNotificationServiceTest {
     @BeforeEach
     void setup() {
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
-                EMAIL_TEMPLATE_MORE_INFO_HWF);
-        when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()).thenReturn(
-                EMAIL_TEMPLATE_UPDATE_REF_NUMBER);
-        when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber()).thenReturn(
-                EMAIL_TEMPLATE_INVALID_HWF_REFERENCE);
-        when(notificationsProperties.getNotifyApplicantForHwfPartialRemission()).thenReturn(
-                EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION);
-        when(notificationsProperties.getNotifyApplicantForNoRemission()).thenReturn(
-            EMAIL_TEMPLATE_NO_REMISSION);
-        when(notificationsProperties.getNotifyApplicantForHwfPaymentOutcome()).thenReturn(
-                EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME);
-        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()).thenReturn(
-            EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME_WLESH);
-        when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
-            EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);
-        when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual()).thenReturn(
-            EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL);
-        when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual()).thenReturn(
-            EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL);
-        when(notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()).thenReturn(
-            EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL);
-        when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
-            EMAIL_TEMPLATE_NO_REMISSION_BILINGUAL);
         when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
         when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                              + "\n For all other matters, call 0300 123 7050");
@@ -214,6 +187,9 @@ public class HwfNotificationServiceTest {
                 .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -242,6 +218,9 @@ public class HwfNotificationServiceTest {
             .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
 
@@ -270,6 +249,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -300,6 +282,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_DEF);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
 
@@ -409,6 +394,9 @@ public class HwfNotificationServiceTest {
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -435,6 +423,9 @@ public class HwfNotificationServiceTest {
             .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_DEF);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -457,6 +448,9 @@ public class HwfNotificationServiceTest {
             .additionalHwfDetails(hwfeeDetails).parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -481,6 +475,9 @@ public class HwfNotificationServiceTest {
             .additionalHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -504,6 +501,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -529,6 +529,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -553,6 +556,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -580,6 +586,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_DEF);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -650,6 +659,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -678,6 +690,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -704,6 +719,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -734,6 +752,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_DEF);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -758,6 +779,9 @@ public class HwfNotificationServiceTest {
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -784,6 +808,9 @@ public class HwfNotificationServiceTest {
             .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -808,6 +835,9 @@ public class HwfNotificationServiceTest {
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -836,6 +866,9 @@ public class HwfNotificationServiceTest {
             .additionalHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_DEF);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
         // Then
@@ -960,6 +993,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -989,6 +1025,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(CIVIL_WELSH_CLA);
+
+        mockNotificationPropertiesBilingual();
+
         // When
         service.sendNotification(caseData);
 
@@ -1016,6 +1055,9 @@ public class HwfNotificationServiceTest {
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+
+        mockNotificationPropertiesEnglish();
+
         // When
         service.sendNotification(caseData);
 
@@ -1052,4 +1094,33 @@ public class HwfNotificationServiceTest {
         return properties;
     }
 
+    private void mockNotificationPropertiesEnglish() {
+        when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeeded()).thenReturn(
+            EMAIL_TEMPLATE_MORE_INFO_HWF);
+        when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumber()).thenReturn(
+            EMAIL_TEMPLATE_UPDATE_REF_NUMBER);
+        when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumber()).thenReturn(
+            EMAIL_TEMPLATE_INVALID_HWF_REFERENCE);
+        when(notificationsProperties.getNotifyApplicantForHwfPartialRemission()).thenReturn(
+            EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION);
+        when(notificationsProperties.getNotifyApplicantForNoRemission()).thenReturn(
+            EMAIL_TEMPLATE_NO_REMISSION);
+        when(notificationsProperties.getNotifyApplicantForHwfPaymentOutcome()).thenReturn(
+            EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME);
+    }
+
+    private void mockNotificationPropertiesBilingual() {
+        when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh()).thenReturn(
+            EMAIL_TEMPLATE_HWF_PAYMENT_OUTCOME_WLESH);
+        when(notificationsProperties.getNotifyApplicantForHwFMoreInformationNeededWelsh()).thenReturn(
+            EMAIL_TEMPLATE_MORE_INFO_HWF_BILINGUAL);
+        when(notificationsProperties.getNotifyApplicantForHwfUpdateRefNumberBilingual()).thenReturn(
+            EMAIL_TEMPLATE_UPDATE_REF_NUMBER_BILINGUAL);
+        when(notificationsProperties.getNotifyApplicantForHwfInvalidRefNumberBilingual()).thenReturn(
+            EMAIL_TEMPLATE_INVALID_HWF_REFERENCE_BILINGUAL);
+        when(notificationsProperties.getNotifyApplicantForHwfPartialRemissionBilingual()).thenReturn(
+            EMAIL_TEMPLATE_HWF_PARTIAL_REMISSION_BILINGUAL);
+        when(notificationsProperties.getNotifyApplicantForHwfNoRemissionWelsh()).thenReturn(
+            EMAIL_TEMPLATE_NO_REMISSION_BILINGUAL);
+    }
 }

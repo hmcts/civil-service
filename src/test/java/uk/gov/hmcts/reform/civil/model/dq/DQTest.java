@@ -32,10 +32,9 @@ abstract class DQTest {
     }
 
     protected StatementOfTruth statementOfTruth() {
-        return StatementOfTruth.builder()
-            .name("John Smith")
-            .role("Solicitor")
-            .build();
+        return new StatementOfTruth()
+            .setName("John Smith")
+            .setRole("Solicitor");
     }
 
     protected RequestedCourt requestedCourt() {
@@ -104,11 +103,10 @@ abstract class DQTest {
     }
 
     protected Document draftDirections() {
-        return Document.builder()
-            .documentBinaryUrl("binary url")
-            .documentFileName("Order")
-            .documentUrl("url")
-            .build();
+        return new Document()
+            .setDocumentBinaryUrl("binary url")
+            .setDocumentFileName("Order")
+            .setDocumentUrl("url");
     }
 
     protected DisclosureReport disclosureReport() {

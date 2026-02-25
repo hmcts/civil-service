@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.service.docmosis.finalorder;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -76,9 +77,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_JUDGE_ASSISTED_ORDER_FORM_LIP;
 
-@SpringBootTest(classes = {
-    AssistedOrderFormGenerator.class
-})
+@ExtendWith(MockitoExtension.class)
 class AssistedOrderFormGeneratorTest {
 
     private static final String RECITAL_RECORDED_TEXT = "It is recorded that";
@@ -103,16 +102,16 @@ class AssistedOrderFormGeneratorTest {
 
     private static final String INTERIM_PAYMENT_TEXT = "An interim payment of £500.00 on account of costs shall be paid by 4pm on";
 
-    @MockBean
+    @Mock
     private DocumentManagementService documentManagementService;
 
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @Mock
     private DocmosisService docmosisService;
 
-    @Autowired
+    @InjectMocks
     private AssistedOrderFormGenerator generator;
 
     @Test
@@ -144,15 +143,13 @@ class AssistedOrderFormGeneratorTest {
                                         .postcode("BA 117").build())
             .claimant2PartyName(null).build();
 
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_FORM)))
-            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
         doThrow(new IllegalArgumentException("Court Name is not found in location data"))
             .when(docmosisService).getCaseManagementLocationVenueName(any(), any());
         Exception exception =
             assertThrows(
                 IllegalArgumentException.class, ()
                     -> generator.generate(caseData, BEARER_TOKEN)
-            );
+        );
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -161,10 +158,11 @@ class AssistedOrderFormGeneratorTest {
     @Test
     void shouldGenerateAssistedOrderDocument() {
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("Reading")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("Reading")
+            );
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
@@ -212,10 +210,11 @@ class AssistedOrderFormGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("London")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("London")
+            );
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(YES).toBuilder()
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
@@ -261,7 +260,7 @@ class AssistedOrderFormGeneratorTest {
         appealShowOption.add(FinalOrderShowToggle.SHOW);
         return GeneralApplicationCaseData.builder()
             .ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775"))
             .claimant1PartyName("ClaimantName")
             .defendant1PartyName("defendant1PartyName")
             .claimant2PartyName("Test Claimant2 Name")
@@ -2373,10 +2372,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldGenerateAssistedOrderDocument() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder()
-                                .epimmsId("2")
-                                .externalShortName("Reading")
-                                .build());
+                .thenReturn(
+                    new LocationRefData()
+                        .setEpimmsId("2")
+                        .setExternalShortName("Reading")
+                );
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class),
                 eq(POST_JUDGE_ASSISTED_ORDER_FORM_LIP)

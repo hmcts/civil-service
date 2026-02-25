@@ -3,17 +3,15 @@ package uk.gov.hmcts.reform.ccd.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.ccd.model.Organisation;
-import uk.gov.hmcts.reform.ccd.model.PreviousOrganisationCollectionItem;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganisationPolicy {

@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
@@ -16,29 +14,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class GaForLipServiceTest {
 
     @InjectMocks
-    GaForLipService gaForLipService;
+    private GaForLipService gaForLipService;
 
     @Test
     void shouldReturnApplicantEmailWhenUserDetailsIsNotPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email("applicantEmail@test.com")
-                                                .build()).build();
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail("applicantEmail@test.com")
+                                                ).build();
         assertEquals("applicantEmail@test.com", gaForLipService.getApplicant1Email(civilCaseData));
     }
 
     @Test
     void shouldReturnApplicantEmailWhenUserDetailsIsPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .claimantUserDetails(IdamUserDetails.builder()
-                                     .id("123")
-                                     .email("applicantEmail@test.com")
-                                     .build()).build();
+            .claimantUserDetails(new IdamUserDetails()
+                                     .setId("123")
+                                     .setEmail("applicantEmail@test.com")
+                                     ).build();
         assertEquals("applicantEmail@test.com", gaForLipService.getApplicant1Email(civilCaseData));
     }
 
@@ -58,10 +55,10 @@ class GaForLipServiceTest {
     @Test
     void shouldReturnDefendantEmailWhenUserDetailsIsPresent() {
         GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
-            .defendantUserDetails(IdamUserDetails.builder()
-                                      .id("123")
-                                      .email("defendantEmail@test.com")
-                                      .build()).build();
+            .defendantUserDetails(new IdamUserDetails()
+                                      .setId("123")
+                                      .setEmail("defendantEmail@test.com")
+                                      ).build();
         assertEquals("defendantEmail@test.com", gaForLipService.getDefendant1Email(civilCaseData));
     }
 

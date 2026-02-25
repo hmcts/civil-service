@@ -29,7 +29,7 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldReturnNull_whenRespondent1OrganisationPolicyOrganisationDoesNotExist() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().build())
+                .respondent1OrganisationPolicy(new OrganisationPolicy())
                 .build();
 
             assertNull(OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData));
@@ -39,8 +39,8 @@ class OrgPolicyUtilsTest {
         void shouldReturnOrganisationId_whenRespondent1OrganisationPolicyOrganisationExist() {
             String expected = "original-id";
             CaseData caseData = CaseDataBuilder.builder().respondent1OrganisationPolicy(
-                    OrganisationPolicy.builder().organisation(
-                        Organisation.builder().organisationID(expected).build()).build())
+                    new OrganisationPolicy().setOrganisation(
+                        new Organisation().setOrganisationID(expected)))
                 .build();
 
             assertEquals(expected, OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData));
@@ -58,8 +58,7 @@ class OrgPolicyUtilsTest {
         void shouldReturnOrganisationId_whenBothRespondent1OrganisationPolicyAndCopyExist() {
             String expected = "original-id";
             CaseData caseData = CaseDataBuilder.builder().respondent1OrganisationPolicy(
-                    OrganisationPolicy.builder().organisation(Organisation.builder()
-                            .organisationID(expected).build()).build()).respondent1OrganisationIDCopy(expected)
+                    new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(expected))).respondent1OrganisationIDCopy(expected)
                 .build();
 
             assertEquals(expected, OrgPolicyUtils.getRespondent1SolicitorOrgId(caseData));
@@ -77,7 +76,7 @@ class OrgPolicyUtilsTest {
         @Test
         void shouldReturnNull_whenRespondent2OrganisationPolicyOrganisationDoesNotExist() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy())
                 .build();
 
             assertNull(OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
@@ -87,8 +86,8 @@ class OrgPolicyUtilsTest {
         void shouldReturnOrganisationId_whenRespondent2OrganisationPolicyOrganisationExist() {
             String expected = "original-id";
             CaseData caseData = CaseDataBuilder.builder().respondent2OrganisationPolicy(
-                    OrganisationPolicy.builder().organisation(
-                        Organisation.builder().organisationID(expected).build()).build()).build();
+                    new OrganisationPolicy().setOrganisation(
+                        new Organisation().setOrganisationID(expected))).build();
 
             assertEquals(expected, OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
         }
@@ -105,8 +104,7 @@ class OrgPolicyUtilsTest {
         void shouldReturnOrganisationId_whenBothRespondent2OrganisationPolicyAndCopyExist() {
             String expected = "original-id";
             CaseData caseData = CaseDataBuilder.builder().respondent2OrganisationPolicy(
-                    OrganisationPolicy.builder().organisation(Organisation.builder().organisationID(expected).build())
-                        .build()).respondent2OrganisationIDCopy(expected).build();
+                    new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(expected))).respondent2OrganisationIDCopy(expected).build();
 
             assertEquals(expected, OrgPolicyUtils.getRespondent2SolicitorOrgId(caseData));
         }
@@ -119,22 +117,20 @@ class OrgPolicyUtilsTest {
             var latestDate = LocalDateTime.parse("2022-02-01T12:00:00.000550439");
             var oldestDate = LocalDateTime.parse("2022-01-01T12:00:00.000550439");
 
-            var orgPolicy = OrganisationPolicy.builder()
-                .previousOrganisations(List.of(
+            var orgPolicy = new OrganisationPolicy().setPreviousOrganisations(List.of(
                     buildPreviousOrganisation("latest-previous-org", latestDate),
-                    buildPreviousOrganisation("oldest-previous-org", oldestDate)))
-                .build();
+                    buildPreviousOrganisation("oldest-previous-org", oldestDate)));
 
             var actual = OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy);
-            assertEquals(
-                PreviousOrganisation.builder()
-                    .organisationName("latest-previous-org")
-                    .toTimestamp(latestDate).build(), actual);
+            PreviousOrganisation expected = new PreviousOrganisation();
+            expected.setOrganisationName("latest-previous-org");
+            expected.setToTimestamp(latestDate);
+            assertEquals(expected, actual);
         }
 
         @Test
         void shouldReturnNull_whenOrgPolicyIsNull() {
-            var orgPolicy = OrganisationPolicy.builder().build();
+            var orgPolicy = new OrganisationPolicy();
             assertNull(OrgPolicyUtils.getLatestOrganisationChanges(orgPolicy));
         }
 
@@ -144,8 +140,11 @@ class OrgPolicyUtilsTest {
         }
 
         private PreviousOrganisationCollectionItem buildPreviousOrganisation(String name, LocalDateTime toDate) {
-            return PreviousOrganisationCollectionItem.builder().value(
-                PreviousOrganisation.builder().organisationName(name).toTimestamp(toDate).build()).build();
+            PreviousOrganisation previousOrganisation = new PreviousOrganisation();
+            previousOrganisation.setOrganisationName(name);
+            previousOrganisation.setToTimestamp(toDate);
+
+            return new PreviousOrganisationCollectionItem(null, previousOrganisation);
         }
     }
 
@@ -173,7 +172,7 @@ class OrgPolicyUtilsTest {
         void shouldNotOverwriteRespondent1OrgPolicy_whenItExists() {
             var caseDataBuilder =
                 CaseData.builder().respondent1OrganisationPolicy(
-                    OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES1-EXISTING]").build());
+                    new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES1-EXISTING]"));
 
             var caseData = caseDataBuilder.build();
             OrgPolicyUtils.addMissingOrgPolicies(caseData);
@@ -193,7 +192,7 @@ class OrgPolicyUtilsTest {
         void shouldNotOverwriteRespondent2OrgPolicy_whenItExists() {
             var caseDataBuilder =
                 CaseData.builder().respondent2OrganisationPolicy(
-                    OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES2-EXISTING]").build());
+                    new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES2-EXISTING]"));
 
             var caseData = caseDataBuilder.build();
             OrgPolicyUtils.addMissingOrgPolicies(caseData);
@@ -214,9 +213,9 @@ class OrgPolicyUtilsTest {
             var caseDataBuilder =
                 CaseData.builder()
                     .respondent1OrganisationPolicy(
-                        OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES1-EXISTING]").build())
+                        new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES1-EXISTING]"))
                     .respondent2OrganisationPolicy(
-                        OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RES2-EXISTING]").build());
+                        new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RES2-EXISTING]"));
 
             var caseData = caseDataBuilder.build();
             OrgPolicyUtils.addMissingOrgPolicies(caseData);

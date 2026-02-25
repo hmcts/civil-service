@@ -2146,16 +2146,15 @@ class DirectionsQuestionnaireGeneratorTest {
                 respondent1LitigationFriend.setFullName("respondent LF");
                 caseData.setRespondent1LitigationFriend(respondent1LitigationFriend);
                 caseData.getSystemGeneratedCaseDocuments().add(element(
-                    CaseDocument.builder()
-                        .createdDatetime(createdDate)
-                        .documentName(
+                    new CaseDocument()
+                        .setCreatedDatetime(createdDate)
+                        .setDocumentName(
                             format(
                                 DQ_RESPONSE_1V1.getDocumentTitle(),
                                 "defendant",
                                 caseData.getLegacyCaseReference()
                             )
-                        )
-                        .build()));
+                        )));
                 Optional<CaseDocument> caseDocument = generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN,
                     "ONE"
                 );
@@ -2677,7 +2676,7 @@ class DirectionsQuestionnaireGeneratorTest {
         void whenIntermediateClaim_shouldUseFixedRecoverableCosts_ClaimantDQ() {
             FixedRecoverableCosts frcIntermediate = new FixedRecoverableCosts()
                 .setIsSubjectToFixedRecoverableCostRegime(YES)
-                .setFrcSupportingDocument(Document.builder().build())
+                .setFrcSupportingDocument(new Document())
                 .setComplexityBandingAgreed(YES)
                 .setBand(ComplexityBand.BAND_1)
                 .setReasons("Reasoning");
@@ -2835,10 +2834,10 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void checkStatementOfTruthTextForDefendent() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                .courtTypeId("10").courtLocationCode("121")
-                .epimmsId("000000").build());
+            locations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+                .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+                .setCourtTypeId("10").setCourtLocationCode("121")
+                .setEpimmsId("000000"));
             when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
