@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.cmc.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Accessors(chain = true)
 public class PartyStatement {
 
     private StatementType type;

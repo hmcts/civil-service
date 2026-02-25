@@ -103,13 +103,11 @@ public class UpdateHmcPartiesNotifiedHandler extends CallbackHandler {
     }
 
     private PartiesNotified buildPartiesNotified(HearingNoticeVariables camundaVariables) {
-        return PartiesNotified.builder()
-            .serviceData(PartiesNotifiedServiceData.builder()
-                             .hearingNoticeGenerated(true)
-                             .hearingLocation(camundaVariables.getHearingLocationEpims())
-                             .days(camundaVariables.getDays())
-                             .build())
-            .build();
+        return new PartiesNotified()
+            .setServiceData(new PartiesNotifiedServiceData()
+                             .setHearingNoticeGenerated(true)
+                             .setHearingLocation(camundaVariables.getHearingLocationEpims())
+                             .setDays(camundaVariables.getDays()));
     }
 
     private void logRequestPayload(PartiesNotified payload, Long caseId, String hearingId) {
