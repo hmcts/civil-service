@@ -791,7 +791,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .build();
         caseData = caseData.toBuilder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                .additionalPaymentDetails(PaymentDetails.builder().status(PaymentStatus.FAILED).build()).build())
+                .additionalPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.FAILED)).build())
             .build();
 
         when(gaForLipService.isLipApp(caseData)).thenReturn(false);

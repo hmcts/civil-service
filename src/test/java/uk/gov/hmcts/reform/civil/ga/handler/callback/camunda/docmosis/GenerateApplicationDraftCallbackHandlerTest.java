@@ -430,8 +430,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         caseData = caseData.toBuilder()
             .judicialDecision(uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision.builder().build())
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(PaymentDetails.builder()
-                                                          .status(PaymentStatus.SUCCESS).build())
+                                      .paymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
                                       .fee(new Fee().setCode("FREE")).build()).build();
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -452,8 +451,7 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
         caseData = caseData.toBuilder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(PaymentDetails.builder()
-                                                          .status(PaymentStatus.SUCCESS).build())
+                                      .paymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
                                       .fee(new Fee().setCode("NotFree")).build()).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
