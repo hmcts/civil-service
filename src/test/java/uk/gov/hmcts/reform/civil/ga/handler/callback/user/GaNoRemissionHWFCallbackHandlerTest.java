@@ -47,7 +47,7 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
 
     @Test
     void shouldSubmit_NoRemissionHwFEventAndStartNotifyApplicantLip() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(AWAITING_RESPONDENT_RESPONSE)
             .hwfFeeType(FeeType.APPLICATION)
             .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(

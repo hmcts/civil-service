@@ -120,7 +120,7 @@ public class HwfNotificationServiceTest {
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                     .email(EMAIL)
                     .build()).build()
-            .toBuilder()
+            .copy()
             .applicantPartyName(APPLICANT)
             .claimant1PartyName(CLAIMANT)
             .defendant1PartyName(DEFENDANT)
@@ -140,7 +140,7 @@ public class HwfNotificationServiceTest {
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                     .email(EMAIL)
                     .build()).build()
-            .toBuilder()
+            .copy()
             .applicantPartyName(APPLICANT)
             .claimant1PartyName(CLAIMANT)
             .defendant1PartyName(DEFENDANT)
@@ -152,8 +152,8 @@ public class HwfNotificationServiceTest {
             .hwfFeeType(FeeType.ADDITIONAL)
             .build();
 
-    private static final GeneralApplicationCaseData  CIVIL_WELSH_CLA = GeneralApplicationCaseData.builder().claimantBilingualLanguagePreference("WELSH").build();
-    private static final GeneralApplicationCaseData  CIVIL_WELSH_DEF = GeneralApplicationCaseData.builder()
+    private static final GeneralApplicationCaseData  CIVIL_WELSH_CLA = new GeneralApplicationCaseData().claimantBilingualLanguagePreference("WELSH").build();
+    private static final GeneralApplicationCaseData  CIVIL_WELSH_DEF = new GeneralApplicationCaseData()
         .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")).build();
 
     @BeforeEach
@@ -177,7 +177,7 @@ public class HwfNotificationServiceTest {
         // Given
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
                 .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .isGaApplicantLip(YesOrNo.YES)
                 .helpWithFeesMoreInformationGa(new HelpWithFeesMoreInformation()
                         .setHwFMoreInfoDocumentDate(NOW)
@@ -186,7 +186,7 @@ public class HwfNotificationServiceTest {
                 .parentCaseReference(GA_REFERENCE)
                 .gaHwfDetails(hwfeeDetails).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -207,7 +207,7 @@ public class HwfNotificationServiceTest {
         // Given
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
@@ -238,7 +238,7 @@ public class HwfNotificationServiceTest {
         // Given
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
                 .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
                 .helpWithFeesMoreInformationAdditional(new HelpWithFeesMoreInformation()
                         .setHwFMoreInfoDocumentDate(NOW)
                         .setHwFMoreInfoRequiredDocuments(
@@ -248,7 +248,7 @@ public class HwfNotificationServiceTest {
                 .additionalHwfDetails(hwfeeDetails).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -269,7 +269,7 @@ public class HwfNotificationServiceTest {
         // Given
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -389,11 +389,11 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
                 .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
                 ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -415,7 +415,7 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
             ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .isGaApplicantLip(YesOrNo.YES)
@@ -443,11 +443,11 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
                 .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
                 ;
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -469,7 +469,7 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
             ;
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).build();
@@ -495,12 +495,12 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
                 .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
                 ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -522,7 +522,7 @@ public class HwfNotificationServiceTest {
         HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
             .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
             ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
@@ -550,12 +550,12 @@ public class HwfNotificationServiceTest {
                 .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
                 ;
 
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -578,7 +578,7 @@ public class HwfNotificationServiceTest {
             .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
             ;
 
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .isGaRespondentOneLip(YesOrNo.YES)
             .parentClaimantIsApplicant(YesOrNo.NO).applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -653,12 +653,12 @@ public class HwfNotificationServiceTest {
                 .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
                 ;
 
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -683,7 +683,7 @@ public class HwfNotificationServiceTest {
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
 
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
@@ -713,12 +713,12 @@ public class HwfNotificationServiceTest {
                 .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
                 ;
 
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -743,7 +743,7 @@ public class HwfNotificationServiceTest {
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
 
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -774,11 +774,11 @@ public class HwfNotificationServiceTest {
             .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -802,7 +802,7 @@ public class HwfNotificationServiceTest {
             .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
             .gaHwfDetails(hwfeeDetails).build();
@@ -830,11 +830,11 @@ public class HwfNotificationServiceTest {
             .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -858,7 +858,7 @@ public class HwfNotificationServiceTest {
             .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -987,12 +987,12 @@ public class HwfNotificationServiceTest {
                 .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
                 ;
 
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 
@@ -1017,7 +1017,7 @@ public class HwfNotificationServiceTest {
             .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
             ;
 
-        GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = GA_CASE_DATA.copy().gaHwfDetails(hwfeeDetails)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
@@ -1049,12 +1049,12 @@ public class HwfNotificationServiceTest {
                 .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
                 ;
 
-        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
+        GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.copy().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
 
         when(solicitorEmailValidation.validateSolicitorEmail(any(), any())).thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         mockNotificationPropertiesEnglish();
 

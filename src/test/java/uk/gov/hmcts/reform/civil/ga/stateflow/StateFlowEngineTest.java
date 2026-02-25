@@ -67,7 +67,7 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().toBuilder().parentClaimantIsApplicant(NO).build();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy().parentClaimantIsApplicant(NO).build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
@@ -218,7 +218,7 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Listed_For_Hearing_WhenJudgeMadeDecision() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(LIST_FOR_A_HEARING))
             .judicialListForHearing(new GAJudgesHearingListGAspec())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
@@ -241,7 +241,7 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecision() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
@@ -263,7 +263,7 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturn_Judge_Directions_WhenJudgeMadeDecision() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(
                 new GAJudicialMakeAnOrder().setMakeAnOrder(
@@ -290,7 +290,7 @@ public class StateFlowEngineTest {
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_SetWelshFlowFlag() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().toBuilder()
+            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(YES)
                 .applicantBilingualLanguagePreference(YES)
                 .parentClaimantIsApplicant(NO).build();
@@ -310,7 +310,7 @@ public class StateFlowEngineTest {
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_SetWelshFlowFlagForRespondentLip() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().toBuilder()
+            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(NO)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(NO)
@@ -365,7 +365,7 @@ public class StateFlowEngineTest {
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_DontSetWelshFlowFlagForRespondentLip() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().toBuilder()
+            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(NO)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(NO)
@@ -387,7 +387,7 @@ public class StateFlowEngineTest {
     @Test
     void shouldSetWelshFlag_Judge_Directions_WhenJudgeMadeDecision() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
             .applicantBilingualLanguagePreference(YES)
@@ -416,7 +416,7 @@ public class StateFlowEngineTest {
     @Test
     void shouldSetWelshFlagRespondentBilingual_Judge_Directions_WhenJudgeMadeDecision() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
             .respondentBilingualLanguagePreference(YES)
@@ -541,7 +541,7 @@ public class StateFlowEngineTest {
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForApplicantWelsh() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
@@ -569,7 +569,7 @@ public class StateFlowEngineTest {
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForRespondentWelsh() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy()
             .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
@@ -598,7 +598,7 @@ public class StateFlowEngineTest {
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsSuccess_DontSetWelshFlowFlagForApplicantLip() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().toBuilder()
+            GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().copy()
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)

@@ -53,7 +53,7 @@ public class DocmosisServiceTest {
     void shouldReturnLocationRefData() {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build()).build();
         LocationRefData locationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(locationRefData.getVenueName())
@@ -64,7 +64,7 @@ public class DocmosisServiceTest {
     void shouldReturnLocationRefData_whenSpecAndCnbc() {
         when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
@@ -76,7 +76,7 @@ public class DocmosisServiceTest {
     void shouldReturnLocationRefData_whenUspecAndCnbc() {
         when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
@@ -88,7 +88,7 @@ public class DocmosisServiceTest {
     void shouldThrowExceptionWhenNoLocationMatch() {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build()).build();
 
         Exception exception =
@@ -106,7 +106,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                       .setReasonForDecisionText("Test Reason")
                                                       .setShowReasonForDecision(YesOrNo.YES)).build();
@@ -120,7 +120,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                       .setReasonForDecisionText("Test Reason")
                                                       .setShowReasonForDecision(YesOrNo.NO)).build();
@@ -134,7 +134,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                       .setJudicialByCourtsInitiative(
                                                           GAByCourtsInitiativeGAspec.OPTION_3)).build();
@@ -148,7 +148,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                       .setOrderWithoutNotice("abcdef")
                                                       .setOrderWithoutNoticeDate(LocalDate.now())
@@ -165,7 +165,7 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                       .setOrderCourtOwnInitiative("abcdef")
                                                       .setOrderCourtOwnInitiativeDate(LocalDate.now())

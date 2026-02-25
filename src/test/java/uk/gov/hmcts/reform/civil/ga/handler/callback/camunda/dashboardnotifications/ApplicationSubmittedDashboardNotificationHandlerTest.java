@@ -56,7 +56,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
         @Test
         void shouldRecordApplicationSubmittedScenario_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -77,7 +77,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaid() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
@@ -105,7 +105,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidThroughCard() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdCaseReference(123456L)
                 .generalAppHelpWithFees(
                     new HelpWithFees()
@@ -130,7 +130,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidFullRemission() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
@@ -163,7 +163,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidNoRemission() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
@@ -196,7 +196,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
 
         @Test
         void shouldRecordWhenLipApplicationIsFeePaidFeePaymentOutCome() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.NO))

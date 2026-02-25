@@ -65,7 +65,7 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
         @Test
         void shouldRecordDeleteWrittenRepsRequiredApplicantScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.NO)
@@ -90,7 +90,7 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
         @Test
         void shouldRecordDeleteWrittenRepsRequiredRespondentScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -120,7 +120,7 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
                 ? LocalDate.now()
                 : LocalDate.now().plusDays(-1);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)

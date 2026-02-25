@@ -65,7 +65,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
                                   .setHwfCaseEvent(NO_REMISSION_HWF_GA)
@@ -93,7 +93,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioAdditionalApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
                                   .setHwfCaseEvent(NO_REMISSION_HWF_GA)
@@ -121,7 +121,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenPartialRemissionInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
                                   .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
@@ -149,7 +149,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_MoreInfo_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
                                           .setHwfCaseEvent(MORE_INFORMATION_HWF_GA)
@@ -177,7 +177,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioApplicationFee_InvalidHwfRef_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
                 .gaHwfDetails(new HelpWithFeesDetails()
                                   .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
@@ -201,7 +201,7 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_InvalidHwfRef_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .additionalHwfDetails(new HelpWithFeesDetails()
                                           .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)

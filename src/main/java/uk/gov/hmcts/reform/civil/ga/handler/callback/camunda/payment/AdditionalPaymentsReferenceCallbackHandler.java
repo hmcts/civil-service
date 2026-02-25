@@ -75,7 +75,7 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
                     .map(GeneralApplicationPbaDetails::copy)
                     .orElse(new GeneralApplicationPbaDetails())
                     .setAdditionalPaymentServiceRef(paymentServiceRequest);
-                caseData = caseData.toBuilder().generalAppPBADetails(paymentDetails).build();
+                caseData = caseData.copy().generalAppPBADetails(paymentDetails).build();
             } catch (FeignException e) {
                 if (e.status() == 403) {
                     throw e;

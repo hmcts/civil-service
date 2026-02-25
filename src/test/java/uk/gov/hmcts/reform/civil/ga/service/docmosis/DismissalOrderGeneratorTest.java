@@ -112,7 +112,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -149,7 +149,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
@@ -192,12 +192,12 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option2() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                            .setDismissalOrderText("Test Dismissal")
                                                            .setReasonForDecisionText("Test Reason")
@@ -244,11 +244,11 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option3() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                           .setDismissalOrderText("Test Dismissal")
                                                           .setShowReasonForDecision(YesOrNo.YES)
@@ -290,10 +290,10 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldHideText_whileUnchecked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                     .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                     .setDismissalOrderText("Test Dismissal")
                     .setShowReasonForDecision(YesOrNo.NO)
@@ -342,7 +342,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)

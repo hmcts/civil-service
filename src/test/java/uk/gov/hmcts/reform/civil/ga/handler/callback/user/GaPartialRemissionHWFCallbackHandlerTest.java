@@ -53,7 +53,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsGa() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
@@ -79,7 +79,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
@@ -106,7 +106,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @Test
     void shouldPopulateErrorWhenApplicationRemissionAmountIsNegative() {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
@@ -130,7 +130,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @Test
     void shouldPopulateErrorWhenAdditionalRemissionAmountIsNegative() {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
@@ -155,7 +155,7 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @MethodSource("provideFeeTypes")
     void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg) {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.valueOf(30000))

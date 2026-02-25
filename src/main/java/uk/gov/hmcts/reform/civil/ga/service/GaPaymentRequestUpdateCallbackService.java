@@ -134,14 +134,12 @@ public class GaPaymentRequestUpdateCallbackService {
             .setErrorMessage(null)
             ;
 
-        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
-            ? new GeneralApplicationPbaDetails()
-            : pbaDetails.copy();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
         updatedPbaDetails
             .setPaymentDetails(paymentDetails)
             .setPaymentSuccessfulDate(time.now());
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .generalAppPBADetails(updatedPbaDetails)
             .build();
 
@@ -165,14 +163,12 @@ public class GaPaymentRequestUpdateCallbackService {
             .setErrorMessage(null)
             ;
 
-        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
-            ? new GeneralApplicationPbaDetails()
-            : pbaDetails.copy();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
         updatedPbaDetails
             .setAdditionalPaymentDetails(paymentDetails)
             .setPaymentSuccessfulDate(time.now());
 
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .ccdState(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData))
             .generalAppPBADetails(updatedPbaDetails)
             .build();

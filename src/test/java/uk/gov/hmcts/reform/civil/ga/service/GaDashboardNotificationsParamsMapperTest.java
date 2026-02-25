@@ -54,7 +54,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     void shouldMapAllParametersWhenIsRequested() {
         LocalDateTime deadline = LocalDateTime.of(2024, 3, 21, 16, 0);
         LocalDate requestMoreInfoDate = LocalDate.of(2024, 9, 4);
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
@@ -89,7 +89,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     void shouldMapWrittenRepSequentialDeadlinesClaimantIsApplicantWhenIsRequested() {
         LocalDate claimantDate = LocalDate.of(2024, 3, 1);
         LocalDate defendantDate = LocalDate.of(2024, 3, 2);
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -113,7 +113,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     void shouldMapWrittenRepSequentialDeadlinesDefendantIsApplicantWhenIsRequested() {
         LocalDate claimantDate = LocalDate.of(2024, 3, 1);
         LocalDate defendantDate = LocalDate.of(2024, 3, 2);
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
@@ -134,7 +134,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapWrittenRepConcurrentDeadlinesWhenIsRequested() {
         LocalDate date = LocalDate.of(2024, 3, 1);
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
                 new GAJudicialWrittenRepresentations()
@@ -152,7 +152,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfApplicationFeeIsRequested() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -171,7 +171,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfApplicationFeeIsRequestedAndMoreInfoRequired() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -193,7 +193,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfAdditionalApplicationFeeIsRequestedAndMoreInfoRequired() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(APPLICATION_ADD_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -216,7 +216,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfApplicationFeeIsRequestedAndIsPartAdmitted_PartRemission() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -240,7 +240,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfAdditionalApplicationFeeIsRequestedAndIsPartAdmitted_PartRemission() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(APPLICATION_ADD_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -265,7 +265,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfApplicationFeeIsRequestedAndCaseStateIsAwaitingApplicationPayment() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
@@ -286,7 +286,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfAdditionalApplicationFeeIsRequested() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdState(APPLICATION_ADD_PAYMENT)
             .legacyCaseReference("000DC001")
@@ -305,7 +305,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldMapParametersWhenHwfAdditionalApplicationFeeIsRequestedAndCaseStateIsApplicationAddPayment() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
+        caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
@@ -327,7 +327,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldNotMapDataWhenNotPresent() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        caseData = caseData.toBuilder().generalAppPBADetails(null).build();
+        caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("applicationFee"));
         assertFalse(result.containsKey("judgeRequestMoreInfoByDateEn"));
@@ -347,7 +347,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     void shouldNotMapCaseworkerHearingDateInfoDateNotPresent() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        caseData = caseData.toBuilder().generalAppPBADetails(null).build();
+        caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("hearingNoticeApplicationDateEn"));
     }

@@ -133,7 +133,7 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetGeneralOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                 .build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
@@ -187,7 +187,7 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetGeneralOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                 .build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
@@ -229,7 +229,7 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetGeneralOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .isMultiParty(NO)
@@ -262,11 +262,11 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetGeneralOrderData_Option2() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                           .setOrderText("Test Order")
                                                           .setOrderWithoutNotice("abcdef")
@@ -321,11 +321,11 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetGeneralOrderData_Option3() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                           .setOrderText("Test Order")
                                                           .setJudicialByCourtsInitiative(
@@ -376,10 +376,10 @@ class GeneralOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldHideText_whileUnchecked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication().build().copy()
                     .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                     .setOrderText("Test Order")
                     .setJudicialByCourtsInitiative(

@@ -66,7 +66,7 @@ class SendFinalOrderPrintServiceTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private GeneralApplicationCaseData buildCaseData() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .claimant1PartyName("claimant1")
                 .defendant1PartyName("defendant1")
@@ -77,7 +77,7 @@ class SendFinalOrderPrintServiceTest {
     }
 
     private GeneralApplicationCaseData buildCivilCaseData() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .legacyCaseReference("00MC2")
                 .applicant1(new GeneralApplicationParty()
@@ -249,7 +249,7 @@ class SendFinalOrderPrintServiceTest {
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();
-        caseData = caseData.toBuilder().parentClaimantIsApplicant(YesOrNo.NO).build();
+        caseData = caseData.copy().parentClaimantIsApplicant(YesOrNo.NO).build();
         ReflectionTestUtils.setField(sendFinalOrderPrintService, "stitchEnabled", true);
         // when
         sendFinalOrderPrintService.sendJudgeTranslatedOrderToPrintForLIP(BEARER_TOKEN, document, document, caseData, CaseEvent.SEND_TRANSLATED_ORDER_TO_LIP_RESPONDENT);
@@ -277,7 +277,7 @@ class SendFinalOrderPrintServiceTest {
         given(documentDownloadService.downloadDocument(any(), any()))
                 .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         GeneralApplicationCaseData caseData = buildCaseData();
-        caseData = caseData.toBuilder().parentClaimantIsApplicant(YesOrNo.NO).build();
+        caseData = caseData.copy().parentClaimantIsApplicant(YesOrNo.NO).build();
         ReflectionTestUtils.setField(sendFinalOrderPrintService, "stitchEnabled", true);
 
         // when

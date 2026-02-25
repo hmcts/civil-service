@@ -401,7 +401,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData build() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdState(ccdState)
             .applicant1(applicant1)
@@ -452,7 +452,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData buildMakePaymentsCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -476,7 +476,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData buildPaymentFailureCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -508,7 +508,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData withNoticeCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         List<GeneralApplicationTypes> types = Arrays.asList(VARY_PAYMENT_TERMS_OF_JUDGMENT);
-        return build().toBuilder()
+        return build().copy()
             .generalAppType(GAApplicationType.builder().types(types).build())
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -541,7 +541,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData withoutNoticeCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -591,7 +591,7 @@ public class GeneralApplicationCaseDataBuilder {
                           .value(pdfDocument).build());
         draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid))
                           .value(pdfDocument).build());
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -624,7 +624,7 @@ public class GeneralApplicationCaseDataBuilder {
     public GeneralApplicationCaseData buildPaymentSuccessfulCaseData() {
         uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -651,7 +651,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGeneralApplication(GeneralApplication application) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(PENDING_APPLICATION_ISSUED)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -676,7 +676,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGeneralApplicationByState(GeneralApplication application, CaseState state) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(state)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -700,7 +700,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGaForCollection(GeneralApplication application) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -744,7 +744,7 @@ public class GeneralApplicationCaseDataBuilder {
                 .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
                 .build();
         }
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -761,8 +761,8 @@ public class GeneralApplicationCaseDataBuilder {
             .build();
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> consentOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData consentOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -793,8 +793,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> finalOrderFreeForm() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData finalOrderFreeForm() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -832,7 +832,7 @@ public class GeneralApplicationCaseDataBuilder {
         respondentAddress.setAddressLine2("respondent1address2");
         respondentAddress.setAddressLine3("respondent1address3");
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .applicant1(new GeneralApplicationParty()
                             .setPrimaryAddress(applicantAddress)
                             .setPartyName("applicant1partyname"))
@@ -841,8 +841,8 @@ public class GeneralApplicationCaseDataBuilder {
                              .setPartyName("respondent1partyname")).build();
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> generalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData generalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -873,8 +873,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> generalOrderFreeFormApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData generalOrderFreeFormApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -903,8 +903,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judgeFinalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData judgeFinalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -934,8 +934,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> directionOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData directionOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -966,8 +966,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dismissalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData dismissalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -995,8 +995,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> hearingOrderApplication(YesOrNo isAgreed, YesOrNo isWithNotice) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData hearingOrderApplication(YesOrNo isAgreed, YesOrNo isWithNotice) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -1035,7 +1035,7 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> hearingScheduledApplication(YesOrNo isCloak) {
+    public GeneralApplicationCaseData hearingScheduledApplication(YesOrNo isCloak) {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -1055,7 +1055,7 @@ public class GeneralApplicationCaseDataBuilder {
             .build();
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .judicialListForHearing(new GAJudgesHearingListGAspec()
@@ -1120,8 +1120,8 @@ public class GeneralApplicationCaseDataBuilder {
             .gaHearingNoticeInformation("testing");
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationSequentialApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData writtenRepresentationSequentialApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -1155,8 +1155,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> approveApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData approveApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1182,8 +1182,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationConcurrentApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData writtenRepresentationConcurrentApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -1216,8 +1216,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> requestForInformationApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData requestForInformationApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
@@ -1250,10 +1250,10 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judicialDecisionWithUncloakRequestForInformationApplication(
+    public GeneralApplicationCaseData judicialDecisionWithUncloakRequestForInformationApplication(
         GAJudgeRequestMoreInfoOption requestMoreInfoOption, YesOrNo isWithNotice, YesOrNo isCloak) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1283,8 +1283,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judicialOrderMadeWithUncloakApplication(YesOrNo isCloak) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData judicialOrderMadeWithUncloakApplication(YesOrNo isCloak) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1322,12 +1322,12 @@ public class GeneralApplicationCaseDataBuilder {
                                                    .build()));
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> adjournOrVacateHearingApplication(
+    public GeneralApplicationCaseData adjournOrVacateHearingApplication(
         YesOrNo isRespondentAgreed, LocalDate gaHearingDate) {
         GAHearingDateGAspec generalAppHearingDate = GAHearingDateGAspec.builder()
             .hearingScheduledDate(gaHearingDate)
             .build();
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1347,8 +1347,8 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> varyApplication(List<GeneralApplicationTypes> types) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData varyApplication(List<GeneralApplicationTypes> types) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1367,13 +1367,13 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> getMainCaseDataWithDetails(
+    public GeneralApplicationCaseData getMainCaseDataWithDetails(
         boolean withGADetails,
         boolean withGADetailsResp,
         boolean withGADetailsResp2,
         boolean withGADetailsMaster) {
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = build().toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = build().copy();
         caseDataBuilder.ccdCaseReference(1L);
         GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
             .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
@@ -1424,14 +1424,14 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildJudicialDecisionRequestMoreInfo() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
                 REQUEST_MORE_INFORMATION).setJudgeRequestMoreInfoByDate(LocalDate.of(2024, 9, 4))).build();
     }
 
     public GeneralApplicationCaseData buildCaseWorkerHearingScheduledInfo() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(LISTING_FOR_A_HEARING)
             .gaHearingNoticeDetail(new GAHearingNoticeDetail().setHearingDate(
                 (LocalDate.of(2024, 9, 4)))).build();

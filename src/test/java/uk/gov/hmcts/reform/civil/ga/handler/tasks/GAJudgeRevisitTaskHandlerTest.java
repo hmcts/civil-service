@@ -161,7 +161,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "from String \"maybe\": not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] "
                          + "(through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
@@ -184,7 +184,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
                          + "not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
@@ -210,7 +210,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
                          + "not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
@@ -244,7 +244,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
                          + "not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
@@ -272,7 +272,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "`uk.gov.hmcts.reform.civil.enums.YesOrNo` from String \"maybe\": "
                          + "not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.get(2).getMessage());
         assertEquals(Level.ERROR, logsList.get(2).getLevel());
@@ -306,7 +306,7 @@ class GAJudgeRevisitTaskHandlerTest {
                          + "from String \"maybe\": not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] "
                          + "(through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.get(3).getMessage());
         assertEquals(Level.ERROR, logsList.get(3).getLevel());

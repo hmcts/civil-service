@@ -37,20 +37,20 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(null).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(null).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
         }
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasAgreed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                 GARespondentOrderAgreement.builder().hasAgreed(YES).build()).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
         }
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedButNotificationDetailsNotSet() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(null).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
@@ -58,7 +58,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedAndNotified() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build()).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
@@ -66,7 +66,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isApplicationCloaked_shouldReturnNoWhenRespondentAgreementHasNotAgreedAndUnNotified() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build()).build();
             assertThat(helper.isApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
@@ -74,7 +74,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(null).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
@@ -82,7 +82,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsYes() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build()).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
@@ -90,7 +90,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenGeneralAppInformOtherPartyIsNo() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build()).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
@@ -98,7 +98,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenConsentOrder() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                     GARespondentOrderAgreement.builder().hasAgreed(NO).build()).generalAppConsentOrder(YES).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(NO);
 
@@ -106,7 +106,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void isLipApplicationCloaked_shouldReturnNoWhenConsentOrderIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppRespondentAgreement(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppRespondentAgreement(
                 GARespondentOrderAgreement.builder().hasAgreed(NO).build()).build();
             assertThat(helper.isLipApplicationCreatedWithoutNoticeByApplicant(caseData)).isEqualTo(YES);
 
@@ -118,20 +118,20 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void shouldReturnFalse_whenApplicantHearingDetailsNotProvided() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             assertThat(helper.isApplicantAndRespondentLocationPrefSame(caseData)).isEqualTo(false);
         }
 
         @Test
         void shouldReturnFalse_whenRespondentHearingDetailsNotProvided() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().generalAppHearingDetails(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().generalAppHearingDetails(
                 GAHearingDetails.builder().build()).build();
             assertThat(helper.isApplicantAndRespondentLocationPrefSame(caseData)).isEqualTo(false);
         }
 
         @Test
         void shouldReturnFalse_whenLocationSelectedByApplicantAndOneOfTheRespondentIsNotSame() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppHearingDetails(
                     GAHearingDetails.builder()
                         .hearingPreferredLocation(
@@ -169,7 +169,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void shouldReturnFalse_whenLocationSelectedByApplicantAndBothOfTheRespondentIsNotSame() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppHearingDetails(
                     GAHearingDetails.builder()
                         .hearingPreferredLocation(
@@ -207,7 +207,7 @@ public class JudicialDecisionHelperTest {
 
         @Test
         void shouldReturnTrue_whenLocationSelectedByApplicantAndBothRespondentIsSame() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppHearingDetails(
                     GAHearingDetails.builder()
                         .hearingPreferredLocation(

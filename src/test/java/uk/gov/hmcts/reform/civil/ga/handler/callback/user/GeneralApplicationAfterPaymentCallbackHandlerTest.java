@@ -116,7 +116,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplicationBeforePayment(isConsented, isTobeNotified))
-            .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+            .copy().ccdCaseReference(CHILD_CCD_REF).build();
     }
 
     private GeneralApplication getGeneralApplicationBeforePayment(YesOrNo isConsented, YesOrNo isTobeNotified) {
@@ -157,13 +157,13 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
             .setStatus(status)
             ;
         updatedPbaDetails.setPaymentDetails(paymentDetails);
-        return caseData.toBuilder()
+        return caseData.copy()
             .generalAppPBADetails(updatedPbaDetails)
             .build();
     }
 
     private GeneralApplicationCaseData addGeneralAppType(GeneralApplicationCaseData caseData, GeneralApplicationTypes generalApplicationTypes) {
-        return caseData.toBuilder().generalAppType(
+        return caseData.copy().generalAppType(
                 GAApplicationType.builder().types(List.of(generalApplicationTypes))
                     .build())
             .build();

@@ -160,7 +160,7 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
                 new GARespondentRepresentative()
                     .setGeneralAppRespondent1Representative(YES)

@@ -21,7 +21,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesOption_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
             .build();
@@ -34,7 +34,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesAllTimeFields_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateDays("2")
@@ -50,7 +50,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesDayAndMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateDays("1")
@@ -65,7 +65,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesDaysAndHours_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateDays("2")
@@ -80,7 +80,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesHoursAndMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateHours("2")
@@ -95,7 +95,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesDays_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateDays("3"))
@@ -109,7 +109,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesHours_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateHours("6"))
@@ -123,7 +123,7 @@ public class JudicialTimeEstimateHelperTest {
     @Test
     void whenJudgeSpecifiesMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialListForHearing(new GAJudgesHearingListGAspec()
                                         .setJudicialTimeEstimate(GAHearingDuration.OTHER)
                                         .setJudicialTimeEstimateMinutes("45"))

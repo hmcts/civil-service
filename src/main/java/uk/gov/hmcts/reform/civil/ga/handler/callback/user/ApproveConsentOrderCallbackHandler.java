@@ -57,7 +57,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
 
     private CallbackResponse validateApplicationType(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         List<GeneralApplicationTypes> validGATypes = List.of(STAY_THE_CLAIM);
         GAApproveConsentOrder gaApproveConsentOrder = new GAApproveConsentOrder();
         if (caseData.getGeneralAppDetailsOfOrder() != null) {
@@ -80,7 +80,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
     private CallbackResponse populateConsentOrder(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         List<String> errors = new ArrayList<>();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         if (caseData.getApproveConsentOrder() != null
             && caseData.getApproveConsentOrder().getShowConsentOrderDate() != null
             && caseData.getApproveConsentOrder().getShowConsentOrderDate().equals(YesOrNo.YES)
@@ -107,7 +107,7 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
 
     private CallbackResponse setBusinessProcess(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData dataBuilder = caseData.copy();
         dataBuilder.businessProcess(BusinessProcess.readyGa(APPROVE_CONSENT_ORDER)).build();
         log.info("Set business process to APPROVE_CONSENT_ORDER for caseId: {}", caseData.getCcdCaseReference());
         return AboutToStartOrSubmitCallbackResponse.builder()

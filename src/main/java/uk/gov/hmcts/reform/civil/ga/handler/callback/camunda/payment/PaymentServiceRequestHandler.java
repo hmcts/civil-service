@@ -101,7 +101,7 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
                     .setPaymentDetails(paymentDetails)
                     .setPaymentSuccessfulDate(time.now());
             }
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppPBADetails(updatedPbaDetails)
                 .build();
         } catch (FeignException e) {

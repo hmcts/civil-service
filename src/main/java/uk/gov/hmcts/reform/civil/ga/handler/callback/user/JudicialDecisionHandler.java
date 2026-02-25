@@ -258,7 +258,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     private CallbackResponse checkInputForNextPage(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialDecision(new GAJudicialDecision());
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
@@ -586,7 +586,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
     private CallbackResponse gaValidateMakeDecisionScreen(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
         List<String> errors = Collections.emptyList();
@@ -647,7 +647,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     private CallbackResponse gaValidateMakeAnOrder(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         caseDataBuilder.judicialDecisionMakeOrder(makeAnOrderBuilder(caseData, callbackParams));
 
@@ -736,7 +736,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
 
     private CallbackResponse gaValidateRequestMoreInfoScreen(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         GAJudicialRequestMoreInfo judicialRequestMoreInfo = caseData.getJudicialDecisionRequestMoreInfo();
 
@@ -827,15 +827,15 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         return errors;
     }
 
-    private GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> getSharedData(CallbackParams callbackParams) {
+    private GeneralApplicationCaseData getSharedData(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         // second idam call is workaround for null pointer when hiding field in getIdamEmail callback
-        return caseData.toBuilder();
+        return caseData.copy();
     }
 
     private CallbackResponse gaPopulateFinalOrderPreviewDoc(final CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         CaseDocument freeform = gaFreeFormOrderGenerator
             .generate(
                 caseData,
@@ -849,18 +849,18 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     }
 
     private CallbackResponse setJudgeBusinessProcess(CallbackParams callbackParams) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = getSharedData(callbackParams);
+        GeneralApplicationCaseData dataBuilder = getSharedData(callbackParams);
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
         if (caseData.getJudicialDecision().getDecision().name().equals(JUDICIAL_DECISION_LIST_FOR_HEARING)
             && caseData.getJudicialListForHearing().getHearingPreferredLocation() != null) {
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec = caseData.getJudicialListForHearing().copy()
                 .setHearingPreferredLocation(populateJudicialHearingLocation(caseData));
-            GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().judicialListForHearing(
+            GeneralApplicationCaseData updatedCaseData = caseData.copy().judicialListForHearing(
                     gaJudgesHearingListGAspec)
                 .build();
             caseData = updatedCaseData;
-            dataBuilder = updatedCaseData.toBuilder();
+            dataBuilder = updatedCaseData.copy();
         }
         String caseId = caseData.getCcdCaseReference().toString();
         dataBuilder.businessProcess(BusinessProcess.readyGa(MAKE_DECISION)).build();
@@ -979,7 +979,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             ? judicialDecisionWrittenRepService.validateWrittenRepresentationsDates(judicialWrittenRepresentationsDate)
             : Collections.emptyList();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         if (caseData.getJudicialDecisionMakeAnOrderForWrittenRepresentations().getWrittenOption()
             .equals(SEQUENTIAL_REPRESENTATIONS)) {
             caseDataBuilder.judicialSequentialDateText(getJudicalSequentialDatePupulatedText(caseData)).build();
@@ -1020,7 +1020,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
         List<String> errors = ofNullable(validateCourtsInitiativeDatesForWrittenRep(caseData))
             .orElse(Collections.emptyList());
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         CaseDocument judgeDecision;
 
@@ -1092,7 +1092,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
             && (caseData.getJudicialListForHearing().getHearingPreferredLocation() == null)) {
             errors.add(PREFERRED_LOCATION_REQUIRED);
         }
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.judicialHearingGeneralOrderHearingText(getJudgeHearingPrePopulatedText(caseData))
             .judicialHearingGOHearingReqText(populateJudgeGOSupportRequirement(caseData))
             .judicialGeneralOrderHearingEstimationTimeText(getJudgeHearingTimeEstPrePopulatedText(caseData))
@@ -1121,7 +1121,7 @@ public class JudicialDecisionHandler extends CallbackHandler implements GeneralA
     private CallbackResponse gaPopulateHearingOrderDoc(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         List<String> errors = ofNullable(validateCourtsInitiativeDatesForHearing(caseData))
             .orElse(Collections.emptyList());

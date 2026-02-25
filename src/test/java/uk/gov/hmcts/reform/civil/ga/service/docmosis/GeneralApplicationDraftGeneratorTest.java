@@ -201,7 +201,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).toBuilder()
+        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).copy()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .applicationIsCloaked(NO)
             .build();
@@ -230,7 +230,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).toBuilder()
+        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).copy()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .applicationIsCloaked(YES)
             .build();
@@ -345,7 +345,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF)
@@ -396,7 +396,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplication(isConsented, isTobeNotified))
-            .toBuilder()
+            .copy()
             .claimant1PartyName("Test Claimant1 Name")
             .generalAppHearingDate(
                 GAHearingDateGAspec.builder()
@@ -408,7 +408,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private GeneralApplicationCaseData getSampleGeneralAppCaseDataWithDeadLineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
-            .toBuilder()
+            .copy()
             .claimant1PartyName("Test Claimant1 Name")
             .generalAppHearingDate(
                 GAHearingDateGAspec.builder()

@@ -101,7 +101,7 @@ public class UpdatePaymentStatusService {
             updatedPbaDetails.setPaymentDetails(paymentDetails);
             log.info("Applied standard payment details for caseReference: {}", caseData.getCcdCaseReference());
         }
-        return caseData.toBuilder()
+        return caseData.copy()
             .generalAppPBADetails(updatedPbaDetails)
             .build();
     }

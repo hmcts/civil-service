@@ -206,7 +206,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -221,7 +221,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantNotBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(NO).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -238,7 +238,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -316,8 +316,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                           .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseData =
-            GeneralApplicationCaseData.builder().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
                     GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).generalAppType(
                     GAApplicationType
                         .builder()
@@ -345,7 +345,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(SUMMARY_JUDGEMENT);
         updateCaseData.parentClaimantIsApplicant(YES)
             .generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -372,7 +372,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -413,7 +413,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void midCallBackValidateDebtorPaymentDatePastDateError() {
         GeneralApplicationCaseData caseData = getCase(AWAITING_RESPONDENT_RESPONSE);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(types).build())
@@ -435,7 +435,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void midCallBackValidateDebtorPaymentDateIsFuture() {
         GeneralApplicationCaseData caseData = getCase(AWAITING_RESPONDENT_RESPONSE);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.generalAppType(GAApplicationType.builder().types(types).build())
             .gaRespondentDebtorOffer(
@@ -726,7 +726,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
-        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().parentClaimantIsApplicant(NO).build();
+        GeneralApplicationCaseData updatedCaseData = caseData.copy().parentClaimantIsApplicant(NO).build();
         CaseDetails ga = CaseDetails.builder().id(456L).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(updatedCaseData);
@@ -748,7 +748,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         respondentSols.add(element(respondent2));
         respondentSols.add(element(respondent1));
         GeneralApplicationCaseData caseData = getCaseWithJudicialDecision(respondentSols, respondentsResponses);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.isMultiParty(YES);
 
         mockIdamClient(DEF_UID);
@@ -843,7 +843,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void shouldReturn_Null_WhenPreferredTypeNotInPerson() {
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
 
@@ -876,7 +876,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void shouldPopulatePreferredLocation_WhenRespondentIsLiP() {
 
         GeneralApplicationCaseData caseData = getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
         caseDataBuilder.hearingDetailsResp(caseData.getHearingDetailsResp().toBuilder()
@@ -920,7 +920,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
@@ -970,7 +970,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .defendant2PartyName("Defendant Two")
@@ -1013,7 +1013,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_No_WhenConsentRespondIsNotAcceptedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
                 .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
                 .generalAppConsentOrder(YES)
@@ -1056,7 +1056,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_No_WhenDebtorIsDeclinedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         LocalDate planDate = LocalDate.of(2023, 11, 29);
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
@@ -1104,7 +1104,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_No_Instalment_WhenDebtorIsDeclinedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
                 .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .defendant2PartyName("Defendant Two")
@@ -1147,7 +1147,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_Yes_WhenDebtorIsAcceptedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .gaRespondentDebtorOffer(
@@ -1203,7 +1203,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA Case Data
         GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
-        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder()
+        GeneralApplicationCaseData updatedCaseData = caseData.copy()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -1235,7 +1235,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDateFrom() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .unavailableTrialRequiredYesOrNo(YES)
                                     .generalAppUnavailableDates(null)
@@ -1244,7 +1244,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDates() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .unavailableTrialRequiredYesOrNo(YES)
                                     .generalAppUnavailableDates(getUnavailableNullDateList())
@@ -1253,7 +1253,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidTrailDateRange() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .trialRequiredYesOrNo(YES)
                                     .trialDateFrom(TRIAL_DATE_FROM_INVALID)
@@ -1263,7 +1263,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidDateToRange() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .trialRequiredYesOrNo(YES)
                                     .trialDateFrom(TRIAL_DATE_FROM_INVALID)
@@ -1273,7 +1273,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithNullFromAndToDate() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
@@ -1288,7 +1288,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithPreferredTypeInPersonLocationNull() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .parentClaimantIsApplicant(YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
@@ -1306,7 +1306,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithUnavailableDates() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
@@ -1320,7 +1320,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithUnavailableDatesBeforeToday() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
@@ -1361,7 +1361,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         respondentsResponses.add(element(new GARespondentResponse()
                                              .setGeneralAppRespondent1Representative(NO)
                                              .setGaRespondentDetails(DEF_UID)));
-        return GeneralApplicationCaseData.builder().parentClaimantIsApplicant(YES)
+        return new GeneralApplicationCaseData().parentClaimantIsApplicant(YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1391,7 +1391,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
                 new GARespondentRepresentative()
                     .setGeneralAppRespondent1Representative(YES)
@@ -1432,7 +1432,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
                 new GARespondentRepresentative()
                     .setGeneralAppRespondent1Representative(YES)
@@ -1474,7 +1474,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
@@ -1517,7 +1517,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .parentClaimantIsApplicant(YES)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()

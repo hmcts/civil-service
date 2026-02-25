@@ -104,7 +104,7 @@ public class DocUploadNotificationServiceTest {
             when(notificationsProperties.getEvidenceUploadTemplate())
                 .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(true, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
@@ -120,7 +120,7 @@ public class DocUploadNotificationServiceTest {
             when(notificationsProperties.getEvidenceUploadTemplate())
                 .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(false, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
@@ -135,7 +135,7 @@ public class DocUploadNotificationServiceTest {
         void respNotificationShouldSendTwice1V2() {
             when(notificationsProperties.getEvidenceUploadTemplate())
                 .thenReturn("general-apps-notice-of-document-template-id");
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
@@ -160,7 +160,7 @@ public class DocUploadNotificationServiceTest {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = getCaseData(true, YES, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
                 DUMMY_EMAIL,
@@ -180,8 +180,8 @@ public class DocUploadNotificationServiceTest {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData =
-                getCaseData(true, YES, NO).toBuilder().applicantBilingualLanguagePreference(YES).build();
-            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().applicantBilingualLanguagePreference(
+                getCaseData(true, YES, NO).copy().applicantBilingualLanguagePreference(YES).build();
+            GeneralApplicationCaseData claimantClaimIssueFlag = new GeneralApplicationCaseData().applicantBilingualLanguagePreference(
                     YES)
                 .claimantBilingualLanguagePreference("WELSH").build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
@@ -210,9 +210,9 @@ public class DocUploadNotificationServiceTest {
                 .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
             respondentSols.add(element(respondent1));
 
-            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).copy()
                 .generalAppRespondentSolicitors(respondentSols).build();
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
                 DUMMY_EMAIL,
@@ -238,9 +238,9 @@ public class DocUploadNotificationServiceTest {
                 .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
             respondentSols.add(element(respondent1));
 
-            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).copy()
                 .generalAppRespondentSolicitors(respondentSols).respondentBilingualLanguagePreference(YES).build();
-            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
+            GeneralApplicationCaseData claimantClaimIssueFlag = new GeneralApplicationCaseData().respondentBilingualLanguagePreference(YES)
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);

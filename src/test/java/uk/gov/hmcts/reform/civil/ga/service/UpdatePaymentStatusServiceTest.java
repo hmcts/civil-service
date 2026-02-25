@@ -49,7 +49,7 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenApplicationFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.READY)
@@ -79,7 +79,7 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenAdditionalFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.READY)

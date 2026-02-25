@@ -126,7 +126,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
     private AboutToStartOrSubmitCallbackResponse applicationValidation(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
 
         if (caseData.getGeneralAppType().getTypes().contains(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)
@@ -318,7 +318,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         UserInfo userInfo = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String userId = userInfo.getUid();
@@ -344,7 +344,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             .build();
     }
 
-    private void addResponseDoc(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder, GeneralApplicationCaseData caseData, String role) {
+    private void addResponseDoc(GeneralApplicationCaseData caseDataBuilder, GeneralApplicationCaseData caseData, String role) {
         List<Element<Document>> documents = caseData.getGeneralAppRespondDocument();
         if (Objects.isNull(documents)) {
             documents = caseData.getGeneralAppRespondConsentDocument();

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -68,7 +67,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
 
     private CallbackResponse setData(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         FeePaymentOutcomeDetails feePaymentOutcomeDetails = new FeePaymentOutcomeDetails();
         feePaymentOutcomeDetails.setHwfNumberAvailable(YesOrNo.NO);
         if (Objects.nonNull(caseData.getGeneralAppHelpWithFees())
@@ -105,7 +104,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
 
     private CallbackResponse submitFeePaymentOutcome(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         if (caseData.isHWFTypeApplication()) {
             LocalDate issueDate = LocalDate.now();
@@ -129,25 +128,21 @@ public class GaFeePaymentOutcomeHWFCallBackHandler extends CallbackHandler imple
                     GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID)) {
                     caseEvent = INITIATE_COSC_APPLICATION_AFTER_PAYMENT;
                 }
-                HelpWithFeesDetails updatedGaHwfDetails = Optional.ofNullable(caseData.getGaHwfDetails())
-                    .map(HelpWithFeesDetails::copy)
-                    .orElse(new HelpWithFeesDetails());
+                HelpWithFeesDetails updatedGaHwfDetails = caseData.getGaHwfDetails().copy();
                 updatedGaHwfDetails
                     .setFee(caseData.getGeneralAppPBADetails().getFee())
                     .setHwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())
                     .setOutstandingFee(BigDecimal.ZERO);
-                caseData = processedCaseData.toBuilder()
+                caseData = processedCaseData.copy()
                     .gaHwfDetails(updatedGaHwfDetails)
                     .businessProcess(BusinessProcess.readyGa(caseEvent)).build();
             } else if (processedCaseData.isHWFTypeAdditional()) {
-                HelpWithFeesDetails updatedAdditionalHwfDetails = Optional.ofNullable(caseData.getAdditionalHwfDetails())
-                    .map(HelpWithFeesDetails::copy)
-                    .orElse(new HelpWithFeesDetails());
+                HelpWithFeesDetails updatedAdditionalHwfDetails = caseData.getAdditionalHwfDetails().copy();
                 updatedAdditionalHwfDetails
                     .setFee(caseData.getGeneralAppPBADetails().getFee())
                     .setHwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())
                     .setOutstandingFee(BigDecimal.ZERO);
-                caseData = processedCaseData.toBuilder()
+                caseData = processedCaseData.copy()
                     .additionalHwfDetails(updatedAdditionalHwfDetails)
                     .businessProcess(BusinessProcess.readyGa(UPDATE_GA_ADD_HWF))
                     .build();

@@ -43,7 +43,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
     class AboutToSubmitCallback {
         @Test
         void shouldUpdateFullRemissionData_GaFee() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                         new Fee()
                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
@@ -62,7 +62,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_GaFee() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                     new Fee()
                         .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
@@ -81,7 +81,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldUpdateFullRemissionData_Additional() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
@@ -101,7 +101,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_AdditionalFee() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
@@ -120,7 +120,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldNotUpdateFullRemissionData_ifGaFeeIsZero() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.ZERO)
@@ -139,7 +139,7 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldNotUpdateFullRemissionData_ifAdditionalFeeIsZero() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.ZERO)

@@ -113,7 +113,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(UserInfo.builder().givenName("John").familyName("Doe").build());
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .atStateClaimDraft()
-            .build().toBuilder()
+            .build().copy()
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
@@ -136,7 +136,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(LocalDateTime.class), eq(21)))
             .thenReturn(localDatePlus21days);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().isMultiParty(NO)
+            .build().copy().isMultiParty(NO)
             .generalAppDetailsOfOrder("order test")
             .locationName("County Court Money Centre")
             .caseManagementLocation(CaseLocationCivil.builder()
@@ -173,7 +173,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().locationName("County Court Money Centre")
+            .build().copy().locationName("County Court Money Centre")
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .isMultiParty(NO)
@@ -251,7 +251,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft()
-            .build().toBuilder().locationName("County Court Money Centre")
+            .build().copy().locationName("County Court Money Centre")
             .claimant1PartyName("Mr. John Rambo")
             .defendant1PartyName("Mr. Sole Trader")
             .defendant2PartyName("Mr. Sole Trader Defendant2")
@@ -330,7 +330,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
@@ -353,7 +353,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
@@ -375,7 +375,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppDetailsOfOrder("order test")
@@ -398,7 +398,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
@@ -415,7 +415,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
@@ -433,7 +433,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
@@ -450,7 +450,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -472,7 +472,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
@@ -495,7 +495,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
@@ -519,7 +519,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalOrderApplication()
             .build()
-            .toBuilder().isMultiParty(YES).finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().isMultiParty(YES).finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
@@ -546,7 +546,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -570,7 +570,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -598,7 +598,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -627,7 +627,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -656,7 +656,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -685,7 +685,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -722,7 +722,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -758,7 +758,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -794,7 +794,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(NO)
             .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
@@ -825,7 +825,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
@@ -844,7 +844,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
@@ -864,7 +864,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder()
+            .copy()
             .finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER)
             .generalAppDetailsOfOrder("order test")
             .assistedOrderMadeSelection(YesOrNo.NO)
@@ -884,7 +884,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         when(freeFormOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER).build();
+            .copy().finalOrderSelection(GaFinalOrderSelection.FREE_FORM_ORDER).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -901,7 +901,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             .thenReturn(new CaseDocument().setDocumentLink(new Document()));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
             .build()
-            .toBuilder().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER).build();
+            .copy().finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER).build();
         CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -918,7 +918,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVOne() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
                 .build();
@@ -930,7 +930,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVTwoSameSol() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YES)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -945,7 +945,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
         void oneVTwo() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -962,7 +962,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldSetUpReadyBusinessProcess() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().gaFinalOrderDocPreview(new Document()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().gaFinalOrderDocPreview(new Document()).build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -985,7 +985,7 @@ class JudicialFinalDecisionHandlerTest extends GeneralApplicationBaseCallbackHan
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")

@@ -215,7 +215,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
     public GeneralApplicationCaseData getGeneralAppCaseData(List<GeneralApplicationTypes> types) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppDetailsOfOrder("Testing prepopulated text")
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
@@ -242,7 +242,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     public GeneralApplicationCaseData getGeneralAppCaseDataForGeneratingDocument(List<GeneralApplicationTypes> types, LocalDate orderDate,
                                                                YesOrNo showConsent) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppDetailsOfOrder("Testing prepopulated text")
             .approveConsentOrder(new GAApproveConsentOrder().setConsentOrderDescription("Testing prepopulated text")
                                      .setShowConsentOrderDate(showConsent)
@@ -272,7 +272,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
     public GeneralApplicationCaseData getGeneralAppCaseDataWithoutOrderDetails(List<GeneralApplicationTypes> types) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())

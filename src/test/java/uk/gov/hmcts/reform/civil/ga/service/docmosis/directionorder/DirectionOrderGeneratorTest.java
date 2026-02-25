@@ -131,7 +131,7 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
@@ -175,7 +175,7 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
@@ -210,12 +210,12 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option2() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                            .setDirectionsText("Test Direction")
                                                            .setJudicialByCourtsInitiative(
@@ -269,11 +269,11 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option3() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                           .setDirectionsText("Test Direction")
                                                           .setJudicialByCourtsInitiative(
@@ -324,10 +324,10 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldHideRecital_whileUnchecked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                     .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                     .setDirectionsText("Test Direction")
                     .setJudicialByCourtsInitiative(
@@ -376,7 +376,7 @@ class DirectionOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1_LipRespondent() {
 
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)
@@ -421,7 +421,7 @@ class DirectionOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1_Lip() {
 
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)

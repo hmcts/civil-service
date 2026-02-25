@@ -261,7 +261,7 @@ class GaHearingFormGeneratorTest {
 
     @Test
     void test_getHearingDurationStringOther() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().gaHearingNoticeDetail(new GAHearingNoticeDetail()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().gaHearingNoticeDetail(new GAHearingNoticeDetail()
                 .setHearingDuration(GAHearingDuration.OTHER)
                 .setHearingDurationOther("One year")).build();
         String durationString = GaHearingFormGenerator.getHearingDurationString(caseData);
@@ -274,7 +274,7 @@ class GaHearingFormGeneratorTest {
                         false,
                         false,
                         true, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -291,7 +291,7 @@ class GaHearingFormGeneratorTest {
                         false,
                         true,
                         false, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -308,7 +308,7 @@ class GaHearingFormGeneratorTest {
                         true,
                         false,
                         false, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -325,7 +325,7 @@ class GaHearingFormGeneratorTest {
                         true,
                         true,
                         true, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes

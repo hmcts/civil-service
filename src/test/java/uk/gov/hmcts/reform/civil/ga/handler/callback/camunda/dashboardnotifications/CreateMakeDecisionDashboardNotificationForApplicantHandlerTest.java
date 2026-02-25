@@ -82,7 +82,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldRecordMoreInfoRequiredApplicantScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -112,7 +112,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @MethodSource("provideCcdState")
         void shouldRecordPayAdditionalPaymentApplicantScenarioWhenInvoked(CaseState caseState) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -151,7 +151,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @MethodSource("provideOrderType")
         void shouldRecordOrderMadeApplicantScenarioWhenInvoked_isWIthNoticeApplication(GAJudgeDecisionOption decisionOption, GAJudgeMakeAnOrderOption orderOption) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -180,7 +180,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldRecordOrderMadeApplicantScenarioWhenInvoked_isWIthOutNoticeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -210,7 +210,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldNotRecordOrderMadeApplicantScenarioWhenInvoked_isWIthNoticeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -240,7 +240,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldNotRecordOrderMadeApplicantScenarioWhenInvoked_isWIthNoticeApplication_OrderNotMade() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -279,7 +279,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldRecordHearingScheduledApplicantScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -309,7 +309,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
         @Test
         void shouldRecordRequestWrittenRepresentationsApplicantScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations().setWrittenOption(

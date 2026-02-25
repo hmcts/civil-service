@@ -202,7 +202,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldDispatchBusinessProcess_whenStatusIsReady() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder().parentCaseReference("1234").build();
+        caseData = caseData.copy().parentCaseReference("1234").build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
@@ -220,7 +220,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListActionNeeded_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -266,7 +266,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListInProgress_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -312,7 +312,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListAvailable_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -373,7 +373,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(NO)
             .ccdCaseReference(CCD_CASE_REFERENCE).build()
-            .toBuilder().parentCaseReference("1234").build();
+            .copy().parentCaseReference("1234").build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -396,7 +396,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidPartialRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -440,7 +440,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidNoRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -482,7 +482,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidThroughWhenHwfIsRejected() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -518,7 +518,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidFullRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -586,7 +586,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
                                                  .setRequestMoreInfoOption(
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
-            .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
+            .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build()).build();
 
@@ -618,7 +618,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
                                                  .setRequestMoreInfoOption(
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
-            .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
+            .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).build();
 
@@ -643,7 +643,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldNotUpdateApplication_whenPaymentFailed() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setAdditionalPaymentDetails(new PaymentDetails()
@@ -660,7 +660,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldNotUpdateParent_whenPaymentFailed() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setAdditionalPaymentDetails(new PaymentDetails()

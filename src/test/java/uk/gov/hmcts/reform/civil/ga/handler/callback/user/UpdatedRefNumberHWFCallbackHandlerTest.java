@@ -44,7 +44,7 @@ class UpdatedRefNumberHWFCallbackHandlerTest extends GeneralApplicationBaseCallb
 
         @Test
         void shouldUpdateRefNumber_forApplicationHwf() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees())
                 .gaHwfDetails(new HelpWithFeesDetails()
@@ -61,7 +61,7 @@ class UpdatedRefNumberHWFCallbackHandlerTest extends GeneralApplicationBaseCallb
 
         @Test
         void shouldUpdateRefNumber_forAdditionalHwf() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .generalAppHelpWithFees(new HelpWithFees())
                 .additionalHwfDetails(new HelpWithFeesDetails()

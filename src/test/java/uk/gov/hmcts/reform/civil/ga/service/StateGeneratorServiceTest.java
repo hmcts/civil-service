@@ -74,7 +74,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturnAwaiting_Addition_InformationWhenMoreInfoSelected() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .judicialDecision(new GAJudicialDecision(REQUEST_MORE_INFO))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setOrderText("test"))
             .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo())
@@ -86,7 +86,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturn_Awaiting_Written_Representation_WhenMakeOrderForWrittenRepresentationsSelected() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .judicialDecision(new GAJudicialDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setOrderText("test"))
             .build();
@@ -98,7 +98,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturn_Awaiting_Directions_Order_Docs_WhenMakeOrderSelectedAndTextProvided() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -118,7 +118,7 @@ public class StateGeneratorServiceTest {
     @Test
     public void shouldReturnCurrentStateWhenMakeOrderAndDismissed() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
@@ -134,7 +134,7 @@ public class StateGeneratorServiceTest {
     @Test
     public void shouldReturnListingForHearingWhenTheDecisionHasBeenMade() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(LIST_FOR_A_HEARING))
             .build();
@@ -146,7 +146,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturnOrderDateWhenCaseworkerApprovesApplication() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .approveConsentOrder(new GAApproveConsentOrder().setConsentOrderDescription("Test Order")
                                      )
             .build();
@@ -157,7 +157,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturnProceedsInHeritageSystemWhenTheDecisionHasBeenMade() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -173,7 +173,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturnOrderMadeWhenTheDecisionHasBeenMade() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -189,7 +189,7 @@ public class StateGeneratorServiceTest {
 
     @Test
     public void shouldReturnOrderMadeWhenJudgeDecidesFreeFormOrder() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .freeFormRecitalText("test")
             .freeFormOrderedText("test")
@@ -206,7 +206,7 @@ public class StateGeneratorServiceTest {
 
     @Test
      void shouldNotReturnOrderAdditionalAddPayment_WhenJudgeUncloakTheApplicationInOrderMake() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -222,7 +222,7 @@ public class StateGeneratorServiceTest {
 
     @Test
      void shouldNotReturnOrderAdditionalAddPayment_WhenJudgeUncloakTheApplicationAwaitingDocsOrderMake() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()

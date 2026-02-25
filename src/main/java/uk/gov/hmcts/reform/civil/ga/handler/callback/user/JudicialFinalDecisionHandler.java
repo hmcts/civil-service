@@ -149,7 +149,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse gaPopulateFinalOrderPreviewDoc(final CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         List<String> errors = validAssistedOrderForm(caseData);
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             CaseDocument freeform = gaFreeFormOrderGenerator.generate(
@@ -174,7 +174,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse setCaseName(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy()
             .caseNameHmctsInternal(getAllPartyNames(caseData));
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
@@ -187,7 +187,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         caseDataBuilder.orderOnCourtInitiative(new FreeFormOrderValues()
                                                    .setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
@@ -299,7 +299,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
         caseDataBuilder.bilingualHint(null);
         caseDataBuilder.businessProcess(BusinessProcess.readyGa(GENERATE_DIRECTIONS_ORDER)).build();

@@ -78,13 +78,13 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
                 .setConsentOrderDateToEnd(consentOrder.getConsentOrderDateToEnd())
                 .setShowConsentOrderDate(consentOrder.getShowConsentOrderDate())
                 .setIsOrderProcessedByStayScheduler(YesOrNo.YES);
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .approveConsentOrder(updatedConsentOrder)
                 .build();
 
         } else {
             GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .judicialDecisionMakeOrder(
                     judicialDecisionMakeOrder.copy().setIsOrderProcessedByStayScheduler(YesOrNo.YES))
                 .build();

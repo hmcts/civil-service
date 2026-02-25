@@ -85,7 +85,7 @@ class GaFeesPaymentServiceTest {
 
     @BeforeEach
     void before() {
-        caseData = GeneralApplicationCaseData.builder().ccdCaseReference(2801090368574910L)
+        caseData = new GeneralApplicationCaseData().ccdCaseReference(2801090368574910L)
             .generalAppPBADetails(new GeneralApplicationPbaDetails().setServiceReqReference("2023-1701090705688")
                                        .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
                                        )
@@ -118,7 +118,7 @@ class GaFeesPaymentServiceTest {
     void shouldCreateGovPayPaymentUrlForServiceRequestAdditionalPayment() {
         GeneralApplicationPbaDetails updatedPbaDetails = caseData.getGeneralAppPBADetails().copy()
             .setAdditionalPaymentServiceRef("2023-1701090705600");
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .generalAppPBADetails(updatedPbaDetails)
             .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -141,7 +141,7 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingPbaDetails() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
                 .generalAppPBADetails(new GeneralApplicationPbaDetails()
                         .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
                         )
@@ -162,7 +162,7 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
             .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                       .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
                                       )

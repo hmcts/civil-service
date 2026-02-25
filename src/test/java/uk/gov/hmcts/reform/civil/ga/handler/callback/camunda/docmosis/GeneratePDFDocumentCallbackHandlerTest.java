@@ -698,7 +698,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GaFinalOrderSelection selection) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                     .build()
-                    .toBuilder()
+                    .copy()
                     .finalOrderSelection(selection)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -725,7 +725,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                     .build()
-                    .toBuilder()
+                    .copy()
                     .finalOrderSelection(selection)
                     .generalOrderDocument(wrapElements(caseDocument))
                     .build();
@@ -745,7 +745,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             GaFinalOrderSelection selection) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                 .build()
-                .toBuilder()
+                .copy()
                 .finalOrderSelection(selection)
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -1118,7 +1118,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .applicantBilingualLanguagePreference(YES)
                 .parentClaimantIsApplicant(YES)
                 .build();
-            caseData = caseData.toBuilder().judicialDecision(new GAJudicialDecision()
+            caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
                                                      .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                      ).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
@@ -1147,7 +1147,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .parentClaimantIsApplicant(YES)
                 .applicantBilingualLanguagePreference(YES)
                 .build();
-            caseData = caseData.toBuilder().judicialDecision(new GAJudicialDecision()
+            caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
                                                                  .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
                                                                  ).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
