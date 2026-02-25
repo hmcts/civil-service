@@ -32,10 +32,9 @@ public class HearingIndividual {
     }
 
     public Attendees buildAttendee() {
-        return Attendees.builder()
-                .partyID(partyId)
-                .hearingSubChannel(hearingSubChannel)
-                .build();
+        return new Attendees()
+                .setPartyID(partyId)
+                .setHearingSubChannel(hearingSubChannel);
     }
 
     private static HearingIndividual attendingHearingBy(String firstName, String lastName, HearingSubChannel hearingSubChannel) {
