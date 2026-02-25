@@ -24,7 +24,7 @@ def versions = [
   junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.38',
+  lombok            : '1.18.42',
   camunda           : '7.20.0',
   testcontainers    : '1.21.3',
   pdfbox            : '3.0.6',
