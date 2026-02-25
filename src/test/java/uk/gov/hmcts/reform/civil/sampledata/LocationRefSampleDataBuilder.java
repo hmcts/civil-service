@@ -289,38 +289,38 @@ public class LocationRefSampleDataBuilder {
 
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                .courtLocationCode("court1").build(),
-            LocationRefData.builder()
-                .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                .courtLocationCode("court2").build(),
-            LocationRefData.builder()
-                .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("court3").build(),
-            LocationRefData.builder()
-                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
-                .courtLocationCode("court5").build()
+            new LocationRefData()
+                .setEpimmsId("111").setSiteName("Site 1").setCourtAddress("Adr 1").setPostcode("AAA 111")
+                .setCourtLocationCode("court1"),
+            new LocationRefData()
+                .setEpimmsId("222").setSiteName("Site 2").setCourtAddress("Adr 2").setPostcode("BBB 222")
+                .setCourtLocationCode("court2"),
+            new LocationRefData()
+                .setEpimmsId("333").setSiteName("Site 3").setCourtAddress("Adr 3").setPostcode("CCC 333")
+                .setCourtLocationCode("court3"),
+            new LocationRefData()
+                .setEpimmsId("00000").setSiteName("Site 5").setCourtAddress("Adr 5").setPostcode("YYY 111")
+                .setCourtLocationCode("court5")
         ));
     }
 
     protected List<LocationRefData> getSampleCourLocationsRefObjectToSort() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("VVV 111")
-                .courtLocationCode("court1").build(),
-            LocationRefData.builder()
-                .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                .courtLocationCode("court2").build(),
-            LocationRefData.builder()
-                .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                .courtLocationCode("court3").build(),
-            LocationRefData.builder()
-                .epimmsId("444").siteName("A Site 3").courtAddress("Adr 3").postcode("AAA 111")
-                .courtLocationCode("court4").build(),
-            LocationRefData.builder()
-                .epimmsId("00000").siteName("Site 5").courtAddress("Adr 5").postcode("YYY 111")
-                .courtLocationCode("court5").build()
+            new LocationRefData()
+                .setEpimmsId("111").setSiteName("Site 1").setCourtAddress("Adr 1").setPostcode("VVV 111")
+                .setCourtLocationCode("court1"),
+            new LocationRefData()
+                .setEpimmsId("222").setSiteName("Site 2").setCourtAddress("Adr 2").setPostcode("BBB 222")
+                .setCourtLocationCode("court2"),
+            new LocationRefData()
+                .setEpimmsId("333").setSiteName("Site 3").setCourtAddress("Adr 3").setPostcode("CCC 333")
+                .setCourtLocationCode("court3"),
+            new LocationRefData()
+                .setEpimmsId("444").setSiteName("A Site 3").setCourtAddress("Adr 3").setPostcode("AAA 111")
+                .setCourtLocationCode("court4"),
+            new LocationRefData()
+                .setEpimmsId("00000").setSiteName("Site 5").setCourtAddress("Adr 5").setPostcode("YYY 111")
+                .setCourtLocationCode("court5")
         ));
     }
 }
