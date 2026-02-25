@@ -78,8 +78,8 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
                 .filter(l -> l.getLabel().equals(preLabel)).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
         }
-        caseDataBuilder.gaHearingNoticeDetail(GAHearingNoticeDetail
-                                                  .builder().hearingLocation(dynamicLocationList).build());
+        caseDataBuilder.gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                                  .setHearingLocation(dynamicLocationList));
 
         if (caseData.getCcdState().equals(CaseState.ORDER_MADE)) {
             caseDataBuilder.gaHearingNoticeApplication(null)

@@ -267,19 +267,18 @@ class GeneralOrderGeneratorTest {
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                          .orderText("Test Order")
-                                                          .orderWithoutNotice("abcdef")
-                                                          .orderWithoutNoticeDate(LocalDate.now())
-                                                          .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                          .setOrderText("Test Order")
+                                                          .setOrderWithoutNotice("abcdef")
+                                                          .setOrderWithoutNoticeDate(LocalDate.now())
+                                                          .setJudicialByCourtsInitiative(
                                                               GAByCourtsInitiativeGAspec.OPTION_2)
-                                                          .showReasonForDecision(YesOrNo.YES)
-                                                          .reasonForDecisionText("Test Reason")
-                                                          .makeAnOrder(
+                                                          .setShowReasonForDecision(YesOrNo.YES)
+                                                          .setReasonForDecisionText("Test Reason")
+                                                          .setMakeAnOrder(
                                                               GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                                          .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                                          .judgeRecitalText("Test Judge's recital")
-                                                          .build()).build();
+                                                          .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                                          .setJudgeRecitalText("Test Judge's recital")).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
@@ -327,17 +326,16 @@ class GeneralOrderGeneratorTest {
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                          .orderText("Test Order")
-                                                          .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                          .setOrderText("Test Order")
+                                                          .setJudicialByCourtsInitiative(
                                                               GAByCourtsInitiativeGAspec.OPTION_3)
-                                                          .showReasonForDecision(YesOrNo.YES)
-                                                          .reasonForDecisionText("Test Reason")
-                                                          .makeAnOrder(
+                                                          .setShowReasonForDecision(YesOrNo.YES)
+                                                          .setReasonForDecisionText("Test Reason")
+                                                          .setMakeAnOrder(
                                                               GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                                          .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                                          .judgeRecitalText("Test Judge's recital")
-                                                          .build()).build();
+                                                          .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                                          .setJudgeRecitalText("Test Judge's recital")).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
@@ -382,16 +380,15 @@ class GeneralOrderGeneratorTest {
                     .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                    .orderText("Test Order")
-                    .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                    .setOrderText("Test Order")
+                    .setJudicialByCourtsInitiative(
                             GAByCourtsInitiativeGAspec.OPTION_3)
-                    .reasonForDecisionText("Test Reason")
-                    .showReasonForDecision(YesOrNo.NO)
-                    .makeAnOrder(
+                    .setReasonForDecisionText("Test Reason")
+                    .setShowReasonForDecision(YesOrNo.NO)
+                    .setMakeAnOrder(
                             GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                    .judgeRecitalText("Test Judge's recital")
-                    .build()).build();
+                    .setJudgeRecitalText("Test Judge's recital")).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
             when(docmosisService.populateJudgeReason(any())).thenReturn(StringUtils.EMPTY);

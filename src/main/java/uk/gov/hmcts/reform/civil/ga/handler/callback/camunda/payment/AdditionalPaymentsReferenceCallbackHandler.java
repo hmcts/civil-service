@@ -72,10 +72,9 @@ public class AdditionalPaymentsReferenceCallbackHandler extends CallbackHandler 
                         authToken
                     ).getServiceRequestReference();
                 GeneralApplicationPbaDetails paymentDetails = ofNullable(caseData.getGeneralAppPBADetails())
-                    .map(GeneralApplicationPbaDetails::toBuilder)
-                    .orElse(GeneralApplicationPbaDetails.builder())
-                    .additionalPaymentServiceRef(paymentServiceRequest)
-                    .build();
+                    .map(GeneralApplicationPbaDetails::copy)
+                    .orElse(new GeneralApplicationPbaDetails())
+                    .setAdditionalPaymentServiceRef(paymentServiceRequest);
                 caseData = caseData.toBuilder().generalAppPBADetails(paymentDetails).build();
             } catch (FeignException e) {
                 if (e.status() == 403) {

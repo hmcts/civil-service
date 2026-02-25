@@ -304,8 +304,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                          .unavailableTrialDateFrom(LocalDate.now()).build()));
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(vulQuestion1)
                                                    .vulnerabilityQuestion("dummy1")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -318,11 +318,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                        .listItems(List.of(location1))
                                                        .value(location1).build() : null)
                                                    .build())
-                             .gaRespondentDetails("1L").build()));
+                             .setGaRespondentDetails("1L")));
         if (addRespondent == YES) {
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(vulQuestion2)
                                                        .vulnerabilityQuestion("dummy2")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -334,7 +334,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                            .listItems(List.of(location1))
                                                            .value(location1).build() : null)
                                                        .build())
-                                 .gaRespondentDetails("2L").build()));
+                                 .setGaRespondentDetails("2L")));
         }
         return respondentsResponses;
     }
@@ -379,9 +379,9 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                     .build())
             .respondentsResponses(getRespondentResponses1nad2(YES, YES, YES, YES, addRespondent))
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

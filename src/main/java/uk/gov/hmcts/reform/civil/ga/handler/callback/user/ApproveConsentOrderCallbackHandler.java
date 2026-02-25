@@ -59,18 +59,18 @@ public class ApproveConsentOrderCallbackHandler extends CallbackHandler implemen
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
         List<GeneralApplicationTypes> validGATypes = List.of(STAY_THE_CLAIM);
-        GAApproveConsentOrder.GAApproveConsentOrderBuilder gaApproveConsentOrderBuilder = GAApproveConsentOrder.builder();
+        GAApproveConsentOrder gaApproveConsentOrder = new GAApproveConsentOrder();
         if (caseData.getGeneralAppDetailsOfOrder() != null) {
-            gaApproveConsentOrderBuilder.consentOrderDescription(caseData.getGeneralAppDetailsOfOrder()).build();
-            gaApproveConsentOrderBuilder.showConsentOrderDate(YesOrNo.NO).build();
+            gaApproveConsentOrder.setConsentOrderDescription(caseData.getGeneralAppDetailsOfOrder());
+            gaApproveConsentOrder.setShowConsentOrderDate(YesOrNo.NO);
         }
 
         if (caseData.getGeneralAppType().getTypes().stream().anyMatch(validGATypes::contains)) {
-            gaApproveConsentOrderBuilder.showConsentOrderDate(YesOrNo.YES).build();
-            gaApproveConsentOrderBuilder.isOrderProcessedByStayScheduler(YesOrNo.NO);
+            gaApproveConsentOrder.setShowConsentOrderDate(YesOrNo.YES);
+            gaApproveConsentOrder.setIsOrderProcessedByStayScheduler(YesOrNo.NO);
         }
         List<String> errors = new ArrayList<>();
-        caseDataBuilder.approveConsentOrder(gaApproveConsentOrderBuilder.build());
+        caseDataBuilder.approveConsentOrder(gaApproveConsentOrder);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .errors(errors)
             .data(caseDataBuilder.build().toMap(objectMapper))

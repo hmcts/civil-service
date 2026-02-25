@@ -142,18 +142,17 @@ public class JudicialDecisionHelperTest {
                                                     getDynamicLocation("LMNO - NE0 0BH"))).build())
                 .respondentsResponses(
                     wrapElements(
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
                                 GAHearingDetails.builder()
                                     .hearingPreferredLocation(
                                         getDynamicLocationsList("PQRS - GU0 0EE",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build(),
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
+                                                                getDynamicLocation("LMNO - NE0 0BH"))).build()),
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
                                 GAHearingDetails.builder()
                                     .hearingPreferredLocation(
                                         getDynamicLocationsList("ABCD - RG0 0AL",
@@ -161,7 +160,7 @@ public class JudicialDecisionHelperTest {
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
                                                                 getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build()
+
                     )
                 )
                 .build();
@@ -181,18 +180,17 @@ public class JudicialDecisionHelperTest {
                                                     getDynamicLocation("LMNO - NE0 0BH"))).build())
                 .respondentsResponses(
                     wrapElements(
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
                                 GAHearingDetails.builder()
                                     .hearingPreferredLocation(
                                         getDynamicLocationsList("PQRS - GU0 0EE",
                                                                 getDynamicLocation("ABCD - RG0 0AL"),
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build(),
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
+                                                                getDynamicLocation("LMNO - NE0 0BH"))).build()),
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
                                 GAHearingDetails.builder()
                                     .hearingPreferredLocation(
                                         getDynamicLocationsList("WXYZ - EW0 0HE",
@@ -200,7 +198,7 @@ public class JudicialDecisionHelperTest {
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
                                                                 getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build()
+
                     )
                 )
                 .build();
@@ -220,8 +218,17 @@ public class JudicialDecisionHelperTest {
                                                     getDynamicLocation("LMNO - NE0 0BH"))).build())
                 .respondentsResponses(
                     wrapElements(
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
+                                GAHearingDetails.builder()
+                                    .hearingPreferredLocation(
+                                        getDynamicLocationsList("ABCD - RG0 0AL",
+                                                                getDynamicLocation("ABCD - RG0 0AL"),
+                                                                getDynamicLocation("PQRS - GU0 0EE"),
+                                                                getDynamicLocation("WXYZ - EW0 0HE"),
+                                                                getDynamicLocation("LMNO - NE0 0BH"))).build()),
+                        new GARespondentResponse()
+                            .setGaHearingDetails(
                                 GAHearingDetails.builder()
                                     .hearingPreferredLocation(
                                         getDynamicLocationsList("ABCD - RG0 0AL",
@@ -229,17 +236,7 @@ public class JudicialDecisionHelperTest {
                                                                 getDynamicLocation("PQRS - GU0 0EE"),
                                                                 getDynamicLocation("WXYZ - EW0 0HE"),
                                                                 getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build(),
-                        GARespondentResponse.builder()
-                            .gaHearingDetails(
-                                GAHearingDetails.builder()
-                                    .hearingPreferredLocation(
-                                        getDynamicLocationsList("ABCD - RG0 0AL",
-                                                                getDynamicLocation("ABCD - RG0 0AL"),
-                                                                getDynamicLocation("PQRS - GU0 0EE"),
-                                                                getDynamicLocation("WXYZ - EW0 0HE"),
-                                                                getDynamicLocation("LMNO - NE0 0BH"))).build())
-                            .build()
+
                         )
                 )
                 .build();
@@ -320,4 +317,3 @@ public class JudicialDecisionHelperTest {
         }
     }
 }
-

@@ -257,9 +257,9 @@ class WrittenRepresentationConcurrentOrderGeneratorTest {
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder()
-                        .orderWithoutNotice("abcd")
-                        .orderWithoutNoticeDate(LocalDate.now()).build()).build();
+                    new GAOrderWithoutNoticeGAspec()
+                        .setOrderWithoutNotice("abcd")
+                        .setOrderWithoutNoticeDate(LocalDate.now())).build();
             GeneralApplicationCaseData updateDate = caseDataBuilder.build();
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
                 .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Reading"));

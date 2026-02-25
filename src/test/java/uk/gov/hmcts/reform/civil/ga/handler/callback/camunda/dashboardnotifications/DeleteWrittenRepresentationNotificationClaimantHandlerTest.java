@@ -95,8 +95,8 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(CONCURRENT_REPRESENTATIONS).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(CONCURRENT_REPRESENTATIONS))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -125,10 +125,10 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(SEQUENTIAL_REPRESENTATIONS)
-                                                                          .sequentialApplicantMustRespondWithin(defendantDeadline)
-                                                                          .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(SEQUENTIAL_REPRESENTATIONS)
+                                                                          .setSequentialApplicantMustRespondWithin(defendantDeadline)
+                                                                          .setWrittenSequentailRepresentationsBy(LocalDate.now().plusDays(1)))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -158,10 +158,10 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                 .isGaApplicantLip(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(SEQUENTIAL_REPRESENTATIONS)
-                                                                          .sequentialApplicantMustRespondWithin(defendantDeadline)
-                                                                          .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(SEQUENTIAL_REPRESENTATIONS)
+                                                                          .setSequentialApplicantMustRespondWithin(defendantDeadline)
+                                                                          .setWrittenSequentailRepresentationsBy(LocalDate.now().plusDays(1)))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -191,10 +191,10 @@ public class DeleteWrittenRepresentationNotificationClaimantHandlerTest extends 
                 .isGaApplicantLip(YesOrNo.NO)
                 .isGaRespondentOneLip(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(SEQUENTIAL_REPRESENTATIONS)
-                                                                          .sequentialApplicantMustRespondWithin(defendantDeadline)
-                                                                          .writtenSequentailRepresentationsBy(LocalDate.now().plusDays(1)).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(SEQUENTIAL_REPRESENTATIONS)
+                                                                          .setSequentialApplicantMustRespondWithin(defendantDeadline)
+                                                                          .setWrittenSequentailRepresentationsBy(LocalDate.now().plusDays(1)))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

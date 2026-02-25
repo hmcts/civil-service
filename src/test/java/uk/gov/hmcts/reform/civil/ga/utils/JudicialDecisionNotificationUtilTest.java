@@ -15,7 +15,7 @@ public class JudicialDecisionNotificationUtilTest {
     @Test
     public void shouldGetJudicialDismissalNotificationCriterion() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
             .businessProcess(BusinessProcess.ready(CaseEvent.MAKE_DECISION))
             .build();
 
@@ -27,7 +27,7 @@ public class JudicialDecisionNotificationUtilTest {
     @Test
     public void shouldGetJudicialDismissalNotificationCriterionAfterTranslationUpload() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION).build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION))
             .businessProcess(BusinessProcess.ready(CaseEvent.UPLOAD_TRANSLATED_DOCUMENT_JUDGE_DECISION))
             .build();
 

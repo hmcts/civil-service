@@ -149,15 +149,16 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
 
     private GeneralApplicationCaseData addPaymentStatusToGAPbaDetails(GeneralApplicationCaseData caseData, PaymentStatus status) {
         GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
+            ? new GeneralApplicationPbaDetails()
+            : pbaDetails.copy();
 
         PaymentDetails paymentDetails = new PaymentDetails()
             .setStatus(status)
             ;
-        pbaDetails = pbaDetailsBuilder.paymentDetails(paymentDetails).build();
+        updatedPbaDetails.setPaymentDetails(paymentDetails);
         return caseData.toBuilder()
-            .generalAppPBADetails(pbaDetails)
+            .generalAppPBADetails(updatedPbaDetails)
             .build();
     }
 
@@ -168,4 +169,3 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
             .build();
     }
 }
-

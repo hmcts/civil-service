@@ -367,9 +367,9 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
             .generalAppAddlnInfoText(generalAppAddlnInfoText)
             .gaAddlDoc(gaAddlDoc)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

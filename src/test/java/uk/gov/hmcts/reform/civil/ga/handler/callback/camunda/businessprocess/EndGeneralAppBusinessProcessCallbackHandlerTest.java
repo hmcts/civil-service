@@ -167,7 +167,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .build();
@@ -215,7 +215,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("PAY")).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
                 .build();
 
             GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
@@ -263,7 +263,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("PAY")).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
                 .build();
 
             GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
@@ -312,10 +312,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .generalAppType(GAApplicationType.builder().types(types).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee().setCode("PAY"))
-                                          .paymentDetails(new PaymentDetails())
-                                          .build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAY"))
+                                          .setPaymentDetails(new PaymentDetails())
+                                          )
                 .build();
 
             GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
@@ -363,10 +363,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .generalAppType(GAApplicationType.builder().types(types).build())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee().setCode("PAY"))
-                                          .paymentDetails(new PaymentDetails())
-                                          .build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAY"))
+                                          .setPaymentDetails(new PaymentDetails())
+                                          )
                 .build();
 
             GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
@@ -410,8 +410,8 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .ccdState(PENDING_APPLICATION_ISSUED)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee().setCode("PAY")).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee().setCode("PAY")))
                 .ccdCaseReference(1234L)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .build();
@@ -547,10 +547,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         void shouldChangeStateToRespondentResponseWhenVaryJudgmentWhenParentIsNotClaimantAndNoResponse() {
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
             respondentsResponses.add(element(respondent1Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
@@ -598,10 +598,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
             respondentsResponses.add(element(respondent1Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, YES));
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
@@ -661,14 +661,14 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
-            GARespondentResponse respondent2Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id3")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
+            GARespondentResponse respondent2Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id3")
+                ;
             respondentsResponses.add(element(respondent1Response));
             respondentsResponses.add(element(respondent2Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
@@ -966,14 +966,14 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
-            GARespondentResponse respondent2Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id3")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
+            GARespondentResponse respondent2Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id3")
+                ;
             respondentsResponses.add(element(respondent1Response));
             respondentsResponses.add(element(respondent2Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
@@ -1002,14 +1002,14 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .gaRespondentDetails("id")
-                    .build();
-            GARespondentResponse respondent2Response = GARespondentResponse.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .gaRespondentDetails("id2")
-                    .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                    .setGeneralAppRespondent1Representative(YES)
+                    .setGaRespondentDetails("id")
+                    ;
+            GARespondentResponse respondent2Response = new GARespondentResponse()
+                    .setGeneralAppRespondent1Representative(YES)
+                    .setGaRespondentDetails("id2")
+                    ;
             respondentsResponses.add(element(respondent1Response));
             respondentsResponses.add(element(respondent2Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
@@ -1041,14 +1041,14 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
-            GARespondentResponse respondent2Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id3")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
+            GARespondentResponse respondent2Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id3")
+                ;
             respondentsResponses.add(element(respondent1Response));
             respondentsResponses.add(element(respondent2Response));
             when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(NO, NO));
@@ -1076,10 +1076,10 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-            GARespondentResponse respondent1Response = GARespondentResponse.builder()
-                .generalAppRespondent1Representative(YES)
-                .gaRespondentDetails("id")
-                .build();
+            GARespondentResponse respondent1Response = new GARespondentResponse()
+                .setGeneralAppRespondent1Representative(YES)
+                .setGaRespondentDetails("id")
+                ;
 
             respondentsResponses.add(element(respondent1Response));
 
@@ -1217,7 +1217,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             when(caseDetailsConverter.toGeneralApplicationCaseData(getCallbackParams(NO, YES).getRequest().getCaseDetails()))
                     .thenReturn(getSampleGeneralApplicationCaseDataAfterOrderMade(NO,
                             YES, GaFinalOrderSelection.ASSISTED_ORDER,
-                            AssistedOrderFurtherHearingDetails.builder().build()));
+                            new AssistedOrderFurtherHearingDetails()));
             when(caseDetailsConverter.toGeneralApplicationCaseData(getStartEventResponse(NO, YES).getCaseDetails()))
                     .thenReturn(getParentCaseDataBeforeUpdate(NO, YES));
 
@@ -1597,9 +1597,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(PARENT_CCD_REF.toString()))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(new PaymentDetails()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
                                                                                 .setCustomerReference("1336546")
-                                                                                ).build())
+                                                                                ))
                 .generalAppRespondentSolicitors(respondentSols)
                 .hearingDetailsResp(GAHearingDetails.builder()
                                         .hearingPreferredLocation(
@@ -1610,9 +1610,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .isMultiParty(NO)
                 .parentClaimantIsApplicant(YES)
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -1633,9 +1633,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink()
                                               .setCaseReference(PARENT_CCD_REF.toString()))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(new PaymentDetails()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
                                                                                 .setCustomerReference("1336546")
-                                                                                ).build())
+                                                                                ))
                 .generalAppRespondentSolicitors(respondentSols)
                 .isMultiParty(YES)
                 .parentClaimantIsApplicant(NO)
@@ -1648,9 +1648,9 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .respondentsResponses(respondentsResponses)
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()

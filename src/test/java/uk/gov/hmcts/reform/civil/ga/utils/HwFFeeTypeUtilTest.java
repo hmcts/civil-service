@@ -23,9 +23,9 @@ public class HwFFeeTypeUtilTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()
                                                                      .setCalculatedAmountInPence(BigDecimal.valueOf(180))
-                                                                     .setCode("FEE123")).build())
+                                                                     .setCode("FEE123")))
                 .build();
 
         // Act
@@ -42,9 +42,9 @@ public class HwFFeeTypeUtilTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .generalAppHelpWithFees(new HelpWithFees())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()
                                                                  .setCalculatedAmountInPence(BigDecimal.valueOf(180))
-                                                                 .setCode("FEE123")).build())
+                                                                 .setCode("FEE123")))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
             .build();
 
@@ -74,12 +74,12 @@ public class HwFFeeTypeUtilTest {
     void getCalculatedFeeInPence_shouldReturnFee_whenFeesIsNotNull() {
         // Arrange
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
                                         .setCode("OOOCM002"))
-                        .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder().build())
+                        )
+                .additionalHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
 

@@ -76,7 +76,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
         GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
         caseData = caseData.toBuilder()
             .judicialDecisionMakeOrder(
-                judicialDecisionMakeOrder.toBuilder().isOrderProcessedByUnlessScheduler(YesOrNo.YES).build())
+                judicialDecisionMakeOrder.copy().setIsOrderProcessedByUnlessScheduler(YesOrNo.YES))
             .build();
         return caseData;
     }

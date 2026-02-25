@@ -61,17 +61,17 @@ public class GaDashboardNotificationsParamsMapperTest {
             .generalAppNotificationDeadlineDate(deadline)
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(
+                new GeneralApplicationPbaDetails()
+                    .setFee(
                         new Fee()
                             .setCode("FE203")
                             .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                             .setVersion("1")
                             )
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .generalAppSuperClaimType("SPEC_CLAIM")
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                REQUEST_MORE_INFORMATION).judgeRequestMoreInfoByDate(requestMoreInfoDate).build()).build();
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                REQUEST_MORE_INFORMATION).setJudgeRequestMoreInfoByDate(requestMoreInfoDate)).build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
 
@@ -93,10 +93,10 @@ public class GaDashboardNotificationsParamsMapperTest {
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .parentClaimantIsApplicant(YesOrNo.YES)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
-                GAJudicialWrittenRepresentations.builder()
-                    .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-                    .sequentialApplicantMustRespondWithin(claimantDate)
-                    .writtenSequentailRepresentationsBy(defendantDate).build())
+                new GAJudicialWrittenRepresentations()
+                    .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+                    .setSequentialApplicantMustRespondWithin(claimantDate)
+                    .setWrittenSequentailRepresentationsBy(defendantDate))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -117,10 +117,10 @@ public class GaDashboardNotificationsParamsMapperTest {
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .parentClaimantIsApplicant(YesOrNo.NO)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
-                GAJudicialWrittenRepresentations.builder()
-                    .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-                    .sequentialApplicantMustRespondWithin(claimantDate)
-                    .writtenSequentailRepresentationsBy(defendantDate).build())
+                new GAJudicialWrittenRepresentations()
+                    .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+                    .setSequentialApplicantMustRespondWithin(claimantDate)
+                    .setWrittenSequentailRepresentationsBy(defendantDate))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -137,9 +137,9 @@ public class GaDashboardNotificationsParamsMapperTest {
         caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
-                GAJudicialWrittenRepresentations.builder()
-                    .writtenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
-                    .writtenConcurrentRepresentationsBy(date).build())
+                new GAJudicialWrittenRepresentations()
+                    .setWrittenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
+                    .setWrittenConcurrentRepresentationsBy(date))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -180,9 +180,9 @@ public class GaDashboardNotificationsParamsMapperTest {
             .hwfFeeType(FeeType.APPLICATION)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
-            .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF_GA)
-                              .remissionAmount(BigDecimal.valueOf(7500))
-                              .outstandingFee(new BigDecimal("200.00")).build())
+            .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF_GA)
+                              .setRemissionAmount(BigDecimal.valueOf(7500))
+                              .setOutstandingFee(new BigDecimal("200.00")))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -202,10 +202,10 @@ public class GaDashboardNotificationsParamsMapperTest {
             .hwfFeeType(FeeType.ADDITIONAL)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
-            .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                      .hwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF_GA)
-                                      .remissionAmount(BigDecimal.valueOf(7500))
-                                      .outstandingFee(new BigDecimal("200.00")).build())
+            .additionalHwfDetails(new HelpWithFeesDetails()
+                                      .setHwfCaseEvent(CaseEvent.MORE_INFORMATION_HWF_GA)
+                                      .setRemissionAmount(BigDecimal.valueOf(7500))
+                                      .setOutstandingFee(new BigDecimal("200.00")))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -225,9 +225,9 @@ public class GaDashboardNotificationsParamsMapperTest {
             .hwfFeeType(FeeType.APPLICATION)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
-            .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GA)
-                              .remissionAmount(BigDecimal.valueOf(7500))
-                              .outstandingFee(new BigDecimal("200.00")).build())
+            .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GA)
+                              .setRemissionAmount(BigDecimal.valueOf(7500))
+                              .setOutstandingFee(new BigDecimal("200.00")))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
@@ -249,10 +249,10 @@ public class GaDashboardNotificationsParamsMapperTest {
             .hwfFeeType(FeeType.ADDITIONAL)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
-            .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                      .hwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GA).remissionAmount(BigDecimal.valueOf(
+            .additionalHwfDetails(new HelpWithFeesDetails()
+                                      .setHwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GA).setRemissionAmount(BigDecimal.valueOf(
                     7500))
-                                      .outstandingFee(new BigDecimal("200.00")).build())
+                                      .setOutstandingFee(new BigDecimal("200.00")))
             .build();
 
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);

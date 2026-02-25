@@ -327,7 +327,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
 
         caseDataBuilder.respondentsResponses(respondentsResponses);
         caseDataBuilder.hearingDetailsResp(null); // Empty HearingDetails Respondent details as its added in the field RespondetsResponses collection
-        caseDataBuilder.generalAppRespondent1Representative(GARespondentRepresentative.builder().build());
+        caseDataBuilder.generalAppRespondent1Representative(new GARespondentRepresentative());
         caseDataBuilder.gaRespondentConsent(null);
         caseDataBuilder.generalAppRespondReason(null);
         caseDataBuilder.generalAppRespondConsentReason(null);
@@ -449,7 +449,7 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
             generalOther = YES;
         }
 
-        GARespondentResponse.GARespondentResponseBuilder gaRespondentResponseBuilder = GARespondentResponse.builder();
+        GARespondentResponse gaRespondentResponse = new GARespondentResponse();
         String reason = caseData.getGeneralAppRespondReason();
         if (Objects.isNull(reason)) {
             reason = caseData.getGeneralAppRespondConsentReason();
@@ -457,16 +457,16 @@ public class RespondToApplicationHandler extends CallbackHandler implements Gene
                 reason = getDebtorReason(caseData.getGaRespondentDebtorOffer());
             }
         }
-        gaRespondentResponseBuilder
-            .generalAppRespondent1Representative(caseData.getGeneralAppRespondent1Representative() == null
+        gaRespondentResponse
+            .setGeneralAppRespondent1Representative(caseData.getGeneralAppRespondent1Representative() == null
                                                      ? generalOther
                                                      : caseData.getGeneralAppRespondent1Representative()
                 .getGeneralAppRespondent1Representative())
-            .gaHearingDetails(populateHearingDetailsResp(caseData, userInfo))
-            .gaRespondentResponseReason(reason)
-            .gaRespondentDetails(userInfo.getUid()).build();
+            .setGaHearingDetails(populateHearingDetailsResp(caseData, userInfo))
+            .setGaRespondentResponseReason(reason)
+            .setGaRespondentDetails(userInfo.getUid());
 
-        return gaRespondentResponseBuilder.build();
+        return gaRespondentResponse;
     }
 
     private String getDebtorReason(GARespondentDebtorOfferGAspec gaRespondentDebtorOffer) {

@@ -81,7 +81,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
-                .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+                .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
                 .generalAppHelpWithFees(
                     new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -134,7 +134,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
-                .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FULL_REMISSION_HWF_GA).build())
+                .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(FULL_REMISSION_HWF_GA))
                 .generalAppHelpWithFees(
                     new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -167,7 +167,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
-                .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+                .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
                 .generalAppHelpWithFees(
                     new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -200,7 +200,7 @@ class ApplicationSubmittedDashboardNotificationHandlerTest extends GeneralApplic
                 .ccdCaseReference(123456L)
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
-                .gaHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FEE_PAYMENT_OUTCOME_GA).build())
+                .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(FEE_PAYMENT_OUTCOME_GA))
                 .generalAppHelpWithFees(
                     new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")

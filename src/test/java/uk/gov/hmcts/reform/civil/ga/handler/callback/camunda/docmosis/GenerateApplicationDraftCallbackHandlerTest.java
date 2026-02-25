@@ -125,10 +125,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -159,10 +159,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -183,10 +183,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, NO);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -210,10 +210,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         caseData = caseData.toBuilder()
             .applicantBilingualLanguagePreference(YES)
             .isGaApplicantLip(YES)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -234,10 +234,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .respondentBilingualLanguagePreference(YES)
             .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -258,10 +258,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
             .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
@@ -283,10 +283,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
             .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
 
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
@@ -303,10 +303,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("FREE")).build()).build();
+                                      .setFee(new Fee().setCode("FREE"))).build();
         when(generalAppFeesService.isFreeApplication(any(GeneralApplicationCaseData.class))).thenReturn(true);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -340,8 +340,8 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
@@ -354,10 +354,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, YES, YES);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -379,10 +379,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         caseData = caseData.toBuilder()
             .gaDraftDocument(null)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -404,10 +404,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
                                                           .setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("Free")).build()).build();
+                                      .setFee(new Fee().setCode("Free"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         when(generalApplicationDraftGenerator.generate(any(GeneralApplicationCaseData.class), anyString()))
             .thenReturn(PDFBuilder.APPLICATION_DRAFT_DOCUMENT);
@@ -429,8 +429,8 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
         caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(new Fee().setCode("Free")).build()).build();
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee().setCode("Free"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
@@ -464,10 +464,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         List<Element<CaseDocument>> gaDraft = new ArrayList<>();
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
 
-        GARespondentResponse respondent1Response = GARespondentResponse.builder()
-            .generalAppRespondent1Representative(YES)
-            .gaRespondentDetails("id")
-            .build();
+        GARespondentResponse respondent1Response = new GARespondentResponse()
+            .setGeneralAppRespondent1Representative(YES)
+            .setGaRespondentDetails("id")
+            ;
         respondentsResponses.add(element(respondent1Response));
         gaDraft.addAll(wrapElements(PDFBuilder.APPLICATION_DRAFT_DOCUMENT));
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(

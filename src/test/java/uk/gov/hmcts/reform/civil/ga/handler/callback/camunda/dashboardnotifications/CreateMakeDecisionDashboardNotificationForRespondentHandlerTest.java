@@ -71,8 +71,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
 
     private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck = List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX);
 
-    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = GAMakeApplicationAvailableCheck.builder()
-        .makeAppAvailableCheck(makeAppAvailableCheck).build();
+    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = new GAMakeApplicationAvailableCheck()
+        .setMakeAppAvailableCheck(makeAppAvailableCheck);
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -95,8 +95,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().deadlineForMoreInfoSubmission(
-                    LocalDateTime.now().plusDays(5)).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setDeadlineForMoreInfoSubmission(
+                    LocalDateTime.now().plusDays(5)))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
 
@@ -124,9 +124,9 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                    GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).deadlineForMoreInfoSubmission(
-                    LocalDateTime.now().plusDays(5)).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                    GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).setDeadlineForMoreInfoSubmission(
+                    LocalDateTime.now().plusDays(5)))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
 
@@ -231,8 +231,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
             caseData = caseData.toBuilder()
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-                .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+                .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
                 .build();
 
@@ -258,8 +258,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
             caseData = caseData.toBuilder()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-                .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+                .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .build();
@@ -287,8 +287,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
             caseData = caseData.toBuilder()
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -314,8 +314,8 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
             caseData = caseData.toBuilder()
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -343,9 +343,9 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .ccdState(CaseState.LISTING_FOR_A_HEARING)
-                .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
-                .gaHearingNoticeApplication(GAHearingNoticeApplication.builder().build())
-                .gaHearingNoticeDetail(GAHearingNoticeDetail.builder().build())
+                .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
+                .gaHearingNoticeApplication(new GAHearingNoticeApplication())
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
                 .build();
 
@@ -374,9 +374,9 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .ccdState(CaseState.LISTING_FOR_A_HEARING)
-                .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
-                .gaHearingNoticeApplication(GAHearingNoticeApplication.builder().build())
-                .gaHearingNoticeDetail(GAHearingNoticeDetail.builder().build())
+                .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
+                .gaHearingNoticeApplication(new GAHearingNoticeApplication())
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
                 .build();
 
@@ -406,9 +406,9 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .judicialDecision(GAJudicialDecision.builder().decision(decisionOption).build())
+                .judicialDecision(new GAJudicialDecision().setDecision(decisionOption))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(orderOption).build()).build();
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(orderOption)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -437,10 +437,10 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .judicialDecision(GAJudicialDecision.builder().decision(decisionOption).build())
+                .judicialDecision(new GAJudicialDecision().setDecision(decisionOption))
                 .ccdState(CaseState.ADDITIONAL_RESPONSE_TIME_EXPIRED)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                               .makeAnOrder(orderOption).build()).build();
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                               .setMakeAnOrder(orderOption)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -467,12 +467,12 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .judicialDecision(GAJudicialDecision.builder().decision(
+                .judicialDecision(new GAJudicialDecision().setDecision(
                     MAKE_AN_ORDER
-                ).build())
+                ))
                 .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                               .makeAnOrder(APPROVE_OR_EDIT).build()).build();
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                               .setMakeAnOrder(APPROVE_OR_EDIT)).build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -508,9 +508,9 @@ public class CreateMakeDecisionDashboardNotificationForRespondentHandlerTest ext
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .applicationIsUncloakedOnce(YesOrNo.YES)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().writtenOption(
-                    GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS).build())
-                .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations().setWrittenOption(
+                    GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS))
+                .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

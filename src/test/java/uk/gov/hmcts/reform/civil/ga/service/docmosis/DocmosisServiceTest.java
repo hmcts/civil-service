@@ -107,9 +107,9 @@ public class DocmosisServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .reasonForDecisionText("Test Reason")
-                                                      .showReasonForDecision(YesOrNo.YES).build()).build();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setReasonForDecisionText("Test Reason")
+                                                      .setShowReasonForDecision(YesOrNo.YES)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudgeReason(updateData)).isEqualTo("Test Reason");
@@ -121,9 +121,9 @@ public class DocmosisServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .reasonForDecisionText("Test Reason")
-                                                      .showReasonForDecision(YesOrNo.NO).build()).build();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setReasonForDecisionText("Test Reason")
+                                                      .setShowReasonForDecision(YesOrNo.NO)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudgeReason(updateData)).isEqualTo(StringUtils.EMPTY);
@@ -135,9 +135,9 @@ public class DocmosisServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_3).build()).build();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_3)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData)).isEqualTo(StringUtils.EMPTY);
@@ -149,12 +149,11 @@ public class DocmosisServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .orderWithoutNotice("abcdef")
-                                                      .orderWithoutNoticeDate(LocalDate.now())
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_2)
-                                                      .build()).build();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setOrderWithoutNotice("abcdef")
+                                                      .setOrderWithoutNoticeDate(LocalDate.now())
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_2)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData))
@@ -167,12 +166,11 @@ public class DocmosisServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
         GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .orderCourtOwnInitiative("abcdef")
-                                                      .orderCourtOwnInitiativeDate(LocalDate.now())
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_1)
-                                                      .build()).build();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setOrderCourtOwnInitiative("abcdef")
+                                                      .setOrderCourtOwnInitiativeDate(LocalDate.now())
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_1)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData))

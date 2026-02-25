@@ -193,8 +193,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_True() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(new Fee().setCode("FREE")).build()).build();
+            caseData = caseData.toBuilder().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                     .setFee(new Fee().setCode("FREE"))).build();
             assertThat(handler.isFreeGaLip(caseData)).isTrue();
         }
 
@@ -208,16 +208,16 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_whenFeeDetailsAreNull_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                  .build()).build();
+            caseData = caseData.toBuilder().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                  ).build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }
 
         @Test
         void shouldReturnFreeLipGa_whenFeeCodeIsNotFree_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(new Fee().setCode("1")).build())
+            caseData = caseData.toBuilder().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                     .setFee(new Fee().setCode("1")))
                                                                      .build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }

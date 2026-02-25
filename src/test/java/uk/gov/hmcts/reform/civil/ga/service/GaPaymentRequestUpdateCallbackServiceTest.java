@@ -121,15 +121,15 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setStatus(FAILED)
                                                                     .setCustomerReference(null)
                                                                     .setReference(REFERENCE)
                                                                     .setErrorCode(null)
                                                                     .setErrorMessage(null)
                                                                     )
-                                      .build())
+                                      )
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -152,15 +152,15 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setStatus(FAILED)
                                                                     .setCustomerReference(null)
                                                                     .setReference(REFERENCE)
                                                                     .setErrorCode(null)
                                                                     .setErrorMessage(null)
                                                                     )
-                                      .build())
+                                      )
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -179,15 +179,15 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldNotSendEmailToRespondent_When_ConsentOrder() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
         caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setStatus(SUCCESS)
                                                                     .setCustomerReference(null)
                                                                     .setReference(REFERENCE)
                                                                     .setErrorCode(null)
                                                                     .setErrorMessage(null)
                                                                     )
-                                      .build())
+                                      )
             .generalAppConsentOrder(YesOrNo.NO)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -289,8 +289,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();
@@ -304,8 +304,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();

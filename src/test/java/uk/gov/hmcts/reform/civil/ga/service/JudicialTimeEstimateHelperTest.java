@@ -22,9 +22,8 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesOption_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.MINUTES_15)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -36,11 +35,11 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesAllTimeFields_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateDays("2")
-                                        .judicialTimeEstimateHours("2")
-                                        .judicialTimeEstimateMinutes("30").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateDays("2")
+                                        .setJudicialTimeEstimateHours("2")
+                                        .setJudicialTimeEstimateMinutes("30"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -52,10 +51,10 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesDayAndMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateDays("1")
-                                        .judicialTimeEstimateMinutes("30").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateDays("1")
+                                        .setJudicialTimeEstimateMinutes("30"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -67,10 +66,10 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesDaysAndHours_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateDays("2")
-                                        .judicialTimeEstimateHours("6").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateDays("2")
+                                        .setJudicialTimeEstimateHours("6"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -82,10 +81,10 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesHoursAndMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateHours("2")
-                                        .judicialTimeEstimateMinutes("30").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateHours("2")
+                                        .setJudicialTimeEstimateMinutes("30"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -97,9 +96,9 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesDays_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateDays("3").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateDays("3"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -111,9 +110,9 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesHours_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateHours("6").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateHours("6"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);
@@ -125,9 +124,9 @@ public class JudicialTimeEstimateHelperTest {
     void whenJudgeSpecifiesMinutes_ShouldGetHearingEstimateText() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
         caseData = caseData.toBuilder()
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judicialTimeEstimate(GAHearingDuration.OTHER)
-                                        .judicialTimeEstimateMinutes("45").build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudicialTimeEstimate(GAHearingDuration.OTHER)
+                                        .setJudicialTimeEstimateMinutes("45"))
             .build();
 
         String timeEstimate = timeEstimateHelper.getEstimatedHearingLength(caseData);

@@ -84,10 +84,10 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalOrderApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
-                                        ).build())
+                                        ))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(NO)
@@ -111,11 +111,11 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalOrderFreeFormApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
                                         )
-                    .fee(new Fee().setCode("FEE23")).build())
+                    .setFee(new Fee().setCode("FEE23")))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -139,11 +139,11 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judgeFinalOrderApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
                                         )
-                    .fee(new Fee().setCode("FEE23")).build())
+                    .setFee(new Fee().setCode("FEE23")))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -167,10 +167,10 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .writtenRepresentationSequentialApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
-                                        ).build())
+                                        ))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(NO)
@@ -194,10 +194,10 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .approveApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
-                                        ).build())
+                                        ))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -219,8 +219,8 @@ public class StateFlowEngineTest {
     @Test
     void shouldReturn_Listed_For_Hearing_WhenJudgeMadeDecision() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder().build())
+            .judicialDecision(new GAJudicialDecision().setDecision(LIST_FOR_A_HEARING))
+            .judicialListForHearing(new GAJudgesHearingListGAspec())
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -242,7 +242,7 @@ public class StateFlowEngineTest {
     @Test
     void shouldReturn_Additional_Info_WhenJudgeMadeDecision() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -264,10 +264,10 @@ public class StateFlowEngineTest {
     @Test
     void shouldReturn_Judge_Directions_WhenJudgeMadeDecision() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .judicialDecisionMakeOrder(
-                GAJudicialMakeAnOrder.builder().makeAnOrder(
-                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
+                new GAJudicialMakeAnOrder().setMakeAnOrder(
+                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -335,11 +335,11 @@ public class StateFlowEngineTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .writtenRepresentationSequentialApplication()
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
                                         )
-                    .fee(new Fee().setCode("FEE23")).build())
+                    .setFee(new Fee().setCode("FEE23")))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .isGaApplicantLip(YES)
@@ -388,13 +388,13 @@ public class StateFlowEngineTest {
     void shouldSetWelshFlag_Judge_Directions_WhenJudgeMadeDecision() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
             .applicantBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
             .judicialDecisionMakeOrder(
-                GAJudicialMakeAnOrder.builder().makeAnOrder(
-                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
+                new GAJudicialMakeAnOrder().setMakeAnOrder(
+                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -417,13 +417,13 @@ public class StateFlowEngineTest {
     void shouldSetWelshFlagRespondentBilingual_Judge_Directions_WhenJudgeMadeDecision() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .isGaApplicantLip(YES)
             .respondentBilingualLanguagePreference(YES)
             .isGaRespondentOneLip(YES)
             .judicialDecisionMakeOrder(
-                GAJudicialMakeAnOrder.builder().makeAnOrder(
-                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING).build())
+                new GAJudicialMakeAnOrder().setMakeAnOrder(
+                    GAJudgeMakeAnOrderOption.GIVE_DIRECTIONS_WITHOUT_HEARING))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -450,11 +450,11 @@ public class StateFlowEngineTest {
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
                                         )
-                    .fee(new Fee().setCode("FEE23")).build())
+                    .setFee(new Fee().setCode("FEE23")))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -482,11 +482,11 @@ public class StateFlowEngineTest {
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
                                         )
-                    .fee(new Fee().setCode("FEE23")).build())
+                    .setFee(new Fee().setCode("FEE23")))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -515,10 +515,10 @@ public class StateFlowEngineTest {
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(new PaymentDetails()
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
                                         .setStatus(PaymentStatus.SUCCESS)
-                                        ).build())
+                                        ))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
             .parentClaimantIsApplicant(YES)
@@ -542,11 +542,11 @@ public class StateFlowEngineTest {
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForApplicantWelsh() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-            GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+            GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
@@ -570,11 +570,11 @@ public class StateFlowEngineTest {
     void shouldReturn_Additional_Info_WhenJudgeMadeDecisionForRespondentWelsh() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder()
-            .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(YES).build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)

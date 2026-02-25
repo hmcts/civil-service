@@ -74,11 +74,11 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee()
                                                    .setCalculatedAmountInPence(new BigDecimal(100000))
                                                    )
-                                          .build())
+                                          )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -108,11 +108,11 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
                 .isGaApplicantLip(YesOrNo.YES)
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(LocalDate.now().minusDays(20)).build())
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee()
                                                    .setCalculatedAmountInPence(new BigDecimal(0))
                                                    )
-                                          .build())
+                                          )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

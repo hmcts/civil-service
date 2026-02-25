@@ -254,10 +254,10 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now()).build())
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now()))
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -301,7 +301,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_3)
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -347,7 +347,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_3)
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 

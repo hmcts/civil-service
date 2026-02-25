@@ -44,11 +44,11 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionData_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                         new Fee()
                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
-                        .build())
-                .gaHwfDetails(HelpWithFeesDetails.builder().build())
+                        )
+                .gaHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.APPLICATION)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -63,11 +63,11 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                     new Fee()
                         .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
-                    .build())
-                .gaHwfDetails(HelpWithFeesDetails.builder().build())
+                    )
+                .gaHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.APPLICATION)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -82,12 +82,12 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionData_Additional() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
                                             .setCode("OOOCM002"))
-                            .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder().build())
+                            )
+                .additionalHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -102,11 +102,11 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldUpdateFullRemissionDataWithDetailsNull_AdditionalFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
                                             .setCode("OOOCM002"))
-                            .build())
+                            )
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -121,12 +121,12 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldNotUpdateFullRemissionData_ifGaFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.ZERO)
                                             .setCode("FREE"))
-                            .build())
-                .gaHwfDetails(HelpWithFeesDetails.builder().build())
+                            )
+                .gaHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.APPLICATION)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
@@ -140,12 +140,12 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         @Test
         void shouldNotUpdateFullRemissionData_ifAdditionalFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                 new Fee()
                                         .setCalculatedAmountInPence(BigDecimal.ZERO)
                                         .setCode("FREE"))
-                        .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder().build())
+                        )
+                .additionalHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);

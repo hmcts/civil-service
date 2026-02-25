@@ -399,9 +399,9 @@ public class RespondToWrittenRepresentationHandlerTest extends GeneralApplicatio
             .generalAppWrittenRepText(generalAppWrittenRepText)
             .gaAddlDoc(gaAddlDoc)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

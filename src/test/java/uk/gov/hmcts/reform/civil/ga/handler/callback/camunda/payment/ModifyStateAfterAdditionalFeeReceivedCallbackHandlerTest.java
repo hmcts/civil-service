@@ -110,8 +110,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
 
     private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck = List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX);
 
-    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = GAMakeApplicationAvailableCheck.builder()
-        .makeAppAvailableCheck(makeAppAvailableCheck).build();
+    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = new GAMakeApplicationAvailableCheck()
+        .setMakeAppAvailableCheck(makeAppAvailableCheck);
 
     @Test
     void shouldRespondWithStateChanged() {
@@ -150,8 +150,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(YesOrNo.NO)
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                           .email("test@gmail.com").organisationIdentifier("org1").build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(NO)
             .isGaRespondentTwoLip(NO)
@@ -178,8 +178,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     void shouldNotRespondWithStateChangedWhenApplicationUncloaked() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
@@ -406,7 +406,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isGaApplicantLip(YES)
             .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                           .setHwfFullRemissionGrantedForAdditionalFee(NO))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA))
             .generalAppHelpWithFees(
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -448,7 +448,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
             .generalAppHelpWithFees(
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -494,7 +494,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
                     .setHelpWithFee(YES))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -532,7 +532,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
                     .setHelpWithFee(YES))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FULL_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(FULL_REMISSION_HWF_GA))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -583,9 +583,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(NO)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(
-                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(
+                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build()).build();
@@ -615,9 +615,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(NO)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(
-                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(
+                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).build();
@@ -645,9 +645,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.toBuilder()
             .parentCaseReference("1234")
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
-                                                                    .setStatus(PaymentStatus.FAILED)).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)))
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -662,9 +662,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
         caseData = caseData.toBuilder()
             .parentCaseReference("1234")
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
-                                                                    .setStatus(PaymentStatus.FAILED)).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)))
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

@@ -126,9 +126,9 @@ public class HwfNotificationServiceTest {
             .defendant1PartyName(DEFENDANT)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
-                    .build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                    .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
+                    )
             .hwfFeeType(FeeType.APPLICATION)
             .build();
 
@@ -146,9 +146,9 @@ public class HwfNotificationServiceTest {
             .defendant1PartyName(DEFENDANT)
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber(
                     HWF_REFERENCE))
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                    .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
-                    .build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                    .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(100000)))
+                    )
             .hwfFeeType(FeeType.ADDITIONAL)
             .build();
 
@@ -175,8 +175,8 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_MoreInformation_Ga() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
                 .helpWithFeesMoreInformationGa(new HelpWithFeesMoreInformation()
@@ -205,8 +205,8 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_MoreInformation_Ga_Bilingual() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -236,8 +236,8 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_MoreInformation_Additional() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
                 .helpWithFeesMoreInformationAdditional(new HelpWithFeesMoreInformation()
                         .setHwFMoreInfoDocumentDate(NOW)
@@ -267,8 +267,8 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_MoreInformation_Additional_Bilingual_Def() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(MORE_INFORMATION_HWF_GA).build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(MORE_INFORMATION_HWF_GA);
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
@@ -386,9 +386,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_ClaimIssued() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+                ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
@@ -412,9 +412,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Ga_Bilingual_Def() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+            ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
@@ -440,9 +440,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Additional() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+                ;
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
             .additionalHwfDetails(hwfeeDetails).parentCaseReference(GA_REFERENCE).build();
@@ -466,9 +466,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_RefNumberUpdated_Additional_Bilingual() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(UPDATE_HELP_WITH_FEE_NUMBER_GA)
+            ;
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
@@ -492,9 +492,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_ClaimIssued() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+                ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
@@ -519,9 +519,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_ClaimIssued_Bilingual() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+            ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -546,9 +546,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_Hearing() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+                ;
 
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
@@ -574,9 +574,9 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_InvalidRefNumber_Hearing_Bilingual_Def() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+            ;
 
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
@@ -647,11 +647,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PartialRemission_Ga() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-                .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+                .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                ;
 
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
@@ -677,11 +677,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PartialRemission_Ga_Bilingual() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-            .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+            .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
 
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .isGaApplicantLip(YesOrNo.YES)
@@ -707,11 +707,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PartialRemission_Additional() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-                .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+                .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                ;
 
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
@@ -737,11 +737,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PartialRemission_Additional_Bilingual_Def() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-            .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+            .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
 
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
@@ -769,11 +769,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfNoRemission_ClaimIssued() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF_GA)
-            .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+            .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
@@ -797,11 +797,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfNoRemission_ClaimIssued_Bilingual() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF_GA)
-            .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+            .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE).applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
@@ -825,11 +825,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfNoRemission_AdditionalFee() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF_GA)
-            .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+            .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
             .parentCaseReference(GA_REFERENCE).build();
@@ -853,11 +853,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfNoRemission_AdditionalFee_Bilingual_Def() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(NO_REMISSION_HWF_GA)
-            .noRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+            .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.INCORRECT_EVIDENCE)
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder()
             .parentCaseReference(GA_REFERENCE)
             .parentClaimantIsApplicant(YesOrNo.NO)
@@ -981,11 +981,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PaymentOut_Ga() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
-                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-                .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
+                .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                ;
 
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)
@@ -1011,11 +1011,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PaymentOut_Ga_inWelsh() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-            .hwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
-            .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-            .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-            .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+            .setHwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
+            .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+            .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+            ;
 
         GeneralApplicationCaseData  caseData = GA_CASE_DATA.toBuilder().gaHwfDetails(hwfeeDetails)
             .parentClaimantIsApplicant(YesOrNo.YES)
@@ -1043,11 +1043,11 @@ public class HwfNotificationServiceTest {
     @Test
     void shouldNotifyApplicant_HwfOutcome_PaymentOut_Additional() {
         // Given
-        HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
-                .remissionAmount(new BigDecimal(REMISSION_AMOUNT))
-                .outstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
-                .build();
+        HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(FEE_PAYMENT_OUTCOME_GA)
+                .setRemissionAmount(new BigDecimal(REMISSION_AMOUNT))
+                .setOutstandingFee(new BigDecimal(OUTSTANDING_AMOUNT_IN_POUNDS))
+                ;
 
         GeneralApplicationCaseData  caseData = ADDITIONAL_CASE_DATA.toBuilder().additionalHwfDetails(hwfeeDetails)
             .isGaApplicantLip(YesOrNo.YES)

@@ -74,12 +74,12 @@ public class DocUploadUtilsTest {
     @Test
     public void should_prepareUploadDocumentByType() {
         List<Element<UploadDocumentByType>> uploadDocument = new ArrayList<>();
-        uploadDocument.add(element(UploadDocumentByType.builder()
-                                       .documentType("witness")
-                                       .additionalDocument(new Document()
+        uploadDocument.add(element(new UploadDocumentByType()
+                                       .setDocumentType("witness")
+                                       .setAdditionalDocument(new Document()
                                                                .setDocumentFileName("witness_document.pdf")
                                                                .setDocumentUrl("http://dm-store:8080")
-                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents")).build()));
+                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
         List<Element<CaseDocument>> result = DocUploadUtils.prepareUploadDocumentByType(uploadDocument, "role");
         assertThat(result.get(0).getValue().getCreatedBy()).isEqualTo("role");
         assertThat(result.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(AssignCategoryId.APPLICATIONS);

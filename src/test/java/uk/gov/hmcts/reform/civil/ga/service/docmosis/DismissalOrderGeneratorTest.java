@@ -198,16 +198,15 @@ class DismissalOrderGeneratorTest {
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                           .dismissalOrderText("Test Dismissal")
-                                                           .reasonForDecisionText("Test Reason")
-                                                           .showReasonForDecision(YesOrNo.YES)
-                                                           .orderWithoutNotice("abcdef")
-                                                           .orderWithoutNoticeDate(LocalDate.now())
-                                                           .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                           .setDismissalOrderText("Test Dismissal")
+                                                           .setReasonForDecisionText("Test Reason")
+                                                           .setShowReasonForDecision(YesOrNo.YES)
+                                                           .setOrderWithoutNotice("abcdef")
+                                                           .setOrderWithoutNoticeDate(LocalDate.now())
+                                                           .setJudicialByCourtsInitiative(
                                                                GAByCourtsInitiativeGAspec.OPTION_2)
-                                                           .makeAnOrder(DISMISS_THE_APPLICATION)
-                                                           .build()).build();
+                                                           .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
             when(docmosisService.populateJudgeReason(any())).thenReturn("Test Reason");
@@ -250,14 +249,13 @@ class DismissalOrderGeneratorTest {
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                          .dismissalOrderText("Test Dismissal")
-                                                          .showReasonForDecision(YesOrNo.YES)
-                                                          .reasonForDecisionText("Test Reason")
-                                                          .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                          .setDismissalOrderText("Test Dismissal")
+                                                          .setShowReasonForDecision(YesOrNo.YES)
+                                                          .setReasonForDecisionText("Test Reason")
+                                                          .setJudicialByCourtsInitiative(
                                                               GAByCourtsInitiativeGAspec.OPTION_3)
-                                                          .makeAnOrder(DISMISS_THE_APPLICATION)
-                                                          .build()).build();
+                                                          .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
             when(docmosisService.populateJudgeReason(any())).thenReturn("Test Reason");
@@ -296,14 +294,13 @@ class DismissalOrderGeneratorTest {
                     .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                    .dismissalOrderText("Test Dismissal")
-                    .showReasonForDecision(YesOrNo.NO)
-                    .reasonForDecisionText("Test Reason")
-                    .judicialByCourtsInitiative(
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                    .setDismissalOrderText("Test Dismissal")
+                    .setShowReasonForDecision(YesOrNo.NO)
+                    .setReasonForDecisionText("Test Reason")
+                    .setJudicialByCourtsInitiative(
                             GAByCourtsInitiativeGAspec.OPTION_3)
-                    .makeAnOrder(DISMISS_THE_APPLICATION)
-                    .build()).build();
+                    .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);

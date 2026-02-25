@@ -67,7 +67,8 @@ public class AdditionalFeeValueCallbackHandler extends CallbackHandler implement
                 .map(fee -> fee.getCalculatedAmountInPence())
                 .orElse(null);
             GeneralApplicationPbaDetails generalAppPBADetails = caseData.getGeneralAppPBADetails()
-                .toBuilder().fee(feeForGA).build();
+                .copy()
+                .setFee(feeForGA);
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
             builder.generalAppPBADetails(generalAppPBADetails);
             if (caseData.getIsGaApplicantLip() == YesOrNo.YES) {

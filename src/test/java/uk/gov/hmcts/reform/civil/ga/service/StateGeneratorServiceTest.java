@@ -76,8 +76,8 @@ public class StateGeneratorServiceTest {
     public void shouldReturnAwaiting_Addition_InformationWhenMoreInfoSelected() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .judicialDecision(new GAJudicialDecision(REQUEST_MORE_INFO))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().orderText("test").build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setOrderText("test"))
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo())
             .build();
 
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
@@ -88,7 +88,7 @@ public class StateGeneratorServiceTest {
     public void shouldReturn_Awaiting_Written_Representation_WhenMakeOrderForWrittenRepresentationsSelected() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .judicialDecision(new GAJudicialDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().orderText("test").build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setOrderText("test"))
             .build();
 
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
@@ -101,9 +101,9 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .directionsText("test")
-                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING).build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setDirectionsText("test")
+                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
@@ -122,9 +122,8 @@ public class StateGeneratorServiceTest {
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(DISMISS_THE_APPLICATION)
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(DISMISS_THE_APPLICATION))
             .build();
 
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
@@ -148,8 +147,8 @@ public class StateGeneratorServiceTest {
     @Test
     public void shouldReturnOrderDateWhenCaseworkerApprovesApplication() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .approveConsentOrder(GAApproveConsentOrder.builder().consentOrderDescription("Test Order")
-                                     .build())
+            .approveConsentOrder(new GAApproveConsentOrder().setConsentOrderDescription("Test Order")
+                                     )
             .build();
 
         CaseState caseState = stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData);
@@ -161,9 +160,8 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT))
             .parentClaimantIsApplicant(YesOrNo.YES)
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .generalAppType(GAApplicationType.builder()
@@ -178,9 +176,8 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .applicationIsCloaked(YesOrNo.YES)
@@ -212,9 +209,8 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
@@ -229,9 +225,9 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .judicialDecision(new GAJudicialDecision(MAKE_AN_ORDER))
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .directionsText("test")
-                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING).build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setDirectionsText("test")
+                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
@@ -272,12 +268,12 @@ public class StateGeneratorServiceTest {
      void shouldRequestMoreInformation_WhenJudgeUncloakTheApplication_AdditionalPaymentIsMadeSuccessfully() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setReference("123456")
                                                                     .setStatus(PaymentStatus.SUCCESS)
                                                                     )
-                                      .build())
+                                      )
             .build();
 
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(any())).thenReturn(true);
@@ -290,12 +286,12 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setReference("123456")
                                                                     .setStatus(PaymentStatus.SUCCESS)
                                                                     )
-                                      .build())
+                                      )
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
@@ -311,12 +307,12 @@ public class StateGeneratorServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setReference("123456")
                                                                     .setStatus(PaymentStatus.SUCCESS)
                                                                     )
-                                      .build())
+                                      )
             .generalAppConsentOrder(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .respondentsResponses(getRespondentResponse())
@@ -331,12 +327,12 @@ public class StateGeneratorServiceTest {
     void shouldRespondentResponse_WhenAdditionalPaymentReceived_ConsentOrder_withoutRespondentResponse() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YesOrNo.NO)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
                                                                     .setReference("123456")
                                                                     .setStatus(PaymentStatus.SUCCESS)
                                                                     )
-                                      .build())
+                                      )
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppConsentOrder(NO)
             .build();
@@ -366,14 +362,14 @@ public class StateGeneratorServiceTest {
     private List<Element<GARespondentResponse>> getRespondentResponse() {
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(YES)
                                                    .vulnerabilityQuestion("dummy")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                    .hearingDuration(GAHearingDuration.HOUR_1)
                                                    .build())
-                             .build()));
+                             ));
 
         return respondentsResponses;
     }

@@ -241,20 +241,18 @@ class HearingOrderGeneratorTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
                 .isMultiParty(NO)
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                            .hearingPreferencesPreferredType(GAJudicialHearingType.PAPER_HEARING)
-                                            .judicialTimeEstimate(GAHearingDuration.MINUTES_15)
-                                            .build())
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                            .setHearingPreferencesPreferredType(GAJudicialHearingType.PAPER_HEARING)
+                                            .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .build();
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_2)
-                .orderCourtOwnInitiativeListForHearing(GAOrderCourtOwnInitiativeGAspec.builder().build())
-                .orderWithoutNoticeListForHearing(GAOrderWithoutNoticeGAspec
-                                                           .builder()
-                                                           .orderWithoutNotice("abcd")
-                                                           .orderWithoutNoticeDate(LocalDate.now()).build()).build();
+                .orderCourtOwnInitiativeListForHearing(new GAOrderCourtOwnInitiativeGAspec())
+                .orderWithoutNoticeListForHearing(new GAOrderWithoutNoticeGAspec()
+                                                      .setOrderWithoutNotice("abcd")
+                                                      .setOrderWithoutNoticeDate(LocalDate.now())).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             var templateData = hearingOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
@@ -301,9 +299,8 @@ class HearingOrderGeneratorTest {
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_3)
-                .orderCourtOwnInitiativeListForHearing(GAOrderCourtOwnInitiativeGAspec.builder().build())
-                .orderWithoutNoticeListForHearing(GAOrderWithoutNoticeGAspec
-                                                      .builder().build()).build();
+                .orderCourtOwnInitiativeListForHearing(new GAOrderCourtOwnInitiativeGAspec())
+                .orderWithoutNoticeListForHearing(new GAOrderWithoutNoticeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -348,9 +345,8 @@ class HearingOrderGeneratorTest {
 
             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
             caseDataBuilder.judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_3)
-                .orderCourtOwnInitiativeListForHearing(GAOrderCourtOwnInitiativeGAspec.builder().build())
-                .orderWithoutNoticeListForHearing(GAOrderWithoutNoticeGAspec
-                                                      .builder().build()).build();
+                .orderCourtOwnInitiativeListForHearing(new GAOrderCourtOwnInitiativeGAspec())
+                .orderWithoutNoticeListForHearing(new GAOrderWithoutNoticeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
