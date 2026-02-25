@@ -62,10 +62,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldReturnLocationList_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.LISTING_FOR_A_HEARING).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -78,10 +76,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldNotPrepopulateData_whenCcdStateIsOrderMade() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.ORDER_MADE).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -93,10 +89,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
@@ -119,10 +113,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldNotReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
@@ -190,10 +182,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()

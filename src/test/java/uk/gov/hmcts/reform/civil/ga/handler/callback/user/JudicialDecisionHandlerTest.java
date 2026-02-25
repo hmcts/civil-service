@@ -1449,8 +1449,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void shouldPrepopulateLocationIfApplicantAndRespondentHaveSameLocationPref() {
 
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address")
-                              .postcode("post code").courtName("Court Name").region("Region").build());
+            locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address")
+                              .setPostcode("post code").setCourtName("Court Name").setRegion("Region"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
             when(helper.isApplicantAndRespondentLocationPrefSame(any())).thenReturn(true);

@@ -38,9 +38,9 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
             .respondent1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .specDefenceAdmittedRequired(YesOrNo.YES)
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal("10000"))
-                                        .whenWasThisAmountPaid(LocalDate.of(2024, 3, 21)).build())
+            .respondToAdmittedClaim(new RespondToClaim()
+                                        .setHowMuchWasPaid(new BigDecimal("10000"))
+                                        .setWhenWasThisAmountPaid(LocalDate.of(2024, 3, 21)))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -80,9 +80,9 @@ public class AlreadyPaidFullDefencePartAdmitScenarioTest extends DashboardBaseIn
             .respondent1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(HAS_PAID_THE_AMOUNT_CLAIMED)
-            .respondToClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal("20000"))
-                                        .whenWasThisAmountPaid(LocalDate.of(2024, 3, 22)).build())
+            .respondToClaim(new RespondToClaim()
+                                        .setHowMuchWasPaid(new BigDecimal("20000"))
+                                        .setWhenWasThisAmountPaid(LocalDate.of(2024, 3, 22)))
             .build();
 
         handler.handle(callbackParams(caseData));

@@ -220,8 +220,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
             when(solicitorEmailValidation
@@ -258,8 +258,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
 
             when(solicitorEmailValidation
@@ -277,8 +277,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -307,8 +307,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -337,8 +337,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .ccdCaseReference(CASE_REFERENCE)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -365,8 +365,8 @@ public class GeneralApplicationCreationNotificationServiceTest {
                 .respondentBilingualLanguagePreference(YES)
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
                                           .fee(new Fee().setCode("PAID"))
-                                          .paymentDetails(PaymentDetails.builder().status(
-                                              PaymentStatus.SUCCESS).build()).build())
+                                          .paymentDetails(new PaymentDetails().setStatus(
+                                              PaymentStatus.SUCCESS)).build())
                 .build();
             when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                       + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");

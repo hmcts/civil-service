@@ -153,13 +153,12 @@ class NotificationClaimantOfHearingHandlerTest {
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingId("HER1234")
+                                .setHearingStartDateTime(LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     LocalTime.of(15, 30)))
-                                .hearingType("AAA7-TRI")
-                                .build());
+                                .setHearingType("AAA7-TRI"));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             LocalDate now = LocalDate.of(2022, 9, 29);
@@ -189,9 +188,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -199,13 +198,12 @@ class NotificationClaimantOfHearingHandlerTest {
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(0)));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingId("HER1234")
+                                .setHearingStartDateTime(LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     LocalTime.of(15, 30)))
-                                .hearingType("AAA7-DIS")
-                                .build());
+                                .setHearingType("AAA7-DIS"));
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
@@ -235,9 +233,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .hearingDueDate(null)
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
@@ -270,9 +268,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
 
@@ -281,13 +279,12 @@ class NotificationClaimantOfHearingHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingId("HER1234")
+                                .setHearingStartDateTime(LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     LocalTime.of(15, 30)))
-                                .hearingType("AAA7-TRI")
-                                .build());
+                                .setHearingType("AAA7-TRI"));
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
@@ -316,9 +313,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .businessProcess(new BusinessProcess().setProcessInstanceId(""))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -326,13 +323,12 @@ class NotificationClaimantOfHearingHandlerTest {
             when(hearingFeesService.getFeeForHearingFastTrackClaims(any()))
                 .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(0)));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingId("HER1234")
+                                .setHearingStartDateTime(LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     LocalTime.of(15, 30)))
-                                .hearingType("AAA7-TRI")
-                                .build());
+                                .setHearingType("AAA7-TRI"));
 
             LocalDate now = LocalDate.of(2022, 9, 29);
             try (MockedStatic<LocalDate> mock = mockStatic(LocalDate.class, CALLS_REAL_METHODS)) {
@@ -366,7 +362,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingDueDate(LocalDate.of(2022, 10, 6))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .solicitorReferences(SolicitorReferences.builder().build())
+                .solicitorReferences(new SolicitorReferences())
                 .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
                 .listingOrRelisting(ListingOrRelisting.LISTING)
                 .build();
@@ -466,9 +462,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingTimeHourMinute("0830")
                 .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -529,9 +525,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
                 .hearingReferenceNumber("000HN001")
                 .hearingTimeHourMinute("0830")
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
                 .hearingNoticeList(HearingNoticeList.OTHER)
@@ -566,9 +562,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingTimeHourMinute("0830")
                 .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
@@ -601,9 +597,9 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingTimeHourMinute("0830")
                 .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
-                .hearingFeePaymentDetails(PaymentDetails.builder()
-                                              .status(SUCCESS)
-                                              .build())
+                .hearingFeePaymentDetails(new PaymentDetails()
+                                              .setStatus(SUCCESS)
+                                              )
                 .addApplicant2(YesOrNo.YES)
                 .addRespondent2(YesOrNo.NO)
                 .build();
@@ -662,13 +658,12 @@ class NotificationClaimantOfHearingHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(hearingNoticeCamundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingId("HER1234")
-                                .hearingStartDateTime(LocalDateTime.of(
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingId("HER1234")
+                                .setHearingStartDateTime(LocalDateTime.of(
                                     LocalDate.of(2022, 10, 7),
                                     LocalTime.of(10, 30)))
-                                .hearingType("AAA7-DIS")
-                                .build());
+                                .setHearingType("AAA7-DIS"));
             when(notificationsProperties.getHearingNotificationLipDefendantTemplate())
                 .thenReturn("test-template-claimant-lip-id");
 

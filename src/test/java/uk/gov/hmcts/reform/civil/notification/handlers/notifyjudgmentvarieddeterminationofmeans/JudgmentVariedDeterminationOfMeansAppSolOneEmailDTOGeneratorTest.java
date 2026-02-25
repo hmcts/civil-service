@@ -61,7 +61,7 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .ccdCaseReference(CCD_CASE_REFERENCE)
                 .applicant1OrganisationPolicy(new OrganisationPolicy())
-                .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder().name("Legal Org Name").build())
+                .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("Legal Org Name"))
                 .applicant1Represented(YesOrNo.YES)
                 .applicant1(Party.builder()
                         .companyName("Applicant 1")

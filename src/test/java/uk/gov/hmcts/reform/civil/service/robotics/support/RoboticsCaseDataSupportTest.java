@@ -63,14 +63,14 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void applyOrganisationDetails_copiesFields() {
-        SolicitorOrganisationDetails organisationDetails = SolicitorOrganisationDetails.builder()
-            .organisationName("Org Name")
-            .phoneNumber("01234 567890")
-            .fax("01234 098765")
-            .dx("DX 123")
-            .email("contact@example.com")
-            .address(new Address("1 High Street", null, null, null, null, null, "ZZ1 1ZZ"))
-            .build();
+        SolicitorOrganisationDetails organisationDetails = new SolicitorOrganisationDetails()
+            .setOrganisationName("Org Name")
+            .setPhoneNumber("01234 567890")
+            .setFax("01234 098765")
+            .setDx("DX 123")
+            .setEmail("contact@example.com")
+            .setAddress(new Address("1 High Street", null, null, null, null, null, "ZZ1 1ZZ"))
+            ;
 
         Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder();
 
@@ -87,11 +87,10 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void applyOrganisation_usesProvidedAddressAndDx() {
-        ContactInformation contactInformation = ContactInformation.builder()
-            .addressLine1("Contact Line 1")
-            .postCode("AA1 1AA")
-            .dxAddress(List.of(DxAddress.builder().dxNumber("DX 999").build()))
-            .build();
+        ContactInformation contactInformation = new ContactInformation()
+            .setAddressLine1("Contact Line 1")
+            .setPostCode("AA1 1AA")
+            .setDxAddress(List.of(new DxAddress().setDxNumber("DX 999")));
         uk.gov.hmcts.reform.civil.prd.model.Organisation organisation = mock(
             uk.gov.hmcts.reform.civil.prd.model.Organisation.class);
         when(organisation.getName()).thenReturn("Organisation Ltd");
@@ -110,10 +109,9 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void resolveOrganisationAddresses_fallsBackToContactInformation() {
-        ContactInformation contactInformation = ContactInformation.builder()
-            .addressLine1("Contact Line 1")
-            .postCode("AA1 1AA")
-            .build();
+        ContactInformation contactInformation = new ContactInformation()
+            .setAddressLine1("Contact Line 1")
+            .setPostCode("AA1 1AA");
 
         RoboticsAddresses addresses = support.resolveOrganisationAddresses(List.of(contactInformation), null);
 
@@ -123,11 +121,10 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void applyOrganisationUsesContactInformationWhenNoServiceAddress() {
-        ContactInformation contactInformation = ContactInformation.builder()
-            .addressLine1("Contact Line 1")
-            .postCode("AA1 1AA")
-            .dxAddress(List.of(DxAddress.builder().dxNumber("DX 555").build()))
-            .build();
+        ContactInformation contactInformation = new ContactInformation()
+            .setAddressLine1("Contact Line 1")
+            .setPostCode("AA1 1AA")
+            .setDxAddress(List.of(new DxAddress().setDxNumber("DX 555")));
         uk.gov.hmcts.reform.civil.prd.model.Organisation organisation = mock(
             uk.gov.hmcts.reform.civil.prd.model.Organisation.class);
         when(organisation.getName()).thenReturn("Organisation Ltd");
@@ -144,28 +141,27 @@ class RoboticsCaseDataSupportTest {
     @Test
     void resolveDxReturnsNullWhenContactInfoMissingOrEmpty() {
         assertThat(support.resolveDx(null)).isNull();
-        assertThat(support.resolveDx(List.of(ContactInformation.builder().build()))).isNull();
+        assertThat(support.resolveDx(List.of(new ContactInformation()))).isNull();
     }
 
     @Test
     void buildSolicitor_appliesOrganisationAndDetails() {
-        ContactInformation contactInformation = ContactInformation.builder()
-            .addressLine1("Org Line 1")
-            .postCode("AB1 2CD")
-            .dxAddress(List.of(DxAddress.builder().dxNumber("DX 111").build()))
-            .build();
+        ContactInformation contactInformation = new ContactInformation()
+            .setAddressLine1("Org Line 1")
+            .setPostCode("AB1 2CD")
+            .setDxAddress(List.of(new DxAddress().setDxNumber("DX 111")));
         uk.gov.hmcts.reform.civil.prd.model.Organisation organisation = mock(
             uk.gov.hmcts.reform.civil.prd.model.Organisation.class);
         when(organisation.getName()).thenReturn("Organisation Ltd");
         when(organisation.getContactInformation()).thenReturn(List.of(contactInformation));
 
-        SolicitorOrganisationDetails organisationDetails = SolicitorOrganisationDetails.builder()
-            .organisationName("Override Org")
-            .phoneNumber("01234 567890")
-            .email("org@example.com")
-            .dx("DX 222")
-            .address(new Address("Details Line 1", null, null, null, null, null, "YY1 2YY"))
-            .build();
+        SolicitorOrganisationDetails organisationDetails = new SolicitorOrganisationDetails()
+            .setOrganisationName("Override Org")
+            .setPhoneNumber("01234 567890")
+            .setEmail("org@example.com")
+            .setDx("DX 222")
+            .setAddress(new Address("Details Line 1", null, null, null, null, null, "YY1 2YY"))
+            ;
 
         Address serviceAddress = new Address("Service Line 1", null, null, null, null, null, "ZZ1 9ZZ");
 
