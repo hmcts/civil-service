@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.citizen.events;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -10,7 +9,6 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import java.util.Map;
 
 @Data
-@Builder
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor

@@ -56,37 +56,37 @@ class RoleInitialisationServiceTest {
 
     @Test
     void shouldCallRoleAssignmentServiceWithExpectedRequest() {
-        RoleAssignmentRequest expected = RoleAssignmentRequest.builder()
-            .roleRequest(RoleRequest.builder()
-                             .assignerId(USER_ID)
-                             .reference("civil-hearings-system-user")
-                             .process("civil-system-user")
-                             .replaceExisting(true)
-                             .build())
-            .requestedRoles(List.of(
-                RoleAssignment.builder()
-                    .actorId(USER_ID)
-                    .actorIdType("IDAM")
-                    .roleType(RoleType.ORGANISATION)
-                    .classification("PUBLIC")
-                    .grantType(GrantType.STANDARD)
-                    .roleCategory(RoleCategory.SYSTEM)
-                    .roleName("hearing-manager")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-                    .readOnly(false)
-                    .build(),
-                RoleAssignment.builder()
-                    .actorId(USER_ID)
-                    .actorIdType("IDAM")
-                    .roleType(RoleType.ORGANISATION)
-                    .classification("PUBLIC")
-                    .grantType(GrantType.STANDARD)
-                    .roleCategory(RoleCategory.SYSTEM)
-                    .roleName("hearing-viewer")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-                    .readOnly(false)
-                    .build()
-            )).build();
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(USER_ID)
+            .setReference("civil-hearings-system-user")
+            .setProcess("civil-system-user")
+            .setReplaceExisting(true);
+
+        RoleAssignment hearingManager = new RoleAssignment()
+            .setActorId(USER_ID)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("hearing-manager")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setReadOnly(false);
+
+        RoleAssignment hearingViewer = new RoleAssignment()
+            .setActorId(USER_ID)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("hearing-viewer")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setReadOnly(false);
+
+        RoleAssignmentRequest expected = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(List.of(hearingManager, hearingViewer));
 
         roleInitialisationService.initialiseUserRolesOnStartUp();
 
@@ -96,37 +96,37 @@ class RoleInitialisationServiceTest {
 
     @Test
     void shouldCallRoleAssignmentServiceWithExpectedRequest_caseAllocator() {
-        RoleAssignmentRequest expected = RoleAssignmentRequest.builder()
-            .roleRequest(RoleRequest.builder()
-                             .assignerId(USER_ID)
-                             .reference("civil-case-allocator-system-user")
-                             .process("civil-system-user")
-                             .replaceExisting(true)
-                             .build())
-            .requestedRoles(List.of(
-                RoleAssignment.builder()
-                    .actorId(USER_ID)
-                    .actorIdType("IDAM")
-                    .roleType(RoleType.ORGANISATION)
-                    .classification("PUBLIC")
-                    .grantType(GrantType.STANDARD)
-                    .roleCategory(RoleCategory.SYSTEM)
-                    .roleName("case-allocator")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-                    .readOnly(false)
-                    .build(),
-                RoleAssignment.builder()
-                    .actorId(USER_ID)
-                    .actorIdType("IDAM")
-                    .roleType(RoleType.ORGANISATION)
-                    .classification("PUBLIC")
-                    .grantType(GrantType.STANDARD)
-                    .roleCategory(RoleCategory.SYSTEM)
-                    .roleName("case-allocator")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "GENERALAPPLICATION"))
-                    .readOnly(false)
-                    .build()
-            )).build();
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(USER_ID)
+            .setReference("civil-case-allocator-system-user")
+            .setProcess("civil-system-user")
+            .setReplaceExisting(true);
+
+        RoleAssignment allocatorCivil = new RoleAssignment()
+            .setActorId(USER_ID)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("case-allocator")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setReadOnly(false);
+
+        RoleAssignment allocatorGa = new RoleAssignment()
+            .setActorId(USER_ID)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("case-allocator")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "GENERALAPPLICATION"))
+            .setReadOnly(false);
+
+        RoleAssignmentRequest expected = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(List.of(allocatorCivil, allocatorGa));
 
         roleInitialisationService.initialiseUserRolesOnStartUp();
 

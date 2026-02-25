@@ -67,7 +67,7 @@ class RaiseQueryDashboardServiceTest {
     void shouldNotifyClaimantWhenDefendantRaisesQueryAndFirstQuery() {
         CaseData caseData = lipCaseData(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"));
         when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
-            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+            .thenReturn(new QueryManagementVariables().setQueryId(DEFENDANT_QUERY_ID));
         when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
             .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
@@ -98,7 +98,7 @@ class RaiseQueryDashboardServiceTest {
     void shouldNotifyDefendantWhenClaimantRaisesQueryWithoutFirstQueryScenario() {
         CaseData caseData = lipCaseData(multiMessageQuery());
         when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
-            .thenReturn(QueryManagementVariables.builder().queryId(CLAIMANT_QUERY_ID).build());
+            .thenReturn(new QueryManagementVariables().setQueryId(CLAIMANT_QUERY_ID));
         when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "claimant"))
             .thenReturn(List.of(CaseRole.CLAIMANT.getFormattedName()));
 
@@ -130,7 +130,7 @@ class RaiseQueryDashboardServiceTest {
             .build();
 
         when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
-            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+            .thenReturn(new QueryManagementVariables().setQueryId(DEFENDANT_QUERY_ID));
         when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
             .thenReturn(List.of(CaseRole.DEFENDANT.getFormattedName()));
 
@@ -143,7 +143,7 @@ class RaiseQueryDashboardServiceTest {
     void shouldDeleteDuplicatesWhenNoPartyScenarioIsRecorded() {
         CaseData caseData = lipCaseData(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"));
         when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
-            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+            .thenReturn(new QueryManagementVariables().setQueryId(DEFENDANT_QUERY_ID));
         when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
             .thenReturn(List.of());
 
@@ -156,7 +156,7 @@ class RaiseQueryDashboardServiceTest {
     void shouldNotifyBothPartiesWhenQueryCreatorHasNoLipRole() {
         CaseData caseData = lipCaseData(singleMessageQuery(DEFENDANT_QUERY_ID, "defendant"));
         when(runtimeService.getProcessVariables(PROCESS_INSTANCE_ID))
-            .thenReturn(QueryManagementVariables.builder().queryId(DEFENDANT_QUERY_ID).build());
+            .thenReturn(new QueryManagementVariables().setQueryId(DEFENDANT_QUERY_ID));
         when(coreCaseUserService.getUserCaseRoles(String.valueOf(CASE_REFERENCE), "defendant"))
             .thenReturn(List.of());
 
