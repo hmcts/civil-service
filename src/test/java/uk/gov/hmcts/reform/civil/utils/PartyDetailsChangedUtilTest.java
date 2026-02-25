@@ -35,20 +35,24 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_NoChanges() {
-            CaseData current = CaseData.builder().applicant1(PartyBuilder.builder().individual().build()).build();
-            CaseData updated = CaseData.builder().applicant1(PartyBuilder.builder().individual().build()).build();
+            CaseData current = CaseData.builder()
+                .applicant1(PartyBuilder.builder().individual().build())
+                .build();
+            CaseData updated = CaseData.builder()
+                .applicant1(PartyBuilder.builder().individual().build())
+                .build();
 
             assertNull(partyDetailsChangedUtil.buildChangesEvent(current, updated));
         }
 
         @Test
         public void testBuildChangesEvent_Applicant1Changes() {
-            CaseData current = CaseData.builder().applicant1(
-                PartyBuilder.builder().company().build().toBuilder().companyName("Company One").build()
-            ).build();
-            CaseData updated = CaseData.builder().applicant1(
-                PartyBuilder.builder().company().build().toBuilder().companyName("Company Two").build()
-            ).build();
+            CaseData current = CaseData.builder()
+                .applicant1(PartyBuilder.builder().company().build().toBuilder().companyName("Company One").build())
+                .build();
+            CaseData updated = CaseData.builder()
+                .applicant1(PartyBuilder.builder().company().build().toBuilder().companyName("Company Two").build())
+                .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
@@ -61,13 +65,15 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant2Changes() {
-            CaseData current = CaseData.builder().applicant2(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("John").individualLastName("Doe").build()
-            ).build();
+            CaseData current = CaseData.builder()
+                .applicant2(PartyBuilder.builder().individual().build().toBuilder()
+                                .individualFirstName("John").individualLastName("Doe").build())
+                .build();
 
-            CaseData updated = CaseData.builder().applicant2(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Jane").individualLastName("Smith").build()
-            ).build();
+            CaseData updated = CaseData.builder()
+                .applicant2(PartyBuilder.builder().individual().build().toBuilder()
+                                .individualFirstName("Jane").individualLastName("Smith").build())
+                .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
@@ -80,13 +86,15 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent1Changes() {
-            CaseData current = CaseData.builder().respondent1(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("John").individualLastName("Doe").build()
-            ).build();
+            CaseData current = CaseData.builder()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
+                                 .individualFirstName("John").individualLastName("Doe").build())
+                .build();
 
-            CaseData updated = CaseData.builder().respondent1(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Jane").individualLastName("Smith").build()
-            ).build();
+            CaseData updated = CaseData.builder()
+                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
+                                 .individualFirstName("Jane").individualLastName("Smith").build())
+                .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
@@ -99,13 +107,15 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent2Changes() {
-            CaseData current = CaseData.builder().respondent2(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("John").individualLastName("Doe").build()
-            ).build();
+            CaseData current = CaseData.builder()
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                                 .individualFirstName("John").individualLastName("Doe").build())
+                .build();
 
-            CaseData updated = CaseData.builder().respondent2(
-                PartyBuilder.builder().individual().build().toBuilder().individualFirstName("Jane").individualLastName("Smith").build()
-            ).build();
+            CaseData updated = CaseData.builder()
+                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
+                                 .individualFirstName("Jane").individualLastName("Smith").build())
+                .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
 
@@ -502,11 +512,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("Jane Carver")
-                .updatedValue("Jane Wilson")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("Jane Carver")
+                .setUpdatedValue("Jane Wilson")
+                ;
 
             assertEquals(List.of(expectedNameChange), changes);
         }
@@ -525,11 +535,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("Jane Carver")
-                .updatedValue("Jane Wilson")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("Jane Carver")
+                .setUpdatedValue("Jane Wilson")
+                ;
 
             assertEquals(List.of(expectedNameChange), changes);
         }
@@ -546,11 +556,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("Company One")
-                .updatedValue("Company Two")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("Company One")
+                .setUpdatedValue("Company Two")
+                ;
 
             assertEquals(List.of(expectedNameChange), changes);
         }
@@ -567,11 +577,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("Organisation One")
-                .updatedValue("Organisation Two")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("Organisation One")
+                .setUpdatedValue("Organisation Two")
+                ;
 
             assertEquals(List.of(expectedNameChange), changes);
         }
@@ -588,11 +598,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedAddressChange = PartyDetailsChange.builder()
-                .fieldName("Address")
-                .previousValue("123 Main St, City, Country")
-                .updatedValue("999 Main St, City, Country")
-                .build();
+            PartyDetailsChange expectedAddressChange = new PartyDetailsChange()
+                .setFieldName("Address")
+                .setPreviousValue("123 Main St, City, Country")
+                .setUpdatedValue("999 Main St, City, Country")
+                ;
 
             assertEquals(List.of(expectedAddressChange), changes);
         }
@@ -613,17 +623,17 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("John Doe")
-                .updatedValue("Jane Smith")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("John Doe")
+                .setUpdatedValue("Jane Smith")
+                ;
 
-            PartyDetailsChange expectedAddressChange = PartyDetailsChange.builder()
-                .fieldName("Address")
-                .previousValue("123 Main St, City, Country")
-                .updatedValue("999 Elm St, Town, Country")
-                .build();
+            PartyDetailsChange expectedAddressChange = new PartyDetailsChange()
+                .setFieldName("Address")
+                .setPreviousValue("123 Main St, City, Country")
+                .setUpdatedValue("999 Elm St, Town, Country")
+                ;
 
             assertEquals(List.of(expectedNameChange, expectedAddressChange), changes);
         }
@@ -662,11 +672,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("John Doe")
-                .updatedValue("Jane Smith")
-                .build();
+            PartyDetailsChange expectedChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("John Doe")
+                .setUpdatedValue("Jane Smith")
+                ;
 
             assertEquals(List.of(expectedChange), changes);
         }
@@ -685,11 +695,11 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedAddressChange = PartyDetailsChange.builder()
-                .fieldName("Address")
-                .previousValue("123 Main St, City, Country")
-                .updatedValue("999 Elm St, Town, Country")
-                .build();
+            PartyDetailsChange expectedAddressChange = new PartyDetailsChange()
+                .setFieldName("Address")
+                .setPreviousValue("123 Main St, City, Country")
+                .setUpdatedValue("999 Elm St, Town, Country")
+                ;
 
             assertEquals(List.of(expectedAddressChange), changes);
         }
@@ -708,17 +718,17 @@ public class PartyDetailsChangedUtilTest {
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
-            PartyDetailsChange expectedNameChange = PartyDetailsChange.builder()
-                .fieldName("Name")
-                .previousValue("John Doe")
-                .updatedValue("Jane Smith")
-                .build();
+            PartyDetailsChange expectedNameChange = new PartyDetailsChange()
+                .setFieldName("Name")
+                .setPreviousValue("John Doe")
+                .setUpdatedValue("Jane Smith")
+                ;
 
-            PartyDetailsChange expectedAddressChange = PartyDetailsChange.builder()
-                .fieldName("Address")
-                .previousValue("123 Main St, City, Country")
-                .updatedValue("999 Elm St, Town, Country")
-                .build();
+            PartyDetailsChange expectedAddressChange = new PartyDetailsChange()
+                .setFieldName("Address")
+                .setPreviousValue("123 Main St, City, Country")
+                .setUpdatedValue("999 Elm St, Town, Country")
+                ;
 
             assertEquals(List.of(expectedNameChange, expectedAddressChange), changes);
         }

@@ -171,9 +171,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -285,9 +285,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.FAILED)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.FAILED)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -345,9 +345,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -406,9 +406,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -474,9 +474,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -534,9 +534,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .solicitorReferences(null)
             .build();
 
@@ -589,9 +589,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -630,9 +630,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService
@@ -669,9 +669,9 @@ class HearingNoticeHmcGeneratorTest {
             .channel(HearingChannel.IN_PERSON)
             .hearingDuration(HearingDuration.DAY_1)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
 
         when(hearingFeesService

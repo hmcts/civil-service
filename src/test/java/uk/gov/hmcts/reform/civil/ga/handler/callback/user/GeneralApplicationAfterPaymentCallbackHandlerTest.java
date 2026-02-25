@@ -152,9 +152,9 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
         GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
         pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
 
-        PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(status)
-            .build();
+        PaymentDetails paymentDetails = new PaymentDetails()
+            .setStatus(status)
+            ;
         pbaDetails = pbaDetailsBuilder.paymentDetails(paymentDetails).build();
         return caseData.toBuilder()
             .generalAppPBADetails(pbaDetails)

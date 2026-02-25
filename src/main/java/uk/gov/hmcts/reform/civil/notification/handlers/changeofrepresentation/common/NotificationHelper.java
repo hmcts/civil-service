@@ -54,10 +54,9 @@ public class NotificationHelper {
                     .map(OrganisationPolicy::getOrganisation)
                     .map(Organisation::getOrganisationID)
                     .orElse(caseData.getRespondent1OrganisationIDCopy());
-                return RecipientData.builder()
-                    .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(respondent1OrgID)
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getRespondentSolicitor1EmailAddress())
+                    .setOrgId(respondent1OrgID);
             }
         } else {
             if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
@@ -65,20 +64,18 @@ public class NotificationHelper {
                     .map(OrganisationPolicy::getOrganisation)
                     .map(Organisation::getOrganisationID)
                     .orElse(null);
-                return RecipientData.builder()
-                    .email(caseData.getApplicantSolicitor1UserDetailsEmail())
-                    .orgId(applicantOrgId)
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
+                    .setOrgId(applicantOrgId);
             } else {
                 if (!isOtherPartyLip(caseData.getRespondent2OrganisationPolicy())) {
                     String respondent2OrgID = Optional.ofNullable(caseData.getRespondent2OrganisationPolicy())
                         .map(OrganisationPolicy::getOrganisation)
                         .map(Organisation::getOrganisationID)
                         .orElse(caseData.getRespondent2OrganisationIDCopy());
-                    return RecipientData.builder()
-                        .email(caseData.getRespondentSolicitor2EmailAddress())
-                        .orgId(respondent2OrgID)
-                        .build();
+                    return new RecipientData()
+                        .setEmail(caseData.getRespondentSolicitor2EmailAddress())
+                        .setOrgId(respondent2OrgID);
                 }
             }
         }
@@ -140,30 +137,27 @@ public class NotificationHelper {
                 .map(OrganisationPolicy::getOrganisation)
                 .map(Organisation::getOrganisationID)
                 .orElse(null);
-            return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
-                .orgId(applicantOrgId)
-                .build();
+            return new RecipientData()
+                .setEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
+                .setOrgId(applicantOrgId);
         } else if (isApplicant1NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
                 String respondent1OrgID = Optional.ofNullable(caseData.getRespondent1OrganisationPolicy())
                     .map(OrganisationPolicy::getOrganisation)
                     .map(Organisation::getOrganisationID)
                     .orElseGet(caseData::getRespondent1OrganisationIDCopy);
-                return RecipientData.builder()
-                    .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(respondent1OrgID)
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getRespondentSolicitor1EmailAddress())
+                    .setOrgId(respondent1OrgID);
             }
         } else if (isRespondent1NewSolicitor(caseData) && !caseData.isApplicantLipOneVOne()) {
             String applicantOrgId = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
                 .map(OrganisationPolicy::getOrganisation)
                 .map(Organisation::getOrganisationID)
                 .orElse(null);
-            return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
-                .orgId(applicantOrgId)
-                .build();
+            return new RecipientData()
+                .setEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
+                .setOrgId(applicantOrgId);
         }
         return null;
     }

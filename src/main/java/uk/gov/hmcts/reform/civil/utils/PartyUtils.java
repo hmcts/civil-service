@@ -199,21 +199,19 @@ public class PartyUtils {
     }
 
     public static PartyData respondent1Data(CaseData caseData) {
-        return PartyData.builder()
-            .role(RESPONDENT_ONE)
-            .details(caseData.getRespondent1())
-            .timeExtensionDate(caseData.getRespondent1TimeExtensionDate())
-            .solicitorAgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension())
-            .build();
+        return new PartyData()
+            .setRole(RESPONDENT_ONE)
+            .setDetails(caseData.getRespondent1())
+            .setTimeExtensionDate(caseData.getRespondent1TimeExtensionDate())
+            .setSolicitorAgreedDeadlineExtension(caseData.getRespondentSolicitor1AgreedDeadlineExtension());
     }
 
     public static PartyData respondent2Data(CaseData caseData) {
-        return PartyData.builder()
-            .role(RESPONDENT_TWO)
-            .details(caseData.getRespondent2())
-            .timeExtensionDate(caseData.getRespondent2TimeExtensionDate())
-            .solicitorAgreedDeadlineExtension(caseData.getRespondentSolicitor2AgreedDeadlineExtension())
-            .build();
+        return new PartyData()
+            .setRole(RESPONDENT_TWO)
+            .setDetails(caseData.getRespondent2())
+            .setTimeExtensionDate(caseData.getRespondent2TimeExtensionDate())
+            .setSolicitorAgreedDeadlineExtension(caseData.getRespondentSolicitor2AgreedDeadlineExtension());
     }
 
     private static final Predicate<CaseData> defendantSolicitor2Reference = caseData -> caseData
