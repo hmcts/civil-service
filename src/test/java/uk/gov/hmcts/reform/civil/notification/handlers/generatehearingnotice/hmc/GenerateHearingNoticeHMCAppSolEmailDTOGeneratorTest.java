@@ -94,7 +94,7 @@ class GenerateHearingNoticeHMCAppSolEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .build();
         when(camundaService.getProcessVariables(PROCESS_ID))
                 .thenReturn(new HearingNoticeVariables().setHearingType(TYPE_FAST));

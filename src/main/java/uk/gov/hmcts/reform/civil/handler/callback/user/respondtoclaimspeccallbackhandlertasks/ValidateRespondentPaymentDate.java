@@ -28,7 +28,7 @@ public class ValidateRespondentPaymentDate implements CaseTask {
 
         List<String> errors = paymentDateValidator
                 .validate(Optional.ofNullable(caseData.getRespondToClaimAdmitPartLRspec())
-                        .orElseGet(() -> RespondToClaimAdmitPartLRspec.builder().build()));
+                        .orElseGet(() -> new RespondToClaimAdmitPartLRspec()));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(errors)

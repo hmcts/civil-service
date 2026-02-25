@@ -27,63 +27,61 @@ public class RequestedCourtForClaimDetailsTab {
     private final LocationReferenceDataService locationRefDataService;
 
     public RequestedCourtForTabDetails createCourtDetails(String auth, DQ courtDetails) {
-        return RequestedCourtForTabDetails.builder()
-            .requestedCourt(
+        return new RequestedCourtForTabDetails()
+            .setRequestedCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
                         .map(RequestedCourt::getResponseCourtCode))
                     .orElse(null)
             )
-            .requestedCourtName(
+            .setRequestedCourtName(
                 Optional.ofNullable(courtDetails)
                     .flatMap(details -> Optional.ofNullable(getCourtName(auth, details)))
                     .orElse(null)
             )
-            .reasonForHearingAtSpecificCourt(
+            .setReasonForHearingAtSpecificCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
                         .map(RequestedCourt::getReasonForHearingAtSpecificCourt))
                     .orElse(null)
             )
-            .requestHearingHeldRemotely(
+            .setRequestHearingHeldRemotely(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearing())
                         .map(RemoteHearing::getRemoteHearingRequested))
                     .orElse(null)
             )
-            .requestHearingHeldRemotelyReason(
+            .setRequestHearingHeldRemotelyReason(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearing())
                         .map(RemoteHearing::getReasonForRemoteHearing))
                     .orElse(null)
-            )
-            .build();
+            );
     }
 
     public RequestedCourtForTabDetails createCourtDetailsSpec(String auth, DQ courtDetails) {
-        return RequestedCourtForTabDetails.builder()
-            .requestedCourt(
+        return new RequestedCourtForTabDetails()
+            .setRequestedCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
                         .map(RequestedCourt::getResponseCourtCode))
                     .orElse(null)
             )
-            .requestedCourtName(
+            .setRequestedCourtName(
                 Optional.ofNullable(courtDetails)
                     .flatMap(details -> Optional.ofNullable(getCourtName(auth, details)))
                     .orElse(null)
             )
-            .reasonForHearingAtSpecificCourt(
+            .setReasonForHearingAtSpecificCourt(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRequestedCourt())
                         .map(RequestedCourt::getReasonForHearingAtSpecificCourt))
                     .orElse(null)
             )
-            .requestHearingHeldRemotely(
+            .setRequestHearingHeldRemotely(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearingLRspec())
                         .map(RemoteHearingLRspec::getRemoteHearingRequested))
                     .orElse(null)
             )
-            .requestHearingHeldRemotelyReason(
+            .setRequestHearingHeldRemotelyReason(
                 Optional.ofNullable(courtDetails).flatMap(details -> Optional.ofNullable(details.getRemoteHearingLRspec())
                         .map(RemoteHearingLRspec::getReasonForRemoteHearing))
                     .orElse(null)
-            )
-            .build();
+            );
     }
 
     private String getCourtName(String auth, DQ courtDetail) {
