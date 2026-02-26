@@ -358,7 +358,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListActionNeeded_whenParentClaimantIsApplicantNo() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -400,7 +400,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListInProgress_whenParentClaimantIsApplicantNo() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -442,7 +442,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldNotUpdateTaskList_whenGaDetailsAreNull() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(null)
             .respondentSolGaAppDetails(null)
@@ -789,9 +789,9 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .ccdCaseReference(CCD_CASE_REFERENCE)
             .build();
-        caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                .additionalPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.FAILED)).build())
+        caseData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                .setAdditionalPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.FAILED)))
             .build();
 
         when(gaForLipService.isLipApp(caseData)).thenReturn(false);
@@ -809,13 +809,13 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldPreferActionNeededOverInProgress_whenBothPresent() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .build();
 
         // Parent case data with both Action Needed and In Progress for the claimant
         GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        parentCaseData = parentCaseData.toBuilder()
+        parentCaseData = parentCaseData.copy()
             .claimantGaAppDetails(List.of(
                 Element.<GeneralApplicationsDetails>builder().value(
                     GeneralApplicationsDetails.builder()

@@ -80,16 +80,15 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
     }
 
     private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
-        var caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        var caseDataBuilder = caseData.toBuilder();
+        var caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails()).copy();
         var caseId = caseData.getCcdCaseReference().toString();
         log.info("Assigning OrgPolicy for caseId: {}", caseId);
 
         if (PENDING_APPLICATION_ISSUED.equals(caseData.getCcdState())) {
-            assignApplicantOrgPolicy(caseData, caseDataBuilder);
+            assignApplicantOrgPolicy(caseData);
         }
 
-        assignRespondentOrgPolicy(caseData, caseDataBuilder);
+        assignRespondentOrgPolicy(caseData);
 
         rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(
             caseData.getGeneralAppParentCaseLink().getCaseReference(),
@@ -97,15 +96,14 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
         );
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(caseDataBuilder.build().toMap(mapper))
+            .data(caseData.toMap(mapper))
             .errors(new ArrayList<>())
             .build();
     }
 
-    private void assignApplicantOrgPolicy(GeneralApplicationCaseData caseData,
-                                          GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder) {
+    private void assignApplicantOrgPolicy(GeneralApplicationCaseData caseData) {
         var applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
-        builder.applicant1OrganisationPolicy(buildOrganisationPolicy(
+        caseData.applicant1OrganisationPolicy(buildOrganisationPolicy(
             applicantSolicitor,
             APPLICANTSOLICITORONE.getFormattedName()
         ));
@@ -116,14 +114,13 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
                 .filter(sol ->
                             sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
                 .toList();
-            builder.generalAppApplicantAddlSolicitors(applicantAddlSolList);
+            caseData.generalAppApplicantAddlSolicitors(applicantAddlSolList);
         }
     }
 
-    private void assignRespondentOrgPolicy(GeneralApplicationCaseData caseData,
-                                           GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder) {
+    private void assignRespondentOrgPolicy(GeneralApplicationCaseData caseData) {
         if (gaForLipService.isGaForLip(caseData)) {
-            assignRespondentLipOrgPolicy(caseData, builder);
+            assignRespondentLipOrgPolicy(caseData);
             return;
         }
 
@@ -133,7 +130,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
                         !sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
             .toList();
 
-        builder.generalAppRespondentSolicitors(respondentSolicitorsList);
+        caseData.generalAppRespondentSolicitors(respondentSolicitorsList);
 
         if (shouldAssignRespondentSolicitorRoles(caseData)) {
             /*
@@ -141,14 +138,13 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
              * Assign case to Respondent Solicitors only after the payment is made by Applicant.
              * If the Application is Free Application, then assign the respondent roles during Initiation of GA
              * */
-            assignRespondentSolicitorRoles(respondentSolicitorsList, builder);
+            assignRespondentSolicitorRoles(respondentSolicitorsList, caseData);
         }
     }
 
-    private void assignRespondentLipOrgPolicy(GeneralApplicationCaseData caseData,
-                                              GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder) {
+    private void assignRespondentLipOrgPolicy(GeneralApplicationCaseData caseData) {
         if (shouldAssignRespondentSolicitorRoles(caseData)) {
-            builder.respondent1OrganisationPolicy(
+            caseData.respondent1OrganisationPolicy(
                 new OrganisationPolicy().setOrgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
             );
         }
@@ -167,18 +163,18 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
     }
 
     private void assignRespondentSolicitorRoles(List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList,
-                                                GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder) {
+                                                GeneralApplicationCaseData caseData) {
         if (respondentSolicitorsList.isEmpty()) {
             return;
         }
 
-        builder.respondent1OrganisationPolicy(buildOrganisationPolicy(
+        caseData.respondent1OrganisationPolicy(buildOrganisationPolicy(
             respondentSolicitorsList.get(0).getValue(),
             RESPONDENTSOLICITORONE.getFormattedName()
         ));
 
         if (respondentSolicitorsList.size() > 1) {
-            builder.respondent2OrganisationPolicy(buildOrganisationPolicy(
+            caseData.respondent2OrganisationPolicy(buildOrganisationPolicy(
                 respondentSolicitorsList.get(1).getValue(),
                 RESPONDENTSOLICITORTWO.getFormattedName()
             ));

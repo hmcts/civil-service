@@ -427,11 +427,11 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     void shouldNotGenerateApplicationDraftDocument_whenJudgeHasMadeDecision_LR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
-        caseData = caseData.toBuilder()
-            .judicialDecision(uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision.builder().build())
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("FREE")).build()).build();
+        caseData = caseData.copy()
+            .judicialDecision(new uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("FREE"))).build();
         when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -449,10 +449,10 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
         // 3. Urgent and paid: NO (Not urgent)
         // 4. RespondentsResponseSatisfied: NO (Assume false by default for this data)
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
-        caseData = caseData.toBuilder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
-                                      .fee(new Fee().setCode("NotFree")).build()).build();
+        caseData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("NotFree"))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         handler.handle(params);
