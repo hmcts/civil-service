@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.ga.service.GaFeesPaymentService;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
@@ -33,6 +35,7 @@ public class FeesPaymentController {
     private final GaFeesPaymentService gaFeesPaymentService;
 
     @PostMapping(path = FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RateLimiter
     @Operation(summary = "Citizen UI will call this API and will get gov pay link for payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
@@ -49,6 +52,7 @@ public class FeesPaymentController {
     }
 
     @GetMapping(path = FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON_VALUE)
+    @RateLimiter
     @Operation(summary = "Citizen UI will call this API and will get status of gov pay payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay status."),
@@ -65,6 +69,7 @@ public class FeesPaymentController {
     }
 
     @PostMapping(path = GA_FEES_PAYMENT_REQUEST_URL, consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RateLimiter
     @Operation(summary = "Citizen UI will call this API and will get gov pay link for general application payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay link is created."),
@@ -80,6 +85,7 @@ public class FeesPaymentController {
     }
 
     @GetMapping(path = GA_FEES_PAYMENT_STATUS_URL, produces = APPLICATION_JSON_VALUE)
+    @RateLimiter
     @Operation(summary = "Citizen UI will call this API and will get status of gov pay general application payment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Successful Gov pay status."),

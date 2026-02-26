@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.enums.FeeType;
 import uk.gov.hmcts.reform.civil.exceptions.InternalServerErrorException;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
@@ -27,6 +29,7 @@ public class ServiceRequestUpdateCallbackController {
     private final AuthorisationService authorisationService;
 
     @PutMapping(path = "/service-request-update", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RateLimiter
     @Operation(summary = "Ways to pay will call this API and send the status of payment with other details")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Callback processed."),

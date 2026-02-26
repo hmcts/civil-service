@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.model.HearingValuesRequest;
 import uk.gov.hmcts.reform.civil.model.hearingvalues.ServiceHearingValuesModel;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingValuesService;
@@ -29,6 +31,7 @@ public class HearingValuesController {
     @PostMapping(path = {
         "/serviceHearingValues"
     })
+    @RateLimiter
     @Operation(summary = "Builds and returns the hearing values for exui")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

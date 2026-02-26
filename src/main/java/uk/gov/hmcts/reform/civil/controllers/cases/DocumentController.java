@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,6 +42,7 @@ public class DocumentController {
     private final DocumentManagementService documentManagementService;
 
     @PostMapping("/generateSealedDoc")
+    @RateLimiter
     public ResponseEntity<CaseDocument> uploadSealedDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation, @NotNull @RequestBody CaseData caseData) {
         return ResponseEntity
@@ -49,6 +51,7 @@ public class DocumentController {
     }
 
     @PostMapping(value = "/generateAnyDoc")
+    @RateLimiter
     @Operation(summary = "Upload document")
     public ResponseEntity<CaseDocument> uploadAnyDocument(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
@@ -61,6 +64,7 @@ public class DocumentController {
     }
 
     @GetMapping(value = "/downloadDocument/{documentId}")
+    @RateLimiter
     public
         ResponseEntity<Resource> downloadDocumentById(
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,

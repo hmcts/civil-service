@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.exceptions.CaseDataInvalidException;
 import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.events.GaCaseEventService;
@@ -78,6 +79,7 @@ public class CasesController {
     @GetMapping(path = {
         "/{caseId}",
     })
+    @RateLimiter
     @Operation(summary = "get case by id from CCD")
     public ResponseEntity<CaseDetails> getCaseId(
         @PathVariable("caseId") Long caseId,
@@ -94,6 +96,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/")
+    @RateLimiter
     @Operation(summary = "get list of the cases from CCD")
     public ResponseEntity<SearchResult> getCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                     @RequestBody String searchString) {
@@ -108,6 +111,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/actors/{actorId}")
+    @RateLimiter
     @Operation(summary = "Gets credentials for actorId from RAS")
     public ResponseEntity<RoleAssignmentServiceResponse> getRoleAssignmentsByActorId(
         @PathVariable("actorId") String actorId,
@@ -120,6 +124,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/claimant/{submitterId}")
+    @RateLimiter
     @Operation(summary = "Gets basic claim information for claimant")
     public ResponseEntity<DashboardResponse> getClaimsForClaimant(
         @PathVariable("submitterId") String submitterId,
@@ -135,6 +140,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/defendant/{submitterId}")
+    @RateLimiter
     @Operation(summary = "Gets basic claim information for defendant")
     public ResponseEntity<DashboardResponse> getClaimsForDefendant(
         @PathVariable("submitterId") String submitterId,
@@ -150,6 +156,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/{caseId}/citizen/{submitterId}/event")
+    @RateLimiter
     @Operation(summary = "Submits event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -173,6 +180,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/response/deadline")
+    @RateLimiter
     @Operation(summary = "Calculates extended response deadline")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -184,6 +192,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/response/agreeddeadline/{caseId}")
+    @RateLimiter
     @Operation(summary = "Return the agreed deadline date")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -195,6 +204,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/caseworkers/create-case/{userId}")
+    @RateLimiter
     @Operation(summary = "Submits event for new case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created"),
@@ -220,6 +230,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/caseworker/searchCaseForSDT/{userId}")
+    @RateLimiter
     @Operation(summary = "SQL Search for a case, for caseworker")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "List of cases for the given search criteria")})
@@ -238,6 +249,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/caseworker/validatePin")
+    @RateLimiter
     @Operation(summary = "Validate address - PostCode")
     public List<String> validatePostCode(
         @RequestParam(name = "postCode") String postCode
@@ -246,6 +258,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/{caseId}/userCaseRoles")
+    @RateLimiter
     @Operation(summary = "Get user Roles for a case")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -259,6 +272,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/{caseId}/courtDecision")
+    @RateLimiter
     @Operation(summary = "Calculates decision on proposed claimant repayment")
     public RepaymentDecisionType calculateDecisionOnClaimantProposedRepayment(
         @PathVariable("caseId") Long caseId,
@@ -269,6 +283,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/ga")
+    @RateLimiter
     @Operation(summary = "get list of the general application cases from CCD")
     public ResponseEntity<SearchResult> getGaCaseList(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                       @RequestBody String searchString) {
@@ -284,6 +299,7 @@ public class CasesController {
     }
 
     @PostMapping(path = "/{caseId}/ga/citizen/{submitterId}/event")
+    @RateLimiter
     @Operation(summary = "Submits event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -307,6 +323,7 @@ public class CasesController {
     }
 
     @GetMapping(path = "/{caseId}/ga/applications")
+    @RateLimiter
     @Operation(summary = "get list of the applications with given general application case id from CCD")
     public ResponseEntity<SearchResult> getGaCaseApplications(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
                                                               @PathVariable("caseId") String caseId) {
