@@ -95,7 +95,7 @@ public class HearingNoticeSchedulerEventHandler {
                 notifyHmc(hearingId, hearing, partiesNotified.getServiceData());
             }
         } else {
-            notifyHmc(hearingId, hearing, PartiesNotifiedServiceData.builder().build());
+            notifyHmc(hearingId, hearing, new PartiesNotifiedServiceData());
         }
     }
 
@@ -124,9 +124,8 @@ public class HearingNoticeSchedulerEventHandler {
     }
 
     private void notifyHmc(String hearingId, HearingGetResponse hearing, PartiesNotifiedServiceData serviceData) {
-        var partiesNotifiedPayload = PartiesNotified.builder()
-            .serviceData(serviceData.toBuilder().hearingNoticeGenerated(false).build())
-            .build();
+        var partiesNotifiedPayload = new PartiesNotified()
+            .setServiceData(serviceData);
         hearingsService.updatePartiesNotifiedResponse(
             getSystemUpdateUser().getUserToken(),
             hearingId,

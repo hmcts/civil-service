@@ -91,7 +91,7 @@ class NoCHelperTest {
             .hearingTimeHourMinute("10:30")
             .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)))
             .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("Court A").build()).build())
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
             .build();
     }
 

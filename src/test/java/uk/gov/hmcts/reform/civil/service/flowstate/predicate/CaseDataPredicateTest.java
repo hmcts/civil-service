@@ -1477,9 +1477,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_claimIssuedPaymentSucceeded_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.claimIssuedPaymentSucceeded.test(caseData));
         }
@@ -1492,9 +1492,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentSucceeded_when_payment_status_not_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentSucceeded.test(caseData));
         }
@@ -1525,27 +1525,27 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_paymentDetailsFailed_when_status_failed() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
         }
 
         @Test
         void should_return_true_for_claimIssuedPaymentFailed_when_status_failed() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.FAILED)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.FAILED)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertTrue(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
         }
 
         @Test
         void should_return_false_for_paymentDetailsFailed_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.paymentDetailsFailed.test(caseData));
         }
@@ -1558,9 +1558,9 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_false_for_claimIssuedPaymentFailed_when_status_success() {
-            PaymentDetails pd = PaymentDetails.builder()
-                .status(PaymentStatus.SUCCESS)
-                .build();
+            PaymentDetails pd = new PaymentDetails()
+                .setStatus(PaymentStatus.SUCCESS)
+                ;
             when(caseData.getClaimIssuedPaymentDetails()).thenReturn(pd);
             assertFalse(CaseDataPredicate.Payment.claimIssuedPaymentFailed.test(caseData));
         }
@@ -1578,7 +1578,7 @@ class CaseDataPredicateTest {
         @Test
         void should_return_true_for_isNotRequiredApplicantMPSpec_when_hasAgreedFreeMediation_is_no() {
             when(caseData.getApplicantMPClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.NO));
             assertTrue(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
         }
 
@@ -1588,14 +1588,14 @@ class CaseDataPredicateTest {
             assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
 
             when(caseData.getApplicantMPClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.YES));
             assertFalse(CaseDataPredicate.Mediation.isNotRequiredApplicantMPSpec.test(caseData));
         }
 
         @Test
         void should_return_true_for_isNotAgreedFreeMediationApplicant1Spec_when_hasAgreedFreeMediation_is_no() {
             when(caseData.getApplicant1ClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.NO).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.NO));
             assertTrue(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
         }
 
@@ -1605,7 +1605,7 @@ class CaseDataPredicateTest {
             assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
 
             when(caseData.getApplicant1ClaimMediationSpecRequired())
-                .thenReturn(SmallClaimMedicalLRspec.builder().hasAgreedFreeMediation(YesOrNo.YES).build());
+                .thenReturn(new SmallClaimMedicalLRspec(YesOrNo.YES));
             assertFalse(CaseDataPredicate.Mediation.isNotAgreedFreeMediationApplicant1Spec.test(caseData));
         }
 

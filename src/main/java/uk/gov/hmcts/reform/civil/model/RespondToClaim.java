@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.validation.groups.PaymentDateGroup;
 
 import java.math.BigDecimal;
@@ -13,9 +13,9 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.PastOrPresent;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class RespondToClaim {
 
     /**
