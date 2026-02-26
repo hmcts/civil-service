@@ -98,10 +98,9 @@ class StartBusinessProcessTaskHandlerTest {
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 
@@ -139,10 +138,9 @@ class StartBusinessProcessTaskHandlerTest {
 
         when(coreCaseDataService.startUpdate(CASE_ID, START_BUSINESS_PROCESS)).thenReturn(startEventResponse);
         when(mockTask.getTopicName()).thenReturn("test");
-        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(StateFlowDTO.builder()
-                                                                               .state(State.from("MAIN.DRAFT"))
-                                                                               .flags(Map.of())
-                                                                               .build());
+        when(stateFlowEngine.getStateFlow(any(CaseData.class))).thenReturn(new StateFlowDTO()
+            .setState(State.from("MAIN.DRAFT"))
+            .setFlags(Map.of()));
 
         handler.execute(mockTask, externalTaskService);
 

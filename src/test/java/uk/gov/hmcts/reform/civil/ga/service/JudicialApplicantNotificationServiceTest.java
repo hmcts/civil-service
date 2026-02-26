@@ -2599,13 +2599,13 @@ class JudicialApplicantNotificationServiceTest {
     }
 
     private PaymentDetails buildAdditionalPaymentSuccessData() {
-        return PaymentDetails.builder()
-            .status(SUCCESS)
-            .customerReference(null)
-            .reference("123445")
-            .errorCode(null)
-            .errorMessage(null)
-            .build();
+        return new PaymentDetails()
+            .setStatus(SUCCESS)
+            .setCustomerReference(null)
+            .setReference("123445")
+            .setErrorCode(null)
+            .setErrorMessage(null)
+            ;
     }
 
     private List<GeneralApplicationTypes> applicationTypeToStayTheClaim() {

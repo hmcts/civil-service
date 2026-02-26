@@ -144,7 +144,7 @@ class HearingUtilsTest {
             .setDate(LocalDate.now())
             ;
         CaseData caseData = CaseData.builder()
-            .sdoHearingNotes(SDOHearingNotes.builder().input("test notes").build())
+            .sdoHearingNotes(new SDOHearingNotes("test notes"))
             .build();
 
         HearingNotes actual = HearingUtils.getHearingNotes(caseData);

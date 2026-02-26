@@ -89,7 +89,7 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .issueDate(LocalDate.now())
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder().paymentSetDate(LocalDate.now()).build())
+                .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate().setPaymentSetDate(LocalDate.now()))
                 .build();
 
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
