@@ -107,18 +107,17 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyDefendantSolicitor1_whenInvoked() {
             when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LR.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -134,18 +133,17 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
         void shouldNotifyDefendantSolicitor2_whenInvoked() {
             when(notificationsProperties.getNotifyDJNonDivergentSpecDefendantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT2_LR.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -178,13 +176,12 @@ class ClaimDJNonDivergentDefendantNotificationHandlerTest extends BaseCallbackHa
                 .ccdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_DJ_NON_DIVERGENT_SPEC_DEFENDANT1_LIP.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

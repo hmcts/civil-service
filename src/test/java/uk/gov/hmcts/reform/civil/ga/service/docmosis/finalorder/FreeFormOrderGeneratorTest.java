@@ -93,7 +93,7 @@ class FreeFormOrderGeneratorTest {
                  .uploadDocument(any(String.class), any(PDF.class)))
             .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                 YES).build()
@@ -135,7 +135,7 @@ class FreeFormOrderGeneratorTest {
             assertThrows(
                 IllegalArgumentException.class, ()
                     -> generator.generate(caseData, BEARER_TOKEN)
-            );
+        );
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -191,16 +191,17 @@ class FreeFormOrderGeneratorTest {
             .finalOrderFreeForm().isMultiParty(YES).build().toBuilder()
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("London")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("London")
+            );
         FreeFormOrder templateDate = generator.getTemplateData(
             null,
             caseData,
             "auth",
             FlowFlag.ONE_RESPONDENT_REPRESENTATIVE
-        );
+            );
         assertThatFieldsAreCorrect_FreeFormOrder(templateDate, caseData);
     }
 
@@ -229,16 +230,17 @@ class FreeFormOrderGeneratorTest {
             .build();
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("Manchester")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("Manchester")
+            );
         FreeFormOrder templateDate = generator.getTemplateData(
             null,
             caseData,
             "auth",
             FlowFlag.ONE_RESPONDENT_REPRESENTATIVE
-        );
+            );
         assertThatFieldsAreCorrect_FreeFormOrder_1V1(templateDate, caseData);
     }
 
@@ -270,10 +272,11 @@ class FreeFormOrderGeneratorTest {
                 .build();
 
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder()
-                                .epimmsId("2")
-                                .externalShortName("Manchester")
-                                .build());
+                .thenReturn(
+                    new LocationRefData()
+                        .setEpimmsId("2")
+                        .setExternalShortName("Manchester")
+                );
             FreeFormOrder templateDate = generator.getTemplateData(
                 GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
                 caseData,
@@ -293,7 +296,7 @@ class FreeFormOrderGeneratorTest {
             when(documentManagementService.uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                     YES).build()
@@ -337,4 +340,3 @@ class FreeFormOrderGeneratorTest {
         }
     }
 }
-

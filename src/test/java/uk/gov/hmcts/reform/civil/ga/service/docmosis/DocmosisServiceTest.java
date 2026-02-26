@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.ga.service.docmosis;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
@@ -24,23 +26,28 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService.DATE_FORMATTER;
 
-@SpringBootTest(classes = {
-    DocmosisService.class})
+@ExtendWith(MockitoExtension.class)
 public class DocmosisServiceTest {
 
     private static final List<LocationRefData> locationRefData = Arrays
         .asList(
-            LocationRefData.builder().epimmsId("1").venueName("Reading").build(),
-            LocationRefData.builder().epimmsId("2").venueName("London").build(),
-            LocationRefData.builder().epimmsId("3").venueName("Manchester").build(),
-            LocationRefData.builder().epimmsId("420219").venueName("CNBC").build()
+            new LocationRefData().setEpimmsId("1").setVenueName("Reading"),
+            new LocationRefData().setEpimmsId("2").setVenueName("London"),
+            new LocationRefData().setEpimmsId("3").setVenueName("Manchester"),
+            new LocationRefData().setEpimmsId("420219").setVenueName("CNBC")
         );
-    @Autowired
+    @InjectMocks
     private DocmosisService docmosisService;
-    @MockBean
+    @Mock
     private GeneralAppLocationRefDataService generalAppLocationRefDataService;
+
+    @BeforeEach
+    void setUp() {
+        setField(docmosisService, "cnbcEpimmId", "420219");
+    }
 
     @Test
     void shouldReturnLocationRefData() {

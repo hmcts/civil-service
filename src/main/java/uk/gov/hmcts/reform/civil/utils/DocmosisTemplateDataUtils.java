@@ -85,20 +85,18 @@ public class DocmosisTemplateDataUtils {
     }
 
     public static SolicitorReferences fetchSolicitorReferences(CaseData caseData) {
-        return SolicitorReferences
-            .builder()
-            .applicantSolicitor1Reference(
+        return new SolicitorReferences()
+            .setApplicantSolicitor1Reference(
                 ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
                     .orElse(REFERENCE_NOT_PROVIDED))
-            .respondentSolicitor1Reference(
+            .setRespondentSolicitor1Reference(
                 ofNullable(caseData.getSolicitorReferences())
                     .map(SolicitorReferences::getRespondentSolicitor1Reference)
                     .orElse(REFERENCE_NOT_PROVIDED))
-            .respondentSolicitor2Reference(
+            .setRespondentSolicitor2Reference(
                 ofNullable(caseData.getRespondentSolicitor2Reference())
-                    .orElse(REFERENCE_NOT_PROVIDED))
-            .build();
+                    .orElse(REFERENCE_NOT_PROVIDED));
     }
 
     public static String fetchSoleTraderCompany(Party party) {
@@ -131,21 +129,19 @@ public class DocmosisTemplateDataUtils {
             if ((caseData.getRespondent1AcknowledgeNotificationDate() == null)
                 && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
                 if (null == caseData.getRespondentSolicitor2Reference()) {
-                    return SolicitorReferences
-                        .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
-                        .applicantSolicitor1Reference(
+                    return new SolicitorReferences()
+                        .setRespondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
+                        .setApplicantSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .build();
+                                .orElse(REFERENCE_NOT_PROVIDED));
                 }
-                return SolicitorReferences
-                    .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
-                    .applicantSolicitor1Reference(
+                return new SolicitorReferences()
+                    .setRespondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                    .setApplicantSolicitor1Reference(
                         ofNullable(caseData.getSolicitorReferences())
                             .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                            .orElse(REFERENCE_NOT_PROVIDED))
-                    .build();
+                            .orElse(REFERENCE_NOT_PROVIDED));
 
             } else if ((caseData.getRespondent1AcknowledgeNotificationDate() != null)//case where both respondents acklg
                 && (caseData.getRespondent2AcknowledgeNotificationDate() != null)) {
@@ -153,60 +149,52 @@ public class DocmosisTemplateDataUtils {
                 if (caseData.getRespondent2AcknowledgeNotificationDate()
                     .isAfter(caseData.getRespondent1AcknowledgeNotificationDate())) {
                     if (null == caseData.getRespondentSolicitor2Reference()) {
-                        return SolicitorReferences
-                            .builder().respondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
-                            .applicantSolicitor1Reference(
+                        return new SolicitorReferences()
+                            .setRespondentSolicitor2Reference(REFERENCE_NOT_PROVIDED)
+                            .setApplicantSolicitor1Reference(
                                 ofNullable(caseData.getSolicitorReferences())
                                     .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                    .orElse(REFERENCE_NOT_PROVIDED))
-                            .build();
+                                    .orElse(REFERENCE_NOT_PROVIDED));
                     }
-                    return SolicitorReferences
-                        .builder().respondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
-                        .applicantSolicitor1Reference(
+                    return new SolicitorReferences()
+                        .setRespondentSolicitor2Reference(caseData.getRespondentSolicitor2Reference())
+                        .setApplicantSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .build();
+                                .orElse(REFERENCE_NOT_PROVIDED));
 
                 } else { //case where resp 2 acknowledges first
-                    return SolicitorReferences
-                        .builder()
-                        .respondentSolicitor1Reference(
+                    return new SolicitorReferences()
+                        .setRespondentSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getRespondentSolicitor1Reference)
                                 .orElse(REFERENCE_NOT_PROVIDED))
-                        .applicantSolicitor1Reference(
+                        .setApplicantSolicitor1Reference(
                             ofNullable(caseData.getSolicitorReferences())
                                 .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                                .orElse(REFERENCE_NOT_PROVIDED))
-                        .build();
+                                .orElse(REFERENCE_NOT_PROVIDED));
                 }
             } else { //case where respondent 1 acknowledges first
-                return SolicitorReferences
-                    .builder()
-                    .respondentSolicitor1Reference(
+                return new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(
                         ofNullable(caseData.getSolicitorReferences())
                             .map(SolicitorReferences::getRespondentSolicitor1Reference)
                             .orElse(REFERENCE_NOT_PROVIDED))
-                    .applicantSolicitor1Reference(
+                    .setApplicantSolicitor1Reference(
                         ofNullable(caseData.getSolicitorReferences())
                             .map(SolicitorReferences::getApplicantSolicitor1Reference)
-                            .orElse(REFERENCE_NOT_PROVIDED))
-                    .build();
+                            .orElse(REFERENCE_NOT_PROVIDED));
             }
         } else { //cases other than ONE_V_TWO_TWO_LEGAL_REP
-            return SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference(
+            return new SolicitorReferences()
+                .setApplicantSolicitor1Reference(
                     ofNullable(caseData.getSolicitorReferences())
                         .map(SolicitorReferences::getApplicantSolicitor1Reference)
                         .orElse(REFERENCE_NOT_PROVIDED))
-                .respondentSolicitor1Reference(
+                .setRespondentSolicitor1Reference(
                     ofNullable(caseData.getSolicitorReferences())
                         .map(SolicitorReferences::getRespondentSolicitor1Reference)
-                        .orElse(REFERENCE_NOT_PROVIDED))
-                .build();
+                        .orElse(REFERENCE_NOT_PROVIDED));
         }
 
     }

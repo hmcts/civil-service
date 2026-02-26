@@ -152,9 +152,9 @@ public class GaFlowPredicateTest {
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                        .paymentDetails(PaymentDetails.builder()
-                                                            .status(PaymentStatus.SUCCESS).build())
-                                        .fee(Fee.builder().code("FREE").build()).build())
+                                        .paymentDetails(new PaymentDetails()
+                                                            .setStatus(PaymentStatus.SUCCESS))
+                                        .fee(new Fee().setCode("FREE")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);
@@ -168,9 +168,9 @@ public class GaFlowPredicateTest {
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(PaymentDetails.builder()
-                                                          .status(PaymentStatus.SUCCESS).build())
-                                      .fee(Fee.builder().code("Not_Free").build()).build())
+                                      .paymentDetails(new PaymentDetails()
+                                                          .setStatus(PaymentStatus.SUCCESS))
+                                      .fee(new Fee().setCode("Not_Free")).build())
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);

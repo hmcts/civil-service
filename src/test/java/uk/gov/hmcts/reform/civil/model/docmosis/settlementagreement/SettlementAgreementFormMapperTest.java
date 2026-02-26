@@ -45,11 +45,11 @@ public class SettlementAgreementFormMapperTest {
         //Given
         CaseData caseData = getCaseData().toBuilder()
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                        .firstRepaymentDate(LocalDate.now().plusDays(5))
-                        .paymentAmount(BigDecimal.valueOf(200))
-                        .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                        .build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                        .setFirstRepaymentDate(LocalDate.now().plusDays(5))
+                        .setPaymentAmount(BigDecimal.valueOf(200))
+                        .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                        )
                 .build();
         //When
         SettlementAgreementForm form = settlementAgreementFormMapper.buildFormData(caseData);

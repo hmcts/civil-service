@@ -246,9 +246,8 @@ public class DashboardClaimInfoServiceTest {
                                             .setStatementOfValueInPennies(
                                                 new BigDecimal("100000")))
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -337,9 +336,8 @@ public class DashboardClaimInfoServiceTest {
                                                 new BigDecimal("100000")))
                             .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -475,8 +473,8 @@ public class DashboardClaimInfoServiceTest {
             .willReturn(CaseData.builder().respondent1ResponseDeadline(LocalDateTime.now().minusDays(1))
                             .defaultJudgmentDocuments(List.of(
                                 Element.<CaseDocument>builder()
-                                    .value(CaseDocument.builder().documentType(DocumentType.DEFAULT_JUDGMENT)
-                                               .createdDatetime(LocalDateTime.now()).build()).build()))
+                                    .value(new CaseDocument().setDocumentType(DocumentType.DEFAULT_JUDGMENT)
+                                               .setCreatedDatetime(LocalDateTime.now())).build()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",

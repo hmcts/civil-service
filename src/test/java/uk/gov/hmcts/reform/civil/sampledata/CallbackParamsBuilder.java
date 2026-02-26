@@ -86,14 +86,13 @@ public class CallbackParamsBuilder {
     }
 
     public CallbackParams build() {
-        return CallbackParams.builder()
+        return new CallbackParams()
             .type(type)
             .request(request)
             .params(params)
             .version(version)
             .pageId(pageId)
             .caseData(caseData)
-            .isGeneralApplicationCaseType(isGeneralApplicationCase)
-            .build();
+            .isGeneralApplicationCaseType(isGeneralApplicationCase);
     }
 }

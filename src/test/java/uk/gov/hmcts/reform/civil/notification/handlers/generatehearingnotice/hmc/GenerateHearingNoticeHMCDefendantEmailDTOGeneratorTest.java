@@ -98,9 +98,8 @@ class GenerateHearingNoticeHMCDefendantEmailDTOGeneratorTest {
                              .build())
             .build();
 
-        HearingNoticeVariables hearingNoticeVariables = HearingNoticeVariables.builder()
-            .hearingStartDateTime(hearingStartDateTime)
-            .build();
+        HearingNoticeVariables hearingNoticeVariables = new HearingNoticeVariables()
+            .setHearingStartDateTime(hearingStartDateTime);
 
         when(camundaService.getProcessVariables(processInstanceId)).thenReturn(hearingNoticeVariables);
 

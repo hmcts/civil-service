@@ -57,10 +57,9 @@ class PaymentsServiceTest {
         .paymentReference("RC-1234-1234-1234-1234").build();
     private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
         .serviceRequestReference("RC-1234-1234-1234-1234").build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .name("test org")
-        .contactInformation(List.of(ContactInformation.builder().build()))
-        .build();
+    private static final Organisation ORGANISATION = new Organisation()
+        .setName("test org")
+        .setContactInformation(List.of(new ContactInformation()));
     private static final String CUSTOMER_REFERENCE = "12345";
     private static final String FEE_NOT_SET_CORRECTLY_ERROR = "Fees are not set correctly.";
 
@@ -110,8 +109,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
         OrganisationPolicy policy = new OrganisationPolicy();
@@ -127,8 +125,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResponseClaimTrack(FAST_CLAIM.name());
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
@@ -153,8 +150,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -177,8 +173,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -201,8 +196,7 @@ class PaymentsServiceTest {
         hfPbaDetails.setServiceReqReference("request-reference");
         hfPbaDetails.setApplicantsPbaAccounts(applicantsPbaAccounts);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -259,10 +253,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .version("1")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setVersion("1")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -278,10 +272,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .code("FEE0442")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setCode("FEE0442")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -297,10 +291,10 @@ class PaymentsServiceTest {
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .code("FEE0442")
-                                               .version("1")
-                                               .build())
+                                      .fee(new Fee()
+                                               .setCode("FEE0442")
+                                               .setVersion("1")
+                                               )
                                       .build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
@@ -315,7 +309,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()).build())
             .build();
 
         Exception exception = assertThrows(
@@ -328,7 +322,7 @@ class PaymentsServiceTest {
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSet() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee()).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 
@@ -344,10 +338,10 @@ class PaymentsServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.TEN)
-                                               .version("version")
-                                               .code("code").build()).build())
+                                      .fee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.TEN)
+                                               .setVersion("version")
+                                               .setCode("code")).build())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 

@@ -6,10 +6,18 @@
   ],
   "automergeSchedule": ["after 8am and before 11am every weekday"],
   "schedule": ["after 8am and before 11am every weekday"],
+  "rebaseWhen": "conflicted",
+  "prConcurrentLimit": 5,
   "packageRules": [
     {
       "matchPackagePatterns": ["pact"],
       "enabled": false
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "All non-major updates",
+      "groupSlug": "all-non-major",
+      "automerge": true
     }
   ]
 }

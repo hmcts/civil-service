@@ -56,9 +56,8 @@ class DjDocumentTaskTest {
         when(locationService.trimListItems(disposalList)).thenReturn(trimmedDisposal);
         when(locationService.trimListItems(trialList)).thenReturn(trimmedTrial);
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, "auth-token"))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, "auth-token"));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 
@@ -80,9 +79,8 @@ class DjDocumentTaskTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(documentService.generateOrder(caseData, "token")).thenReturn(Optional.empty());
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Map.of(BEARER_TOKEN, "token"))
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Map.of(BEARER_TOKEN, "token"));
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.DOCUMENT_GENERATION);
 

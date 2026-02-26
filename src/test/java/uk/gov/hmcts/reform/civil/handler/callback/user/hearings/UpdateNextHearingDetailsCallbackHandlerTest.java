@@ -94,14 +94,13 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(hearingStartTime)),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -136,14 +135,13 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(TODAY.minusDays(1), hearingStartTime)),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -178,8 +176,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(
                             hearingId,
@@ -189,8 +187,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                         ),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -224,8 +221,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(TODAY.minusDays(1))),
                         hearing(
                             hearingId,
@@ -234,8 +231,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                             List.of(TODAY.minusDays(1), TODAY.minusDays(2), TODAY.minusDays(3))
                         ),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(TODAY.minusDays(2)))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -264,12 +260,11 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -303,14 +298,13 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(hearingStartTime)),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -345,14 +339,13 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(TODAY.minusDays(1), hearingStartTime)),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -387,8 +380,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(hearingStartTime)),
                         hearing(
                             hearingId,
@@ -398,8 +391,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                         ),
                         hearing("33333", hmcstatus, TODAY.minusDays(3), List.of(hearingStartTime)),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -433,8 +425,8 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", CANCELLED, TODAY.minusDays(1), List.of(TODAY.minusDays(1))),
                         hearing(
                             hearingId,
@@ -443,8 +435,7 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                             List.of(TODAY.minusDays(1), TODAY.minusDays(2), TODAY.minusDays(3))
                         ),
                         hearing("22222", ADJOURNED, TODAY.minusDays(2), List.of(TODAY.minusDays(2)))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -473,12 +464,11 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
                 CaseData caseData = CaseDataBuilder.builder().build();
                 String hearingId = "12345";
 
-                HearingsResponse hearingsResponse = HearingsResponse.builder()
-                    .caseHearings(List.of(
+                HearingsResponse hearingsResponse = new HearingsResponse()
+                    .setCaseHearings(List.of(
                         hearing("11111", LISTED, requestedDateTime.minusDays(1), List.of(hearingStartTime)),
                         hearing(hearingId, hmcstatus, requestedDateTime, List.of(hearingStartTime))
-                    ))
-                    .build();
+                    ));
 
                 when(hearingService.getHearings(any(), any(), any())).thenReturn(hearingsResponse);
 
@@ -499,13 +489,12 @@ class UpdateNextHearingDetailsCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private CaseHearing hearing(String hearingId, HmcStatus hmcStatus, LocalDateTime hearingRequestTime, List<LocalDateTime> startTimes) {
-        return CaseHearing.builder()
-            .hmcStatus(hmcStatus.name())
-            .hearingId(Long.valueOf(hearingId))
-            .hearingRequestDateTime(hearingRequestTime)
-            .hearingDaySchedule(startTimes.stream().map(startTime -> HearingDaySchedule.builder().hearingStartDateTime(
-                startTime).build()).toList())
-            .build();
+        return new CaseHearing()
+            .setHmcStatus(hmcStatus.name())
+            .setHearingId(Long.valueOf(hearingId))
+            .setHearingRequestDateTime(hearingRequestTime)
+            .setHearingDaySchedule(startTimes.stream().map(startTime -> new HearingDaySchedule().setHearingStartDateTime(
+                startTime)).toList());
     }
 
 }

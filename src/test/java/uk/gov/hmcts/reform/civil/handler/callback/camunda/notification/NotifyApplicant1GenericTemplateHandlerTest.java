@@ -73,7 +73,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     void shouldSendGenericEmailWhenAllDataIsCorrectAndNotBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
@@ -102,8 +102,8 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     void shouldSendGenericEmailWhenAllDataIsCorrectAndNotBilingual_SolicitorAfterNoC() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("solicitor@claimant.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@claimant.net"))
             .applicant1Represented(YesOrNo.YES)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())
@@ -130,7 +130,7 @@ class NotifyApplicant1GenericTemplateHandlerTest {
     void shouldSendGenericEmailWhenAllDataIsCorrectAndBilingual() {
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1Represented(YesOrNo.NO)
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .type(Party.Type.INDIVIDUAL).build())

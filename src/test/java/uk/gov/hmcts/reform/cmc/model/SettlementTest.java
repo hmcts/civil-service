@@ -11,27 +11,21 @@ class SettlementTest {
     @Test
     void givenSettelmentRejectedByDefendant_whenIsAcceptedByClaimant_thenReturnFalse() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.CLAIMANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.REJECTION)
-                .madeBy(MadeBy.DEFENDANT)
-                .build()
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.CLAIMANT),
+            new PartyStatement()
+                .setType(StatementType.REJECTION)
+                .setMadeBy(MadeBy.DEFENDANT)
         ));
         assertThat(settlement.isAcceptedByClaimant()).isFalse();
     }
 
     @Test
     void givenSettlementAcceptedByDefendantButNotByClaimant_whenIsAcceptedByClaimant_thenReturnFalse() {
-        Settlement settlement = getSettlement(List.of(PartyStatement
-                                                          .builder()
-                                                          .type(StatementType.ACCEPTATION)
-                                                          .madeBy(MadeBy.DEFENDANT)
-                                                          .build()));
+        Settlement settlement = getSettlement(List.of(new PartyStatement()
+                                                          .setType(StatementType.ACCEPTATION)
+                                                          .setMadeBy(MadeBy.DEFENDANT)));
         assertThat(settlement.isAcceptedByClaimant()).isFalse();
     }
 
@@ -44,42 +38,32 @@ class SettlementTest {
     @Test
     void givenPartyStatementHasAcceptedByClaimantAndNoRejectionsFromDefendant_whenIsAcceptedByClaimant_thenReturnTrue() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.CLAIMANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.DEFENDANT)
-                .build()
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.CLAIMANT),
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.DEFENDANT)
         ));
         assertThat(settlement.isAcceptedByClaimant()).isTrue();
     }
 
     @Test
     void givenPartyStatementHasCounterSign_whenIsSettled_thenReturnTrue() {
-        Settlement settlement = getSettlement(List.of(PartyStatement
-                                                          .builder()
-                                                          .type(StatementType.COUNTERSIGNATURE)
-                                                          .build()));
+        Settlement settlement = getSettlement(List.of(new PartyStatement()
+                                                          .setType(StatementType.COUNTERSIGNATURE)));
         assertThat(settlement.isSettled()).isTrue();
     }
 
     @Test
     void givenPartyStatementDoesNotHaveCounterSign_whenIsSettled_thenReturnFalse() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.CLAIMANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.DEFENDANT)
-                .build()
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.CLAIMANT),
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.DEFENDANT)
         ));
         assertThat(settlement.isSettled()).isFalse();
     }
@@ -87,21 +71,15 @@ class SettlementTest {
     @Test
     void givenPartyStatementIsOfferAndNoPaymentIntention_whenIsThroughAdmissions_thenReturnTrue() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.CLAIMANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.DEFENDANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.OFFER)
-                .offer(Offer.builder().build())
-                .build()
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.CLAIMANT),
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.DEFENDANT),
+            new PartyStatement()
+                .setType(StatementType.OFFER)
+                .setOffer(new Offer())
         ));
         assertThat(settlement.isThroughAdmissions()).isTrue();
     }
@@ -109,36 +87,24 @@ class SettlementTest {
     @Test
     void givenPartyStatementIsOfferAndHasPaymentIntention_whenIsThroughAdmissions_thenReturnFalse() {
         Settlement settlement = getSettlement(List.of(
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.CLAIMANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.ACCEPTATION)
-                .madeBy(MadeBy.DEFENDANT)
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.OFFER)
-                .offer(Offer.builder().build())
-                .build(),
-            PartyStatement
-                .builder()
-                .type(StatementType.OFFER)
-                .offer(Offer.builder()
-                           .paymentIntention(PaymentIntention
-                                                 .builder()
-                                                 .build())
-                           .build())
-                .build()
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.CLAIMANT),
+            new PartyStatement()
+                .setType(StatementType.ACCEPTATION)
+                .setMadeBy(MadeBy.DEFENDANT),
+            new PartyStatement()
+                .setType(StatementType.OFFER)
+                .setOffer(new Offer()),
+            new PartyStatement()
+                .setType(StatementType.OFFER)
+                .setOffer(new Offer()
+                           .setPaymentIntention(new PaymentIntention()))
         ));
         assertThat(settlement.isThroughAdmissions()).isFalse();
     }
 
     private Settlement getSettlement(List<PartyStatement> partyStatements) {
-        return Settlement.builder()
-            .partyStatements(partyStatements).build();
+        return new Settlement().setPartyStatements(partyStatements);
     }
 }

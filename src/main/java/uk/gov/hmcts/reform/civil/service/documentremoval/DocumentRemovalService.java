@@ -89,12 +89,11 @@ public class DocumentRemovalService {
             + "from CaseData JSON for case ID: %s", caseId));
 
         ((ObjectNode) caseDataJson).remove("documentToKeepCollection");
-        return DocumentRemovalCaseDataDTO.builder()
-            .documentsMarkedForDelete(documentsUserWantsDeletedList.stream()
+        return new DocumentRemovalCaseDataDTO()
+            .setDocumentsMarkedForDelete(documentsUserWantsDeletedList.stream()
                 .map(DocumentToKeepCollection::getValue)
                 .toList())
-            .caseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId))
-            .build();
+            .setCaseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId));
     }
 
     private LocalDateTime getUploadTimestampFromDocumentNode(JsonNode documentNode) {
@@ -123,18 +122,19 @@ public class DocumentRemovalService {
         for (Map.Entry<JsonNode, String> documentNode : documentNodes.entrySet()) {
             String docUrl = documentNode.getKey().get(DOCUMENT_URL).asText();
             String[] documentUrlAsArray = docUrl.split("/");
+
+            CaseDocumentToKeep caseDocumentToKeep = new CaseDocumentToKeep();
+            caseDocumentToKeep.setDocumentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim());
+            caseDocumentToKeep.setDocumentUrl(documentNode.getKey().get(DOCUMENT_URL).asText());
+            caseDocumentToKeep.setDocumentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText());
+            caseDocumentToKeep.setUploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()));
             String docId = documentUrlAsArray[documentUrlAsArray.length - 1];
 
             documentsCollection.add(
                 new DocumentToKeepCollection()
                     .setValue(new DocumentToKeep()
                         .setDocumentId(docId)
-                        .setCaseDocumentToKeep(CaseDocumentToKeep.builder()
-                            .documentFilename(documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim())
-                            .documentUrl(documentNode.getKey().get(DOCUMENT_URL).asText())
-                            .documentBinaryUrl(documentNode.getKey().get(DOCUMENT_BINARY_URL).asText())
-                            .uploadTimestamp(getUploadTimestampFromDocumentNode(documentNode.getKey()))
-                            .build())
+                        .setCaseDocumentToKeep(caseDocumentToKeep)
                         .setUploadedDate(getUploadTimestampFromDocumentNode(documentNode.getKey()))
                         .setSystemGenerated(getSystemGeneratedFlag(documentNode.getValue(), documentNode.getKey().get(DOCUMENT_FILENAME).asText().trim()))));
         }

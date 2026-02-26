@@ -1,0 +1,27 @@
+{
+  "name": "Civil - Organisation 1",
+  "organisationIdentifier": "Q1KOKP2",
+  "contactInformation": [
+    {
+      "addressLine1": "38 Delisle Road",
+      "addressLine2": null,
+      "addressLine3": null,
+      "townCity": "London",
+      "county": "London",
+      "country": null,
+      "postCode": "SE28 0JE",
+      "dxAddress": []
+    }
+  ],
+  "status": "ACTIVE",
+  "sraRegulated": false,
+  "superUser": {
+    "firstName": "Civil",
+    "lastName": "Organisation1",
+    "email": "hmcts.civil+organisation.1.superuser@gmail.com"
+  },
+  "paymentAccount": [
+    "PBA0088192",
+    "PBA0078095"
+  ]
+}

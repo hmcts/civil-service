@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.GeneralAppParentCaseLink;
@@ -38,9 +37,9 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
-import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -59,22 +58,22 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    UpdateGaLocationCallbackHandler.class, JacksonAutoConfiguration.class, Time.class
-})
+@ExtendWith(MockitoExtension.class)
  class UpdateGaLocationCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    private UpdateGaLocationCallbackHandler handler;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
-    private CoreCaseDataService coreCaseDataService;
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @MockBean
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
+    private UpdateGaLocationCallbackHandler handler;
+
+    @Mock
+    private CoreCaseDataService coreCaseDataService;
+
+    @Mock
     private GeneralAppLocationRefDataService locationRefDataService;
     private static final Long CHILD_CCD_REF = 1646003133062762L;
     private static final Long PARENT_CCD_REF = 1645779506193000L;
@@ -135,10 +134,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
-                LocationRefData.builder()
-                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
-                    .postcode("M5 4RR")
-                    .courtLocationCode("court1").build()
+                new LocationRefData()
+                    .setEpimmsId("00000").setSiteName("locationOfRegion2").setCourtAddress("Prince William House, Peel Cross Road, Salford")
+                    .setPostcode("M5 4RR")
+                    .setCourtLocationCode("court1")
             ));
         }
 
@@ -194,17 +193,17 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
                     GAPbaDetails.builder()
-                        .paymentDetails(PaymentDetails.builder()
-                                            .status(PaymentStatus.SUCCESS)
-                                            .reference("RC-1658-4258-2679-9795")
-                                            .customerReference(CUSTOMER_REFERENCE)
-                                            .build())
+                        .paymentDetails(new PaymentDetails()
+                                            .setStatus(PaymentStatus.SUCCESS)
+                                            .setReference("RC-1658-4258-2679-9795")
+                                            .setCustomerReference(CUSTOMER_REFERENCE)
+                                            )
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -219,8 +218,8 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 

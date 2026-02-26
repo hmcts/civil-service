@@ -103,13 +103,12 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -127,13 +126,12 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -164,13 +162,12 @@ class ClaimReconsiderationUpheldDefendantNotificationHandlerTest extends BaseCal
                 .respondent1Represented(NO)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.NOTIFY_CLAIM_RECONSIDERATION_UPHELD_DEFENDANT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

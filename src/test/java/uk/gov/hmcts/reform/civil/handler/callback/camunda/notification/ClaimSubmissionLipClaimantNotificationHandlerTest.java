@@ -126,8 +126,8 @@ class ClaimSubmissionLipClaimantNotificationHandlerTest extends BaseCallbackHand
         // Given
         caseData.getApplicant1().setPartyEmail(null);
         caseData = caseData.toBuilder()
-            .claimantUserDetails(IdamUserDetails.builder()
-                                     .build())
+            .claimantUserDetails(new IdamUserDetails()
+                                     )
             .build();
         CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
             CallbackRequest.builder().eventId(CaseEvent.NOTIFY_LIP_CLAIMANT_CLAIM_SUBMISSION.toString())

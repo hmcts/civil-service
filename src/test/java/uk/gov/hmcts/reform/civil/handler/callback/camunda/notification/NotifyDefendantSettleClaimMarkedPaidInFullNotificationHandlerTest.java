@@ -86,7 +86,7 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest e
         void setup() {
             when(notificationsProperties.getNotifySettleClaimMarkedPaidInFullDefendantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
@@ -103,13 +103,12 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest e
         void shouldNotifyDefendantSolicitor1_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_SOLICITOR1_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -125,13 +124,12 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest e
         void shouldNotifyDefendantSolicitor2_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(NOTIFY_SOLICITOR2_DEFENDANT_SETTLE_CLAIM_MARKED_PAID_IN_FULL.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

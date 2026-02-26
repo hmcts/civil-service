@@ -4,10 +4,9 @@ import com.google.common.collect.Maps;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -25,22 +24,19 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    GaCaseEventService.class
-})
+@ExtendWith(MockitoExtension.class)
 public class GaCaseEventServiceTest {
 
-    @MockBean
+    @Mock
     private CoreCaseDataApi coreCaseDataApi;
 
-    @MockBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService gaCoreCaseDataService;
 
-    @Autowired
+    @InjectMocks
     private GaCaseEventService gaCaseEventService;
 
     private static final String EVENT_TOKEN = "jM4OWUxMGRkLWEyMzYt";
@@ -72,14 +68,12 @@ public class GaCaseEventServiceTest {
     void shouldSubmitEventForExistingClaimSuccessfully() {
         when(gaCoreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
 
-        CaseDetails caseDetails = gaCaseEventService.submitEvent(EventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.RESPOND_TO_APPLICATION)
-                                                                   .caseId(CASE_ID)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails caseDetails = gaCaseEventService.submitEvent(new EventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.RESPOND_TO_APPLICATION)
+                                                                   .setCaseId(CASE_ID)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
 
         StartEventResponse startEventResponse = gaCaseEventService

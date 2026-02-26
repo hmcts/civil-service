@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowFlag;
 import uk.gov.hmcts.reform.civil.service.flowstate.FlowState;
 import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
+import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventTextFormatter;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 
 import java.time.LocalDate;
@@ -99,6 +100,8 @@ class CaseEventTaskHandlerTest {
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     @Spy
     private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+    @Spy
+    private RoboticsEventTextFormatter textFormatter = new RoboticsEventTextFormatter();
     @Captor
     ArgumentCaptor<CaseDataContent> caseDataContentArgumentCaptor;
     @InjectMocks
@@ -140,7 +143,7 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(any(CaseData.class)))
-                .thenReturn(StateFlowDTO.builder().state(State.from("MAIN.DRAFT")).flags(Map.of()).build());
+                .thenReturn(new StateFlowDTO().setState(State.from("MAIN.DRAFT")).setFlags(Map.of()));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -267,7 +270,7 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(any(CaseData.class)))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName())).flags(flags).build());
+                .thenReturn(new StateFlowDTO().setState(State.from(state.fullName())).setFlags(flags));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -326,9 +329,9 @@ class CaseEventTaskHandlerTest {
             when(coreCaseDataService.submitUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
-                                .flags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(TAKEN_OFFLINE_BY_STAFF.fullName()))
+                    .setFlags(getFlowFlags(TAKEN_OFFLINE_BY_STAFF)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -372,9 +375,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -415,9 +418,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -458,9 +461,9 @@ class CaseEventTaskHandlerTest {
                 .thenReturn(caseData);
 
             when(stateFlowEngine.getStateFlow(caseData))
-                .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                .flags(getFlowFlags(state))
-                                .build());
+                .thenReturn(new StateFlowDTO()
+                    .setState(State.from(state.fullName()))
+                    .setFlags(getFlowFlags(state)));
 
             caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -510,9 +513,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -543,9 +546,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -574,9 +577,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -605,9 +608,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -639,9 +642,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -670,9 +673,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -701,9 +704,9 @@ class CaseEventTaskHandlerTest {
                         .thenReturn(caseData);
 
                     when(stateFlowEngine.getStateFlow(caseData))
-                        .thenReturn(StateFlowDTO.builder().state(State.from(state.fullName()))
-                                        .flags(getFlowFlags(state))
-                                        .build());
+                        .thenReturn(new StateFlowDTO()
+                            .setState(State.from(state.fullName()))
+                            .setFlags(getFlowFlags(state)));
 
                     caseEventTaskHandler.execute(mockTask, externalTaskService);
 
@@ -825,12 +828,12 @@ class CaseEventTaskHandlerTest {
                     caseDataBuilder.atStatePendingClaimIssuedUnregisteredDefendant()
                         .respondent1OrgRegistered(NO)
                         .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]").build())
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]"))
                         .addRespondent2(YES)
                         .respondent2Represented(YES)
                         .respondent2OrgRegistered(NO)
                         .respondent2OrganisationPolicy(
-                            OrganisationPolicy.builder().orgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]").build());
+                            new OrganisationPolicy().setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORTWO]"));
                     break;
                 case PENDING_CLAIM_ISSUED_UNREPRESENTED_UNREGISTERED_DEFENDANT:
                     caseDataBuilder.atStatePendingClaimIssuedUnrepresentedUnregisteredDefendant();
