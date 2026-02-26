@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
@@ -30,6 +31,8 @@ public class SdoTrackDefaultsService {
     private final SdoExpertEvidenceFieldsService sdoExpertEvidenceFieldsService;
     private final SdoDisclosureOfDocumentsFieldsService sdoDisclosureOfDocumentsFieldsService;
     private final SdoJudgementDeductionService sdoJudgementDeductionService;
+    @Value("${other_remedy.enabled:false}")
+    private boolean otherRemedyEnabled;
 
     private static final List<IncludeInOrderToggle> INCLUDE_IN_ORDER_TOGGLE = List.of(IncludeInOrderToggle.INCLUDE);
 
@@ -53,18 +56,25 @@ public class SdoTrackDefaultsService {
     }
 
     private void populatePenalNoticeFields(CaseData caseData) {
-        caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
-        caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
-        caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
-        caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+        if (otherRemedyEnabled) {
+            caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
+            caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
+            caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
+            caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+        }
     }
 
     private void populatePpiFields(CaseData caseData) {
-        PPI ppi = new PPI();
-        ppi.setPpiDate(LocalDate.now().plusDays(28));
-        ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
-        caseData.setSmallClaimsPPI(ppi);
-        caseData.setFastTrackPPI(ppi);
+        if (otherRemedyEnabled) {
+            PPI ppi = new PPI();
+            ppi.setPpiDate(LocalDate.now().plusDays(28));
+            ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
+            caseData.setSmallClaimsPPI(ppi);
+            caseData.setFastTrackPPI(ppi);
+        } else {
+            caseData.setSmallClaimsPPI(null);
+            caseData.setFastTrackPPI(null);
+        }
     }
 
     public void applyR2Defaults(CaseData caseData) {

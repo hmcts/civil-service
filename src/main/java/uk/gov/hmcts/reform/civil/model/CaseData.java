@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -202,6 +203,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String detailsOfClaim;
     private  ClaimValue claimValue;
     private  Fee claimFee;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  Fee otherRemedyFee;
     private  String serviceRequestReference;
     private  String paymentReference;
@@ -650,7 +652,9 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  YesOrNo isMintiLipCase;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  String  smallClaimsPenalNotice;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  String  fastTrackPenalNotice;
 
     @Builder.Default
@@ -659,8 +663,11 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  ClientContext clientContext;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  YesOrNo isClaimDeclarationAdded;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  String  claimDeclarationDescription;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private  YesOrNo isHumanRightsActIssues;
 
     /**

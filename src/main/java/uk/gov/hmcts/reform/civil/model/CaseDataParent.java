@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -155,7 +156,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<OrderDetailsPagesSectionsToggle> smallClaimsWitnessStatementToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsFlightDelayToggle;
     private List<OrderDetailsPagesSectionsToggle> smallClaimsMediationSectionToggle;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<OrderDetailsPagesSectionsToggle> smallClaimsPenalNoticeToggle;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<OrderDetailsPagesSectionsToggle> fastTrackPenalNoticeToggle;
     private List<DateToShowToggle> smallClaimsHearingDateToToggle;
     private List<DateToShowToggle> fastTrackTrialDateToToggle;
@@ -224,7 +227,9 @@ public class CaseDataParent extends CaseDataCaseProgression implements MappableO
     private List<DisposalAndTrialHearingDJToggle> sdoR2TrialUseOfWelshLangToggleDJ;
     private SdoR2FastTrackCreditHire sdoR2FastTrackCreditHire;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PPI smallClaimsPPI;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private PPI fastTrackPPI;
 
     private  LocalDate nextDeadline;
