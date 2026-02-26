@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_DEFENDANT;
@@ -23,6 +22,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class StayLiftedDefendantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
+    private static final String citizenRole = "DEFENDANT";
 
     protected StayLiftedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
@@ -33,6 +33,7 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
 
     public void notifyStayLifted(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+        reconfigureDashboardNotifications(caseData, citizenRole);
     }
 
     @Override
@@ -54,12 +55,9 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
 
     private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
         return switch (CaseState.valueOf(caseData.getPreStayState())) {
-            case AWAITING_RESPONDENT_ACKNOWLEDGEMENT -> Map.of(
-                SCENARIO_AAA6_CLAIM_ISSUE_RESPONSE_REQUIRED.getScenario(), true);
-            case AWAITING_APPLICANT_INTENTION, IN_MEDIATION, JUDICIAL_REFERRAL, CASE_PROGRESSION, DECISION_OUTCOME,
-                 All_FINAL_ORDERS_ISSUED -> Map.of(
+            case CASE_PROGRESSION, All_FINAL_ORDERS_ISSUED -> Map.of(
                 getViewDocumentsScenario(caseData).getScenario(), true);
-            case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING -> Map.of(
+            case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING, DECISION_OUTCOME -> Map.of(
                 getViewDocumentsScenario(caseData).getScenario(), true,
                 SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), true);
             default -> Map.of();

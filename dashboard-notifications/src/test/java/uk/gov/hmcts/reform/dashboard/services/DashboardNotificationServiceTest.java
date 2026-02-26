@@ -269,4 +269,20 @@ public class DashboardNotificationServiceTest {
         }
     }
 
+    @Test
+    void should_return_dashboard_notification_entities_for_case_and_role() {
+        List<DashboardNotificationsEntity> expected = getNotificationEntityList();
+
+        when(dashboardNotificationsRepository
+                 .findByReferenceAndCitizenRole("123", "Claimant"))
+            .thenReturn(expected);
+
+        List<DashboardNotificationsEntity> actual =
+            dashboardNotificationService
+                .getDashboardNotifications("123", "Claimant");
+
+        assertThat(actual).isEqualTo(expected);
+        verify(dashboardNotificationsRepository)
+            .findByReferenceAndCitizenRole("123", "Claimant");
+    }
 }

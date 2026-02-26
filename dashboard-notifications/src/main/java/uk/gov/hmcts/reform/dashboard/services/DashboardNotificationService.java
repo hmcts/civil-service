@@ -61,6 +61,12 @@ public class DashboardNotificationService {
             .toList();
     }
 
+
+    public List<DashboardNotificationsEntity> getDashboardNotifications(String ccdCaseIdentifier, String roleType) {
+        return dashboardNotificationsRepository
+            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+    }
+
     public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
         Map<String, List<Notification>> gaNotifications = new HashMap<>();
         ccdCaseIdentifiers.forEach(gaCaseId -> gaNotifications.put(gaCaseId, getNotifications(gaCaseId, roleType)));

@@ -17,11 +17,7 @@ import uk.gov.hmcts.reform.dashboard.templates.NotificationTemplateDefinition;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -64,6 +60,56 @@ public class DashboardScenariosService {
             //Delete old notifications as notification template says for scenario ref (if exist for case ref)
             deleteNotificationForScenario(scenario, uniqueCaseIdentifier);
         });
+    }
+
+    public void reconfigureCaseDashboardNotifications(String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams, String roleType) {
+        dashboardNotificationService.getDashboardNotifications(uniqueCaseIdentifier, roleType)
+            .forEach(existingNotification -> reconfigureCaseNotificationTemplate(existingNotification, uniqueCaseIdentifier, scenarioRequestParams));
+    }
+
+    private void reconfigureCaseNotificationTemplate(DashboardNotificationsEntity existingNotification, String uniqueCaseIdentifier, ScenarioRequestParams scenarioRequestParams) {
+        Optional<NotificationTemplateDefinition> optionalTemplate =
+            notificationTemplateCatalog.findByName(existingNotification.getName());
+
+        if (optionalTemplate.isEmpty()) {
+            log.warn("Template not found for notification {}", existingNotification.getName());
+            return;
+        }
+
+        NotificationTemplateDefinition template = optionalTemplate.get();
+
+        HashMap<String, Object> params = scenarioRequestParams.getParams();
+        StringSubstitutor substitutor = new StringSubstitutor(params);
+
+        LocalDateTime notificationDeadline = null;
+        String deadlineParam = template.getDeadlineParam();
+        if (deadlineParam != null) {
+            Object raw = params.get(deadlineParam);
+            if (raw != null) {
+                try {
+                    notificationDeadline = LocalDateTime.parse(raw.toString());
+                } catch (DateTimeParseException ex) {
+                    log.error("Unable to parse deadline '{}' for notification {}",
+                              raw, template.getName());
+                }
+            }
+        }
+
+        DashboardNotificationsEntity updated = existingNotification.toBuilder()
+            .titleEn(substitutor.replace(template.getTitleEn()))
+            .titleCy(substitutor.replace(template.getTitleCy()))
+            .descriptionEn(substitutor.replace(template.getDescriptionEn()))
+            .descriptionCy(substitutor.replace(template.getDescriptionCy()))
+            .params(params)
+            .timeToLive(template.getTimeToLive())
+            .deadline(notificationDeadline)
+            .updatedOn(OffsetDateTime.now())
+            .build();
+
+        dashboardNotificationService.saveOrUpdate(updated);
+
+        log.info("Reconfigured notification {} for case {}",
+                 template.getName(), uniqueCaseIdentifier);
     }
 
     private void createNotificationsForScenario(
