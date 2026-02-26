@@ -287,9 +287,9 @@ class DashboardScenariosServiceTest {
 
         verify(dashboardNotificationService).saveOrUpdate(
             org.mockito.ArgumentMatchers.argThat(updated ->
-                                                     updated.getTitleEn().equals("The Tiger jumped over the Safari.") &&
-                                                         updated.getDescriptionEn().equals("The Tiger jumped over the Safari.") &&
-                                                         updated.getReference().equals(caseId)
+                                                     updated.getTitleEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getDescriptionEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getReference().equals(caseId)
             )
         );
 
