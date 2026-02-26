@@ -194,7 +194,7 @@ class ApplicationProcessCaseEventTaskHandlerTest {
             when(coreCaseDataService.startGaUpdate(any(), any()))
                 .thenReturn(StartEventResponse.builder().caseDetails(caseDetails).build());
             when(coreCaseDataService.submitGaUpdate(any(), any()))
-                .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
+                .thenReturn(new GeneralApplicationCaseData().generalAppParentCaseLink(
                     new GeneralAppParentCaseLink().setCaseReference("123")).build());
 
             assertThrows(CompleteTaskException.class,

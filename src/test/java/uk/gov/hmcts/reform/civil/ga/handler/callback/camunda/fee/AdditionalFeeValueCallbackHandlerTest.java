@@ -129,7 +129,7 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
             .judicialDecisionWithUncloakRequestForInformationApplication(
                 REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
             .build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .isGaApplicantLip(YesOrNo.YES)
             .build();
 

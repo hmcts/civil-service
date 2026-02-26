@@ -53,7 +53,7 @@ public class EmailFooterUtilsTest {
     void shouldAddEmailsToFooterWhenPublicQmNotEnabled() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build().toBuilder().respondent1Represented(YES).applicant1Represented(YES).build();
+            .build().copy().respondent1Represented(YES).applicant1Represented(YES).build();
         GeneralApplicationCaseData mainCaseData = GeneralApplicationCaseDataBuilder.builder().build();
         Map<String, String> actual = addAllFooterItems(
             caseData,
@@ -69,7 +69,7 @@ public class EmailFooterUtilsTest {
     void shouldAddQueryStringToFooterWhenPublicQmEnabled() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build().toBuilder().respondent1Represented(YES).applicant1Represented(YES).build();
+            .build().copy().respondent1Represented(YES).applicant1Represented(YES).build();
         GeneralApplicationCaseData mainCaseData = GeneralApplicationCaseDataBuilder.builder().build();
         Map<String, String> actual = addAllFooterItems(
             caseData,
@@ -85,7 +85,7 @@ public class EmailFooterUtilsTest {
     void shouldAddQueryStringToFooterWhenPublicQmEnabledApplicantLip() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build().toBuilder().respondent1Represented(YES).isGaApplicantLip(YES).build();
+            .build().copy().respondent1Represented(YES).isGaApplicantLip(YES).build();
         GeneralApplicationCaseData mainCaseData = GeneralApplicationCaseDataBuilder.builder().build();
         Map<String, String> actual = addAllFooterItems(
             caseData,
@@ -101,7 +101,7 @@ public class EmailFooterUtilsTest {
     void shouldAddQueryStringToFooterWhenPublicEnabledRespondentLip() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
-            .build().toBuilder().isGaRespondentOneLip(YES).applicant1Represented(YES).build();
+            .build().copy().isGaRespondentOneLip(YES).applicant1Represented(YES).build();
         GeneralApplicationCaseData mainCaseData = GeneralApplicationCaseDataBuilder.builder().build();
         Map<String, String> actual = addAllFooterItems(
             caseData,
@@ -117,7 +117,7 @@ public class EmailFooterUtilsTest {
     @ValueSource(strings = {"PENDING_CASE_ISSUED", "CLOSED", "PROCEEDS_IN_HERITAGE_SYSTEM", "CASE_DISMISSED"})
     void shouldAddSpecAndUnspecContactWhenCaseInQueryNotAllowedState(String caseState) {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .build().toBuilder().respondent1Represented(YES).applicant1Represented(YES)
+            .build().copy().respondent1Represented(YES).applicant1Represented(YES)
             .ccdState(Enum.valueOf(CaseState.class, caseState)).build();
         GeneralApplicationCaseData mainCaseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.valueOf(caseState)).build();
         Map<String, String> actual = addAllFooterItems(

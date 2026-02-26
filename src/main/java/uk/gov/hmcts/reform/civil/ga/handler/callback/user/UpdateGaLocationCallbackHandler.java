@@ -70,7 +70,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
                             .getCase(Long.parseLong(parentCaseReference)));
         LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getCaseManagementLocation().getBaseLocation(),
                                                                            authToken);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder
             .businessProcess(
                 new BusinessProcess()

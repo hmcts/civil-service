@@ -64,7 +64,7 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler im
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         String userId = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString()).getUid();
         caseData = buildBundleData(caseData, userId);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String role = DocUploadUtils.getUserRole(caseData, userId);
         DocUploadUtils.addUploadDocumentByTypeToAddl(caseData, caseDataBuilder,
                                                      caseData.getUploadDocument(), role, true);
@@ -109,7 +109,7 @@ public class UploadAdditionalDocumentsCallbackHandler extends CallbackHandler im
             if (Objects.nonNull(caseData.getGaAddlDocBundle())) {
                 bundle.addAll(caseData.getGaAddlDocBundle());
             }
-            return caseData.toBuilder().uploadDocument(exBundle).gaAddlDocBundle(bundle).build();
+            return caseData.copy().uploadDocument(exBundle).gaAddlDocBundle(bundle).build();
         }
         return caseData;
     }

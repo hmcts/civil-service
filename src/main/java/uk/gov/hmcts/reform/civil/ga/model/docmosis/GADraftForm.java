@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
@@ -14,13 +16,15 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@Builder(toBuilder = true)
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Accessors(chain = true)
 public class GADraftForm implements MappableObject {
 
     private String claimNumber;
-    private final String applicationId;
+    private String applicationId;
     private String claimantName;
     private String defendantName;
     private String claimantReference;
@@ -35,7 +39,7 @@ public class GADraftForm implements MappableObject {
     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate issueDate;
+    private LocalDate issueDate;
     private String applicantPartyName;
     private YesOrNo hasAgreed;
     private YesOrNo isWithNotice;
@@ -137,5 +141,5 @@ public class GADraftForm implements MappableObject {
     private YesOrNo isLipCase;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "d MMMM yyyy")
     @JsonSerialize(using = LocalDateSerializer.class)
-    private final LocalDate submittedDate;
+    private LocalDate submittedDate;
 }
