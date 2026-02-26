@@ -74,11 +74,11 @@ public class CourtOfficerOrderHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private UserService userService;
 
-    private static LocationRefData locationRefData =   LocationRefData.builder().siteName("A nice Site Name")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name example").region("Region").regionId("2").courtVenueId("666")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData =   new LocationRefData().setSiteName("A nice Site Name")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name example").setRegion("Region").setRegionId("2").setCourtVenueId("666")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
     public static final CaseDocument courtOfficerOrder = new CaseDocument()
         .setCreatedBy("Test")
         .setDocumentName("Court Officer Order test name")

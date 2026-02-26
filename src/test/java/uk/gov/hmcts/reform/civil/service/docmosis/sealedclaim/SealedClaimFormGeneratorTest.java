@@ -277,10 +277,9 @@ class SealedClaimFormGeneratorTest {
         @Test
         void whenCaseIsAtClaimDetailsNotified_shouldGetSealedClaimFormDataFor1V1() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -295,10 +294,9 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoDefendantSolicitors().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             final var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -314,14 +312,12 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimTwoApplicants().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
-                .applicant2LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant2")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
+                .applicant2LitigationFriend(new LitigationFriend().setFirstName("applicant2")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);
@@ -336,10 +332,9 @@ class SealedClaimFormGeneratorTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .multiPartyClaimOneDefendantSolicitor().build().toBuilder()
-                .applicant1LitigationFriend(LitigationFriend.builder()
-                                                .firstName("applicant")
-                                                .lastName("LF")
-                                                .build())
+                .applicant1LitigationFriend(new LitigationFriend().setFirstName("applicant")
+                                                .setLastName("LF")
+                                                )
                 .build();
 
             var templateData = sealedClaimFormGenerator.getTemplateData(caseData, BEARER_TOKEN);

@@ -41,10 +41,9 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
             .respondent1(Party.builder()
                         .companyName("Company one")
                         .type(Party.Type.COMPANY).build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(responseDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(responseDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
@@ -97,10 +96,9 @@ public class FullOrPartAdmitPayByDateOrgOrLtdCompanyFromDefendantScenarioTest ex
             .respondent1(Party.builder()
                     .organisationName("Org one")
                     .type(Party.Type.ORGANISATION).build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(admitPaymentDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();

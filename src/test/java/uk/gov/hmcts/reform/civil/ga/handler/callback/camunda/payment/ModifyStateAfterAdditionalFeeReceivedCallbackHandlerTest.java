@@ -646,8 +646,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.toBuilder()
             .parentCaseReference("1234")
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(PaymentStatus.FAILED).build()).build())
+                                      .additionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)).build())
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -663,8 +663,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.toBuilder()
             .parentCaseReference("1234")
             .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(PaymentStatus.FAILED).build()).build())
+                                      .additionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)).build())
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

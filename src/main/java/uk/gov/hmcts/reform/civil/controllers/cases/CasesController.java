@@ -160,14 +160,12 @@ public class CasesController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @RequestBody EventDto eventDto
     ) {
-        EventSubmissionParams params = EventSubmissionParams
-            .builder()
-            .authorisation(authorization)
-            .caseId(caseId)
-            .userId(submitterId)
-            .event(eventDto.getEvent())
-            .updates(eventDto.getCaseDataUpdate())
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setAuthorisation(authorization)
+            .setCaseId(caseId)
+            .setUserId(submitterId)
+            .setEvent(eventDto.getEvent())
+            .setUpdates(eventDto.getCaseDataUpdate());
         CaseDetails caseDetails = caseEventService.submitEvent(params);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }
@@ -294,14 +292,12 @@ public class CasesController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
         @RequestBody EventDto eventDto
     ) {
-        EventSubmissionParams params = EventSubmissionParams
-            .builder()
-            .authorisation(authorization)
-            .caseId(caseId)
-            .userId(submitterId)
-            .event(eventDto.getEvent())
-            .updates(eventDto.getCaseDataUpdate())
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setAuthorisation(authorization)
+            .setCaseId(caseId)
+            .setUserId(submitterId)
+            .setEvent(eventDto.getEvent())
+            .setUpdates(eventDto.getCaseDataUpdate());
         CaseDetails caseDetails = gaCaseEventService.submitEvent(params);
         return new ResponseEntity<>(caseDetails, HttpStatus.OK);
     }

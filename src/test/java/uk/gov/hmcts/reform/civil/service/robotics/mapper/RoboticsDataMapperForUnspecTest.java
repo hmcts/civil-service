@@ -91,20 +91,29 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForUnspecTest {
 
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-            .dxNumber("DX 12345")
-            .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+            .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
+
+    private ContactInformation copyContactInformation(ContactInformation source) {
+        return new ContactInformation()
+            .setAddressLine1(source.getAddressLine1())
+            .setAddressLine2(source.getAddressLine2())
+            .setAddressLine3(source.getAddressLine3())
+            .setPostCode(source.getPostCode())
+            .setCounty(source.getCounty())
+            .setCountry(source.getCountry())
+            .setTownCity(source.getTownCity())
+            .setDxAddress(source.getDxAddress());
+    }
 
     @MockBean
     OrganisationApi organisationApi;
@@ -252,7 +261,8 @@ class RoboticsDataMapperForUnspecTest {
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
         assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
 
-        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
+        ContactInformation contactInformation = copyContactInformation(CONTACT_INFORMATION)
+            .setAddressLine1("line 1 provided");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 

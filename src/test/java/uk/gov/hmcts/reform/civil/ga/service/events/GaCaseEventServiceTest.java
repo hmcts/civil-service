@@ -68,14 +68,12 @@ public class GaCaseEventServiceTest {
     void shouldSubmitEventForExistingClaimSuccessfully() {
         when(gaCoreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
 
-        CaseDetails caseDetails = gaCaseEventService.submitEvent(EventSubmissionParams
-                                                                   .builder()
-                                                                   .updates(Maps.newHashMap())
-                                                                   .event(CaseEvent.RESPOND_TO_APPLICATION)
-                                                                   .caseId(CASE_ID)
-                                                                   .userId(USER_ID)
-                                                                   .authorisation(AUTHORISATION)
-                                                                   .build());
+        CaseDetails caseDetails = gaCaseEventService.submitEvent(new EventSubmissionParams()
+                                                                   .setUpdates(Maps.newHashMap())
+                                                                   .setEvent(CaseEvent.RESPOND_TO_APPLICATION)
+                                                                   .setCaseId(CASE_ID)
+                                                                   .setUserId(USER_ID)
+                                                                   .setAuthorisation(AUTHORISATION));
         assertThat(caseDetails).isEqualTo(CASE_DETAILS);
 
         StartEventResponse startEventResponse = gaCaseEventService

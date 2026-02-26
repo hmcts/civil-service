@@ -104,7 +104,7 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
@@ -183,7 +183,7 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentReceived())
                 .thenReturn("test-template-received-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Received email
@@ -214,7 +214,7 @@ class DJRespondentReceivedNotificationHandlerTest {
             when(notificationsProperties.getRespondentSolicitor1DefaultJudgmentRequested())
                 .thenReturn("test-template-requested-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email

@@ -28,41 +28,30 @@ public class CmcClaimTest {
 
     @Test
     void shouldReturnClaimantNameWhenClaimantExists() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().claimants(Arrays.asList(CmcParty.builder()
-                                                                       .name(NAME)
-                                                                       .build()))
-                           .build())
-            .build();
+        CmcClaim cmcClaim = new CmcClaim()
+            .setClaimData(new ClaimData().setClaimants(Arrays.asList(new CmcParty().setName(NAME))));
         String claimantName = cmcClaim.getClaimantName();
         assert (claimantName).equals(NAME);
     }
 
     @Test
     void shouldReturnEmptyStringWhenClaimantDoesNotExist() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().claimants(Collections.emptyList()).build())
-            .build();
+        CmcClaim cmcClaim = new CmcClaim().setClaimData(new ClaimData().setClaimants(Collections.emptyList()));
         String claimantName = cmcClaim.getClaimantName();
         assert (claimantName).equals("");
     }
 
     @Test
     void shouldReturnDefendantNameWhenDefendantExists() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().defendants(Arrays.asList(CmcParty.builder().name(NAME)
-                                                                        .build()))
-                           .build())
-            .build();
+        CmcClaim cmcClaim = new CmcClaim()
+            .setClaimData(new ClaimData().setDefendants(Arrays.asList(new CmcParty().setName(NAME))));
         String defendantName = cmcClaim.getDefendantName();
         assert (defendantName).equals(NAME);
     }
 
     @Test
     void shouldReturnEmptyStringWhenDefendantDoesNotExist() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder().defendants(Collections.emptyList()).build())
-            .build();
+        CmcClaim cmcClaim = new CmcClaim().setClaimData(new ClaimData().setDefendants(Collections.emptyList()));
         String defendantName = cmcClaim.getDefendantName();
         assert (defendantName).equals("");
     }
@@ -71,10 +60,7 @@ public class CmcClaimTest {
     void shouldReturnPayedByDateWhenItExists() {
         //Given
         LocalDate now = LocalDate.now();
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .response(Response.builder().paymentIntention(PaymentIntention.builder()
-                                                              .paymentDate(now).build())
-                          .build()).build();
+        CmcClaim cmcClaim = new CmcClaim().setResponse(new Response().setPaymentIntention(new PaymentIntention().setPaymentDate(now)));
         //When
         LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
         //Then
@@ -84,7 +70,7 @@ public class CmcClaimTest {
     @Test
     void shouldReturnNullWhenNoResponseExists() {
         //Given
-        CmcClaim cmcClaim = CmcClaim.builder().build();
+        CmcClaim cmcClaim = new CmcClaim();
         //When
         LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
         //Then
@@ -94,8 +80,8 @@ public class CmcClaimTest {
     @Test
     void shouldReturnNullWhenNoPaymentIntentionExists() {
         //Given
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .response(Response.builder().build()).build();
+        CmcClaim cmcClaim = new CmcClaim()
+            .setResponse(new Response());
         //When
         LocalDate paymentDate = cmcClaim.getBySpecifiedDate();
         //Then
@@ -104,30 +90,22 @@ public class CmcClaimTest {
 
     @Test
     void shouldReturnTrueWhenClaimRejectedAndOfferSettleOutOfCourt() {
-        CmcClaim claim = CmcClaim.builder()
-            .response(Response.builder()
-                          .responseType(RespondentResponseType.FULL_DEFENCE)
-                          .build())
-            .settlement(Settlement.builder()
-                            .partyStatements(List.of(PartyStatement.builder().build()))
-                            .build())
-            .build();
+        CmcClaim claim = new CmcClaim()
+            .setResponse(new Response()
+                          .setResponseType(RespondentResponseType.FULL_DEFENCE))
+            .setSettlement(new Settlement()
+                            .setPartyStatements(List.of(new PartyStatement())));
 
         assertTrue(claim.isClaimRejectedAndOfferSettleOutOfCourt());
     }
 
     @Test
     void shouldReturnTrueWhenClaimantRejectOffer()  {
-        CmcClaim claim = CmcClaim.builder()
-            .response(Response.builder()
-                          .responseType(RespondentResponseType.FULL_DEFENCE)
-                          .build())
-            .settlement(Settlement.builder()
-                            .partyStatements(List.of(PartyStatement.builder()
-                                                         .type(StatementType.REJECTION)
-                                                         .build()))
-                            .build())
-            .build();
+        CmcClaim claim = new CmcClaim()
+            .setResponse(new Response().setResponseType(RespondentResponseType.FULL_DEFENCE))
+            .setSettlement(new Settlement()
+                            .setPartyStatements(List.of(new PartyStatement()
+                                                         .setType(StatementType.REJECTION))));
 
         assertTrue(claim.hasClaimantRejectOffer());
         assertNull(claim.getResponse().getPaymentIntention());
@@ -135,12 +113,9 @@ public class CmcClaimTest {
 
     @Test
     void given_claimantNotRespondedWithInDeadLine_whenGetStatus_claimEnded() {
-        CmcClaim claim = CmcClaim.builder()
-            .response(Response.builder()
-                          .responseType(RespondentResponseType.FULL_DEFENCE)
-                          .build())
-            .intentionToProceedDeadline(LocalDate.now().minusDays(1))
-            .build();
+        CmcClaim claim = new CmcClaim()
+            .setResponse(new Response().setResponseType(RespondentResponseType.FULL_DEFENCE))
+            .setIntentionToProceedDeadline(LocalDate.now().minusDays(1));
         DashboardClaimStatus status =
             cmcClaimStatusDashboardFactory.getDashboardClaimStatus(claim);
         AssertionsForClassTypes.assertThat(status).isEqualTo(DashboardClaimStatus.CLAIM_ENDED);
@@ -149,24 +124,17 @@ public class CmcClaimTest {
     @Test
     void shouldReturnTrueIfOfferAcceptedAndClaimantSignedSettlementAgreement() {
         //Given
-        CmcClaim claim = CmcClaim.builder()
-                .response(Response.builder()
-                        .responseType(RespondentResponseType.FULL_ADMISSION)
-                        .build())
-                .settlement(Settlement.builder()
-                        .partyStatements(List.of(
-                                PartyStatement.builder()
-                                        .type(StatementType.OFFER)
-                                        .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.ACCEPTATION)
-                                        .build()))
-                        .build())
-                .claimantResponse(ClaimantResponse.builder().build())
-                .build();
+        CmcClaim claim = new CmcClaim()
+                .setResponse(new Response().setResponseType(RespondentResponseType.FULL_ADMISSION))
+                .setSettlement(new Settlement()
+                        .setPartyStatements(List.of(
+                                new PartyStatement()
+                                        .setType(StatementType.OFFER)
+                                        .setOffer(new Offer()
+                                               .setPaymentIntention(new PaymentIntention())),
+                                new PartyStatement()
+                                        .setType(StatementType.ACCEPTATION))))
+                .setClaimantResponse(new ClaimantResponse());
         //When
         boolean signed = claim.hasClaimantSignedSettlementAgreement();
         //Then
@@ -176,26 +144,19 @@ public class CmcClaimTest {
     @Test
     void shouldReturnTrueIfClaimantSignedSettlementAgreementChosenByCourt() {
         //Given
-        CmcClaim claim = CmcClaim.builder()
-                .response(Response.builder()
-                        .responseType(RespondentResponseType.FULL_ADMISSION)
-                        .build())
-                .settlement(Settlement.builder()
-                        .partyStatements(List.of(
-                                PartyStatement.builder()
-                                        .type(StatementType.OFFER)
-                                        .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.ACCEPTATION)
-                                        .build()))
-                        .build())
-                .claimantResponse(ClaimantResponse.builder()
-                        .courtDetermination(CourtDetermination.builder().build())
-                        .build())
-                .build();
+        CmcClaim claim = new CmcClaim()
+                .setResponse(new Response()
+                        .setResponseType(RespondentResponseType.FULL_ADMISSION))
+                .setSettlement(new Settlement()
+                        .setPartyStatements(List.of(
+                                new PartyStatement()
+                                        .setType(StatementType.OFFER)
+                                        .setOffer(new Offer()
+                                               .setPaymentIntention(new PaymentIntention())),
+                                new PartyStatement()
+                                        .setType(StatementType.ACCEPTATION))))
+                .setClaimantResponse(new ClaimantResponse()
+                        .setCourtDetermination(new CourtDetermination()));
         //When
         boolean signed = claim.hasClaimantSignedSettlementAgreement();
         //Then
@@ -205,24 +166,18 @@ public class CmcClaimTest {
     @Test
     void shouldReturnTrueIfSettlementAgreementDeadlineExpired() {
         //Given
-        CmcClaim claim = CmcClaim.builder()
-                .response(Response.builder()
-                        .responseType(RespondentResponseType.FULL_ADMISSION)
-                        .build())
-                .settlement(Settlement.builder()
-                        .partyStatements(List.of(
-                                PartyStatement.builder()
-                                        .type(StatementType.OFFER)
-                                        .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.ACCEPTATION)
-                                        .build()))
-                        .build())
-                .claimantRespondedAt(LocalDateTime.MIN)
-                .build();
+        CmcClaim claim = new CmcClaim()
+                .setResponse(new Response()
+                        .setResponseType(RespondentResponseType.FULL_ADMISSION))
+                .setSettlement(new Settlement()
+                        .setPartyStatements(List.of(
+                                new PartyStatement()
+                                        .setType(StatementType.OFFER)
+                                        .setOffer(new Offer()
+                                               .setPaymentIntention(new PaymentIntention())),
+                                new PartyStatement()
+                                        .setType(StatementType.ACCEPTATION))))
+                .setClaimantRespondedAt(LocalDateTime.MIN);
         //When
         boolean signed = claim.hasClaimantSignedSettlementAgreementAndDeadlineExpired();
         //Then
@@ -232,26 +187,19 @@ public class CmcClaimTest {
     @Test
     void shouldReturnTrueIfBothSignedSettlementAgreement() {
         //Given
-        CmcClaim claim = CmcClaim.builder()
-                .response(Response.builder()
-                        .responseType(RespondentResponseType.FULL_ADMISSION)
-                        .build())
-                .settlement(Settlement.builder()
-                        .partyStatements(List.of(
-                                PartyStatement.builder()
-                                        .type(StatementType.OFFER)
-                                        .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.ACCEPTATION)
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.COUNTERSIGNATURE)
-                                        .build()))
-                        .build())
-                .build();
+        CmcClaim claim = new CmcClaim()
+                .setResponse(new Response()
+                        .setResponseType(RespondentResponseType.FULL_ADMISSION))
+                .setSettlement(new Settlement()
+                        .setPartyStatements(List.of(
+                                new PartyStatement()
+                                        .setType(StatementType.OFFER)
+                                        .setOffer(new Offer()
+                                               .setPaymentIntention(new PaymentIntention())),
+                                new PartyStatement()
+                                        .setType(StatementType.ACCEPTATION),
+                                new PartyStatement()
+                                        .setType(StatementType.COUNTERSIGNATURE))));
         //When
         boolean signed = claim.hasClaimantAndDefendantSignedSettlementAgreement();
         //Then
@@ -261,27 +209,20 @@ public class CmcClaimTest {
     @Test
     void shouldReturnTrueIfDefendantRejectedSettlementAgreement() {
         //Given
-        CmcClaim claim = CmcClaim.builder()
-                .response(Response.builder()
-                        .responseType(RespondentResponseType.FULL_ADMISSION)
-                        .build())
-                .settlement(Settlement.builder()
-                        .partyStatements(List.of(
-                                PartyStatement.builder()
-                                        .type(StatementType.OFFER)
-                                        .offer(Offer.builder()
-                                               .paymentIntention(PaymentIntention.builder().build())
-                                               .build())
-                                        .build(),
-                                PartyStatement.builder()
-                                        .type(StatementType.REJECTION)
-                                        .build()))
-                        .build())
-                .claimantResponse(ClaimantResponse.builder()
-                        .type(ClaimantResponseType.ACCEPTATION)
-                        .formaliseOption(FormaliseOption.SETTLEMENT)
-                        .build())
-                .build();
+        CmcClaim claim = new CmcClaim()
+                .setResponse(new Response()
+                        .setResponseType(RespondentResponseType.FULL_ADMISSION))
+                .setSettlement(new Settlement()
+                        .setPartyStatements(List.of(
+                                new PartyStatement()
+                                        .setType(StatementType.OFFER)
+                                        .setOffer(new Offer()
+                                               .setPaymentIntention(new PaymentIntention())),
+                                new PartyStatement()
+                                        .setType(StatementType.REJECTION))))
+                .setClaimantResponse(new ClaimantResponse()
+                        .setType(ClaimantResponseType.ACCEPTATION)
+                        .setFormaliseOption(FormaliseOption.SETTLEMENT));
         //When
         boolean signed = claim.hasDefendantRejectedSettlementAgreement();
         //Then

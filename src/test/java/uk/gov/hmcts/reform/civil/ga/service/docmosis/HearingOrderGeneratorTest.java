@@ -77,7 +77,7 @@ class HearingOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(HEARING_ORDER)))
             .thenReturn(new DocmosisDocument(HEARING_ORDER.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO).build();
 
         hearingOrderGenerator.generate(caseData, BEARER_TOKEN);
@@ -119,7 +119,7 @@ class HearingOrderGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(POST_JUDGE_HEARING_ORDER_LIP)))
                 .thenReturn(new DocmosisDocument(POST_JUDGE_HEARING_ORDER_LIP.getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO).build();
 
             hearingOrderGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),
@@ -137,7 +137,7 @@ class HearingOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("15 minutes");
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
@@ -193,7 +193,7 @@ class HearingOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("15 minutes");
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
@@ -236,7 +236,7 @@ class HearingOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option2() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("15 minutes");
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
@@ -291,7 +291,7 @@ class HearingOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option3() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("15 minutes");
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()
@@ -337,7 +337,7 @@ class HearingOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option3_1v1() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("15 minutes");
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .hearingOrderApplication(YesOrNo.NO, YesOrNo.YES).build().toBuilder()

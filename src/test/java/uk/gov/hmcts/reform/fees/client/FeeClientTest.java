@@ -73,17 +73,15 @@ class FeeClientTest {
     void shouldReturnFeeData_whenValidClaimValueWhenFeatureIsEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
         given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .setCode("test_fee_code")
+                            .setVersion(1));
 
-        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-            .code("test_fee_code")
-            .version(1)
-            .build();
+        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = new FeeLookupResponseDto()
+            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .setCode("test_fee_code")
+            .setVersion(1);
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
@@ -103,17 +101,15 @@ class FeeClientTest {
     void shouldReturnFeeData_whenValidClaimValueWhenFeatureIsNotEnabled() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(false);
         given(feesApiClient.lookupFeeWithoutKeyword(any(), any(), any(), any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .setCode("test_fee_code")
+                            .setVersion(1));
 
-        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-            .code("test_fee_code")
-            .version(1)
-            .build();
+        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = new FeeLookupResponseDto()
+            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .setCode("test_fee_code")
+            .setVersion(1);
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, EVENT_ISSUE, new BigDecimal("50.00"));
 
@@ -169,11 +165,10 @@ class FeeClientTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .setCode("test_fee_code")
+                            .setVersion(1));
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(
             CHANNEL,
@@ -197,11 +192,10 @@ class FeeClientTest {
     void shouldCallLookupFeeWithKeyWordHearingSmallClaimsWhenEventIsNotIssue() {
         when(featureToggleService.isFeatureEnabled("fee-keywords-enable")).thenReturn(true);
         given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
+            .willReturn(new FeeLookupResponseDto()
+                            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+                            .setCode("test_fee_code")
+                            .setVersion(1));
 
         FeeLookupResponseDto feeLookupResponseDto = feesClient.lookupFee(CHANNEL, "EventOtherThanIssueOrHearing", new BigDecimal("50.00"));
 

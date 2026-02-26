@@ -104,8 +104,8 @@ class DocmosisTemplateDataUtilsTest {
                             .individualFirstName("White")
                             .individualLastName("Clark")
                             .build())
-            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
@@ -128,8 +128,8 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .applicant2(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualTitle("Mr.")
@@ -158,16 +158,16 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .applicant2(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualTitle("Mr.")
                             .individualFirstName("White")
                             .individualLastName("Clark")
                             .build())
-            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
@@ -190,24 +190,24 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .applicant2(Party.builder()
                             .type(Party.Type.INDIVIDUAL)
                             .individualTitle("Mr.")
                             .individualFirstName("White")
                             .individualLastName("Clark")
                             .build())
-            .applicant2LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant2LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
                              .individualFirstName("Alex")
                              .individualLastName("Richards")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Respondent Litigation")
-                                             .lastName("Friend").build())
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Respondent Litigation")
+                                             .setLastName("Friend"))
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -226,24 +226,24 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
                              .individualFirstName("Alex")
                              .individualLastName("Richards")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Respondent Litigation")
-                                             .lastName("Friend").build())
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Respondent Litigation")
+                                             .setLastName("Friend"))
             .respondent2(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
                              .individualFirstName("White")
                              .individualLastName("Richards")
                              .build())
-            .respondent2LitigationFriend(LitigationFriend.builder().firstName("Respondent2 Litigation")
-                                        .lastName("Friend").build())
+            .respondent2LitigationFriend(new LitigationFriend().setFirstName("Respondent2 Litigation")
+                                        .setLastName("Friend"))
             .build();
 
         String caseName = toCaseName.apply(caseData);
@@ -365,8 +365,8 @@ class DocmosisTemplateDataUtilsTest {
                              .individualLastName("Richards")
                              .partyName("Mr. Other Party")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                             .lastName("Friend").build())
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                             .setLastName("Friend"))
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName)
@@ -382,8 +382,8 @@ class DocmosisTemplateDataUtilsTest {
                             .individualFirstName("Sam")
                             .individualLastName("Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Litigation")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Litigation")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
@@ -407,17 +407,16 @@ class DocmosisTemplateDataUtilsTest {
                             .individualLastName("Clark")
                             .partyName("Mr. Sam Clark")
                             .build())
-            .applicant1LitigationFriend(LitigationFriend.builder().firstName("Applicant")
-                                            .lastName("Friend").build())
+            .applicant1LitigationFriend(new LitigationFriend().setFirstName("Applicant")
+                                            .setLastName("Friend"))
             .respondent1(Party.builder()
                              .type(Party.Type.INDIVIDUAL)
                              .individualTitle("Mr.")
                              .individualFirstName("Alex")
                              .individualLastName("Richards")
                              .build())
-            .respondent1LitigationFriend(LitigationFriend.builder()
-                                             .firstName("Respondent")
-                                             .lastName("Friend").build())
+            .respondent1LitigationFriend(new LitigationFriend().setFirstName("Respondent")
+                                             .setLastName("Friend"))
             .build();
         String caseName = toCaseName.apply(caseData);
         assertThat(caseName).isEqualTo("Mr. Sam Clark (proceeding by L/F Applicant Friend) \nvs Mr. Alex Richards "
@@ -444,7 +443,7 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
-            SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference(null)
@@ -460,11 +459,9 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateProvidedValues_whenSolicitorReferencesAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .respondentSolicitor1Reference("Respondent ref")
-                .build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences()
+                .setApplicantSolicitor1Reference("Applicant ref")
+                .setRespondentSolicitor1Reference("Respondent ref");
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference("Respondent 2 ref")
@@ -481,10 +478,8 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenOneReferencesNotAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences()
+                .setApplicantSolicitor1Reference("Applicant ref");
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .build();

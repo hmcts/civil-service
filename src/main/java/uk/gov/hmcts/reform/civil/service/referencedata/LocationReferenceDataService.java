@@ -38,7 +38,7 @@ public class LocationReferenceDataService {
                 );
             if (cnbcLocations == null || cnbcLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CNBC location");
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 if (cnbcLocations.size() > 1) {
                     log.warn("Location Reference Data Lookup returned more than one CNBC location");
@@ -48,7 +48,7 @@ public class LocationReferenceDataService {
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
-        return LocationRefData.builder().build();
+        return new LocationRefData();
     }
 
     public LocationRefData getCcmccLocation(String authToken) {
@@ -61,7 +61,7 @@ public class LocationReferenceDataService {
                 );
             if (ccmccLocations == null || ccmccLocations.isEmpty()) {
                 log.warn("Location Reference Data Lookup did not return any CCMCC location");
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 if (ccmccLocations.size() > 1) {
                     log.warn("Location Reference Data Lookup returned more than one CCMCC location");
@@ -71,7 +71,7 @@ public class LocationReferenceDataService {
         } catch (Exception e) {
             log.error(LOCATION_REFERENCE_DATA_LOOKUP_FAILED, e.getMessage(), e);
         }
-        return LocationRefData.builder().build();
+        return new LocationRefData();
     }
 
     public List<LocationRefData> getCourtLocationsForDefaultJudgments(String authToken) {
@@ -185,7 +185,7 @@ public class LocationReferenceDataService {
         try {
             List<LocationRefData> locations = courtVenueService.getCourtVenueByLocationCode(authTokenGenerator.generate(), authToken, threeDigitCode);
             if (locations == null || locations.isEmpty()) {
-                return LocationRefData.builder().build();
+                return new LocationRefData();
             } else {
                 return filterCourtLocation(locations, threeDigitCode);
 

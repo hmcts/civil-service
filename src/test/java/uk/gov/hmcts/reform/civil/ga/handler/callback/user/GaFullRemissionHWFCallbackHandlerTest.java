@@ -45,8 +45,8 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldUpdateFullRemissionData_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                        Fee.builder()
-                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                        new Fee()
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                         .build())
                 .gaHwfDetails(HelpWithFeesDetails.builder().build())
                 .hwfFeeType(FeeType.APPLICATION)
@@ -64,8 +64,8 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldUpdateFullRemissionDataWithDetailsNull_GaFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                    Fee.builder()
-                        .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
+                    new Fee()
+                        .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
                     .build())
                 .gaHwfDetails(HelpWithFeesDetails.builder().build())
                 .hwfFeeType(FeeType.APPLICATION)
@@ -83,9 +83,9 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldUpdateFullRemissionData_Additional() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                            .code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                            .setCode("OOOCM002"))
                             .build())
                 .additionalHwfDetails(HelpWithFeesDetails.builder().build())
                 .hwfFeeType(FeeType.ADDITIONAL)
@@ -103,9 +103,9 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldUpdateFullRemissionDataWithDetailsNull_AdditionalFee() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                            .code("OOOCM002").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                            .setCode("OOOCM002"))
                             .build())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
@@ -122,9 +122,9 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldNotUpdateFullRemissionData_ifGaFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                     .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.ZERO)
-                                            .code("FREE").build())
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.ZERO)
+                                            .setCode("FREE"))
                             .build())
                 .gaHwfDetails(HelpWithFeesDetails.builder().build())
                 .hwfFeeType(FeeType.APPLICATION)
@@ -141,9 +141,9 @@ public class GaFullRemissionHWFCallbackHandlerTest extends GeneralApplicationBas
         void shouldNotUpdateFullRemissionData_ifAdditionalFeeIsZero() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
                 .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.ZERO)
-                                        .code("FREE").build())
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.ZERO)
+                                        .setCode("FREE"))
                         .build())
                 .additionalHwfDetails(HelpWithFeesDetails.builder().build())
                 .hwfFeeType(FeeType.ADDITIONAL)

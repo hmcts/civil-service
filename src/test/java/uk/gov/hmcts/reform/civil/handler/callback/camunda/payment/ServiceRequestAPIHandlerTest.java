@@ -187,7 +187,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
-            caseData.setClaimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build());
+            caseData.setClaimIssuedPBADetails(new SRPbaDetails().setServiceReqReference("123456"));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -205,7 +205,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
             caseData.setHearingDueDate(LocalDate.now());
-            caseData.setHearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.ONE).build());
+            caseData.setHearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE));
             caseData.setClaimValue(new ClaimValue().setStatementOfValueInPennies(BigDecimal.TEN));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //When
@@ -248,7 +248,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
             caseData.setHearingDueDate(LocalDate.now().plusWeeks(1));
-            caseData.setHearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build());
+            caseData.setHearingFeePBADetails(new SRPbaDetails().setServiceReqReference("123"));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -268,12 +268,11 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull_allocatedTrackIsDefined() {
-            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId(""));
@@ -286,10 +285,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
-            SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
-                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
-                .build();
+            SRPbaDetails expected = new SRPbaDetails()
+                .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
+                .setServiceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
+                ;
 
             assertThat(actual).isEqualTo(expected);
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
@@ -297,12 +296,11 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldCalculateFee_whenPaymentStatusIsNull_responseTrackIsDefined() {
-            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build());
+            when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)));
 
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setAllocatedTrack(null);
@@ -317,10 +315,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
-            SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(10800)).build())
-                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
-                .build();
+            SRPbaDetails expected = new SRPbaDetails()
+                .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
+                .setServiceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
+                ;
 
             assertThat(actual).isEqualTo(expected);
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
@@ -366,9 +364,8 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldHandleException_whenPaymentRequestFails() {
             when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                                .hearingType("AAA7-TRI")
-                                .build());
+                .thenReturn(new HearingNoticeVariables()
+                                .setHearingType("AAA7-TRI"));
 
             caseData = CaseDataBuilder.builder().withHearingFeePBADetailsNoPaymentStatus();
             caseData.setBusinessProcess(new BusinessProcess().setProcessInstanceId(""));

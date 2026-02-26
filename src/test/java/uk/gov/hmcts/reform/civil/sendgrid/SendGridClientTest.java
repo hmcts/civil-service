@@ -44,12 +44,11 @@ class SendGridClientTest {
         "response body",
         Map.of()
     );
-    private static final EmailData EMAIL_DATA = EmailData.builder()
-        .to("to@server.net")
-        .subject("my email")
-        .message("My email message")
-        .attachments(List.of())
-        .build();
+    private static final EmailData EMAIL_DATA = new EmailData()
+        .setTo("to@server.net")
+        .setSubject("my email")
+        .setMessage("My email message")
+        .setAttachments(List.of());
     private static final String EMAIL_FROM = "from@server.net";
 
     @MockBean
@@ -76,12 +75,11 @@ class SendGridClientTest {
         @ParameterizedTest
         @NullAndEmptySource
         void shouldThrowIllegalArgumentException_whenToIsNullOrBlank(String to) {
-            EmailData emailData = EmailData.builder()
-                .to(to)
-                .subject("my email")
-                .message("My email message")
-                .attachments(List.of())
-                .build();
+            EmailData emailData = new EmailData()
+                .setTo(to)
+                .setSubject("my email")
+                .setMessage("My email message")
+                .setAttachments(List.of());
             assertThrows(
                 IllegalArgumentException.class,
                 () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
@@ -91,12 +89,11 @@ class SendGridClientTest {
         @ParameterizedTest
         @NullAndEmptySource
         void shouldThrowIllegalArgumentException_whenSubjectIsNullOrBlank(String subject) {
-            EmailData emailData = EmailData.builder()
-                .to("to@server.net")
-                .subject(subject)
-                .message("My email message")
-                .attachments(List.of())
-                .build();
+            EmailData emailData = new EmailData()
+                .setTo("to@server.net")
+                .setSubject(subject)
+                .setMessage("My email message")
+                .setAttachments(List.of());
             assertThrows(
                 IllegalArgumentException.class,
                 () -> sendGridClient.sendEmail(EMAIL_FROM, emailData)
@@ -139,12 +136,11 @@ class SendGridClientTest {
         void shouldSendEmail_whenEmptyMessageIsProvided() {
             when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
 
-            sendGridClient.sendEmail(EMAIL_FROM, EmailData.builder()
-                .to("to@server.net")
-                .subject("subject")
-                .message("")
-                .attachments(List.of())
-                .build());
+            sendGridClient.sendEmail(EMAIL_FROM, new EmailData()
+                .setTo("to@server.net")
+                .setSubject("subject")
+                .setMessage("")
+                .setAttachments(List.of()));
 
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
@@ -156,12 +152,11 @@ class SendGridClientTest {
         void shouldSendEmail_whenAttachmentIsProvided() {
             when(sendGrid.api(any(Request.class))).thenReturn(SUCCESSFUL_RESPONSE);
 
-            sendGridClient.sendEmail(EMAIL_FROM, EmailData.builder()
-                .to("to@server.net")
-                .subject("subject")
-                .message("message")
-                .attachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf")))
-                .build());
+            sendGridClient.sendEmail(EMAIL_FROM, new EmailData()
+                .setTo("to@server.net")
+                .setSubject("subject")
+                .setMessage("message")
+                .setAttachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf"))));
 
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();

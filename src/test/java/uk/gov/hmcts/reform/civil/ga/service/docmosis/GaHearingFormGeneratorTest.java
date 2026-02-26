@@ -104,7 +104,7 @@ class GaHearingFormGeneratorTest {
                 .uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
@@ -140,7 +140,7 @@ class GaHearingFormGeneratorTest {
                  .uploadDocument(any(String.class), any(PDF.class)))
             .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
@@ -215,7 +215,7 @@ class GaHearingFormGeneratorTest {
     @Test
     void test_getCaseNumberFormatted() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build()).build();
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775")).build();
         String formattedCaseNumber = generator.getCaseNumberFormatted(caseData);
         assertThat(formattedCaseNumber).isEqualTo("1644-4957-3908-7775");
     }
@@ -359,7 +359,7 @@ class GaHearingFormGeneratorTest {
                      .uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             Map<String, String> refMap = new HashMap<>();
             refMap.put("applicantSolicitor1Reference", "app1ref");
