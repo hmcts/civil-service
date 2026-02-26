@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notification.handlers.EmailDTO;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,9 @@ class GenerateSpecDJFormAllPartiesEmailGeneratorTest {
 
     @Test
     void shouldCollectEmailsForGeneratorsThatShouldNotify() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(1234567890123456L).build();
+        CaseData caseData = new CaseDataBuilder()
+            .ccdCaseReference(1234567890123456L)
+            .build();
         EmailDTO appSolEmail = new EmailDTO("app@example.com", "tmpl", Map.of(), "ref1");
         EmailDTO claimantEmail = new EmailDTO("claimant@example.com", "tmpl", Map.of(), "ref2");
         EmailDTO requestedEmail = new EmailDTO("requested@example.com", "tmpl", Map.of(), "ref3");
@@ -94,4 +97,3 @@ class GenerateSpecDJFormAllPartiesEmailGeneratorTest {
         assertThat(result).containsExactlyInAnyOrder(appSolEmail, claimantEmail, requestedEmail);
     }
 }
-
