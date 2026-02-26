@@ -54,6 +54,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
+
     @Value("${other_remedy.enabled:false}")
     private boolean otherRemedyEnabled;
     private final SdoDeadlineService sdoDeadlineService;
@@ -144,7 +145,7 @@ public class SdoSmallClaimsNarrativeService {
     }
 
     public void applyHousingDisrepair(CaseData caseData) {
-        if(otherRemedyEnabled) {
+        if (otherRemedyEnabled) {
             HousingDisrepair housingDisrepair = new HousingDisrepair();
             housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
             housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
@@ -155,9 +156,8 @@ public class SdoSmallClaimsNarrativeService {
             housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
             housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
             caseData.setSmallClaimsHousingDisrepair(housingDisrepair);
-        }else{
+        } else {
             caseData.setSmallClaimsHousingDisrepair(null);
         }
-
     }
 }
