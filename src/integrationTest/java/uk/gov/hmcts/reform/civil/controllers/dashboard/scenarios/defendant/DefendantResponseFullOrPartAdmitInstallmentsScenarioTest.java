@@ -39,12 +39,11 @@ public class DefendantResponseFullOrPartAdmitInstallmentsScenarioTest extends Da
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(YesOrNo.NO)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec
-                                          .builder()
-                                          .repaymentFrequency(frequency)
-                                          .paymentAmount(installmentAmount)
-                                          .firstRepaymentDate(firstPaymentDate)
-                                          .build())
+            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setRepaymentFrequency(frequency)
+                                          .setPaymentAmount(installmentAmount)
+                                          .setFirstRepaymentDate(firstPaymentDate)
+                                          )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondToAdmittedClaimOwingAmountPounds(totalAmount)
             .build();

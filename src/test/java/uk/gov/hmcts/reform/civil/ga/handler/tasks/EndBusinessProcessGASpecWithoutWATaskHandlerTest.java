@@ -75,9 +75,8 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder()
-            .caseId(CASE_ID)
-            .build();
+        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
+            .setCaseId(CASE_ID);
 
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         when(coreCaseDataService.startGaUpdate(
@@ -105,9 +104,8 @@ public class EndBusinessProcessGASpecWithoutWATaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder()
-            .caseId(CASE_ID)
-            .build();
+        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
+            .setCaseId(CASE_ID);
 
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         when(coreCaseDataService.startGaUpdate(

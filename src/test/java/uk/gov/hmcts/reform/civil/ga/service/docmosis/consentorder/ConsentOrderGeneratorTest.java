@@ -87,7 +87,7 @@ class ConsentOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(CONSENT_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(CONSENT_ORDER_FORM.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         consentOrderGenerator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService).uploadDocument(
@@ -106,7 +106,7 @@ class ConsentOrderGeneratorTest {
                 YES)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
         assertThatFieldsAreCorrect_GeneralOrder(templateData, caseData);
     }
@@ -140,7 +140,7 @@ class ConsentOrderGeneratorTest {
             .isMultiParty(NO)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
         var templateData = consentOrderGenerator.getTemplateData(caseData, "auth");
         assertThatFieldsAreCorrect_GeneralOrder_1v1(templateData, caseData);
     }

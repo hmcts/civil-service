@@ -131,8 +131,8 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .legacyCaseReference("12345")
             .ccdCaseReference(CASE_ID)
             .respondent1ResponseDate(null)
-            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
-                                                          .name("statementOfTruthName").build())
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
+                .setName("statementOfTruthName"))
             .respondent2(Party.builder()
                              .type(Party.Type.ORGANISATION)
                              .organisationName("org-name")
@@ -162,7 +162,7 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .build();
 
         when(organisationService.findOrganisationById("org-id"))
-            .thenReturn(Optional.of(Organisation.builder().name("Org Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Org Name")));
 
         // When
         String organisationName = notifier.getLegalOrganisationName(caseData);
