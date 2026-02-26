@@ -25,7 +25,7 @@ class MakeDecisionDashboardTaskTest {
     @Mock
     private DashboardTaskContext context;
 
-    private final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(3L).build();
+    private final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(3L).build();
 
     @BeforeEach
     void setupContext() {

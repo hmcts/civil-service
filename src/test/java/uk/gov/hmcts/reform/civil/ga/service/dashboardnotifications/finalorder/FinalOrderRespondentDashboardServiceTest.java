@@ -64,11 +64,11 @@ class FinalOrderRespondentDashboardServiceTest {
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .isMultiParty(YesOrNo.NO)
                 .atStateClaimDraft()
-                .withNoticeCaseData();
-        caseData = caseData.toBuilder()
-            .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .generalAppConsentOrder(YesOrNo.YES)
-            .build();
+                .withNoticeCaseData()
+                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppConsentOrder(YesOrNo.YES)
+                .build();
+
         HashMap<String, Object> params = new HashMap<>();
         when(mapper.mapCaseDataToParams(caseData)).thenReturn(params);
 
@@ -88,10 +88,9 @@ class FinalOrderRespondentDashboardServiceTest {
             GeneralApplicationCaseDataBuilder.builder()
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .isMultiParty(YesOrNo.NO)
-                .withoutNoticeCaseData();
-        caseData = caseData.toBuilder()
-            .generalAppConsentOrder(YesOrNo.NO)
-            .build();
+                .withoutNoticeCaseData()
+                .generalAppConsentOrder(YesOrNo.NO)
+                .build();
 
         service.notifyFinalOrder(caseData, AUTH_TOKEN);
 
@@ -100,7 +99,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenRespondentOneLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaRespondentOneLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -108,7 +107,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .isGaRespondentOneLip(YesOrNo.NO)
             .build();
@@ -117,7 +116,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -125,7 +124,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyAndRespondentTwoLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.YES)
@@ -135,7 +134,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenMultiPartyAndRespondentTwoLipNoAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.NO)
@@ -145,7 +144,7 @@ class FinalOrderRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyRespondentOneLipYesEvenIfRespondentTwoLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.YES)
             .isGaRespondentTwoLip(YesOrNo.NO)

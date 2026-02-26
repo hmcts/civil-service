@@ -16,8 +16,8 @@ class OrderMadeRuleTest {
 
     @Test
     void shouldReturnScenarioWhenOrderMadeAndAwaitingDecisionState() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_AN_ORDER).build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(true, false, false, false)))
@@ -26,8 +26,8 @@ class OrderMadeRuleTest {
 
     @Test
     void shouldReturnEmptyWhenNotAwaitingDecisionState() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_AN_ORDER).build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false))).isEmpty();

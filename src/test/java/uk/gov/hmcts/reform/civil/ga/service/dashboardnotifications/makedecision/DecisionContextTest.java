@@ -14,12 +14,12 @@ class DecisionContextTest {
 
     @Test
     void shouldBuildContextFromCaseData() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
+            )
             .build();
 
         DecisionContext context = DecisionContext.from(caseData);
@@ -32,7 +32,7 @@ class DecisionContextTest {
 
     @Test
     void shouldHandleMissingFields() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
 
         DecisionContext context = DecisionContext.from(caseData);

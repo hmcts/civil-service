@@ -21,12 +21,11 @@ class JudgeUncloakedRuleTest {
     @Test
     void shouldReturnScenarioWhenWithoutNoticeAndUncloakedAndVisible() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .applicationIsUncloakedOnce(YesOrNo.YES)
-            .makeAppVisibleToRespondents(GAMakeApplicationAvailableCheck.builder()
-                                              .makeAppAvailableCheck(List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX))
-                                              .build())
-            .build();
+            .makeAppVisibleToRespondents(
+                new GAMakeApplicationAvailableCheck()
+                    .setMakeAppAvailableCheck(List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX))
+            );
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false)))
             .contains(SCENARIO_AAA6_GENERAL_APPLICATION_JUDGE_UNCLOAK_RESPONDENT.getScenario());
@@ -35,7 +34,6 @@ class JudgeUncloakedRuleTest {
     @Test
     void shouldReturnEmptyWhenNotVisibleToRespondent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .applicationIsUncloakedOnce(YesOrNo.YES)
             .build();
 
@@ -43,7 +41,7 @@ class JudgeUncloakedRuleTest {
     }
 
     private GeneralApplicationCaseData baseCase() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .build();
     }

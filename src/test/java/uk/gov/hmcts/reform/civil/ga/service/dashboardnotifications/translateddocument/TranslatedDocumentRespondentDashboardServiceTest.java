@@ -35,7 +35,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenRespondentIsLipAndWithNotice() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(456L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .isGaRespondentOneLip(YesOrNo.YES)
@@ -56,7 +56,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenRespondentIsLipAndConsentOrder() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(456L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppConsentOrder(YesOrNo.YES)
@@ -77,7 +77,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenRespondentIsLipWithoutNoticeOrConsent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(456L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppConsentOrder(YesOrNo.NO)
@@ -91,7 +91,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenRespondentIsNotLip() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(456L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .isGaRespondentOneLip(YesOrNo.NO)

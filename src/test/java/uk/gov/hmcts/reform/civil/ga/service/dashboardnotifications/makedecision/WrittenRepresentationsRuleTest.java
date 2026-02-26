@@ -18,11 +18,11 @@ class WrittenRepresentationsRuleTest {
 
     @Test
     void shouldReturnScenarioWhenWrittenRepresentationsRequired() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
-                                  .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+            .judicialDecision(
+                new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
+            )
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false)))
@@ -31,11 +31,11 @@ class WrittenRepresentationsRuleTest {
 
     @Test
     void shouldReturnEmptyWhenDecisionDoesNotMatch() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_AN_ORDER)
-                                  .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+            .judicialDecision(
+                new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER)
+            )
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false))).isEmpty();

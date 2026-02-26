@@ -77,7 +77,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenRespondentOneLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaRespondentOneLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -85,7 +85,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .isGaRespondentOneLip(YesOrNo.NO)
             .build();
@@ -94,7 +94,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -102,7 +102,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyAndRespondentTwoLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.YES)
@@ -112,7 +112,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenMultiPartyAndRespondentTwoLipNoAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.NO)
@@ -122,7 +122,7 @@ class ApplicationIssuedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyRespondentOneLipYesEvenIfRespondentTwoLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.YES)
             .isGaRespondentTwoLip(YesOrNo.NO)

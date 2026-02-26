@@ -20,11 +20,11 @@ class HearingScheduledRuleTest {
 
     @Test
     void shouldReturnScenarioWhenHearingScheduled() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.LISTING_FOR_A_HEARING)
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
-            .gaHearingNoticeApplication(GAHearingNoticeApplication.builder().build())
-            .gaHearingNoticeDetail(GAHearingNoticeDetail.builder().build())
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
+            .gaHearingNoticeApplication(new GAHearingNoticeApplication())
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail())
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false)))
@@ -33,10 +33,10 @@ class HearingScheduledRuleTest {
 
     @Test
     void shouldReturnEmptyWhenHearingDetailsMissing() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.LISTING_FOR_A_HEARING)
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
-            .gaHearingNoticeApplication(GAHearingNoticeApplication.builder().build())
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
+            .gaHearingNoticeApplication(new GAHearingNoticeApplication())
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false))).isEmpty();

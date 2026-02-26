@@ -35,7 +35,7 @@ class TranslatedDocumentApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenarioWhenApplicantIsLip() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(123L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .isGaApplicantLip(YesOrNo.YES)
@@ -55,7 +55,7 @@ class TranslatedDocumentApplicantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenarioWhenApplicantIsNotLip() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(123L)
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .isGaApplicantLip(YesOrNo.NO)

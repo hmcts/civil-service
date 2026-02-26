@@ -17,11 +17,10 @@ class RespondentRequestMoreInfoRuleTest {
 
     @Test
     void shouldReturnScenarioWhenRequestMoreInfoAndAwaitingDecisionState() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false)))
@@ -30,11 +29,11 @@ class RespondentRequestMoreInfoRuleTest {
 
     @Test
     void shouldReturnEmptyWhenOptionIsSendToOtherParty() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
+            )
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false))).isEmpty();
@@ -42,11 +41,11 @@ class RespondentRequestMoreInfoRuleTest {
 
     @Test
     void shouldReturnEmptyWhenStateIsNotAwaitingDecision() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
+            )
             .build();
 
         assertThat(rule.evaluate(caseData, new DecisionContext(false, false, false, false))).isEmpty();
