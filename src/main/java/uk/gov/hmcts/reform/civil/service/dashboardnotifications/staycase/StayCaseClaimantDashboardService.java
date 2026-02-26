@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.staycase;
 
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_APPLICANT_INTENTION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
 import uk.gov.hmcts.reform.civil.enums.CaseState;
