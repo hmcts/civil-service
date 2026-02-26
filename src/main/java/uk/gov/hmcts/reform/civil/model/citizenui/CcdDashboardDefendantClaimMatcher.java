@@ -275,8 +275,7 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
     public boolean hasClaimEnded() {
         return (nonNull(caseData.getApplicant1ProceedsWithClaimSpec())
             && caseData.getApplicant1ProceedsWithClaimSpec().equals(YesOrNo.NO)
-            && caseData.isRespondentResponseFullDefence())
-            || caseData.getApplicant1ResponseDeadlinePassed();
+            && caseData.isRespondentResponseFullDefence());
     }
 
     @Override
@@ -331,7 +330,10 @@ public class CcdDashboardDefendantClaimMatcher extends CcdDashboardClaimMatcher 
 
     @Override
     public boolean isClaimantDefaultJudgement() {
-        return caseData.getRespondent1ResponseDeadline() != null
+        return (
+            caseData.isCcjRequestJudgmentByAdmission()
+            && CaseState.All_FINAL_ORDERS_ISSUED.equals(caseData.getCcdState()))
+            || caseData.getRespondent1ResponseDeadline() != null
             && caseData.getRespondent1ResponseDeadline().isBefore(LocalDate.now().atTime(FOUR_PM))
             && caseData.getPaymentTypeSelection() != null;
     }
