@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -53,7 +54,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
-
+    @Value("${other_remedy.enabled:false}")
+    private boolean otherRemedyEnabled;
     private final SdoDeadlineService sdoDeadlineService;
 
     public void applyJudgesRecital(CaseData caseData) {
@@ -142,15 +144,20 @@ public class SdoSmallClaimsNarrativeService {
     }
 
     public void applyHousingDisrepair(CaseData caseData) {
-        HousingDisrepair housingDisrepair = new HousingDisrepair();
-        housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
-        housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
-        housingDisrepair.setFirstReportDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
-        housingDisrepair.setClauseCBeforeDate(HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE);
-        housingDisrepair.setJointStatementDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
-        housingDisrepair.setClauseCAfterDate(HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE);
-        housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
-        housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
-        caseData.setSmallClaimsHousingDisrepair(housingDisrepair);
+        if(otherRemedyEnabled) {
+            HousingDisrepair housingDisrepair = new HousingDisrepair();
+            housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
+            housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
+            housingDisrepair.setFirstReportDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
+            housingDisrepair.setClauseCBeforeDate(HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE);
+            housingDisrepair.setJointStatementDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
+            housingDisrepair.setClauseCAfterDate(HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE);
+            housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
+            housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
+            caseData.setSmallClaimsHousingDisrepair(housingDisrepair);
+        }else{
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
+
     }
 }
