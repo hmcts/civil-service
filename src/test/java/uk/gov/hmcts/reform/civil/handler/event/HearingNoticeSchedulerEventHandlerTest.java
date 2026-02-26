@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.hmc.model.hearing.HearingDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingGetResponse;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingRequestDetails;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingResponse;
+import uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus;
 import uk.gov.hmcts.reform.hmc.model.hearing.PartyDetailsModel;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.HearingDay;
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotified;
@@ -33,7 +34,10 @@ import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedResponses
 import uk.gov.hmcts.reform.hmc.model.unnotifiedhearings.PartiesNotifiedServiceData;
 import uk.gov.hmcts.reform.hmc.service.HearingsService;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
-import uk.gov.hmcts.reform.hmc.model.hearing.ListAssistCaseStatus;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,10 +49,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 class HearingNoticeSchedulerEventHandlerTest {
@@ -152,7 +152,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString())).thenReturn(
-            PartiesNotifiedResponses.builder().build());
+            new PartiesNotifiedResponses());
 
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
@@ -181,7 +181,7 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.CASE_CLOSED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            PartiesNotifiedResponses.builder().responses(List.of()).build());
+            new PartiesNotifiedResponses().setResponses(List.of()));
 
         handler.handle(new HearingNoticeSchedulerTaskEvent(HEARING_ID));
 
@@ -191,9 +191,8 @@ class HearingNoticeSchedulerEventHandlerTest {
                 HEARING_ID,
                 VERSION,
                 RECEIVED_DATETIME,
-                PartiesNotified.builder()
-                    .serviceData(PartiesNotifiedServiceData.builder().hearingNoticeGenerated(false).build())
-                    .build()
+                new PartiesNotified()
+                    .setServiceData(new PartiesNotifiedServiceData().setHearingNoticeGenerated(false))
             );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
         verifyNoInteractions(messageCorrelationBuilder);
@@ -213,17 +212,12 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            PartiesNotifiedResponses.builder().responses(List.of(
-                PartiesNotifiedResponse.builder()
-                    .serviceData(PartiesNotifiedServiceData
-                                     .builder()
-                                     .days(List.of(HearingDay.builder()
-                                                       .hearingStartDateTime(LocalDateTime.of(2030, 6, 6, 12, 0, 0))
-                                                       .build()))
-                                     .hearingLocation(VENUE_ID)
-                                     .build())
-                    .build()
-            )).build());
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setServiceData(new PartiesNotifiedServiceData()
+                                     .setDays(List.of(new HearingDay()
+                                                       .setHearingStartDateTime(LocalDateTime.of(2030, 6, 6, 12, 0, 0))))
+                                     .setHearingLocation(VENUE_ID)))));
 
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
@@ -254,17 +248,12 @@ class HearingNoticeSchedulerEventHandlerTest {
         when(hearingsService.getHearingResponse(AUTH_TOKEN, HEARING_ID)).thenReturn(
             createHearing(ListAssistCaseStatus.LISTED));
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            PartiesNotifiedResponses.builder().responses(List.of(
-                PartiesNotifiedResponse.builder()
-                    .serviceData(PartiesNotifiedServiceData
-                                     .builder()
-                                     .days(List.of(HearingDay.builder()
-                                                       .hearingStartDateTime(HEARING_DATE)
-                                                       .build()))
-                                     .hearingLocation("111111")
-                                     .build())
-                    .build()
-            )).build());
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setServiceData(new PartiesNotifiedServiceData()
+                                     .setDays(List.of(new HearingDay()
+                                                       .setHearingStartDateTime(HEARING_DATE)))
+                                     .setHearingLocation("111111")))));
 
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
@@ -295,19 +284,14 @@ class HearingNoticeSchedulerEventHandlerTest {
             createHearing(ListAssistCaseStatus.LISTED));
 
         when(hearingsService.getPartiesNotifiedResponses(AUTH_TOKEN, HEARING_ID)).thenReturn(
-            PartiesNotifiedResponses.builder().responses(List.of(
-                PartiesNotifiedResponse.builder()
-                    .responseReceivedDateTime(LocalDateTime.now())
-                    .serviceData(PartiesNotifiedServiceData
-                                     .builder()
-                                     .days(List.of(HearingDay.builder()
-                                                       .hearingStartDateTime(HEARING_DATE)
-                                                       .hearingEndDateTime(HEARING_DATE.plusHours(1))
-                                                       .build()))
-                                     .hearingLocation(VENUE_ID)
-                                     .build())
-                    .build()
-            )).build());
+            new PartiesNotifiedResponses().setResponses(List.of(
+                new PartiesNotifiedResponse()
+                    .setResponseReceivedDateTime(LocalDateTime.now())
+                    .setServiceData(new PartiesNotifiedServiceData()
+                                     .setDays(List.of(new HearingDay()
+                                                       .setHearingStartDateTime(HEARING_DATE)
+                                                       .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
+                                     .setHearingLocation(VENUE_ID)))));
 
         CaseDetails mockCaseDetails = CaseDetails.builder()
             .id(Long.parseLong(CASE_ID))
@@ -323,13 +307,12 @@ class HearingNoticeSchedulerEventHandlerTest {
             HEARING_ID,
             VERSION,
             RECEIVED_DATETIME,
-            PartiesNotified.builder().serviceData(PartiesNotifiedServiceData.builder()
-                                                      .hearingLocation(VENUE_ID)
-                                                      .days(List.of(HearingDay.builder()
-                                                                        .hearingStartDateTime(HEARING_DATE)
-                                                                        .hearingEndDateTime(HEARING_DATE.plusHours(1))
-                                                                        .build()))
-                                                      .hearingNoticeGenerated(false).build()).build()
+            new PartiesNotified().setServiceData(new PartiesNotifiedServiceData()
+                                                      .setHearingLocation(VENUE_ID)
+                                                      .setDays(List.of(new HearingDay()
+                                                                        .setHearingStartDateTime(HEARING_DATE)
+                                                                        .setHearingEndDateTime(HEARING_DATE.plusHours(1))))
+                                                      .setHearingNoticeGenerated(false))
         );
         verify(runtimeService, times(0)).createMessageCorrelation(MESSAGE_ID);
         verifyNoInteractions(messageCorrelationBuilder);
@@ -347,24 +330,21 @@ class HearingNoticeSchedulerEventHandlerTest {
 
     private HearingGetResponse createHearing(ListAssistCaseStatus hearingStatus) {
         PartyDetailsModel partyDetailsModel = new PartyDetailsModel();
-        return HearingGetResponse.builder()
-            .hearingDetails(HearingDetails.builder().build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION.longValue())
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef(HearingNoticeSchedulerEventHandlerTest.CASE_ID).build())
-            .partyDetails(List.of(partyDetailsModel))
-            .hearingResponse(
-                HearingResponse.builder()
-                    .receivedDateTime(RECEIVED_DATETIME)
-                    .laCaseStatus(hearingStatus)
-                    .hearingDaySchedule(List.of(
-                        HearingDaySchedule.builder()
-                            .hearingStartDateTime(HEARING_DATE)
-                            .hearingEndDateTime(HEARING_DATE.plusHours(1))
-                            .hearingVenueId(VENUE_ID).build()
-                    ))
-                    .build())
-            .build();
+        return new HearingGetResponse()
+            .setHearingDetails(new HearingDetails())
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION.longValue()))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef(HearingNoticeSchedulerEventHandlerTest.CASE_ID))
+            .setPartyDetails(List.of(partyDetailsModel))
+            .setHearingResponse(
+                new HearingResponse()
+                    .setReceivedDateTime(RECEIVED_DATETIME)
+                    .setLaCaseStatus(hearingStatus)
+                    .setHearingDaySchedule(List.of(
+                        new HearingDaySchedule()
+                            .setHearingStartDateTime(HEARING_DATE)
+                            .setHearingEndDateTime(HEARING_DATE.plusHours(1))
+                            .setHearingVenueId(VENUE_ID)
+                    )));
     }
 }

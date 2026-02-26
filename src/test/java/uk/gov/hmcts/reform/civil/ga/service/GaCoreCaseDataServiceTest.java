@@ -151,13 +151,12 @@ class GaCoreCaseDataServiceTest {
         @Test
         void triggerUpdateLocationEpimdsIdEvent_WhenApplicant1DQRequestedCourtCalled() {
             List<LocationRefData> mockLocation = new ArrayList<>();
-            LocationRefData locationRefData = LocationRefData.builder()
-                .region("1")
-                .epimmsId("12345")
-                .courtAddress("Central London")
-                .postcode("LJ09 EMM")
-                .siteName("London SX12 2345")
-                .build();
+            LocationRefData locationRefData = new LocationRefData()
+                .setRegion("1")
+                .setEpimmsId("12345")
+                .setCourtAddress("Central London")
+                .setPostcode("LJ09 EMM")
+                .setSiteName("London SX12 2345");
             mockLocation.add(locationRefData);
             when(locationRefDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
 
@@ -583,7 +582,7 @@ class GaCoreCaseDataServiceTest {
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
             )).thenThrow(new RuntimeException("Exception"));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitUpdate(CASE_ID, CaseDataContent.builder().build());
 
@@ -600,7 +599,7 @@ class GaCoreCaseDataServiceTest {
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
             )).thenThrow(new RuntimeException("Exception"));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build());
             verify(coreCaseDataApi, times(2)).submitEventForCaseWorker(anyString(), anyString(), anyString(),

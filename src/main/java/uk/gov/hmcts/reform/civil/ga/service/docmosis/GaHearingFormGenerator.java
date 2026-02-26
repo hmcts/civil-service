@@ -88,46 +88,45 @@ public class GaHearingFormGenerator implements TemplateDataGenerator<GaHearingFo
         boolean defendant2exists = canViewResp(parentCaseData, caseData, "2")
                 && nonNull(caseData.getDefendant2PartyName());
 
-        GaHearingForm.GaHearingFormBuilder hearingFormBuilder = GaHearingForm.builder()
-            .court(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-            .judgeHearingLocation(caseData.getGaHearingNoticeDetail().getHearingLocation().getValue().getLabel())
-            .caseNumber(getCaseNumberFormatted(caseData))
-            .creationDate(getDateFormatted(LocalDate.now()))
-            .claimant(caseData.getClaimant1PartyName())
-            .claimantReference(getReference(parentCase, "applicantSolicitor1Reference"))
-            .defendant(caseData.getDefendant1PartyName())
-            .defendantReference(getReference(parentCase, "respondentSolicitor1Reference"))
-            .hearingDate(getDateFormatted(caseData.getGaHearingNoticeDetail().getHearingDate()))
-            .hearingTime(getHearingTimeFormatted(caseData.getGaHearingNoticeDetail().getHearingTimeHourMinute()))
-            .hearingType(caseData.getGaHearingNoticeDetail().getChannel().getDisplayedValue())
-            .applicationDate(getDateFormatted(caseData.getGaHearingNoticeApplication()
-                                                  .getHearingNoticeApplicationDate()))
-            .hearingDuration(getHearingDurationString(caseData))
-            .additionalInfo(caseData.getGaHearingNoticeInformation())
-            .applicant(caseData.getApplicantPartyName())
-            .claimant1exists(claimant1exists)
-            .defendant1exists(defendant1exists)
-            .claimant2exists(claimant2exists)
-            .defendant2exists(defendant2exists)
-            .claimant2(nonNull(caseData.getClaimant2PartyName()) ? caseData.getClaimant2PartyName() : null)
-            .defendant2(nonNull(caseData.getDefendant2PartyName()) ? caseData.getDefendant2PartyName() : null)
-            .claimant2Reference(getReference(parentCase, "applicantSolicitor1Reference"))
-            .defendant2Reference(getReference(parentCase, "respondentSolicitor2Reference"));
+        GaHearingForm hearingForm = new GaHearingForm()
+            .setCourt(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
+            .setJudgeHearingLocation(caseData.getGaHearingNoticeDetail().getHearingLocation().getValue().getLabel())
+            .setCaseNumber(getCaseNumberFormatted(caseData))
+            .setCreationDate(getDateFormatted(LocalDate.now()))
+            .setClaimant(caseData.getClaimant1PartyName())
+            .setClaimantReference(getReference(parentCase, "applicantSolicitor1Reference"))
+            .setDefendant(caseData.getDefendant1PartyName())
+            .setDefendantReference(getReference(parentCase, "respondentSolicitor1Reference"))
+            .setHearingDate(getDateFormatted(caseData.getGaHearingNoticeDetail().getHearingDate()))
+            .setHearingTime(getHearingTimeFormatted(caseData.getGaHearingNoticeDetail().getHearingTimeHourMinute()))
+            .setHearingType(caseData.getGaHearingNoticeDetail().getChannel().getDisplayedValue())
+            .setApplicationDate(getDateFormatted(caseData.getGaHearingNoticeApplication()
+                                                     .getHearingNoticeApplicationDate()))
+            .setHearingDuration(getHearingDurationString(caseData))
+            .setAdditionalInfo(caseData.getGaHearingNoticeInformation())
+            .setApplicant(caseData.getApplicantPartyName())
+            .setClaimant1exists(claimant1exists)
+            .setDefendant1exists(defendant1exists)
+            .setClaimant2exists(claimant2exists)
+            .setDefendant2exists(defendant2exists)
+            .setClaimant2(nonNull(caseData.getClaimant2PartyName()) ? caseData.getClaimant2PartyName() : null)
+            .setDefendant2(nonNull(caseData.getDefendant2PartyName()) ? caseData.getDefendant2PartyName() : null)
+            .setClaimant2Reference(getReference(parentCase, "applicantSolicitor1Reference"))
+            .setDefendant2Reference(getReference(parentCase, "respondentSolicitor2Reference"));
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
             boolean parentClaimantIsApplicant = caseData.identifyParentClaimantIsApplicant(caseData);
 
-            hearingFormBuilder
-                .partyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine1(caseData.partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine2(caseData.partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine3(caseData.partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData))
-                .build();
+            hearingForm
+                .setPartyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine1(caseData.partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine2(caseData.partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine3(caseData.partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData));
         }
 
-        return hearingFormBuilder.build();
+        return hearingForm;
     }
 
     protected String getCaseNumberFormatted(GeneralApplicationCaseData caseData) {

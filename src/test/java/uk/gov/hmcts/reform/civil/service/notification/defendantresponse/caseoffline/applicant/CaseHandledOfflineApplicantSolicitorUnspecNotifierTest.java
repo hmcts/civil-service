@@ -81,7 +81,7 @@ class CaseHandledOfflineApplicantSolicitorUnspecNotifierTest {
     @Test
     void shouldNotifySolicitor_when1v1Case() {
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn(TEMPLATE_ONE);
 
@@ -102,7 +102,7 @@ class CaseHandledOfflineApplicantSolicitorUnspecNotifierTest {
     @Test
     void shouldNotifyApplicantSolicitor_when1v2Case() {
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty())
             .thenReturn(TEMPLATE_ONE);
 
@@ -124,7 +124,7 @@ class CaseHandledOfflineApplicantSolicitorUnspecNotifierTest {
     @Test
     void shouldNotifyApplicantSolicitor_when2v1Case() {
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
             .thenReturn(TEMPLATE_ONE);
 

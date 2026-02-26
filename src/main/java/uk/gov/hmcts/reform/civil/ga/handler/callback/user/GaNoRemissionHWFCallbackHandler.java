@@ -51,7 +51,7 @@ public class GaNoRemissionHWFCallbackHandler extends CallbackHandler implements 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         caseData = HwFFeeTypeUtil.updateOutstandingFee(caseData, callbackParams.getRequest().getEventId());
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+        GeneralApplicationCaseData updatedData = caseData.copy()
             .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         log.info("NOTIFY_APPLICANT_LIP_HWF business process for caseId: {}", caseData.getCcdCaseReference());
 

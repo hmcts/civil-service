@@ -2,16 +2,16 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Accessors(chain = true)
 @EqualsAndHashCode
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)

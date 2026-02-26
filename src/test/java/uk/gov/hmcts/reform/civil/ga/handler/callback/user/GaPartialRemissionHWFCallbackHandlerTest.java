@@ -53,15 +53,15 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsGa() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                            .build())
-                    .gaHwfDetails(HelpWithFeesDetails.builder()
-                            .remissionAmount(BigDecimal.valueOf(1000))
-                            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-                            .build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
+                            )
+                    .gaHwfDetails(new HelpWithFeesDetails()
+                            .setRemissionAmount(BigDecimal.valueOf(1000))
+                            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+                            )
                     .hwfFeeType(FeeType.APPLICATION)
                     .build();
 
@@ -79,15 +79,15 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
 
         @Test
         void shouldCallPartialRemissionHwfEventWhenFeeTypeIsHearing() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                    Fee.builder()
-                                            .calculatedAmountInPence(BigDecimal.valueOf(10000)).code("OOOCM002").build())
-                            .build())
-                    .additionalHwfDetails(HelpWithFeesDetails.builder()
-                            .remissionAmount(BigDecimal.valueOf(1000))
-                            .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-                            .build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                    new Fee()
+                                            .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
+                            )
+                    .additionalHwfDetails(new HelpWithFeesDetails()
+                            .setRemissionAmount(BigDecimal.valueOf(1000))
+                            .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+                            )
                     .hwfFeeType(FeeType.ADDITIONAL)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, CaseEvent.PARTIAL_REMISSION_HWF_GA, CallbackType.ABOUT_TO_SUBMIT);
@@ -106,15 +106,15 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @Test
     void shouldPopulateErrorWhenApplicationRemissionAmountIsNegative() {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
-                        .build())
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                        .remissionAmount(BigDecimal.valueOf(-1000))
-                        .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
+                        )
+                .gaHwfDetails(new HelpWithFeesDetails()
+                        .setRemissionAmount(BigDecimal.valueOf(-1000))
+                        )
                 .hwfFeeType(FeeType.APPLICATION)
                 .build();
 
@@ -130,15 +130,15 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @Test
     void shouldPopulateErrorWhenAdditionalRemissionAmountIsNegative() {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
-                        .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                        .remissionAmount(BigDecimal.valueOf(-1000))
-                        .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
+                        )
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                        .setRemissionAmount(BigDecimal.valueOf(-1000))
+                        )
                 .hwfFeeType(FeeType.ADDITIONAL)
 
                 .build();
@@ -155,18 +155,18 @@ public class GaPartialRemissionHWFCallbackHandlerTest extends GeneralApplication
     @MethodSource("provideFeeTypes")
     void shouldPopulateErrorWhenRemissionAmountIsNotValidForDifferentFeeTypes(FeeType feeType, String errMsg) {
         //Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
-                        .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                        .remissionAmount(BigDecimal.valueOf(35000))
-                        .build())
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                        .remissionAmount(BigDecimal.valueOf(35000))
-                        .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
+                        )
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                        .setRemissionAmount(BigDecimal.valueOf(35000))
+                        )
+                .gaHwfDetails(new HelpWithFeesDetails()
+                        .setRemissionAmount(BigDecimal.valueOf(35000))
+                        )
                 .hwfFeeType(feeType)
                 .build();
         CallbackParams params = callbackParamsOf(caseData, CallbackType.MID, "remission-amount");

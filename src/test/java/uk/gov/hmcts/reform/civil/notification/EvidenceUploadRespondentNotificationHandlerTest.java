@@ -95,7 +95,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
         void shouldNotifyRespondent1Solicitor_whenInvoked() {
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -160,7 +160,7 @@ class EvidenceUploadRespondentNotificationHandlerTest extends BaseCallbackHandle
             //given: case data has two respondent solicitor
             when(notificationsProperties.getEvidenceUploadTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 

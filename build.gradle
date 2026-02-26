@@ -98,12 +98,12 @@ allprojects {
         entry 'guava'
       }
 
-      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.2.1'
+      dependency group: 'com.squareup.okhttp3', name: 'okhttp', version: '5.3.2'
 
       // To prevent other libraries using conflicting versions
       dependency group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.17'
 
-      dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.3.6') {
+      dependencySet(group: 'org.apache.httpcomponents.core5', version: '5.4.1') {
         entry 'httpcore5'
         entry 'httpcore5-h2'
       }
@@ -343,7 +343,7 @@ dependencies {
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
-  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.49.5'
+  implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
   implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
@@ -353,10 +353,10 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
   implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.6'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
-  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '7.0.0'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.7'
 
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
@@ -398,7 +398,7 @@ dependencies {
       because 'CVE-2025-68161 (upgrade to vendor recommended version)'
     }
   }
-  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
+  implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
   implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
 
@@ -431,7 +431,7 @@ dependencies {
 
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
-  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.5.1'
+  implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.6'
 
   testImplementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
   testImplementation group: 'org.apache.pdfbox', name: 'preflight', version: versions.pdfbox, withoutJunit4

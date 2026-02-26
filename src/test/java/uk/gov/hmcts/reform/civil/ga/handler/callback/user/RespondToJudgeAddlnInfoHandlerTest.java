@@ -302,7 +302,7 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
             generalAppAddlnInfoUpload.add(element(document2));
 
             GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+            caseData = caseData.copy().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
                 .generalAppAddlnInfoText("test").build();
 
             Map<String, Object> dataMap = objectMapper.convertValue(
@@ -335,7 +335,7 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
             generalAppAddlnInfoUpload.add(element(document2));
 
             GeneralApplicationCaseData caseData = getCase(generalAppAddlnInfoUpload, null, null);
-            caseData = caseData.toBuilder().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
+            caseData = caseData.copy().isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES)
                 .preTranslationGaDocuments(List.of(element(new CaseDocument().setDocumentName("Additional information").setCreatedBy("Applicant")))).build();
 
             Map<String, Object> dataMap = objectMapper.convertValue(
@@ -360,16 +360,16 @@ public class RespondToJudgeAddlnInfoHandlerTest extends GeneralApplicationBaseCa
                              String generalAppAddlnInfoText) {
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-        return GeneralApplicationCaseData.builder().parentClaimantIsApplicant(YES)
+        return new GeneralApplicationCaseData().parentClaimantIsApplicant(YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppAddlnInfoUpload(generalAppAddlnInfoUpload)
             .generalAppAddlnInfoText(generalAppAddlnInfoText)
             .gaAddlDoc(gaAddlDoc)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

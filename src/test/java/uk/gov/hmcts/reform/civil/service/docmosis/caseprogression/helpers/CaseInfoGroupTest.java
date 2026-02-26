@@ -25,10 +25,9 @@ public class CaseInfoGroupTest {
         Party applicant2 = Party.builder().partyName("Claimant 2").type(Type.COMPANY).build();
         Party respondent1 = Party.builder().partyName("Defendant 1").type(Type.COMPANY).build();
         Party respondent2 = Party.builder().partyName("Defendant 2").type(Type.COMPANY).build();
-        SolicitorReferences solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference("ClaimantRef")
-            .respondentSolicitor1Reference("DefendantRef")
-            .build();
+        SolicitorReferences solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("ClaimantRef")
+            .setRespondentSolicitor1Reference("DefendantRef");
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .applicant1(applicant1)

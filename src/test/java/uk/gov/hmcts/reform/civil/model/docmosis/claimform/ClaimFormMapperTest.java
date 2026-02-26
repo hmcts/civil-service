@@ -82,12 +82,10 @@ class ClaimFormMapperTest {
                             .type(Party.Type.INDIVIDUAL)
                             .build())
             .timelineOfEvents(List.of(
-                TimelineOfEvents.builder().id("1").value(
-                        TimelineOfEventDetails.builder()
-                            .timelineDate(LocalDate.now())
-                            .timelineDescription("desc")
-                            .build())
-                    .build()))
+                new TimelineOfEvents(
+                    new TimelineOfEventDetails(LocalDate.now(), "desc"),
+                    "1"
+                )))
             .respondent1(Party.builder()
                              .individualLastName(INDIVIDUAL_LAST_NAME)
                              .individualFirstName(INDIVIDUAL_FIRST_NAME)
@@ -151,14 +149,14 @@ class ClaimFormMapperTest {
                             .type(Party.Type.COMPANY)
                             .build())
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             )
             .respondent1(Party.builder()
                              .companyName(COMPANY)
                              .partyEmail(EMAIL)
                              .type(Party.Type.COMPANY)
                              .build())
-            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
+            .uiStatementOfTruth(new StatementOfTruth().setName("Test").setRole("Test"))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -180,7 +178,7 @@ class ClaimFormMapperTest {
                             .type(Party.Type.ORGANISATION)
                             .build())
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             )
             .respondent1(Party.builder()
                              .organisationName(ORGANISATION)
@@ -383,7 +381,7 @@ class ClaimFormMapperTest {
         //Given
         CaseData caseData = CASE_DATA.toBuilder()
             .claimantUserDetails(
-                IdamUserDetails.builder().email(EMAIL).build()
+                new IdamUserDetails().setEmail(EMAIL)
             ).totalClaimAmount(null).build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
@@ -404,7 +402,7 @@ class ClaimFormMapperTest {
         //Given
         CaseData caseData = getCaseData().toBuilder()
             .submittedDate(SUBMITTED_DATE)
-            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE))
             .build();
         given(interestCalculator.calculateInterest(caseData)).willReturn(INTEREST);
         //When
@@ -489,10 +487,10 @@ class ClaimFormMapperTest {
                         .partyEmail(EMAIL)
                         .type(Party.Type.COMPANY)
                         .build())
-                .flightDelayDetails(FlightDelayDetails.builder()
-                        .flightNumber("BA123")
-                        .nameOfAirline("BATestAirLine")
-                        .scheduledDate(LocalDate.now()).build()).build();
+                .flightDelayDetails(new FlightDelayDetails()
+                        .setFlightNumber("BA123")
+                        .setNameOfAirline("BATestAirLine")
+                        .setScheduledDate(LocalDate.now())).build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);
         //Then

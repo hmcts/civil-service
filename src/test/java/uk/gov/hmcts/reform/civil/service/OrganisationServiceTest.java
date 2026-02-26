@@ -39,9 +39,8 @@ class OrganisationServiceTest {
         Request.create(GET, "", Map.of(), new byte[]{}, UTF_8, null),
         "not found response body".getBytes(UTF_8),
         Map.of());
-    private final Organisation expectedOrganisation = Organisation.builder()
-        .organisationIdentifier(ORG_ID)
-        .build();
+    private final Organisation expectedOrganisation = new Organisation()
+        .setOrganisationIdentifier(ORG_ID);
 
     @Mock
     private OrganisationApi organisationApi;

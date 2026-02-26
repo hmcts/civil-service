@@ -63,7 +63,7 @@ class HearingFeeUnpaidRespSolOneEmailDTOGeneratorTest {
         String formattedDate = formatLocalDate(caseData.getHearingDate(), DATE);
 
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
 
         Map<String, String> updatedProperties = generator.addCustomProperties(properties, caseData);
 
