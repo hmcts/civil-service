@@ -61,7 +61,6 @@ public class DashboardNotificationService {
             .toList();
     }
 
-
     public List<DashboardNotificationsEntity> getDashboardNotifications(String ccdCaseIdentifier, String roleType) {
         return dashboardNotificationsRepository
             .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
