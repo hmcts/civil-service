@@ -152,7 +152,7 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
             return APPLICATION_DISMISSED;
         }
 
-        var snapshot = data.toBuilder().build();
+        var snapshot = data.copy();
         var respondentsSatisfied = isRespondentsResponseSatisfied(data, snapshot);
 
         if (isVaryPaymentTermsProceedsInHeritage(data, types, respondentsSatisfied)) {

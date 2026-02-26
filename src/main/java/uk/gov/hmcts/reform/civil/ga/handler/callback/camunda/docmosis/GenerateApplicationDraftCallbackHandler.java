@@ -104,27 +104,25 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     }
 
     private CallbackResponse createPDFdocument(CallbackParams callbackParams) {
-        var caseData = callbackParams.getGeneralApplicationCaseData();
-        var caseDataBuilder = caseData.toBuilder();
+        var caseData = callbackParams.getGeneralApplicationCaseData().copy();
 
         if (gaForLipService.isGaForLip(caseData)) {
-            handleLipDraftGeneration(callbackParams, caseData, caseDataBuilder);
+            handleLipDraftGeneration(callbackParams, caseData);
         } else {
-            handleNonLipDraftGeneration(callbackParams, caseData, caseDataBuilder);
+            handleNonLipDraftGeneration(callbackParams, caseData);
         }
 
-        return AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(objectMapper)).build();
+        return AboutToStartOrSubmitCallbackResponse.builder().data(caseData.toMap(objectMapper)).build();
     }
 
     private void handleLipDraftGeneration(CallbackParams callbackParams,
-                                          GeneralApplicationCaseData caseData,
-                                          GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+                                          GeneralApplicationCaseData caseData) {
         if (generalAppFeesService.isFreeApplication(caseData) || isFeePaid(caseData)) {
-            var gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
+            var gaDraftDocument = generateDraftDocument(callbackParams, caseData);
             if (shouldUseWelshTranslation(caseData)) {
-                updateWelshTranslationDocuments(caseData, caseDataBuilder, gaDraftDocument);
+                updateWelshTranslationDocuments(caseData, gaDraftDocument);
             } else {
-                updateDraftApplicationList(caseData, caseDataBuilder, gaDraftDocument);
+                updateDraftApplicationList(caseData, gaDraftDocument);
             }
         }
     }
@@ -136,7 +134,6 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
     }
 
     private void updateWelshTranslationDocuments(GeneralApplicationCaseData caseData,
-                                                 GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
                                                  CaseDocument gaDraftDocument) {
         var preTranslatedDocuments = Optional.ofNullable(
             caseData.getPreTranslationGaDocuments())
@@ -154,11 +151,10 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             ? PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC
             : PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC;
 
-        caseDataBuilder.preTranslationGaDocumentType(docType).preTranslationGaDocuments(preTranslatedDocuments);
+        caseData.preTranslationGaDocumentType(docType).preTranslationGaDocuments(preTranslatedDocuments);
     }
 
     private void updateDraftApplicationList(GeneralApplicationCaseData caseData,
-                                            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
                                             CaseDocument gaDraftDocument) {
         var draftApplicationList = Optional.ofNullable(caseData.getGaDraftDocument()).orElseGet(ArrayList::new);
         draftApplicationList.add(element(gaDraftDocument));
@@ -168,20 +164,19 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
             document -> document.getValue().getDocumentLink(),
             AssignCategoryId.APPLICATIONS
         );
-        caseDataBuilder.gaDraftDocument(draftApplicationList);
+        caseData.gaDraftDocument(draftApplicationList);
     }
 
     private void handleNonLipDraftGeneration(CallbackParams callbackParams,
-                                             GeneralApplicationCaseData caseData,
-                                             GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+                                             GeneralApplicationCaseData caseData) {
         /*
         1. Draft document should not be generated if judge had made the decision on application
         2. Draft document should be generated only if all the respondents responded in Multiparty
         3. Draft document should be generated only if Free fee application
         4. Draft document should be generated only after payment is made for urgent application and without notice
         */
-        if (shouldGenerateNonLipDraft(caseData, caseDataBuilder.build())) {
-            var gaDraftDocument = generateDraftDocument(callbackParams, caseDataBuilder.build());
+        if (shouldGenerateNonLipDraft(caseData)) {
+            var gaDraftDocument = generateDraftDocument(callbackParams, caseData);
             var draftApplicationList = wrapElements(gaDraftDocument);
 
             assignCategoryId.assignCategoryIdToCollection(
@@ -189,15 +184,15 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
                 document -> document.getValue().getDocumentLink(),
                 AssignCategoryId.APPLICATIONS
             );
-            caseDataBuilder.gaDraftDocument(draftApplicationList);
+            caseData.gaDraftDocument(draftApplicationList);
         }
     }
 
-    private boolean shouldGenerateNonLipDraft(GeneralApplicationCaseData caseData, GeneralApplicationCaseData builtData) {
+    private boolean shouldGenerateNonLipDraft(GeneralApplicationCaseData caseData) {
         return (isApplicationUrgentAndFreeFee(caseData)
             || isGANonUrgentWithOutNoticeFeePaid(caseData)
             || isApplicationUrgentAndFeePaid(caseData)
-            || isRespondentsResponseSatisfied(caseData, builtData))
+            || isRespondentsResponseSatisfied(caseData, caseData))
             && Objects.isNull(caseData.getJudicialDecision());
     }
 

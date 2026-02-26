@@ -407,7 +407,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
                 caseDetailsConverter, gaForLipService, mockHelper);
 
-            GeneralApplicationCaseData data = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData data = new GeneralApplicationCaseData()
                 .ccdCaseReference(1234L)
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .parentClaimantIsApplicant(YES)
@@ -415,8 +415,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                               .setHwfFullRemissionGrantedForGa(NO)
                                               .setHwfOutstandingFeePaymentDoneForGa(List.of("No")))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
-                .build();
+                .generalAppPBADetails(new GeneralApplicationPbaDetails());
 
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             CallbackParams callbackParams = getCallbackParams(data);
@@ -434,14 +433,13 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
                 caseDetailsConverter, gaForLipService, mockHelper);
 
-            GeneralApplicationCaseData data = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData data = new GeneralApplicationCaseData()
                 .ccdCaseReference(1234L)
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .parentClaimantIsApplicant(YES)
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
                 .feePaymentOutcomeDetails(null)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
-                .build();
+                .generalAppPBADetails(new GeneralApplicationPbaDetails());
 
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             CallbackParams callbackParams = getCallbackParams(data);
