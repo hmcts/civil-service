@@ -53,11 +53,9 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordRequestMoreInfoScenario() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_REQUEST_MORE_INFO_APPLICANT.getScenario());
@@ -66,11 +64,9 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordAdditionalPaymentScenarioWhenUncloakedWithAdditionalFee() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .build();
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
 
@@ -80,11 +76,10 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordRequestMoreInfoScenarioWhenNoAdditionalFee() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
+            )
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_REQUEST_MORE_INFO_APPLICANT.getScenario());
@@ -93,11 +88,10 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordHearingScheduledScenario() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.LISTING_FOR_A_HEARING)
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING).build())
-            .gaHearingNoticeApplication(GAHearingNoticeApplication.builder().build())
-            .gaHearingNoticeDetail(GAHearingNoticeDetail.builder().build())
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING))
+            .gaHearingNoticeApplication(new GAHearingNoticeApplication())
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail())
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_HEARING_SCHEDULED_APPLICANT.getScenario());
@@ -106,12 +100,9 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordWrittenRepresentationsScenario() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
-                                  .build())
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
             .build();
 
         assertScenarioRecorded(
@@ -123,16 +114,14 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldPreferWrittenRepresentationsOverRequestMoreInfoScenario() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
-                                  .build())
-            .build();
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
+            )
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
+            .judicialDecision(
+                new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS)
+            ).build();
 
         assertScenarioRecorded(
             caseData,
@@ -143,9 +132,8 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldRecordOrderMadeScenario() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecision(GAJudicialDecision.builder().decision(GAJudgeDecisionOption.MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario());
@@ -154,7 +142,6 @@ class MakeDecisionApplicantDashboardServiceTest {
     @Test
     void shouldNotRecordScenarioWhenNoConditionsMatched() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
             .build();
 
@@ -164,7 +151,7 @@ class MakeDecisionApplicantDashboardServiceTest {
     }
 
     private GeneralApplicationCaseData baseCase() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(123L)
             .isGaApplicantLip(YesOrNo.YES)
             .build();
@@ -186,7 +173,7 @@ class MakeDecisionApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenApplicantIsLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -194,7 +181,7 @@ class MakeDecisionApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -202,7 +189,7 @@ class MakeDecisionApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
     }

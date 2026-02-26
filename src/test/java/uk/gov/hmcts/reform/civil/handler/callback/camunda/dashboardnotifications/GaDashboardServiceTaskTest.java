@@ -16,7 +16,7 @@ class GaDashboardServiceTaskTest {
 
     @Test
     void shouldDelegateToServiceWithCaseDataAndAuthToken() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(123456L)
             .build();
         CallbackParams callbackParams = new CallbackParams()
@@ -34,7 +34,7 @@ class GaDashboardServiceTaskTest {
 
     @Test
     void shouldThrowWhenAuthTokenMissing() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(123456L)
             .build();
         CallbackParams callbackParams = new CallbackParams()

@@ -83,7 +83,7 @@ class ApplicationIssuedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenApplicantIsLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -91,7 +91,7 @@ class ApplicationIssuedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -99,7 +99,7 @@ class ApplicationIssuedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
     }

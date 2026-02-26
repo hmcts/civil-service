@@ -40,7 +40,6 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     @Test
     void shouldRecordNonUrgentScenarioWhenWithNotice() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
             .build();
@@ -51,7 +50,6 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     @Test
     void shouldRecordUrgentScenarioWhenWithNoticeAndUrgent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
             .build();
@@ -62,7 +60,6 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     @Test
     void shouldRecordNonUrgentScenarioWhenWithConsent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .generalAppConsentOrder(YesOrNo.YES)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
             .build();
@@ -73,7 +70,6 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     @Test
     void shouldRecordUrgentScenarioWhenWithConsentAndUrgent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .generalAppConsentOrder(YesOrNo.YES)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
             .build();
@@ -84,7 +80,6 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     @Test
     void shouldNotRecordScenarioWhenWithoutNoticeOrConsent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
             .generalAppConsentOrder(YesOrNo.NO)
             .build();
@@ -95,7 +90,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     }
 
     private GeneralApplicationCaseData baseCase() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(789012L)
             .isGaRespondentOneLip(YesOrNo.YES)
             .isMultiParty(YesOrNo.NO)
@@ -120,7 +115,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenRespondentOneLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaRespondentOneLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -128,7 +123,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .isGaRespondentOneLip(YesOrNo.NO)
             .build();
@@ -137,7 +132,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenSinglePartyAndRespondentOneLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -145,7 +140,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyAndRespondentTwoLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.YES)
@@ -155,7 +150,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenMultiPartyAndRespondentTwoLipNoAndRespondentOneLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.NO)
             .isGaRespondentTwoLip(YesOrNo.NO)
@@ -165,7 +160,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenMultiPartyRespondentOneLipYesEvenIfRespondentTwoLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(YesOrNo.YES)
             .isGaRespondentOneLip(YesOrNo.YES)
             .isGaRespondentTwoLip(YesOrNo.NO)

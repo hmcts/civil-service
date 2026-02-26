@@ -14,7 +14,7 @@ class DashboardTaskContextTest {
 
     @Test
     void shouldExposeGaCaseDataAndCaseType() {
-        GeneralApplicationCaseData gaCaseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData()
             .ccdCaseReference(111L)
             .build();
         CallbackParams callbackParams = new CallbackParams()

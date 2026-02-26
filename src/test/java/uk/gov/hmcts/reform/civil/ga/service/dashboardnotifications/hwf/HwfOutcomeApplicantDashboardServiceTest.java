@@ -78,10 +78,12 @@ class HwfOutcomeApplicantDashboardServiceTest {
     }
 
     private GeneralApplicationCaseData buildCase(FeeType feeType, CaseEvent hwfCaseEvent) {
-        GeneralApplicationCaseData caseData =
-            GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-        HelpWithFeesDetails hwfDetails = HelpWithFeesDetails.builder().hwfCaseEvent(hwfCaseEvent).build();
-        return caseData.toBuilder()
+
+        HelpWithFeesDetails hwfDetails = new HelpWithFeesDetails().setHwfCaseEvent(hwfCaseEvent);
+
+        return GeneralApplicationCaseDataBuilder.builder()
+            .atStateClaimDraft()
+            .withNoticeCaseData()
             .hwfFeeType(feeType)
             .gaHwfDetails(feeType == FeeType.APPLICATION ? hwfDetails : null)
             .additionalHwfDetails(feeType == FeeType.ADDITIONAL ? hwfDetails : null)

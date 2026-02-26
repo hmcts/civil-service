@@ -30,7 +30,7 @@ class GaDashboardScenarioServiceTest {
 
     @Test
     void shouldRecordPrimaryExtraAndAdditionalScenarios() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdCaseReference(123456L)
             .build();
         HashMap<String, Object> params = new HashMap<>();

@@ -42,10 +42,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
     @Test
     void shouldRecordSubmittedAndFeePaidScenariosWhenHwfNoRemission() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
-            .gaHwfDetails(HelpWithFeesDetails.builder()
-                              .hwfCaseEvent(CaseEvent.NO_REMISSION_HWF_GA)
-                              .build())
+            .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.NO_REMISSION_HWF_GA))
             .build();
 
         assertScenarioRecorded(
@@ -58,10 +55,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
     @Test
     void shouldRecordSubmittedAndFullRemissionScenariosWhenHwfFullRemission() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
-            .gaHwfDetails(HelpWithFeesDetails.builder()
-                              .hwfCaseEvent(CaseEvent.FULL_REMISSION_HWF_GA)
-                              .build())
+            .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.FULL_REMISSION_HWF_GA))
             .build();
 
         assertScenarioRecorded(
@@ -74,12 +68,9 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
     @Test
     void shouldRecordSubmittedAndFeePaidScenariosWhenFeePaymentOutcomeNoRemission() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
             .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                           .setHwfFullRemissionGrantedForGa(YesOrNo.NO))
-            .gaHwfDetails(HelpWithFeesDetails.builder()
-                              .hwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME_GA)
-                              .build())
+            .gaHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(CaseEvent.FEE_PAYMENT_OUTCOME_GA))
             .build();
 
         assertScenarioRecorded(
@@ -107,7 +98,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
     }
 
     private GeneralApplicationCaseData baseCase() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(123456L)
             .isGaApplicantLip(YesOrNo.YES)
             .build();
@@ -138,7 +129,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_true_whenApplicantIsLipYes() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .build();
         assertTrue(service.shouldRecordScenario(caseData));
@@ -146,7 +137,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.NO)
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
@@ -154,7 +145,7 @@ class ApplicationSubmittedApplicantDashboardServiceTest {
 
     @Test
     void shouldRecordScenario_false_whenApplicantIsLipNull() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
         assertFalse(service.shouldRecordScenario(caseData));
     }

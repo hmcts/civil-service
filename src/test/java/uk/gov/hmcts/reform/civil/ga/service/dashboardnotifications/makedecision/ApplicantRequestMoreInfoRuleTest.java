@@ -27,10 +27,9 @@ class ApplicantRequestMoreInfoRuleTest {
     @Test
     void shouldReturnAdditionalPaymentScenarioWhenUncloakedWithAdditionalFee() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
+            )
             .build();
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(true);
 
@@ -44,10 +43,9 @@ class ApplicantRequestMoreInfoRuleTest {
     @Test
     void shouldReturnRequestMoreInfoScenarioWhenNoAdditionalFee() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
-                                                 .build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)
+            )
             .build();
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(caseData)).thenReturn(false);
 
@@ -61,11 +59,10 @@ class ApplicantRequestMoreInfoRuleTest {
     @Test
     void shouldReturnEmptyWhenWrittenRepresentationsPresent() {
         GeneralApplicationCaseData caseData = baseCase()
-            .toBuilder()
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
-                                                 .build())
-            .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder().build())
+            .judicialDecisionRequestMoreInfo(
+                new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)
+            )
+            .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations())
             .build();
 
         RequestMoreInfoApplicantRule rule = new RequestMoreInfoApplicantRule(judicialDecisionHelper);
@@ -75,7 +72,7 @@ class ApplicantRequestMoreInfoRuleTest {
     }
 
     private GeneralApplicationCaseData baseCase() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .build();
     }

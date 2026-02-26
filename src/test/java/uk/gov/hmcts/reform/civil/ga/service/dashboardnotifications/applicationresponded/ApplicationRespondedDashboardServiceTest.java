@@ -124,7 +124,7 @@ class ApplicationRespondedDashboardServiceTest {
     }
 
     private GeneralApplicationCaseData buildCase(boolean varyPaymentTerms) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .parentClaimantIsApplicant(varyPaymentTerms ? YesOrNo.NO : YesOrNo.YES)
             .generalAppType(GAApplicationType.builder()
                                 .types(List.of(varyPaymentTerms
