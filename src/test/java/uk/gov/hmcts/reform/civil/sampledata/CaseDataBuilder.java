@@ -7931,11 +7931,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder otherRemedyFee(BigDecimal amount) {
-        otherRemedyFee =  Fee.builder()
-            .version("1")
-            .code("CODE")
-            .calculatedAmountInPence(amount)
-            .build();
+        otherRemedyFee = new Fee(amount, "CODE", "1");
         return this;
     }
 

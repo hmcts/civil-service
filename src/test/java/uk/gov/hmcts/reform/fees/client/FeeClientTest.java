@@ -126,18 +126,11 @@ class FeeClientTest {
 
     @Test
     void shouldReturnFeeDataForOtherRemedy_whenValidClaimValue() {
+        FeeLookupResponseDto expectedFeeDto = new FeeLookupResponseDto(
+            "test_fee_code", null, TEST_FEE_AMOUNT_POUNDS, 1
+        );
         given(feesApiClient.lookupFeeWithAmount(any(), any(), any(), any(), any(), any(), any()))
-            .willReturn(FeeLookupResponseDto.builder()
-                            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-                            .code("test_fee_code")
-                            .version(1)
-                            .build());
-
-        FeeLookupResponseDto expectedFeeDtoFeeLookupResponseDto = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-            .code("test_fee_code")
-            .version(1)
-            .build();
+            .willReturn(expectedFeeDto);
         given(otherRemedyFeesConfiguration.getService()).willReturn("civil");
         given(otherRemedyFeesConfiguration.getJurisdiction1()).willReturn("jurisdiction1");
         given(otherRemedyFeesConfiguration.getJurisdiction2()).willReturn("jurisdiction2");
@@ -156,7 +149,7 @@ class FeeClientTest {
             "OtherRemedyKeyword",
             new BigDecimal("50.00")
         );
-        assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDtoFeeLookupResponseDto);
+        assertThat(feeLookupResponseDto).isEqualTo(expectedFeeDto);
     }
 
     @Test
