@@ -699,7 +699,7 @@ class CaseFlagUtilsTest {
             void shouldUpdateFlagName_whenClaimant1NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
                 caseData.setApplicant1(caseData.getApplicant1().toBuilder()
@@ -726,7 +726,7 @@ class CaseFlagUtilsTest {
             void shouldNotUpdateClaimant1FlagName_whenFlagIsMissing() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
                 caseData.setApplicant1(caseData.getApplicant1().toBuilder()
@@ -746,7 +746,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
                 caseData.setApplicant2(caseData.getApplicant2().toBuilder()
@@ -774,7 +774,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
                 caseData.setApplicant2(caseData.getApplicant2().toBuilder()
@@ -793,7 +793,7 @@ class CaseFlagUtilsTest {
             void shouldUpdateFlagName_whenRespondent1NameUpdated() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
                 caseData.setRespondent1(caseData.getRespondent1().toBuilder()
@@ -820,7 +820,7 @@ class CaseFlagUtilsTest {
             void shouldNotUpdateDefendant1FlagName_whenFlagIsMissing() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
                 caseData.setRespondent1(caseData.getRespondent1().toBuilder()
@@ -840,7 +840,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
                 caseData.setRespondent2(caseData.getRespondent2().toBuilder()
@@ -869,7 +869,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
                 caseData.setRespondent2(caseData.getRespondent2().toBuilder()
@@ -894,7 +894,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LITIGATION_FRIEND_ID))
                     .build();
 
                 caseData.setApplicant1LitigationFriend(caseData.getApplicant1LitigationFriend().copy()
@@ -922,7 +922,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant2LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_LITIGATION_FRIEND_ID))
                     .build();
 
                 caseData.setApplicant2LitigationFriend(caseData.getApplicant2LitigationFriend().copy()
@@ -950,7 +950,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LITIGATION_FRIEND_ID))
                     .build();
 
                 caseData.setRespondent1LitigationFriend(caseData.getRespondent1LitigationFriend().copy()
@@ -979,7 +979,7 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent2LitigationFriend()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LITIGATION_FRIEND_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LITIGATION_FRIEND_ID))
                     .build();
 
                 caseData.setRespondent2LitigationFriend(caseData.getRespondent2LitigationFriend().copy()
@@ -1010,7 +1010,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantLRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setApplicant1LRIndividuals(wrapElements(new PartyFlagStructure()
@@ -1034,7 +1034,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicantLRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getApplicant1LRIndividuals()).get(0);
@@ -1065,7 +1065,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1LRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setRespondent1LRIndividuals(wrapElements(new PartyFlagStructure()
@@ -1089,7 +1089,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1LRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent1LRIndividuals()).get(0);
@@ -1121,7 +1121,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2LRIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setRespondent2LRIndividuals(wrapElements(new PartyFlagStructure()
@@ -1145,7 +1145,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent2LRIndividual("Legal", "Rep")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2LRIndividuals()).get(0);
@@ -1181,7 +1181,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimant1OrgIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setApplicant1OrgIndividuals(wrapElements(new PartyFlagStructure()
@@ -1205,7 +1205,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant1OrgIndividuals()).get(0);
@@ -1238,7 +1238,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoApplicants()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setApplicant2OrgIndividuals(wrapElements(new PartyFlagStructure()
@@ -1263,7 +1263,7 @@ class CaseFlagUtilsTest {
                     .atStateClaimIssued()
                     .multiPartyClaimTwoApplicants()
                     .addApplicant2OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant2OrgIndividuals()).get(0);
@@ -1295,7 +1295,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1OrgIndividualAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setRespondent1OrgIndividuals(wrapElements(new PartyFlagStructure()
@@ -1319,7 +1319,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getRespondent1OrgIndividuals()).get(0);
@@ -1352,7 +1352,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 caseData.setRespondent2OrgIndividuals(wrapElements(new PartyFlagStructure()
@@ -1377,7 +1377,7 @@ class CaseFlagUtilsTest {
                     .atStateClaimIssued()
                     .multiPartyClaimTwoDefendantSolicitors()
                     .addRespondent2OrgIndividual("Org", "Person")
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID))
                     .build();
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2OrgIndividuals()).get(0);
@@ -1413,7 +1413,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID))
                     .build();
 
                 caseData.setApplicantExperts(wrapElements(new PartyFlagStructure()
@@ -1437,7 +1437,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantExperts()).get(0);
@@ -1468,7 +1468,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1ExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID))
                     .build();
 
                 caseData.setRespondent1Experts(wrapElements(new PartyFlagStructure()
@@ -1492,7 +1492,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Experts()).get(0);
@@ -1523,7 +1523,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2ExpertsAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID))
                     .build();
 
                 caseData.setRespondent2Experts(wrapElements(new PartyFlagStructure()
@@ -1548,7 +1548,7 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
                     .addRespondent2ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_EXPERTS_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Experts()).get(0);
@@ -1583,7 +1583,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenClaimantWitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID))
                     .build();
 
                 caseData.setApplicantWitnesses(wrapElements(new PartyFlagStructure()
@@ -1607,7 +1607,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addApplicant1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantWitnesses()).get(0);
@@ -1638,7 +1638,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent1WitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID))
                     .build();
 
                 caseData.setRespondent1Witnesses(wrapElements(new PartyFlagStructure()
@@ -1662,7 +1662,7 @@ class CaseFlagUtilsTest {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
                     .addRespondent1ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
@@ -1694,7 +1694,7 @@ class CaseFlagUtilsTest {
             void shouldCreateFlag_whenRespondent2WitnessAdded() {
                 CaseData caseData = CaseDataBuilder.builder()
                     .atStateApplicantRespondToDefenceAndProceed()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID))
                     .build();
 
                 caseData.setRespondent2Witnesses(wrapElements(new PartyFlagStructure()
@@ -1719,7 +1719,7 @@ class CaseFlagUtilsTest {
                     .multiPartyClaimTwoDefendantSolicitors()
                     .atStateApplicantRespondToDefenceAndProceed(ONE_V_TWO_TWO_LEGAL_REP)
                     .addRespondent2ExpertsAndWitnesses()
-                    .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
+                    .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_WITNESSES_ID))
                     .build();
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Witnesses()).get(0);

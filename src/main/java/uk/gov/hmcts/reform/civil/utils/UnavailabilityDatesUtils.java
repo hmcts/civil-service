@@ -216,9 +216,16 @@ public class UnavailabilityDatesUtils {
                 if (existingDate.getValue() != null
                     && existingDate.getValue().getEventAdded() == null
                     && existingDate.getValue().getDateAdded() == null) {
-                    updatedUnavailableDates.addAll(wrapElements(existingDate.getValue().toBuilder()
-                                                                    .dateAdded(date)
-                                                                    .eventAdded(event).build()));
+                    UnavailableDate updatedDate = new UnavailableDate(
+                        existingDate.getValue().getWho(),
+                        existingDate.getValue().getDate(),
+                        existingDate.getValue().getFromDate(),
+                        existingDate.getValue().getToDate(),
+                        existingDate.getValue().getUnavailableDateType(),
+                        event,
+                        date
+                    );
+                    updatedUnavailableDates.addAll(wrapElements(updatedDate));
                 } else {
                     updatedUnavailableDates.add(existingDate);
                 }

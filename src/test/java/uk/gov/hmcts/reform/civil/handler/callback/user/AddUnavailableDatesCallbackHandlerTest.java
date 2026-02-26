@@ -207,32 +207,26 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Nested
     class AboutToSubmit {
         List<UnavailableDate> dates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .build()
-        ).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2)),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))).toList();
 
         List<UnavailableDate> expectedNewDatesFromUnavailableDatesEvent = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .dateAdded(issueDate)
-                .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .dateAdded(issueDate)
-                .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                .build()
-        ).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2))
+                .setDateAdded(issueDate)
+                .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))
+                .setDateAdded(issueDate)
+                .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
         @BeforeEach
         void setup() {
@@ -242,10 +236,9 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Nested
         class LegalRepView {
-            UpdateDetailsForm form = UpdateDetailsForm.builder()
-                .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                .partyChosen(DynamicList.builder().listItems(List.of(DynamicListElement.builder().label("something").build())).build())
-                .build();
+            UpdateDetailsForm form = new UpdateDetailsForm()
+                .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                .setPartyChosen(DynamicList.builder().listItems(List.of(DynamicListElement.builder().label("something").build())).build());
 
             @Nested
             class OneVOne {
@@ -289,33 +282,27 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentOneDates_whenItAlreadyHaveExistingDates_ForDefendantResponse() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("RESPONDENTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(DEFENDANT_RESPONSE_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DEFENDANT_RESPONSE_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -344,33 +331,27 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenItAlreadyHaveExistingDates_ForClaimantResponse() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("APPLICANTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(CLAIMANT_INTENTION_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(CLAIMANT_INTENTION_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -399,45 +380,37 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenItAlreadyHaveExistingDates_ForDJ() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("APPLICANTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2023, 8, 20))
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2023, 8, 20))
-                            .toDate(LocalDate.of(2023, 8, 22))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2023, 8, 20)),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2023, 8, 20))
+                            .setToDate(LocalDate.of(2023, 8, 22))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2023, 8, 20))
-                            .dateAdded(issueDate)
-                            .eventAdded(DJ_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2023, 8, 20))
-                            .toDate(LocalDate.of(2023, 8, 22))
-                            .dateAdded(issueDate)
-                            .eventAdded(DJ_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2023, 8, 20))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DJ_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2023, 8, 20))
+                            .setToDate(LocalDate.of(2023, 8, 22))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DJ_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()
@@ -463,47 +436,39 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_secondRoundOfAdditionOfDates() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("APPLICANTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingTopLevelDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(CLAIMANT_INTENTION_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 3, 4))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(CLAIMANT_INTENTION_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 3, 4))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(CLAIMANT_INTENTION_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 3, 4))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(CLAIMANT_INTENTION_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 3, 4))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -641,33 +606,27 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateRespondentTwoDates_whenItAlreadyHaveExistingDates_ForDefendantResponse() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("RESPONDENTSOLICITORTWO"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(DEFENDANT_RESPONSE_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DEFENDANT_RESPONSE_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -741,33 +700,27 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneAndTwoDates_whenItAlreadyHaveExistingDates() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("APPLICANTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2022, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(CLAIMANT_INTENTION_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2022, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(CLAIMANT_INTENTION_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -804,45 +757,37 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
                 void shouldPopulateApplicantOneDates_whenItAlreadyHaveExistingDates_ForDJ() {
                     when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(List.of("APPLICANTSOLICITORONE"));
                     List<Element<UnavailableDate>> existingDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2023, 8, 20))
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2023, 8, 20))
-                            .toDate(LocalDate.of(2023, 8, 22))
-                            .build()
-                    ).map(ElementUtils::element).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2023, 8, 20)),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2023, 8, 20))
+                            .setToDate(LocalDate.of(2023, 8, 22))).map(ElementUtils::element).toList();
 
                     List<UnavailableDate> expectedDates = Stream.of(
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2023, 8, 20))
-                            .dateAdded(issueDate)
-                            .eventAdded(DJ_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2023, 8, 20))
-                            .toDate(LocalDate.of(2023, 8, 22))
-                            .dateAdded(issueDate)
-                            .eventAdded(DJ_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                            .date(LocalDate.of(2020, 5, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build(),
-                        UnavailableDate.builder()
-                            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                            .fromDate(LocalDate.of(2020, 5, 2))
-                            .toDate(LocalDate.of(2020, 6, 2))
-                            .dateAdded(issueDate)
-                            .eventAdded(ADD_UNAVAILABLE_DATES_EVENT)
-                            .build()
-                    ).toList();
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2023, 8, 20))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DJ_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2023, 8, 20))
+                            .setToDate(LocalDate.of(2023, 8, 22))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(DJ_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                            .setDate(LocalDate.of(2020, 5, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT),
+                        new UnavailableDate()
+                            .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                            .setFromDate(LocalDate.of(2020, 5, 2))
+                            .setToDate(LocalDate.of(2020, 6, 2))
+                            .setDateAdded(issueDate)
+                            .setEventAdded(ADD_UNAVAILABLE_DATES_EVENT)).toList();
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimDetailsNotified()
@@ -880,15 +825,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVOne {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendant").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -906,15 +850,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendant").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -935,15 +878,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVTwoSameSolicitor {
                 @Test
                 void shouldPopulateRespondentOneAndTwoDates_whenDefendantsChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendants").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendants").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -963,15 +905,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendants").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -994,16 +935,15 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class OneVTwoDifferentSolicitor {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendant1ChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant 1").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendant 1").build(),
                                              DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1024,16 +964,15 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateRespondentTwoDates_whenDefendant2ChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant 2").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendant 1").build(),
                                              DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1054,16 +993,15 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimant").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimant").build(),
                                              DynamicListElement.builder().label("Defendant 1").build(),
                                              DynamicListElement.builder().label("Defendant 2").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1087,15 +1025,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
             class TwoVOne {
                 @Test
                 void shouldPopulateRespondentOneDates_whenDefendantChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Defendant").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimants").build(),
                                              DynamicListElement.builder().label("Defendant").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()
@@ -1115,15 +1052,14 @@ class AddUnavailableDatesCallbackHandlerTest extends BaseCallbackHandlerTest {
 
                 @Test
                 void shouldPopulateApplicantOneDates_whenClaimantsChoiceIsSelected() {
-                    UpdateDetailsForm form = UpdateDetailsForm.builder()
-                        .additionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
-                        .partyChosen(DynamicList.builder()
+                    UpdateDetailsForm form = new UpdateDetailsForm()
+                        .setAdditionalUnavailableDates(wrapElements(new ArrayList<>(dates)))
+                        .setPartyChosen(DynamicList.builder()
                                          .value(DynamicListElement.builder().label("Claimants").build())
                                          .listItems(List.of(
                                              DynamicListElement.builder().label("Claimants").build(),
                                              DynamicListElement.builder().label("Defendant").build()
-                                         )).build())
-                        .build();
+                                         )).build());
 
                     CaseData caseData = CaseDataBuilder.builder()
                         .atStateClaimantFullDefence()

@@ -152,15 +152,14 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
 
     private List<Element<UnavailableDate>> getUnavailableTestDates() {
         return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-                           .value(UnavailableDate.builder()
-                                      .who("who")
-                                      .date(LocalDate.of(2020, 1, 1))
-                                      .fromDate(LocalDate.of(2020, 1, 1))
-                                      .toDate(LocalDate.of(2020, 1, 1))
-                                      .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                      .eventAdded("eventAdd")
-                                      .dateAdded(LocalDate.of(2020, 1, 1))
-                                      .build()).build());
+                           .value(new UnavailableDate()
+                                      .setWho("who")
+                                      .setDate(LocalDate.of(2020, 1, 1))
+                                      .setFromDate(LocalDate.of(2020, 1, 1))
+                                      .setToDate(LocalDate.of(2020, 1, 1))
+                                      .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                      .setEventAdded("eventAdd")
+                                      .setDateAdded(LocalDate.of(2020, 1, 1))).build());
     }
 
     private Address getTestAddress(String rua) {

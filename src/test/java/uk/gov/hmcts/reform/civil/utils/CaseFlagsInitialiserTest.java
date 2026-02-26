@@ -157,9 +157,8 @@ class CaseFlagsInitialiserTest {
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
         CaseData caseData = CaseData.builder()
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("id")))
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                   .build())
+            .updateDetailsForm(new UpdateDetailsForm()
+                                   .setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
             .build();
 
         caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData);

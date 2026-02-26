@@ -1106,10 +1106,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent1DQWithUnavailableDates() {
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(LocalDate.now().plusDays(1))
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(LocalDate.now().plusDays(1))
+            .setUnavailableDateType(SINGLE_DATE);
         this.respondent1DQ = new Respondent1DQ()
             .setRespondent1DQHearing(new Hearing()
                 .setHearingLength(ONE_DAY)
@@ -1119,11 +1118,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent1DQWithUnavailableDateRange() {
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .fromDate(LocalDate.now().plusDays(1))
-            .toDate(LocalDate.now().plusDays(2))
-            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setFromDate(LocalDate.now().plusDays(1))
+            .setToDate(LocalDate.now().plusDays(2))
+            .setUnavailableDateType(UnavailableDateType.DATE_RANGE);
         this.respondent1DQ = new Respondent1DQ()
             .setRespondent1DQHearing(new Hearing()
                 .setHearingLength(MORE_THAN_DAY)
@@ -1133,11 +1131,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder respondent2DQWithUnavailableDateRange() {
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .fromDate(LocalDate.now().plusDays(1))
-            .toDate(LocalDate.now().plusDays(2))
-            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setFromDate(LocalDate.now().plusDays(1))
+            .setToDate(LocalDate.now().plusDays(2))
+            .setUnavailableDateType(UnavailableDateType.DATE_RANGE);
         this.respondent2DQ = new Respondent2DQ()
             .setRespondent2DQHearing(new Hearing()
                 .setHearingLength(MORE_THAN_DAY)
@@ -1147,11 +1144,10 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder applicant1DQWithUnavailableDateRange() {
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .fromDate(LocalDate.now().plusDays(1))
-            .toDate(LocalDate.now().plusDays(2))
-            .unavailableDateType(UnavailableDateType.DATE_RANGE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setFromDate(LocalDate.now().plusDays(1))
+            .setToDate(LocalDate.now().plusDays(2))
+            .setUnavailableDateType(UnavailableDateType.DATE_RANGE);
         this.applicant1DQ = new Applicant1DQ()
             .setApplicant1DQHearing(new Hearing()
                 .setHearingLength(MORE_THAN_DAY)
@@ -1161,10 +1157,9 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder applicant1DQWithUnavailableDate() {
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(LocalDate.now().plusDays(1))
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(LocalDate.now().plusDays(1))
+            .setUnavailableDateType(SINGLE_DATE);
         this.applicant1DQ = new Applicant1DQ()
             .setApplicant1DQHearing(new Hearing()
                 .setHearingLength(ONE_DAY)
@@ -7392,23 +7387,20 @@ public class CaseDataBuilder {
 
     private List<Element<UnavailableDate>> getMediationUnavailableDates() {
         return wrapElements(List.of(
-            UnavailableDate.builder()
-                .unavailableDateType(SINGLE_DATE)
-                .date(LocalDate.of(2024, 6, 1))
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(SINGLE_DATE)
-                .date(LocalDate.of(2024, 6, 7))
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(DATE_RANGE)
-                .fromDate(LocalDate.of(2024, 6, 10))
-                .toDate(LocalDate.of(2024, 6, 15))
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(DATE_RANGE)
-                .fromDate(LocalDate.of(2024, 6, 20))
-                .toDate(LocalDate.of(2024, 6, 25)).build()));
+            new UnavailableDate()
+                .setUnavailableDateType(SINGLE_DATE)
+                .setDate(LocalDate.of(2024, 6, 1)),
+            new UnavailableDate()
+                .setUnavailableDateType(SINGLE_DATE)
+                .setDate(LocalDate.of(2024, 6, 7)),
+            new UnavailableDate()
+                .setUnavailableDateType(DATE_RANGE)
+                .setFromDate(LocalDate.of(2024, 6, 10))
+                .setToDate(LocalDate.of(2024, 6, 15)),
+            new UnavailableDate()
+                .setUnavailableDateType(DATE_RANGE)
+                .setFromDate(LocalDate.of(2024, 6, 20))
+                .setToDate(LocalDate.of(2024, 6, 25))));
     }
 
     public CaseDataBuilder applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate repaymentBySetDate) {

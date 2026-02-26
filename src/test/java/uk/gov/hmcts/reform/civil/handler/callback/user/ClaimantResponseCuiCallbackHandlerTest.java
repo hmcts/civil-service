@@ -230,11 +230,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                           .setHearingLength(ONE_DAY)
                                           .setUnavailableDatesRequired(YES)
                                           .setUnavailableDates(wrapElements(List.of(
-                                              UnavailableDate.builder()
-                                                  .date(LocalDate.of(2024, 2, 1))
-                                                  .dateAdded(LocalDate.of(2024, 1, 1))
-                                                  .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                  .build()))));
+                                              new UnavailableDate()
+                                                  .setDate(LocalDate.of(2024, 2, 1))
+                                                  .setDateAdded(LocalDate.of(2024, 1, 1))
+                                                  .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)))));
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                  .setResponseCourtCode("court2")
@@ -276,12 +275,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isEqualTo("court1");
             assertThat(data.getCaseNameHmctsInternal()).isEqualTo(data.getApplicant1().getPartyName() + " v " + data.getRespondent1().getPartyName());
             assertThat(data.getApplicant1().getUnavailableDates()).isEqualTo(
-                wrapElements(List.of(UnavailableDate.builder()
-                                         .eventAdded("Claimant Intention Event")
-                                         .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                         .dateAdded(now.toLocalDate())
-                                         .date(LocalDate.of(2024, 2, 1))
-                                         .build())));
+                wrapElements(List.of(new UnavailableDate()
+                                         .setEventAdded("Claimant Intention Event")
+                                         .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                         .setDateAdded(now.toLocalDate())
+                                         .setDate(LocalDate.of(2024, 2, 1)))));
         }
 
         @Test

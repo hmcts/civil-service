@@ -445,11 +445,9 @@ public class UnavailabilityDatesUtilsTest {
     @Nested
     class ListingTabFields {
         List<Element<UnavailableDate>> existingDates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2022, 5, 2))
-                .build()
-        ).map(ElementUtils::element).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2022, 5, 2))).map(ElementUtils::element).toList();
 
         @Test
         public void shouldCopyDatesIntoListingTabFieldsForRespondent1() {

@@ -721,10 +721,10 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                 .toDate(LocalDate.now().plusDays(5))
-                                                 .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                 .setToDate(LocalDate.now().plusDays(5))
+                                                 .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -760,10 +760,10 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -867,15 +867,15 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                .toDate(LocalDate.now().plusDays(5))
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                .setToDate(LocalDate.now().plusDays(5))
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)

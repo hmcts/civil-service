@@ -47,18 +47,15 @@ class Applicant1DQTest extends DQTest {
         String lengthHours = "6";
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .who("who 1")
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .who("who 2")
-                .build()
-        ).map(ElementUtils::element).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2))
+                .setWho("who 1"),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))
+                .setWho("who 2")).map(ElementUtils::element).toList();
 
         Hearing hearing = buildApplicant1Dq().copy()
             .setApplicant1DQHearing(null)
@@ -89,18 +86,15 @@ class Applicant1DQTest extends DQTest {
     void shouldReturnSmallClaimHearing_whenHearingNull() {
         YesOrNo hasUnavailableDates = YES;
         List<Element<UnavailableDate>> lrDates = Stream.of(
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.of(2020, 5, 2))
-                .who("who 1")
-                .build(),
-            UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.of(2020, 5, 2))
-                .toDate(LocalDate.of(2020, 6, 2))
-                .who("who 2")
-                .build()
-        ).map(ElementUtils::element).toList();
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.of(2020, 5, 2))
+                .setWho("who 1"),
+            new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.of(2020, 5, 2))
+                .setToDate(LocalDate.of(2020, 6, 2))
+                .setWho("who 2")).map(ElementUtils::element).toList();
 
         Hearing hearing = buildApplicant1Dq().copy()
             .setApplicant1DQHearing(null)
