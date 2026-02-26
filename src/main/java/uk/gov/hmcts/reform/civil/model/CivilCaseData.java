@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -194,6 +195,7 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private FastTrackBuildingDispute fastTrackBuildingDispute;
     private FastTrackClinicalNegligence fastTrackClinicalNegligence;
     private FastTrackCreditHire fastTrackCreditHire;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private HousingDisrepair fastTrackHousingDisrepair;
     private FastTrackPersonalInjury fastTrackPersonalInjury;
     private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
@@ -222,6 +224,7 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private SmallClaimsFlightDelay smallClaimsFlightDelay;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private HousingDisrepair smallClaimsHousingDisrepair;
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
