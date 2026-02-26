@@ -193,11 +193,11 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
                     GAPbaDetails.builder()
-                        .paymentDetails(PaymentDetails.builder()
-                                            .status(PaymentStatus.SUCCESS)
-                                            .reference("RC-1658-4258-2679-9795")
-                                            .customerReference(CUSTOMER_REFERENCE)
-                                            .build())
+                        .paymentDetails(new PaymentDetails()
+                                            .setStatus(PaymentStatus.SUCCESS)
+                                            .setReference("RC-1658-4258-2679-9795")
+                                            .setCustomerReference(CUSTOMER_REFERENCE)
+                                            )
                         .fee(
                             new Fee()
                                 .setCode("FE203")

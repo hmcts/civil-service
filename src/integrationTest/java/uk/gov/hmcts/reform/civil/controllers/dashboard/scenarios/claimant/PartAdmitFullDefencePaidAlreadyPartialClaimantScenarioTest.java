@@ -41,10 +41,10 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(1000))
-                                .whenWasThisAmountPaid(paymentDate)
-                                .build())
+            .respondToClaim(new RespondToClaim()
+                                .setHowMuchWasPaid(new BigDecimal(1000))
+                                .setWhenWasThisAmountPaid(paymentDate)
+                                )
             .totalClaimAmount(new BigDecimal(1500))
             .build();
 
@@ -92,10 +92,10 @@ public class PartAdmitFullDefencePaidAlreadyPartialClaimantScenarioTest extends 
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(1000))
-                                .whenWasThisAmountPaid(paymentDate)
-                                .build())
+            .respondToAdmittedClaim(new RespondToClaim()
+                                .setHowMuchWasPaid(new BigDecimal(1000))
+                                .setWhenWasThisAmountPaid(paymentDate)
+                                )
             .totalClaimAmount(new BigDecimal(1500))
             .build();
 

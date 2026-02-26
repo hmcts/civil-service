@@ -49,14 +49,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = null;
 
-        respondentSolicitor1OrganisationDetails = SolicitorOrganisationDetails.builder()
-            .email("testorg@email.com")
-            .organisationName("test org name")
-            .fax("123123123")
-            .dx("test org dx")
-            .phoneNumber("0123456789")
-            .address(AddressBuilder.defaults().build())
-            .build();
+        respondentSolicitor1OrganisationDetails = new SolicitorOrganisationDetails()
+            .setEmail("testorg@email.com")
+            .setOrganisationName("test org name")
+            .setFax("123123123")
+            .setDx("test org dx")
+            .setPhoneNumber("0123456789")
+            .setAddress(AddressBuilder.defaults().build())
+            ;
         return this;
     }
 
@@ -89,7 +89,7 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         paymentReference = "some reference";
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal().build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.minimal();
         submittedDate = LocalDateTime.now();
         return this;
     }
@@ -113,10 +113,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulWithMinimalData() {
         atStatePendingCaseIssuedWithMinimalData();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .status(SUCCESS)
-            .reference("RC-1604-0739-2145-4711")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setStatus(SUCCESS)
+            .setReference("RC-1604-0739-2145-4711")
+            ;
         paymentSuccessfulDate = LocalDateTime.now();
         claimDetailsNotificationDeadline = LocalDateTime.now().plusDays(1);
         return this;
@@ -200,10 +200,10 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
 
     public CaseDataMinEdgeCasesBuilder atStatePaymentSuccessfulMinimumData() {
         atStateClaimSubmittedMinimumData();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .status(SUCCESS)
-            .reference("RC-1604-0739-2145-4711")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setStatus(SUCCESS)
+            .setReference("RC-1604-0739-2145-4711")
+            ;
         paymentReference = "12345";
         paymentSuccessfulDate = LocalDateTime.now();
         return this;
@@ -216,21 +216,19 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = LocalDateTime.now();
-        claimIssuedPaymentDetails = PaymentDetails.builder()
-            .customerReference("r")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails()
+            .setCustomerReference("r")
+            ;
         return this;
     }
 
     public CaseDataMinEdgeCasesBuilder atStateApplicantRespondToDefenceAndProceed() {
         atStateRespondentFullDefenceMinimumData();
         applicant1ProceedWithClaim = YES;
-        applicant1DefenceResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("claimant-response.pdf").build())
-            .build();
+        applicant1DefenceResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("claimant-response.pdf").build());
         applicant1DQ();
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
+        uiStatementOfTruth = new StatementOfTruth().setName("J").setRole("S");
         return this;
     }
 
@@ -238,15 +236,13 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
         atStateRespondentFullDefenceMinimumData();
         applicant1ProceedWithClaim = NO;
         applicant1ResponseDate = LocalDateTime.now();
-        uiStatementOfTruth = StatementOfTruth.builder().name("J").role("S").build();
+        uiStatementOfTruth = new StatementOfTruth().setName("J").setRole("S");
         return this;
     }
 
     public CaseDataMinEdgeCasesBuilder atStateRespondentFullDefenceMinimumData() {
         atStateRespondentRespondToClaimMinimumData(RespondentResponseType.FULL_DEFENCE);
-        respondent1ClaimResponseDocument = ResponseDocument.builder()
-            .file(DocumentBuilder.builder().documentName("defendant-response.pdf").build())
-            .build();
+        respondent1ClaimResponseDocument = new ResponseDocument(DocumentBuilder.builder().documentName("defendant-response.pdf").build());
         respondent1DQ();
         respondent1ResponseDate = LocalDateTime.now();
         return this;
