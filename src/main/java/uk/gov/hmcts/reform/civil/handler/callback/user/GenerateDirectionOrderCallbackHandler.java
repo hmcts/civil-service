@@ -711,6 +711,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && savedFinalOrderFurtherHearingToggle != null)
             || isJudicialReferral(callbackParams)) {
             state = CASE_PROGRESSION;
+            caseData.setEnableUploadEvent(YES);
         }
         if (!ASSISTED_ORDER.equals(savedFinalOrderSelection)) {
             caseData.setFinalOrderFurtherHearingToggle(null);

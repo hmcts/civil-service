@@ -6,12 +6,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
@@ -30,10 +34,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,7 +98,6 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class MidValidateDate {
-        private final String eventName = "validate-obligation-date";
 
         @Test
         void shouldThrowError_ifObligationDateIsNotInTheFuture() {
@@ -110,17 +109,18 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().build();
             caseData.setObligationData(List.of(element));
 
+            String eventName = "validate-obligation-date";
             CallbackParams params = callbackParamsOf(caseData, MID, eventName);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo(OBLIGATION_DATE_ERROR);
         }
     }
 
     @Nested
     class Mid {
-        private String eventName = "validate-tasks-left";
+        private final String eventName = "validate-tasks-left";
 
         @Test
         void shouldThrowError_ifStillTasksLeft() {
@@ -173,21 +173,79 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsOnly(CONFIRM_ORDER_REVIEW.name(), "READY");
         }
 
-        @Test
-        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder() {
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrderUnspec(AllocatedTrack allocatedTrack) {
             CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+            caseData.setAllocatedTrack(allocatedTrack);
+            caseData.setEaCourtLocation(YesOrNo.YES);
             caseData.setIsFinalOrder(YesOrNo.YES);
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
+            } else {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+            }
             assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrderSpec(AllocatedTrack allocatedTrack) {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setResponseClaimTrack(allocatedTrack.name());
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(YesOrNo.YES);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            if (allocatedTrack == AllocatedTrack.SMALL_CLAIM || allocatedTrack == AllocatedTrack.FAST_CLAIM) {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.NO.getLabel());
+            } else {
+                assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+            }
+            assertThat(response.getState()).isEqualTo(CaseState.All_FINAL_ORDERS_ISSUED.name());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_spec_v2(AllocatedTrack allocatedTrack) {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+            caseData.setResponseClaimTrack(allocatedTrack.name());
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = AllocatedTrack.class)
+        void shouldSetAllFinalOrdersIssuedState_whenIsFinalOrder_unspec_v3(AllocatedTrack allocatedTrack) {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+            caseData.setAllocatedTrack(allocatedTrack);
+            caseData.setEaCourtLocation(YesOrNo.YES);
+            caseData.setIsFinalOrder(NO);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
         }
 
         @Test
         void shouldSetStoredObligationData_whenObligationDataIsPresent() {
-            LocalDateTime localDateTime = LocalDateTime.of(2024, 01, 01, 10, 10, 10);
+            LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 1, 10, 10, 10);
             Mockito.when(time.now()).thenReturn(localDateTime);
             Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
@@ -222,12 +280,12 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(data.getStoredObligationData().get(0).getValue()).isEqualTo(expectedData);
+            assertThat(data.getStoredObligationData().getFirst().getValue()).isEqualTo(expectedData);
         }
 
         @Test
         void shouldSetStoredObligationData_whenObligationDataIsPresent_withOtherReason() {
-            LocalDateTime localDateTime = LocalDateTime.of(2024, 01, 01, 10, 10, 10);
+            LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 1, 10, 10, 10);
             Mockito.when(time.now()).thenReturn(localDateTime);
             Mockito.when(userService.getUserDetails(any())).thenReturn(UserDetails
                                                                            .builder()
@@ -265,7 +323,7 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData data = objectMapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(data.getStoredObligationData().get(0).getValue()).isEqualTo(expectedData);
+            assertThat(data.getStoredObligationData().getFirst().getValue()).isEqualTo(expectedData);
         }
     }
 

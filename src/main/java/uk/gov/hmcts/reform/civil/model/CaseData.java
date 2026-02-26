@@ -652,6 +652,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     @Builder.Default
     private  List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
     private  YesOrNo isReferToJudgeClaim;
+    private  YesOrNo enableUploadEvent;
 
     private  ClientContext clientContext;
 

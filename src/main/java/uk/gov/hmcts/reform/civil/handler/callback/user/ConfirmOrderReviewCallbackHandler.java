@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.civil.callback.Callback;
 import uk.gov.hmcts.reform.civil.callback.CallbackHandler;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.ObligationReason;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,7 +26,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -40,9 +41,11 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CONFIRM_ORDER_REVIEW_FINAL_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.CourtStaffNextSteps.STILL_TASKS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
@@ -162,15 +165,35 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
         }
 
         if (YesOrNo.YES.equals(caseData.getIsFinalOrder())) {
+            caseData.setEnableUploadEvent(shouldEvidenceUploadEventBeAvailable(caseData));
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .state(CaseState.All_FINAL_ORDERS_ISSUED.toString())
                 .build();
         }
-
+        caseData.setEnableUploadEvent(YesOrNo.YES);
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
+    }
+
+    private YesOrNo shouldEvidenceUploadEventBeAvailable(CaseData caseData) {
+        YesOrNo eaCourtLocation = caseData.getEaCourtLocation();
+        boolean eaFlag = eaCourtLocation == null || YesOrNo.YES.equals(eaCourtLocation);
+        boolean result = isMultiOrIntTrack(caseData) && eaFlag;
+        log.info("Evidence upload event is enabled for minti claim {}, eaCourtLocation {}, for caseId {}",
+                 result, eaFlag, caseData.getCcdCaseReference());
+        return result ? YesOrNo.YES : YesOrNo.NO;
+    }
+
+    private boolean isMultiOrIntTrack(CaseData caseData) {
+        if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.name().equals(caseData.getResponseClaimTrack())
+                || AllocatedTrack.MULTI_CLAIM.name().equals(caseData.getResponseClaimTrack());
+        } else {
+            return AllocatedTrack.INTERMEDIATE_CLAIM.equals(caseData.getAllocatedTrack())
+                || AllocatedTrack.MULTI_CLAIM.equals(caseData.getAllocatedTrack());
+        }
     }
 
     private CallbackResponse fillConfirmationScreen(CallbackParams callbackParams) {
