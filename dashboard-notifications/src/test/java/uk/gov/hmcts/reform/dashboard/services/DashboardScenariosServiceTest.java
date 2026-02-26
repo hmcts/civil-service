@@ -253,7 +253,6 @@ class DashboardScenariosServiceTest {
         HashMap<String, Object> params = new HashMap<>();
         params.put("animal", "Tiger");
         params.put("target", "Safari");
-        ScenarioRequestParams scenarioRequestParams = new ScenarioRequestParams(params);
 
         DashboardNotificationsEntity existingNotification1 = DashboardNotificationsEntity.builder()
             .name(NOTIFICATION_ISSUE_CLAIM_START)
@@ -281,6 +280,8 @@ class DashboardScenariosServiceTest {
             .thenReturn(Optional.of(template));
         when(notificationTemplateCatalog.findByName("nonexistent.template"))
             .thenReturn(Optional.empty());
+
+        ScenarioRequestParams scenarioRequestParams = new ScenarioRequestParams(params);
 
         dashboardScenariosService.reconfigureCaseDashboardNotifications(caseId, scenarioRequestParams, roleType);
 
