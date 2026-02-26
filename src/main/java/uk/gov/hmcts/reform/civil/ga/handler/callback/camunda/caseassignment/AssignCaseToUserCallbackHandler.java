@@ -73,7 +73,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
     private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         List<String> errors = new ArrayList<>();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String caseId = caseData.getCcdCaseReference().toString();
         log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
 
