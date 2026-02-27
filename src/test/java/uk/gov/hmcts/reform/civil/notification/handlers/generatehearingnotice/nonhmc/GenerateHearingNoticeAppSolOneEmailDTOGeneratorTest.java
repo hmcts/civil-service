@@ -65,7 +65,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
     @Test
     void shouldReturnNoFeeTemplate_whenPaymentSuccess() {
         CaseData caseData = baseBuilder()
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
                 .listingOrRelisting(ListingOrRelisting.LISTING)
                 .build();
@@ -233,7 +233,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
 
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0800)
-                    .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                    .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                     .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(10000)))
                     .hearingDueDate(DATE_2025_07_01)
                     .hearingDate(DATE_2025_07_01)
@@ -267,7 +267,7 @@ class GenerateHearingNoticeAppSolOneEmailDTOGeneratorTest {
 
             CaseData caseData = baseBuilder()
                     .hearingTimeHourMinute(TIME_0900)
-                    .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                    .hearingFeePaymentDetails(new PaymentDetails().setStatus(FAILED))
                     .hearingFee(new Fee().setCalculatedAmountInPence(valueOf(15000)))
                     .hearingDueDate(DATE_2025_08_15)
                     .hearingDate(DATE_2025_07_01)

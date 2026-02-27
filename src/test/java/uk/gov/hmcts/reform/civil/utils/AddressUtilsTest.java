@@ -46,15 +46,14 @@ class AddressUtilsTest {
 
     @Test
     void getAddress() {
-        ContactInformation contactInformation = ContactInformation.builder()
-            .addressLine1("Hello")
-            .addressLine2("World")
-            .addressLine3("AI")
-            .county("MDX")
-            .country("United Kingdom")
-            .townCity("London")
-            .postCode("SW19 2PQ")
-            .build();
+        ContactInformation contactInformation = new ContactInformation()
+            .setAddressLine1("Hello")
+            .setAddressLine2("World")
+            .setAddressLine3("AI")
+            .setCounty("MDX")
+            .setCountry("United Kingdom")
+            .setTownCity("London")
+            .setPostCode("SW19 2PQ");
 
         Address address = AddressUtils.getAddress(contactInformation);
         assertEquals("Hello", address.getAddressLine1());
@@ -65,15 +64,14 @@ class AddressUtilsTest {
         assertEquals("United Kingdom", address.getCountry());
         assertEquals("SW19 2PQ", address.getPostCode());
 
-        contactInformation = ContactInformation.builder()
-            .addressLine1("Hello")
-            .addressLine2(null)
-            .addressLine3(null)
-            .townCity("London")
-            .county("MDX")
-            .country("United Kingdom")
-            .postCode("SW19 2PQ")
-            .build();
+        contactInformation = new ContactInformation()
+            .setAddressLine1("Hello")
+            .setAddressLine2(null)
+            .setAddressLine3(null)
+            .setTownCity("London")
+            .setCounty("MDX")
+            .setCountry("United Kingdom")
+            .setPostCode("SW19 2PQ");
 
         Address address1 = AddressUtils.getAddress(contactInformation);
         assertEquals("Hello", address1.getAddressLine1());

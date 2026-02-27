@@ -35,7 +35,7 @@ class PaymentPredicateTest {
         @Test
         void should_return_true_for_successful_when_represented_and_claim_issued_payment_succeeded() {
             when(caseData.isApplicantNotRepresented()).thenReturn(false);
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build());
+            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(new PaymentDetails().setStatus(PaymentStatus.SUCCESS));
             assertTrue(PaymentPredicate.successful.test(caseData));
         }
 
@@ -57,7 +57,7 @@ class PaymentPredicateTest {
         void should_return_false_for_successful_when_payment_failed() {
             when(caseData.isApplicantNotRepresented()).thenReturn(false);
             when(caseData.getPaymentSuccessfulDate()).thenReturn(null);
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(PaymentDetails.builder().status(PaymentStatus.FAILED).build());
+            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(new PaymentDetails().setStatus(PaymentStatus.FAILED));
             assertFalse(PaymentPredicate.successful.test(caseData));
         }
     }
@@ -68,14 +68,14 @@ class PaymentPredicateTest {
         @Test
         void should_return_true_for_failed_when_represented_and_payment_details_failed() {
             when(caseData.isApplicantNotRepresented()).thenReturn(false);
-            when(caseData.getPaymentDetails()).thenReturn(PaymentDetails.builder().status(PaymentStatus.FAILED).build());
+            when(caseData.getPaymentDetails()).thenReturn(new PaymentDetails().setStatus(PaymentStatus.FAILED));
             assertTrue(PaymentPredicate.failed.test(caseData));
         }
 
         @Test
         void should_return_true_for_failed_when_represented_and_claim_issued_payment_failed() {
             when(caseData.isApplicantNotRepresented()).thenReturn(false);
-            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(PaymentDetails.builder().status(PaymentStatus.FAILED).build());
+            when(caseData.getClaimIssuedPaymentDetails()).thenReturn(new PaymentDetails().setStatus(PaymentStatus.FAILED));
             assertTrue(PaymentPredicate.failed.test(caseData));
         }
 

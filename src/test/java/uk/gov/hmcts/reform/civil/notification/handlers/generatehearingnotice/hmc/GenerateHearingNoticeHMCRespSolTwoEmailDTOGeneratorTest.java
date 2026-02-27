@@ -79,15 +79,13 @@ class GenerateHearingNoticeHMCRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .hearingDate(HEARING_DATE_VAL)
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
-                .solicitorReferences(SolicitorReferences.builder()
-                        .respondentSolicitor1Reference(DEF_REF)
-                        .build())
+                .solicitorReferences(new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(DEF_REF))
                 .build();
 
         when(camundaService.getProcessVariables(PROCESS_ID))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingStartDateTime(START_DT)
-                        .build());
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingStartDateTime(START_DT));
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {
             utils.when(() -> NotificationUtils.getFormattedHearingDate(HEARING_DATE_VAL))

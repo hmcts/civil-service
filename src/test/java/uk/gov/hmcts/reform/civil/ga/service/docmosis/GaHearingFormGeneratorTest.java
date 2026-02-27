@@ -104,7 +104,7 @@ class GaHearingFormGeneratorTest {
                 .uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").venueName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("London"));
 
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
@@ -140,7 +140,7 @@ class GaHearingFormGeneratorTest {
                  .uploadDocument(any(String.class), any(PDF.class)))
             .thenReturn(CASE_DOCUMENT);
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
         Map<String, String> refMap = new HashMap<>();
         refMap.put("applicantSolicitor1Reference", "app1ref");
@@ -158,14 +158,13 @@ class GaHearingFormGeneratorTest {
             anyLong()
         )).thenReturn(caseDetails);
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YES)
-            .gaHearingNoticeDetail(GAHearingNoticeDetail
-                                       .builder()
-                                       .hearingDuration(GAHearingDuration.OTHER)
-                                       .channel(GAJudicialHearingType.IN_PERSON)
-                                       .hearingLocation(
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                       .setHearingDuration(GAHearingDuration.OTHER)
+                                       .setChannel(GAJudicialHearingType.IN_PERSON)
+                                       .setHearingLocation(
                                            DynamicList.builder()
                                                .value(selectedLocation).listItems(listItems)
-                                               .build()).build())
+                                               .build()))
             .build();
 
         var templateData = generator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
@@ -262,9 +261,9 @@ class GaHearingFormGeneratorTest {
 
     @Test
     void test_getHearingDurationStringOther() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
-                .hearingDuration(GAHearingDuration.OTHER)
-                .hearingDurationOther("One year").build()).build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                .setHearingDuration(GAHearingDuration.OTHER)
+                .setHearingDurationOther("One year")).build();
         String durationString = GaHearingFormGenerator.getHearingDurationString(caseData);
         assertThat(durationString).isEqualTo("One year");
     }
@@ -275,7 +274,7 @@ class GaHearingFormGeneratorTest {
                         false,
                         false,
                         true, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -292,7 +291,7 @@ class GaHearingFormGeneratorTest {
                         false,
                         true,
                         false, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -309,7 +308,7 @@ class GaHearingFormGeneratorTest {
                         true,
                         false,
                         false, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(GeneralApplicationCaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -326,7 +325,7 @@ class GaHearingFormGeneratorTest {
                         true,
                         true,
                         true, true).build();
-        GeneralApplicationCaseData generalAppCaseData = GeneralApplicationCaseData.builder().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
+        GeneralApplicationCaseData generalAppCaseData = new GeneralApplicationCaseData().ccdCaseReference(CaseDataBuilder.CASE_ID).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any()))
                 .thenReturn(caseData);
         AssertionsForClassTypes
@@ -359,7 +358,7 @@ class GaHearingFormGeneratorTest {
                      .uploadDocument(any(String.class), any(PDF.class)))
                 .thenReturn(CASE_DOCUMENT);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             Map<String, String> refMap = new HashMap<>();
             refMap.put("applicantSolicitor1Reference", "app1ref");
@@ -380,14 +379,13 @@ class GaHearingFormGeneratorTest {
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YES)
                 .parentClaimantIsApplicant(YES)
-                .gaHearingNoticeDetail(GAHearingNoticeDetail
-                                           .builder()
-                                           .hearingDuration(GAHearingDuration.OTHER)
-                                           .channel(GAJudicialHearingType.IN_PERSON)
-                                           .hearingLocation(
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                           .setHearingDuration(GAHearingDuration.OTHER)
+                                           .setChannel(GAJudicialHearingType.IN_PERSON)
+                                           .setHearingLocation(
                                                DynamicList.builder()
                                                    .value(selectedLocation).listItems(listItems)
-                                                   .build()).build())
+                                                   .build()))
                 .build();
 
             var templateData = generator.getTemplateData(

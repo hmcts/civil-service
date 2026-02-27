@@ -21,9 +21,9 @@ class CourtLocationUtilsTest {
     @BeforeEach
     void setup() {
         courtLocationUtils = new CourtLocationUtils();
-        locationA = LocationRefData.builder().siteName("Site 1").courtAddress("Lane 1").postcode("123").build();
+        locationA = new LocationRefData().setSiteName("Site 1").setCourtAddress("Lane 1").setPostcode("123");
         locations.add(locationA);
-        locations.add(LocationRefData.builder().siteName("Site 2").courtAddress("Lane 2").postcode("124").build());
+        locations.add(new LocationRefData().setSiteName("Site 2").setCourtAddress("Lane 2").setPostcode("124"));
         locationList = courtLocationUtils.getLocationsFromList(locations);
     }
 

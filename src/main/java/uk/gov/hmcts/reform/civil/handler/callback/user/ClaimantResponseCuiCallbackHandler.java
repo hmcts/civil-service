@@ -137,8 +137,8 @@ public class ClaimantResponseCuiCallbackHandler extends CallbackHandler {
         if (isDefendantPartAdmitPayImmediatelyAccepted(caseData)) {
             LocalDate whenBePaid = paymentDateService.calculatePaymentDeadline();
             caseData.setWhenToBePaidText(whenBePaid.format(DATE_FORMATTER));
-            caseData.setRespondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                      .whenWillThisAmountBePaid(whenBePaid).build());
+            caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                                      .setWhenWillThisAmountBePaid(whenBePaid));
         }
 
         updateCcjRequestPaymentDetails(caseData);

@@ -47,14 +47,12 @@ public class GaPaymentRequestUpdateCallbackService {
     private GeneralApplicationCaseData data;
 
     public GeneralApplicationCaseData processHwf(GeneralApplicationCaseData caseData) {
-        ServiceRequestUpdateDto serviceRequestUpdateDto = ServiceRequestUpdateDto
-                .builder()
-                .ccdCaseNumber(caseData.getCcdCaseReference().toString())
-                .payment(PaymentDto.builder()
-                        .customerReference(caseData.getGeneralAppHelpWithFees()
-                                .getHelpWithFeesReferenceNumber())
-                        .build())
-                .build();
+        ServiceRequestUpdateDto serviceRequestUpdateDto = new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(caseData.getCcdCaseReference().toString())
+            .setPayment(PaymentDto.builder()
+                .customerReference(caseData.getGeneralAppHelpWithFees()
+                    .getHelpWithFeesReferenceNumber())
+                .build());
         return processServiceRequest(serviceRequestUpdateDto, caseData, true);
     }
 
@@ -127,19 +125,22 @@ public class GaPaymentRequestUpdateCallbackService {
             .orElse(pbaDetails.getServiceReqReference());
 
         PaymentDetails paymentDetails = ofNullable(pbaDetails.getPaymentDetails())
-            .map(PaymentDetails::toBuilder)
-            .orElse(PaymentDetails.builder())
-            .status(SUCCESS)
-            .customerReference(paymentReference)
-            .reference(serviceRequestUpdateDto.getPayment().getPaymentReference())
-            .errorCode(null)
-            .errorMessage(null)
-            .build();
+            .map(PaymentDetails::copy)
+            .orElse(new PaymentDetails())
+            .setStatus(SUCCESS)
+            .setCustomerReference(paymentReference)
+            .setReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .setErrorCode(null)
+            .setErrorMessage(null)
+            ;
 
-        caseData = caseData.toBuilder()
-            .generalAppPBADetails(pbaDetails.toBuilder()
-                                      .paymentDetails(paymentDetails)
-                                      .paymentSuccessfulDate(time.now()).build())
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
+        updatedPbaDetails
+            .setPaymentDetails(paymentDetails)
+            .setPaymentSuccessfulDate(time.now());
+
+        caseData = caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
             .build();
 
         return caseData;
@@ -153,21 +154,24 @@ public class GaPaymentRequestUpdateCallbackService {
             .orElse(pbaDetails.getAdditionalPaymentServiceRef());
 
         PaymentDetails paymentDetails = ofNullable(pbaDetails.getAdditionalPaymentDetails())
-            .map(PaymentDetails::toBuilder)
-            .orElse(PaymentDetails.builder())
-            .status(SUCCESS)
-            .customerReference(customerReference)
-            .reference(serviceRequestUpdateDto.getPayment().getPaymentReference())
-            .errorCode(null)
-            .errorMessage(null)
-            .build();
+            .map(PaymentDetails::copy)
+            .orElse(new PaymentDetails())
+            .setStatus(SUCCESS)
+            .setCustomerReference(customerReference)
+            .setReference(serviceRequestUpdateDto.getPayment().getPaymentReference())
+            .setErrorCode(null)
+            .setErrorMessage(null)
+            ;
 
-        caseData = caseData.toBuilder()
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy();
+        updatedPbaDetails
+            .setAdditionalPaymentDetails(paymentDetails)
+            .setPaymentSuccessfulDate(time.now());
+
+        caseData = caseData.copy()
             .ccdState(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(caseData))
-            .generalAppPBADetails(pbaDetails.toBuilder()
-                                      .additionalPaymentDetails(paymentDetails)
-                                      .paymentSuccessfulDate(time.now()).build()
-            ).build();
+            .generalAppPBADetails(updatedPbaDetails)
+            .build();
 
         return caseData;
     }
