@@ -124,12 +124,12 @@ public class EndGeneralAppBusinessProcessCallbackHandler extends CallbackHandler
         } else if (data.getParentClaimantIsApplicant().equals(YesOrNo.NO) && data.getGeneralAppType().getTypes().contains(
             GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT) && isRespondentsResponseSatisfied(
             data,
-            data.toBuilder().build())) {
+            data.copy().build())) {
             newState = PROCEEDS_IN_HERITAGE;
         } else {
             newState = (isNotificationCriteriaSatisfied(data) && !isRespondentsResponseSatisfied(
                 data,
-                data.toBuilder().build()
+                data.copy().build()
             ))
                 ? AWAITING_RESPONDENT_RESPONSE
                 : APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION;

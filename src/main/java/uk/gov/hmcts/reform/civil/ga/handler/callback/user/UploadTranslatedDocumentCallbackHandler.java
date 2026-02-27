@@ -47,7 +47,7 @@ public class UploadTranslatedDocumentCallbackHandler extends CallbackHandler imp
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         String translator = IdamUserUtils.getIdamUserFullName(userDetails);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseDataBuilder);
         caseDataBuilder = uploadTranslatedDocumentService.processTranslatedDocument(caseDataBuilder.build(), translator);

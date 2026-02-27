@@ -59,7 +59,7 @@ public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackH
         if (!NON_LIVE_STATES.contains(caseData.getCcdState())) {
             log.info("Changing state to APPLICATION_CLOSED for caseId: {}", caseId);
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder
                 .businessProcess(
                     new BusinessProcess()
