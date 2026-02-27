@@ -6,12 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
@@ -41,12 +43,14 @@ class RespondToQueryHelperTest {
     private QueryManagementCamundaService runtimeService;
     @Mock
     private CoreCaseUserService coreCaseUserService;
+    @Mock
+    private OrganisationService organisationService;
 
     private RespondToQueryHelper helper;
 
     @BeforeEach
     void setUp() {
-        helper = new RespondToQueryHelper(runtimeService, coreCaseUserService);
+        helper = new RespondToQueryHelper(runtimeService, coreCaseUserService, organisationService);
     }
 
     @Test
@@ -121,6 +125,59 @@ class RespondToQueryHelperTest {
         helper.addQueryDateProperty(properties, caseData);
 
         assertThat(properties).containsEntry(QUERY_DATE, formatLocalDate(now.minusDays(3).toLocalDate(), DATE));
+    }
+
+    @Test
+    void shouldIdentifyApplicantSolicitorAsRecipient() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseData caseData = createCaseData(now);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
+        when(runtimeService.getProcessVariables("process-id"))
+            .thenReturn(queryManagementVariables);
+        when(coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), "LR"))
+            .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
+
+        assertThat(helper.shouldNotifyApplicantSolicitor(caseData)).isTrue();
+        assertThat(helper.shouldNotifyRespondentSolicitorOne(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyLipClaimantWhenOtherPartyIsClaimant() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseData caseData = createCaseData(now);
+        caseData.getApplicant1().setPartyEmail("claimant@example.com");
+        caseData.getRespondent1().setPartyEmail("defendant@example.com");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
+        when(runtimeService.getProcessVariables("process-id"))
+            .thenReturn(queryManagementVariables);
+        when(coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), "LR"))
+            .thenReturn(List.of(CaseRole.DEFENDANT.toString()));
+
+        assertThat(helper.shouldNotifyOtherPartyLipClaimant(caseData)).isTrue();
+        assertThat(helper.shouldNotifyOtherPartyLipDefendant(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyLipDefendantWhenOtherPartyIsDefendant() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseData caseData = createCaseData(now);
+        caseData.getApplicant1().setPartyEmail("claimant@example.com");
+        caseData.getRespondent1().setPartyEmail("defendant@example.com");
+        caseData.setApplicant1Represented(YesOrNo.NO);
+        caseData.setRespondent1Represented(YesOrNo.NO);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
+        when(runtimeService.getProcessVariables("process-id"))
+            .thenReturn(queryManagementVariables);
+        when(coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), "LR"))
+            .thenReturn(List.of(CaseRole.CLAIMANT.toString()));
+
+        assertThat(helper.shouldNotifyOtherPartyLipDefendant(caseData)).isTrue();
+        assertThat(helper.shouldNotifyOtherPartyLipClaimant(caseData)).isFalse();
     }
 
     private CaseData createCaseData(OffsetDateTime now) {

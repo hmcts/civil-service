@@ -31,4 +31,9 @@ public class OtherPartyQueryResponseClaimantEmailDTOGenerator extends AbstractRe
             caseData.getApplicant1().getPartyName()
         );
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return respondToQueryHelper.shouldNotifyOtherPartyLipClaimant(caseData);
+    }
 }

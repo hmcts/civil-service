@@ -33,4 +33,9 @@ public class OtherPartyQueryResponseAppSolEmailDTOGenerator extends AbstractResp
         respondToQueryHelper.addCustomProperties(properties, caseData, orgName, false);
         return properties;
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return respondToQueryHelper.shouldNotifyOtherPartyApplicantSolicitor(caseData);
+    }
 }

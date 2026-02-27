@@ -22,4 +22,9 @@ public abstract class AbstractRespondToQueryRespSolOneEmailDTOGenerator extends 
     public String getEmailTemplateId(CaseData caseData) {
         return notificationsProperties.getQueryLrPublicResponseReceived();
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return respondToQueryHelper.shouldNotifyRespondentSolicitorOne(caseData);
+    }
 }

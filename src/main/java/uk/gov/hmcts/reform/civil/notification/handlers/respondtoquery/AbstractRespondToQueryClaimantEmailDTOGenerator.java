@@ -21,4 +21,9 @@ public abstract class AbstractRespondToQueryClaimantEmailDTOGenerator extends Cl
             ? notificationsProperties.getQueryLipWelshPublicResponseReceived()
             : notificationsProperties.getQueryLipPublicResponseReceived();
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return respondToQueryHelper.shouldNotifyLipClaimant(caseData);
+    }
 }

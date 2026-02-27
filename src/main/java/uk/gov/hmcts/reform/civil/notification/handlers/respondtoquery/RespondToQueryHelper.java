@@ -6,10 +6,12 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementCamundaService;
 import uk.gov.hmcts.reform.civil.service.querymanagement.QueryManagementVariables;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +26,16 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.EMAIL;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.getOtherPartyEmailDetailsPublicQuery;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
@@ -41,6 +47,7 @@ public class RespondToQueryHelper {
 
     private final QueryManagementCamundaService runtimeService;
     private final CoreCaseUserService coreCaseUserService;
+    private final OrganisationService organisationService;
 
     public Map<String, String> addCustomProperties(Map<String, String> properties,
                                                    CaseData caseData,
@@ -73,23 +80,8 @@ public class RespondToQueryHelper {
     }
 
     private Optional<LocalDate> getOriginalQueryCreatedDate(CaseData caseData) {
-        if (caseData.getBusinessProcess() == null
-            || caseData.getBusinessProcess().getProcessInstanceId() == null) {
-            return Optional.empty();
-        }
-
-        QueryManagementVariables processVariables = runtimeService.getProcessVariables(
-            caseData.getBusinessProcess().getProcessInstanceId());
-        if (processVariables == null || processVariables.getQueryId() == null) {
-            return Optional.empty();
-        }
-
-        CaseMessage responseQuery = getQueryById(caseData, processVariables.getQueryId());
-        String parentQueryId = responseQuery.getParentId();
-        CaseMessage parentQuery = getQueryById(caseData, parentQueryId);
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
-
-        return Optional.ofNullable(getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery));
+        return getContext(caseData)
+            .map(ctx -> getOriginalQueryCreatedDate(caseData, ctx.responseQuery(), ctx.roles(), ctx.parentQuery()));
     }
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
@@ -137,4 +129,103 @@ public class RespondToQueryHelper {
             throw new IllegalArgumentException(QUERY_NOT_FOUND);
         }
     }
+
+    public boolean shouldNotifyApplicantSolicitor(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> isApplicantSolicitor(ctx.roles()))
+            .orElse(false);
+    }
+
+    public boolean shouldNotifyRespondentSolicitorOne(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> isRespondentSolicitorOne(ctx.roles()))
+            .orElse(false);
+    }
+
+    public boolean shouldNotifyRespondentSolicitorTwo(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> isRespondentSolicitorTwo(ctx.roles()))
+            .orElse(false);
+    }
+
+    public boolean shouldNotifyLipClaimant(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> isLIPClaimant(ctx.roles()))
+            .orElse(false);
+    }
+
+    public boolean shouldNotifyLipDefendant(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> isLIPDefendant(ctx.roles()))
+            .orElse(false);
+    }
+
+    public boolean shouldNotifyOtherPartyApplicantSolicitor(CaseData caseData) {
+        return containsRecipientEmail(getOtherPartyRecipients(caseData),
+            caseData.getApplicantSolicitor1UserDetailsEmail());
+    }
+
+    public boolean shouldNotifyOtherPartyRespondentSolicitorOne(CaseData caseData) {
+        return containsRecipientEmail(getOtherPartyRecipients(caseData),
+            caseData.getRespondentSolicitor1EmailAddress());
+    }
+
+    public boolean shouldNotifyOtherPartyRespondentSolicitorTwo(CaseData caseData) {
+        return containsRecipientEmail(getOtherPartyRecipients(caseData),
+            caseData.getRespondentSolicitor2EmailAddress());
+    }
+
+    public boolean shouldNotifyOtherPartyLipClaimant(CaseData caseData) {
+        return containsRecipientEmail(getOtherPartyRecipients(caseData), caseData.getApplicant1Email());
+    }
+
+    public boolean shouldNotifyOtherPartyLipDefendant(CaseData caseData) {
+        return containsRecipientEmail(getOtherPartyRecipients(caseData), caseData.getRespondent1PartyEmail());
+    }
+
+    private boolean containsRecipientEmail(List<Map<String, String>> recipients, String targetEmail) {
+        if (targetEmail == null || recipients.isEmpty()) {
+            return false;
+        }
+        return recipients.stream().anyMatch(details -> targetEmail.equals(details.get(EMAIL)));
+    }
+
+    private List<Map<String, String>> getOtherPartyRecipients(CaseData caseData) {
+        return getContext(caseData)
+            .map(ctx -> getOtherPartyEmailDetailsPublicQuery(
+                caseData,
+                organisationService,
+                coreCaseUserService,
+                ctx.parentQueryId()
+            ))
+            .orElse(Collections.emptyList());
+    }
+
+    private Optional<RespondToQueryContext> getContext(CaseData caseData) {
+        if (caseData.getBusinessProcess() == null
+            || caseData.getBusinessProcess().getProcessInstanceId() == null) {
+            return Optional.empty();
+        }
+
+        QueryManagementVariables processVariables = runtimeService.getProcessVariables(
+            caseData.getBusinessProcess().getProcessInstanceId());
+        if (processVariables == null || processVariables.getQueryId() == null) {
+            return Optional.empty();
+        }
+
+        CaseMessage responseQuery = getQueryById(caseData, processVariables.getQueryId());
+        String parentQueryId = responseQuery.getParentId();
+        if (parentQueryId == null) {
+            return Optional.empty();
+        }
+        CaseMessage parentQuery = getQueryById(caseData, parentQueryId);
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
+
+        return Optional.of(new RespondToQueryContext(responseQuery, parentQuery, parentQueryId, roles));
+    }
+
+    private record RespondToQueryContext(CaseMessage responseQuery,
+                                         CaseMessage parentQuery,
+                                         String parentQueryId,
+                                         List<String> roles) {}
 }
