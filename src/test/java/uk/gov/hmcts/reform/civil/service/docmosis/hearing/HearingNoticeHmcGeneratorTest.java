@@ -76,7 +76,7 @@ class HearingNoticeHmcGeneratorTest {
     private static final String EPIMS = "venue-id";
     private static final Long VERSION_NUMBER = 1L;
 
-    private HearingGetResponse baseHearing;
+    private HearingGetResponse baseHearing = new HearingGetResponse();
 
     private static final String FILE_NAME_APPLICATION = String.format(
         HEARING_NOTICE_HMC.getDocumentTitle(), REFERENCE_NUMBER);
@@ -134,39 +134,30 @@ class HearingNoticeHmcGeneratorTest {
                 HearingIndividual.nonAttending("James", "Allen")
         );
 
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
-        baseHearing = HearingGetResponse.builder()
-                .partyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
-                .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        baseHearing
+                .setPartyDetails(hearingIndividuals.stream().map(HearingIndividual::buildPartyDetails).toList())
+                .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                                 List.of(
-                                        HearingDaySchedule.builder()
-                                                .attendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
-                                                .hearingVenueId(EPIMS)
-                                                .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                                                .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                                                .build()))
-                        .receivedDateTime(hearingResponseDate)
-                        .build())
-                .requestDetails(HearingRequestDetails.builder()
-                        .versionNumber(VERSION_NUMBER)
-                        .build())
-                .build();
+                                        new HearingDaySchedule()
+                                                .setAttendees(hearingIndividuals.stream().map(HearingIndividual::buildAttendee).toList())
+                                                .setHearingVenueId(EPIMS)
+                                                .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                                                .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                        .setReceivedDateTime(hearingResponseDate))
+                .setRequestDetails(new HearingRequestDetails()
+                        .setVersionNumber(VERSION_NUMBER));
     }
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasBeenPaid() {
-        var hearing = baseHearing.toBuilder()
-                    .hearingDetails(HearingDetails.builder()
-                                        .hearingType("AAA7-TRI")
-                                        .build()
-                    )
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
@@ -219,13 +210,11 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldOnlyIgnoreFeeDetails_1v1_whenHearingFeeHasBeenPaidThroughHwFAndCPToggleEnabled() {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build()
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI")
             )
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
@@ -280,12 +269,9 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
     void shouldGenerateHearingNoticeHmc_1v1_whenHearingFeeHasNotBeenPaid(boolean isWelsh) {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
@@ -342,12 +328,10 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
     void shouldGenerateHearingNoticeHmc_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DIS")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DIS"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
             .totalClaimAmount(new BigDecimal(2000))
@@ -405,12 +389,10 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @CsvSource({"true, false", "false, false", "true, true", "false, false"})
     void shouldGenerateHearingNoticeHmcDisputeResolution_1v2DS_whenHearingFeeHasBeenPaid(boolean isWelsh) {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DRH")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DRH"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension()
             .totalClaimAmount(new BigDecimal(2000))
@@ -473,12 +455,10 @@ class HearingNoticeHmcGeneratorTest {
         "AAA7-DRH, dispute resolution hearing, false"
     })
     void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_whenHearingType(String hearingType, String expectedTitle) {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(hearingType)
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(hearingType))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
@@ -535,12 +515,10 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldGenerateHearingNoticeHmc_2v1_whenHearingFeeHasBeenPaid_noSolicitorReferences() {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-DRH")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-DRH"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
@@ -595,12 +573,9 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocuments() {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails().setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal(2000))
@@ -637,12 +612,10 @@ class HearingNoticeHmcGeneratorTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void shouldReturnListOfExpectedCaseDocumentsSpec() {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .caseDetails(CaseDetailsHearing.builder().caseRef("1234567812345678").build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI"))
+            .setCaseDetails(new CaseDetailsHearing().setCaseRef("1234567812345678"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()
@@ -679,11 +652,9 @@ class HearingNoticeHmcGeneratorTest {
 
     @Test
     void shouldReturnListOfExpectedCaseDocumentsSpec_WhenIsWelshHearingNotice() {
-        var hearing = baseHearing.toBuilder()
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType("AAA7-TRI")
-                                .build())
-            .build();
+        var hearing = baseHearing
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType("AAA7-TRI"));
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateBothApplicantsRespondToDefenceAndProceed_2v1_SPEC()

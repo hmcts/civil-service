@@ -41,7 +41,7 @@ class RespondToWrittenRepresentationGeneratorTest {
     @Test
     void shouldGenerateRespondToWrittenRepresentationDocument() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-            .build().toBuilder().generalAppWrittenRepText("writtenRep text").build();
+            .build().copy().generalAppWrittenRepText("writtenRep text").build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
             .thenReturn(new DocmosisDocument(RESPOND_FOR_WRITTEN_REPRESENTATION.getDocumentTitle(), bytes));
@@ -59,7 +59,7 @@ class RespondToWrittenRepresentationGeneratorTest {
     @Test
     void whenRespond_ShouldGetRespondToWrittenRepresentationData() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-            .build().toBuilder().generalAppWrittenRepText("writtenRep Text").build();
+            .build().copy().generalAppWrittenRepText("writtenRep Text").build();
         respondToWrittenRepresentationGenerator.setRole(DocUploadUtils.APPLICANT);
         var templateData =
             respondToWrittenRepresentationGenerator.getTemplateData(caseData, "auth");
@@ -69,7 +69,7 @@ class RespondToWrittenRepresentationGeneratorTest {
     @Test
     void whenRespond_ShouldGetRespondToWrittenRepresentationDataForRespondent() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-            .build().toBuilder().parentClaimantIsApplicant(YesOrNo.YES).generalAppWrittenRepText("writtenRep Text")
+            .build().copy().parentClaimantIsApplicant(YesOrNo.YES).generalAppWrittenRepText("writtenRep Text")
             .build();
         respondToWrittenRepresentationGenerator.setRole(DocUploadUtils.RESPONDENT_ONE);
         var templateData =
@@ -80,7 +80,7 @@ class RespondToWrittenRepresentationGeneratorTest {
     @Test
     void whenRespond_ShouldGetRespondToWrittenRepresentationDataForRespondentHasClaimant() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-            .build().toBuilder().parentClaimantIsApplicant(YesOrNo.NO).generalAppWrittenRepText("writtenRep Text")
+            .build().copy().parentClaimantIsApplicant(YesOrNo.NO).generalAppWrittenRepText("writtenRep Text")
             .build();
         respondToWrittenRepresentationGenerator.setRole(DocUploadUtils.RESPONDENT_ONE);
         var templateData =

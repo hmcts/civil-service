@@ -47,16 +47,16 @@ import static uk.gov.hmcts.reform.civil.enums.CaseState.AWAITING_RESPONDENT_RESP
 
     @Test
     void shouldSubmit_NoRemissionHwFEventAndStartNotifyApplicantLip() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(AWAITING_RESPONDENT_RESPONSE)
             .hwfFeeType(FeeType.APPLICATION)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                     new Fee()
                         .setCalculatedAmountInPence(BigDecimal.valueOf(500)).setCode("FEE205"))
-                                      .build())
-            .gaHwfDetails(HelpWithFeesDetails.builder()
-                               .remissionAmount(BigDecimal.valueOf(500))
-                               .build())
+                                      )
+            .gaHwfDetails(new HelpWithFeesDetails()
+                               .setRemissionAmount(BigDecimal.valueOf(500))
+                               )
             .generalAppHelpWithFees(new HelpWithFees()).build();
         CallbackParams params = callbackParamsOf(caseData, CaseEvent.NO_REMISSION_HWF_GA, CallbackType.ABOUT_TO_SUBMIT);
 
