@@ -73,7 +73,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                 .claimantBilingualLanguagePreference("WELSH").build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
@@ -108,7 +108,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData().build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
@@ -137,7 +137,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotSendTranslatedOrderLetterToLipApplicantIfNotOrderDocument() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
@@ -167,7 +167,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")).build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
@@ -203,7 +203,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
                 .claimantBilingualLanguagePreference("BOTH").build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
@@ -233,7 +233,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
         @Test
         void shouldNotSendTranslatedOrderLetterToLipApplicantIfPrintServiceNotEnabled() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
@@ -257,7 +257,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldNotSendTranslatedOrderLetterToLipApplicantIfNullDocuments() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
         caseData = caseData.copy()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
             .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -278,7 +278,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
 
     @Test
     void shouldNotSendTranslatedOrderLetterToLipApplicantIfEmptyDocuments() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
         caseData = caseData.copy()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
             .translatedDocumentsBulkPrint(List.of())

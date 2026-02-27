@@ -48,8 +48,8 @@ class ClaimSubmissionClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party respondent = Party.builder().companyName("Respondent").type(Party.Type.COMPANY).build();
-        Party claimant = Party.builder().companyName("Claimant").type(Party.Type.COMPANY).build();
+        Party respondent = new Party().setCompanyName("Respondent").setType(Party.Type.COMPANY);
+        Party claimant = new Party().setCompanyName("Claimant").setType(Party.Type.COMPANY);
         CaseData caseData = CaseData.builder()
                 .respondent1(respondent)
                 .applicant1(claimant)

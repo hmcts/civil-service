@@ -105,7 +105,7 @@ public class DefendantSignSettlementClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String caseReference = "caseReference";
         CaseData caseData = CaseData.builder().applicant1(party).respondent1(party).legacyCaseReference(caseReference).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);

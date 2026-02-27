@@ -127,7 +127,7 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .addRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
 
         given(documentDownloadService.downloadDocument(
             any(),
@@ -160,7 +160,7 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
             .applicant1(applicant)
             .respondent1(defendant)
             .addRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
 
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
             .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));

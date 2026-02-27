@@ -57,7 +57,7 @@ public class LipDefendantCaseAssignmentService {
         if (caseDetails.isPresent()) {
             CaseData caseData = caseDetailsConverter.toCaseData(caseDetails.get());
             Party respondent1 = caseData.getRespondent1();
-            respondent1 = respondent1.toBuilder().partyEmail(defendantIdamUserDetails.getEmail()).build();
+            respondent1 = respondent1.setPartyEmail(defendantIdamUserDetails.getEmail());
             data.put("respondent1", respondent1);
             if (caseFlagsLoggingEnabled) {
                 log.info(

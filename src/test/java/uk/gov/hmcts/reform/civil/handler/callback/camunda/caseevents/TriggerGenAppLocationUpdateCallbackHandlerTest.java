@@ -80,7 +80,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true,
                     true, true,
                     getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
 
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -107,7 +107,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true,
                     true, true,
                     getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
 
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -134,7 +134,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true,
                     true, true,
                     getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -161,7 +161,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true,
                     true, true,
                     getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -314,7 +314,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
                     true,
                     true, true,
                     getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
             when(helperService.updateApplicationLocationDetailsInClaim(any(), any())).thenReturn(caseData);
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

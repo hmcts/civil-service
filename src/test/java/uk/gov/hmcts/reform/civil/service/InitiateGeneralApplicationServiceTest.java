@@ -420,7 +420,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnCaseDataPopulated_whenValidApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build()).build();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -438,7 +438,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnCaseDataWithAdditionToCollection_whenAnotherApplicationIsBeingInitiated() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build()).build();
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));
 
         CaseData result = service.buildCaseData(caseData, UserDetails.builder()
@@ -730,7 +730,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnTrue_whenApplicantIsClaimantAtMainCase() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseData(CaseDataBuilder.builder().build());
+            .getTestCaseData(CaseDataBuilder.builder().build()).build();
         List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]"));
         OrganisationPolicy orgPolicy = new OrganisationPolicy();
         orgPolicy.setOrgPolicyCaseAssignedRole("[APPLICANTSOLICITORONE]");
@@ -747,7 +747,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldReturnFalse_whenApplicantIsClaimantAtMainCase() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseData(CaseDataBuilder.builder().build());
+            .getTestCaseData(CaseDataBuilder.builder().build()).build();
         List<String> userRoles = new ArrayList<>(Arrays.asList("[APPLICANTSOLICITORONE]", "[RESPONDENTSOLICITORTWO]"));
 
         OrganisationPolicy orgPolicy = new OrganisationPolicy();
@@ -1139,7 +1139,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
 
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build()).build();
 
         caseData.setCertOfSC(certOfSC);
         caseData.setGeneralAppEvidenceDocument(documentList);
@@ -1166,7 +1166,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
         gaApplicationType2.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
 
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataWithEmptyCollectionOfApps(CaseDataBuilder.builder().build()).build();
 
         caseData.setCertOfSC(certOfSC2);
         caseData.setGeneralAppType(gaApplicationType2);
@@ -1185,7 +1185,7 @@ class InitiateGeneralApplicationServiceTest extends LocationRefSampleDataBuilder
     @Test
     void shouldExtendDeadline_buildCaseData() {
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build());
+            .getTestCaseDataCollectionOfApps(CaseDataBuilder.builder().build()).build();
         when(calc.addMonthsToDateToNextWorkingDayAtMidnight(36, LocalDate.now()))
             .thenReturn(LocalDateTime.now().plusMonths(36));
         when(locationService.getWorkAllocationLocation(any(), any())).thenReturn(Pair.of(getSampleCourLocationsRefObjectPostSdo(), true));

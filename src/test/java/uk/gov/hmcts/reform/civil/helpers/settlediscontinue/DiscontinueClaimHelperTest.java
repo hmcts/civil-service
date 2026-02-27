@@ -53,7 +53,7 @@ public class DiscontinueClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LiPvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
             .applicant1Represented(YesOrNo.NO)
             .build();
         List<String> errors = new ArrayList<>();
@@ -100,7 +100,7 @@ public class DiscontinueClaimHelperTest {
     void shouldNotReturn_error_when_claim_is_1v2_LRvLRWithDiffLR() {
         CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimSubmittedTwoRespondentRepresentatives()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+                .respondent2(PartyBuilder.builder().individual().build())
                 .build();
         List<String> errors = new ArrayList<>();
         DiscontinueClaimHelper.checkState(caseData, errors);
@@ -111,7 +111,7 @@ public class DiscontinueClaimHelperTest {
     @Test
     void shouldReturn_true_when_claim_is_1v2_LRvLR() {
         CaseData caseData = CaseDataBuilder.builder()
-            .atStateClaimDraft().respondent2(Party.builder().partyName("Resp2").build())
+            .atStateClaimDraft().respondent2(new Party().setPartyName("Resp2"))
             .build();
         assertThat(DiscontinueClaimHelper.is1v2LrVLrCase(caseData)).isTrue();
     }
@@ -146,7 +146,7 @@ public class DiscontinueClaimHelperTest {
     void shouldReturn_false_when_claim_is_1v2_LiPvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
             .applicant1Represented(YesOrNo.NO)
             .build();
         assertThat(DiscontinueClaimHelper.is1v2LrVLrCase(caseData)).isFalse();

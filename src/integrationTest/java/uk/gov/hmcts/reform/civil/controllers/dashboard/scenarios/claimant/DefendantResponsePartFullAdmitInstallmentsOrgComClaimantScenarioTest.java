@@ -41,7 +41,7 @@ public class DefendantResponsePartFullAdmitInstallmentsOrgComClaimantScenarioTes
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .responseClaimTrack("SMALL_CLAIM")
-            .respondent1(Party.builder().companyName("Company One").type(Party.Type.COMPANY).build())
+            .respondent1(new Party().setCompanyName("Company One").setType(Party.Type.COMPANY))
             .respondent1RepaymentPlan(new RepaymentPlanLRspec()
                                           .setRepaymentFrequency(frequency)
                                           .setPaymentAmount(installmentAmount)

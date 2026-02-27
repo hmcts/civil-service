@@ -67,7 +67,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsnullIfnotSet() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNull(activeJudgment);
@@ -76,7 +76,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsUpdated() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         JudgmentDetails activeJudgment = editJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -105,7 +105,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsUpdated_scenario2() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
@@ -132,7 +132,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsUpdated_PayInstallments() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
@@ -164,7 +164,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsUpdated_PayByDate() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
@@ -192,7 +192,7 @@ public class EditJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultActiveJudgmentIsUpdated_scenario2() {
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
         caseData.setJoAmountCostOrdered(null);
         caseData.setActiveJudgment(defaultJudgmentMapper.addUpdateActiveJudgment(caseData));
 

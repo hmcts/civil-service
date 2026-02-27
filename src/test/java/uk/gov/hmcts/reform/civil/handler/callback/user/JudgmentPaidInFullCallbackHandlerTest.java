@@ -69,7 +69,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             judgmentDetails.setOrderedAmount("100");
             judgmentDetails.setCosts("50");
             judgmentDetails.setTotalAmount("150");
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -99,7 +99,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             judgmentDetails.setOrderedAmount("100");
             judgmentDetails.setCosts("50");
             judgmentDetails.setTotalAmount("150");
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -126,7 +126,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             judgmentDetails.setOrderedAmount("100");
             judgmentDetails.setCosts("50");
             judgmentDetails.setTotalAmount("150");
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31Days().build();
             caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -157,7 +157,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
             judgmentDetails.setCosts("50");
             judgmentDetails.setTotalAmount("150");
             CaseData caseData = CaseDataBuilder.builder()
-                .getDefaultJudgment1v1CaseJudgmentPaid();
+                .getDefaultJudgment1v1CaseJudgmentPaid().build();
             caseData.setActiveJudgment(judgmentDetails);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -179,7 +179,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentMadeDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-payment-date");
@@ -191,7 +191,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateJudgementByAdmissionDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
             caseData.setJoJudgementByAdmissionIssueDate(LocalDateTime.now());
 
@@ -204,7 +204,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateDefaultJudgementDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             caseData.getJoJudgmentPaidInFull().setDateOfFullPaymentMade(LocalDate.now().minusDays(2));
             caseData.setJoDJCreatedDate(LocalDateTime.now());
 
@@ -219,7 +219,7 @@ class JudgmentPaidInFullCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31Days().build();
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED);

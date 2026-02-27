@@ -149,7 +149,7 @@ class HearingScheduledDefendantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .respondent1Represented(YesOrNo.NO)
             .build()
-            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM).build();
         caseData.setTrialReadyRespondent1(null);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
@@ -170,7 +170,7 @@ class HearingScheduledDefendantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .respondent1Represented(YesOrNo.NO)
             .build()
-            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM).build();
         caseData.setTrialReadyRespondent1(YesOrNo.YES);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());

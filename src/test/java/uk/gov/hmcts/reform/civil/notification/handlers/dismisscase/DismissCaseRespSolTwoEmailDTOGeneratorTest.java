@@ -52,7 +52,7 @@ public class DismissCaseRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         CaseData caseData = CaseData.builder().respondent2(party).build();
 
         String allPartyNames = "all party names";

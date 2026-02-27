@@ -90,7 +90,7 @@ class NotifyDefendantJudgmentByAdmissionNotificationHandlerTest extends BaseCall
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .atStateClaimDraft()
                 .specClaim1v1LrVsLip()
-                .buildJudmentOnlineCaseDataWithPaymentImmediately();
+                .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 

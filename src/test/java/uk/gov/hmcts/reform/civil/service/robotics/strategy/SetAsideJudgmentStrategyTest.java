@@ -52,7 +52,7 @@ class SetAsideJudgmentStrategyTest {
     @Test
     void contributeAddsSingleRespondentEvent() {
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 5, 1));
@@ -87,7 +87,7 @@ class SetAsideJudgmentStrategyTest {
         respondent2.setIndividualLastName("Jones");
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+            .buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party().build();
         caseData.setRespondent2(respondent2);
         caseData.setAddRespondent2(YesOrNo.YES);
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
@@ -111,7 +111,7 @@ class SetAsideJudgmentStrategyTest {
     @Test
     void contributeUsesDefenceDateWhenOrderAfterDefence() {
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
         caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
         caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 6, 10));

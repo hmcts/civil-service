@@ -61,10 +61,10 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddClaimantNameWhenNotImmediatePayment() {
-        Party applicant = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Jane")
-            .individualLastName("Doe").build();
+        Party applicant = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Jane")
+            .setIndividualLastName("Doe");
         CaseData caseData = CaseData.builder()
             .applicant1(applicant)
             .defenceAdmitPartPaymentTimeRouteRequired(null)

@@ -31,10 +31,9 @@ public class DefendantResponseDeadlineScenarioTest extends DashboardBaseIntegrat
                 .toBuilder()
                 .legacyCaseReference("reference")
                 .ccdCaseReference(Long.valueOf(caseId))
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                        .individualFirstName("James")
-                        .individualLastName("John")
-                        .build())
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                        .setIndividualFirstName("James")
+                        .setIndividualLastName("John"))
                 .applicant1Represented(YesOrNo.NO)
                 .build();
 

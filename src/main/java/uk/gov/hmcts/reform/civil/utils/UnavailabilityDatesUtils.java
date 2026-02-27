@@ -265,11 +265,11 @@ public class UnavailabilityDatesUtils {
 
         if (isApplicant1) {
             updatedData
-                .applicant1(caseData.getApplicant1().toBuilder().unavailableDates(dates).build())
+                .applicant1(caseData.getApplicant1().setUnavailableDates(dates))
                 .applicant1UnavailableDatesForTab(dates);
         } else {
             updatedData
-                .applicant2(caseData.getApplicant2().toBuilder().unavailableDates(dates).build())
+                .applicant2(caseData.getApplicant2().setUnavailableDates(dates))
                 .applicant2UnavailableDatesForTab(dates);
         }
     }
@@ -294,10 +294,10 @@ public class UnavailabilityDatesUtils {
             );
 
         if (isApplicant1) {
-            caseData.setApplicant1(caseData.getApplicant1().toBuilder().unavailableDates(dates).build());
+            caseData.setApplicant1(caseData.getApplicant1().setUnavailableDates(dates));
             caseData.setApplicant1UnavailableDatesForTab(dates);
         } else {
-            caseData.setApplicant2(caseData.getApplicant2().toBuilder().unavailableDates(dates).build());
+            caseData.setApplicant2(caseData.getApplicant2().setUnavailableDates(dates));
             caseData.setApplicant2UnavailableDatesForTab(dates);
         }
     }
@@ -322,7 +322,7 @@ public class UnavailabilityDatesUtils {
         );
 
         updatedData
-            .respondent1(caseData.getRespondent1().toBuilder().unavailableDates(dates).build())
+            .respondent1(caseData.getRespondent1().setUnavailableDates(dates))
             .respondent1UnavailableDatesForTab(dates);
     }
 
@@ -343,7 +343,7 @@ public class UnavailabilityDatesUtils {
             dateAdded
         );
 
-        caseData.setRespondent1(caseData.getRespondent1().toBuilder().unavailableDates(dates).build());
+        caseData.setRespondent1(caseData.getRespondent1().setUnavailableDates(dates));
         caseData.setRespondent1UnavailableDatesForTab(dates);
     }
 
@@ -367,7 +367,7 @@ public class UnavailabilityDatesUtils {
         );
 
         updatedData
-            .respondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build())
+            .respondent2(caseData.getRespondent2().setUnavailableDates(dates))
             .respondent2UnavailableDatesForTab(dates);
     }
 
@@ -388,7 +388,7 @@ public class UnavailabilityDatesUtils {
             dateAdded
         );
 
-        caseData.setRespondent2(caseData.getRespondent2().toBuilder().unavailableDates(dates).build());
+        caseData.setRespondent2(caseData.getRespondent2().setUnavailableDates(dates));
         caseData.setRespondent2UnavailableDatesForTab(dates);
     }
 

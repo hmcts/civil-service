@@ -495,19 +495,19 @@ public class ManageContactInformationUtils {
     }
 
     public static List<Element<UpdatePartyDetailsForm>> mapPartyFieldsToPartyFormData(List<Element<PartyFlagStructure>> partyFields) {
-        return ofNullable(partyFields).orElse(new ArrayList<>()).stream().map(partyElement ->
-                        {
-                            UpdatePartyDetailsForm form = new UpdatePartyDetailsForm();
-                            form.setFirstName(partyElement.getValue().getFirstName());
-                            form.setLastName(partyElement.getValue().getLastName());
-                            form.setEmailAddress(partyElement.getValue().getEmail());
-                            form.setPhoneNumber(partyElement.getValue().getPhone());
-                            return Element.<UpdatePartyDetailsForm>builder()
-                                .id(partyElement.getId())
-                                .value(form)
-                                .build();
-                        })
-                .toList();
+        return ofNullable(partyFields).orElse(new ArrayList<>()).stream()
+            .map(partyElement -> {
+                UpdatePartyDetailsForm form = new UpdatePartyDetailsForm();
+                form.setFirstName(partyElement.getValue().getFirstName());
+                form.setLastName(partyElement.getValue().getLastName());
+                form.setEmailAddress(partyElement.getValue().getEmail());
+                form.setPhoneNumber(partyElement.getValue().getPhone());
+                return Element.<UpdatePartyDetailsForm>builder()
+                    .id(partyElement.getId())
+                    .value(form)
+                    .build();
+            })
+            .toList();
     }
 
     public static List<Element<PartyFlagStructure>> mapFormDataToIndividualsData(List<Element<PartyFlagStructure>> existing,

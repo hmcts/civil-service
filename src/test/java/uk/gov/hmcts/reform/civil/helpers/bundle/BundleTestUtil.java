@@ -38,16 +38,16 @@ public class BundleTestUtil {
     public static CaseData getCaseDataWithNoId() {
         return CaseData.builder().ccdCaseReference(1L)
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocsNoId())
-            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
-                "applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
-                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl1Fname").setPartyName(
+                "applicant1").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualLastName("lastname").setIndividualFirstName("df1Fname").setPartyName(
+                "respondent1").setType(Party.Type.INDIVIDUAL))
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
-                "applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
-                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl2Fname").setPartyName(
+                "applicant2").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setIndividualLastName("lastname").setIndividualFirstName("df2Fname").setPartyName(
+                "respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.now())
             .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
                                             2, 2))
@@ -106,16 +106,16 @@ public class BundleTestUtil {
             .documentCostsRes(setupOtherEvidenceDocs(null))
             .documentCostsRes2(setupOtherEvidenceDocs(null))
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
-            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
-                "applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
-                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl1Fname").setPartyName(
+                "applicant1").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualLastName("lastname").setIndividualFirstName("df1Fname").setPartyName(
+                "respondent1").setType(Party.Type.INDIVIDUAL))
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
-                "applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
-                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl2Fname").setPartyName(
+                "applicant2").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setIndividualLastName("lastname").setIndividualFirstName("df2Fname").setPartyName(
+                "respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.now())
             .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
                                             2, 2))
@@ -175,16 +175,16 @@ public class BundleTestUtil {
             .documentCostsRes(setupOtherEvidenceDocs(null))
             .documentCostsRes2(setupOtherEvidenceDocs(null))
             .systemGeneratedCaseDocuments(setupSystemGeneratedCaseDocs())
-            .applicant1(Party.builder().individualLastName("lastname").individualFirstName("cl1Fname").partyName(
-                "applicant1").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualLastName("lastname").individualFirstName("df1Fname").partyName(
-                "respondent1").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl1Fname").setPartyName(
+                "applicant1").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualLastName("lastname").setIndividualFirstName("df1Fname").setPartyName(
+                "respondent1").setType(Party.Type.INDIVIDUAL))
             .addApplicant2(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
-            .applicant2(Party.builder().individualLastName("lastname").individualFirstName("cl2Fname").partyName(
-                "applicant2").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualLastName("lastname").individualFirstName("df2Fname").partyName(
-                "respondent2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setIndividualLastName("lastname").setIndividualFirstName("cl2Fname").setPartyName(
+                "applicant2").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setIndividualLastName("lastname").setIndividualFirstName("df2Fname").setPartyName(
+                "respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.now())
             .submittedDate(LocalDateTime.of(2023, 2, 10, 2,
                                             2, 2))

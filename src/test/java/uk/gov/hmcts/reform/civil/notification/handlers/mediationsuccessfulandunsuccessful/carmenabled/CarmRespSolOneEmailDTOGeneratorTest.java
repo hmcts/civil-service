@@ -139,18 +139,18 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomPropertiesForTwoVOneScenario() {
         CaseData caseData = mock(CaseData.class);
-        Party applicant1 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualTitle("Mr")
-            .individualFirstName("Applicant")
-            .individualLastName("One")
-            .partyName(APPLICANT1_NAME).build();
-        Party applicant2 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualTitle("Mr")
-            .individualFirstName("Applicant")
-            .individualLastName("Two")
-            .partyName(APPLICANT2_NAME).build();
+        Party applicant1 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("Applicant")
+            .setIndividualLastName("One")
+            .setPartyName(APPLICANT1_NAME);
+        Party applicant2 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("Applicant")
+            .setIndividualLastName("Two")
+            .setPartyName(APPLICANT2_NAME);
         when(caseData.getApplicant1()).thenReturn(applicant1);
         when(caseData.getApplicant2()).thenReturn(applicant2);
         when(caseData.getAddApplicant2()).thenReturn(YesOrNo.YES);
@@ -172,12 +172,12 @@ class CarmRespSolOneEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomPropertiesForNonTwoVOneScenario() {
         CaseData caseData = mock(CaseData.class);
-        Party applicant1 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualTitle("Mr")
-            .individualFirstName("Applicant")
-            .individualLastName("One")
-            .partyName(APPLICANT1_NAME).build();
+        Party applicant1 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("Applicant")
+            .setIndividualLastName("One")
+            .setPartyName(APPLICANT1_NAME);
         when(caseData.getApplicant1()).thenReturn(applicant1);
 
         Map<String, String> props = new HashMap<>();

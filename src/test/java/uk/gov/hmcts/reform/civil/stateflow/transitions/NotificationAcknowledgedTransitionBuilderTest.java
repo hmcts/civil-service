@@ -126,7 +126,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     void shouldReturnTrue_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterNotificationAcknowledged()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(now().minusDays(1))
             .build();
@@ -138,7 +138,7 @@ public class NotificationAcknowledgedTransitionBuilderTest {
     void shouldReturnFalse_whenCaseDataAtStateTakenOfflineByStaffAfterNotificationAcknowledged1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledgedRespondent1TimeExtension()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .build();
         assertFalse(TakenOfflinePredicate.byStaff

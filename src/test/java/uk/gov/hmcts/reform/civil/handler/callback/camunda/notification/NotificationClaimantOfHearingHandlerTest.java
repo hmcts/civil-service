@@ -397,7 +397,7 @@ class NotificationClaimantOfHearingHandlerTest {
                 .hearingDueDate(LocalDate.of(2022, 11, 23))
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
-                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
+                .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
                 .hearingNoticeList(HearingNoticeList.FAST_TRACK_TRIAL)
                 .listingOrRelisting(ListingOrRelisting.LISTING)
                 .build();
@@ -567,7 +567,7 @@ class NotificationClaimantOfHearingHandlerTest {
                                               )
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.YES)
-                .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
+                .respondent2(new Party().setType(Party.Type.COMPANY).setCompanyName("Party2"))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();

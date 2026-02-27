@@ -226,10 +226,8 @@ class DJApplicantReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                    .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                            .build())
-                    .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .build())
+                    .applicant1(PartyBuilder.builder().individual().build())
+                    .respondent1(PartyBuilder.builder().soleTrader().build())
                     .respondent1Represented(YesOrNo.NO)
                     .specRespondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)

@@ -621,27 +621,25 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     private Party company(String suffix) {
-        return Party.builder()
-            .type(Party.Type.COMPANY)
-            .companyName("company " + suffix)
-            .partyPhone("phone " + suffix)
-            .partyEmail("email " + suffix)
-            .partyName("company " + suffix)
-            .primaryAddress(address(suffix))
-            .build();
+        return new Party()
+            .setType(Party.Type.COMPANY)
+            .setCompanyName("company " + suffix)
+            .setPartyPhone("phone " + suffix)
+            .setPartyEmail("email " + suffix)
+            .setPartyName("company " + suffix)
+            .setPrimaryAddress(address(suffix));
     }
 
     private Party individual(String suffix) {
-        return Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Name " + suffix)
-            .individualLastName("Surname " + suffix)
-            .individualDateOfBirth(LocalDate.of(1956, 10, 2))
-            .partyPhone("phone " + suffix)
-            .partyName("Name Surname" + suffix)
-            .partyEmail("email " + suffix)
-            .primaryAddress(address(suffix))
-            .build();
+        return new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Name " + suffix)
+            .setIndividualLastName("Surname " + suffix)
+            .setIndividualDateOfBirth(LocalDate.of(1956, 10, 2))
+            .setPartyPhone("phone " + suffix)
+            .setPartyName("Name Surname" + suffix)
+            .setPartyEmail("email " + suffix)
+            .setPrimaryAddress(address(suffix));
     }
 
     private Address address(String suffix) {

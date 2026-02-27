@@ -68,12 +68,11 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         .setDocumentLink(new Document().setDocumentFileName(FILE_NAME).setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
 
     private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
-    private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Smith")
-        .individualLastName("John")
-        .build();
+    private static final Party DEFENDANT = new Party().setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Smith")
+        .setIndividualLastName("John");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -86,11 +85,11 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
         .ccdCaseReference(16543480L)
-        .applicant1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .individualTitle("Mr.")
-                        .individualFirstName("John")
-                        .individualLastName("Smith").build())
+        .applicant1(new Party()
+                        .setType(Party.Type.INDIVIDUAL)
+                        .setIndividualTitle("Mr.")
+                        .setIndividualFirstName("John")
+                        .setIndividualLastName("Smith"))
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))

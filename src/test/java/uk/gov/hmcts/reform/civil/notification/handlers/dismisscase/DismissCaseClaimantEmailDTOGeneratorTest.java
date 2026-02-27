@@ -61,7 +61,7 @@ public class DismissCaseClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
 
         String allPartyNames = "all party names";
         String applicantName = "applicant name";

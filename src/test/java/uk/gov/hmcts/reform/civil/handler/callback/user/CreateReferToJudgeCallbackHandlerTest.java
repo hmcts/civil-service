@@ -102,7 +102,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(PartyBuilder.builder().individual().build().setPartyID("res-1-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -127,7 +127,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
+                .respondent2(PartyBuilder.builder().individual().build().setPartyID("res-2-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -144,7 +144,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmitted()
                 .setClaimTypeToSpecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(PartyBuilder.builder().individual().build().setPartyID("res-1-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);

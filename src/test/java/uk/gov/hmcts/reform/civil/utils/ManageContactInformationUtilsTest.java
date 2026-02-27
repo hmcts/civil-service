@@ -152,10 +152,9 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
-            .applicant1(Party.builder()
-                            .organisationName("Test Inc")
-                            .type(ORGANISATION)
-                            .build())
+            .applicant1(new Party()
+                            .setOrganisationName("Test Inc")
+                            .setType(ORGANISATION))
             .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -170,10 +169,9 @@ class ManageContactInformationUtilsTest {
                 .addApplicant1LitigationFriend()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .applicant1Represented(NO)
-                .applicant1(Party.builder()
-                        .organisationName("Test Inc")
-                        .type(ORGANISATION)
-                        .build())
+                .applicant1(new Party()
+                        .setOrganisationName("Test Inc")
+                        .setType(ORGANISATION))
                 .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -188,10 +186,9 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
-            .applicant1(Party.builder()
-                            .companyName("Test Inc")
-                            .type(COMPANY)
-                            .build())
+            .applicant1(new Party()
+                            .setCompanyName("Test Inc")
+                            .setType(COMPANY))
             .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -206,10 +203,9 @@ class ManageContactInformationUtilsTest {
                 .addApplicant1LitigationFriend()
                 .applicant1Represented(NO)
                 .atStateApplicantRespondToDefenceAndProceed()
-                .applicant1(Party.builder()
-                        .companyName("Test Inc")
-                        .type(COMPANY)
-                        .build())
+                .applicant1(new Party()
+                        .setCompanyName("Test Inc")
+                        .setType(COMPANY))
                 .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -536,7 +532,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_ClaimantOneAdminIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build()).build();
+                .applicant1(new Party().setType(INDIVIDUAL)).build();
 
             String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
 
@@ -546,7 +542,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_ClaimantTwoAdminSoleTrader() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant2(Party.builder().type(SOLE_TRADER).build()).build();
+                .applicant2(new Party().setType(SOLE_TRADER)).build();
 
             String result = appendUserAndType(CLAIMANT_TWO_ID, caseData, true);
 
@@ -556,7 +552,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantOneAdminOrganisation() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(Party.builder().type(ORGANISATION).build()).build();
+                .respondent1(new Party().setType(ORGANISATION)).build();
 
             String result = appendUserAndType(DEFENDANT_ONE_ID, caseData, true);
 
@@ -566,7 +562,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantTwoAdminCompany() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(Party.builder().type(COMPANY).build()).build();
+                .respondent2(new Party().setType(COMPANY)).build();
 
             String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, true);
 
@@ -576,7 +572,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantTwoLegalRepIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(Party.builder().type(INDIVIDUAL).build()).build();
+                .respondent2(new Party().setType(INDIVIDUAL)).build();
 
             String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, false);
 

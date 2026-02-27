@@ -154,24 +154,23 @@ public class PartyBuilder {
     }
 
     public Party build() {
-        return Party.builder()
-            .type(type)
-            .individualTitle(individualTitle)
-            .individualFirstName(individualFirstName)
-            .individualLastName(individualLastName)
-            .individualDateOfBirth(individualDateOfBirth)
-            .partyName(partyName)
-            .primaryAddress(primaryAddress)
-            .companyName(companyName)
-            .organisationName(organisationName)
-            .soleTraderTitle(soleTraderTitle)
-            .soleTraderFirstName(soleTraderFirstName)
-            .soleTraderLastName(soleTraderLastName)
-            .soleTraderDateOfBirth(soleTraderDateOfBirth)
-            .soleTraderTradingAs(soleTraderTradingAs)
-            .partyPhone(partyPhone)
-            .partyEmail(partyEmail)
-            .legalRepHeading(legalRepHeading)
-            .build();
+        return new Party()
+            .setType(type)
+            .setIndividualTitle(individualTitle)
+            .setIndividualFirstName(individualFirstName)
+            .setIndividualLastName(individualLastName)
+            .setIndividualDateOfBirth(individualDateOfBirth)
+            .setPartyName(partyName)
+            .setPrimaryAddress(primaryAddress)
+            .setCompanyName(companyName)
+            .setOrganisationName(organisationName)
+            .setSoleTraderTitle(soleTraderTitle)
+            .setSoleTraderFirstName(soleTraderFirstName)
+            .setSoleTraderLastName(soleTraderLastName)
+            .setSoleTraderDateOfBirth(soleTraderDateOfBirth)
+            .setSoleTraderTradingAs(soleTraderTradingAs)
+            .setPartyPhone(partyPhone)
+            .setPartyEmail(partyEmail)
+            .setLegalRepHeading(legalRepHeading);
     }
 }

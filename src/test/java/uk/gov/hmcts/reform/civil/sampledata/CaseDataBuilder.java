@@ -2123,7 +2123,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendants() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor1OrganisationDetails = null;
@@ -2160,7 +2160,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssued1v2UnrepresentedDefendant() {
         atStateClaimIssuedUnrepresentedDefendants();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
         respondent2OrganisationPolicy = null;
@@ -2188,7 +2188,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimIssuedUnrepresentedDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondentSolicitor2OrganisationDetails = null;
@@ -2206,7 +2206,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendants() {
         atStatePendingClaimIssuedUnregisteredDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrganisationPolicy = new OrganisationPolicy()
@@ -2271,7 +2271,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant2() {
         atStatePendingClaimIssuedUnregisteredDefendant();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = YES;
@@ -2294,7 +2294,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateProceedsOfflineSameUnregisteredDefendant() {
         atStatePendingClaimIssuedUnregisteredDefendant();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent1OrgRegistered = NO;
@@ -2342,7 +2342,7 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateProceedsOfflineUnrepresentedDefendant1UnregisteredDefendant2() {
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
         takenOfflineDate = LocalDateTime.now();
         respondent2Represented = YES;
@@ -2369,7 +2369,7 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder atStateProceedsOfflineUnregisteredDefendant1UnrepresentedDefendant2() {
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         atStatePendingClaimIssuedUnrepresentedDefendant();
         addRespondent2 = YES;
         ccdState = PROCEEDS_IN_HERITAGE_SYSTEM;
@@ -2529,8 +2529,8 @@ public class CaseDataBuilder {
             .setCode("CODE")
             .setCalculatedAmountInPence(BigDecimal.valueOf(100))
             ;
-        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
-        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
+        applicant1 = PartyBuilder.builder().individual().build().setPartyID("app-1-party-id");
+        respondent1 = PartyBuilder.builder().soleTrader().build().setPartyID("res-1-party-id");
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
@@ -2577,8 +2577,8 @@ public class CaseDataBuilder {
             .setCode("CODE")
             .setCalculatedAmountInPence(BigDecimal.valueOf(100))
             ;
-        applicant1 = PartyBuilder.builder().individual().build().toBuilder().partyID("app-1-party-id").build();
-        respondent1 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build();
+        applicant1 = PartyBuilder.builder().individual().build().setPartyID("app-1-party-id");
+        respondent1 = PartyBuilder.builder().soleTrader().build().setPartyID("res-1-party-id");
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
@@ -2738,7 +2738,7 @@ public class CaseDataBuilder {
         respondent2OrgRegistered = null;
         respondent1Represented = NO;
         respondent2Represented = NO;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         return this;
     }
 
@@ -2758,7 +2758,7 @@ public class CaseDataBuilder {
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         return this;
     }
 
@@ -2769,7 +2769,7 @@ public class CaseDataBuilder {
         respondent1Represented = NO;
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         return this;
     }
 
@@ -3254,7 +3254,7 @@ public class CaseDataBuilder {
         respondent1OrgRegistered = NO;
         respondent2Represented = NO;
         respondent2OrgRegistered = NO;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent1OrganisationPolicy = new OrganisationPolicy()
             .setOrgPolicyCaseAssignedRole("[RESPONDENTSOLICITORONE]");
         respondent2OrganisationPolicy = new OrganisationPolicy()
@@ -3274,7 +3274,7 @@ public class CaseDataBuilder {
         atStatePendingClaimIssued();
         claimNotificationDeadline = NOTIFICATION_DEADLINE;
         ccdState = CASE_ISSUED;
-        applicant1 = PartyBuilder.builder().company().build().toBuilder().partyID("app-1-party-id").build();
+        applicant1 = PartyBuilder.builder().company().build().setPartyID("app-1-party-id");
         buildHmctsInternalCaseName();
         return this;
     }
@@ -3546,14 +3546,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent1NotifiedTimeExtension() {
         atStateClaimDetailsNotifiedTimeExtension();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent2SameLegalRepresentative = NO;
         return this;
     }
 
     public CaseDataBuilder atState1v2DifferentSolicitorClaimDetailsRespondent2NotifiedTimeExtension() {
         atStateClaimDetailsNotified();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent2SameLegalRepresentative = NO;
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
         respondent2TimeExtensionDate = claimDetailsNotificationDate.plusDays(1);
@@ -3563,7 +3563,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atState1v2SameSolicitorClaimDetailsRespondentNotifiedTimeExtension() {
         atStateClaimDetailsNotifiedTimeExtension();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent2SameLegalRepresentative = YES;
         return this;
     }
@@ -3838,7 +3838,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondentFullDefenceRespondent2() {
         atStateRespondent2RespondToClaim(RespondentResponseType.FULL_DEFENCE);
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent2ClaimResponseDocument = new ResponseDocument(DocumentBuilder.builder().setDocumentName("defendant-response.pdf").build());
         respondent2DQWithLocation();
         respondent2ResponseDate = LocalDateTime.now().minusDays(1);
@@ -4467,7 +4467,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondent2CounterClaimAfterNotifyDetails() {
         atStateClaimDetailsNotified();
-        respondent2 = Party.builder().partyName("Respondent 2").build();
+        respondent2 = new Party().setPartyName("Respondent 2");
         respondent2ClaimResponseType = RespondentResponseType.COUNTER_CLAIM;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent2ResponseDate = claimDetailsNotificationDate.plusDays(1);
@@ -4498,7 +4498,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateRespondent2FullAdmissionAfterNotifyDetails() {
         atStateClaimDetailsNotified();
-        respondent2 = Party.builder().partyName("Respondent 2").build();
+        respondent2 = new Party().setPartyName("Respondent 2");
         respondent2ClaimResponseType = RespondentResponseType.FULL_ADMISSION;
         applicant1ResponseDeadline = APPLICANT_RESPONSE_DEADLINE;
         respondent2ResponseDate = claimDetailsNotificationDate.plusDays(1);
@@ -4664,11 +4664,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTrialReadyCheckLiP(boolean hasEmailAddress) {
         atStateHearingFeeDuePaid().setClaimTypeToSpecClaim();
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         if (!hasEmailAddress) {
-            applicant1 = applicant1.toBuilder().partyEmail(null).build();
-            respondent1 = respondent1.toBuilder().partyEmail("").build();
-            respondent2 = respondent2.toBuilder().partyEmail("").build();
+            applicant1 = applicant1.setPartyEmail(null);
+            respondent1 = respondent1.setPartyEmail("");
+            respondent2 = respondent2.setPartyEmail("");
         }
         legacyCaseReference = "000MC001";
         ccdState = PREPARE_FOR_HEARING_CONDUCT_HEARING;
@@ -5046,7 +5046,7 @@ public class CaseDataBuilder {
         atStateNotificationAcknowledged();
         addRespondent2 = YES;
         respondent2SameLegalRepresentative = NO;
-        respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         respondent2TimeExtensionDate = respondent1AcknowledgeNotificationDate.plusHours(numberOfHoursAfterCurrentDate);
         respondentSolicitor2AgreedDeadlineExtension = LocalDate.now();
         respondent2ResponseDeadline = RESPONSE_DEADLINE;
@@ -5190,7 +5190,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterClaimDetailsNotified(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            respondent2 = PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id");
             atStateClaimDetailsNotified1v1().respondent2Copy(respondent2).build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
@@ -5222,7 +5222,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledged(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            respondent2 = PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id");
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
         } else {
@@ -5241,7 +5241,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder atStateTakenOfflineSDONotDrawnAfterNotificationAcknowledgedTimeExtension(MultiPartyScenario mpScenario, boolean isReason) {
         if (mpScenario == ONE_V_TWO_ONE_LEGAL_REP || mpScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+            respondent2 = PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id");
             atStateNotificationAcknowledged_1v2_BothDefendants().respondent2Copy(respondent2).build();
             respondent2SameLegalRepresentative = mpScenario == ONE_V_TWO_ONE_LEGAL_REP ? YES : NO;
             respondent1TimeExtensionDate = LocalDateTime.now();
@@ -5502,7 +5502,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         this.respondent2Represented = YES;
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
@@ -5516,7 +5516,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantsLiP() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         this.respondent2Represented = NO;
         this.respondent1Represented = NO;
         return this;
@@ -5524,7 +5524,7 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsForSdoMP() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         respondent2ClaimResponseType = RespondentResponseType.FULL_DEFENCE;
@@ -5534,14 +5534,14 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         this.respondent2SameLegalRepresentative = YES;
         return this;
     }
 
     public CaseDataBuilder multiPartyClaimTwoDefendantSolicitorsSpec() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build();
+        this.respondent2 = PartyBuilder.builder().individual().build().setPartyID("res-2-party-id");
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         this.specRespondent1Represented = YES;
@@ -5572,13 +5572,13 @@ public class CaseDataBuilder {
     public CaseDataBuilder multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
         this.applicant2 = PartyBuilder.builder().individual("Jason").build()
-            .toBuilder().partyID("app-2-party-id").build();
+            .setPartyID("app-2-party-id");
         return this;
     }
 
     private List<CaseData> get2v1DifferentResponseCase() {
-        Party applicant1 = Party.builder().build();
-        Party applicant2 = Party.builder().build();
+        Party applicant1 = new Party();
+        Party applicant2 = new Party();
         List<CaseData> cases = new ArrayList<>();
         for (RespondentResponseTypeSpec r1 : RespondentResponseTypeSpec.values()) {
             for (RespondentResponseTypeSpec r2 : RespondentResponseTypeSpec.values()) {
@@ -5778,14 +5778,14 @@ public class CaseDataBuilder {
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lip_1Lr() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendant1Lip1Lr();
-        respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id");
         return this;
     }
 
     public CaseDataBuilder atStateClaimDetailsNotified_1v2_1Lr_1Lip() {
         atStateClaimDetailsNotified();
         multiPartyClaimTwoDefendant1Lr1Lip();
-        respondent2 = PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build();
+        respondent2 = PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id");
         return this;
     }
 
@@ -6064,11 +6064,11 @@ public class CaseDataBuilder {
                     .setVersion("1")
                     )
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
-            .applicant1(Party.builder()
-                .individualFirstName("First name")
-                .individualLastName("Second name")
-                .type(Party.Type.INDIVIDUAL)
-                .partyName("test").build())
+            .applicant1(new Party()
+                .setIndividualFirstName("First name")
+                .setIndividualLastName("Second name")
+                .setType(Party.Type.INDIVIDUAL)
+                .setPartyName("test"))
             .build();
     }
 
@@ -6205,18 +6205,18 @@ public class CaseDataBuilder {
             .joPaymentPlan(new JudgmentPaymentPlan().setType(PaymentPlanSelection.PAY_IMMEDIATELY))
             .joOrderMadeDate(LocalDate.of(2022, 12, 12))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
-            .respondent1(Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualTitle("Mr.")
-                .individualFirstName("Alex")
-                .individualLastName(
+            .respondent1(new Party()
+                .setType(Party.Type.INDIVIDUAL)
+                .setIndividualTitle("Mr.")
+                .setIndividualFirstName("Alex")
+                .setIndividualLastName(
                     "Richards Extra long name which exceeds 70 characters need to be trimmed down")
-                .partyName(
+                .setPartyName(
                     "Mr. Alex Richards Extra long name which exceeds 70 characters need to be trimmed down")
-                .partyEmail("respondent1@gmail.com")
-                .primaryAddress(oldAddress)
-                .build())
-            .joIsRegisteredWithRTL(YES).build();
+                .setPartyEmail("respondent1@gmail.com")
+                .setPrimaryAddress(oldAddress))
+            .joIsRegisteredWithRTL(YES)
+            .build();
     }
 
     public CaseData buildJudgmentOnlineCaseDataWithPaymentByDate() {
@@ -6604,13 +6604,13 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withApplicant1Flags(List<Element<FlagDetail>> flags) {
-        this.applicant1 = applicant1.toBuilder()
-            .partyID("app-1-party-id")
-            .flags(new Flags()
+        this.applicant1 = applicant1
+            .setPartyID("app-1-party-id")
+            .setFlags(new Flags()
                 .setPartyName(applicant1.getPartyName())
                 .setRoleOnCase("Claimant 1")
                 .setDetails(flags)
-                ).build();
+                );
         return this;
     }
 
@@ -6648,13 +6648,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withApplicant2Flags() {
-        this.applicant2 = applicant2.toBuilder()
-            .partyID("app-2-party-id")
-            .flags(new Flags()
+        this.applicant2 = applicant2
+            .setPartyID("app-2-party-id")
+            .setFlags(new Flags()
                 .setPartyName(applicant2.getPartyName())
                 .setRoleOnCase("Claimant 2")
-                .setDetails(flagDetails()))
-            .build();
+                .setDetails(flagDetails()));
         return this;
     }
 
@@ -6710,13 +6709,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withRespondent1Flags(List<Element<FlagDetail>> flags) {
-        this.respondent1 = respondent1.toBuilder()
-            .partyID("res-1-party-id")
-            .flags(new Flags()
+        this.respondent1 = respondent1
+            .setPartyID("res-1-party-id")
+            .setFlags(new Flags()
                 .setPartyName(respondent1.getPartyName())
                 .setRoleOnCase("Defendant 1")
-                .setDetails(flags))
-            .build();
+                .setDetails(flags));
         return this;
     }
 
@@ -6749,13 +6747,12 @@ public class CaseDataBuilder {
     }
 
     public CaseDataBuilder withRespondent2Flags() {
-        this.respondent2 = respondent2.toBuilder()
-            .partyID("res-2-party-id")
-            .flags(new Flags()
+        this.respondent2 = respondent2
+            .setPartyID("res-2-party-id")
+            .setFlags(new Flags()
                 .setPartyName(respondent2.getPartyName())
                 .setRoleOnCase("Defendant 2")
-                .setDetails(flagDetails()))
-            .build();
+                .setDetails(flagDetails()));
         return this;
     }
 

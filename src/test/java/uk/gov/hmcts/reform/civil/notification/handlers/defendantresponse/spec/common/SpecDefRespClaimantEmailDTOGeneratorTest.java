@@ -46,11 +46,10 @@ class SpecDefRespClaimantEmailDTOGeneratorTest {
     void shouldAddClaimantNameToProperties() {
         String claimantName = "Jane Doe";
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("Jane")
-                            .individualLastName("Doe")
-                            .build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Jane")
+                            .setIndividualLastName("Doe"))
             .build();
 
         Map<String, String> properties = new HashMap<>();

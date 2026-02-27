@@ -53,7 +53,7 @@ class DefRespCaseOfflineRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldReturnTemplateIdForMultipartyCase() {
         CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .build();
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOfflineMultiparty()).thenReturn(TEMPLATE_MULTIPARTY);
 

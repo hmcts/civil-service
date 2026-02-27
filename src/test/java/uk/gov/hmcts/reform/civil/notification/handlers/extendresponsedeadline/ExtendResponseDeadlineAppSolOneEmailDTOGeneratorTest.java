@@ -60,7 +60,7 @@ public class ExtendResponseDeadlineAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String appLegalOrgName = "applicant-legal-org-name";
         LocalDate agreedExtensionDate = LocalDate.of(2025, 6, 20);
 

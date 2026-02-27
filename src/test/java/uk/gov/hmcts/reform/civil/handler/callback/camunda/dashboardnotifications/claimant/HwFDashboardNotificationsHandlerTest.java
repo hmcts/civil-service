@@ -77,7 +77,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
         void shouldConfigureScenariosForClaimIssueHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData().build();
             caseData.setHwfFeeType(FeeType.CLAIMISSUED);
             HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
             helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
@@ -113,7 +113,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
         void shouldConfigureScenariosForHearingFeeHwfEvents(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
+                .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails().build();
             caseData.setHwfFeeType(FeeType.HEARING);
             HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
             helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
@@ -148,7 +148,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotConfigureScenariosForHwfEventsWhenFeeTypeNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData().build();
             caseData.setHwfFeeType(null);
             HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
             helpWithFeesDetails.setHwfCaseEvent(hwfEvent);
@@ -171,7 +171,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotConfigureScenariosForHwfEventsWhenHwfDetailsNull(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData().build();
             caseData.setHwfFeeType(FeeType.HEARING);
             caseData.setHearingHwfDetails(null);
             caseData.setApplicant1Represented(YesOrNo.NO);
@@ -192,7 +192,7 @@ class HwFDashboardNotificationsHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotConfigureScenariosForHwfEventsWhenRepresented(CaseEvent hwfEvent, DashboardScenarios dashboardScenario) {
             //Given
             CaseData caseData = CaseDataBuilder.builder()
-                .buildClaimIssuedPaymentCaseData();
+                .buildClaimIssuedPaymentCaseData().build();
             caseData.setHwfFeeType(FeeType.HEARING);
             HelpWithFeesDetails helpWithFeesDetails = new HelpWithFeesDetails();
             helpWithFeesDetails.setHwfCaseEvent(hwfEvent);

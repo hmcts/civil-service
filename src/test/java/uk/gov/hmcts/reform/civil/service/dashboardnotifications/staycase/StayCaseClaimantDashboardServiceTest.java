@@ -47,7 +47,7 @@ class StayCaseClaimantDashboardServiceTest {
     @Test
     void shouldNotifyClaimantWhenCaseStayed() {
         CaseData caseData = CaseDataBuilder.builder().build()
-            .setCcdCaseReference(1234L);
+            .setCcdCaseReference(1234L).build();
 
         service.notifyStayCase(caseData, AUTH_TOKEN);
 

@@ -56,7 +56,7 @@ class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTe
                                         true,
                                         true, true,
                                         getOriginalStatusOfGeneralApplication()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

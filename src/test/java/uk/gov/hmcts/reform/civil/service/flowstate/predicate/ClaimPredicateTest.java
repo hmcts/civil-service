@@ -201,7 +201,7 @@ class ClaimPredicateTest {
             when(caseData.getIssueDate()).thenReturn(java.time.LocalDate.now());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
             when(caseData.getRespondent1OrgRegistered()).thenReturn(YES);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2Represented()).thenReturn(YES);
             when(caseData.getRespondent2OrgRegistered()).thenReturn(YES);
             assertTrue(ClaimPredicate.pendingIssued.test(caseData));
@@ -212,7 +212,7 @@ class ClaimPredicateTest {
             when(caseData.getIssueDate()).thenReturn(java.time.LocalDate.now());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
             when(caseData.getRespondent1OrgRegistered()).thenReturn(YES);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2Represented()).thenReturn(YES);
             when(caseData.getRespondent2OrgRegistered()).thenReturn(NO);
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
@@ -246,7 +246,7 @@ class ClaimPredicateTest {
             when(caseData.getIssueDate()).thenReturn(java.time.LocalDate.now());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
             when(caseData.getRespondent1OrgRegistered()).thenReturn(YES);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2Represented()).thenReturn(NO);
             assertFalse(ClaimPredicate.pendingIssued.test(caseData));
         }
@@ -256,7 +256,7 @@ class ClaimPredicateTest {
             when(caseData.getIssueDate()).thenReturn(java.time.LocalDate.now());
             when(caseData.getRespondent1Represented()).thenReturn(YES);
             when(caseData.getRespondent1OrgRegistered()).thenReturn(YES);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2Represented()).thenReturn(YES);
             when(caseData.getRespondent2OrgRegistered()).thenReturn(NO);
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
@@ -278,7 +278,7 @@ class ClaimPredicateTest {
         @Test
         void should_return_true_for_spec_multiparty_both_unrepresented() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-            when(caseData.getRespondent2()).thenReturn(uk.gov.hmcts.reform.civil.model.Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent1Represented()).thenReturn(NO);
             when(caseData.getRespondent2Represented()).thenReturn(NO);
             assertTrue(ClaimPredicate.pendingIssuedUnrepresented.test(caseData));

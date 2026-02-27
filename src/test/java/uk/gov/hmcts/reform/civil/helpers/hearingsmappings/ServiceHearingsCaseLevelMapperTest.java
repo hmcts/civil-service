@@ -214,15 +214,15 @@ public class ServiceHearingsCaseLevelMapperTest {
 
         @BeforeEach
         void setupParties() {
-            applicant1 = Party.builder()
-                .individualFirstName("Applicant")
-                .individualLastName("One")
-                .type(Party.Type.INDIVIDUAL).build();
+            applicant1 = new Party()
+                .setIndividualFirstName("Applicant")
+                .setIndividualLastName("One")
+                .setType(Party.Type.INDIVIDUAL);
 
-            respondent1 = Party.builder()
-                .individualFirstName("Respondent")
-                .individualLastName("One")
-                .type(Party.Type.INDIVIDUAL).build();
+            respondent1 = new Party()
+                .setIndividualFirstName("Respondent")
+                .setIndividualLastName("One")
+                .setType(Party.Type.INDIVIDUAL);
         }
 
         @Test

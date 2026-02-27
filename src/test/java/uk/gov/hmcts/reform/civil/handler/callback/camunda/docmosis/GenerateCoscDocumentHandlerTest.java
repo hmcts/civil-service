@@ -75,7 +75,7 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
                                                     eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT))).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_COSC_DOCUMENT.name());
 
@@ -117,7 +117,7 @@ class GenerateCoscDocumentHandlerTest extends BaseCallbackHandlerTest {
                  .generateDoc(any(CaseData.class), anyString(), eq(DocmosisTemplates.CERTIFICATE_OF_DEBT_PAYMENT_WELSH))).thenReturn(document);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidWithin31DaysForCosc().build();
         caseData.setCcdCaseReference(Long.valueOf("12345"));
         RespondentLiPResponse respondentLiPResponse = new RespondentLiPResponse();
         respondentLiPResponse.setRespondent1ResponseLanguage(Language.BOTH.toString());

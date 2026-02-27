@@ -85,7 +85,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @EnumSource(YesOrNo.class)
         void shouldPopulateAllJoFieldsAsNull(YesOrNo yesOrNo) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
             caseData.setJoIsLiveJudgmentExists(yesOrNo);
             caseData.setJoIssuedDate(LocalDate.now());
@@ -109,7 +109,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotPopulateAllJoFieldsAsNull() {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setCcdState(CaseState.All_FINAL_ORDERS_ISSUED);
             caseData.setJoIsLiveJudgmentExists(null);
             caseData.setJoIssuedDate(LocalDate.now());
@@ -129,7 +129,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Instalment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -173,7 +173,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_Immediately() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -206,7 +206,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -241,7 +241,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateAllJudgmentFields_For_Pay_By_Date_multi_party() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             //When: handler is called with ABOUT_TO_SUBMIT event
@@ -275,7 +275,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void whenAboutToSubmit_andRTLNo_thenSetIssuedDateToNull() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -295,7 +295,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentInstalmentDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             JudgmentInstalmentDetails judgmentInstalmentDetails = new JudgmentInstalmentDetails();
             judgmentInstalmentDetails.setStartDate(LocalDate.now().minusDays(2));
             caseData.setJoInstalmentDetails(judgmentInstalmentDetails);
@@ -309,7 +309,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -319,7 +319,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateOrderDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoOrderMadeDate(LocalDate.now().plusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
@@ -333,7 +333,7 @@ class RecordJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
         @Test
         public void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED);

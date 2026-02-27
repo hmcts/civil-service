@@ -59,7 +59,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isSmallClaimsTrack(any())).thenReturn(true);
         when(caseClassificationService.isDrhSmallClaim(any())).thenReturn(false);
 
-        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1));
+        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1)).build();
 
         assertThat(result.getSetSmallClaimsFlag()).isEqualTo(YesOrNo.YES);
         assertThat(result.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.NO);
@@ -85,7 +85,7 @@ class SdoOrderDetailsServiceTest {
         when(caseClassificationService.isFastTrack(any())).thenReturn(true);
         when(caseClassificationService.isNihlFastTrack(any())).thenReturn(false);
 
-        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1));
+        CaseData result = service.updateOrderDetails(orderDetailsContext(CaseDataBuilder.builder().build(), V_1)).build();
 
         assertThat(result.getSetFastTrackFlag()).isEqualTo(YesOrNo.YES);
         assertThat(result.getIsSdoR2NewScreen()).isEqualTo(YesOrNo.NO);

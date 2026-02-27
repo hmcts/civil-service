@@ -43,8 +43,8 @@ class ClaimantResponseCuiRejectPayClaimantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("12345")
-            .applicant1(Party.builder().partyName("Claimant Name").individualFirstName("Claimant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("Defendant Name").individualFirstName("Defendant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setPartyName("Claimant Name").setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setPartyName("Defendant Name").setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .build();
 
         Map<String, String> properties = emailGenerator.addCustomProperties(new HashMap<>(), caseData);

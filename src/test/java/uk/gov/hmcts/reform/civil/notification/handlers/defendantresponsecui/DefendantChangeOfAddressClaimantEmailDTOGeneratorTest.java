@@ -65,7 +65,7 @@ public class DefendantChangeOfAddressClaimantEmailDTOGeneratorTest {
     void shouldReturnCorrectCustomProperties() {
         String legacyCaseReference = "legacy case reference";
         Long ccdCaseReference = 0L;
-        Party party = Party.builder().build();
+        Party party = new Party();
         CaseData caseData = CaseData.builder()
             .legacyCaseReference(legacyCaseReference)
             .ccdCaseReference(ccdCaseReference)

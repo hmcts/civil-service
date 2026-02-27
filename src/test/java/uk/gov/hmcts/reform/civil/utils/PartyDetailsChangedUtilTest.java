@@ -48,10 +48,10 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant1Changes() {
             CaseData current = CaseData.builder()
-                .applicant1(PartyBuilder.builder().company().build().toBuilder().companyName("Company One").build())
+                .applicant1(PartyBuilder.builder().company().build().setCompanyName("Company One"))
                 .build();
             CaseData updated = CaseData.builder()
-                .applicant1(PartyBuilder.builder().company().build().toBuilder().companyName("Company Two").build())
+                .applicant1(PartyBuilder.builder().company().build().setCompanyName("Company Two"))
                 .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
@@ -66,13 +66,13 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant2Changes() {
             CaseData current = CaseData.builder()
-                .applicant2(PartyBuilder.builder().individual().build().toBuilder()
-                                .individualFirstName("John").individualLastName("Doe").build())
+                .applicant2(PartyBuilder.builder().individual().build()
+                                .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .applicant2(PartyBuilder.builder().individual().build().toBuilder()
-                                .individualFirstName("Jane").individualLastName("Smith").build())
+                .applicant2(PartyBuilder.builder().individual().build()
+                                .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
@@ -87,13 +87,13 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent1Changes() {
             CaseData current = CaseData.builder()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
-                                 .individualFirstName("John").individualLastName("Doe").build())
+                .respondent1(PartyBuilder.builder().individual().build()
+                                 .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder()
-                                 .individualFirstName("Jane").individualLastName("Smith").build())
+                .respondent1(PartyBuilder.builder().individual().build()
+                                 .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
@@ -108,13 +108,13 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent2Changes() {
             CaseData current = CaseData.builder()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                                 .individualFirstName("John").individualLastName("Doe").build())
+                .respondent2(PartyBuilder.builder().individual().build()
+                                 .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                                 .individualFirstName("Jane").individualLastName("Smith").build())
+                .respondent2(PartyBuilder.builder().individual().build()
+                                 .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
@@ -153,8 +153,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant1LitigationFriendAddressChanges_toAddressSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -185,8 +185,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant1LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -242,8 +242,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant2LitigationFriendAddressChanges_toAddressSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -274,8 +274,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Applicant2LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -331,8 +331,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent1LitigationFriendAddressChanges_toAddressSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -364,8 +364,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testBuildChangesEvent_Respondent1LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
-            Party litigant = Party.builder().primaryAddress(
-                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+            Party litigant = new Party().setPrimaryAddress(
+                address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
             LitigationFriend current = new LitigationFriend().setFirstName("John")
                 .setLastName("Doe")
@@ -422,8 +422,8 @@ public class PartyDetailsChangedUtilTest {
 
     @Test
     public void testBuildChangesEvent_Respondent2LitigationFriendAddressChanges_toAddressSameAsLitigant() {
-        Party litigant = Party.builder().primaryAddress(
-            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+        Party litigant = new Party().setPrimaryAddress(
+            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
         LitigationFriend current = new LitigationFriend().setFirstName("John")
             .setLastName("Doe")
@@ -455,8 +455,8 @@ public class PartyDetailsChangedUtilTest {
 
     @Test
     public void testBuildChangesEvent_Respondent2LitigationFriendAddressChanges_toAddressNotSameAsLitigant() {
-        Party litigant = Party.builder().primaryAddress(
-            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country")).build();
+        Party litigant = new Party().setPrimaryAddress(
+            address("Litigant Street", "Litigant City", "Litigant Postcode", "Litigant Country"));
 
         LitigationFriend current = new LitigationFriend().setFirstName("John")
             .setLastName("Doe")
@@ -500,15 +500,13 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Individual() {
-            Party current = PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Jane")
-                .individualLastName("Carver")
-                .build();
+            Party current = PartyBuilder.builder().individual().build()
+                .setIndividualFirstName("Jane")
+                .setIndividualLastName("Carver");
 
-            Party updated = PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Jane")
-                .individualLastName("Wilson")
-                .build();
+            Party updated = PartyBuilder.builder().individual().build()
+                .setIndividualFirstName("Jane")
+                .setIndividualLastName("Wilson");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -523,15 +521,13 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_SoleTrader() {
-            Party current = PartyBuilder.builder().soleTrader().build().toBuilder()
-                .soleTraderFirstName("Jane")
-                .soleTraderLastName("Carver")
-                .build();
+            Party current = PartyBuilder.builder().soleTrader().build()
+                .setSoleTraderFirstName("Jane")
+                .setSoleTraderLastName("Carver");
 
-            Party updated = PartyBuilder.builder().soleTrader().build().toBuilder()
-                .soleTraderFirstName("Jane")
-                .soleTraderLastName("Wilson")
-                .build();
+            Party updated = PartyBuilder.builder().soleTrader().build()
+                .setSoleTraderFirstName("Jane")
+                .setSoleTraderLastName("Wilson");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -546,13 +542,11 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Company() {
-            Party current = PartyBuilder.builder().company().build().toBuilder()
-                .companyName("Company One")
-                .build();
+            Party current = PartyBuilder.builder().company().build()
+                .setCompanyName("Company One");
 
-            Party updated = PartyBuilder.builder().company().build().toBuilder()
-                .companyName("Company Two")
-                .build();
+            Party updated = PartyBuilder.builder().company().build()
+                .setCompanyName("Company Two");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -567,13 +561,11 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Organisation() {
-            Party current = PartyBuilder.builder().organisation().build().toBuilder()
-                .organisationName("Organisation One")
-                .build();
+            Party current = PartyBuilder.builder().organisation().build()
+                .setOrganisationName("Organisation One");
 
-            Party updated = PartyBuilder.builder().organisation().build().toBuilder()
-                .organisationName("Organisation Two")
-                .build();
+            Party updated = PartyBuilder.builder().organisation().build()
+                .setOrganisationName("Organisation Two");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -588,13 +580,11 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_AddressChange() {
-            Party current = PartyBuilder.builder().individual().build().toBuilder()
-                .primaryAddress(address("123 Main St", "City", "Country"))
-                .build();
+            Party current = PartyBuilder.builder().individual().build()
+                .setPrimaryAddress(address("123 Main St", "City", "Country"));
 
-            Party updated = PartyBuilder.builder().individual().build().toBuilder()
-                .primaryAddress(address("999 Main St", "City", "Country"))
-                .build();
+            Party updated = PartyBuilder.builder().individual().build()
+                .setPrimaryAddress(address("999 Main St", "City", "Country"));
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -609,17 +599,15 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_MultipleChanges() {
-            Party current = PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("John")
-                .individualLastName("Doe")
-                .primaryAddress(address("123 Main St", "City", "Country"))
-                .build();
+            Party current = PartyBuilder.builder().individual().build()
+                .setIndividualFirstName("John")
+                .setIndividualLastName("Doe")
+                .setPrimaryAddress(address("123 Main St", "City", "Country"));
 
-            Party updated = PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Jane")
-                .individualLastName("Smith")
-                .primaryAddress(address("999 Elm St", "Town", "Country"))
-                .build();
+            Party updated = PartyBuilder.builder().individual().build()
+                .setIndividualFirstName("Jane")
+                .setIndividualLastName("Smith")
+                .setPrimaryAddress(address("999 Elm St", "Town", "Country"));
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 

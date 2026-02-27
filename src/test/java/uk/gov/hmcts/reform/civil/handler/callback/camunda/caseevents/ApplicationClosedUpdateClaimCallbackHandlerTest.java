@@ -67,7 +67,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                                         true,
                                         true, true,
                                         getOriginalStatusOfGeneralApplication_test1()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(
@@ -96,7 +96,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                                         false,
                                         false, false,
                                         Map.of()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -114,7 +114,7 @@ class ApplicationClosedUpdateClaimCallbackHandlerTest extends BaseCallbackHandle
                                         true,
                                         true, true,
                                         getOriginalStatusOfGeneralApplication_test1()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))

@@ -47,7 +47,7 @@ public class RecordJudgementDeterminationOfMeansLiPDefendant1LetterHandlerTest e
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
-            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(POST_JO_DEFENDANT1_PIN_IN_LETTER.name());
         // when

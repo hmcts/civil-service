@@ -17,16 +17,16 @@ class ClaimantLipNocHelperTest {
     @Test
     void shouldReturnExpectedLipProperties() {
 
-        Party applicant = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualLastName("Claimant")
-            .individualFirstName("John")
-            .partyName("John Claimant").build();
-        Party respondent = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualLastName("Defendant")
-            .individualFirstName("Jane")
-            .partyName("Jane Defendant").build();
+        Party applicant = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualLastName("Claimant")
+            .setIndividualFirstName("John")
+            .setPartyName("John Claimant");
+        Party respondent = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualLastName("Defendant")
+            .setIndividualFirstName("Jane")
+            .setPartyName("Jane Defendant");
 
         CaseData caseData = CaseData.builder()
             .applicant1(applicant)

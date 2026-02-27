@@ -26,8 +26,8 @@ public class DefendantAcceptsSettlementClaimantNotificationTest extends Dashboar
             .caseDataLiP(new CaseDataLiP().setRespondentSignSettlementAgreement(YesOrNo.YES))
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
-            .respondent1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
-            .applicant1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
+            .applicant1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
             .build();
 
         handler.handle(callbackParams(caseData));

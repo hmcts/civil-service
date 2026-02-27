@@ -93,7 +93,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
+        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         paymentsService.validateRequest(caseData);
         assertThat(caseData).isNotNull();
     }
@@ -101,7 +101,7 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequest_whenValidCaseDetails() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData();
+        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData().build();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 
@@ -217,7 +217,7 @@ class PaymentsServiceTest {
     //General Application Tests
     @Test
     void validateRequestGaShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         paymentsService.validateRequestGa(caseData);
         assertThat(caseData).isNotNull();
     }
@@ -353,7 +353,7 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequestGa_whenValidCaseDetails() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequestGa(caseData, AUTH_TOKEN);
         assertThat(caseData.getGeneralAppSuperClaimType()).isEqualTo("UNSPEC_CLAIM");
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
@@ -363,7 +363,7 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequestGa_whenGaTypeIsSpecClaim() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         caseData = caseData.copy().generalAppSuperClaimType("SPEC_CLAIM").build();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequestGa(caseData, AUTH_TOKEN);
         assertThat(caseData.getGeneralAppSuperClaimType()).isEqualTo("SPEC_CLAIM");

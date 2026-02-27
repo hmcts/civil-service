@@ -101,7 +101,7 @@ class CaseFlagUtilsTest {
         void shouldUpdatePartyWithFlagsMeta() {
             Party party = PartyBuilder.builder().individual().build();
             Flags flags = new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of());
-            Party expected = party.toBuilder().flags(flags).build();
+            Party expected = party.setFlags(flags);
 
             Party actual = CaseFlagUtils.updateParty("applicant", party);
 
@@ -111,8 +111,7 @@ class CaseFlagUtilsTest {
         @Test
         void shouldNotUpdatePartyFlagsIfFlagsExist() {
             Party existingParty = PartyBuilder.builder().individual().build()
-                .toBuilder()
-                .flags(new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of())).build();
+                .setFlags(new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of()));
 
             Party actual = CaseFlagUtils.updateParty("updatedField", existingParty);
 
@@ -702,14 +701,13 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
-                caseData.setApplicant1(caseData.getApplicant1().toBuilder()
-                                           .flags(new Flags()
+                caseData.setApplicant1(caseData.getApplicant1().setFlags(new Flags()
                                                       .setPartyName("Mr. John Rambo")
                                                       .setRoleOnCase("applicant")
                                                       .setDetails(wrapElements(List.of(
                                                           new FlagDetail().setName("flag name")))))
-                                           .individualFirstName("Johnny")
-                                           .individualLastName("Rambo new").build());
+                                           .setIndividualFirstName("Johnny")
+                                           .setIndividualLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -729,9 +727,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_ONE_ID))
                     .build();
 
-                caseData.setApplicant1(caseData.getApplicant1().toBuilder()
-                                           .individualFirstName("Johnny")
-                                           .individualLastName("Rambo new").build());
+                caseData.setApplicant1(caseData.getApplicant1()
+                                           .setIndividualFirstName("Johnny")
+                                           .setIndividualLastName("Rambo new"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -749,14 +747,13 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
-                caseData.setApplicant2(caseData.getApplicant2().toBuilder()
-                                           .flags(new Flags()
+                caseData.setApplicant2(caseData.getApplicant2().setFlags(new Flags()
                                                       .setPartyName("Mr. Jason Rambo")
                                                       .setRoleOnCase("applicant")
                                                       .setDetails(wrapElements(List.of(
                                                           new FlagDetail().setName("flag name")))))
-                                           .individualFirstName("JJ")
-                                           .individualLastName("Rambo edited").build());
+                                           .setIndividualFirstName("JJ")
+                                           .setIndividualLastName("Rambo edited"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -777,9 +774,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(CLAIMANT_TWO_ID))
                     .build();
 
-                caseData.setApplicant2(caseData.getApplicant2().toBuilder()
-                                           .individualFirstName("JJ")
-                                           .individualLastName("Rambo edited").build());
+                caseData.setApplicant2(caseData.getApplicant2()
+                                           .setIndividualFirstName("JJ")
+                                           .setIndividualLastName("Rambo edited"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -796,14 +793,13 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
-                caseData.setRespondent1(caseData.getRespondent1().toBuilder()
-                                            .flags(new Flags()
+                caseData.setRespondent1(caseData.getRespondent1().setFlags(new Flags()
                                                        .setPartyName("Mr. Sole Trader")
                                                        .setRoleOnCase("respondent")
                                                        .setDetails(wrapElements(List.of(
                                                            new FlagDetail().setName("flag name")))))
-                                            .soleTraderFirstName("Solo")
-                                            .soleTraderLastName("New trader").build());
+                                            .setSoleTraderFirstName("Solo")
+                                            .setSoleTraderLastName("New trader"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -823,9 +819,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_ONE_ID))
                     .build();
 
-                caseData.setRespondent1(caseData.getRespondent1().toBuilder()
-                                            .soleTraderFirstName("Solo")
-                                            .soleTraderLastName("New trader").build());
+                caseData.setRespondent1(caseData.getRespondent1()
+                                            .setSoleTraderFirstName("Solo")
+                                            .setSoleTraderLastName("New trader"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -843,15 +839,14 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
-                caseData.setRespondent2(caseData.getRespondent2().toBuilder()
-                                            .flags(new Flags()
+                caseData.setRespondent2(caseData.getRespondent2().setFlags(new Flags()
                                                        .setPartyName("Mr. John Rambo")
                                                        .setRoleOnCase("respondent")
                                                        .setDetails(wrapElements(List.of(
                                                            new FlagDetail().setName("flag name")))))
-                                            .individualTitle("Miss")
-                                            .individualFirstName("Jenny")
-                                            .individualLastName("Rombo").build());
+                                            .setIndividualTitle("Miss")
+                                            .setIndividualFirstName("Jenny")
+                                            .setIndividualLastName("Rombo"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -872,10 +867,10 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(new UpdateDetailsForm().setPartyChosenId(DEFENDANT_TWO_ID))
                     .build();
 
-                caseData.setRespondent2(caseData.getRespondent2().toBuilder()
-                                            .individualTitle("Miss")
-                                            .individualFirstName("Jenny")
-                                            .individualLastName("Rombo").build());
+                caseData.setRespondent2(caseData.getRespondent2()
+                                            .setIndividualTitle("Miss")
+                                            .setIndividualFirstName("Jenny")
+                                            .setIndividualLastName("Rombo"));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 

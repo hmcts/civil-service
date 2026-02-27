@@ -70,8 +70,8 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                 .atStateClaimDetailsNotified()
                 .build().toBuilder()
                 .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue())
-                .applicant1(Party.builder().individualFirstName("Claimant")
-                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party().setIndividualFirstName("Claimant")
+                            .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
                 .build();
 
         when(notificationsProperties.getHearingNotificationLipDefendantTemplateWelsh())
@@ -104,8 +104,8 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                     .build().toBuilder()
                     .hearingTimeHourMinute(TIME_1015)
                     .hearingDate(DATE_2025_07_04)
-                    .applicant1(Party.builder().individualFirstName("Claimant")
-                                    .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+                    .applicant1(new Party().setIndividualFirstName("Claimant")
+                                    .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
                     .build();
 
             Map<String, String> result1 = generator.addCustomProperties(props, caseData1);
@@ -130,8 +130,8 @@ class GenerateHearingNoticeClaimantEmailDTOGeneratorTest {
                     .build().toBuilder()
                     .hearingTimeHourMinute(TIME_0800)
                     .hearingDate(DATE_2025_12_01)
-                    .applicant1(Party.builder().individualFirstName("Claimant")
-                                    .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+                    .applicant1(new Party().setIndividualFirstName("Claimant")
+                                    .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
                     .build();
 
             Map<String, String> result2 = generator.addCustomProperties(props2, caseData2);

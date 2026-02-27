@@ -93,11 +93,9 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldNotifyApplicant1_ClaimIsSubmittedButNotIssued() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .partyEmail(CLAIMANT_EMAIL_ID)
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build().setPartyEmail(CLAIMANT_EMAIL_ID)
+                                )
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -126,10 +124,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldNotSendEmail_whenEventIsCalledAndApplicantHasNoEmail() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -158,10 +154,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldSendEmail_whenHFWReferenceNumberPresent() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .caseDataLiP(new CaseDataLiP().setHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("1111")))
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
@@ -191,10 +185,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldSendEmail_whenHFWReferanceNumberNotPresent() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -223,10 +215,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldSendEmail_whenHWFReferanceNumberNotPresentAndBilingual() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .respondent1Represented(YesOrNo.NO)
                 .specRespondent1Represented(YesOrNo.NO)
                 .applicant1Represented(YesOrNo.NO)
@@ -256,10 +246,8 @@ public class NotifyClaimantClaimSubmittedTest extends BaseCallbackHandlerTest {
         void shouldSendEmail_whenHWFReferenceNumberPresentAndBilingual() {
             //Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmitted().build().toBuilder()
-                .applicant1(PartyBuilder.builder().individual().build().toBuilder()
-                                .build())
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .applicant1(PartyBuilder.builder().individual().build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .caseDataLiP(new CaseDataLiP()
                                  .setHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("1111")))
                 .respondent1Represented(YesOrNo.NO)
