@@ -68,6 +68,21 @@ class OtherPartyQueryResponseDefendantEmailDTOGeneratorTest {
         verify(respondToQueryHelper).addLipOtherPartyProperties(properties, caseData, "Respondent Test");
     }
 
+    @Test
+    void shouldReturnReferenceTemplate() {
+        assertThat(generator.getReferenceTemplate()).isEqualTo("other-party-response-to-query-notification-%s");
+    }
+
+    @Test
+    void shouldRespectShouldNotifyFlag() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        when(respondToQueryHelper.shouldNotifyOtherPartyLipDefendant(caseData)).thenReturn(true);
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+
+        when(respondToQueryHelper.shouldNotifyOtherPartyLipDefendant(caseData)).thenReturn(false);
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
     private Party createParty(String name) {
         Party party = new Party();
         party.setType(Party.Type.INDIVIDUAL);
