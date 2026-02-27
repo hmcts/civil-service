@@ -86,41 +86,39 @@ public class RequestForInformationGenerator implements TemplateDataGenerator<Jud
     @Override
     public JudgeDecisionPdfDocument getTemplateData(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData, String authorisation, FlowFlag userType) {
         LocationRefData courtLocation  = docmosisService.getCaseManagementLocationVenueName(caseData, authorisation);
-        JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
-            JudgeDecisionPdfDocument.builder()
-                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-                .isMultiParty(caseData.getIsMultiParty())
-                .claimant1Name(caseData.getClaimant1PartyName())
-                .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
-                .defendant1Name(caseData.getDefendant1PartyName())
-                .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
-                .courtName(courtLocation.getVenueName())
-                .courtNameCy(caseData.isApplicantBilingual() ? (Objects.nonNull(courtLocation.getWelshExternalShortName())
-                                 ? courtLocation.getWelshExternalShortName() : courtLocation.getVenueName()) : null)
-                .siteName(caseData.getCaseManagementLocation().getSiteName())
-                .address(caseData.getCaseManagementLocation().getAddress())
-                .postcode(caseData.getCaseManagementLocation().getPostcode())
-                .judgeRecital(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRecitalText())
-                .judgeComments(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoText())
-                .submittedOn(LocalDate.now())
-                .dateBy(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())
-                .additionalApplicationFee(getAdditionalApplicationFee(caseData))
-                .applicationCreatedDate(caseData.getCreatedDate().toLocalDate())
-                .applicationCreatedDateCy((caseData.isApplicantBilingual()) ? formatDateInWelsh(caseData.getCreatedDate().toLocalDate(), false) : null);
+        JudgeDecisionPdfDocument judgeDecisionPdfDocument = new JudgeDecisionPdfDocument()
+            .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setIsMultiParty(caseData.getIsMultiParty())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setClaimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setDefendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
+            .setCourtName(courtLocation.getVenueName())
+            .setCourtNameCy(caseData.isApplicantBilingual() ? (Objects.nonNull(courtLocation.getWelshExternalShortName())
+                               ? courtLocation.getWelshExternalShortName() : courtLocation.getVenueName()) : null)
+            .setSiteName(caseData.getCaseManagementLocation().getSiteName())
+            .setAddress(caseData.getCaseManagementLocation().getAddress())
+            .setPostcode(caseData.getCaseManagementLocation().getPostcode())
+            .setJudgeRecital(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRecitalText())
+            .setJudgeComments(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoText())
+            .setSubmittedOn(LocalDate.now())
+            .setDateBy(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())
+            .setAdditionalApplicationFee(getAdditionalApplicationFee(caseData))
+            .setApplicationCreatedDate(caseData.getCreatedDate().toLocalDate())
+            .setApplicationCreatedDateCy((caseData.isApplicantBilingual()) ? formatDateInWelsh(caseData.getCreatedDate().toLocalDate(), false) : null);
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT).contains(userType)) {
             boolean parentClaimantIsApplicant = caseData.identifyParentClaimantIsApplicant(caseData);
 
-            judgeDecisionPdfDocumentBuilder
-                .partyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine1(caseData.partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine2(caseData.partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine3(caseData.partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData))
-                .build();
+            judgeDecisionPdfDocument
+                .setPartyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine1(caseData.partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine2(caseData.partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine3(caseData.partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData));
         }
-        return judgeDecisionPdfDocumentBuilder.build();
+        return judgeDecisionPdfDocument;
     }
 
     private DocmosisTemplates getDocmosisTemplate(GeneralApplicationCaseData caseData, FlowFlag userType) {

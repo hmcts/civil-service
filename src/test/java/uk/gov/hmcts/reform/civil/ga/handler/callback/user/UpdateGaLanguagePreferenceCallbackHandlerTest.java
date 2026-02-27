@@ -56,11 +56,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantApplicantUnspecified() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData().build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
 
@@ -74,11 +74,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantApplicantEnglish() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("ENGLISH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("ENGLISH"))
                 .build();
@@ -95,11 +95,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantApplicantWelsh() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("WELSH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH"))
                 .build();
@@ -116,11 +116,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantApplicantBoth() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("BOTH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH"))
                 .build();
@@ -137,11 +137,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantRespondentUnspecified() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData().build();
             when(coreCaseDataService.getCase(any())).thenReturn(mockCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(mockCaseDetails)).thenReturn(civilCaseData);
 
@@ -155,11 +155,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantRespondentEnglish() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("ENGLISH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("ENGLISH"))
                 .build();
@@ -176,11 +176,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantRespondentWelsh() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("WELSH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("WELSH"))
                 .build();
@@ -197,11 +197,11 @@ public class UpdateGaLanguagePreferenceCallbackHandlerTest extends GeneralApplic
 
         @Test
         void shouldUpdateLanguagePreference_forClaimantRespondentBoth() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YesOrNo.NO)
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1234"))
                 .build();
-            GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("BOTH")
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH"))
                 .build();
