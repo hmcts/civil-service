@@ -582,7 +582,7 @@ class GaCoreCaseDataServiceTest {
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
             )).thenThrow(new RuntimeException("Exception"));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitUpdate(CASE_ID, CaseDataContent.builder().build());
 
@@ -599,7 +599,7 @@ class GaCoreCaseDataServiceTest {
                                                           anyString(), anyString(), anyString(),
                                                           anyBoolean(), any(CaseDataContent.class)
             )).thenThrow(new RuntimeException("Exception"));
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
             service.submitGaUpdate(CASE_ID, CaseDataContent.builder().build());
             verify(coreCaseDataApi, times(2)).submitEventForCaseWorker(anyString(), anyString(), anyString(),
