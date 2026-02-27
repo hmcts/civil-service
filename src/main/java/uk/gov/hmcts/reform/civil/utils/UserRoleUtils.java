@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.civil.utils;
 
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+
 import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
@@ -33,6 +35,25 @@ public class UserRoleUtils {
 
     public static boolean isLIPDefendant(List<String> roles) {
         return hasRole(roles, DEFENDANT);
+    }
+
+    public static Optional<CaseRole> getCaseRole(List<String> roles) {
+        if (isApplicantSolicitor(roles)) {
+            return Optional.of(APPLICANTSOLICITORONE);
+        }
+        if (isRespondentSolicitorOne(roles)) {
+            return Optional.of(RESPONDENTSOLICITORONE);
+        }
+        if (isRespondentSolicitorTwo(roles)) {
+            return Optional.of(RESPONDENTSOLICITORTWO);
+        }
+        if (isLIPClaimant(roles)) {
+            return Optional.of(CLAIMANT);
+        }
+        if (isLIPDefendant(roles)) {
+            return Optional.of(DEFENDANT);
+        }
+        return Optional.empty();
     }
 
     private static boolean hasRole(List<String> roles, CaseRole role) {

@@ -25,6 +25,7 @@ public class CaseMessage {
     private LocalDate hearingDate;
     private OffsetDateTime createdOn;
     private String createdBy;
+    private String createdByCaseRole;
     private String parentId;
     private String messageType;
     private YesOrNo isClosed;

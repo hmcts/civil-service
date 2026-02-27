@@ -311,6 +311,30 @@ class RaiseQueryCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(actualData.getQmRespondentSolicitor2Queries()).isEqualTo(null);
             assertThat(actualData.getQueries()).isEqualTo(caseData.getQueries());
         }
+
+        @Test
+        void shouldStoreCreatorRoleOnLatestMessage() {
+            when(coreCaseUserService.getUserCaseRoles(CASE_ID.toString(), USER_ID)).thenReturn(List.of(
+                APPLICANTSOLICITORONE.getFormattedName()));
+
+            CaseMessage latestMessage = new CaseMessage();
+            latestMessage.setId(QUERY_ID);
+            latestMessage.setCreatedOn(NOW);
+            CaseQueriesCollection caseQueriesCollection = new CaseQueriesCollection();
+            caseQueriesCollection.setCaseMessages(wrapElements(latestMessage));
+
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setCcdCaseReference(CASE_ID);
+            caseData.setQueries(caseQueriesCollection);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updated = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updated.getQueries().latest().getCreatedByCaseRole())
+                .isEqualTo(APPLICANTSOLICITORONE.getFormattedName());
+        }
     }
 
     private CaseQueriesCollection mockQueriesCollection(String queryId, String partyName, OffsetDateTime latestDate) {

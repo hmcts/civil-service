@@ -298,6 +298,7 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
     private CaseMessage createCaseMessage(String id) {
         CaseMessage caseMessage = new CaseMessage();
         caseMessage.setId(id);
+        caseMessage.setCreatedBy("LR");
         return caseMessage;
     }
 
