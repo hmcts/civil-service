@@ -23,7 +23,7 @@ def versions = [
   junit             : '5.14.3',
   junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
-  springStatemachine: '4.0.1',
+  springStatemachine: '4.0.0',
   lombok            : '1.18.42',
   camunda           : '7.20.0',
   testcontainers    : '1.21.4',
@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.2.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.51.0'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
