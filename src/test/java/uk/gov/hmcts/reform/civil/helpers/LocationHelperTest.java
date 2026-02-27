@@ -48,12 +48,12 @@ class LocationHelperTest {
     @Test
     void thereIsAMatchingLocation() {
         CaseData updatedData = CaseData.builder().build();
-        List<LocationRefData> locations = List.of(LocationRefData.builder()
-                                                      .courtLocationCode("123")
-                                                      .regionId("regionId")
-                                                      .region("region name")
-                                                      .epimmsId("99999")
-                                                      .build());
+        List<LocationRefData> locations = List.of(new LocationRefData()
+                                                      .setCourtLocationCode("123")
+                                                      .setRegionId("regionId")
+                                                      .setRegion("region name")
+                                                      .setEpimmsId("99999")
+                                                      );
         RequestedCourt requestedCourt = new RequestedCourt()
             .setCaseLocation(new CaseLocationCivil().setBaseLocation("99999"));
         helper.updateCaseManagementLocation(updatedData, requestedCourt, () -> locations);

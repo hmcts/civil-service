@@ -74,7 +74,7 @@ class ClaimantLipRepresentedRespSolOneEmailGeneratorTest {
                              .partyName("Jane Dan").build())
             .build();
 
-        Organisation org = Organisation.builder().name("New Org Ltd").build();
+        Organisation org = new Organisation().setName("New Org Ltd");
         when(organisationService.findOrganisationById("org-123")).thenReturn(Optional.of(org));
 
         try (MockedStatic<NotificationUtils> notificationUtilsMockedStatic = Mockito.mockStatic(NotificationUtils.class)) {
@@ -94,7 +94,7 @@ class ClaimantLipRepresentedRespSolOneEmailGeneratorTest {
     @Test
     void shouldReturnOrganisationName() {
         String orgId = "org-xyz";
-        Organisation organisation = Organisation.builder().name("My Org Name").build();
+        Organisation organisation = new Organisation().setName("My Org Name");
         when(organisationService.findOrganisationById(orgId)).thenReturn(Optional.of(organisation));
 
         String result = generator.getOrganisationName(orgId);

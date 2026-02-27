@@ -528,12 +528,11 @@ class PartyUtilsTest {
                 .respondentSolicitor1AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_ONE)
-                .details(caseData.getRespondent1())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_ONE)
+                .setDetails(caseData.getRespondent1())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent1Data(caseData);
 
@@ -550,12 +549,11 @@ class PartyUtilsTest {
                 .respondentSolicitor2AgreedDeadlineExtension(date)
                 .build();
 
-            PartyData expectedData = PartyData.builder()
-                .role(RESPONDENT_TWO)
-                .details(caseData.getRespondent2())
-                .timeExtensionDate(datetime)
-                .solicitorAgreedDeadlineExtension(date)
-                .build();
+            PartyData expectedData = new PartyData()
+                .setRole(RESPONDENT_TWO)
+                .setDetails(caseData.getRespondent2())
+                .setTimeExtensionDate(datetime)
+                .setSolicitorAgreedDeadlineExtension(date);
 
             PartyData actualData = PartyUtils.respondent2Data(caseData);
 

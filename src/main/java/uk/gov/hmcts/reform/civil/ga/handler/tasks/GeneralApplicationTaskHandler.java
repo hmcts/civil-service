@@ -71,8 +71,8 @@ public class GeneralApplicationTaskHandler extends BaseExternalTaskHandler {
 
         if (generalAppParentCaseLink == null
             || StringUtils.isBlank(generalAppParentCaseLink.getCaseReference())) {
-            updatedData.put("generalAppParentCaseLink", GeneralAppParentCaseLink.builder()
-                .caseReference(variables.getCaseId()).build());
+            updatedData.put("generalAppParentCaseLink", new GeneralAppParentCaseLink()
+                .setCaseReference(variables.getCaseId()));
         }
 
         return CaseDataContent.builder()

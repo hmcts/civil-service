@@ -93,13 +93,13 @@ class CoreCaseDataServiceV2Test {
         @BeforeEach
         void setUp() {
             List<LocationRefData> mockLocation = new ArrayList<>();
-            LocationRefData locationRefData = LocationRefData.builder()
-                .region("1")
-                .epimmsId("12345")
-                .courtAddress("Central London")
-                .postcode("LJ09 EMM")
-                .siteName("London SX12 2345")
-                .build();
+            LocationRefData locationRefData = new LocationRefData()
+                .setRegion("1")
+                .setEpimmsId("12345")
+                .setCourtAddress("Central London")
+                .setPostcode("LJ09 EMM")
+                .setSiteName("London SX12 2345")
+                ;
             mockLocation.add(locationRefData);
             when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());

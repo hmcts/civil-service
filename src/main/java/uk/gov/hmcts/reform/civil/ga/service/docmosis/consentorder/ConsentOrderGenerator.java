@@ -35,26 +35,22 @@ public class ConsentOrderGenerator implements TemplateDataGenerator<ConsentOrder
     @Override
     public ConsentOrderForm getTemplateData(GeneralApplicationCaseData caseData, String authorisation) {
 
-        ConsentOrderForm.ConsentOrderFormBuilder consentOrderFormBuilder =
-            ConsentOrderForm.builder()
-                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-                .isMultiParty(caseData.getIsMultiParty())
-                .claimant1Name(caseData.getClaimant1PartyName())
-                .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
-                .defendant1Name(caseData.getDefendant1PartyName())
-                .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
-                .orderDate(LocalDate.now())
-                .courtName(docmosisService.getCaseManagementLocationVenueName(
-                    caseData,
-                    authorisation
-                ).getExternalShortName())
-                .siteName(caseData.getCaseManagementLocation().getSiteName())
-                .address(caseData.getCaseManagementLocation().getAddress())
-                .postcode(caseData.getCaseManagementLocation().getPostcode())
-                .consentOrder(caseData.getApproveConsentOrder()
-                                  .getConsentOrderDescription());
-
-        return consentOrderFormBuilder.build();
+        return new ConsentOrderForm()
+            .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setIsMultiParty(caseData.getIsMultiParty())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setClaimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setDefendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
+            .setOrderDate(LocalDate.now())
+            .setCourtName(docmosisService.getCaseManagementLocationVenueName(
+                caseData,
+                authorisation
+            ).getExternalShortName())
+            .setSiteName(caseData.getCaseManagementLocation().getSiteName())
+            .setAddress(caseData.getCaseManagementLocation().getAddress())
+            .setPostcode(caseData.getCaseManagementLocation().getPostcode())
+            .setConsentOrder(caseData.getApproveConsentOrder().getConsentOrderDescription());
     }
 
     protected String getDateFormatted(LocalDate date) {

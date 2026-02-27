@@ -37,14 +37,14 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1ResponseDeadline(responseDeadline.atStartOfDay())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder().whenWillThisAmountBePaid(
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec().setWhenWillThisAmountBePaid(
                 LocalDate.of(2024, 3, 18)
-            ).build())
+            ))
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
                     .individualFirstName("James")
                     .individualLastName("John")
                     .build())
-            .claimFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(30000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .totalClaimAmount(BigDecimal.valueOf(300))

@@ -134,10 +134,10 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
-                LocationRefData.builder()
-                    .epimmsId("00000").siteName("locationOfRegion2").courtAddress("Prince William House, Peel Cross Road, Salford")
-                    .postcode("M5 4RR")
-                    .courtLocationCode("court1").build()
+                new LocationRefData()
+                    .setEpimmsId("00000").setSiteName("locationOfRegion2").setCourtAddress("Prince William House, Peel Cross Road, Salford")
+                    .setPostcode("M5 4RR")
+                    .setCourtLocationCode("court1")
             ));
         }
 
@@ -193,17 +193,17 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
                     GAPbaDetails.builder()
-                        .paymentDetails(PaymentDetails.builder()
-                                            .status(PaymentStatus.SUCCESS)
-                                            .reference("RC-1658-4258-2679-9795")
-                                            .customerReference(CUSTOMER_REFERENCE)
-                                            .build())
+                        .paymentDetails(new PaymentDetails()
+                                            .setStatus(PaymentStatus.SUCCESS)
+                                            .setReference("RC-1658-4258-2679-9795")
+                                            .setCustomerReference(CUSTOMER_REFERENCE)
+                                            )
                         .fee(
-                            Fee.builder()
-                                .code("FE203")
-                                .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                                .version("1")
-                                .build())
+                            new Fee()
+                                .setCode("FE203")
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                                .setVersion("1")
+                                )
                         .serviceReqReference(CUSTOMER_REFERENCE).build())
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -218,13 +218,13 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
                                             .baseLocation("687686")
                                             .region("4").build())
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                              .caseReference(PARENT_CCD_REF.toString()).build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                              .setCaseReference(PARENT_CCD_REF.toString()))
                 .build();
         }
 
         private GeneralApplicationCaseData getParentCaseDataAfterUpdateFromCivilService(YesOrNo isConsented, YesOrNo isTobeNotified) {
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalApplications(wrapElements(getGeneralApplication(isConsented, isTobeNotified)))
                 .caseManagementLocation(CaseLocationCivil.builder()
                                             .baseLocation("00000")
@@ -261,7 +261,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                     getGeneralApplication(isConsented, isTobeNotified))
-                .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+                .copy().ccdCaseReference(CHILD_CCD_REF).build();
         }
     }
 }

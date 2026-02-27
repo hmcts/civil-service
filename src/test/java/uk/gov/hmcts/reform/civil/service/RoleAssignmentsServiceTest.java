@@ -42,16 +42,12 @@ class RoleAssignmentsServiceTest {
     private static final String CASE_ID = "123456789";
     private static final List<String> ROLE_TYPE = List.of("test_role_type_case");
     private static final List<String> ROLE_NAME = List.of("test_role_name_judge", "test_role_name_judge_lead");
-    private static RoleAssignmentServiceResponse RAS_RESPONSE = RoleAssignmentServiceResponse
-        .builder()
-        .roleAssignmentResponse(
-            List.of(RoleAssignmentResponse
-                        .builder()
-                        .actorId(ACTORID)
-                        .build()
+    private static RoleAssignmentServiceResponse RAS_RESPONSE = new RoleAssignmentServiceResponse()
+        .setRoleAssignmentResponse(
+            List.of(new RoleAssignmentResponse()
+                        .setActorId(ACTORID)
             )
-        )
-        .build();
+        );
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -73,13 +69,14 @@ class RoleAssignmentsServiceTest {
     void getRoleAssignmentsWithLabels_shouldReturnExpectAssignments() {
         RoleAssignmentServiceResponse expected = new RoleAssignmentServiceResponse()
             .setRoleAssignmentResponse(
-                List.of(RoleAssignmentResponse
-                            .builder()
-                            .actorId(ACTORID)
-                            .roleLabel("Role Label")
-                            .build()
-                )
+                List.of(new RoleAssignmentResponse()
+                            .setActorId(ACTORID)
+                            .setRoleLabel("Role Label"))
             );
+        QueryRequest expectedQuery = new QueryRequest()
+            .setActorId(List.of(ACTORID))
+            .setRoleName(ROLE_NAME);
+
         when(roleAssignmentApi.getRoleAssignments(
             eq(USER_AUTH_TOKEN),
             eq(SERVICE_TOKEN),
@@ -88,7 +85,7 @@ class RoleAssignmentsServiceTest {
             eq(100),
             eq(null),
             eq(null),
-            eq(QueryRequest.builder().actorId(ACTORID).roleName(ROLE_NAME).build()),
+            eq(expectedQuery),
             eq(true))
         ).thenReturn(expected);
 
@@ -101,19 +98,15 @@ class RoleAssignmentsServiceTest {
     void getRoleAssignmentsByCaseIdAndRole_shouldReturnExpectAssignments() {
         RoleAssignmentServiceResponse expected = new RoleAssignmentServiceResponse()
             .setRoleAssignmentResponse(
-                List.of(RoleAssignmentResponse
-                            .builder()
-                            .actorId(ACTORID)
-                            .roleLabel("Role Label")
-                            .build()
-                )
+                List.of(new RoleAssignmentResponse()
+                            .setActorId(ACTORID)
+                            .setRoleLabel("Role Label"))
             );
 
-        QueryRequest queryRequest = QueryRequest.builder()
-            .roleType(ROLE_TYPE)
-            .roleName(ROLE_NAME)
-            .attributes(Map.of("caseId", List.of(CASE_ID)))
-            .build();
+        QueryRequest queryRequest = new QueryRequest()
+            .setRoleType(ROLE_TYPE)
+            .setRoleName(ROLE_NAME)
+            .setAttributes(Map.of("caseId", List.of(CASE_ID)));
 
         when(roleAssignmentApi.getRoleAssignments(
             eq(USER_AUTH_TOKEN),
@@ -140,27 +133,26 @@ class RoleAssignmentsServiceTest {
 
     @Test
     void shouldPostExpectedPayload() {
-        RoleAssignmentRequest request = RoleAssignmentRequest.builder()
-            .roleRequest(
-                RoleRequest.builder()
-                    .assignerId(ACTORID)
-                    .reference("civil-hearings-system-user")
-                    .process("civil-system-user")
-                    .replaceExisting(true)
-                    .build())
-            .requestedRoles(List.of(
-                RoleAssignment.builder()
-                    .actorId(ACTORID)
-                    .actorIdType("IDAM")
-                    .roleType(ORGANISATION)
-                    .classification("PUBLIC")
-                    .grantType(GrantType.STANDARD)
-                    .roleCategory(RoleCategory.SYSTEM)
-                    .roleName("some-role")
-                    .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-                    .readOnly(false)
-                    .build()
-            )).build();
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(ACTORID)
+            .setReference("civil-hearings-system-user")
+            .setProcess("civil-system-user")
+            .setReplaceExisting(true);
+
+        RoleAssignment roleAssignment = new RoleAssignment()
+            .setActorId(ACTORID)
+            .setActorIdType("IDAM")
+            .setRoleType(ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("some-role")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setReadOnly(false);
+
+        RoleAssignmentRequest request = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(List.of(roleAssignment));
 
         roleAssignmentsService.assignUserRoles(ACTORID, USER_AUTH_TOKEN, request);
 

@@ -50,9 +50,9 @@ public class GaRespondentResponseDeadlineCallbackHandler extends CallbackHandler
 
     private CallbackResponse deleteNotifications(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
-        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData().copy()
             .build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.respondentResponseDeadlineChecked(YesOrNo.YES);
         HashMap<String, Object> paramsMap = mapper.mapCaseDataToParams(caseData);
         dashboardApiClient.recordScenario(

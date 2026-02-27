@@ -54,7 +54,7 @@ class CaseFlagsInitialiserTest {
         organisationService = mock(OrganisationService.class);
         caseFlagsInitialiser = new CaseFlagsInitialiser(organisationService);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Civil - Organisation 1").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Civil - Organisation 1")));
     }
 
     @Test
@@ -63,8 +63,8 @@ class CaseFlagsInitialiserTest {
         var applicant2 = PartyBuilder.builder().company().build();
         var respondent1 = PartyBuilder.builder().soleTrader().build();
         var respondent2 = PartyBuilder.builder().organisation().build();
-        var applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        var applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        var applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        var applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
         var expected = CaseData.builder()
             .applicant1(
@@ -80,20 +80,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                     new Flags()
                         .setPartyName("Jason Wilson")
                         .setRoleOnCase("Claimant 1 Litigation Friend")
                         .setDetails(List.of()))
-                    .build()
+                    
                 )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -123,25 +123,25 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldInitialiseCaseFlagsForAddLitigationFriendEvent() {
-        var respondent1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        var respondent2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        var respondent1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        var respondent2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
         var expected = CaseData.builder()
             .respondent1LitigationFriend(
-                respondent1LitFriend.toBuilder().flags(
+                respondent1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Defendant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .respondent2LitigationFriend(
-                respondent2LitFriend.toBuilder().flags(
+                respondent2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Defendant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .build();
 
         var caseData = CaseData.builder()
@@ -172,8 +172,8 @@ class CaseFlagsInitialiserTest {
         Party applicant1 = PartyBuilder.builder().individual().build();
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -195,20 +195,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -216,89 +216,83 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Defendant 1")
                         .setDetails(List.of())).build())
             .applicantWitnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    .build(),
-                 PartyFlagStructure.builder()
-                     .firstName("Second")
-                     .lastName("witness")
-                     .flags(new Flags()
+                               .setDetails(List.of())),
+                 new PartyFlagStructure()
+                     .setFirstName("Second")
+                     .setLastName("witness")
+                     .setFlags(new Flags()
                                 .setPartyName("Second witness")
                                 .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                                .setDetails(List.of()))
-                     .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("witnessy")
-                    .flags(new Flags()
+                                .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("witnessy")
+                    .setFlags(new Flags()
                                .setPartyName("Third witnessy")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
                                .setDetails(List.of()))
-                    .build())))
+                    )))
             .applicantExperts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
                                .setPartyName("Second expert")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("experto")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("experto")
+                    .setFlags(new Flags()
                                .setPartyName("Third experto")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
                                .setDetails(List.of()))
-                    .build())))
+                    )))
             .respondent1Witnesses(wrapElements(List.of(
-                    PartyFlagStructure.builder()
-                        .firstName("First")
-                        .lastName("Name")
-                        .flags(new Flags()
+                    new PartyFlagStructure()
+                        .setFirstName("First")
+                        .setLastName("Name")
+                        .setFlags(new Flags()
                                    .setPartyName("First Name")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                                   .setDetails(List.of()))
-                        .build(),
-                    PartyFlagStructure.builder()
-                        .firstName("Second")
-                        .lastName("witness")
-                        .flags(new Flags()
+                                   .setDetails(List.of())),
+                    new PartyFlagStructure()
+                        .setFirstName("Second")
+                        .setLastName("witness")
+                        .setFlags(new Flags()
                                    .setPartyName("Second witness")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
                                    .setDetails(List.of()))
-                        .build())))
+                        )))
             .respondent1Experts(wrapElements(List.of(
-                    PartyFlagStructure.builder()
-                        .firstName("First")
-                        .lastName("Name")
-                        .flags(new Flags()
+                    new PartyFlagStructure()
+                        .setFirstName("First")
+                        .setLastName("Name")
+                        .setFlags(new Flags()
                                    .setPartyName("First Name")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                                   .setDetails(List.of()))
-                        .build(),
-                    PartyFlagStructure.builder()
-                        .firstName("Second")
-                        .lastName("expert")
-                        .flags(new Flags()
+                                   .setDetails(List.of())),
+                    new PartyFlagStructure()
+                        .setFirstName("Second")
+                        .setLastName("expert")
+                        .setFlags(new Flags()
                                    .setPartyName("Second expert")
                                    .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
                                    .setDetails(List.of()))
-                        .build())))
+                        )))
             .build();
 
         CaseData caseData = CaseData.builder()
@@ -336,8 +330,8 @@ class CaseFlagsInitialiserTest {
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         Party respondent2 = PartyBuilder.builder().organisation().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -359,20 +353,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -386,110 +380,104 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Defendant 2")
                         .setDetails(List.of())).build())
             .applicantWitnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
                                .setPartyName("Second witness")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("witnessy")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("witnessy")
+                    .setFlags(new Flags()
                                .setPartyName("Third witnessy")
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
                                .setDetails(List.of()))
-                    .build())))
+                    )))
             .applicantExperts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
                                .setPartyName("Second expert")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                               .setDetails(List.of()))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("experto")
-                    .flags(new Flags()
+                               .setDetails(List.of())),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("experto")
+                    .setFlags(new Flags()
                                .setPartyName("Third experto")
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
                                .setDetails(List.of()))
-                    .build())))
+                    )))
             .respondent1Witnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS))
-                    .build())))
+                    )))
             .respondent1Experts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT))
-                    .build())))
-            .respondent2Witnesses(wrapElements(List.of(PartyFlagStructure.builder()
-                                                           .firstName("Third")
-                                                           .lastName("witnessy")
-                                                           .flags(new Flags()
+                    )))
+            .respondent2Witnesses(wrapElements(List.of(new PartyFlagStructure()
+                                                           .setFirstName("Third")
+                                                           .setLastName("witnessy")
+                                                           .setFlags(new Flags()
                                                                       .setDetails(wrapElements(List.of(new FlagDetail()
                                                                                                         .setName("Flag name")
                                                                                                         .setFlagCode("123"))))
                                                                       .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_WITNESS))
-                                                           .build())))
-            .respondent2Experts(wrapElements(List.of(PartyFlagStructure.builder()
-                                                         .firstName("Third")
-                                                         .lastName("experto")
-                                                         .flags(new Flags()
+                                                           )))
+            .respondent2Experts(wrapElements(List.of(new PartyFlagStructure()
+                                                         .setFirstName("Third")
+                                                         .setLastName("experto")
+                                                         .setFlags(new Flags()
                                                                     .setDetails(wrapElements(List.of(new FlagDetail()
                                                                                                       .setName("Flag name")
                                                                                                       .setFlagCode("123"))))
-                                                                    .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)).build())))
+                                                                    .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)))))
             .build();
 
         CaseData caseData = CaseData.builder()
@@ -520,61 +508,59 @@ class CaseFlagsInitialiserTest {
                                                               .setDetails(wrapElements(witness3))))
             .addRespondent2(YES)
             .respondent1Witnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123")))))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123")))))
-                    .build())))
+                    )))
             .respondent1Experts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123")))))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
-                               .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123")))))
-                    .build())))
-            .respondent2Witnesses(wrapElements(List.of(PartyFlagStructure.builder()
-                                                           .firstName("Third")
-                                                           .lastName("witnessy")
-                                                           .flags(new Flags()
+                    )))
+            .respondent2Witnesses(wrapElements(List.of(new PartyFlagStructure()
+                                                           .setFirstName("Third")
+                                                           .setLastName("witnessy")
+                                                           .setFlags(new Flags()
                                                                       .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_WITNESS)
                                                                       .setDetails(wrapElements(List.of(new FlagDetail()
                                                                                                         .setName("Flag name")
                                                                                                         .setFlagCode("123")))))
-                                                           .build())))
-            .respondent2Experts(wrapElements(List.of(PartyFlagStructure.builder()
-                                                         .firstName("Third")
-                                                         .lastName("experto")
-                                                         .flags(new Flags()
+                                                           )))
+            .respondent2Experts(wrapElements(List.of(new PartyFlagStructure()
+                                                         .setFirstName("Third")
+                                                         .setLastName("experto")
+                                                         .setFlags(new Flags()
                                                                     .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)
                                                                     .setDetails(wrapElements(List.of(new FlagDetail()
                                                                                                       .setName("Flag name")
                                                                                                       .setFlagCode("123"))))
-                                                         ).build())))
+                                                         ))))
             .respondent1(respondent1)
             .respondent2(respondent2).build();
 
@@ -589,8 +575,8 @@ class CaseFlagsInitialiserTest {
         Party applicant2 = PartyBuilder.builder().company().build();
         Party respondent1 = PartyBuilder.builder().soleTrader().build();
         Party respondent2 = PartyBuilder.builder().organisation().build();
-        LitigationFriend applicant1LitFriend = LitigationFriend.builder().firstName("Jason").lastName("Wilson").build();
-        LitigationFriend applicant2LitFriend = LitigationFriend.builder().firstName("Jenny").lastName("Carter").build();
+        LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
+        LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
         Witness witness2 = new Witness().setFirstName("Second").setLastName("witness");
         Witness witness3 = new Witness().setFirstName("Third").setLastName("witnessy");
@@ -612,20 +598,20 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Claimant 2")
                         .setDetails(List.of())).build())
             .applicant1LitigationFriend(
-                applicant1LitFriend.toBuilder().flags(
+                applicant1LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jason Wilson")
                             .setRoleOnCase("Claimant 1 Litigation Friend")
                             .setDetails(List.of()))
-                    .build()
+                    
             )
             .applicant2LitigationFriend(
-                applicant2LitFriend.toBuilder().flags(
+                applicant2LitFriend.copy().setFlags(
                         new Flags()
                             .setPartyName("Jenny Carter")
                             .setRoleOnCase("Claimant 2 Litigation Friend")
                             .setDetails(List.of()))
-                    .build())
+                    )
             .respondent1(
                 respondent1.toBuilder().flags(
                     new Flags()
@@ -639,119 +625,113 @@ class CaseFlagsInitialiserTest {
                         .setRoleOnCase("Defendant 2")
                         .setDetails(List.of())).build())
             .applicantWitnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("witnessy")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
                     )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("witnessy")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    .build())))
+                    )))
             .applicantExperts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("experto")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
                     )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("experto")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    .build())))
+                    )))
             .respondent1Witnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
-                               .setDetails(wrapElements(List.of())))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
+                               .setDetails(wrapElements(List.of()))),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
                                .setPartyName("Second witness")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_WITNESS)
                                .setDetails(wrapElements(List.of())))
-                    .build())))
+                    )))
             .respondent1Experts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
                                .setPartyName("First Name")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
-                               .setDetails(wrapElements(List.of())))
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
+                               .setDetails(wrapElements(List.of()))),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
                                .setPartyName("Second expert")
                                .setRoleOnCase(RESPONDENT_SOLICITOR_ONE_EXPERT)
                                .setDetails(wrapElements(List.of()))
                     )
-                    .build())))
-            .respondent2Witnesses(wrapElements(List.of(PartyFlagStructure.builder()
-                                                           .firstName("Third")
-                                                           .lastName("witnessy")
-                                                           .flags(new Flags()
+                    )))
+            .respondent2Witnesses(wrapElements(List.of(new PartyFlagStructure()
+                                                           .setFirstName("Third")
+                                                           .setLastName("witnessy")
+                                                           .setFlags(new Flags()
                                                                       .setPartyName("Third witnessy")
                                                                       .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_WITNESS)
                                                                       .setDetails(wrapElements(List.of()))
                                                            )
-                                                           .build())))
-            .respondent2Experts(wrapElements(List.of(PartyFlagStructure.builder()
-                                                         .firstName("Third")
-                                                         .lastName("experto")
-                                                         .flags(new Flags()
+                                                           )))
+            .respondent2Experts(wrapElements(List.of(new PartyFlagStructure()
+                                                         .setFirstName("Third")
+                                                         .setLastName("experto")
+                                                         .setFlags(new Flags()
                                                                     .setPartyName("Third experto")
                                                                     .setRoleOnCase(RESPONDENT_SOLICITOR_TWO_EXPERT)
                                                                     .setDetails(wrapElements(List.of()))
-                                                         ).build())))
+                                                         ))))
             .build();
 
         CaseData caseData = CaseData.builder()
@@ -782,68 +762,64 @@ class CaseFlagsInitialiserTest {
             .respondent1(respondent1)
             .respondent2(respondent2)
             .applicantWitnesses(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("witness")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("witnessy")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
                     )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("witness")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("witnessy")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_WITNESS)
-                    )
-                    .build()
+                    
             )))
             .applicantExperts(wrapElements(List.of(
-                PartyFlagStructure.builder()
-                    .firstName("First")
-                    .lastName("Name")
-                    .flags(new Flags()
+                new PartyFlagStructure()
+                    .setFirstName("First")
+                    .setLastName("Name")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Second")
+                    .setLastName("expert")
+                    .setFlags(new Flags()
+                               .setDetails(wrapElements(List.of(new FlagDetail()
+                                                                 .setName("Flag name")
+                                                                 .setFlagCode("123"))))
+                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
+                    ),
+                new PartyFlagStructure()
+                    .setFirstName("Third")
+                    .setLastName("experto")
+                    .setFlags(new Flags()
                                .setDetails(wrapElements(List.of(new FlagDetail()
                                                                  .setName("Flag name")
                                                                  .setFlagCode("123"))))
                                .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
                     )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Second")
-                    .lastName("expert")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    .build(),
-                PartyFlagStructure.builder()
-                    .firstName("Third")
-                    .lastName("experto")
-                    .flags(new Flags()
-                               .setDetails(wrapElements(List.of(new FlagDetail()
-                                                                 .setName("Flag name")
-                                                                 .setFlagCode("123"))))
-                               .setRoleOnCase(APPLICANT_SOLICITOR_EXPERT)
-                    )
-                    .build()
+                    
             ))).build();
 
         caseFlagsInitialiser.initialiseMissingCaseFlags(caseData);

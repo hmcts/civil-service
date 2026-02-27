@@ -170,7 +170,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             String suppliedValuePennies = "12345";
             String expectedValuePounds = "123.45";
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-            caseData.setRespondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal(suppliedValuePennies)).build());
+            caseData.setRespondToAdmittedClaim(new RespondToClaim().setHowMuchWasPaid(new BigDecimal(suppliedValuePennies)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -350,18 +350,18 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         protected List<LocationRefData> getSampleCourLocationsRefObject() {
             return new ArrayList<>(List.of(
-                LocationRefData.builder()
-                    .epimmsId("111").siteName("Site 1").courtAddress("Adr 1").postcode("AAA 111")
-                    .regionId("region 1").courtLocationCode("court1").build(),
-                LocationRefData.builder()
-                    .epimmsId("222").siteName("Site 2").courtAddress("Adr 2").postcode("BBB 222")
-                    .regionId("region 2").courtLocationCode("court2").build(),
-                LocationRefData.builder()
-                    .epimmsId("333").siteName("Site 3").courtAddress("Adr 3").postcode("CCC 333")
-                    .regionId("region 3").courtLocationCode("court3").build(),
-                LocationRefData.builder()
-                    .epimmsId("444").siteName(LIVERPOOL_SITE_NAME).courtAddress("Adr 3").postcode("CCC 333")
-                    .regionId("region 4").courtLocationCode("court4").build()
+                new LocationRefData()
+                    .setEpimmsId("111").setSiteName("Site 1").setCourtAddress("Adr 1").setPostcode("AAA 111")
+                    .setRegionId("region 1").setCourtLocationCode("court1"),
+                new LocationRefData()
+                    .setEpimmsId("222").setSiteName("Site 2").setCourtAddress("Adr 2").setPostcode("BBB 222")
+                    .setRegionId("region 2").setCourtLocationCode("court2"),
+                new LocationRefData()
+                    .setEpimmsId("333").setSiteName("Site 3").setCourtAddress("Adr 3").setPostcode("CCC 333")
+                    .setRegionId("region 3").setCourtLocationCode("court3"),
+                new LocationRefData()
+                    .setEpimmsId("444").setSiteName(LIVERPOOL_SITE_NAME).setCourtAddress("Adr 3").setPostcode("CCC 333")
+                    .setRegionId("region 4").setCourtLocationCode("court4")
             ));
         }
 
@@ -385,9 +385,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setApplicant1Represented(NO);
             caseData.setTotalClaimAmount(BigDecimal.valueOf(1000));
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
-            caseData.setClaimFee(Fee.builder()
-                .calculatedAmountInPence(BigDecimal.valueOf(10000))
-                .build());
+            caseData.setClaimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10000)));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CCJPaymentDetails ccjResponseForJudgement =
@@ -450,9 +448,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
-            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
-                .nameOfAirline("Sri Lankan")
-                .build());
+            caseData.setFlightDelayDetails(new FlightDelayDetails().setNameOfAirline("Sri Lankan"));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
@@ -472,9 +468,7 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
-            caseData.setFlightDelayDetails(FlightDelayDetails.builder()
-                .nameOfAirline("INVALID_AIRLINE")
-                .build());
+            caseData.setFlightDelayDetails(new FlightDelayDetails().setNameOfAirline("INVALID_AIRLINE"));
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedCaseData = getCaseData(response);
