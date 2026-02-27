@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.citizenui.GeneralApplicationFeeRequest;
@@ -44,7 +43,6 @@ public class FeesController {
     private final InterestCalculator interestCalculator;
 
     @GetMapping("/ranges")
-    @RateLimiter
     @Operation(summary = "Gets a group of claim amount ranges and associated fees for those ranges")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -55,7 +53,6 @@ public class FeesController {
     }
 
     @GetMapping("/claim/{claimAmount}")
-    @RateLimiter
     @Operation(summary = "Gets the claim fee associated with an amount")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -66,7 +63,6 @@ public class FeesController {
     }
 
     @PostMapping("/claim/calculate-interest")
-    @RateLimiter
     @Operation(summary = "Calculates the claim interest")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -77,7 +73,6 @@ public class FeesController {
     }
 
     @GetMapping("/hearing/{claimAmount}")
-    @RateLimiter
     @Operation(summary = "Gets the hearing fee associated with an amount")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -88,7 +83,6 @@ public class FeesController {
     }
 
     @PostMapping("/general-application")
-    @RateLimiter
     @Operation(summary = "Gets the general app fee associated with an application type")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),

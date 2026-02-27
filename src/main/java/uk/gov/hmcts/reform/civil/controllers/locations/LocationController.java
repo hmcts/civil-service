@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.CourtLocationUtils;
@@ -37,7 +36,6 @@ public class LocationController {
     private final CourtLocationUtils courtLocationUtils;
 
     @GetMapping(path = "/courtLocations")
-    @RateLimiter
     @Operation(summary = "Gets court locations")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
