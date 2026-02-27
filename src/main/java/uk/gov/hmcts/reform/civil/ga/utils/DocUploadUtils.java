@@ -32,7 +32,7 @@ public class DocUploadUtils {
 
     }
 
-    public static void addUploadDocumentByTypeToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addUploadDocumentByTypeToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                                      List<Element<UploadDocumentByType>> source, String role,
                                                      boolean updateScheduler) {
         caseDataBuilder.isDocumentVisible(DocUploadUtils.isDocumentVisible(caseData));
@@ -62,7 +62,7 @@ public class DocUploadUtils {
             .toList();
     }
 
-    public static void addDocumentToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addDocumentToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                          List<Element<Document>> source, String role, CaseEvent event,
                                          boolean updateScheduler) {
         if (Objects.isNull(source) || source.isEmpty()) {
@@ -73,7 +73,7 @@ public class DocUploadUtils {
         addToAddl(caseData, caseDataBuilder, docs, role, updateScheduler);
     }
 
-    public static void addToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                  List<Element<CaseDocument>> tobeAdded, String role,
                                  boolean updateScheduler) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
@@ -96,7 +96,7 @@ public class DocUploadUtils {
         caseDataBuilder.gaAddlDocStaff(addDocuments(tobeAdded, caseData.getGaAddlDocStaff()));
     }
 
-    public static void addDocumentToPreTranslation(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addDocumentToPreTranslation(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                                    List<Element<Document>> source, String role, CaseEvent event) {
         if (Objects.isNull(source) || source.isEmpty()) {
             return;
@@ -225,7 +225,7 @@ public class DocUploadUtils {
         return Objects.nonNull(caseData.getIsGaRespondentOneLip()) && caseData.getIsGaRespondentOneLip().equals(YES);
     }
 
-    public static void setRespondedValues(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder, String role) {
+    public static void setRespondedValues(GeneralApplicationCaseData caseDataBuilder, String role) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
             caseDataBuilder.isApplicantResponded(YES);
             caseDataBuilder.isRespondentResponded(null);

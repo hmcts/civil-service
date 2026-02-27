@@ -109,7 +109,7 @@ public class StateGeneratorService {
     private static boolean isConsentOrderRespondentSatisfied(GeneralApplicationCaseData caseData) {
         return nonNull(caseData.getGeneralAppConsentOrder()) && isRespondentsResponseSatisfied(
             caseData,
-            caseData.toBuilder().build()
+            caseData.copy().build()
         );
     }
 

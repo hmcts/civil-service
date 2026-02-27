@@ -58,7 +58,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -85,7 +85,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -103,7 +103,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withTenantId() {
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -124,7 +124,7 @@ class GaEventEmitterServiceTest {
             .thenReturn(null);
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -147,7 +147,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -165,7 +165,7 @@ class GaEventEmitterServiceTest {
     void shouldSendMessageAndNotTriggerGAEvent_whenNotTrue() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -188,7 +188,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -207,7 +207,7 @@ class GaEventEmitterServiceTest {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
