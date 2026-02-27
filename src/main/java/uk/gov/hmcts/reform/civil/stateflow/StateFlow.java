@@ -60,10 +60,9 @@ public class StateFlow {
     }
 
     public StateFlowDTO toStateFlowDTO() {
-        return StateFlowDTO.builder()
-            .stateHistory(getStateHistory())
-            .state(getState())
-            .flags(getFlags())
-            .build();
+        return new StateFlowDTO()
+            .setStateHistory(getStateHistory())
+            .setState(getState())
+            .setFlags(getFlags());
     }
 }

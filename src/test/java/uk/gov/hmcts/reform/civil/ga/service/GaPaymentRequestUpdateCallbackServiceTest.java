@@ -78,7 +78,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldStartAndSubmitEventWithCaseDetails() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT).build();
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -99,7 +99,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldProceed_WhenGeneralAppParentCaseLink() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
             .generalAppParentCaseLink(null).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -120,16 +120,16 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldProceed_WhenAdditionalPaymentExist_WithPaymentFail() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(FAILED)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
-                                      .build())
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(FAILED)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
+                                      )
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -151,16 +151,16 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     public void shouldNotProceed_WhenAdditionalPaymentExist_WithPaymentFail_AndNotificationServiceIsDown() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(FAILED)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
-                                      .build())
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(FAILED)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
+                                      )
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -178,16 +178,16 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Test
     public void shouldNotSendEmailToRespondent_When_ConsentOrder() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(APPLICATION_ADD_PAYMENT)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(SUCCESS)
-                                                                    .customerReference(null)
-                                                                    .reference(REFERENCE)
-                                                                    .errorCode(null)
-                                                                    .errorMessage(null)
-                                                                    .build())
-                                      .build())
+        caseData = caseData.copy().ccdState(APPLICATION_ADD_PAYMENT)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(SUCCESS)
+                                                                    .setCustomerReference(null)
+                                                                    .setReference(REFERENCE)
+                                                                    .setErrorCode(null)
+                                                                    .setErrorMessage(null)
+                                                                    )
+                                      )
             .generalAppConsentOrder(YesOrNo.NO)
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -209,7 +209,7 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Test
     public void shouldNotDoProceed_WhenApplicationNotIn_AdditionalPayment_Status() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YesOrNo.NO).build();
-        caseData = caseData.toBuilder().ccdState(PENDING_CASE_ISSUED).build();
+        caseData = caseData.copy().ccdState(PENDING_CASE_ISSUED).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
@@ -226,16 +226,15 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
-        return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CASE_ID)
-            .serviceRequestStatus(status)
-            .payment(PaymentDto.builder()
-                         .amount(new BigDecimal(167))
-                         .paymentReference(REFERENCE)
-                         .caseReference(REFERENCE)
-                         .accountNumber(ACCOUNT_NUMBER)
-                         .build())
-            .build();
+        return new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(CASE_ID)
+            .setServiceRequestStatus(status)
+            .setPayment(PaymentDto.builder()
+                .amount(new BigDecimal(167))
+                .paymentReference(REFERENCE)
+                .caseReference(REFERENCE)
+                .accountNumber(ACCOUNT_NUMBER)
+                .build());
     }
 
     private StartEventResponse startEventResponse(CaseDetails caseDetails,
@@ -250,8 +249,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Test
     public void shouldProceedAfterInitialPaymentIsSuccess() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder().build();
-        caseData = caseData.toBuilder().ccdState(AWAITING_APPLICATION_PAYMENT).build();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy().build();
+        caseData = caseData.copy().ccdState(AWAITING_APPLICATION_PAYMENT).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
         when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails))
             .thenReturn(caseData);
@@ -269,8 +268,8 @@ class GaPaymentRequestUpdateCallbackServiceTest {
     @Test
     public void shouldLogErrorWhenCcdStateIsNotAwaitingPayment() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().toBuilder().build();
-        caseData = caseData.toBuilder().ccdState(AWAITING_RESPONDENT_RESPONSE).build();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentSuccessfulCaseData().copy().build();
+        caseData = caseData.copy().ccdState(AWAITING_RESPONDENT_RESPONSE).build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
         paymentRequestUpdateCallbackService.processServiceRequest(buildServiceDto(PAID), caseData, false);
@@ -287,11 +286,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
     @Test
     public void shouldProcessHwf() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(AWAITING_APPLICATION_PAYMENT)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();
@@ -302,11 +301,11 @@ class GaPaymentRequestUpdateCallbackServiceTest {
 
     @Test
     public void shouldNotProcessHwf() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .ccdCaseReference(1L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.ONE)))
                 .generalAppHelpWithFees(new HelpWithFees()
                         .setHelpWithFeesReferenceNumber("ref"))
                 .build();

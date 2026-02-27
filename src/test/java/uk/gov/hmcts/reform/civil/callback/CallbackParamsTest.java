@@ -16,7 +16,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldReturnGeneralApplicationCaseDataWhenCaseDataIsGeneralApplicationCaseData() {
-            final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseData(caseData);
 
@@ -44,7 +44,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldReturnGeneralApplicationCaseDataWhenCaseDataBeforeIsGeneralApplicationCaseData() {
-            final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseDataBefore(caseData);
 
@@ -88,7 +88,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataIsGeneralApplicationCaseData() {
-            final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseData(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getCaseData);
@@ -116,7 +116,7 @@ class CallbackParamsTest {
 
         @Test
         void shouldThrowIllegalStateExceptionWhenCaseDataBeforeIsGeneralApplicationCaseData() {
-            final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             final CallbackParams callbackParams = new CallbackParams()
                 .caseDataBefore(caseData);
             assertThrows(IllegalStateException.class, callbackParams::getCaseDataBefore);
