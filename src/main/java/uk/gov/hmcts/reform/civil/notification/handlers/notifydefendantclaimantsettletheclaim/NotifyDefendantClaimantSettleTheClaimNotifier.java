@@ -13,7 +13,7 @@ public class NotifyDefendantClaimantSettleTheClaimNotifier extends Notifier {
     protected NotifyDefendantClaimantSettleTheClaimNotifier(
         NotificationService notificationService,
         CaseTaskTrackingService caseTaskTrackingService,
-        NotifyDefendantClaimantSettleTheClaimPartiesEmailGenerator partiesNotifier) {
+        NotifyDefendantClaimantSettleTheClaimAllPartiesEmailGenerator partiesNotifier) {
         super(notificationService, caseTaskTrackingService, partiesNotifier);
     }
 

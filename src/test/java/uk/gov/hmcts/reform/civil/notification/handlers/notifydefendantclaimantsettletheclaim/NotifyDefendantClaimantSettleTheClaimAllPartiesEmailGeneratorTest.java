@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.notification.handlers.AllPartiesEmailGenerator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
-class NotifyDefendantClaimantSettleTheClaimPartiesEmailGeneratorTest {
+class NotifyDefendantClaimantSettleTheClaimAllPartiesEmailGeneratorTest {
 
     @Mock
     private NotifyDefendantClaimantSettleTheClaimDefendantEmailDTOGenerator defendantEmailDTOGenerator;
@@ -19,7 +19,7 @@ class NotifyDefendantClaimantSettleTheClaimPartiesEmailGeneratorTest {
     private NotifyDefendantClaimantSettleTheClaimRespSolOneEmailDTOGenerator respSolOneEmailDTOGenerator;
 
     @InjectMocks
-    private NotifyDefendantClaimantSettleTheClaimPartiesEmailGenerator emailGenerator;
+    private NotifyDefendantClaimantSettleTheClaimAllPartiesEmailGenerator emailGenerator;
 
     @Test
     void shouldExtendAllPartiesEmailGenerator() {
