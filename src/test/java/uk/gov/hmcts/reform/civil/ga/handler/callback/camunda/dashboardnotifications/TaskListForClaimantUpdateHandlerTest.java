@@ -75,7 +75,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioActionNeeded_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -110,7 +110,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioInProgress_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -145,7 +145,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioAvailable_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -180,7 +180,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioActionNeeded_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -215,7 +215,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioInProgress_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -250,7 +250,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldRecordClaimantScenarioAvailable_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
@@ -285,7 +285,7 @@ public class TaskListForClaimantUpdateHandlerTest extends GeneralApplicationBase
         void shouldNotRecordClaimantScenario_whenClaimantNotLiP() {
             CaseDetails caseDetails = CaseDetails.builder().build();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.YES)
