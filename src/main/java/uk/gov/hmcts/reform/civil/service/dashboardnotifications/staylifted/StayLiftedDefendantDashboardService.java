@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.staylifted;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -21,19 +22,18 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 public class StayLiftedDefendantDashboardService extends DashboardScenarioService {
 
     private final FeatureToggleService featureToggleService;
-    private final StayLiftedDashboardHelper stayLiftedDashboardHelper;
+    private static final String citizenRole = "DEFENDANT";
 
     protected StayLiftedDefendantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                   DashboardNotificationsParamsMapper mapper,
-                                                  FeatureToggleService featureToggleService,
-                                                  StayLiftedDashboardHelper stayLiftedDashboardHelper) {
+                                                  FeatureToggleService featureToggleService) {
         super(dashboardScenariosService, mapper);
         this.featureToggleService = featureToggleService;
-        this.stayLiftedDashboardHelper = stayLiftedDashboardHelper;
     }
 
     public void notifyStayLifted(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+        reconfigureDashboardNotifications(caseData, citizenRole);
     }
 
     @Override
@@ -44,17 +44,24 @@ public class StayLiftedDefendantDashboardService extends DashboardScenarioServic
     @Override
     protected Map<String, Boolean> getScenarios(CaseData caseData) {
         if (caseData.isRespondent1NotRepresented() && featureToggleService.isLipVLipEnabled()) {
-            return Map.of(
-                SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(),
-                true,
-                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(),
-                stayLiftedDashboardHelper.hadHearingScheduled(caseData),
-                getViewDocumentsScenario(caseData).getScenario(),
-                stayLiftedDashboardHelper.isNotPreCaseProgression(caseData)
-            );
+            Map<String, Boolean> scenarios = new HashMap<>();
+            scenarios.put(SCENARIO_AAA6_CP_STAY_LIFTED_DEFENDANT.getScenario(), true);
+            scenarios.putAll(getScenariosBasedOnPreStayState(caseData));
+            return scenarios;
         }
 
         return new HashMap<>();
+    }
+
+    private Map<String, Boolean> getScenariosBasedOnPreStayState(CaseData caseData) {
+        return switch (CaseState.valueOf(caseData.getPreStayState())) {
+            case CASE_PROGRESSION, All_FINAL_ORDERS_ISSUED -> Map.of(
+                getViewDocumentsScenario(caseData).getScenario(), true);
+            case HEARING_READINESS, PREPARE_FOR_HEARING_CONDUCT_HEARING, DECISION_OUTCOME -> Map.of(
+                getViewDocumentsScenario(caseData).getScenario(), true,
+                SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_DEFENDANT.getScenario(), true);
+            default -> Map.of();
+        };
     }
 
     private DashboardScenarios getViewDocumentsScenario(CaseData caseData) {

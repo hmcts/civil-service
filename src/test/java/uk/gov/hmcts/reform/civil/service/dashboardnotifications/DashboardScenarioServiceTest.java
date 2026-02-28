@@ -18,7 +18,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -102,6 +104,41 @@ class DashboardScenarioServiceTest {
             verify(mapper).mapCaseDataToParams(caseData);
             verifyNoInteractions(dashboardScenariosService);
             assertThat(scenarioService.beforeHookCalled).isFalse();
+        }
+    }
+
+    @Nested
+    class ReconfigureDashboardNotificationsTests {
+
+        private TestDashboardScenarioService scenarioService;
+
+        @BeforeEach
+        void setup() {
+            scenarioService = new TestDashboardScenarioService(dashboardScenariosService, mapper);
+        }
+
+        @Test
+        void should_delegate_to_dashboardScenariosService_with_correct_params() {
+            // Arrange
+            CaseData caseData = CaseData.builder().ccdCaseReference(456L).build();
+            ScenarioRequestParams expectedParams = ScenarioRequestParams.builder()
+                .params(new HashMap<>())
+                .build();
+
+            TestDashboardScenarioService spyService = spy(scenarioService);
+            doReturn(expectedParams).when(spyService).scenarioRequestParamsFrom(caseData);
+
+            String roleType = "CLAIMANT";
+
+            // Act
+            spyService.reconfigureDashboardNotifications(caseData, roleType);
+
+            verify(dashboardScenariosService)
+                .reconfigureCaseDashboardNotifications(
+                    eq("456"),
+                    eq(expectedParams),
+                    eq(roleType)
+                );
         }
     }
 

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.staycase;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_CLAIMANT;
 
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService;
@@ -40,10 +41,13 @@ public class StayCaseClaimantDashboardService extends DashboardScenarioService {
         final String caseId = String.valueOf(caseData.getCcdCaseReference());
         final String role = "CLAIMANT";
         final String GA = "Applications";
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseId,
-            role
-        );
+        CaseState preStayState = CaseState.valueOf(caseData.getPreStayState());
+        if (preStayState != CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT
+            && preStayState != CaseState.AWAITING_APPLICANT_INTENTION) {
+            dashboardNotificationService.deleteByReferenceAndCitizenRole(
+                caseId, role
+            );
+        }
 
         taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
             caseId,

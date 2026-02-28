@@ -20,11 +20,19 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
+import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
@@ -39,8 +47,12 @@ public class ManageStayCallbackHandlerTest {
 
     @InjectMocks
     private ManageStayCallbackHandler handler;
+
     @Mock
     private FeatureToggleService featureToggleService;
+
+    @Mock
+    private DeadlinesCalculator deadlinesCalculator;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -49,6 +61,7 @@ public class ManageStayCallbackHandlerTest {
         mapper.registerModules(new JavaTimeModule(), new Jdk8Module());
         handler = new ManageStayCallbackHandler(
             featureToggleService,
+            deadlinesCalculator,
             mapper
         );
     }
@@ -61,8 +74,8 @@ public class ManageStayCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
         }
@@ -71,9 +84,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldSetManageStayOptionToNull_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             caseData.setManageStayOption("LIFT_STAY");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_START, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             CaseData updatedCaseData = mapper.convertValue(response.getData(), CaseData.class);
             assertThat(updatedCaseData.getManageStayOption()).isNull();
@@ -88,8 +103,8 @@ public class ManageStayCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateDecisionOutcome().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getErrors()).isNull();
         }
@@ -101,10 +116,11 @@ public class ManageStayCallbackHandlerTest {
             caseData.setManageStayOption("LIFT_STAY");
             caseData.setCcdState(preStayState);
             caseData.setPreStayState(preStayState.name());
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getData()).extracting("businessProcess")
                 .extracting("status", "camundaEvent")
@@ -118,29 +134,33 @@ public class ManageStayCallbackHandlerTest {
 
         @ParameterizedTest
         @MethodSource("provideCaseStatesForLiftStay")
-        void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(CaseState preStayState, CaseState expectedState) {
+        void shouldSetCorrectCaseState_WhenManageStayOptionIsLiftStay(
+            CaseState preStayState,
+            CaseState expectedState
+        ) {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("LIFT_STAY");
             caseData.setCcdState(preStayState);
             caseData.setPreStayState(preStayState.name());
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(expectedState.name());
         }
 
         @Test
         void shouldNotChangeCaseState_WhenManageStayOptionIsNotLiftStay() {
-
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("REQUEST_UPDATE");
             caseData.setCcdState(CASE_STAYED);
+
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
-            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
-                .handle(params);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response.getState()).isEqualTo(CASE_STAYED.name());
             assertThat(response.getData()).extracting("businessProcess")
@@ -154,7 +174,11 @@ public class ManageStayCallbackHandlerTest {
                 Arguments.of(CaseState.JUDICIAL_REFERRAL, CaseState.JUDICIAL_REFERRAL),
                 Arguments.of(CaseState.CASE_PROGRESSION, CaseState.CASE_PROGRESSION),
                 Arguments.of(CaseState.HEARING_READINESS, CaseState.CASE_PROGRESSION),
-                Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING, CaseState.CASE_PROGRESSION)
+                Arguments.of(CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.DECISION_OUTCOME, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.All_FINAL_ORDERS_ISSUED, CaseState.CASE_PROGRESSION),
+                Arguments.of(CaseState.AWAITING_APPLICANT_INTENTION, CaseState.AWAITING_APPLICANT_INTENTION),
+                Arguments.of(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT, CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT)
             );
         }
     }
@@ -166,8 +190,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithLiftStay() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("LIFT_STAY");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -180,8 +207,11 @@ public class ManageStayCallbackHandlerTest {
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvokedWithRequestUpdate() {
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
             caseData.setManageStayOption("REQUEST_UPDATE");
+
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
-            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            SubmittedCallbackResponse response =
+                (SubmittedCallbackResponse) handler.handle(params);
 
             assertThat(response).usingRecursiveComparison().isEqualTo(
                 SubmittedCallbackResponse.builder()
@@ -189,5 +219,82 @@ public class ManageStayCallbackHandlerTest {
                     .confirmationBody("&nbsp;")
                     .build());
         }
+    }
+
+    @Test
+    void shouldUpdateRespondentDeadlines_whenLiftingStayAndStateIsAwaitingRespondentAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT.name());
+        caseData.setCcdState(CaseState.AWAITING_RESPONDENT_ACKNOWLEDGEMENT);
+
+        caseData.setCaseStayDate(LocalDate.now().minusDays(5));
+        caseData.setRespondent1ResponseDeadline(LocalDate.now().plusDays(10).atStartOfDay());
+        caseData.setRespondent2ResponseDeadline(LocalDate.now().plusDays(15).atStartOfDay());
+
+        when(deadlinesCalculator.plusDaysSetAt4PMDeadline(any(), eq(5L)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updated =
+            mapper.convertValue(response.getData(), CaseData.class);
+
+        verify(deadlinesCalculator, times(2))
+            .plusDaysSetAt4PMDeadline(any(), eq(5L));
+
+        assertThat(updated.getRespondent1ResponseDeadline()).isNotNull();
+        assertThat(updated.getRespondent2ResponseDeadline()).isNotNull();
+    }
+
+    @Test
+    void shouldUpdateApplicantDeadline_whenLiftingStayAndStateIsAwaitingApplicantIntention() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_APPLICANT_INTENTION.name());
+        caseData.setCcdState(CaseState.AWAITING_APPLICANT_INTENTION);
+
+        caseData.setCaseStayDate(LocalDate.now().minusDays(3));
+        caseData.setApplicant1ResponseDeadline(LocalDate.now().plusDays(7).atStartOfDay());
+
+        when(deadlinesCalculator.plusDaysSetAt4PMDeadline(any(), eq(3L)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        AboutToStartOrSubmitCallbackResponse response =
+            (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        CaseData updated =
+            mapper.convertValue(response.getData(), CaseData.class);
+
+        verify(deadlinesCalculator)
+            .plusDaysSetAt4PMDeadline(any(), eq(3L));
+
+        assertThat(updated.getApplicant1ResponseDeadline()).isNotNull();
+    }
+
+    @Test
+    void shouldNotUpdateDeadlines_whenCaseStayDateIsNull() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setManageStayOption("LIFT_STAY");
+        caseData.setPreStayState(CaseState.AWAITING_APPLICANT_INTENTION.name());
+
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, caseData)
+            .build();
+
+        handler.handle(params);
+
+        verifyNoInteractions(deadlinesCalculator);
     }
 }

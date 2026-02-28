@@ -245,4 +245,57 @@ class DashboardScenariosServiceTest {
         verify(dashboardNotificationService).deleteByNameAndReference("template.missing", "case-id");
     }
 
+    @Test
+    void shouldReconfigureExistingNotifications() {
+        // Arrange
+        String caseId = "ccd-case-id";
+        String roleType = "CLAIMANT";
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("animal", "Tiger");
+        params.put("target", "Safari");
+
+        DashboardNotificationsEntity existingNotification1 = DashboardNotificationsEntity.builder()
+            .name(NOTIFICATION_ISSUE_CLAIM_START)
+            .reference(caseId)
+            .build();
+
+        DashboardNotificationsEntity existingNotification2 = DashboardNotificationsEntity.builder()
+            .name("nonexistent.template")
+            .reference(caseId)
+            .build();
+
+        when(dashboardNotificationService.getDashboardNotifications(caseId, roleType))
+            .thenReturn(List.of(existingNotification1, existingNotification2));
+
+        NotificationTemplateDefinition template = NotificationTemplateDefinition.builder()
+            .name(NOTIFICATION_ISSUE_CLAIM_START)
+            .role(roleType.toLowerCase())
+            .titleEn("The ${animal} jumped over the ${target}.")
+            .descriptionEn("The ${animal} jumped over the ${target}.")
+            .titleCy("The ${animal} jumped over the ${target}.")
+            .descriptionCy("The ${animal} jumped over the ${target}.")
+            .build();
+
+        when(notificationTemplateCatalog.findByName(NOTIFICATION_ISSUE_CLAIM_START))
+            .thenReturn(Optional.of(template));
+        when(notificationTemplateCatalog.findByName("nonexistent.template"))
+            .thenReturn(Optional.empty());
+
+        ScenarioRequestParams scenarioRequestParams = new ScenarioRequestParams(params);
+
+        dashboardScenariosService.reconfigureCaseDashboardNotifications(caseId, scenarioRequestParams, roleType);
+
+        verify(dashboardNotificationService).saveOrUpdate(
+            org.mockito.ArgumentMatchers.argThat(updated ->
+                                                     updated.getTitleEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getDescriptionEn().equals("The Tiger jumped over the Safari.")
+                                                         && updated.getReference().equals(caseId)
+            )
+        );
+
+        verify(dashboardNotificationService, never())
+            .saveOrUpdate(org.mockito.ArgumentMatchers.argThat(n ->
+                                                                   n.getName().equals("nonexistent.template")
+            ));
+    }
 }

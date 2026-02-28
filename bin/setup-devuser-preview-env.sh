@@ -9,7 +9,7 @@ echo "Importing Roles to the CCD pod"
 echo "Importing Camunda definitions"
 ./bin/pull-latest-camunda-files.sh ${camundaBranch}
 echo "Importing CCD definitions"
-./bin/pull-latest-ccd-files.sh ${ccdBranch}
+./bin/pull-latest-civil-ccd-files.sh ${ccdBranch}
 ./bin/import-ccd-definition.sh "-e *-prod.json,*HNL-nonprod.json,AuthorisationCaseType-shuttered.json"
 
 rm -rf $(pwd)/ccd-definition

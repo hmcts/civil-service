@@ -17,6 +17,8 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT;
@@ -46,7 +48,8 @@ class StayCaseDefendantDashboardServiceTest {
     @Test
     void shouldNotifyDefendantWhenCaseStayed() {
         CaseData caseData = CaseDataBuilder.builder().build()
-            .setCcdCaseReference(1234L);
+            .setCcdCaseReference(1234L)
+            .setPreStayState("IN_MEDIATION");
 
         service.notifyStayCase(caseData, AUTH_TOKEN);
 
@@ -58,6 +61,46 @@ class StayCaseDefendantDashboardServiceTest {
             SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT.getScenario(),
             "1234",
             ScenarioRequestParams.builder().params(new HashMap<>()).build()
+        );
+    }
+
+    @Test
+    void shouldNotDeleteNotification_WhenPreStayStateIsAwaitingRespondentAcknowledgement() {
+        CaseData caseData = CaseDataBuilder.builder().build()
+            .setCcdCaseReference(5678L)
+            .setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
+
+        service.notifyStayCase(caseData, AUTH_TOKEN);
+
+        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "5678", "DEFENDANT", "Applications"
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT.getScenario()),
+            eq("5678"),
+            eq(ScenarioRequestParams.builder().params(new HashMap<>()).build())
+        );
+    }
+
+    @Test
+    void shouldNotDeleteNotification_WhenPreStayStateIsAwaitingApplicationIntention() {
+        CaseData caseData = CaseDataBuilder.builder().build()
+            .setCcdCaseReference(5678L)
+            .setPreStayState("AWAITING_APPLICANT_INTENTION");
+
+        service.notifyStayCase(caseData, AUTH_TOKEN);
+
+        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "5678", "DEFENDANT", "Applications"
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            eq(AUTH_TOKEN),
+            eq(SCENARIO_AAA6_CP_CASE_STAYED_DEFENDANT.getScenario()),
+            eq("5678"),
+            eq(ScenarioRequestParams.builder().params(new HashMap<>()).build())
         );
     }
 }

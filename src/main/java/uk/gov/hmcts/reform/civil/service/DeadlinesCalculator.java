@@ -53,6 +53,11 @@ public class DeadlinesCalculator {
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
     }
 
+    public LocalDateTime plusDaysSetAt4PMDeadline(LocalDateTime startDate, long days) {
+        LocalDate notificationDeadline = startDate.plusDays(days).toLocalDate();
+        return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
+    }
+
     public LocalDateTime plus14DaysDeadline(LocalDateTime startDate) {
         LocalDate notificationDeadline = startDate.plusDays(14).toLocalDate();
         return calculateFirstWorkingDay(notificationDeadline).atTime(END_OF_BUSINESS_DAY);
@@ -175,7 +180,6 @@ public class DeadlinesCalculator {
     public LocalDate getJudicialOrderDeadlineDate(LocalDateTime responseDate, int daysToAdd) {
         LocalDateTime dateTime = responseDate.plusDays(daysToAdd);
 
-        LocalDate deadLineDate = calculateFirstWorkingDay(dateTime.toLocalDate());
-        return deadLineDate;
+        return calculateFirstWorkingDay(dateTime.toLocalDate());
     }
 }

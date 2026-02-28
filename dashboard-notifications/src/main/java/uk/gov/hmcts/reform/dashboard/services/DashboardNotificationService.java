@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Objects.nonNull;
@@ -29,6 +30,10 @@ public class DashboardNotificationService {
 
     private final DashboardNotificationsRepository dashboardNotificationsRepository;
     private final NotificationActionRepository notificationActionRepository;
+    private static final Set<String> CASE_STAY_TEMPLATES = Set.of(
+        "Notice.AAA6.CP.Case.Stayed.Claimant",
+        "Notice.AAA6.CP.Case.Stayed.Defendant"
+    );
 
     private final IdamApi idamApi;
 
@@ -52,13 +57,31 @@ public class DashboardNotificationService {
 
     public List<Notification> getNotifications(String ccdCaseIdentifier, String roleType) {
 
-        List<DashboardNotificationsEntity> dashboardNotificationsEntityList = dashboardNotificationsRepository
-            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
+        List<DashboardNotificationsEntity> all =
+            dashboardNotificationsRepository.findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
 
-        return dashboardNotificationsEntityList.stream()
-            .sorted(Comparator.comparing(DashboardNotificationsEntity::getCreatedAt, Comparator.reverseOrder()))
+        // Sort all notifications
+        List<DashboardNotificationsEntity> sortedAllNotifications = all.stream()
+            .sorted(Comparator.comparing(DashboardNotificationsEntity::getCreatedAt).reversed())
+            .toList();
+
+        // Filter stay lifted
+        List<DashboardNotificationsEntity> caseStayedNotification = sortedAllNotifications.stream()
+            .filter(n -> n.getName() != null && CASE_STAY_TEMPLATES.contains(n.getName()))
+            .toList();
+
+        // If found, return only those, otherwise return all
+        List<DashboardNotificationsEntity> result =
+            caseStayedNotification.isEmpty() ? sortedAllNotifications : caseStayedNotification;
+
+        return result.stream()
             .map(Notification::from)
             .toList();
+    }
+
+    public List<DashboardNotificationsEntity> getDashboardNotifications(String ccdCaseIdentifier, String roleType) {
+        return dashboardNotificationsRepository
+            .findByReferenceAndCitizenRole(ccdCaseIdentifier, roleType);
     }
 
     public Map<String, List<Notification>> getAllCasesNotifications(List<String> ccdCaseIdentifiers, String roleType) {
