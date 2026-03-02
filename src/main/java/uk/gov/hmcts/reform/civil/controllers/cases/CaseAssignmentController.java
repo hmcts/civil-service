@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.aspect.RateLimiter;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.citizenui.dto.PinDto;
 import uk.gov.hmcts.reform.civil.service.AssignCaseService;
@@ -50,6 +51,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}"
     })
+    @RateLimiter(rateLimit = 100, timeInSeconds = 60)
     @Operation(summary = "Validates case reference and pin")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -66,6 +68,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}/ocmc"
     })
+    @RateLimiter(rateLimit = 100, timeInSeconds = 60)
     @Operation(summary = "Validates case reference and pin for ocmc")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "302", description = "FOUND"),
@@ -119,6 +122,7 @@ public class CaseAssignmentController {
     }
 
     @PostMapping(path = "/case/{caseId}/{caseRole}")
+    @RateLimiter
     @Operation(summary = "Assigns case to defendant")
     public void assignCaseToDefendant(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,
                                       @PathVariable("caseId") String caseId,

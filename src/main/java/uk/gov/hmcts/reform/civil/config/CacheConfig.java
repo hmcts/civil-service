@@ -39,6 +39,11 @@ public class CacheConfig {
                               Caffeine.newBuilder()
                                   .expireAfterWrite(12, TimeUnit.HOURS)
                                   .build()
+            ),
+            new CaffeineCache("ipRateLimitCache",
+                              Caffeine.newBuilder()
+                                  .maximumSize(10000)
+                                  .build()
             )
         ));
 

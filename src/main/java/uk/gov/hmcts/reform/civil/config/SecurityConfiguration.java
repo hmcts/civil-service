@@ -35,7 +35,7 @@ public class SecurityConfiguration {
         "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**",
         "/health", "/env", "/health/**", "/status/health",
         "/loggers/**", "/assignment/**", "/service-request-update",
-        "/service-request-update-claim-issued", "/case/document/downloadDocument/**",
+        "/service-request-update-claim-issued",
         "/fees/claim/calculate-interest",
         "/testing-support/**"
     };
