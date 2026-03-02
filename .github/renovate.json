@@ -18,6 +18,25 @@
       "groupName": "All non-major updates",
       "groupSlug": "all-non-major",
       "automerge": true
+    },
+    {
+      "matchPackagePatterns": [
+        "org.springframework",
+        "org.springdoc",
+        "spring-boot",
+        "spring-cloud",
+        "jakarta.persistence",
+        "org.hibernate"
+      ],
+      "groupName": "Spring Boot and related updates",
+      "groupSlug": "spring-boot-related",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["terraform"],
+      "groupName": "Terraform updates",
+      "groupSlug": "terraform",
+      "automerge": true
     }
   ]
 }
