@@ -51,7 +51,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}"
     })
-    @RateLimiter(rateLimit = 100, timeInSeconds = 60)
+    @RateLimiter(rateLimit = 10, timeInSeconds = 60)
     @Operation(summary = "Validates case reference and pin")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
