@@ -1,10 +1,5 @@
 package uk.gov.hmcts.reform.civil.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,8 +27,13 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -248,6 +248,7 @@ class CaseQueriesUtilTest {
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
         CaseMessage applicantMsg = new CaseMessage();
         applicantMsg.setId("1");
+        applicantMsg.setCreatedBy("user");
         CaseQueriesCollection applicantQuery = new CaseQueriesCollection();
         applicantQuery.setRoleOnCase("applicant-solicitor");
         applicantQuery.setCaseMessages(wrapElements(applicantMsg));
@@ -267,6 +268,7 @@ class CaseQueriesUtilTest {
 
         CaseMessage respondent1Msg = new CaseMessage();
         respondent1Msg.setId("2");
+        respondent1Msg.setCreatedBy("user");
         CaseQueriesCollection respondent1Query = new CaseQueriesCollection();
         respondent1Query.setRoleOnCase("respondent-solicitor-1");
         respondent1Query.setCaseMessages(wrapElements(respondent1Msg));
@@ -286,6 +288,7 @@ class CaseQueriesUtilTest {
 
         CaseMessage respondent2Msg = new CaseMessage();
         respondent2Msg.setId("3");
+        respondent2Msg.setCreatedBy("user");
         CaseQueriesCollection respondent2Query = new CaseQueriesCollection();
         respondent2Query.setRoleOnCase("respondent-solicitor-2");
         respondent2Query.setCaseMessages(wrapElements(respondent2Msg));
@@ -296,6 +299,23 @@ class CaseQueriesUtilTest {
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "3");
 
         assertThat(roles).containsOnly(CaseRole.RESPONDENTSOLICITORTWO.toString());
+    }
+
+    @Test
+    void shouldReturnStoredRole_whenCaseMessageContainsRole() {
+        CaseMessage storedRoleMessage = new CaseMessage();
+        storedRoleMessage.setId("4");
+        storedRoleMessage.setCreatedByCaseRole(CaseRole.CLAIMANT.toString());
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(storedRoleMessage));
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
+
+        List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "4");
+
+        assertThat(roles).containsOnly(CaseRole.CLAIMANT.getFormattedName());
+        verifyNoInteractions(coreCaseUserService);
     }
 
     @Test
@@ -452,7 +472,7 @@ class CaseQueriesUtilTest {
                 .thenCallRealMethod();
             mockedStatic.when(() -> CaseQueriesUtil.hasOldQueries(any(CaseData.class)))
                 .thenCallRealMethod();
-            mockedStatic.when(() -> CaseQueriesUtil.migrateQueries(any(CaseQueriesCollection.class), any(CaseData.class)))
+            mockedStatic.when(() -> CaseQueriesUtil.migrateQueries(any(CaseQueriesCollection.class), any(CaseData.class), any(CaseRole.class)))
                 .thenThrow(expectedException);
 
             NullPointerException thrownException = assertThrows(NullPointerException.class, () ->

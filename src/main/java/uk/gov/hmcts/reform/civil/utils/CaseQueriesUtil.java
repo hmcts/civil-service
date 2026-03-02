@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -16,9 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static java.util.Objects.nonNull;
 
+import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
@@ -39,10 +40,27 @@ public class CaseQueriesUtil {
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
-        String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
+        CaseMessage queryMessage = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
             .filter(m -> m.getId().equals(queryId)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
-            .getCreatedBy();
+            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
+
+        if (queryMessage.getCreatedByCaseRole() != null) {
+            String storedRole = queryMessage.getCreatedByCaseRole();
+            if (storedRole.startsWith("[") && storedRole.endsWith("]")) {
+                return List.of(storedRole);
+            }
+            try {
+                CaseRole caseRole = CaseRole.valueOf(storedRole);
+                return List.of(caseRole.getFormattedName());
+            } catch (IllegalArgumentException e) {
+                return List.of(storedRole);
+            }
+        }
+
+        String createdBy = queryMessage.getCreatedBy();
+        if (createdBy == null) {
+            return List.of();
+        }
         return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
     }
 
@@ -178,11 +196,11 @@ public class CaseQueriesUtil {
                 queriesCollection.setCaseMessages(new ArrayList<>());
                 caseData.setQueries(queriesCollection);
                 collectionOwner = "Claimant";
-                migrateQueries(caseData.getQmApplicantSolicitorQueries(), caseData);
+                migrateQueries(caseData.getQmApplicantSolicitorQueries(), caseData, CaseRole.APPLICANTSOLICITORONE);
                 collectionOwner = "Defendant 1";
-                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), caseData);
+                migrateQueries(caseData.getQmRespondentSolicitor1Queries(), caseData, CaseRole.RESPONDENTSOLICITORONE);
                 collectionOwner = "Defendant 2";
-                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), caseData);
+                migrateQueries(caseData.getQmRespondentSolicitor2Queries(), caseData, CaseRole.RESPONDENTSOLICITORTWO);
             } catch (Exception e) {
                 log.error("There was a problem migrating the [{}] queries ", collectionOwner, e);
                 // Continue to throw the original error since all queries must be migrated successfully.
@@ -191,10 +209,17 @@ public class CaseQueriesUtil {
         }
     }
 
-    public static void migrateQueries(CaseQueriesCollection collectionToMigrate, CaseData caseData) {
+    public static void migrateQueries(CaseQueriesCollection collectionToMigrate,
+                                      CaseData caseData,
+                                      CaseRole caseRole) {
         if (nonNull(collectionToMigrate) && nonNull(collectionToMigrate.getCaseMessages())) {
             log.info("Started to migrate [{}] queries for caseId {}", collectionToMigrate.getPartyName(), caseData.getCcdCaseReference());
             List<Element<CaseMessage>> messages = caseData.getQueries().getCaseMessages();
+            collectionToMigrate.getCaseMessages().forEach(element -> {
+                if (caseRole != null && element.getValue().getCreatedByCaseRole() == null) {
+                    element.getValue().setCreatedByCaseRole(caseRole.getFormattedName());
+                }
+            });
             messages.addAll(collectionToMigrate.getCaseMessages());
             caseData.getQueries().setCaseMessages(messages);
         }

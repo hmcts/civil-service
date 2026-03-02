@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.buildLatestQuery;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.clearOldQueryCollections;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.logMigrationSuccess;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.migrateAllQueries;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.getCaseRole;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +107,12 @@ public class RaiseQueryCallbackHandler extends CallbackHandler {
         CaseMessage latestCaseMessage = caseData.getQueries().latest();
         if (nonNull(caseData.getQueries()) && caseData.getQueries().messageThread(latestCaseMessage).size() % 2 == 0) {
             return AboutToStartOrSubmitCallbackResponse.builder().errors(List.of(FOLLOW_UPS_ERROR)).build();
+        }
+
+        if (latestCaseMessage != null) {
+            getCaseRole(roles)
+                .map(caseRole -> caseRole.getFormattedName())
+                .ifPresent(latestCaseMessage::setCreatedByCaseRole);
         }
 
         assignCategoryIdToAttachments(latestCaseMessage, assignCategoryId, roles);
