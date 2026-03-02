@@ -84,7 +84,7 @@ public class CaseAssignmentController {
     @GetMapping(path = {
         "/reference/{caseReference}/defendant-link-status"
     })
-    @RateLimiter
+    @RateLimiter(rateLimit = 5, timeInSeconds = 60)
     @Operation(summary = "Check whether a claim is linked to a defendant")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
