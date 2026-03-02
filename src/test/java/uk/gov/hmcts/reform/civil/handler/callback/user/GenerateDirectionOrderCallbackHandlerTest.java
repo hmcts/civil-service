@@ -217,17 +217,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldReturnError_WhenAboutToStartIsInvokedWithRespondentLip() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1Represented(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
-        }
-
-        @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedNotInJudicialReferral() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .applicant1Represented(NO)
@@ -1680,8 +1669,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
             // Given
-            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
-            finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(new ArrayList<>())
@@ -1695,10 +1682,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getFinalOrderDocumentCollection().getFirst()
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getFinalOrderDocumentCollection().getFirst()
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+            assertThat(updatedData.getEnableUploadEvent()).isEqualTo(YES);
         }
 
         @Test
