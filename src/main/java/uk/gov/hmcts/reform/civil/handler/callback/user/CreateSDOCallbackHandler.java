@@ -42,6 +42,14 @@ public class CreateSDOCallbackHandler extends CallbackHandler {
     public static final String ERROR_MINTI_DISPOSAL_NOT_ALLOWED = "Disposal Hearing is not available for Multi Track and Intermediate Track Claims. "
         + "This can be requested by using the Make an Order event.";
 
+    public static final String DEFAULT_PENAL_NOTICE = """
+    WARNING
+
+    [DEFENDANT] IF YOU DO NOT COMPLY WITH THIS ORDER YOU MAY BE HELD IN CONTEMPT OF COURT AND PUNISHED BY A FINE, \
+    IMPRISONMENT, CONFISCATION OF ASSETS OR OTHER PUNISHMENT UNDER THE LAW.
+
+    A penal notice against the Defendant is attached to paragraph X below.""";
+
     private final ObjectMapper objectMapper;
     private final DirectionsOrderCallbackPipeline directionsOrderCallbackPipeline;
     private final DirectionsOrderStageExecutor directionsOrderStageExecutor;

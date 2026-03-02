@@ -13,7 +13,9 @@ import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 import uk.gov.hmcts.reform.civil.model.sdo.JudgementSum;
+import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsAddNewDirections;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
@@ -51,7 +53,9 @@ public class SdoDocumentFormSmall implements MappableObject {
     private List<SmallTrack> smallClaims;
 
     private boolean hasCreditHire;
+    private boolean hasHousingDisrepair;
     private boolean hasRoadTrafficAccident;
+    private boolean hasPaymentProtectionInsurance;
     private boolean writtenByJudge;
 
     private SmallClaimsJudgesRecital smallClaimsJudgesRecital;
@@ -67,8 +71,10 @@ public class SdoDocumentFormSmall implements MappableObject {
     private LocationRefData hearingLocation;
     private LocationRefData caseManagementLocation;
     private SmallClaimsCreditHire smallClaimsCreditHire;
+    private HousingDisrepair smallClaimsHousingDisrepair;
     private SmallClaimsRoadTrafficAccident smallClaimsRoadTrafficAccident;
     private SdoR2SmallClaimsWitnessStatements sdoR2SmallClaimsWitnessStatements;
+    private PPI smallClaimsPPI;
 
     private String welshLanguageDescription;
     private boolean hasNewDirections;
@@ -89,6 +95,8 @@ public class SdoDocumentFormSmall implements MappableObject {
     private String smallClaimMediationSectionInput;
     private boolean smallClaimsWelshLanguageToggle;
     private String caseAccessCategory;
+    private boolean showPenalNotice;
+    private String penalNoticeText;
 
     @SuppressWarnings("unused")
     public boolean getSmallClaimsMethodToggle() {

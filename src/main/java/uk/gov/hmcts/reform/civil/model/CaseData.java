@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import lombok.Builder;
@@ -202,6 +203,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  String detailsOfClaim;
     private  ClaimValue claimValue;
     private  Fee claimFee;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  Fee otherRemedyFee;
     private  String serviceRequestReference;
     private  String paymentReference;
     private  DynamicList applicantSolicitor1PbaAccounts;
@@ -649,11 +652,23 @@ public class CaseData extends CaseDataParent implements MappableObject {
 
     private  YesOrNo isMintiLipCase;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  String  smallClaimsPenalNotice;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  String  fastTrackPenalNotice;
+
     @Builder.Default
     private  List<Element<CaseDocument>> courtOfficersOrders = new ArrayList<>();
     private  YesOrNo isReferToJudgeClaim;
 
     private  ClientContext clientContext;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  YesOrNo isClaimDeclarationAdded;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  String  claimDeclarationDescription;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private  YesOrNo isHumanRightsActIssues;
 
     /**
      * There are several fields that can hold the I2P of applicant1 depending
@@ -1645,5 +1660,12 @@ public class CaseData extends CaseDataParent implements MappableObject {
     public boolean isClaimUnderTranslationAfterClaimantResponse() {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
+    }
+
+    @JsonIgnore
+    public boolean isOtherRemedyClaim() {
+        return this.getClaimType() != null
+            && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimTypeUnSpec())
+            || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimTypeUnSpec()));
     }
 }

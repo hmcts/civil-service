@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -46,6 +48,8 @@ public class CalculateFeeTask {
 
         setClaimFee(caseData);
 
+        setOtherRemedyFee(caseData);
+
         return buildCallbackResponse(caseData);
     }
 
@@ -83,6 +87,13 @@ public class CalculateFeeTask {
     private void setClaimFee(CaseData caseData) {
         log.info("Calculating fees for claim value {} ", caseData.getClaimValue());
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+    }
+
+    private void setOtherRemedyFee(CaseData caseData) {
+        if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+            Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
+            caseData.setOtherRemedyFee(otherRemedyFee);
+        }
     }
 
     private CallbackResponse buildCallbackResponse(CaseData caseData) {

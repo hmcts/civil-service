@@ -4,5 +4,7 @@ public enum SmallTrack {
     smallClaimCreditHire,
     smallClaimRoadTrafficAccident,
     smallClaimDisputeResolutionHearing,
-    smallClaimFlightDelay
+    smallClaimFlightDelay,
+    smallClaimHousingDisrepair,
+    smallClaimPPI
 }
