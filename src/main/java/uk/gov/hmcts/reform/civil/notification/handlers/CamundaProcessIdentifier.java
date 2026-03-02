@@ -59,5 +59,6 @@ public enum CamundaProcessIdentifier {
     BundleCreationNotify,
     CreateSDONotify,
     RaiseQueryNotifier,
-    OtherPartyQueryRaisedNotifier;
+    OtherPartyQueryRaisedNotifier,
+    STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES;
 }
