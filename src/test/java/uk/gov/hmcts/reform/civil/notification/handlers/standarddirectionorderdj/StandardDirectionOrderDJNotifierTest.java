@@ -14,6 +14,6 @@ class StandardDirectionOrderDJNotifierTest extends NotifierTestBase {
     @Test
     void shouldReturnCorrectTaskId() {
         String taskId = notifier.getTaskId();
-        assertThat(taskId).isEqualTo("StandardDirectionOrderDJNotifyParties");
+        assertThat(taskId).isEqualTo("STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES");
     }
 }
