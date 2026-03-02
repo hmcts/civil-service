@@ -69,7 +69,7 @@ class FullDefenceApplicantSolicitorOneUnspecNotifierTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
         when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));

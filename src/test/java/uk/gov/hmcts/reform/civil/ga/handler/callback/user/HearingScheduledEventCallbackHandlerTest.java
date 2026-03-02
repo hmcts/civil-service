@@ -62,10 +62,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldReturnLocationList_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.LISTING_FOR_A_HEARING).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -78,10 +76,8 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldNotPrepopulateData_whenCcdStateIsOrderMade() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdState(CaseState.ORDER_MADE).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -93,19 +89,17 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
-                GAJudgesHearingListGAspec.builder().hearingPreferredLocation(DynamicList.builder()
+                new GAJudgesHearingListGAspec().setHearingPreferredLocation(DynamicList.builder()
                                                                                  .listItems(List.of(location1))
-                                                                                 .value(location1).build()).build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdState(CaseState.LISTING_FOR_A_HEARING)
+                                                                                 .value(location1).build());
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.LISTING_FOR_A_HEARING)
                 .judicialListForHearing(gaJudgesHearingListGAspec).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -119,19 +113,17 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldNotReturnLocationList_with_preferredLocationSelected_whenLocationsAreQueried() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
 
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
             GAJudgesHearingListGAspec gaJudgesHearingListGAspec =
-                GAJudgesHearingListGAspec.builder().hearingPreferredLocation(DynamicList.builder()
+                new GAJudgesHearingListGAspec().setHearingPreferredLocation(DynamicList.builder()
                                                                                  .listItems(List.of(location1))
-                                                                                 .value(location1).build()).build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdState(CaseState.ORDER_MADE)
+                                                                                 .value(location1).build());
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdState(CaseState.ORDER_MADE)
                 .judicialListForHearing(gaJudgesHearingListGAspec).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -153,10 +145,10 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             String minutes = "0" + localDateTime.getMinute();
             hours = hours.substring(hours.length() - 2);
             minutes = minutes.substring(minutes.length() - 2);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
-                .gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
-                                           .hearingDate(LocalDate.from(localDateTime))
-                                           .hearingTimeHourMinute(hours + minutes).build())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                           .setHearingDate(LocalDate.from(localDateTime))
+                                           .setHearingTimeHourMinute(hours + minutes))
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -172,10 +164,10 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
             String minutes = "0" + localDateTime.getMinute();
             hours = hours.substring(hours.length() - 2);
             minutes = minutes.substring(minutes.length() - 2);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
-                .gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
-                                           .hearingDate(LocalDate.from(localDateTime))
-                                           .hearingTimeHourMinute(hours + minutes).build())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                           .setHearingDate(LocalDate.from(localDateTime))
+                                           .setHearingTimeHourMinute(hours + minutes))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
@@ -190,17 +182,15 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
         @Test
         void shouldGetDueDateAndFeeSmallClaim_whenAboutToSubmit() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("Site Name 1").courtAddress("Address1").postcode("18000")
-                              .build());
-            locations.add(LocationRefData.builder().siteName("Site Name 2").courtAddress("Address2").postcode("28000")
-                              .build());
+            locations.add(new LocationRefData().setSiteName("Site Name 1").setCourtAddress("Address1").setPostcode("18000"));
+            locations.add(new LocationRefData().setSiteName("Site Name 2").setCourtAddress("Address2").setPostcode("28000"));
             DynamicListElement location1 = DynamicListElement.builder()
                 .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().toBuilder()
-                .gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
-                                           .hearingLocation(DynamicList.builder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build().copy()
+                .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                           .setHearingLocation(DynamicList.builder()
                                                                 .listItems(List.of(location1))
-                                                                .value(location1).build()).build())
+                                                                .value(location1).build()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -223,7 +213,7 @@ class HearingScheduledEventCallbackHandlerTest extends GeneralApplicationBaseCal
                 + "##### hearing for example, book an interpreter.<br/>" + "<br/>";
             String body = "<br/> <br/>";
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
-                    YesOrNo.YES).build().toBuilder()
+                    YesOrNo.YES).build().copy()
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);

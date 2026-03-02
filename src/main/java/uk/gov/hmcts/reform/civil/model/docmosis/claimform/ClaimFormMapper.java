@@ -180,9 +180,9 @@ public class ClaimFormMapper {
     @JsonIgnore
     private FlightDelayDetails getFlightDelayDetails(CaseData caseData) {
         return Objects.nonNull(caseData.getFlightDelayDetails()) && caseData.getRespondent1().isCompany()
-            ? FlightDelayDetails.builder().flightNumber(caseData.getFlightDelayDetails().getFlightNumber())
-            .nameOfAirline(caseData.getFlightDelayDetails().getNameOfAirline()).scheduledDate(caseData.getFlightDelayDetails().getScheduledDate())
-            .build()
+            ? new FlightDelayDetails().setFlightNumber(caseData.getFlightDelayDetails().getFlightNumber())
+            .setNameOfAirline(caseData.getFlightDelayDetails().getNameOfAirline()).setScheduledDate(caseData.getFlightDelayDetails().getScheduledDate())
+            
             : null;
     }
 }

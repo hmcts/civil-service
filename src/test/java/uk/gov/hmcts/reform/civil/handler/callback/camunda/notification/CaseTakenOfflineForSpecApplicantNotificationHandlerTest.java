@@ -90,7 +90,7 @@ class CaseTakenOfflineForSpecApplicantNotificationHandlerTest extends BaseCallba
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOfflineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -109,7 +109,7 @@ class CaseTakenOfflineForSpecApplicantNotificationHandlerTest extends BaseCallba
         void shouldGetApplicantSolicitor1ClaimStatementOfTruth_whenNoOrgFound() {
             when(notificationsProperties.getSolicitorCaseTakenOfflineForSpec()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();

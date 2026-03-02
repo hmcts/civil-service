@@ -40,7 +40,7 @@ public class RespondForInformationGeneratorTest {
     @Test
     void shouldGenerateRespondForInformationDocument() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-                .build().toBuilder().generalAppAddlnInfoText("more info").build();
+                .build().copy().generalAppAddlnInfoText("more info").build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), any()))
                 .thenReturn(new DocmosisDocument(RESPOND_FOR_INFORMATION.getDocumentTitle(), bytes));
@@ -58,7 +58,7 @@ public class RespondForInformationGeneratorTest {
     @Test
     void whenRespond_ShouldGetRespondForInformationData() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-                .build().toBuilder().generalAppAddlnInfoText("more info").build();
+                .build().copy().generalAppAddlnInfoText("more info").build();
         respondForInformationGenerator.setRole(DocUploadUtils.APPLICANT);
         var templateData =
                 respondForInformationGenerator.getTemplateData(caseData, "auth");

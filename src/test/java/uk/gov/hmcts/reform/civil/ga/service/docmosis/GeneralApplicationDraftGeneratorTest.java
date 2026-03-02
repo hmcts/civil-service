@@ -201,7 +201,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).toBuilder()
+        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).copy()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .applicationIsCloaked(NO)
             .build();
@@ -230,7 +230,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).toBuilder()
+        GeneralApplicationCaseData caseData = getCase(respondentSols, NO).copy()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .applicationIsCloaked(YES)
             .build();
@@ -304,8 +304,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                          .unavailableTrialDateFrom(LocalDate.now()).build()));
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(vulQuestion1)
                                                    .vulnerabilityQuestion("dummy1")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -318,11 +318,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                        .listItems(List.of(location1))
                                                        .value(location1).build() : null)
                                                    .build())
-                             .gaRespondentDetails("1L").build()));
+                             .setGaRespondentDetails("1L")));
         if (addRespondent == YES) {
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(vulQuestion2)
                                                        .vulnerabilityQuestion("dummy2")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -334,7 +334,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                            .listItems(List.of(location1))
                                                            .value(location1).build() : null)
                                                        .build())
-                                 .gaRespondentDetails("2L").build()));
+                                 .setGaRespondentDetails("2L")));
         }
         return respondentsResponses;
     }
@@ -345,7 +345,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF)
@@ -379,16 +379,16 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                     .build())
             .respondentsResponses(getRespondentResponses1nad2(YES, YES, YES, YES, addRespondent))
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
@@ -396,7 +396,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplication(isConsented, isTobeNotified))
-            .toBuilder()
+            .copy()
             .claimant1PartyName("Test Claimant1 Name")
             .generalAppHearingDate(
                 GAHearingDateGAspec.builder()
@@ -408,7 +408,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     private GeneralApplicationCaseData getSampleGeneralAppCaseDataWithDeadLineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
-            .toBuilder()
+            .copy()
             .claimant1PartyName("Test Claimant1 Name")
             .generalAppHearingDate(
                 GAHearingDateGAspec.builder()
@@ -431,11 +431,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE)
                     .paymentSuccessfulDate(LocalDateTime.now())
                     .build())
@@ -458,8 +458,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
             .build();
     }
@@ -479,11 +479,11 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -506,8 +506,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
             .generalAppSubmittedDateGAspec(LocalDateTime.now())
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .build();
     }
 

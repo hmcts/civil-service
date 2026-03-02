@@ -42,10 +42,9 @@ public class DefendantResponseFullAdmitPayBySetDateClaimantScenarioTest extends 
                 .individualFirstName("James")
                 .individualLastName("John")
                 .build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                .builder()
-                .whenWillThisAmountBePaid(admitPaymentDeadline)
-                .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(admitPaymentDeadline)
+                )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();

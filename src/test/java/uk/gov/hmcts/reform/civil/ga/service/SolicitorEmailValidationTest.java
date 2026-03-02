@@ -227,27 +227,27 @@ public class SolicitorEmailValidationTest {
                                           .email(DUMMY_EMAIL).organisationIdentifier("1").build())
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email(applicantEmail)
-                                                .build())
-            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
-            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail(applicantEmail))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("2")))
             .respondent2SameLegalRepresentative(NO)
-            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation().setOrganisationID("3")))
             .build();
-        var builder = caseData.toBuilder();
+        var builder = caseData.copy();
         if (Objects.nonNull(lipClEmail)) {
-            builder.claimantUserDetails(IdamUserDetails.builder()
-                    .id("123")
-                    .email(lipClEmail)
-                    .build());
+            builder.claimantUserDetails(new IdamUserDetails()
+                    .setId("123")
+                    .setEmail(lipClEmail));
         }
         if (Objects.nonNull(lipDefEmail)) {
-            builder.defendantUserDetails(IdamUserDetails.builder()
-                    .id("1")
-                    .email(lipDefEmail)
-                    .build());
+            builder.defendantUserDetails(new IdamUserDetails()
+                    .setId("1")
+                    .setEmail(lipDefEmail));
         }
         return builder.build();
     }
@@ -276,7 +276,7 @@ public class SolicitorEmailValidationTest {
             .parentClaimantIsApplicant(parentClaimantIsApplicant)
             .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .build();
-        var builder = caseData.toBuilder();
+        var builder = caseData.copy();
         if (isLipApp.equals(YES)) {
             builder.isGaApplicantLip(YES);
         }

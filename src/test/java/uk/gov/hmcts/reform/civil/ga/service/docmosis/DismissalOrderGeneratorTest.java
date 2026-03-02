@@ -74,7 +74,7 @@ class DismissalOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DISMISSAL_ORDER)))
             .thenReturn(new DocmosisDocument(DISMISSAL_ORDER.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build();
 
         dismissalOrderGenerator.generate(caseData, BEARER_TOKEN);
@@ -112,7 +112,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -120,7 +120,7 @@ class DismissalOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -149,7 +149,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
@@ -160,7 +160,7 @@ class DismissalOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -192,29 +192,28 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option2() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                           .dismissalOrderText("Test Dismissal")
-                                                           .reasonForDecisionText("Test Reason")
-                                                           .showReasonForDecision(YesOrNo.YES)
-                                                           .orderWithoutNotice("abcdef")
-                                                           .orderWithoutNoticeDate(LocalDate.now())
-                                                           .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                           .setDismissalOrderText("Test Dismissal")
+                                                           .setReasonForDecisionText("Test Reason")
+                                                           .setShowReasonForDecision(YesOrNo.YES)
+                                                           .setOrderWithoutNotice("abcdef")
+                                                           .setOrderWithoutNoticeDate(LocalDate.now())
+                                                           .setJudicialByCourtsInitiative(
                                                                GAByCourtsInitiativeGAspec.OPTION_2)
-                                                           .makeAnOrder(DISMISS_THE_APPLICATION)
-                                                           .build()).build();
+                                                           .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
             when(docmosisService.populateJudgeReason(any())).thenReturn("Test Reason");
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcdef ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -245,26 +244,25 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_Option3() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                          .dismissalOrderText("Test Dismissal")
-                                                          .showReasonForDecision(YesOrNo.YES)
-                                                          .reasonForDecisionText("Test Reason")
-                                                          .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                          .setDismissalOrderText("Test Dismissal")
+                                                          .setShowReasonForDecision(YesOrNo.YES)
+                                                          .setReasonForDecisionText("Test Reason")
+                                                          .setJudicialByCourtsInitiative(
                                                               GAByCourtsInitiativeGAspec.OPTION_3)
-                                                          .makeAnOrder(DISMISS_THE_APPLICATION)
-                                                          .build()).build();
+                                                          .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.YES);
             when(docmosisService.populateJudgeReason(any())).thenReturn("Test Reason");
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn(StringUtils.EMPTY);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -292,24 +290,23 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldHideText_whileUnchecked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                     .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                    .dismissalOrderText("Test Dismissal")
-                    .showReasonForDecision(YesOrNo.NO)
-                    .reasonForDecisionText("Test Reason")
-                    .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                    .setDismissalOrderText("Test Dismissal")
+                    .setShowReasonForDecision(YesOrNo.NO)
+                    .setReasonForDecisionText("Test Reason")
+                    .setJudicialByCourtsInitiative(
                             GAByCourtsInitiativeGAspec.OPTION_3)
-                    .makeAnOrder(DISMISS_THE_APPLICATION)
-                    .build()).build();
+                    .setMakeAnOrder(DISMISS_THE_APPLICATION)).build();
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
             when(docmosisService.populateJudgeReason(any())).thenReturn("");
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(null, updateData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -327,7 +324,7 @@ class DismissalOrderGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(POST_JUDGE_DISMISSAL_ORDER_LIP)))
                 .thenReturn(new DocmosisDocument(DISMISSAL_ORDER.getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .dismissalOrderApplication()
                 .parentClaimantIsApplicant(YES)
@@ -345,7 +342,7 @@ class DismissalOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetDissmisalOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
@@ -357,7 +354,7 @@ class DismissalOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = dismissalOrderGenerator.getTemplateData(
                 GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(),

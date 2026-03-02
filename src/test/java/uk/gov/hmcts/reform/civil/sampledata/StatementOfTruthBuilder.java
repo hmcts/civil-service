@@ -7,25 +7,25 @@ import static uk.gov.hmcts.reform.civil.sampledata.CaseDataMaxEdgeCasesBuilder.M
 
 public class StatementOfTruthBuilder {
 
-    public static StatementOfTruth.StatementOfTruthBuilder defaults() {
-        return StatementOfTruth.builder()
-            .name("Signer Name")
-            .role("Signer Role");
+    public static StatementOfTruth defaults() {
+        return new StatementOfTruth()
+            .setName("Signer Name")
+            .setRole("Signer Role");
     }
 
-    public static StatementOfTruth.StatementOfTruthBuilder minimal() {
-        return StatementOfTruth.builder()
-            .name("a")
-            .role("b");
+    public static StatementOfTruth minimal() {
+        return new StatementOfTruth()
+            .setName("a")
+            .setRole("b");
     }
 
-    public static StatementOfTruth.StatementOfTruthBuilder maximal() {
-        return StatementOfTruth.builder()
-            .name(repeat("a", MAX_ALLOWED))
-            .role(repeat("b", MAX_ALLOWED));
+    public static StatementOfTruth maximal() {
+        return new StatementOfTruth()
+            .setName(repeat("a", MAX_ALLOWED))
+            .setRole(repeat("b", MAX_ALLOWED));
     }
 
     public StatementOfTruth build() {
-        return defaults().build();
+        return defaults();
     }
 }

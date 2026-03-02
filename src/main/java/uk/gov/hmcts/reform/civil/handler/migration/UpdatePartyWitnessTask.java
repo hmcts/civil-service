@@ -47,11 +47,10 @@ public class UpdatePartyWitnessTask extends MigrationTask<CaseReference> {
             throw new IllegalArgumentException("CaseReference fields must not be null");
         }
 
-        UnaryOperator<PartyFlagStructure> updatePartyFlag = witness -> witness.toBuilder()
-            .firstName(defaultIfNull(witness.getFirstName()))
-            .lastName(defaultIfNull(witness.getLastName()))
-            .partyID(generatePartyIdIfNull(witness.getPartyID()))
-            .build();
+        UnaryOperator<PartyFlagStructure> updatePartyFlag = witness -> witness.copy()
+            .setFirstName(defaultIfNull(witness.getFirstName()))
+            .setLastName(defaultIfNull(witness.getLastName()))
+            .setPartyID(generatePartyIdIfNull(witness.getPartyID()));
 
         UnaryOperator<Witness> updateWitness = witness -> witness.copy()
             .setFirstName(defaultIfNull(witness.getFirstName()))

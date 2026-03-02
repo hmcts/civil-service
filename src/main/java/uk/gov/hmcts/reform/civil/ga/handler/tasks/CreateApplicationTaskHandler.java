@@ -170,7 +170,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
             }
         }
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .claimantGaAppDetails(applications)
             .respondentSolGaAppDetails(respondentSpecficGADetails)
             .respondentSolTwoGaAppDetails(respondentTwoSpecficGADetails)

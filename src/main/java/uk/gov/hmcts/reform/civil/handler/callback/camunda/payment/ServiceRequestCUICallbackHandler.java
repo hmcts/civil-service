@@ -91,9 +91,8 @@ public class ServiceRequestCUICallbackHandler extends CallbackHandler {
     }
 
     private SRPbaDetails getClaimIssuePbaDetails(String serviceReference, Fee claimFee) {
-        return SRPbaDetails.builder()
-            .serviceReqReference(serviceReference)
-            .fee(claimFee)
-            .build();
+        return new SRPbaDetails()
+            .setServiceReqReference(serviceReference)
+            .setFee(claimFee);
     }
 }

@@ -2,15 +2,17 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.ClaimantRepresentationType;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.DefendantRepresentationType;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class ClaimantDefendantRepresentation {
 
     private ClaimantRepresentationType claimantRepresentation;

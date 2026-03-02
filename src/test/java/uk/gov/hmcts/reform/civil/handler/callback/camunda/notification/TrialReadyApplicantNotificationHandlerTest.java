@@ -93,7 +93,7 @@ class TrialReadyApplicantNotificationHandlerTest {
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -119,7 +119,7 @@ class TrialReadyApplicantNotificationHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
                 .applicant1(PartyBuilder.builder().company().partyEmail(null).build())
-                .claimantUserDetails(new IdamUserDetails().toBuilder().email("email@email.com").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("email@email.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .build();

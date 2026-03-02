@@ -382,9 +382,7 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .setDocumentBinaryUrl("http://dm-store/documents/123/binary")
             .setDocumentFileName("defence-response.pdf");
 
-        ResponseDocument responseDocument = ResponseDocument.builder()
-            .file(document)
-            .build();
+        ResponseDocument responseDocument = new ResponseDocument(document);
 
         CaseData caseData = CaseData.builder()
             .applicant1DefenceResponseDocumentSpec(responseDocument)

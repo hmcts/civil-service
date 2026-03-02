@@ -2834,10 +2834,10 @@ class DirectionsQuestionnaireGeneratorTest {
         @Test
         void checkStatementOfTruthTextForDefendent() {
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                .courtTypeId("10").courtLocationCode("121")
-                .epimmsId("000000").build());
+            locations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+                .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+                .setCourtTypeId("10").setCourtLocationCode("121")
+                .setEpimmsId("000000"));
             when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceWithHearingSupport()
