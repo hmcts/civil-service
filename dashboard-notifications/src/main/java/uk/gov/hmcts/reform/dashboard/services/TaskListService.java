@@ -25,6 +25,8 @@ public class TaskListService {
 
     private final TaskListRepository taskListRepository;
     private final TaskItemTemplateRepository taskItemTemplateRepository;
+    private static final String DOCUMENT_TEMPLATE_NAME = "Hearing.Document.View";
+    private static final List<String> ROLES = List.of("CLAIMANT", "DEFENDANT");
 
     @Autowired
     public TaskListService(TaskListRepository taskListRepository, TaskItemTemplateRepository taskItemTemplateRepository) {
@@ -82,28 +84,42 @@ public class TaskListService {
     }
 
     private void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role, String excludedCategory, String excludedTemplate) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role: {} excludedCategory: {} excludedTemplate: {}",
-                 caseIdentifier, role, excludedCategory, excludedTemplate);
+        log.info(
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier:{} role: {} excludedCategory: {} excludedTemplate: {}",
+            caseIdentifier,
+            role,
+            excludedCategory,
+            excludedTemplate
+        );
         List<TaskListEntity> tasks = new ArrayList<>();
         if (Objects.nonNull(excludedCategory)) {
-            List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(excludedCategory, role);
+            List<TaskItemTemplateEntity> categories = taskItemTemplateRepository.findByCategoryEnAndRole(
+                excludedCategory,
+                role
+            );
             if (Objects.nonNull(categories)) {
                 List<Long> catIds = categories.stream().map(TaskItemTemplateEntity::getId).toList();
                 tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
-                    caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                                  TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()), catIds
+                    caseIdentifier, role, List.of(
+                        TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                        TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+                    ), catIds
                 );
             }
         } else if (Objects.nonNull(excludedTemplate)) {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplateTemplateNameNot(
-                caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
-                ), excludedTemplate);
+                caseIdentifier, role, List.of(
+                    TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+                ), excludedTemplate
+            );
         } else {
             tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
-                caseIdentifier, role, List.of(TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
-                                              TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
-                ));
+                caseIdentifier, role, List.of(
+                    TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                    TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+                )
+            );
         }
         tasks.forEach(t -> {
             TaskListEntity task = t.toBuilder()
@@ -122,21 +138,54 @@ public class TaskListService {
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRole(String caseIdentifier, String role) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier: {} role: {}", caseIdentifier, role);
+        log.info(
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRole caseIdentifier: {} role: {}",
+            caseIdentifier,
+            role
+        );
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, null);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(String caseIdentifier, String role, String excludedCategory) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} role: {} excludedCategory: {}",
-                 caseIdentifier, role, excludedCategory);
+        log.info(
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory caseIdentifier:{} role: {} excludedCategory: {}",
+            caseIdentifier, role, excludedCategory
+        );
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, excludedCategory, null);
     }
 
     @Transactional
     public void makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate(String caseIdentifier, String role, String excludedTemplate) {
-        log.info("makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate caseIdentifier:{} role: {} excludedTemplate: {}",
-                 caseIdentifier, role, excludedTemplate);
+        log.info(
+            "makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingTemplate caseIdentifier:{} role: {} excludedTemplate: {}",
+            caseIdentifier, role, excludedTemplate
+        );
         makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseIdentifier, role, null, excludedTemplate);
+    }
+
+    @Transactional
+    public void makeViewDocumentTaskAvailable(String caseIdentifier) {
+        ROLES.forEach(role -> makeViewDocumentTaskAvailable(caseIdentifier, role));
+    }
+
+    private void makeViewDocumentTaskAvailable(String caseIdentifier, String role) {
+        List<TaskListEntity> tasks = taskListRepository.findByReferenceAndTaskItemTemplateRoleAndTaskItemTemplateTemplateName(
+            caseIdentifier,
+            role,
+            DOCUMENT_TEMPLATE_NAME
+        );
+        tasks.stream().filter(task -> task.getCurrentStatus() == TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()).toList()
+            .forEach(t -> {
+                TaskListEntity task = t.toBuilder()
+                    .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                    .nextStatus(TaskStatus.AVAILABLE.getPlaceValue())
+                    .hintTextCy("")
+                    .hintTextEn("")
+                    .taskNameEn(StringUtility.activateLink(t.getTaskNameEn()))
+                    .taskNameCy(StringUtility.activateLink(t.getTaskNameCy()))
+                    .build();
+                taskListRepository.save(task);
+            });
     }
 }
