@@ -97,7 +97,7 @@ class FreeFormOrderGeneratorTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                 YES).build()
-            .toBuilder()
+            .copy()
             .freeFormRecitalText("RecitalText")
             .freeFormOrderedText("OrderedText")
             .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)
@@ -125,7 +125,7 @@ class FreeFormOrderGeneratorTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                 YES).build()
-            .toBuilder()
+            .copy()
             .freeFormRecitalText("RecitalText")
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build())
             .freeFormOrderedText("OrderedText")
@@ -147,7 +147,7 @@ class FreeFormOrderGeneratorTest {
         FreeFormOrderValues values = new FreeFormOrderValues()
             .setOnInitiativeSelectionTextArea("test")
             .setOnInitiativeSelectionDate(LocalDate.now());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().orderOnCourtsList(
                 ORDER_ON_COURT_INITIATIVE)
             .orderOnCourtInitiative(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
@@ -159,7 +159,7 @@ class FreeFormOrderGeneratorTest {
         FreeFormOrderValues values = new FreeFormOrderValues()
             .setWithoutNoticeSelectionTextArea("test")
             .setWithoutNoticeSelectionDate(LocalDate.now());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().orderOnCourtsList(
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().orderOnCourtsList(
                 ORDER_WITHOUT_NOTICE)
             .orderWithoutNotice(values).build();
         String orderString = generator.getFreeFormOrderValue(caseData);
@@ -188,7 +188,7 @@ class FreeFormOrderGeneratorTest {
     @Test
     void whenJudgeMakeDecision_ShouldGetFreeFormOrderData() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .finalOrderFreeForm().isMultiParty(YES).build().toBuilder()
+            .finalOrderFreeForm().isMultiParty(YES).build().copy()
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
             .thenReturn(
@@ -222,7 +222,7 @@ class FreeFormOrderGeneratorTest {
     @Test
     void whenJudgeMakeDecision_ShouldGetFreeFormOrderData_1V1() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .finalOrderFreeForm().build().toBuilder()
+            .finalOrderFreeForm().build().copy()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
@@ -263,7 +263,7 @@ class FreeFormOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetFreeFormOrderData_1V1() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-                .finalOrderFreeForm().build().toBuilder()
+                .finalOrderFreeForm().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(NO)
@@ -300,7 +300,7 @@ class FreeFormOrderGeneratorTest {
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(
                     YES).build()
-                .toBuilder()
+                .copy()
                 .freeFormRecitalText("RecitalText")
                 .freeFormOrderedText("OrderedText")
                 .orderOnCourtsList(OrderOnCourtsList.NOT_APPLICABLE)

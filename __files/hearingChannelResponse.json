@@ -1,0 +1,52 @@
+{
+  "list_of_values": [
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "INTER",
+      "lov_order": 0,
+      "value_cy": "Yn Bersonol",
+      "value_en": "In Person"
+    },
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "NA",
+      "lov_order": 0,
+      "value_cy": "Ddim yn Bresennol",
+      "value_en": "Not in Attendance"
+    },
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "TEL",
+      "lov_order": 0,
+      "value_cy": "Ffôn",
+      "value_en": "Telephone"
+    },
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "VID",
+      "lov_order": 0,
+      "value_cy": "Fideo",
+      "value_en": "Video"
+    },
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "ONPPRS",
+      "lov_order": 0,
+      "value_cy": "Ar y Papurau",
+      "value_en": "On the Papers"
+    },
+    {
+      "active_flag": "Y",
+      "category_key": "HearingChannel",
+      "key": "WIREMOCK",
+      "lov_order": 999,
+      "value_cy": "WireMock",
+      "value_en": "WireMock"
+    }
+  ]
+}

@@ -152,7 +152,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .parentClaimantIsApplicant(YES)
                 .writtenRepresentationSequentialApplication().build()
-                .toBuilder().build();
+                .copy().build();
 
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
@@ -204,7 +204,7 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationSequentialData() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder().build();
+                .copy().build();
 
             when(listGeneratorService.applicationType(caseData)).thenReturn("Extend time");
 
@@ -248,16 +248,16 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
                 .thenReturn(new LocationRefData().setEpimmsId("2").setVenueName("Manchester"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication()
                 .build()
-                .toBuilder()
+                .copy()
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
                 .build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now()).build())
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now()))
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -295,13 +295,13 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationSequentialData_Option3_1v1() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder().isMultiParty(YesOrNo.YES)
+                .copy().isMultiParty(YesOrNo.YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_3)
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -340,14 +340,14 @@ class WrittenRepresentationSequentialOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetWrittenRepresentationSequentialData_Option3_1V1() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder()
+                .copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .isMultiParty(YesOrNo.NO).build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_3)
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec()).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 

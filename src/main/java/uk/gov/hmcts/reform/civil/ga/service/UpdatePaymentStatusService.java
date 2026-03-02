@@ -84,8 +84,9 @@ public class UpdatePaymentStatusService {
         log.info("Updating CaseData with new payment status for caseReference: {}", caseData.getCcdCaseReference());
 
         GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
+            ? new GeneralApplicationPbaDetails()
+            : pbaDetails.copy();
 
         PaymentDetails paymentDetails = new PaymentDetails()
             .setStatus(PaymentStatus.valueOf(cardPaymentStatusResponse.getStatus().toUpperCase()))
@@ -94,14 +95,14 @@ public class UpdatePaymentStatusService {
             .setErrorMessage(cardPaymentStatusResponse.getErrorDescription())
             ;
         if (caseData.isAdditionalFeeRequested()) {
-            pbaDetails = pbaDetailsBuilder.additionalPaymentDetails(paymentDetails).build();
+            updatedPbaDetails.setAdditionalPaymentDetails(paymentDetails);
             log.info("Applied additional payment details for caseReference: {}", caseData.getCcdCaseReference());
         } else {
-            pbaDetails = pbaDetailsBuilder.paymentDetails(paymentDetails).build();
+            updatedPbaDetails.setPaymentDetails(paymentDetails);
             log.info("Applied standard payment details for caseReference: {}", caseData.getCcdCaseReference());
         }
-        return caseData.toBuilder()
-            .generalAppPBADetails(pbaDetails)
+        return caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
             .build();
     }
 }

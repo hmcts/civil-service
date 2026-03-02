@@ -85,10 +85,10 @@ class GaFeesPaymentServiceTest {
 
     @BeforeEach
     void before() {
-        caseData = GeneralApplicationCaseData.builder().ccdCaseReference(2801090368574910L)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().serviceReqReference("2023-1701090705688")
-                                       .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
-                                       .build())
+        caseData = new GeneralApplicationCaseData().ccdCaseReference(2801090368574910L)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setServiceReqReference("2023-1701090705688")
+                                       .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                                       )
             .parentCaseReference("1701090368574910")
             .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -116,8 +116,11 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldCreateGovPayPaymentUrlForServiceRequestAdditionalPayment() {
-        caseData = caseData.toBuilder().generalAppPBADetails(caseData.getGeneralAppPBADetails().toBuilder()
-                                                                 .additionalPaymentServiceRef("2023-1701090705600").build()).build();
+        GeneralApplicationPbaDetails updatedPbaDetails = caseData.getGeneralAppPBADetails().copy()
+            .setAdditionalPaymentServiceRef("2023-1701090705600");
+        caseData = caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
+            .build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
         CardPaymentServiceRequestResponse response = buildServiceRequestResponse();
 
@@ -138,10 +141,10 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingPbaDetails() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
-                        .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                        )
             .build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
@@ -159,10 +162,10 @@ class GaFeesPaymentServiceTest {
     @Test
     @SneakyThrows
     void shouldNotCreateGovPayPaymentUrlForMissingServiceRequest() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(1701090368574910L)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
-                                      .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1701090368574910L)
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee().setCalculatedAmountInPence(new BigDecimal("23200")))
+                                      )
             .build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);

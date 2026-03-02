@@ -51,7 +51,7 @@ class GaValidateFeeCallbackHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnNoErrors() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().gaPbaDetails(
-                GeneralApplicationPbaDetails.builder().build()).build();
+                new GeneralApplicationPbaDetails()).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

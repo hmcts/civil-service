@@ -102,7 +102,7 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().toBuilder().isMultiParty(
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().copy().isMultiParty(
                 YES)
             .build();
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
@@ -133,7 +133,7 @@ class ConsentOrderGeneratorTest {
 
     @Test
     void whenCaseWorkerMakeDecision_ShouldGetConsentOrderData_1v1() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().consentOrderApplication().build().copy()
             .defendant2PartyName(null)
             .claimant2PartyName(null)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
