@@ -62,9 +62,10 @@ public class RateLimiterAspect {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                 response.getWriter().write("Rate limit exceeded. Please try again later.");
                 response.getWriter().flush();
+                log.info("response status : {} ", response.getStatus());
+                log.info("response : {} ", response.toString());
             }
-            log.info("response status : {} ", response.getStatus());
-            log.info("response : {} ", response.toString());
+
             return null;
         }
     }
