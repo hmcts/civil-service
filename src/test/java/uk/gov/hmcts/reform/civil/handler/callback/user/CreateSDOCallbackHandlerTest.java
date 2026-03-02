@@ -430,7 +430,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void shouldPopulateLocationListsWhenTransferredOnlineHearingLocationShouldBeNewCaseManagementLocaion() {
+        void shouldPopulateLocationListsWhenTransferredOnlineHearingLocationShouldBeNewCaseManagementLocation() {
             Category category = new Category();
             category.setCategoryKey("HearingChannel");
             category.setKey("INTER");
@@ -441,12 +441,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             categorySearchResult.setCategories(List.of(category));
             String preSelectedCourt = "214320";
             List<LocationRefData> locations = List.of(
-                LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                    .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-                LocationRefData.builder().epimmsId(preSelectedCourt).courtLocationCode(preSelectedCourt)
-                    .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-                LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                    .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
             );
             when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
             when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
