@@ -95,21 +95,21 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
             caseData = caseData.toBuilder()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test2")
-                                 .individualLastName("Test2 Lastname")
-                                 .individualFirstName("Test2 Firstname").build())
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test2")
+                                 .setIndividualLastName("Test2 Lastname")
+                                 .setIndividualFirstName("Test2 Firstname"))
                 .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
                     new uk.gov.hmcts.reform.ccd.model.Organisation()
                         .setOrganisationID(ORG_NAME_RESPONDENT1))).build();
@@ -134,21 +134,21 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
             caseData = caseData.toBuilder()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.YES)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
-                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test2")
-                                 .individualLastName("Test2 Lastname")
-                                 .individualFirstName("Test2 Firstname").build())
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
+                .respondent2(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test2")
+                                 .setIndividualLastName("Test2 Lastname")
+                                 .setIndividualFirstName("Test2 Firstname"))
                 .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(
                     new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME_RESPONDENT2))).build();
             when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME_RESPONDENT2)));
@@ -176,13 +176,13 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
             caseData = caseData.toBuilder()
-                .applicant1(Party.builder()
-                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
-                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
-                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .respondent1Represented(null)
                 .legacyCaseReference("000DC001")
                 .specRespondent1Represented(YesOrNo.NO)

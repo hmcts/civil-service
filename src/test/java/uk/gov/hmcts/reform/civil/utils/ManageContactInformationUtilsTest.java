@@ -152,10 +152,9 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
-            .applicant1(Party.builder()
-                            .organisationName("Test Inc")
-                            .type(ORGANISATION)
-                            .build())
+            .applicant1(new Party()
+                            .setOrganisationName("Test Inc")
+                            .setType(ORGANISATION))
             .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -170,10 +169,9 @@ class ManageContactInformationUtilsTest {
                 .addApplicant1LitigationFriend()
                 .atStateApplicantRespondToDefenceAndProceed()
                 .applicant1Represented(NO)
-                .applicant1(Party.builder()
-                        .organisationName("Test Inc")
-                        .type(ORGANISATION)
-                        .build())
+                .applicant1(new Party()
+                        .setOrganisationName("Test Inc")
+                        .setType(ORGANISATION))
                 .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -188,10 +186,9 @@ class ManageContactInformationUtilsTest {
             .addApplicant1LitigationFriend()
             .applicant1Represented(YES)
             .atStateApplicantRespondToDefenceAndProceed()
-            .applicant1(Party.builder()
-                            .companyName("Test Inc")
-                            .type(COMPANY)
-                            .build())
+            .applicant1(new Party()
+                            .setCompanyName("Test Inc")
+                            .setType(COMPANY))
             .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -206,10 +203,9 @@ class ManageContactInformationUtilsTest {
                 .addApplicant1LitigationFriend()
                 .applicant1Represented(NO)
                 .atStateApplicantRespondToDefenceAndProceed()
-                .applicant1(Party.builder()
-                        .companyName("Test Inc")
-                        .type(COMPANY)
-                        .build())
+                .applicant1(new Party()
+                        .setCompanyName("Test Inc")
+                        .setType(COMPANY))
                 .build();
 
         List<DynamicListElement> options = new ArrayList<>();
@@ -378,10 +374,10 @@ class ManageContactInformationUtilsTest {
         Expert expert2 = new Expert().setFirstName("Second").setLastName("expert").setFieldOfExpertise("field")
             .setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
         Experts experts = new Experts().setDetails(wrapElements(expert1, expert2));
-        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-            .partyId("id").build();
-        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
-            .fieldOfExpertise("field").phoneNumber("1").emailAddress("email").partyId("id2").build();
+        UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+            .setPartyId("id");
+        UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("expert")
+            .setFieldOfExpertise("field").setPhoneNumber("1").setEmailAddress("email").setPartyId("id2");
 
         assertThat(mapExpertsToUpdatePartyDetailsForm(experts)).isEqualTo(wrapElements(party, party2));
     }
@@ -397,10 +393,10 @@ class ManageContactInformationUtilsTest {
         Witness witness2 = new Witness().setFirstName("Second").setLastName("expert").setReasonForWitness("reason")
             .setPhoneNumber("1").setEmailAddress("email").setPartyID("id2");
         Witnesses witnesses = new Witnesses().setDetails(wrapElements(witness1, witness2));
-        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("First").lastName("Name")
-            .partyId("id").build();
-        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
-            .phoneNumber("1").emailAddress("email").partyId("id2").build();
+        UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("First").setLastName("Name")
+            .setPartyId("id");
+        UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("expert")
+            .setPhoneNumber("1").setEmailAddress("email").setPartyId("id2");
 
         assertThat(mapWitnessesToUpdatePartyDetailsForm(witnesses)).isEqualTo(wrapElements(party, party2));
     }
@@ -412,10 +408,10 @@ class ManageContactInformationUtilsTest {
 
     @Nested
     class MapToDQExperts {
-        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("Lewis").lastName("John")
-            .partyId("id").build();
-        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("expert")
-            .fieldOfExpertise("field").phoneNumber("1").emailAddress("expertemail").partyId("id2").build();
+        UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("Lewis").setLastName("John")
+            .setPartyId("id");
+        UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("expert")
+            .setFieldOfExpertise("field").setPhoneNumber("1").setEmailAddress("expertemail").setPartyId("id2");
 
         LocalDate date = LocalDate.of(2020, 3, 20);
 
@@ -468,10 +464,10 @@ class ManageContactInformationUtilsTest {
 
     @Nested
     class MapToDQWitnesses {
-        UpdatePartyDetailsForm party = UpdatePartyDetailsForm.builder().firstName("Lewis").lastName("John")
-            .partyId("id").build();
-        UpdatePartyDetailsForm party2 = UpdatePartyDetailsForm.builder().firstName("Second").lastName("witness")
-            .phoneNumber("1").emailAddress("witnessemail").partyId("id2").build();
+        UpdatePartyDetailsForm party = new UpdatePartyDetailsForm().setFirstName("Lewis").setLastName("John")
+            .setPartyId("id");
+        UpdatePartyDetailsForm party2 = new UpdatePartyDetailsForm().setFirstName("Second").setLastName("witness")
+            .setPhoneNumber("1").setEmailAddress("witnessemail").setPartyId("id2");
 
         LocalDate date = LocalDate.of(2020, 3, 20);
 
@@ -536,7 +532,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_ClaimantOneAdminIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(INDIVIDUAL).build()).build();
+                .applicant1(new Party().setType(INDIVIDUAL)).build();
 
             String result = appendUserAndType(CLAIMANT_ONE_ID, caseData, true);
 
@@ -546,7 +542,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_ClaimantTwoAdminSoleTrader() {
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant2(Party.builder().type(SOLE_TRADER).build()).build();
+                .applicant2(new Party().setType(SOLE_TRADER)).build();
 
             String result = appendUserAndType(CLAIMANT_TWO_ID, caseData, true);
 
@@ -556,7 +552,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantOneAdminOrganisation() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(Party.builder().type(ORGANISATION).build()).build();
+                .respondent1(new Party().setType(ORGANISATION)).build();
 
             String result = appendUserAndType(DEFENDANT_ONE_ID, caseData, true);
 
@@ -566,7 +562,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantTwoAdminCompany() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(Party.builder().type(COMPANY).build()).build();
+                .respondent2(new Party().setType(COMPANY)).build();
 
             String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, true);
 
@@ -576,7 +572,7 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldHaveCorrectID_DefendantTwoLegalRepIndividual() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(Party.builder().type(INDIVIDUAL).build()).build();
+                .respondent2(new Party().setType(INDIVIDUAL)).build();
 
             String result = appendUserAndType(DEFENDANT_TWO_ID, caseData, false);
 
@@ -612,12 +608,11 @@ class ManageContactInformationUtilsTest {
             List<Element<UpdatePartyDetailsForm>> actual = mapPartyFieldsToPartyFormData(wrapElements(partyData));
 
             assertThat(unwrapElements(actual)).isEqualTo(List.of(
-                UpdatePartyDetailsForm.builder()
-                    .firstName(partyData.getFirstName())
-                    .lastName(partyData.getLastName())
-                    .phoneNumber(partyData.getPhone())
-                    .emailAddress(partyData.getEmail())
-                    .build()));
+                new UpdatePartyDetailsForm()
+                    .setFirstName(partyData.getFirstName())
+                    .setLastName(partyData.getLastName())
+                    .setPhoneNumber(partyData.getPhone())
+                    .setEmailAddress(partyData.getEmail())));
         }
 
         @Test
@@ -633,12 +628,11 @@ class ManageContactInformationUtilsTest {
         void shouldReturnExpectedPartyDetailsList_forGivenData_whenExistingListIsDefined() {
             PartyFlagStructure existing = createParty("claimant-1-lr-individual");
 
-            UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()
-                .firstName("NewClaimantName")
-                .lastName(existing.getLastName())
-                .phoneNumber(existing.getPhone())
-                .emailAddress(existing.getEmail())
-                .build();
+            UpdatePartyDetailsForm updated = new UpdatePartyDetailsForm()
+                .setFirstName("NewClaimantName")
+                .setLastName(existing.getLastName())
+                .setPhoneNumber(existing.getPhone())
+                .setEmailAddress(existing.getEmail());
 
             UUID uuid = UUID.randomUUID();
             List<Element<PartyFlagStructure>> existingList = List.of(Element.<PartyFlagStructure>builder().id(uuid).value(existing).build());
@@ -653,12 +647,11 @@ class ManageContactInformationUtilsTest {
         @Test
         void shouldReturnExpectedPartyDetailsList_forGivenData_whenExistingListIsEmpty() {
 
-            UpdatePartyDetailsForm updated = UpdatePartyDetailsForm.builder()
-                .firstName("NewClaimantName")
-                .lastName("LastName")
-                .phoneNumber("09876565432")
-                .emailAddress("some-email@example.com")
-                .build();
+            UpdatePartyDetailsForm updated = new UpdatePartyDetailsForm()
+                .setFirstName("NewClaimantName")
+                .setLastName("LastName")
+                .setPhoneNumber("09876565432")
+                .setEmailAddress("some-email@example.com");
 
             UUID uuid = UUID.randomUUID();
 
@@ -700,19 +693,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -747,19 +737,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -794,19 +781,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -841,19 +825,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -892,19 +873,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -939,19 +917,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 
@@ -986,19 +961,16 @@ class ManageContactInformationUtilsTest {
 
             assertThat(actual).isEqualTo(
                 wrapElements(
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails1.getFirstName())
-                        .lastName(partyDetails1.getLastName())
-                        .emailAddress(partyDetails1.getEmail())
-                        .phoneNumber(partyDetails1.getPhone())
-                        .build(),
-                    UpdatePartyDetailsForm.builder()
-                        .firstName(partyDetails2.getFirstName())
-                        .lastName(partyDetails2.getLastName())
-                        .emailAddress(partyDetails2.getEmail())
-                        .phoneNumber(partyDetails2.getPhone())
-                        .build()
-                )
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails1.getFirstName())
+                        .setLastName(partyDetails1.getLastName())
+                        .setEmailAddress(partyDetails1.getEmail())
+                        .setPhoneNumber(partyDetails1.getPhone()),
+                    new UpdatePartyDetailsForm()
+                        .setFirstName(partyDetails2.getFirstName())
+                        .setLastName(partyDetails2.getLastName())
+                        .setEmailAddress(partyDetails2.getEmail())
+                        .setPhoneNumber(partyDetails2.getPhone()))
             );
         }
 

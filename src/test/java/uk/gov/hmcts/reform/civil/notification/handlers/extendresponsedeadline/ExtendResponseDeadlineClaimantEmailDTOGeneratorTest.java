@@ -73,8 +73,8 @@ public class ExtendResponseDeadlineClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party claimant = Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build();
-        Party defendant = Party.builder().companyName("Defendant Name").type(Party.Type.COMPANY).build();
+        Party claimant = new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY);
+        Party defendant = new Party().setCompanyName("Defendant Name").setType(Party.Type.COMPANY);
         LocalDateTime responseDeadline = LocalDateTime.of(2025, 6, 20, 0, 0);
         CaseData caseData = CaseData.builder()
             .applicant1(claimant)

@@ -111,7 +111,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
             .setBusinessProcess(
                 new BusinessProcess()
                     .setStatus(BusinessProcessStatus.READY)
-                    .setProcessInstanceId("process-id"));
+                    .setProcessInstanceId("process-id")).build();
 
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
 
@@ -150,7 +150,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
                 new ContactDetailsUpdatedEvent()
                     .setDescription("Best description")
                     .setSummary("Even better summary")
-                    .setSubmittedByCaseworker(YES));
+                    .setSubmittedByCaseworker(YES)).build();
 
         caseData.setActiveJudgment(
             new JudgmentDetails()
@@ -199,7 +199,7 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
                 new ContactDetailsUpdatedEvent()
                     .setDescription("Best description")
                     .setSummary("Even better summary")
-                    .setSubmittedByCaseworker(YES));
+                    .setSubmittedByCaseworker(YES)).build();
 
         caseData.setActiveJudgment(
             new JudgmentDetails()

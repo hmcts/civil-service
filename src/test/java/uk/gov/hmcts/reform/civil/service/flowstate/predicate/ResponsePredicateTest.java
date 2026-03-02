@@ -32,7 +32,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_notificationAcknowledged_when_one_v_two_two_legal_rep_and_respondent2_acknowledged() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         assertTrue(ResponsePredicate.notificationAcknowledged.test(caseData));
@@ -40,7 +40,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_notificationAcknowledged_when_one_v_two_one_legal_rep_and_respondent2_acknowledged() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
@@ -62,7 +62,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_true_for_respondentTimeExtension_when_one_v_two_two_legal_rep_and_respondent2_has_time_extension() {
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(LocalDateTime.now());
         assertTrue(ResponsePredicate.respondentTimeExtension.test(caseData));
     }
@@ -82,7 +82,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_true_for_allResponsesReceived_when_both_respondents_responded_in_two_legal_rep() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2ResponseDate()).thenReturn(LocalDateTime.now());
         assertTrue(ResponsePredicate.allResponsesReceived.test(caseData));
     }
@@ -96,14 +96,14 @@ class ResponsePredicateTest {
     @Test
     void should_return_false_for_allResponsesReceived_when_only_one_respondent_responded_in_two_legal_rep() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
         assertFalse(ResponsePredicate.allResponsesReceived.test(caseData));
     }
 
     @Test
     void should_return_true_for_awaitingResponsesFullDefenceReceived_when_one_v_two_two_legal_rep_and_r1_full_defence_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceived.test(caseData));
@@ -111,7 +111,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullDefenceReceived_when_one_v_two_two_legal_rep_and_r2_full_defence_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceived.test(caseData));
@@ -124,7 +124,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullDefenceReceived_when_both_respondents_have_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_ADMISSION);
         assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceived.test(caseData));
@@ -132,7 +132,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullDefenceReceived_when_neither_is_full_defence() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceived.test(caseData));
@@ -140,7 +140,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullAdmitReceived_when_one_v_two_two_legal_rep_and_r1_full_admit_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceived.test(caseData));
@@ -148,7 +148,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullAdmitReceived_when_one_v_two_two_legal_rep_and_r2_full_admit_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_ADMISSION);
         assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceived.test(caseData));
@@ -161,7 +161,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullAdmitReceived_when_both_respondents_have_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceived.test(caseData));
@@ -169,7 +169,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullAdmitReceived_when_neither_is_full_admit() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceived.test(caseData));
@@ -177,7 +177,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceived_when_one_v_two_two_legal_rep_and_r1_non_full_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
@@ -185,7 +185,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceived_when_one_v_two_two_legal_rep_and_r2_non_full_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
@@ -198,7 +198,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceived_when_both_respondents_have_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
@@ -206,7 +206,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceived_when_r1_full_defence_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
@@ -214,7 +214,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceived_when_neither_has_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceived.test(caseData));
@@ -243,7 +243,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_true_for_is_when_one_v_two_one_legal_rep_and_r1_full_defence_and_same_response() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.YES);
@@ -253,7 +253,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_true_for_is_when_one_v_two_one_legal_rep_and_r1_full_defence_and_r2_full_defence() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.NO);
@@ -264,7 +264,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_false_for_is_when_one_v_two_one_legal_rep_and_r1_full_defence_and_r2_not_full_defence() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.NO);
@@ -275,7 +275,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_true_for_is_when_one_v_two_two_legal_rep_and_both_full_defence() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         assertTrue(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
@@ -284,7 +284,7 @@ class ResponsePredicateTest {
     @Test
     void should_return_false_for_is_when_one_v_two_two_legal_rep_and_r2_not_full_defence() {
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseType()).thenReturn(RespondentResponseType.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseType()).thenReturn(RespondentResponseType.PART_ADMISSION);
         assertFalse(ResponsePredicate.isType(RespondentResponseType.FULL_DEFENCE).test(caseData));
@@ -328,7 +328,7 @@ class ResponsePredicateTest {
     void should_return_true_for_isSpec_when_one_v_two_one_legal_rep_and_spec_claim_and_r1_full_defence_and_same_response() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.YES);
@@ -339,7 +339,7 @@ class ResponsePredicateTest {
     void should_return_true_for_isSpec_when_one_v_two_one_legal_rep_and_spec_claim_and_r1_full_defence_and_r2_full_defence() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.NO);
@@ -351,7 +351,7 @@ class ResponsePredicateTest {
     void should_return_false_for_isSpec_when_one_v_two_one_legal_rep_and_spec_claim_and_r1_full_defence_and_r2_not_full_defence() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondentResponseIsSame()).thenReturn(YesOrNo.NO);
@@ -363,7 +363,7 @@ class ResponsePredicateTest {
     void should_return_true_for_isSpec_when_one_v_two_two_legal_rep_and_spec_claim_and_both_full_defence() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         assertTrue(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE).test(caseData));
@@ -373,7 +373,7 @@ class ResponsePredicateTest {
     void should_return_false_for_isSpec_when_one_v_two_two_legal_rep_and_spec_claim_and_r1_not_full_defence() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         assertFalse(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE).test(caseData));
     }
@@ -382,7 +382,7 @@ class ResponsePredicateTest {
     void should_return_false_for_isSpec_when_one_v_two_two_legal_rep_and_spec_claim_and_r2_not_full_defence() {
         when(caseData.getCaseAccessCategory()).thenReturn(CaseCategory.SPEC_CLAIM);
         when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         assertFalse(ResponsePredicate.isType(RespondentResponseTypeSpec.FULL_DEFENCE).test(caseData));
@@ -390,7 +390,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullDefenceReceivedSpec_when_r1_full_defence_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
@@ -398,7 +398,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullDefenceReceivedSpec_when_r2_full_defence_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         assertTrue(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
@@ -411,7 +411,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullDefenceReceivedSpec_when_both_have_responses() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
         assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
@@ -419,7 +419,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullDefenceReceivedSpec_when_neither_is_full_defence() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesFullDefenceReceivedSpec.test(caseData));
@@ -427,7 +427,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullAdmitReceivedSpec_when_r1_full_admission_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
@@ -435,7 +435,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesFullAdmitReceivedSpec_when_r2_full_admission_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
         assertTrue(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
@@ -448,7 +448,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullAdmitReceivedSpec_when_both_have_responses() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
@@ -456,7 +456,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesFullAdmitReceivedSpec_when_neither_is_full_admission() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesFullAdmitReceivedSpec.test(caseData));
@@ -464,7 +464,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r1_non_full_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
@@ -472,7 +472,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_true_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r2_non_full_and_r1_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         assertTrue(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
@@ -485,7 +485,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_both_have_responses() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
@@ -493,7 +493,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_r1_full_defence_and_r2_no_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));
@@ -501,7 +501,7 @@ class ResponsePredicateTest {
 
     @Test
     void should_return_false_for_awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec_when_neither_has_response() {
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(null);
         when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(null);
         assertFalse(ResponsePredicate.awaitingResponsesNonFullDefenceOrFullAdmitReceivedSpec.test(caseData));

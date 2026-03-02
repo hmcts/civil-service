@@ -621,27 +621,25 @@ class SealedClaimLipResponseFormGeneratorTest {
     }
 
     private Party company(String suffix) {
-        return Party.builder()
-            .type(Party.Type.COMPANY)
-            .companyName("company " + suffix)
-            .partyPhone("phone " + suffix)
-            .partyEmail("email " + suffix)
-            .partyName("company " + suffix)
-            .primaryAddress(address(suffix))
-            .build();
+        return new Party()
+            .setType(Party.Type.COMPANY)
+            .setCompanyName("company " + suffix)
+            .setPartyPhone("phone " + suffix)
+            .setPartyEmail("email " + suffix)
+            .setPartyName("company " + suffix)
+            .setPrimaryAddress(address(suffix));
     }
 
     private Party individual(String suffix) {
-        return Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Name " + suffix)
-            .individualLastName("Surname " + suffix)
-            .individualDateOfBirth(LocalDate.of(1956, 10, 2))
-            .partyPhone("phone " + suffix)
-            .partyName("Name Surname" + suffix)
-            .partyEmail("email " + suffix)
-            .primaryAddress(address(suffix))
-            .build();
+        return new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Name " + suffix)
+            .setIndividualLastName("Surname " + suffix)
+            .setIndividualDateOfBirth(LocalDate.of(1956, 10, 2))
+            .setPartyPhone("phone " + suffix)
+            .setPartyName("Name Surname" + suffix)
+            .setPartyEmail("email " + suffix)
+            .setPrimaryAddress(address(suffix));
     }
 
     private Address address(String suffix) {
@@ -721,10 +719,10 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                 .toDate(LocalDate.now().plusDays(5))
-                                                 .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                 .setToDate(LocalDate.now().plusDays(5))
+                                                 .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -760,10 +758,10 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(company("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
@@ -867,15 +865,15 @@ class SealedClaimLipResponseFormGeneratorTest {
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         List<Element<UnavailableDate>> def1UnavailabilityDates = new ArrayList<>();
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
-        def1UnavailabilityDates.add(element(UnavailableDate.builder()
-                                                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                .toDate(LocalDate.now().plusDays(5))
-                                                .date(LocalDate.now())
-                                                .fromDate(LocalDate.now()).build()));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
+        def1UnavailabilityDates.add(element(new UnavailableDate()
+                                                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                .setToDate(LocalDate.now().plusDays(5))
+                                                .setDate(LocalDate.now())
+                                                .setFromDate(LocalDate.now())));
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
             .respondent1(individual("B"))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)

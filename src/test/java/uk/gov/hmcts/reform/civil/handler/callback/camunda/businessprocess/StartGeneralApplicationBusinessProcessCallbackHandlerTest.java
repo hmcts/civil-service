@@ -144,7 +144,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
 
     @Test
     void shouldReturnStartedStatusForSingleGABusinessProcess() {
-        CaseData caseData = getBusinessProcessReadyTestCaseData(CaseDataBuilder.builder().build());
+        CaseData caseData = getBusinessProcessReadyTestCaseData(CaseDataBuilder.builder().build()).build();
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
@@ -176,7 +176,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
 
     @Test
     void shouldReturnStartedStatusForMultipleGA() {
-        CaseData caseData = getBusinessProcessReadyForMultipleGA(CaseDataBuilder.builder().build());
+        CaseData caseData = getBusinessProcessReadyForMultipleGA(CaseDataBuilder.builder().build()).build();
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
@@ -197,7 +197,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
 
     @Test
     void shouldNotThrowErrorForMultipleValidGA() {
-        CaseData caseData = getBusinessProcessForMultipleGA(CaseDataBuilder.builder().build());
+        CaseData caseData = getBusinessProcessForMultipleGA(CaseDataBuilder.builder().build()).build();
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);
@@ -210,7 +210,7 @@ class StartGeneralApplicationBusinessProcessCallbackHandlerTest extends BaseCall
 
     @Test
     void shouldNotReturnErrors_whenGABusinessProcessIsEmpty() {
-        CaseData caseData = getTestCaseDataWithNullBusinessProcessGA(CaseDataBuilder.builder().build());
+        CaseData caseData = getTestCaseDataWithNullBusinessProcessGA(CaseDataBuilder.builder().build()).build();
         Map<String, Object> dataMap = objectMapper.convertValue(caseData, new TypeReference<>() {
         });
         CallbackParams params = callbackParamsOf(dataMap, CallbackType.ABOUT_TO_SUBMIT);

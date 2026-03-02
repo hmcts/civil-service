@@ -75,10 +75,10 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setType(Party.Type.INDIVIDUAL)).build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
             TEMPLATE_ID);
@@ -105,10 +105,10 @@ class NotifyApplicant1GenericTemplateHandlerTest {
             .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("solicitor@claimant.net"))
             .applicant1Represented(YesOrNo.YES)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setType(Party.Type.INDIVIDUAL)).build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn(
             TEMPLATE_ID);
@@ -132,10 +132,10 @@ class NotifyApplicant1GenericTemplateHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).build()).build();
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setType(Party.Type.INDIVIDUAL)).build();
         caseData = caseData.toBuilder().claimantBilingualLanguagePreference("BOTH").build();
 
         when(notificationsProperties.getNotifyLipUpdateTemplateBilingual()).thenReturn(

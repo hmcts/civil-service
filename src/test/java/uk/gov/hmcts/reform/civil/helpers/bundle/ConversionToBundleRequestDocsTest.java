@@ -38,10 +38,9 @@ class ConversionToBundleRequestDocsTest {
     void shouldConvertOtherWitnessEvidenceToBundleRequestDocs() {
         String displayName = "displayName";
         String documentType = "documentType";
-        Party party = Party.builder()
-            .partyName("PartyName")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setPartyName("PartyName")
+            .setType(Party.Type.INDIVIDUAL);
 
         Document witnessDocument = new Document()
             .setDocumentUrl("http://example.com/document.pdf")

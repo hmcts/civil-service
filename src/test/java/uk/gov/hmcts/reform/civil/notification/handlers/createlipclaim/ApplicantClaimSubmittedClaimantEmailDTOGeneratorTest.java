@@ -115,8 +115,8 @@ class ApplicantClaimSubmittedClaimantEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
 
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().companyName("Claimant Name").type(Party.Type.COMPANY).build())
-                .respondent1(Party.builder().companyName("Defendant Name").type(Party.Type.COMPANY).build())
+                .applicant1(new Party().setCompanyName("Claimant Name").setType(Party.Type.COMPANY))
+                .respondent1(new Party().setCompanyName("Defendant Name").setType(Party.Type.COMPANY))
                 .build();
 
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn("http://frontend.url");

@@ -64,7 +64,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
                                         true,
                                         true, true,
                                         getOriginalStatusOfGeneralApplication_test1()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(
@@ -93,7 +93,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
                                         false,
                                         false, false,
                                         Map.of()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -111,7 +111,7 @@ class ApplicationOfflineUpdateClaimCallbackHandlerTest extends BaseCallbackHandl
                                         true,
                                         true, true,
                                         getOriginalStatusOfGeneralApplication_test1()
-            );
+            ).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
         when(helperService.updateApplicationDetailsInClaim(any(), any(), any()))

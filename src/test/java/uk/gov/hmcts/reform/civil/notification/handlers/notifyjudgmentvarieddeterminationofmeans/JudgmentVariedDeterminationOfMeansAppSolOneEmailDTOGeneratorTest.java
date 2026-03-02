@@ -63,14 +63,12 @@ class JudgmentVariedDeterminationOfMeansAppSolOneEmailDTOGeneratorTest {
                 .applicant1OrganisationPolicy(new OrganisationPolicy())
                 .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("Legal Org Name"))
                 .applicant1Represented(YesOrNo.YES)
-                .applicant1(Party.builder()
-                        .companyName("Applicant 1")
-                        .type(Party.Type.COMPANY)
-                        .build())
-                .respondent1(Party.builder()
-                        .companyName("Respondent 1")
-                        .type(Party.Type.COMPANY)
-                        .build())
+                .applicant1(new Party()
+                        .setCompanyName("Applicant 1")
+                        .setType(Party.Type.COMPANY))
+                .respondent1(new Party()
+                        .setCompanyName("Respondent 1")
+                        .setType(Party.Type.COMPANY))
                 .build();
 
         Map<String, String> properties = new HashMap<>();

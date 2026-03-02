@@ -32,7 +32,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvoked() {
-        CaseData caseData = CaseData.builder().applicant1(Party.builder().build()).applicant1Represented(YesOrNo.NO)
+        CaseData caseData = CaseData.builder().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.BOTH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedBilingualTemplate()).thenReturn(expectedTemplateId);
@@ -44,7 +44,7 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvokedAndBilingual() {
-        CaseData caseData = CaseData.builder().applicant1(Party.builder().build()).applicant1Represented(YesOrNo.NO)
+        CaseData caseData = CaseData.builder().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getClaimantLipClaimUpdatedTemplate()).thenReturn(expectedTemplateId);
@@ -65,12 +65,11 @@ class ClaimantRespConfirmProceedClaimantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         String legacyCaseReference = "000LR001";
 
-        Party applicant = Party.builder()
-            .individualTitle("Mr")
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party applicant = new Party()
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe")
+            .setType(Party.Type.INDIVIDUAL);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference(legacyCaseReference)

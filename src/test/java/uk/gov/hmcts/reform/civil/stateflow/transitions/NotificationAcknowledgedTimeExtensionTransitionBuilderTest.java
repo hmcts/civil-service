@@ -145,7 +145,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
     void shouldReturnTrue_whenTakenOfflineByStaffAfterNotificationAcknowledgedExtension_1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateTakenOfflineByStaffAfterNotificationAcknowledgeExtension()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
             .respondent2TimeExtensionDate(LocalDateTime.now().minusDays(1))
@@ -157,7 +157,7 @@ public class NotificationAcknowledgedTimeExtensionTransitionBuilderTest {
     void shouldReturnFalse_whenNotificationAcknowledgedExtension_1v2() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledgedRespondent1TimeExtension()
-            .respondent2(Party.builder().partyName("Respondent 2").build())
+            .respondent2(new Party().setPartyName("Respondent 2"))
             .respondent2SameLegalRepresentative(YES)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().minusDays(2))
             .build();

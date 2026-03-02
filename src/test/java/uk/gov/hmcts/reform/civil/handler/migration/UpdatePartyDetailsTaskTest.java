@@ -37,26 +37,22 @@ class UpdatePartyDetailsTaskTest {
     @MethodSource("provideScenarios")
     void migrateCaseData_shouldUpdateCorrectRoleAndParty(TestScenario scenario) {
         Party existing = switch (scenario.partyType) {
-            case INDIVIDUAL -> Party.builder()
-                .type(Party.Type.INDIVIDUAL)
-                .individualFirstName("OldFirst")
-                .individualLastName("OldLast")
-                .partyEmail("old@example.com")
-                .individualDateOfBirth(LocalDate.of(1990, 1, 1))
-                .build();
-            case SOLE_TRADER -> Party.builder()
-                .type(Party.Type.SOLE_TRADER)
-                .soleTraderFirstName("OldFirst")
-                .soleTraderLastName("OldLast")
-                .build();
-            case COMPANY -> Party.builder()
-                .type(Party.Type.COMPANY)
-                .companyName("OldCompany")
-                .build();
-            case ORGANISATION -> Party.builder()
-                .type(Party.Type.ORGANISATION)
-                .organisationName("OldOrg")
-                .build();
+            case INDIVIDUAL -> new Party()
+                .setType(Party.Type.INDIVIDUAL)
+                .setIndividualFirstName("OldFirst")
+                .setIndividualLastName("OldLast")
+                .setPartyEmail("old@example.com")
+                .setIndividualDateOfBirth(LocalDate.of(1990, 1, 1));
+            case SOLE_TRADER -> new Party()
+                .setType(Party.Type.SOLE_TRADER)
+                .setSoleTraderFirstName("OldFirst")
+                .setSoleTraderLastName("OldLast");
+            case COMPANY -> new Party()
+                .setType(Party.Type.COMPANY)
+                .setCompanyName("OldCompany");
+            case ORGANISATION -> new Party()
+                .setType(Party.Type.ORGANISATION)
+                .setOrganisationName("OldOrg");
         };
 
         CaseData.CaseDataBuilder<?, ?> caseDataBuilder = CaseData.builder();
@@ -71,21 +67,17 @@ class UpdatePartyDetailsTaskTest {
         }
 
         Party updates = switch (scenario.partyType) {
-            case INDIVIDUAL -> Party.builder()
-                .individualFirstName("NewFirst")
-                .individualLastName("NewLast")
-                .partyEmail("new@example.com")
-                .build();
-            case SOLE_TRADER -> Party.builder()
-                .soleTraderFirstName("NewFirst")
-                .soleTraderLastName("NewLast")
-                .build();
-            case COMPANY -> Party.builder()
-                .companyName("NewCompany")
-                .build();
-            case ORGANISATION -> Party.builder()
-                .organisationName("NewOrg")
-                .build();
+            case INDIVIDUAL -> new Party()
+                .setIndividualFirstName("NewFirst")
+                .setIndividualLastName("NewLast")
+                .setPartyEmail("new@example.com");
+            case SOLE_TRADER -> new Party()
+                .setSoleTraderFirstName("NewFirst")
+                .setSoleTraderLastName("NewLast");
+            case COMPANY -> new Party()
+                .setCompanyName("NewCompany");
+            case ORGANISATION -> new Party()
+                .setOrganisationName("NewOrg");
         };
 
         PartyDetailsCaseReference ref = new PartyDetailsCaseReference();
@@ -145,7 +137,7 @@ class UpdatePartyDetailsTaskTest {
         CaseData caseData = CaseData.builder().build();
         PartyDetailsCaseReference ref = new PartyDetailsCaseReference();
         ref.setCaseReference("123");
-        ref.setParty(Party.builder().build());
+        ref.setParty(new Party());
 
         RuntimeException ex = assertThrows(
             RuntimeException.class,
@@ -156,9 +148,8 @@ class UpdatePartyDetailsTaskTest {
 
     @Test
     void migrateCaseData_shouldReturnOriginalPartyIfUpdatesAreNull() {
-        Party existing = Party.builder()
-            .individualFirstName("John")
-            .build();
+        Party existing = new Party()
+            .setIndividualFirstName("John");
 
         CaseData caseData = CaseData.builder()
             .applicant1(existing)

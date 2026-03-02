@@ -41,7 +41,7 @@ class JudgmentOnlineMapperTest {
     @Test
     void moveToHistoricJudgment() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
 
         //Record Judgment 1
         JudgmentDetails activeJudgment = recordJudgmentMapper.addUpdateActiveJudgment(caseData);

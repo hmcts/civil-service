@@ -296,12 +296,10 @@ public class CaseFlagsToHearingValueMapperTest {
             .setFlagCode("RA0042");
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().flags(new Flags()
-                                                  .setDetails(wrapElements(flagDetail1)))
-                            .build())
-            .respondent1(Party.builder().flags(new Flags()
-                                                   .setDetails(wrapElements(flagDetail2, flagDetail3)))
-                             .build())
+            .applicant1(new Party().setFlags(new Flags()
+                                                  .setDetails(wrapElements(flagDetail1))))
+            .respondent1(new Party().setFlags(new Flags()
+                                                   .setDetails(wrapElements(flagDetail2, flagDetail3))))
                 .build();
 
         assertTrue(hasCaseInterpreterRequiredFlag(caseData));

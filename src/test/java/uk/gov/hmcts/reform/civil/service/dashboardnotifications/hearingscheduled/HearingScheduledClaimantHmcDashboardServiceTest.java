@@ -108,7 +108,7 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
             .applicant1Represented(YesOrNo.NO)
             .build()
             .setBusinessProcess(businessProcess)
-            .setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.SMALL_CLAIM).build();
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(null);
         caseData.setHearingFeePaymentDetails(paymentDetails);
@@ -231,7 +231,7 @@ class HearingScheduledClaimantHmcDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM).build();
         caseData.setTrialReadyApplicant(null);
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);

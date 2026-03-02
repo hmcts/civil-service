@@ -89,41 +89,63 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
             return original;
         }
 
-        Party.PartyBuilder builder = original.toBuilder();
+        Party builder = new Party()
+            .setPartyID(original.getPartyID())
+            .setType(original.getType())
+            .setIndividualTitle(original.getIndividualTitle())
+            .setIndividualFirstName(original.getIndividualFirstName())
+            .setIndividualLastName(original.getIndividualLastName())
+            .setIndividualDateOfBirth(original.getIndividualDateOfBirth())
+            .setCompanyName(original.getCompanyName())
+            .setOrganisationName(original.getOrganisationName())
+            .setSoleTraderTitle(original.getSoleTraderTitle())
+            .setSoleTraderFirstName(original.getSoleTraderFirstName())
+            .setSoleTraderLastName(original.getSoleTraderLastName())
+            .setSoleTraderTradingAs(original.getSoleTraderTradingAs())
+            .setSoleTraderDateOfBirth(original.getSoleTraderDateOfBirth())
+            .setPrimaryAddress(original.getPrimaryAddress())
+            .setPartyName(original.getPartyName())
+            .setBulkClaimPartyName(original.getBulkClaimPartyName())
+            .setPartyTypeDisplayValue(original.getPartyTypeDisplayValue())
+            .setPartyEmail(original.getPartyEmail())
+            .setPartyPhone(original.getPartyPhone())
+            .setLegalRepHeading(original.getLegalRepHeading())
+            .setUnavailableDates(original.getUnavailableDates())
+            .setFlags(original.getFlags());
 
         // Common fields
-        builder.partyID(updateIfExists(updates.getPartyID(), original.getPartyID()));
-        builder.primaryAddress(updateIfExists(updates.getPrimaryAddress(), original.getPrimaryAddress()));
-        builder.partyEmail(updateIfExists(updates.getPartyEmail(), original.getPartyEmail()));
-        builder.partyPhone(updateIfExists(updates.getPartyPhone(), original.getPartyPhone()));
-        builder.legalRepHeading(updateIfExists(updates.getLegalRepHeading(), original.getLegalRepHeading()));
-        builder.unavailableDates(updateIfExists(updates.getUnavailableDates(), original.getUnavailableDates()));
-        builder.flags(updateIfExists(updates.getFlags(), original.getFlags()));
+        builder.setPartyID(updateIfExists(updates.getPartyID(), original.getPartyID()));
+        builder.setPrimaryAddress(updateIfExists(updates.getPrimaryAddress(), original.getPrimaryAddress()));
+        builder.setPartyEmail(updateIfExists(updates.getPartyEmail(), original.getPartyEmail()));
+        builder.setPartyPhone(updateIfExists(updates.getPartyPhone(), original.getPartyPhone()));
+        builder.setLegalRepHeading(updateIfExists(updates.getLegalRepHeading(), original.getLegalRepHeading()));
+        builder.setUnavailableDates(updateIfExists(updates.getUnavailableDates(), original.getUnavailableDates()));
+        builder.setFlags(updateIfExists(updates.getFlags(), original.getFlags()));
 
         if (original.isIndividual()) {
-            builder.individualTitle(updateIfExists(updates.getIndividualTitle(), original.getIndividualTitle()));
-            builder.individualFirstName(updateIfExists(updates.getIndividualFirstName(), original.getIndividualFirstName()));
-            builder.individualLastName(updateIfExists(updates.getIndividualLastName(), original.getIndividualLastName()));
-            builder.individualDateOfBirth(updateIfExists(updates.getIndividualDateOfBirth(), original.getIndividualDateOfBirth()));
+            builder.setIndividualTitle(updateIfExists(updates.getIndividualTitle(), original.getIndividualTitle()));
+            builder.setIndividualFirstName(updateIfExists(updates.getIndividualFirstName(), original.getIndividualFirstName()));
+            builder.setIndividualLastName(updateIfExists(updates.getIndividualLastName(), original.getIndividualLastName()));
+            builder.setIndividualDateOfBirth(updateIfExists(updates.getIndividualDateOfBirth(), original.getIndividualDateOfBirth()));
         }
 
         if (original.isSoleTrader()) {
-            builder.soleTraderTitle(updateIfExists(updates.getSoleTraderTitle(), original.getSoleTraderTitle()));
-            builder.soleTraderFirstName(updateIfExists(updates.getSoleTraderFirstName(), original.getSoleTraderFirstName()));
-            builder.soleTraderLastName(updateIfExists(updates.getSoleTraderLastName(), original.getSoleTraderLastName()));
-            builder.soleTraderTradingAs(updateIfExists(updates.getSoleTraderTradingAs(), original.getSoleTraderTradingAs()));
-            builder.soleTraderDateOfBirth(updateIfExists(updates.getSoleTraderDateOfBirth(), original.getSoleTraderDateOfBirth()));
+            builder.setSoleTraderTitle(updateIfExists(updates.getSoleTraderTitle(), original.getSoleTraderTitle()));
+            builder.setSoleTraderFirstName(updateIfExists(updates.getSoleTraderFirstName(), original.getSoleTraderFirstName()));
+            builder.setSoleTraderLastName(updateIfExists(updates.getSoleTraderLastName(), original.getSoleTraderLastName()));
+            builder.setSoleTraderTradingAs(updateIfExists(updates.getSoleTraderTradingAs(), original.getSoleTraderTradingAs()));
+            builder.setSoleTraderDateOfBirth(updateIfExists(updates.getSoleTraderDateOfBirth(), original.getSoleTraderDateOfBirth()));
         }
 
         if (original.isCompany()) {
-            builder.companyName(updateIfExists(updates.getCompanyName(), original.getCompanyName()));
+            builder.setCompanyName(updateIfExists(updates.getCompanyName(), original.getCompanyName()));
         }
 
         if (original.isOrganisation()) {
-            builder.organisationName(updateIfExists(updates.getOrganisationName(), original.getOrganisationName()));
+            builder.setOrganisationName(updateIfExists(updates.getOrganisationName(), original.getOrganisationName()));
         }
 
-        return builder.build();
+        return builder;
     };
 
     private static <T> T updateIfExists(T newValue, T oldValue) {

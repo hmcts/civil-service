@@ -162,16 +162,13 @@ class Respondent1DQTest extends DQTest {
             String lengthHours = "6";
             YesOrNo hasUnavailableDates = YES;
             List<Element<UnavailableDate>> lrDates = Stream.of(
-                UnavailableDate.builder()
-                    .date(LocalDate.of(2020, 5, 2))
-                    .who("who 1")
-                    .build(),
-                UnavailableDate.builder()
-                    .fromDate(LocalDate.of(2020, 5, 2))
-                    .toDate(LocalDate.of(2020, 6, 2))
-                    .who("who 2")
-                    .build()
-            ).map(ElementUtils::element).toList();
+                new UnavailableDate()
+                    .setDate(LocalDate.of(2020, 5, 2))
+                    .setWho("who 1"),
+                new UnavailableDate()
+                    .setFromDate(LocalDate.of(2020, 5, 2))
+                    .setToDate(LocalDate.of(2020, 6, 2))
+                    .setWho("who 2")).map(ElementUtils::element).toList();
 
             Hearing hearing = buildRespondent1Dq().copy()
                 .setRespondent1DQHearing(null)
@@ -201,16 +198,13 @@ class Respondent1DQTest extends DQTest {
         void shouldReturnSmallClaimHearing_whenHearingNull() {
             YesOrNo hasUnavailableDates = YES;
             List<Element<UnavailableDate>> lrDates = Stream.of(
-                UnavailableDate.builder()
-                    .date(LocalDate.of(2020, 5, 2))
-                    .who("who 1")
-                    .build(),
-                UnavailableDate.builder()
-                    .fromDate(LocalDate.of(2020, 5, 2))
-                    .toDate(LocalDate.of(2020, 6, 2))
-                    .who("who 2")
-                    .build()
-            ).map(ElementUtils::element).toList();
+                new UnavailableDate()
+                    .setDate(LocalDate.of(2020, 5, 2))
+                    .setWho("who 1"),
+                new UnavailableDate()
+                    .setFromDate(LocalDate.of(2020, 5, 2))
+                    .setToDate(LocalDate.of(2020, 6, 2))
+                    .setWho("who 2")).map(ElementUtils::element).toList();
 
             Hearing hearing = buildRespondent1Dq().copy()
                 .setRespondent1DQHearing(null)

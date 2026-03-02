@@ -259,7 +259,7 @@ class TakenOfflinePredicateTest {
     void should_return_true_for_afterClaimNotifiedAckExtension_when_one_v_two_one_legal_rep_and_both_ack_and_extensions() {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(LocalDateTime.now());
@@ -270,7 +270,7 @@ class TakenOfflinePredicateTest {
     void should_return_false_for_afterClaimNotifiedAckExtension_when_two_legal_rep_and_missing_r2_extension() {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
@@ -290,7 +290,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -310,7 +310,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(LocalDateTime.now());
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -331,7 +331,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now());
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
@@ -473,7 +473,7 @@ class TakenOfflinePredicateTest {
         when(caseData.getRespondent1ResponseDate()).thenReturn(null);
         when(caseData.getRespondent1TimeExtensionDate()).thenReturn(null);
         when(caseData.getClaimDismissedDate()).thenReturn(null);
-        when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+        when(caseData.getRespondent2()).thenReturn(new Party());
         when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
         when(caseData.getRespondent2ResponseDate()).thenReturn(null);
         when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);

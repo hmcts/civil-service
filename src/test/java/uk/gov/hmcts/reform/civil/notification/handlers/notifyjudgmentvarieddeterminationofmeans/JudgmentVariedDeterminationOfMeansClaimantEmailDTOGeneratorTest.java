@@ -45,7 +45,7 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     void shouldReturnCorrectAddress() {
         CaseData caseData = CaseData.builder()
                 .applicant1Represented(YesOrNo.NO)
-                .applicant1(Party.builder().partyEmail(APPLICANT_LIP_EMAIL).build())
+                .applicant1(new Party().setPartyEmail(APPLICANT_LIP_EMAIL))
                 .build();
         assertThat(generator.getEmailAddress(caseData)).isEqualTo(APPLICANT_LIP_EMAIL);
     }
@@ -70,8 +70,8 @@ class JudgmentVariedDeterminationOfMeansClaimantEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().companyName("Applicant").partyEmail(APPLICANT_LIP_EMAIL).type(Party.Type.COMPANY).build())
-                .respondent1(Party.builder().companyName("Respondent").partyEmail("respondent@example.com").type(Party.Type.COMPANY).build())
+                .applicant1(new Party().setCompanyName("Applicant").setPartyEmail(APPLICANT_LIP_EMAIL).setType(Party.Type.COMPANY))
+                .respondent1(new Party().setCompanyName("Respondent").setPartyEmail("respondent@example.com").setType(Party.Type.COMPANY))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference(LEGACY_REF)
                 .build();

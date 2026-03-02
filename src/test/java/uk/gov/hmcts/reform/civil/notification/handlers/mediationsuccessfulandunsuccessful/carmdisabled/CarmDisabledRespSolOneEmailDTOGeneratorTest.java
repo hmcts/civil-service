@@ -43,12 +43,11 @@ class CarmDisabledRespSolOneEmailDTOGeneratorTest {
     @BeforeEach
     void setUp() {
         caseData = CaseData.builder()
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualFirstName("Alice")
-                            .individualLastName("Smith")
-                            .individualTitle("Mrs")
-                            .build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualFirstName("Alice")
+                            .setIndividualLastName("Smith")
+                            .setIndividualTitle("Mrs"))
             .build();
     }
 

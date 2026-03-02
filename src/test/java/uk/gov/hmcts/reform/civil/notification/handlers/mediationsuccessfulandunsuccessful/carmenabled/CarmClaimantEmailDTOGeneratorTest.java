@@ -43,12 +43,12 @@ class CarmClaimantEmailDTOGeneratorTest {
     void setUp() {
         caseData = CaseData.builder()
             .ccdCaseReference(Long.valueOf(CASE_REFERENCE))
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr")
-                            .individualFirstName("John")
-                            .individualLastName("Doe")
-                            .partyName(APPLICANT_NAME).build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualTitle("Mr")
+                            .setIndividualFirstName("John")
+                            .setIndividualLastName("Doe")
+                            .setPartyName(APPLICANT_NAME))
             .build();
     }
 

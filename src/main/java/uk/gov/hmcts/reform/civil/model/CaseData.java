@@ -1646,4 +1646,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
         return this.getApplicant1ResponseDate() != null
             && this.getCcdState() == CaseState.AWAITING_APPLICANT_INTENTION;
     }
+
+    public CaseData build() {
+        return this;
+    }
 }

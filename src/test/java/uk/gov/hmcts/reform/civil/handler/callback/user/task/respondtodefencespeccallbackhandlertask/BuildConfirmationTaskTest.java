@@ -100,7 +100,7 @@ class BuildConfirmationTaskTest {
             .buildJudmentOnlineCaseDataWithPaymentByInstalment()
             .setAllocatedTrack(MULTI_CLAIM)
             .setApplicant1ProceedWithClaim(YesOrNo.NO)
-            .setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
+            .setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE).build();
 
         SubmittedCallbackResponse response = buildConfirmationTask.execute(callbackParams(caseData), featureToggleService);
 

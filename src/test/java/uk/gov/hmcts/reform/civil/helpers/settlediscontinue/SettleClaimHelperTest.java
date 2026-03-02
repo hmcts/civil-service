@@ -52,7 +52,7 @@ public class SettleClaimHelperTest {
     void shouldReturn_error_when_claim_is_1v2_LiPvLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
             .applicant1Represented(YesOrNo.NO)
             .build();
         List<String> errors = new ArrayList<>();
@@ -122,7 +122,7 @@ public class SettleClaimHelperTest {
     void shouldNotReturn_error_when_claim_is_1v2_LRvLRsameLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndSameRepresentative()
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);
@@ -134,7 +134,7 @@ public class SettleClaimHelperTest {
     void shouldNotReturn_error_when_claim_is_1v2_LRvLRdiffLR() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimSubmittedTwoRespondentRepresentatives()
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder().build())
+            .respondent2(PartyBuilder.builder().individual().build())
             .build();
         List<String> errors = new ArrayList<>();
         SettleClaimHelper.checkState(caseData, errors);

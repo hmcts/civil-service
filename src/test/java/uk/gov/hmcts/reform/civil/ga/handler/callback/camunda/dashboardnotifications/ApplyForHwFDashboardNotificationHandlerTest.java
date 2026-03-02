@@ -72,7 +72,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
         @Test
         void shouldRecordApplicantScenario_ApplyForHwF_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())
@@ -105,7 +105,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
         @Test
         void shouldRecordApplicantScenario_ApplyForHwFAdditionalApplicationFee_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())

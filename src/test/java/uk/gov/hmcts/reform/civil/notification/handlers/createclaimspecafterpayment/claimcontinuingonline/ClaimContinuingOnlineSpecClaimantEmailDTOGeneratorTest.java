@@ -79,8 +79,8 @@ public class ClaimContinuingOnlineSpecClaimantEmailDTOGeneratorTest {
         LocalDateTime deadline = LocalDateTime.of(2022, 1, 15, 0, 0);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
-                .respondent1(Party.builder().companyName(RESP_NAME).type(Party.Type.COMPANY).build())
-                .applicant1(Party.builder().companyName(APP_NAME).type(Party.Type.COMPANY).build())
+                .respondent1(new Party().setCompanyName(RESP_NAME).setType(Party.Type.COMPANY))
+                .applicant1(new Party().setCompanyName(APP_NAME).setType(Party.Type.COMPANY))
                 .issueDate(issueDate)
                 .respondent1ResponseDeadline(deadline)
                 .legacyCaseReference(LEGACY_CASE_REFERENCE)

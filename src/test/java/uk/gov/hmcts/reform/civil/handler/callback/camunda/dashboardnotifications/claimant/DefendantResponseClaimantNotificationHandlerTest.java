@@ -357,7 +357,7 @@ class DefendantResponseClaimantNotificationHandlerTest extends BaseCallbackHandl
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(Long.valueOf(caseId));
             caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+            caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL));
             caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec());
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN);
             caseData.setTotalClaimAmount(new BigDecimal(1000));

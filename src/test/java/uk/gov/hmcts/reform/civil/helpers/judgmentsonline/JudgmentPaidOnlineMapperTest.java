@@ -46,7 +46,7 @@ public class JudgmentPaidOnlineMapperTest {
 
     @Test
     void testIfActiveJudgmentIsSatisfied() {
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //PAID IN FULL
@@ -72,7 +72,7 @@ public class JudgmentPaidOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsHistoricAfterCancelled() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         JudgmentPaidInFull paid2 = new JudgmentPaidInFull();
@@ -89,7 +89,7 @@ public class JudgmentPaidOnlineMapperTest {
     @Test
     void testIfDefaultActiveJudgmentIsHistoricAfterCancelled() {
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
 
         JudgmentPaidInFull paid3 = new JudgmentPaidInFull();

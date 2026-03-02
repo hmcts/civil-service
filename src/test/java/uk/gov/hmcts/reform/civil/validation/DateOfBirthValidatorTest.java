@@ -32,7 +32,7 @@ class DateOfBirthValidatorTest {
 
     @Test
     void shouldReturnError_whenDateOfBirthIsInTheFuture() {
-        Party party = Party.builder().individualDateOfBirth(LocalDate.now().plusDays(1)).build();
+        Party party = new Party().setIndividualDateOfBirth(LocalDate.now().plusDays(1));
 
         var errors = dateOfBirthValidator.validate(party);
 
@@ -41,7 +41,7 @@ class DateOfBirthValidatorTest {
 
     @Test
     void shouldReturnNoError_whenDateOfBirthIsInThePast() {
-        Party party = Party.builder().individualDateOfBirth(LocalDate.now().minusYears(19)).build();
+        Party party = new Party().setIndividualDateOfBirth(LocalDate.now().minusYears(19));
 
         var errors = dateOfBirthValidator.validate(party);
 
@@ -50,7 +50,7 @@ class DateOfBirthValidatorTest {
 
     @Test
     void shouldReturnNoError_whenDateOfBirthIsNotProvided() {
-        Party party = Party.builder().build();
+        Party party = new Party();
 
         var errors = dateOfBirthValidator.validate(party);
 

@@ -51,14 +51,14 @@ public class DocUploadNotifyHandlerTest extends GeneralApplicationBaseCallbackHa
 
     @Test
     public void shouldReturnCorrectEvent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         assertThat(handler.handledEvents()).contains(GA_EVIDENCE_UPLOAD_CHECK);
     }
 
     @Test
     public void shouldNotifyAll1v2WithNotice() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
         verify(notificationService, times(1)).notifyApplicantEvidenceUpload(
@@ -93,7 +93,7 @@ public class DocUploadNotifyHandlerTest extends GeneralApplicationBaseCallbackHa
                 .notifyRespondentEvidenceUpload(any());
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-                .withNoticeCaseData();
+                .withNoticeCaseData().build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         handler.handle(params);
         List<ILoggingEvent> logsList = listAppender.list;

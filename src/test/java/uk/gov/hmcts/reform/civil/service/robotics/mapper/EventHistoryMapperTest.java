@@ -10569,7 +10569,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldGenerateRPAFeedfor_SetAside() {
             CaseData caseData =
-                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
@@ -10619,7 +10619,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldGenerateRPAFeedfor_SetAsideDefence() {
             CaseData caseData =
-                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
@@ -10669,7 +10669,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldGenerateRPAFeedfor_SetAside_Error() {
             CaseData caseData =
-                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+                    CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideCreatedDate(LocalDateTime.of(2022, 11, 11, 10, 10));
             caseData.setActiveJudgment(new JudgmentDetails().setState(JudgmentState.SET_ASIDE));
@@ -10716,7 +10716,7 @@ class EventHistoryMapperTest {
         @Test
         public void shouldGenerateRPAfeedfor_SetAside_1v2() {
             CaseData caseData =
-                    CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
+                    CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
@@ -11770,7 +11770,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData =
                         CaseDataBuilder.builder()
-                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
                 caseData.setCertOfSC(certOfSC);
                 caseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
                 caseData.setJoMarkedPaidInFullIssueDate(markPaidInFullIssueDate);
@@ -11814,7 +11814,7 @@ class EventHistoryMapperTest {
             public void shouldGenerateRPA_Cancelled_MarkPaidInFull_NoCoscApplied() {
                 CaseData caseData =
                         CaseDataBuilder.builder()
-                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
                 caseData.setJoMarkedPaidInFullIssueDate(markPaidInFullIssueDate);
                 caseData.setJoCoscRpaStatus(CANCELLED);
                 caseData.setJoFullyPaymentMadeDate(markPaidInFullDate);
@@ -11863,7 +11863,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData =
                         CaseDataBuilder.builder()
-                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
                 caseData.setCertOfSC(certOfSC);
                 caseData.setJoDefendantMarkedPaidInFullIssueDate(joDefendantMarkedPaidInFullIssueDate);
                 caseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
@@ -11919,7 +11919,7 @@ class EventHistoryMapperTest {
 
                 CaseData caseData =
                         CaseDataBuilder.builder()
-                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+                                .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
                 caseData.setCertOfSC(certOfSC);
                 caseData.setSystemGeneratedCaseDocuments(wrapElements(caseDocument));
                 caseData.setJoMarkedPaidInFullIssueDate(markPaidInFullIssueDate);

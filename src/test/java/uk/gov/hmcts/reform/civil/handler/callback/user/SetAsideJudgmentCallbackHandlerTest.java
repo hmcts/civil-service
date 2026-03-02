@@ -79,7 +79,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
@@ -110,7 +110,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateDefenceReceivedDate() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
@@ -141,7 +141,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideJudgmentErrorText() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
             caseData.setJoSetAsideJudgmentErrorText("Some text");
 
@@ -173,7 +173,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateOrderType() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             LocalDateTime nextDeadline = respondent1ResponseDeadline.atTime(16, 0);
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setActiveJudgment(new JudgmentDetails());
@@ -200,7 +200,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void testSetAsideForDefaultJudgment() {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
-            CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+            CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.of(2022, 12, 12));
@@ -230,7 +230,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldPopulateSetAsideData_WithApplicationDate() {
             //Given
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER);
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 11, 12));
@@ -264,7 +264,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateSetAsideDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.now().plusDays(5));
             caseData.setJoSetAsideApplicationDate(LocalDate.now());
@@ -278,7 +278,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateDefenceReceivedState() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_DEFENCE);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2022, 12, 12));
             caseData.setJoSetAsideDefenceReceivedDate(LocalDate.now().plusDays(5));
@@ -292,7 +292,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateSetAsideApplicationDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoSetAsideOrderType(JudgmentSetAsideOrderType.ORDER_AFTER_APPLICATION);
             caseData.setJoSetAsideOrderDate(LocalDate.of(2024, 11, 12));
             caseData.setJoSetAsideApplicationDate(LocalDate.of(2024, 11, 23));
@@ -308,7 +308,7 @@ class SetAsideJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
         @Test
         void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED);

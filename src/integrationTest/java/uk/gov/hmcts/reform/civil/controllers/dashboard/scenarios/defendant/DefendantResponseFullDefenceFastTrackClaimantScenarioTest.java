@@ -35,8 +35,8 @@ public class DefendantResponseFullDefenceFastTrackClaimantScenarioTest extends D
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDateTime.of(2024, 8, 6, 12, 0))
-            .respondent1(Party.builder().individualFirstName("James")
-                    .individualLastName("John").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("James")
+                    .setIndividualLastName("John").setType(Party.Type.INDIVIDUAL))
             .responseClaimTrack(track.name())
             .defenceRouteRequired(DISPUTES_THE_CLAIM)
             .build();

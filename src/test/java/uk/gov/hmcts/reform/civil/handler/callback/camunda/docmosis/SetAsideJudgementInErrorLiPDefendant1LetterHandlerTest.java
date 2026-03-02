@@ -49,7 +49,7 @@ public class SetAsideJudgementInErrorLiPDefendant1LetterHandlerTest extends Base
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
 
         caseData.setJoSetAsideReason(JudgmentSetAsideReason.JUDGMENT_ERROR);
         caseData.setJoSetAsideJudgmentErrorText("Some text");

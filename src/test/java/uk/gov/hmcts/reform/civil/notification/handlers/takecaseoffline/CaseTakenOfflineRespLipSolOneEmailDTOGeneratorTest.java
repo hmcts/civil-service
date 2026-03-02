@@ -82,8 +82,8 @@ class CaseTakenOfflineRespLipSolOneEmailDTOGeneratorTest {
         String legacyCaseReference = "12345";
         String defendantName = "Defendant Name";
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("Claimant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Defendant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .legacyCaseReference(legacyCaseReference)
             .build();
 

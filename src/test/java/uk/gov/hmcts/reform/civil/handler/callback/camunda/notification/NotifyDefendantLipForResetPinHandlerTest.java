@@ -62,8 +62,7 @@ public class NotifyDefendantLipForResetPinHandlerTest extends BaseCallbackHandle
         void shouldNotifyDefendantLip_whenInvoked() {
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP()
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .build())
+                .respondent1(PartyBuilder.builder().soleTrader().build())
                 .addRespondent1PinToPostLRspec(new DefendantPinToPostLRspec()
                                                    .setAccessCode("TEST1234")
                                                    .setExpiryDate(LocalDate.now().plusDays(180)))
@@ -90,9 +89,8 @@ public class NotifyDefendantLipForResetPinHandlerTest extends BaseCallbackHandle
         @Test
         void shouldNotNotifyDefendantLip_whenNoEmailIsEntered() {
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder().soleTrader().build().toBuilder()
-                                 .partyEmail(null)
-                                 .build())
+                .respondent1(PartyBuilder.builder().soleTrader().build().setPartyEmail(null)
+                                 )
                 .addRespondent1PinToPostLRspec(new DefendantPinToPostLRspec()
                                                    .setAccessCode("TEST1234")
                                                    .setExpiryDate(LocalDate.now().plusDays(180)))

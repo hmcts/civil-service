@@ -73,7 +73,7 @@ class LipDefendantCaseAssignmentServiceTest {
         given(userService.getUserDetails(anyString())).willReturn(UserDetails.builder().id(USER_ID).email(EMAIL).build());
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         Party respondent1 = caseData.getRespondent1()
-            .toBuilder().partyEmail(EMAIL).build();
+            .setPartyEmail(EMAIL);
         IdamUserDetails defendantUserDetails = new IdamUserDetails()
             .setId(USER_ID)
             .setEmail(EMAIL)
@@ -117,20 +117,19 @@ class LipDefendantCaseAssignmentServiceTest {
         CaseData caseData = new CaseDataBuilder().atStateClaimSubmitted()
             .addRespondent1PinToPostLRspec(buildPin("TEST1234", LocalDate.now().plusDays(180)))
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
-            .respondent1(Party.builder()
-                             .flags(new Flags()
+            .respondent1(new Party()
+                             .setFlags(new Flags()
                                         .setPartyName("Mr test")
                                         .setRoleOnCase("Defendant 1")
                                         .setDetails(List.of()))
-                             .type(Party.Type.INDIVIDUAL)
-                             .build())
+                             .setType(Party.Type.INDIVIDUAL))
             .build();
         IdamUserDetails defendantUserDetails = new IdamUserDetails()
             .setId(USER_ID)
             .setEmail(EMAIL)
             ;
         data.put("defendantUserDetails", defendantUserDetails);
-        data.put("respondent1", caseData.getRespondent1().toBuilder().partyEmail(EMAIL).build());
+        data.put("respondent1", caseData.getRespondent1().setPartyEmail(EMAIL));
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
         Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);

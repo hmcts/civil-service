@@ -43,7 +43,7 @@ class DismissedPredicateTest {
             when(caseData.getRespondent1ClaimResponseIntentionType()).thenReturn(null);
             when(caseData.getRespondent1ResponseDate()).thenReturn(null);
             when(caseData.getTakenOfflineByStaffDate()).thenReturn(null);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(null);
             when(caseData.getRespondent2TimeExtensionDate()).thenReturn(null);
@@ -242,7 +242,7 @@ class DismissedPredicateTest {
         @Test
         void should_return_true_for_1v2_twoLR_when_both_acked_no_extensions_and_at_least_one_no_response() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO);
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
@@ -278,7 +278,7 @@ class DismissedPredicateTest {
         @Test
         void should_return_false_for_twoLR_when_both_responded() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO);
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(2));
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(2));
@@ -313,7 +313,7 @@ class DismissedPredicateTest {
         @Test
         void should_return_true_for_1v2_twoLR_when_both_acked_and_r2_has_time_extension() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO);
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
@@ -326,7 +326,7 @@ class DismissedPredicateTest {
         @Test
         void should_return_true_for_1v2_oneLR_when_both_acked_and_r1_has_time_extension() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
@@ -353,7 +353,7 @@ class DismissedPredicateTest {
         @Test
         void should_return_false_for_1v2_when_no_time_extension_on_either() {
             when(caseData.getClaimDismissedDeadline()).thenReturn(LocalDateTime.now().minusDays(1));
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO);
             when(caseData.getRespondent1AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));
             when(caseData.getRespondent2AcknowledgeNotificationDate()).thenReturn(LocalDateTime.now().minusDays(3));

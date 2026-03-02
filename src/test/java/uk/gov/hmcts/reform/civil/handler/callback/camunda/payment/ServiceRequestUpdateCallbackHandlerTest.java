@@ -32,7 +32,7 @@ class ServiceRequestUpdateCallbackHandlerTest extends BaseCallbackHandlerTest {
     void shouldChangeApplicationState_whenInvoked() {
         //Given: Case data with hearingFee PBA details
         CaseData caseData = CaseDataBuilder.builder()
-            .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails();
+            .buildMakePaymentsCaseDataWithHearingDueDateWithHearingFeePBADetails().build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         //when: handler is called
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

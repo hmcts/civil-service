@@ -91,7 +91,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
         void populateRespondentCopy1_checkIfDeadlineNotPassed() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent2(PartyBuilder.builder().soleTrader().build().setPartyID("res-1-party-id"))
                 .build();
 
             Flags respondent1Flags = new Flags();
@@ -242,7 +242,7 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .build();
-            caseData.setRespondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-1-party-id").build());
+            caseData.setRespondent2(PartyBuilder.builder().soleTrader().build().setPartyID("res-1-party-id"));
             caseData.setRespondent1Copy(respondent1Copy);
             caseData.setRespondent2Copy(respondent2Copy);
 

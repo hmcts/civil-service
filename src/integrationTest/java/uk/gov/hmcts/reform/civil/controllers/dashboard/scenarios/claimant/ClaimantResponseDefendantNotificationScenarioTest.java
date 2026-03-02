@@ -115,7 +115,7 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
             .respondent1Represented(NO)
             .applicant1Represented(YES)
             .applicant1ProceedWithClaim(null)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("White").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("White").setType(Party.Type.INDIVIDUAL))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()

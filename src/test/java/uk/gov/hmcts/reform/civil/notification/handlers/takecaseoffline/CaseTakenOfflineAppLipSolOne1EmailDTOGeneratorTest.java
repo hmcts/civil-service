@@ -85,11 +85,11 @@ class CaseTakenOfflineAppLipSolOne1EmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String caseReference = "1111";
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("Claimant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Defendant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .legacyCaseReference(caseReference)
             .build();
 

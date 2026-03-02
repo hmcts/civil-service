@@ -259,14 +259,13 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .individualTitle("Mr.")
-                                 .individualFirstName("Alex")
-                                 .individualLastName("Richards")
-                                 .partyName("Mr. Alex Richards")
-                                 .partyEmail("respondentLip2@gmail.com")
-                                 .build()).build();
+                .respondent2(new Party()
+                                 .setType(Party.Type.INDIVIDUAL)
+                                 .setIndividualTitle("Mr.")
+                                 .setIndividualFirstName("Alex")
+                                 .setIndividualLastName("Richards")
+                                 .setPartyName("Mr. Alex Richards")
+                                 .setPartyEmail("respondentLip2@gmail.com")).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
             ).build();
@@ -292,14 +291,13 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
                 .claimantBilingualLanguagePreference(Language.BOTH.toString())
                 .respondent1Represented(YesOrNo.NO)
                 .respondent2Represented(YesOrNo.NO)
-                .respondent2(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .individualTitle("Mr.")
-                                 .individualFirstName("Alex")
-                                 .individualLastName("Richards")
-                                 .partyName("Mr. Alex Richards")
-                                 .partyEmail("respondentLip2@gmail.com")
-                                 .build()).build();
+                .respondent2(new Party()
+                                 .setType(Party.Type.INDIVIDUAL)
+                                 .setIndividualTitle("Mr.")
+                                 .setIndividualFirstName("Alex")
+                                 .setIndividualLastName("Richards")
+                                 .setPartyName("Mr. Alex Richards")
+                                 .setPartyEmail("respondentLip2@gmail.com")).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
             ).build();
