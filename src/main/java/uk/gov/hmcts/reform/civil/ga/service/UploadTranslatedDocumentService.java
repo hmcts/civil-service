@@ -51,9 +51,9 @@ public class UploadTranslatedDocumentService {
     private final DocUploadDashboardNotificationService docUploadDashboardNotificationService;
     private final DeadlinesCalculator deadlinesCalculator;
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder processTranslatedDocument(GeneralApplicationCaseData caseData, String translator) {
+    public GeneralApplicationCaseData processTranslatedDocument(GeneralApplicationCaseData caseData, String translator) {
         List<Element<TranslatedDocument>> translatedDocuments = caseData.getTranslatedDocuments();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         if (Objects.nonNull(translatedDocuments)) {
             Map<DocumentType, List<Element<CaseDocument>>>
@@ -118,7 +118,7 @@ public class UploadTranslatedDocumentService {
         };
     }
 
-    private void updateCaseDataBuilderByType(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    private void updateCaseDataBuilderByType(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                              DocumentType documentType,
                                              List<Element<CaseDocument>> documents) {
         switch (documentType) {
@@ -167,7 +167,7 @@ public class UploadTranslatedDocumentService {
         }
     }
 
-    public void updateGADocumentsWithOriginalDocuments(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+    public void updateGADocumentsWithOriginalDocuments(GeneralApplicationCaseData caseDataBuilder) {
         List<Element<CaseDocument>> bulkPrintOriginalDocuments = newArrayList();
         List<Element<TranslatedDocument>> translatedDocuments = caseDataBuilder.build().getTranslatedDocuments();
         List<Element<CaseDocument>> preTranslationGaDocuments = caseDataBuilder.build().getPreTranslationGaDocuments();

@@ -650,7 +650,7 @@ public class JudicialNotificationService implements NotificationDataGA {
                 .calculateApplicantResponseDeadline(
                     LocalDateTime.now(), NUMBER_OF_DEADLINE_DAYS);
 
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppNotificationDeadlineDate(deadlineForMoreInfoSubmission)
                 .build();
         }

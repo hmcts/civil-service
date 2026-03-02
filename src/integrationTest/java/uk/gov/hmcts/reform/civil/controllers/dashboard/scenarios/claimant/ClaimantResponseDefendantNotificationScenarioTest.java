@@ -118,9 +118,9 @@ public class ClaimantResponseDefendantNotificationScenarioTest extends Dashboard
             .applicant1(Party.builder().individualFirstName("John").individualLastName("White").type(Party.Type.INDIVIDUAL).build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                                               )
             .build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);

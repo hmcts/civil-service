@@ -63,14 +63,14 @@ class RoboticsCaseDataSupportTest {
 
     @Test
     void applyOrganisationDetails_copiesFields() {
-        SolicitorOrganisationDetails organisationDetails = SolicitorOrganisationDetails.builder()
-            .organisationName("Org Name")
-            .phoneNumber("01234 567890")
-            .fax("01234 098765")
-            .dx("DX 123")
-            .email("contact@example.com")
-            .address(new Address("1 High Street", null, null, null, null, null, "ZZ1 1ZZ"))
-            .build();
+        SolicitorOrganisationDetails organisationDetails = new SolicitorOrganisationDetails()
+            .setOrganisationName("Org Name")
+            .setPhoneNumber("01234 567890")
+            .setFax("01234 098765")
+            .setDx("DX 123")
+            .setEmail("contact@example.com")
+            .setAddress(new Address("1 High Street", null, null, null, null, null, "ZZ1 1ZZ"))
+            ;
 
         Solicitor.SolicitorBuilder<?, ?> builder = Solicitor.builder();
 
@@ -155,13 +155,13 @@ class RoboticsCaseDataSupportTest {
         when(organisation.getName()).thenReturn("Organisation Ltd");
         when(organisation.getContactInformation()).thenReturn(List.of(contactInformation));
 
-        SolicitorOrganisationDetails organisationDetails = SolicitorOrganisationDetails.builder()
-            .organisationName("Override Org")
-            .phoneNumber("01234 567890")
-            .email("org@example.com")
-            .dx("DX 222")
-            .address(new Address("Details Line 1", null, null, null, null, null, "YY1 2YY"))
-            .build();
+        SolicitorOrganisationDetails organisationDetails = new SolicitorOrganisationDetails()
+            .setOrganisationName("Override Org")
+            .setPhoneNumber("01234 567890")
+            .setEmail("org@example.com")
+            .setDx("DX 222")
+            .setAddress(new Address("Details Line 1", null, null, null, null, null, "YY1 2YY"))
+            ;
 
         Address serviceAddress = new Address("Service Line 1", null, null, null, null, null, "ZZ1 9ZZ");
 

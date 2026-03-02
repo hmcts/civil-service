@@ -36,9 +36,9 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.of(2025, Month.MAY, 10))
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.of(2025, Month.MAY, 10))
+            )
             .build();
 
         String expectedOrgName = "OrgName Ltd";

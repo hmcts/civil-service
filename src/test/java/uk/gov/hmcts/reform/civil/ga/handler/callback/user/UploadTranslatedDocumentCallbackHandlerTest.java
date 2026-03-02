@@ -48,7 +48,7 @@ public class UploadTranslatedDocumentCallbackHandlerTest extends GeneralApplicat
 
         @Test
         void shouldCallAboutToSubmit() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .build();
 
             CallbackParams params = callbackParamsOf(
@@ -56,7 +56,7 @@ public class UploadTranslatedDocumentCallbackHandlerTest extends GeneralApplicat
                 CaseEvent.UPLOAD_TRANSLATED_DOCUMENT,
                 CallbackType.ABOUT_TO_SUBMIT
             );
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             when(uploadTranslatedDocumentService.processTranslatedDocument(eq(caseData), any())).thenReturn(caseDataBuilder);
             //When
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

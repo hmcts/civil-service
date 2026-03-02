@@ -41,10 +41,9 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                     .individualFirstName("Claimant")
                     .individualLastName("John")
                     .build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(responseDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(responseDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
@@ -95,10 +94,9 @@ public class DefendantResponsePayImmediatelyScenarioTest extends DashboardBaseIn
                     .individualFirstName("Claimant")
                     .individualLastName("John")
                     .build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(admitPaymentDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(1000))
             .build();

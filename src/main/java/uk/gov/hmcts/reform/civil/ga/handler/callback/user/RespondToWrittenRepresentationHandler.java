@@ -69,7 +69,7 @@ public class RespondToWrittenRepresentationHandler extends CallbackHandler imple
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String userId = idamClient.getUserInfo(authToken).getUid();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String role = DocUploadUtils.getUserRole(caseData, userId);
         List<Element<Document>> responseDocumentToBeAdded = caseData.getGeneralAppWrittenRepUpload();
         if (Objects.isNull(responseDocumentToBeAdded)) {

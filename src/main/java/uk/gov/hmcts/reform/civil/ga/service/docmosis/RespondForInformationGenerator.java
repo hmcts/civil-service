@@ -52,17 +52,13 @@ public class RespondForInformationGenerator implements TemplateDataGenerator<Jud
     @Override
     public JudgeDecisionPdfDocument getTemplateData(GeneralApplicationCaseData caseData, String authorisation) {
 
-        JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
-                JudgeDecisionPdfDocument.builder()
-                        .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-                        .claimant1Name(caseData.getClaimant1PartyName())
-                        .defendant1Name(caseData.getDefendant1PartyName())
-                        .judgeComments(caseData.getGeneralAppAddlnInfoText())
-                        .judgeNameTitle(getSubmittedBy(role, caseData))
-                        .submittedOn(LocalDate.now());
-        ;
-
-        return judgeDecisionPdfDocumentBuilder.build();
+        return new JudgeDecisionPdfDocument()
+            .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setJudgeComments(caseData.getGeneralAppAddlnInfoText())
+            .setJudgeNameTitle(getSubmittedBy(role, caseData))
+            .setSubmittedOn(LocalDate.now());
     }
 
     private String getSubmittedBy(String role, GeneralApplicationCaseData caseData) {

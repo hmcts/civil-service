@@ -69,12 +69,12 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         void shouldSendTranslatedOrderLetterToLipApplicantWhenInvoked() {
             Document printDocument = new Document();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("WELSH").build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
                                                         .value(new CaseDocument()
@@ -105,11 +105,11 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         void shouldSendEnglishOrderLetterToLipApplicantIfEnglishPreference() {
             Document printDocument = new Document();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData().build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
                                                           .value(new CaseDocument()
@@ -138,7 +138,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldNotSendTranslatedOrderLetterToLipApplicantIfNotOrderDocument() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
                                                           .value(new TranslatedDocument()
@@ -163,12 +163,12 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         void shouldSendTranslatedOrderLetterToLipRespondentWhenInvoked() {
             Document printDocument = new Document();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")).build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
                                                         .value(new CaseDocument()
@@ -199,12 +199,12 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         void shouldSendTranslatedOrderLetterToLipRespondentIfApplicantIsDefendantWhenInvoked() {
             Document printDocument = new Document();
             CaseDetails parentCaseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .claimantBilingualLanguagePreference("BOTH").build();
             when(coreCaseDataService.getCase(anyLong())).thenReturn(parentCaseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(parentCaseDetails)).thenReturn(parentCaseData);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .originalDocumentsBulkPrint(List.of(Element.<CaseDocument>builder()
                                                         .value(new CaseDocument()
@@ -234,7 +234,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
         @Test
         void shouldNotSendTranslatedOrderLetterToLipApplicantIfPrintServiceNotEnabled() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .translatedDocumentsBulkPrint(List.of(Element.<TranslatedDocument>builder()
                                                  .value(new TranslatedDocument()
@@ -258,7 +258,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldNotSendTranslatedOrderLetterToLipApplicantIfNullDocuments() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .isGaApplicantLip(YesOrNo.YES)
@@ -279,7 +279,7 @@ public class SendTranslatedOrderToLiPCallbackHandlerTest extends BaseCallbackHan
     @Test
     void shouldNotSendTranslatedOrderLetterToLipApplicantIfEmptyDocuments() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference(caseData.getCcdCaseReference().toString())
             .translatedDocumentsBulkPrint(List.of())
             .applicantBilingualLanguagePreference(YesOrNo.YES)

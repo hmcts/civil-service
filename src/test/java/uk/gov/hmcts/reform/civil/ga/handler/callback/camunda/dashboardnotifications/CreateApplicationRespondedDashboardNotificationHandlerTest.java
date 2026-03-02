@@ -154,19 +154,18 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -211,19 +210,18 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)

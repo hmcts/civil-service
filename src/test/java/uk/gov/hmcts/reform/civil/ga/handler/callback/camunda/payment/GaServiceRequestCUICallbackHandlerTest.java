@@ -50,12 +50,12 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
 
     @BeforeEach
     public void setup() {
-        caseData = GeneralApplicationCaseData.builder()
+        caseData = new GeneralApplicationCaseData()
              .ccdCaseReference(1644495739087775L)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                        .fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                        .setFee(new Fee()
                                 .setCalculatedAmountInPence(BigDecimal.valueOf(100))
-                                .setCode("CODE")).build())
+                                .setCode("CODE")))
             .build();
     }
 
@@ -86,9 +86,9 @@ public class GaServiceRequestCUICallbackHandlerTest extends GeneralApplicationBa
         @Test
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             //GIVEN
-            caseData = caseData.toBuilder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                            .serviceReqReference(GeneralApplicationCaseDataBuilder.CUSTOMER_REFERENCE).build())
+            caseData = caseData.copy()
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                            .setServiceReqReference(GeneralApplicationCaseDataBuilder.CUSTOMER_REFERENCE))
                 .build();
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_GENERAL_APP, ABOUT_TO_SUBMIT);
             //WHEN

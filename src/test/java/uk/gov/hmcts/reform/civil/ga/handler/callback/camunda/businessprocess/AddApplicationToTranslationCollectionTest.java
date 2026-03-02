@@ -39,7 +39,7 @@ public class AddApplicationToTranslationCollectionTest extends GeneralApplicatio
     class AboutToSubmitCallback {
         @Test
         void should_updateTranslationCollectionWithApplicationDetails() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().ccdCaseReference(Long.valueOf(123456)).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(Long.valueOf(123456)).build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             handler.handle(params);
             verify(parentCaseUpdateHelper, times(1))

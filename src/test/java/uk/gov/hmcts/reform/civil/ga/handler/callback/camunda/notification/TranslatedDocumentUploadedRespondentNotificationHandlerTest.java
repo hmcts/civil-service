@@ -88,7 +88,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationLiPRespondentConsent_WhenParentCaseInEnglish() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
@@ -128,7 +128,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationLiPRespondentConsent_WhenParentCaseInWelsh() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
@@ -170,7 +170,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationRespondentConsentForLR() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(

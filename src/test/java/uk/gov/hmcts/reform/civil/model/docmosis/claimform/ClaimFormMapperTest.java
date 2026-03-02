@@ -82,12 +82,10 @@ class ClaimFormMapperTest {
                             .type(Party.Type.INDIVIDUAL)
                             .build())
             .timelineOfEvents(List.of(
-                TimelineOfEvents.builder().id("1").value(
-                        TimelineOfEventDetails.builder()
-                            .timelineDate(LocalDate.now())
-                            .timelineDescription("desc")
-                            .build())
-                    .build()))
+                new TimelineOfEvents(
+                    new TimelineOfEventDetails(LocalDate.now(), "desc"),
+                    "1"
+                )))
             .respondent1(Party.builder()
                              .individualLastName(INDIVIDUAL_LAST_NAME)
                              .individualFirstName(INDIVIDUAL_FIRST_NAME)
@@ -158,7 +156,7 @@ class ClaimFormMapperTest {
                              .partyEmail(EMAIL)
                              .type(Party.Type.COMPANY)
                              .build())
-            .uiStatementOfTruth(StatementOfTruth.builder().name("Test").role("Test").build())
+            .uiStatementOfTruth(new StatementOfTruth().setName("Test").setRole("Test"))
             .build();
         //When
         ClaimForm form = claimFormMapper.toClaimForm(caseData);

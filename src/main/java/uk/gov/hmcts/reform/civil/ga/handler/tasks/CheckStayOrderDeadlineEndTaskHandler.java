@@ -73,16 +73,20 @@ public class CheckStayOrderDeadlineEndTaskHandler extends BaseExternalTaskHandle
     private GeneralApplicationCaseData updateCaseData(GeneralApplicationCaseData caseData) {
         if (caseData.getApproveConsentOrder() != null) {
             GAApproveConsentOrder consentOrder = caseData.getApproveConsentOrder();
-            caseData = caseData.toBuilder()
-                .approveConsentOrder(
-                    consentOrder.toBuilder().isOrderProcessedByStayScheduler(YesOrNo.YES).build())
+            GAApproveConsentOrder updatedConsentOrder = new GAApproveConsentOrder()
+                .setConsentOrderDescription(consentOrder.getConsentOrderDescription())
+                .setConsentOrderDateToEnd(consentOrder.getConsentOrderDateToEnd())
+                .setShowConsentOrderDate(consentOrder.getShowConsentOrderDate())
+                .setIsOrderProcessedByStayScheduler(YesOrNo.YES);
+            caseData = caseData.copy()
+                .approveConsentOrder(updatedConsentOrder)
                 .build();
 
         } else {
             GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .judicialDecisionMakeOrder(
-                    judicialDecisionMakeOrder.toBuilder().isOrderProcessedByStayScheduler(YesOrNo.YES).build())
+                    judicialDecisionMakeOrder.copy().setIsOrderProcessedByStayScheduler(YesOrNo.YES))
                 .build();
         }
         return caseData;

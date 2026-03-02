@@ -33,8 +33,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void should_addToAddl() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
 
         List<Element<CaseDocument>> tobeAdded = new ArrayList<>();
         tobeAdded.add(element(new CaseDocument().setCreatedBy("civil")
@@ -56,12 +56,12 @@ public class DocUploadUtilsTest {
         caseData = builder.build();
         assertThat(caseData.getGaAddlDocClaimant().size()).isEqualTo(2);
         assertThat(caseData.getCaseDocumentUploadDate()).isNull();
-        builder = caseData.toBuilder();
+        builder = caseData.copy();
         DocUploadUtils.addToAddl(caseData, builder, tobeAdded, DocUploadUtils.RESPONDENT_ONE, false);
         caseData = builder.build();
         assertThat(caseData.getGaAddlDocRespondentSol().size()).isEqualTo(2);
         assertThat(caseData.getCaseDocumentUploadDateRes()).isNull();
-        builder = caseData.toBuilder();
+        builder = caseData.copy();
         DocUploadUtils.addToAddl(caseData, builder, tobeAdded, DocUploadUtils.RESPONDENT_TWO, true);
         caseData = builder.build();
         assertThat(caseData.getGaAddlDocRespondentSolTwo().size()).isEqualTo(2);
@@ -74,12 +74,12 @@ public class DocUploadUtilsTest {
     @Test
     public void should_prepareUploadDocumentByType() {
         List<Element<UploadDocumentByType>> uploadDocument = new ArrayList<>();
-        uploadDocument.add(element(UploadDocumentByType.builder()
-                                       .documentType("witness")
-                                       .additionalDocument(new Document()
+        uploadDocument.add(element(new UploadDocumentByType()
+                                       .setDocumentType("witness")
+                                       .setAdditionalDocument(new Document()
                                                                .setDocumentFileName("witness_document.pdf")
                                                                .setDocumentUrl("http://dm-store:8080")
-                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents")).build()));
+                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
         List<Element<CaseDocument>> result = DocUploadUtils.prepareUploadDocumentByType(uploadDocument, "role");
         assertThat(result.get(0).getValue().getCreatedBy()).isEqualTo("role");
         assertThat(result.get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo(AssignCategoryId.APPLICATIONS);
@@ -111,7 +111,7 @@ public class DocUploadUtilsTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
             .atStateClaimDraft()
             .ccdCaseReference(1678356749555475L)
-            .build().toBuilder()
+            .build().copy()
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .generalAppConsentOrder(YES)
             .generalAppRespondentSolicitors(gaRespSolicitors)
@@ -203,14 +203,14 @@ public class DocUploadUtilsTest {
 
     @Test
     public void shouldVisible_whenUnCloaked() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .applicationIsCloaked(YesOrNo.NO).build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.YES);
     }
 
     @Test
     public void shouldVisible_whenConsent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalAppConsentOrder(YesOrNo.YES).build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.YES);
     }
@@ -223,8 +223,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void shouldSetApplicantRespondentWhenRoleIsApplicant() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
         DocUploadUtils.setRespondedValues(builder, DocUploadUtils.APPLICANT);
         caseData = builder.build();
         assertThat(caseData.getIsApplicantResponded()).isEqualTo(YesOrNo.YES);
@@ -232,8 +232,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void shouldSetApplicantRespondentWhenRoleIsRespondent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
         DocUploadUtils.setRespondedValues(builder, DocUploadUtils.RESPONDENT_ONE);
         caseData = builder.build();
         assertThat(caseData.getIsRespondentResponded()).isEqualTo(YesOrNo.YES);
@@ -241,8 +241,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void should_addToPreTranslationApplicant() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
         tobeAdded.add(element(new Document()
@@ -269,8 +269,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void should_addToPreTranslationRespondent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
         tobeAdded.add(element(new Document()
@@ -297,8 +297,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void should_notAddToAddlDocs_ifOnlyOneDoc() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
         tobeAdded.add(element(new Document()
@@ -319,8 +319,8 @@ public class DocUploadUtilsTest {
 
     @Test
     public void should_notAddToPreTranslation_ifEmptySource() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
+        GeneralApplicationCaseData builder = caseData.copy();
 
         List<Element<Document>> tobeAdded = new ArrayList<>();
         DocUploadUtils.addDocumentToPreTranslation(

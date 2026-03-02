@@ -59,23 +59,19 @@ class TriggerHearingCvpLinkEventHandlerTest {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
-            HearingsResponse.builder()
-                .caseRef("reference")
-                .hmctsServiceCode("AAA7")
-                .caseHearings(List.of(CaseHearing.builder()
-                                          .hearingDaySchedule(List.of(
-                                              HearingDaySchedule.builder()
-                                                  .attendees(List.of(
-                                                      Attendees.builder()
-                                                          .hearingSubChannel(VIDCVP)
-                                                          .build(),
-                                                      Attendees.builder()
-                                                          .hearingSubChannel(null)
-                                                          .build()
-                                                  )).build()
-                                          ))
-                                          .build()))
-                .build());
+            new HearingsResponse()
+                .setCaseRef("reference")
+                .setHmctsServiceCode("AAA7")
+                .setCaseHearings(List.of(new CaseHearing()
+                                          .setHearingDaySchedule(List.of(
+                                              new HearingDaySchedule()
+                                                  .setAttendees(List.of(
+                                                      new Attendees()
+                                                          .setHearingSubChannel(VIDCVP),
+                                                      new Attendees()
+                                                          .setHearingSubChannel(null)
+                                                  ))
+                                          )))));
 
         handler.triggerCvpJoinLinkEvent(event);
 
@@ -87,31 +83,26 @@ class TriggerHearingCvpLinkEventHandlerTest {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
-            HearingsResponse.builder()
-                .caseRef("reference")
-                .hmctsServiceCode("AAA7")
-                .caseHearings(List.of(
-                    CaseHearing.builder()
-                        .hearingDaySchedule(List.of(
-                            HearingDaySchedule.builder()
-                                .attendees(List.of(
-                                    Attendees.builder()
-                                        .hearingSubChannel(INTER)
-                                        .build()
-                                )).build()
-                        ))
-                        .build(),
-                    CaseHearing.builder()
-                        .hearingDaySchedule(List.of(
-                            HearingDaySchedule.builder()
-                                .attendees(List.of(
-                                    Attendees.builder()
-                                        .hearingSubChannel(VIDCVP)
-                                        .build()
-                                )).build()
-                        ))
-                        .build()))
-                .build());
+            new HearingsResponse()
+                .setCaseRef("reference")
+                .setHmctsServiceCode("AAA7")
+                .setCaseHearings(List.of(
+                    new CaseHearing()
+                        .setHearingDaySchedule(List.of(
+                            new HearingDaySchedule()
+                                .setAttendees(List.of(
+                                    new Attendees()
+                                        .setHearingSubChannel(INTER)
+                                ))
+                        )),
+                    new CaseHearing()
+                        .setHearingDaySchedule(List.of(
+                            new HearingDaySchedule()
+                                .setAttendees(List.of(
+                                    new Attendees()
+                                        .setHearingSubChannel(VIDCVP)
+                                ))
+                        )))));
 
         handler.triggerCvpJoinLinkEvent(event);
 
@@ -123,21 +114,18 @@ class TriggerHearingCvpLinkEventHandlerTest {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
-            HearingsResponse.builder()
-                .caseRef("reference")
-                .hmctsServiceCode("AAA7")
-                .caseHearings(List.of(
-                    CaseHearing.builder()
-                        .hearingDaySchedule(List.of(
-                            HearingDaySchedule.builder()
-                                .attendees(List.of(
-                                    Attendees.builder()
-                                        .hearingSubChannel(INTER)
-                                        .build()
-                                )).build()
-                        ))
-                        .build()))
-                .build());
+            new HearingsResponse()
+                .setCaseRef("reference")
+                .setHmctsServiceCode("AAA7")
+                .setCaseHearings(List.of(
+                    new CaseHearing()
+                        .setHearingDaySchedule(List.of(
+                            new HearingDaySchedule()
+                                .setAttendees(List.of(
+                                    new Attendees()
+                                        .setHearingSubChannel(INTER)
+                                ))
+                        )))));
 
         handler.triggerCvpJoinLinkEvent(event);
 
@@ -149,10 +137,9 @@ class TriggerHearingCvpLinkEventHandlerTest {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
-            HearingsResponse.builder()
-                .caseRef("reference")
-                .hmctsServiceCode("AAA7")
-                .build());
+            new HearingsResponse()
+                .setCaseRef("reference")
+                .setHmctsServiceCode("AAA7"));
 
         handler.triggerCvpJoinLinkEvent(event);
 
@@ -164,11 +151,10 @@ class TriggerHearingCvpLinkEventHandlerTest {
         CvpJoinLinkEvent event = new CvpJoinLinkEvent(1L);
 
         when(hearingService.getHearings(anyString(), anyLong(), anyString())).thenReturn(
-            HearingsResponse.builder()
-                .caseRef("reference")
-                .hmctsServiceCode("AAA7")
-                .caseHearings(List.of())
-                .build());
+            new HearingsResponse()
+                .setCaseRef("reference")
+                .setHmctsServiceCode("AAA7")
+                .setCaseHearings(List.of()));
 
         handler.triggerCvpJoinLinkEvent(event);
 

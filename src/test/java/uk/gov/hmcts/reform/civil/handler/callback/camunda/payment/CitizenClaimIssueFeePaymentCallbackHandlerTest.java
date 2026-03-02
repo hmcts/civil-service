@@ -44,10 +44,10 @@ class CitizenClaimIssueFeePaymentCallbackHandlerTest extends BaseCallbackHandler
     }
 
     private PaymentDetails buildPaymentDetails() {
-        return PaymentDetails.builder()
-            .status(PaymentStatus.SUCCESS)
-            .reference("R1234-1234-1234-1234")
-            .build();
+        return new PaymentDetails()
+            .setStatus(PaymentStatus.SUCCESS)
+            .setReference("R1234-1234-1234-1234")
+            ;
 
     }
 }

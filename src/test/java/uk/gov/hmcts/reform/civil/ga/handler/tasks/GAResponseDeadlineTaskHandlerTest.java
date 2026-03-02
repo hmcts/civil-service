@@ -136,7 +136,7 @@ class GAResponseDeadlineTaskHandlerTest {
                          + "Cannot deserialize value of type `uk.gov.hmcts.reform.civil.enums.YesOrNo` "
                          + "from String \"maybe\": not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());
@@ -162,7 +162,7 @@ class GAResponseDeadlineTaskHandlerTest {
                          + "Cannot deserialize value of type `uk.gov.hmcts.reform.civil.enums.YesOrNo` "
                          + "from String \"maybe\": not one of the values accepted for Enum class: [No, Yes]\n"
                          + " at [Source: UNKNOWN; byte offset: #UNKNOWN] (through reference chain: "
-                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData$GeneralApplicationCaseDataBuilderImpl"
+                         + "uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData"
                          + "[\"generalAppConsentOrder\"])",
                      logsList.getFirst().getMessage());
         assertEquals(Level.ERROR, logsList.getFirst().getLevel());

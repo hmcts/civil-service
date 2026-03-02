@@ -217,15 +217,14 @@ public class SendFinalOrderPrintService {
     public PostOrderCoverLetter getTemplateData(GeneralApplicationCaseData caseData, GeneralApplicationCaseData civilCaseData, CaseEvent caseEvent) {
         boolean parentClaimantIsApplicant = identifyParentClaimantIsApplicant(caseData);
 
-        return PostOrderCoverLetter.builder()
-            .caseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-            .partyName(getPartyName(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .partyAddressAddressLine1(partyAddressAddressLine1(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .partyAddressAddressLine2(partyAddressAddressLine2(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .partyAddressAddressLine3(partyAddressAddressLine3(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .partyAddressPostCode(partyAddressPostCode(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .partyAddressPostTown(partyAddressPostTown(parentClaimantIsApplicant, caseEvent, civilCaseData))
-            .build();
+        return new PostOrderCoverLetter()
+            .setCaseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setPartyName(getPartyName(parentClaimantIsApplicant, caseEvent, civilCaseData))
+            .setPartyAddressAddressLine1(partyAddressAddressLine1(parentClaimantIsApplicant, caseEvent, civilCaseData))
+            .setPartyAddressAddressLine2(partyAddressAddressLine2(parentClaimantIsApplicant, caseEvent, civilCaseData))
+            .setPartyAddressAddressLine3(partyAddressAddressLine3(parentClaimantIsApplicant, caseEvent, civilCaseData))
+            .setPartyAddressPostCode(partyAddressPostCode(parentClaimantIsApplicant, caseEvent, civilCaseData))
+            .setPartyAddressPostTown(partyAddressPostTown(parentClaimantIsApplicant, caseEvent, civilCaseData));
     }
 
     private String getPartyName(boolean parentClaimantIsApplicant, CaseEvent caseEvent, GeneralApplicationCaseData civilCaseData) {

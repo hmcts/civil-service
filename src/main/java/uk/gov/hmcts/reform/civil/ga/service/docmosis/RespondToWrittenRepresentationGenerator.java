@@ -53,16 +53,13 @@ public class RespondToWrittenRepresentationGenerator implements TemplateDataGene
     @Override
     public JudgeDecisionPdfDocument getTemplateData(GeneralApplicationCaseData caseData, String authorisation) {
 
-        JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder respondToWrittenRepDocumentBuilder =
-            JudgeDecisionPdfDocument.builder()
-                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-                .claimant1Name(caseData.getClaimant1PartyName())
-                .defendant1Name(caseData.getDefendant1PartyName())
-                .judgeComments(caseData.getGeneralAppWrittenRepText())
-                .judgeNameTitle(getSubmittedBy(role, caseData))
-                .submittedOn(LocalDate.now());
-
-        return respondToWrittenRepDocumentBuilder.build();
+        return new JudgeDecisionPdfDocument()
+            .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setJudgeComments(caseData.getGeneralAppWrittenRepText())
+            .setJudgeNameTitle(getSubmittedBy(role, caseData))
+            .setSubmittedOn(LocalDate.now());
     }
 
     private String getSubmittedBy(String role, GeneralApplicationCaseData caseData) {

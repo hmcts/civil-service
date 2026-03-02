@@ -42,8 +42,8 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateApplicantExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
-        PartyFlagStructure expert2 = PartyFlagStructure.builder().firstName("John").lastName(null).build();
+        PartyFlagStructure expert1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
+        PartyFlagStructure expert2 = new PartyFlagStructure().setFirstName("John").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(
@@ -66,7 +66,7 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateRespondent1ExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert = PartyFlagStructure.builder().firstName(null).lastName("Smith").build();
+        PartyFlagStructure expert = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
             .respondent1Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
@@ -83,7 +83,7 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateRespondent2ExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert = PartyFlagStructure.builder().firstName("Bob").lastName(null).build();
+        PartyFlagStructure expert = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .respondent2Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
@@ -133,11 +133,11 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldAssignNewPartyIdWhenMissing() {
-        PartyFlagStructure expert = PartyFlagStructure.builder()
-            .firstName("Test")
-            .lastName("User")
-            .partyID(null)
-            .build();
+        PartyFlagStructure expert = new PartyFlagStructure()
+            .setFirstName("Test")
+            .setLastName("User")
+            .setPartyID(null)
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
@@ -153,11 +153,11 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldNotChangePartyIdIfAlreadyPresent() {
-        PartyFlagStructure expert = PartyFlagStructure.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .partyID("existing-id-123")
-            .build();
+        PartyFlagStructure expert = new PartyFlagStructure()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setPartyID("existing-id-123")
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))

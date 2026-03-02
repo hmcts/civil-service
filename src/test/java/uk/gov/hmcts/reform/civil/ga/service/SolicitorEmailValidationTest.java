@@ -238,7 +238,7 @@ public class SolicitorEmailValidationTest {
             .respondent2OrganisationPolicy(new OrganisationPolicy()
                                                .setOrganisation(new Organisation().setOrganisationID("3")))
             .build();
-        var builder = caseData.toBuilder();
+        var builder = caseData.copy();
         if (Objects.nonNull(lipClEmail)) {
             builder.claimantUserDetails(new IdamUserDetails()
                     .setId("123")
@@ -276,7 +276,7 @@ public class SolicitorEmailValidationTest {
             .parentClaimantIsApplicant(parentClaimantIsApplicant)
             .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .build();
-        var builder = caseData.toBuilder();
+        var builder = caseData.copy();
         if (isLipApp.equals(YES)) {
             builder.isGaApplicantLip(YES);
         }

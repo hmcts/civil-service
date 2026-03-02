@@ -118,8 +118,8 @@ class IncomeCalculatorTest {
     }
 
     private static Respondent1SelfEmploymentLRspec createAnnualIncome() {
-        return Respondent1SelfEmploymentLRspec.builder()
-            .annualTurnover(new BigDecimal(6700000))
-            .build();
+        return new Respondent1SelfEmploymentLRspec()
+            .setAnnualTurnover(new BigDecimal(6700000))
+            ;
     }
 }

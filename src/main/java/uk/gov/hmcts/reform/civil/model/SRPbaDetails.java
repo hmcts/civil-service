@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
+@Accessors(chain = true)
 public class SRPbaDetails {
 
     private DynamicList applicantsPbaAccounts;

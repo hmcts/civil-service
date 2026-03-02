@@ -245,10 +245,10 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec atStateClaimDraft() {
         caseAccessCategory = CaseCategory.SPEC_CLAIM;
-        solicitorReferences = SolicitorReferences.builder()
-            .applicantSolicitor1Reference("12345")
-            .respondentSolicitor1Reference("6789")
-            .build();
+        solicitorReferences = new SolicitorReferences()
+            .setApplicantSolicitor1Reference("12345")
+            .setRespondentSolicitor1Reference("6789")
+            ;
         claimValue = new ClaimValue()
             .setStatementOfValueInPennies(BigDecimal.valueOf(10000000));
         applicantSolicitor1PbaAccounts = DynamicList.builder()
@@ -272,7 +272,7 @@ public class CaseDataBuilderSpec {
         respondentSolicitor1EmailAddress = "respondentsolicitor@example.com";
         respondentSolicitor2EmailAddress = "respondentsolicitor2@example.com";
         applicantSolicitor1UserDetails = new IdamUserDetails().setEmail("applicantsolicitor@example.com");
-        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults().build();
+        applicantSolicitor1ClaimStatementOfTruth = StatementOfTruthBuilder.defaults();
         applicantSolicitor1CheckEmail = new CorrectEmail().setEmail("hmcts.civil@gmail.com").setCorrect(YES);
         return this;
     }
@@ -283,7 +283,7 @@ public class CaseDataBuilderSpec {
         ccdState = PENDING_CASE_ISSUED;
         ccdCaseReference = CASE_ID;
         submittedDate = SUBMITTED_DATE_TIME;
-        claimIssuedPaymentDetails = PaymentDetails.builder().customerReference("12345").build();
+        claimIssuedPaymentDetails = new PaymentDetails().setCustomerReference("12345");
         return this;
     }
 
@@ -419,18 +419,18 @@ public class CaseDataBuilderSpec {
         }
 
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v1PaymentSuccessful() {
         atStateSpec1v1ClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
@@ -446,78 +446,78 @@ public class CaseDataBuilderSpec {
 
     public CaseDataBuilderSpec atStateSpec1v1PaymentFailed() {
         atStateSpec1v1ClaimSubmitted();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-                                                            .customerReference("12345")
-                                                            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+                                                            .setCustomerReference("12345")
+                                                            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantRepresentedPaymentSuccessful() {
         atStateClaimSubmittedTwoRespondentSameSolicitorSpec();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnrepresentedPaymentSuccessful() {
         atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantRepresentedPaymentFailed() {
         atStateClaimSubmittedTwoRespondentDifferentSolicitorSpec();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorOneDefendantUnrepresentedPaymentSuccessful() {
         atStateSpec1v2BothDefendantUnrepresentedClaimSubmitted();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2SameSolicitorBothDefendantUnregisteredPaymentSuccessful() {
         atStateSpec1v2SameSolicitorBothDefendantRepresentedAndUnregistered();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2DifferentSolicitorBothDefendantUnregisteredPaymentSuccessful() {
         atStateSpec1v2DifferentSolicitorBothDefendantRepresentedAndUnregistered();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec1v2OneDefendantUnregisteredOtherUnrepresentedPaymentSuccessful() {
         atStateSpec1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted();
         ccdState = CASE_ISSUED;
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 
     public CaseDataBuilderSpec atStateSpec2v1PaymentFailure() {
         atStateClaimSubmitted2v1();
-        claimIssuedPaymentDetails = PaymentDetails.builder().status(PaymentStatus.FAILED)
-            .customerReference("12345")
-            .build();
+        claimIssuedPaymentDetails = new PaymentDetails().setStatus(PaymentStatus.FAILED)
+            .setCustomerReference("12345")
+            ;
         return this;
     }
 

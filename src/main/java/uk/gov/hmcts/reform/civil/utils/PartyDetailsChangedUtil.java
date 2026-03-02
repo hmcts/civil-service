@@ -123,19 +123,17 @@ public class PartyDetailsChangedUtil {
         }
 
         if (!current.getPartyName(true).equals(updated.getPartyName(true))) {
-            changes.add(PartyDetailsChange.builder()
-                            .fieldName(nameLabel)
-                            .previousValue(current.getPartyName(true))
-                            .updatedValue(updated.getPartyName(true))
-                            .build());
+            changes.add(new PartyDetailsChange()
+                            .setFieldName(nameLabel)
+                            .setPreviousValue(current.getPartyName(true))
+                            .setUpdatedValue(updated.getPartyName(true)));
         }
 
         if (!formatAddress(current.getPrimaryAddress()).equals(formatAddress(updated.getPrimaryAddress()))) {
-            changes.add(PartyDetailsChange.builder()
-                            .fieldName(addressLabel)
-                            .previousValue(formatAddress(current.getPrimaryAddress()))
-                            .updatedValue(formatAddress(updated.getPrimaryAddress()))
-                            .build());
+            changes.add(new PartyDetailsChange()
+                            .setFieldName(addressLabel)
+                            .setPreviousValue(formatAddress(current.getPrimaryAddress()))
+                            .setUpdatedValue(formatAddress(updated.getPrimaryAddress())));
         }
 
         return changes;
@@ -156,19 +154,17 @@ public class PartyDetailsChangedUtil {
         }
 
         if (!current.getFirstName().equals(updated.getFirstName()) || !current.getLastName().equals(updated.getLastName())) {
-            changes.add(PartyDetailsChange.builder()
-                            .fieldName(nameLabel)
-                            .previousValue(String.format("%s %s", current.getFirstName(), current.getLastName()))
-                            .updatedValue(String.format("%s %s", updated.getFirstName(), updated.getLastName()))
-                            .build());
+            changes.add(new PartyDetailsChange()
+                            .setFieldName(nameLabel)
+                            .setPreviousValue(String.format("%s %s", current.getFirstName(), current.getLastName()))
+                            .setUpdatedValue(String.format("%s %s", updated.getFirstName(), updated.getLastName())));
         }
 
         if (!formatAddress(current.getPrimaryAddress()).equals(formatAddress(updated.getPrimaryAddress()))) {
-            changes.add(PartyDetailsChange.builder()
-                            .fieldName(addressLabel)
-                            .previousValue(formatAddress(current.getPrimaryAddress()))
-                            .updatedValue(formatAddress(updated.getPrimaryAddress()))
-                            .build());
+            changes.add(new PartyDetailsChange()
+                            .setFieldName(addressLabel)
+                            .setPreviousValue(formatAddress(current.getPrimaryAddress()))
+                            .setUpdatedValue(formatAddress(updated.getPrimaryAddress())));
         }
 
         return changes;

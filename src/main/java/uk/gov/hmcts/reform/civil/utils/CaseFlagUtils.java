@@ -85,14 +85,14 @@ public class CaseFlagUtils {
     private static PartyFlagStructure createPartiesCaseFlagsField(String partyId, String firstName, String lastName,
                                                                   String email, String phone, String roleOnCase) {
         String partyName = formattedPartyNameForFlags(firstName, lastName);
-        return PartyFlagStructure.builder()
-            .partyID(partyId)
-            .firstName(firstName)
-            .lastName(lastName)
-            .email(email)
-            .phone(phone)
-            .flags(createFlags(partyName, roleOnCase))
-            .build();
+        return new PartyFlagStructure()
+            .setPartyID(partyId)
+            .setFirstName(firstName)
+            .setLastName(lastName)
+            .setEmail(email)
+            .setPhone(phone)
+            .setFlags(createFlags(partyName, roleOnCase))
+            ;
     }
 
     public static Party updateParty(String roleOnCase, Party partyToUpdate) {
@@ -326,8 +326,8 @@ public class CaseFlagUtils {
                     // new party so initialise flags and party ID
                     updatedList.add(
                         appendWithNewPartyId(partyFlagStructure
-                                                 .toBuilder()
-                                                 .flags(createFlags(formattedPartyNameForFlags, roleOnCase)).build()));
+                                                 .copy()
+                                                 .setFlags(createFlags(formattedPartyNameForFlags, roleOnCase))));
                 } else {
                     // existing party with flags so just update the name
                     Flags existingFlags = partyFlagStructure.getFlags();
@@ -337,8 +337,8 @@ public class CaseFlagUtils {
                         .setDetails(existingFlags != null ? existingFlags.getDetails() : null);
                     updatedList.add(
                         partyFlagStructure
-                            .toBuilder()
-                            .flags(updatedFlags).build());
+                            .copy()
+                            .setFlags(updatedFlags));
                 }
             }
             return wrapElements(updatedList);

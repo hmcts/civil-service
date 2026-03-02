@@ -149,7 +149,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse gaPopulateFinalOrderPreviewDoc(final CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         List<String> errors = validAssistedOrderForm(caseData);
         if (caseData.getFinalOrderSelection().equals(FREE_FORM_ORDER)) {
             CaseDocument freeform = gaFreeFormOrderGenerator.generate(
@@ -174,7 +174,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse setCaseName(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder()
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy()
             .caseNameHmctsInternal(getAllPartyNames(caseData));
         UserInfo userDetails = idamClient.getUserInfo(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseDataBuilder.judgeTitle(IdamUserUtils.getIdamUserFullName(userDetails));
@@ -187,7 +187,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     public CallbackResponse populateFreeFormValues(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         caseDataBuilder.orderOnCourtInitiative(new FreeFormOrderValues()
                                                    .setOnInitiativeSelectionTextArea(ON_INITIATIVE_SELECTION_TEST)
@@ -198,101 +198,78 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
                                                .setWithoutNoticeSelectionDate(deadlinesCalculator.getJudicialOrderDeadlineDate(
                                                    LocalDateTime.now(), PLUS_7DAYS)));
 
-        caseDataBuilder.orderMadeOnOwnInitiative(DetailTextWithDate.builder().detailText(ON_INITIATIVE_SELECTION_TEST)
-                                                     .date(deadlinesCalculator.getJudicialOrderDeadlineDate(
-                                                         LocalDateTime.now(), PLUS_7DAYS)).build());
-        caseDataBuilder.orderMadeOnWithOutNotice(DetailTextWithDate.builder().detailText(WITHOUT_NOTICE_SELECTION_TEXT)
-                                                     .date(deadlinesCalculator.getJudicialOrderDeadlineDate(
-                                                         LocalDateTime.now(), PLUS_7DAYS)).build());
+        caseDataBuilder.orderMadeOnOwnInitiative(new DetailTextWithDate().setDetailText(ON_INITIATIVE_SELECTION_TEST)
+                                                     .setDate(deadlinesCalculator.getJudicialOrderDeadlineDate(
+                                                         LocalDateTime.now(), PLUS_7DAYS)));
+        caseDataBuilder.orderMadeOnWithOutNotice(new DetailTextWithDate().setDetailText(WITHOUT_NOTICE_SELECTION_TEXT)
+                                                     .setDate(deadlinesCalculator.getJudicialOrderDeadlineDate(
+                                                         LocalDateTime.now(), PLUS_7DAYS)));
 
-        caseDataBuilder.assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder()
-                                                              .singleDateSelection(AssistedOrderDateHeard.builder().singleDate(
-                                                                  LocalDate.now()).build())
-                                                              .build()).build();
-        caseDataBuilder.assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                               .datesToAvoid(NO).build());
+        caseDataBuilder.assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails()
+                                                              .setSingleDateSelection(new AssistedOrderDateHeard().setSingleDate(
+                                                                  LocalDate.now()))
+                                                              ).build();
+        caseDataBuilder.assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                               .setDatesToAvoid(NO));
         caseDataBuilder
             .assistedOrderMakeAnOrderForCosts(
-                AssistedOrderCost
-                    .builder()
-                    .assistedOrderAssessmentThirdDropdownDate(
+                new AssistedOrderCost()
+                    .setAssistedOrderAssessmentThirdDropdownDate(
                         deadlinesCalculator
                             .getJudicialOrderDeadlineDate(LocalDateTime.now(), 14))
-                    .assistedOrderCostsFirstDropdownDate(
+                    .setAssistedOrderCostsFirstDropdownDate(
                         deadlinesCalculator
                             .getJudicialOrderDeadlineDate(LocalDateTime.now(), 14))
-                    .makeAnOrderForCostsYesOrNo(NO).build())
+                    .setMakeAnOrderForCostsYesOrNo(NO))
             .publicFundingCostsProtection(NO);
 
-        caseDataBuilder
-            .assistedOrderAppealDetails(
-                AssistedOrderAppealDetails
-                    .builder()
-                    .appealTypeChoicesForGranted(
-                        AppealTypeChoices
-                            .builder()
-                            .appealChoiceOptionA(AppealTypeChoiceList.builder()
-                                                     .appealGrantedRefusedDate(
-                                                         deadlinesCalculator
-                                                             .getJudicialOrderDeadlineDate(
-                                                                 LocalDateTime.now(),
-                                                                 21
-                                                             )).build())
-                            .appealChoiceOptionB(AppealTypeChoiceList.builder()
-                                                     .appealGrantedRefusedDate(
-                                                         deadlinesCalculator
-                                                             .getJudicialOrderDeadlineDate(
-                                                                 LocalDateTime.now(),
-                                                                 21
-                                                             )).build())
-                            .build())
-                    .appealTypeChoicesForRefused(
-                        AppealTypeChoices
-                            .builder()
-                            .appealChoiceOptionA(
-                                AppealTypeChoiceList
-                                    .builder()
-                                    .appealGrantedRefusedDate(deadlinesCalculator
-                                                                  .getJudicialOrderDeadlineDate(
-                                                                      LocalDateTime.now(),
-                                                                      21
-                                                                  )).build())
-                            .appealChoiceOptionB(
-                                AppealTypeChoiceList.builder()
-                                    .appealGrantedRefusedDate(deadlinesCalculator
-                                                                  .getJudicialOrderDeadlineDate(
-                                                                      LocalDateTime.now(),
-                                                                      21
-                                                                  )).build())
-                            .build()).build());
+        LocalDate appealDeadline = deadlinesCalculator.getJudicialOrderDeadlineDate(LocalDateTime.now(), 21);
+        AppealTypeChoiceList appealGrantedOptionA = new AppealTypeChoiceList()
+            .setAppealGrantedRefusedDate(appealDeadline);
+        AppealTypeChoiceList appealGrantedOptionB = new AppealTypeChoiceList()
+            .setAppealGrantedRefusedDate(appealDeadline);
+        AppealTypeChoices appealChoicesGranted = new AppealTypeChoices()
+            .setAppealChoiceOptionA(appealGrantedOptionA)
+            .setAppealChoiceOptionB(appealGrantedOptionB);
 
-        caseDataBuilder.assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                        .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                             .claimantPartyName(caseData.getClaimant1PartyName())
-                                                                                             .defendantPartyName(
-                                                                                                 caseData.getDefendant1PartyName()).build()).build());
+        AppealTypeChoiceList appealRefusedOptionA = new AppealTypeChoiceList()
+            .setAppealGrantedRefusedDate(appealDeadline);
+        AppealTypeChoiceList appealRefusedOptionB = new AppealTypeChoiceList()
+            .setAppealGrantedRefusedDate(appealDeadline);
+        AppealTypeChoices appealChoicesRefused = new AppealTypeChoices()
+            .setAppealChoiceOptionA(appealRefusedOptionA)
+            .setAppealChoiceOptionB(appealRefusedOptionB);
+
+        caseDataBuilder.assistedOrderAppealDetails(new AssistedOrderAppealDetails()
+                                                       .setAppealTypeChoicesForGranted(appealChoicesGranted)
+                                                       .setAppealTypeChoicesForRefused(appealChoicesRefused));
+
+        caseDataBuilder.assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                        .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                             .setClaimantPartyName(caseData.getClaimant1PartyName())
+                                                                                             .setDefendantPartyName(
+                                                                                                 caseData.getDefendant1PartyName())));
         if (caseData.getIsMultiParty().equals(YES)) {
-            caseDataBuilder.assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                            .claimantDefendantRepresentation(
-                                                                ClaimantDefendantRepresentation.builder()
-                                                                    .claimantPartyName(caseData.getClaimant1PartyName())
-                                                                    .defendantPartyName(caseData.getDefendant1PartyName())
-                                                                    .defendantTwoPartyName(caseData.getDefendant2PartyName()).build()).build());
+            caseDataBuilder.assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                            .setClaimantDefendantRepresentation(
+                                                                new ClaimantDefendantRepresentation()
+                                                                    .setClaimantPartyName(caseData.getClaimant1PartyName())
+                                                                    .setDefendantPartyName(caseData.getDefendant1PartyName())
+                                                                    .setDefendantTwoPartyName(caseData.getDefendant2PartyName())));
         }
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
         caseDataBuilder.assistedOrderFurtherHearingDetails(
-            AssistedOrderFurtherHearingDetails
-                .builder()
-                .hearingLocationList(populateHearingLocation(caseData))
-                .alternativeHearingLocation(dynamicLocationList)
-                .datesToAvoidDateDropdown(
-                    AssistedOrderDateHeard.builder()
-                        .datesToAvoidDates(deadlinesCalculator
-                                               .getJudicialOrderDeadlineDate(
-                                                   LocalDateTime.now(), PLUS_7DAYS))
-                        .build()).build());
+            new AssistedOrderFurtherHearingDetails()
+                .setHearingLocationList(populateHearingLocation(caseData))
+                .setAlternativeHearingLocation(dynamicLocationList)
+                .setDatesToAvoidDateDropdown(
+                    new AssistedOrderDateHeard()
+                        .setDatesToAvoidDates(deadlinesCalculator
+                                                  .getJudicialOrderDeadlineDate(
+                                                      LocalDateTime.now(), PLUS_7DAYS))
+                ));
 
         caseDataBuilder.assistedOrderGiveReasonsYesNo(NO)
             .assistedOrderOrderedThatText(caseData.getGeneralAppDetailsOfOrder()).build();
@@ -322,7 +299,7 @@ public class JudicialFinalDecisionHandler extends CallbackHandler implements Gen
 
     private CallbackResponse setFinalDecisionBusinessProcess(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         log.info("General app for LiP is enabled for caseId: {}", caseData.getCcdCaseReference());
         caseDataBuilder.bilingualHint(null);
         caseDataBuilder.businessProcess(BusinessProcess.readyGa(GENERATE_DIRECTIONS_ORDER)).build();

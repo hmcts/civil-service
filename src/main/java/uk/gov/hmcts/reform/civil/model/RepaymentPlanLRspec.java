@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -16,7 +15,6 @@ import java.time.LocalDate;
 
 @Accessors(chain = true)
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RepaymentPlanLRspec {

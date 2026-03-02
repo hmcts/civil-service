@@ -51,7 +51,7 @@ public class GaFullRemissionHWFCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse fullRemissionHWF(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        GeneralApplicationCaseData updatedData = caseData.copy();
         BigDecimal feeAmount = HwFFeeTypeUtil.getCalculatedFeeInPence(caseData);
 
         if (caseData.getHwfFeeType().equals(FeeType.APPLICATION)
@@ -60,18 +60,18 @@ public class GaFullRemissionHWFCallbackHandler extends CallbackHandler implement
             Optional.ofNullable(caseData.getGaHwfDetails())
                 .ifPresentOrElse(
                     gaHwfDetails -> updatedData.gaHwfDetails(
-                        gaHwfDetails.toBuilder().remissionAmount(feeAmount)
-                            .outstandingFee(BigDecimal.ZERO)
-                            .hwfFeeType(FeeType.APPLICATION)
-                            .hwfCaseEvent(FULL_REMISSION_HWF_GA)
-                            .build()
+                        gaHwfDetails.copy()
+                            .setRemissionAmount(feeAmount)
+                            .setOutstandingFee(BigDecimal.ZERO)
+                            .setHwfFeeType(FeeType.APPLICATION)
+                            .setHwfCaseEvent(FULL_REMISSION_HWF_GA)
                     ),
                     () -> updatedData.gaHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(feeAmount)
-                            .outstandingFee(BigDecimal.ZERO)
-                            .hwfFeeType(FeeType.APPLICATION)
-                            .hwfCaseEvent(FULL_REMISSION_HWF_GA)
-                            .build()
+                        new HelpWithFeesDetails().setRemissionAmount(feeAmount)
+                            .setOutstandingFee(BigDecimal.ZERO)
+                            .setHwfFeeType(FeeType.APPLICATION)
+                            .setHwfCaseEvent(FULL_REMISSION_HWF_GA)
+                            
                     )
                 );
         } else if (caseData.getHwfFeeType().equals(FeeType.ADDITIONAL)
@@ -80,18 +80,18 @@ public class GaFullRemissionHWFCallbackHandler extends CallbackHandler implement
             Optional.ofNullable(caseData.getAdditionalHwfDetails())
                 .ifPresentOrElse(
                     additionalHwfDetails -> updatedData.additionalHwfDetails(
-                        additionalHwfDetails.toBuilder().remissionAmount(feeAmount)
-                            .outstandingFee(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF_GA)
-                            .hwfFeeType(FeeType.ADDITIONAL)
-                            .build()
+                        additionalHwfDetails.copy()
+                            .setRemissionAmount(feeAmount)
+                            .setOutstandingFee(BigDecimal.ZERO)
+                            .setHwfCaseEvent(FULL_REMISSION_HWF_GA)
+                            .setHwfFeeType(FeeType.ADDITIONAL)
                     ),
                     () -> updatedData.additionalHwfDetails(
-                        HelpWithFeesDetails.builder().remissionAmount(feeAmount)
-                            .outstandingFee(BigDecimal.ZERO)
-                            .hwfCaseEvent(FULL_REMISSION_HWF_GA)
-                            .hwfFeeType(FeeType.ADDITIONAL)
-                            .build()
+                        new HelpWithFeesDetails().setRemissionAmount(feeAmount)
+                            .setOutstandingFee(BigDecimal.ZERO)
+                            .setHwfCaseEvent(FULL_REMISSION_HWF_GA)
+                            .setHwfFeeType(FeeType.ADDITIONAL)
+                            
                     )
                 );
         }

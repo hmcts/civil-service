@@ -32,25 +32,22 @@ public class NocNotificationUtils {
      */
     private static RecipientData getOtherSolicitor1(CaseData caseData) {
         if (isRespondent2NewSolicitor(caseData)) {
-            return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetailsEmail())
-                .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-                .build();
+            return new RecipientData()
+                .setEmail(caseData.getApplicantSolicitor1UserDetailsEmail())
+                .setOrgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
         } else if (isApplicant1NewSolicitor(caseData)) {
             if (!isOtherPartyLip(caseData.getRespondent1OrganisationPolicy())) {
                 Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
                 String respondent1OrgID = respondent1Org != null
                     ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
-                return RecipientData.builder()
-                    .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(respondent1OrgID)
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getRespondentSolicitor1EmailAddress())
+                    .setOrgId(respondent1OrgID);
             }
         } else if (isRespondent1NewSolicitor(caseData) && !caseData.isApplicantLipOneVOne()) {
-            return RecipientData.builder()
-                .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
-                .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-                .build();
+            return new RecipientData()
+                .setEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                .setOrgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
         }
         return null;
     }
@@ -68,25 +65,22 @@ public class NocNotificationUtils {
                 Organisation respondent1Org = caseData.getRespondent1OrganisationPolicy().getOrganisation();
                 String respondent1OrgID = respondent1Org != null
                     ? respondent1Org.getOrganisationID() : caseData.getRespondent1OrganisationIDCopy();
-                return RecipientData.builder()
-                    .email(caseData.getRespondentSolicitor1EmailAddress())
-                    .orgId(respondent1OrgID)
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getRespondentSolicitor1EmailAddress())
+                    .setOrgId(respondent1OrgID);
             }
         } else {
             if (getMultiPartyScenario(caseData).equals(TWO_V_ONE)) {
-                return RecipientData.builder()
-                    .email(caseData.getApplicantSolicitor1UserDetails().getEmail())
-                    .orgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID())
-                    .build();
+                return new RecipientData()
+                    .setEmail(caseData.getApplicantSolicitor1UserDetails().getEmail())
+                    .setOrgId(caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID());
             } else {
                 if (!isOtherPartyLip(caseData.getRespondent2OrganisationPolicy())) {
                     Organisation respondent2Org = caseData.getRespondent2OrganisationPolicy().getOrganisation();
                     String respondent2OrgID = respondent2Org != null ? respondent2Org.getOrganisationID() : caseData.getRespondent2OrganisationIDCopy();
-                    return RecipientData.builder()
-                        .email(caseData.getRespondentSolicitor2EmailAddress())
-                        .orgId(respondent2OrgID)
-                        .build();
+                    return new RecipientData()
+                        .setEmail(caseData.getRespondentSolicitor2EmailAddress())
+                        .setOrgId(respondent2OrgID);
                 }
             }
         }

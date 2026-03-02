@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication.finalorder;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.ga.enums.GAJudicialHearingType;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.LengthOfHearing;
@@ -15,7 +16,8 @@ import java.time.LocalDate;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class AssistedOrderFurtherHearingDetails {
 
     private LocalDate listFromDate;

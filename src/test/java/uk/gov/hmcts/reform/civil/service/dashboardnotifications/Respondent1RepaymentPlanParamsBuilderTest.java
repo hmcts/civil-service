@@ -27,11 +27,11 @@ class Respondent1RepaymentPlanParamsBuilderTest {
     void shouldAddRepaymentPlanParamsWhenRespondent1RepaymentPlanIsPresent() {
         // Arrange
         CaseData caseData = mock(CaseData.class);
-        RepaymentPlanLRspec repaymentPlan = RepaymentPlanLRspec.builder()
-            .firstRepaymentDate(LocalDate.parse("2023-10-15"))
-            .paymentAmount(new BigDecimal("10000"))
-            .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-            .build();
+        RepaymentPlanLRspec repaymentPlan = new RepaymentPlanLRspec()
+            .setFirstRepaymentDate(LocalDate.parse("2023-10-15"))
+            .setPaymentAmount(new BigDecimal("10000"))
+            .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+            ;
 
         when(caseData.getRespondent1RepaymentPlan()).thenReturn(repaymentPlan);
 

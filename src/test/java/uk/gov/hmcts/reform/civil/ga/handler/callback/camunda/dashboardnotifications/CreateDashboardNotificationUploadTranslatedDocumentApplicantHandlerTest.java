@@ -57,7 +57,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentApplicantHandler
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();

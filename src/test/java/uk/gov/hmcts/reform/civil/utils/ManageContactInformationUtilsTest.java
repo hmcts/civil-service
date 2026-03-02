@@ -646,7 +646,7 @@ class ManageContactInformationUtilsTest {
 
             List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
 
-            List<PartyFlagStructure>  expected = List.of(existing.toBuilder().firstName("NewClaimantName").build());
+            List<PartyFlagStructure>  expected = List.of(existing.copy().setFirstName("NewClaimantName"));
             assertThat(unwrapElements(actual)).isEqualTo(expected);
         }
 
@@ -668,12 +668,12 @@ class ManageContactInformationUtilsTest {
             List<Element<PartyFlagStructure>> actual = mapFormDataToIndividualsData(existingList, updatedList);
 
             List<PartyFlagStructure> expected = List.of(
-                PartyFlagStructure.builder()
-                    .firstName(updated.getFirstName())
-                    .lastName(updated.getLastName())
-                    .phone(updated.getPhoneNumber())
-                    .email(updated.getEmailAddress())
-                    .build()
+                new PartyFlagStructure()
+                    .setFirstName(updated.getFirstName())
+                    .setLastName(updated.getLastName())
+                    .setPhone(updated.getPhoneNumber())
+                    .setEmail(updated.getEmailAddress())
+                    
             );
 
             assertThat(unwrapElements(actual)).isEqualTo(expected);
@@ -1098,14 +1098,14 @@ class ManageContactInformationUtilsTest {
     }
 
     private PartyFlagStructure createParty(String prefix) {
-        return PartyFlagStructure.builder()
-            .partyID(prefix + "-id")
-            .firstName(prefix + "-firstname")
-            .lastName(prefix + "-lastname")
-            .email(prefix + "-individual@example.com")
-            .phone(prefix + "-07867654543")
-            .flags(new Flags()
+        return new PartyFlagStructure()
+            .setPartyID(prefix + "-id")
+            .setFirstName(prefix + "-firstname")
+            .setLastName(prefix + "-lastname")
+            .setEmail(prefix + "-individual@example.com")
+            .setPhone(prefix + "-07867654543")
+            .setFlags(new Flags()
                        .setRoleOnCase(prefix + "-role"))
-            .build();
+            ;
     }
 }

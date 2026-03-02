@@ -43,14 +43,12 @@ class HmcMessageHandlerTest {
     void shouldNotTriggerEvent_whenMessageRelevantForServiceAndHearingException() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-            .caseId(1234L)
-            .hearingId("HER1234")
-            .hmctsServiceCode("AAA7")
-            .hearingUpdate(HearingUpdate.builder()
-                               .hmcStatus(EXCEPTION)
-                               .build())
-            .build();
+        HmcMessage hmcMessage = new HmcMessage()
+            .setCaseId(1234L)
+            .setHearingId("HER1234")
+            .setHmctsServiceCode("AAA7")
+            .setHearingUpdate(new HearingUpdate()
+                               .setHmcStatus(EXCEPTION));
 
         handler.handleMessage(hmcMessage);
 
@@ -61,14 +59,12 @@ class HmcMessageHandlerTest {
     void shouldNotTriggerEvent_whenMessageRelevantForServiceNoHearingException() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-            .caseId(1234L)
-            .hearingId("HER1234")
-            .hmctsServiceCode("AAA7")
-            .hearingUpdate(HearingUpdate.builder()
-                               .hmcStatus(HEARING_REQUESTED)
-                               .build())
-            .build();
+        HmcMessage hmcMessage = new HmcMessage()
+            .setCaseId(1234L)
+            .setHearingId("HER1234")
+            .setHmctsServiceCode("AAA7")
+            .setHearingUpdate(new HearingUpdate()
+                               .setHmcStatus(HEARING_REQUESTED));
 
         handler.handleMessage(hmcMessage);
 
@@ -77,14 +73,12 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsListed() {
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA6")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(LISTED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA6")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(LISTED));
 
         handler.handleMessage(hmcMessage);
 
@@ -95,14 +89,12 @@ class HmcMessageHandlerTest {
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsListed() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA7")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(LISTED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA7")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(LISTED));
 
         handler.handleMessage(hmcMessage);
 
@@ -111,14 +103,12 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsAwaitingActuals() {
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA6")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(AWAITING_ACTUALS)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA6")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(AWAITING_ACTUALS));
 
         handler.handleMessage(hmcMessage);
 
@@ -129,14 +119,12 @@ class HmcMessageHandlerTest {
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAwaitingActuals() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA7")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(AWAITING_ACTUALS)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA7")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(AWAITING_ACTUALS));
 
         handler.handleMessage(hmcMessage);
 
@@ -145,14 +133,12 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsCompleted() {
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA6")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(COMPLETED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA6")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(COMPLETED));
 
         handler.handleMessage(hmcMessage);
 
@@ -163,14 +149,12 @@ class HmcMessageHandlerTest {
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCompleted() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA7")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(COMPLETED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA7")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(COMPLETED));
 
         handler.handleMessage(hmcMessage);
 
@@ -179,14 +163,12 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsCenceled() {
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA6")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(CANCELLED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA6")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(CANCELLED));
 
         handler.handleMessage(hmcMessage);
 
@@ -197,14 +179,12 @@ class HmcMessageHandlerTest {
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsCanceled() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA7")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(CANCELLED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA7")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(CANCELLED));
 
         handler.handleMessage(hmcMessage);
 
@@ -213,14 +193,12 @@ class HmcMessageHandlerTest {
 
     @Test
     void shouldTriggerEvent_whenServiceIdIsAAA6AndHMCStatusIsAdjourned() {
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA6")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(ADJOURNED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA6")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(ADJOURNED));
 
         handler.handleMessage(hmcMessage);
 
@@ -231,14 +209,12 @@ class HmcMessageHandlerTest {
     void shouldTriggerEvent_whenServiceIdIsAAA7AndHMCStatusIsAdjourned() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-                .caseId(1234L)
-                .hearingId("HER1234")
-                .hmctsServiceCode("AAA7")
-                .hearingUpdate(HearingUpdate.builder()
-                        .hmcStatus(ADJOURNED)
-                        .build())
-                .build();
+        HmcMessage hmcMessage = new HmcMessage()
+                .setCaseId(1234L)
+                .setHearingId("HER1234")
+                .setHmctsServiceCode("AAA7")
+                .setHearingUpdate(new HearingUpdate()
+                        .setHmcStatus(ADJOURNED));
 
         handler.handleMessage(hmcMessage);
 
@@ -249,14 +225,12 @@ class HmcMessageHandlerTest {
     void shouldNotTriggerEvent_whenMessageServiceIdNotRelevant() {
         when(paymentsConfiguration.getSiteId()).thenReturn("AAA7");
 
-        HmcMessage hmcMessage = HmcMessage.builder()
-            .caseId(1234L)
-            .hearingId("HER1234")
-            .hmctsServiceCode("AAA8")
-            .hearingUpdate(HearingUpdate.builder()
-                               .hmcStatus(EXCEPTION)
-                               .build())
-            .build();
+        HmcMessage hmcMessage = new HmcMessage()
+            .setCaseId(1234L)
+            .setHearingId("HER1234")
+            .setHmctsServiceCode("AAA8")
+            .setHearingUpdate(new HearingUpdate()
+                               .setHmcStatus(EXCEPTION));
 
         handler.handleMessage(hmcMessage);
 

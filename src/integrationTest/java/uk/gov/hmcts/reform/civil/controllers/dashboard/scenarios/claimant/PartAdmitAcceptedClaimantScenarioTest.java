@@ -38,10 +38,12 @@ public class PartAdmitAcceptedClaimantScenarioTest extends DashboardBaseIntegrat
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(500))
             .build().toBuilder()
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.of(2024, 3, 19))
-                                               .build())
-            .ccdCaseReference(Long.valueOf(caseId)).ccdState(CaseState.AWAITING_APPLICANT_INTENTION).build();
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.of(2024, 3, 19))
+                                               )
+            .ccdCaseReference(Long.valueOf(caseId))
+            .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
+            .build();
 
         // When
         handler.handle(callbackParams(caseData));

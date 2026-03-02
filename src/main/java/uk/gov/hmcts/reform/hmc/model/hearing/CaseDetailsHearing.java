@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.hmc.model.hearing;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.hmcts.reform.hmc.model.hearing.CaseCategoryModel;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Accessors(chain = true)
 public class CaseDetailsHearing {
 
     private String hmctsServiceCode;

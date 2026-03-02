@@ -74,14 +74,14 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void updateFeeType_shouldSetAdditionalFeeTypeWithEmptyRef_whenCaseStateIsApplicationAddPayment() {
             // Arrange
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(new HelpWithFees())
                 .hwfFeeType(FeeType.ADDITIONAL)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                     new Fee()
                         .setCalculatedAmountInPence(BigDecimal.valueOf(180))
-                        .setCode("FEE123")).build())
+                        .setCode("FEE123")))
                 .build();
 
             // Act
@@ -96,7 +96,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void updateFeeType_shouldSetAdditionalFeeTypeWithRef_whenCaseStateIsApplicationAddPayment() {
             // Arrange
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("123"))
@@ -115,14 +115,14 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void updateFeeType_shouldSetApplicationFeeTypeWithEmptyRef_whenCaseStateIsNotApplicationAddPayment() {
             // Arrange
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                     new Fee()
                         .setCalculatedAmountInPence(BigDecimal.valueOf(180))
-                        .setCode("FEE123")).build())
+                        .setCode("FEE123")))
                 .build();
 
             // Act
@@ -138,7 +138,7 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void updateFeeType_shouldSetApplicationFeeTypeWithRef_whenCaseStateIsNotApplicationAddPayment() {
             // Arrange
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("123"))
@@ -162,15 +162,15 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void shouldValidationFeePaymentOutcomeGa_withInvalidOutstandingFee() {
             //Given
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                             .setHwfNumberAvailable(YesOrNo.YES)
                             .setHwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                             .setHwfFullRemissionGrantedForGa(YesOrNo.YES))
                     .hwfFeeType(FeeType.APPLICATION)
-                    .gaHwfDetails(HelpWithFeesDetails.builder()
-                            .outstandingFee(BigDecimal.valueOf(100.00))
-                            .build())
+                    .gaHwfDetails(new HelpWithFeesDetails()
+                            .setOutstandingFee(BigDecimal.valueOf(100.00))
+                            )
                     .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "remission-type");
@@ -182,15 +182,15 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void shouldValidationFeePaymentOutcomeAdditional_withInvalidOutstandingFee() {
             //Given
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                             .setHwfNumberAvailable(YesOrNo.YES)
                             .setHwfNumberForFeePaymentOutcome("HWF-1C4-E34")
                             .setHwfFullRemissionGrantedForAdditionalFee(YesOrNo.YES))
                     .hwfFeeType(FeeType.ADDITIONAL)
-                    .additionalHwfDetails(HelpWithFeesDetails.builder()
-                            .outstandingFee(BigDecimal.valueOf(100.00))
-                            .build())
+                    .additionalHwfDetails(new HelpWithFeesDetails()
+                            .setOutstandingFee(BigDecimal.valueOf(100.00))
+                            )
                     .build();
             //When
             CallbackParams params = callbackParamsOf(caseData, MID, "remission-type");
@@ -205,13 +205,13 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
         @Test
         void shouldTrigger_after_payment_GaFee() {
             List<GeneralApplicationTypes> types = List.of(STRIKE_OUT);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
-                            .build())
+                            )
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
-                    .gaHwfDetails(HelpWithFeesDetails.builder().build())
+                    .gaHwfDetails(new HelpWithFeesDetails())
                 .generalAppType(GAApplicationType.builder().types(types).build())
                     .hwfFeeType(FeeType.APPLICATION)
                     .build();
@@ -230,16 +230,16 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldTrigger_after_payment_GaFee_shouldTriggerCosc() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                     .generalAppType(GAApplicationType.builder()
                                         .types(List.of(GeneralApplicationTypes.CONFIRM_CCJ_DEBT_PAID))
                                         .build())
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
-                            .build())
+                            )
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
-                    .gaHwfDetails(HelpWithFeesDetails.builder().build())
+                    .gaHwfDetails(new HelpWithFeesDetails())
                     .hwfFeeType(FeeType.APPLICATION)
                     .build();
             when(service.processHwf(any(GeneralApplicationCaseData.class)))
@@ -257,14 +257,14 @@ public class GaFeePaymentOutcomeHWFCallBackHandlerTest extends GeneralApplicatio
 
         @Test
         void shouldTrigger_modify_state_additioanlFee() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                    .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                    .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
                                     new Fee()
                                             .setCalculatedAmountInPence(BigDecimal.valueOf(10000)).setCode("OOOCM002"))
-                            .build())
+                            )
                     .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("ref"))
-                    .gaHwfDetails(HelpWithFeesDetails.builder().build())
-                    .additionalHwfDetails(HelpWithFeesDetails.builder().build())
+                    .gaHwfDetails(new HelpWithFeesDetails())
+                    .additionalHwfDetails(new HelpWithFeesDetails())
                     .hwfFeeType(FeeType.ADDITIONAL)
                     .build();
             when(service.processHwf(any(GeneralApplicationCaseData.class)))

@@ -40,7 +40,7 @@ class GaInvalidHwFCallbackHandlerTest {
     class AboutToSubmit {
         @Test
         void shouldSubmit_InvalidHwFEvent() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees()).build();

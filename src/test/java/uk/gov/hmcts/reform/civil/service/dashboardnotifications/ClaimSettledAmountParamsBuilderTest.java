@@ -30,10 +30,10 @@ class ClaimSettledAmountParamsBuilderTest {
     void shouldAddClaimSettledAmountWhenPresent() {
         caseData = caseData.toBuilder().respondent1ResponseDeadline(null)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
-            .respondToClaim(RespondToClaim.builder()
-                .howMuchWasPaid(new BigDecimal("10000"))
-                .whenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
-                .build())
+            .respondToClaim(new RespondToClaim()
+                .setHowMuchWasPaid(new BigDecimal("10000"))
+                .setWhenWasThisAmountPaid(LocalDate.parse("2023-03-29"))
+                )
             .build();
 
         HashMap<String, Object> params = new HashMap<>();

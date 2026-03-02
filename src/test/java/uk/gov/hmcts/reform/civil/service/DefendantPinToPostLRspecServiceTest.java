@@ -270,7 +270,7 @@ class DefendantPinToPostLRspecServiceTest {
         }
 
         private DefendantLinkStatus createDefendantLinkStatus(boolean linked) {
-            return DefendantLinkStatus.builder().linked(linked).build();
+            return new DefendantLinkStatus().setLinked(linked);
         }
 
         @Test

@@ -63,7 +63,7 @@ public class RespondToJudgeAddlnInfoHandler extends CallbackHandler implements G
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
 
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         String userId = idamClient.getUserInfo(authToken).getUid();
         String role = DocUploadUtils.getUserRole(caseData, userId);

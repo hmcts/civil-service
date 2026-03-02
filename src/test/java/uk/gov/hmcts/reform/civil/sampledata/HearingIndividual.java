@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.civil.sampledata;
 
-import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.hmc.model.hearing.Attendees;
 import uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel;
 import uk.gov.hmcts.reform.hmc.model.hearing.IndividualDetailsModel;
@@ -13,7 +15,9 @@ import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.NA;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.TELCVP;
 import static uk.gov.hmcts.reform.hmc.model.hearing.HearingSubChannel.VIDCVP;
 
-@Builder
+@NoArgsConstructor
+@Accessors(chain = true)
+@Data
 public class HearingIndividual {
 
     private String partyId;
@@ -32,19 +36,17 @@ public class HearingIndividual {
     }
 
     public Attendees buildAttendee() {
-        return Attendees.builder()
-                .partyID(partyId)
-                .hearingSubChannel(hearingSubChannel)
-                .build();
+        return new Attendees()
+                .setPartyID(partyId)
+                .setHearingSubChannel(hearingSubChannel);
     }
 
     private static HearingIndividual attendingHearingBy(String firstName, String lastName, HearingSubChannel hearingSubChannel) {
-        return HearingIndividual.builder()
-                .partyId(UUID.randomUUID().toString())
-                .firstName(firstName)
-                .lastName(lastName)
-                .hearingSubChannel(hearingSubChannel)
-                .build();
+        return new HearingIndividual()
+                .setPartyId(UUID.randomUUID().toString())
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setHearingSubChannel(hearingSubChannel);
     }
 
     public static HearingIndividual attendingHearingInPerson(String firstName, String lastName) {

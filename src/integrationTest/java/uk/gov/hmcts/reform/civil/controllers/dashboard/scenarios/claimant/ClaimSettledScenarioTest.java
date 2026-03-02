@@ -44,10 +44,10 @@ public class ClaimSettledScenarioTest extends DashboardBaseIntegrationTest {
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
             .ccdState(CaseState.CASE_SETTLED)
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(BigDecimal.valueOf(300000))
-                                .whenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
-                                .build())
+            .respondToClaim(new RespondToClaim()
+                                .setHowMuchWasPaid(BigDecimal.valueOf(300000))
+                                .setWhenWasThisAmountPaid(LocalDate.of(2024, 3, 16))
+                                )
             .respondent1RespondToSettlementAgreementDeadline(respondent1SettlementDeadline)
             .build();
 

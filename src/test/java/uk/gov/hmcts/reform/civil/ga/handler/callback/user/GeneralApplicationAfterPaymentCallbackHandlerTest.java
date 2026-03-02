@@ -116,7 +116,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplicationBeforePayment(isConsented, isTobeNotified))
-            .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+            .copy().ccdCaseReference(CHILD_CCD_REF).build();
     }
 
     private GeneralApplication getGeneralApplicationBeforePayment(YesOrNo isConsented, YesOrNo isTobeNotified) {
@@ -149,23 +149,23 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
 
     private GeneralApplicationCaseData addPaymentStatusToGAPbaDetails(GeneralApplicationCaseData caseData, PaymentStatus status) {
         GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
+            ? new GeneralApplicationPbaDetails()
+            : pbaDetails.copy();
 
-        PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(status)
-            .build();
-        pbaDetails = pbaDetailsBuilder.paymentDetails(paymentDetails).build();
-        return caseData.toBuilder()
-            .generalAppPBADetails(pbaDetails)
+        PaymentDetails paymentDetails = new PaymentDetails()
+            .setStatus(status)
+            ;
+        updatedPbaDetails.setPaymentDetails(paymentDetails);
+        return caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
             .build();
     }
 
     private GeneralApplicationCaseData addGeneralAppType(GeneralApplicationCaseData caseData, GeneralApplicationTypes generalApplicationTypes) {
-        return caseData.toBuilder().generalAppType(
+        return caseData.copy().generalAppType(
                 GAApplicationType.builder().types(List.of(generalApplicationTypes))
                     .build())
             .build();
     }
 }
-

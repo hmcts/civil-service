@@ -65,11 +65,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfCaseEvent(NO_REMISSION_HWF_GA)
-                                  .build())
+                .gaHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+                                  )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -93,11 +93,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioAdditionalApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfCaseEvent(NO_REMISSION_HWF_GA)
-                                  .build())
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfCaseEvent(NO_REMISSION_HWF_GA)
+                                  )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -121,11 +121,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordClaimantScenarioApplicationFee_whenPartialRemissionInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
-                                  .build())
+                .gaHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA)
+                                  )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -149,11 +149,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_MoreInfo_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                          .hwfCaseEvent(MORE_INFORMATION_HWF_GA)
-                                          .build())
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                                          .setHwfCaseEvent(MORE_INFORMATION_HWF_GA)
+                                          )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -177,11 +177,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioApplicationFee_InvalidHwfRef_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.APPLICATION)
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-                                  .build())
+                .gaHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+                                  )
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -201,11 +201,11 @@ public class GaHwFDashboardNotificationsHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordApplicantScenarioAdditionalApplicationFee_InvalidHwfRef_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .hwfFeeType(FeeType.ADDITIONAL)
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                          .hwfCaseEvent(INVALID_HWF_REFERENCE_GA)
-                                          .build())
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                                          .setHwfCaseEvent(INVALID_HWF_REFERENCE_GA)
+                                          )
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

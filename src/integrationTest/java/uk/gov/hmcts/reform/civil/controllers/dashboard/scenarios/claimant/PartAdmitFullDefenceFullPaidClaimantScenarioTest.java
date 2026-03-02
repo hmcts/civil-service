@@ -41,10 +41,10 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .applicant1ResponseDeadline(LocalDateTime.of(deadline, LocalTime.now()))
             .responseClaimTrack("SMALL_CLAIM")
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(100000))
-                                .whenWasThisAmountPaid(paymentDate)
-                                .build())
+            .respondToClaim(new RespondToClaim()
+                                .setHowMuchWasPaid(new BigDecimal(100000))
+                                .setWhenWasThisAmountPaid(paymentDate)
+                                )
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 
@@ -99,10 +99,10 @@ public class PartAdmitFullDefenceFullPaidClaimantScenarioTest extends DashboardB
             .applicant1Represented(YesOrNo.NO)
             .applicant1ResponseDeadline(LocalDateTime.of(deadline, LocalTime.now()))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondToAdmittedClaim(RespondToClaim.builder()
-                                        .howMuchWasPaid(new BigDecimal(100000))
-                                        .whenWasThisAmountPaid(paymentDate)
-                                        .build())
+            .respondToAdmittedClaim(new RespondToClaim()
+                                        .setHowMuchWasPaid(new BigDecimal(100000))
+                                        .setWhenWasThisAmountPaid(paymentDate)
+                                        )
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 

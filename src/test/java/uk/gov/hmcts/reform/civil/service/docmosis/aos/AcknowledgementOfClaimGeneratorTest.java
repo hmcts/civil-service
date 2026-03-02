@@ -256,11 +256,10 @@ class AcknowledgementOfClaimGeneratorTest {
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .respondentSolicitor2Reference("5678")
-            .solicitorReferences(SolicitorReferences.builder()
-                                     .applicantSolicitor1Reference("12345")
-                                     .respondentSolicitor1Reference(null)
-                                     .respondentSolicitor2Reference("5678")
-                                     .build())
+            .solicitorReferences(new SolicitorReferences()
+                .setApplicantSolicitor1Reference("12345")
+                .setRespondentSolicitor1Reference(null)
+                .setRespondentSolicitor2Reference("5678"))
 
             .build();
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(
@@ -308,10 +307,9 @@ class AcknowledgementOfClaimGeneratorTest {
             .addApplicant2(YES)
             .respondent1ClaimResponseIntentionTypeApplicant2(CONTEST_JURISDICTION)
             .respondentSolicitor2Reference("5678")
-            .solicitorReferences(SolicitorReferences.builder()
-                                     .applicantSolicitor1Reference("12345")
-                                     .respondentSolicitor1Reference("1234")
-                                     .build())
+            .solicitorReferences(new SolicitorReferences()
+                .setApplicantSolicitor1Reference("12345")
+                .setRespondentSolicitor1Reference("1234"))
 
             .build();
         AcknowledgementOfClaimForm expectedDocmosisData = new AcknowledgementOfClaimForm(

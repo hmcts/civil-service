@@ -65,16 +65,14 @@ public class ClaimStoreServiceTest {
 
     @BeforeEach
     void setUp() {
-        CmcClaim cmcClaim = CmcClaim.builder()
-            .claimData(ClaimData.builder()
-                           .defendants(Arrays.asList(CmcParty.builder().name(DEFENDANT_NAME).build()))
-                           .claimants(Arrays.asList(CmcParty.builder().name(CLAIMANT_NAME).build()))
-                           .build())
-            .referenceNumber(REFERENCE_NUMBER)
-            .responseDeadline(RESPONSE_DEADLINE)
-            .totalAmountTillToday(TOTAL_AMOUNT)
-            .createdAt(CREATE_DATETIME)
-            .build();
+        CmcClaim cmcClaim = new CmcClaim()
+            .setClaimData(new ClaimData()
+                           .setDefendants(Arrays.asList(new CmcParty().setName(DEFENDANT_NAME)))
+                           .setClaimants(Arrays.asList(new CmcParty().setName(CLAIMANT_NAME))))
+            .setReferenceNumber(REFERENCE_NUMBER)
+            .setResponseDeadline(RESPONSE_DEADLINE)
+            .setTotalAmountTillToday(TOTAL_AMOUNT)
+            .setCreatedAt(CREATE_DATETIME);
         given(claimStoreApi.getClaimsForClaimant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
         given(claimStoreApi.getClaimsForDefendant(any(), any())).willReturn(Collections.singletonList(cmcClaim));
     }
@@ -113,7 +111,7 @@ public class ClaimStoreServiceTest {
 
     @Test
     void shouldReturnDefendantLinkStatusFalseIfLinked() {
-        given(claimStoreApi.isDefendantLinked(anyString())).willReturn(DefendantLinkStatus.builder().linked(true).build());
+        given(claimStoreApi.isDefendantLinked(anyString())).willReturn(new DefendantLinkStatus().setLinked(true));
         DefendantLinkStatus status = claimStoreService.isOcmcDefendantLinked("620MC123");
         verify(claimStoreApi).isDefendantLinked(anyString());
         assertTrue(status.isLinked());

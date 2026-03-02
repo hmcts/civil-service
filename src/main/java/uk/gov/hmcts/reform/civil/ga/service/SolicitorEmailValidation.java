@@ -97,7 +97,7 @@ public class SolicitorEmailValidation {
     public GeneralApplicationCaseData validateSolicitorEmail(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData gaCaseData) {
 
         // GA Applicant solicitor
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = gaCaseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = gaCaseData.copy();
         if (!gaForLipService.isGaForLip(gaCaseData)) {
             caseDataBuilder.generalAppApplnSolicitor(checkIfOrgIDMatch(gaCaseData.getGeneralAppApplnSolicitor(),
                                                                    civilCaseData, gaCaseData));
@@ -118,7 +118,7 @@ public class SolicitorEmailValidation {
     }
 
     private void validateLipEmail(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData gaCaseData,
-                                  GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+                                  GeneralApplicationCaseData caseDataBuilder) {
 
         String applicant1Email = gaForLipService.getApplicant1Email(civilCaseData);
         String defendant1Email = gaForLipService.getDefendant1Email(civilCaseData);
@@ -140,7 +140,7 @@ public class SolicitorEmailValidation {
     }
 
     private void checkApplicantLip(GeneralApplicationCaseData gaCaseData,
-                                   GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+                                   GeneralApplicationCaseData caseDataBuilder,
                                    String userEmail) {
         if (userEmail != null
             && gaCaseData.getGeneralAppApplnSolicitor() != null
@@ -152,7 +152,7 @@ public class SolicitorEmailValidation {
     }
 
     private void checkRespondentsLip(GeneralApplicationCaseData gaCaseData,
-                                     GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+                                     GeneralApplicationCaseData caseDataBuilder,
                                      String userEmail) {
         List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors = newArrayList();
         /*GA for Lip is 1v1*/

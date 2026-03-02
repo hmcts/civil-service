@@ -116,7 +116,7 @@ class EventEmitterAspectTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessGACamundaEvent_whenBPStatusIsNotReadyAndPIIdnull(BusinessProcessStatus status) {
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(new BusinessProcess().setStatus(status))
             .build();
         final CaseDetails caseDetails = CaseDetailsBuilder.builder()
@@ -144,7 +144,7 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldNotEmitBusinessProcessCamundaEvent_whenGAIsNull() {
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
         final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .id(1L)
@@ -251,7 +251,7 @@ class EventEmitterAspectTest {
     private CallbackParams callbackParamsForSubmittedWith(Long caseId, GeneralApplication generalApplication, CaseEvent event, boolean isGaCase) {
         final List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(caseId)
             .build();

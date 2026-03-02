@@ -108,9 +108,9 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
                 .thenReturn(Optional.of(new Organisation().setName("test solicatior")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .respondentSolicitor1OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                             .email("testorg@email.com")
-                                                             .organisationName("test solicatior").build())
+                .respondentSolicitor1OrganisationDetails(new SolicitorOrganisationDetails()
+                    .setEmail("testorg@email.com")
+                    .setOrganisationName("test solicatior"))
                 .claimDetailsNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .addRespondent2(YesOrNo.NO)
@@ -137,9 +137,9 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
                 .thenReturn(Optional.of(new Organisation().setName("test solicatior")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                             .email("testorg@email.com")
-                                                             .organisationName("test solicatior").build())
+                .respondentSolicitor2OrganisationDetails(new SolicitorOrganisationDetails()
+                    .setEmail("testorg@email.com")
+                    .setOrganisationName("test solicatior"))
                 .claimDetailsNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .addRespondent2(YesOrNo.YES)
@@ -167,9 +167,9 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
             ;
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-                .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                             .email("testorg@email.com")
-                                                             .organisationName("test solicatior").build())
+                .respondentSolicitor2OrganisationDetails(new SolicitorOrganisationDetails()
+                    .setEmail("testorg@email.com")
+                    .setOrganisationName("test solicatior"))
                 .claimDetailsNotificationDate(LocalDateTime.now())
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .addRespondent2(YesOrNo.YES)
@@ -216,9 +216,9 @@ class ClaimContinuingOnlineRespondentForSpecNotificationHandlerTest extends Base
     @Test
     void shouldNotNotifyRespondent2SolicitorIfNoSecondDefendant_whenInvoked() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified()
-            .respondentSolicitor2OrganisationDetails(SolicitorOrganisationDetails.builder()
-                                                         .email("testorg@email.com")
-                                                         .organisationName("test solicatior").build())
+            .respondentSolicitor2OrganisationDetails(new SolicitorOrganisationDetails()
+                .setEmail("testorg@email.com")
+                .setOrganisationName("test solicatior"))
             .claimDetailsNotificationDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.now())
             .addRespondent2(YesOrNo.NO)

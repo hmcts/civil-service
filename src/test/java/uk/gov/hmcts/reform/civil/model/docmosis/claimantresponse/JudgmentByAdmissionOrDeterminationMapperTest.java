@@ -73,11 +73,11 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal("21000"))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          .build())
+            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setFirstRepaymentDate(firstRepaymentDate)
+                                          .setPaymentAmount(new BigDecimal("21000"))
+                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          )
             .build();
 
         // When
@@ -102,11 +102,11 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                            .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_DEFENDANT)
                                                            .setClaimantResponseOnCourtDecision(ClaimantResponseOnCourtDecisionType.ACCEPT_REPAYMENT_PLAN)))
-            .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal("21000"))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
-                                          .build())
+            .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setFirstRepaymentDate(firstRepaymentDate)
+                                          .setPaymentAmount(new BigDecimal("21000"))
+                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_MONTH)
+                                          )
             .build();
 
         // When
@@ -128,11 +128,11 @@ class JudgmentByAdmissionOrDeterminationMapperTest {
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES)
             .respondent1RepaymentPlan(null)
-            .respondent2RepaymentPlan(RepaymentPlanLRspec.builder()
-                                          .firstRepaymentDate(firstRepaymentDate)
-                                          .paymentAmount(new BigDecimal("20000"))
-                                          .repaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
-                                          .build())
+            .respondent2RepaymentPlan(new RepaymentPlanLRspec()
+                                          .setFirstRepaymentDate(firstRepaymentDate)
+                                          .setPaymentAmount(new BigDecimal("20000"))
+                                          .setRepaymentFrequency(PaymentFrequencyLRspec.ONCE_ONE_WEEK)
+                                          )
             .build();
 
         // When

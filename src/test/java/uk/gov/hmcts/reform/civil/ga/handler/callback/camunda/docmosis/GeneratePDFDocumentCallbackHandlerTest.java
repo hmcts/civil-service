@@ -349,8 +349,8 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldGenerateMadeDecisionFinalOrderDocument_whenAboutToSubmitEventIsCalled() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().finalOrderFreeForm()
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(GAJudgeDecisionOption.FREE_FORM_ORDER).build()).build();
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -367,8 +367,8 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldPrintGenerateFreeFormOrderDocument() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().finalOrderFreeForm()
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(GAJudgeDecisionOption.FREE_FORM_ORDER).build())
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER))
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicationIsUncloakedOnce(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.YES)
@@ -622,10 +622,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldPrintGenerateSendAppToOtherPartyLip() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText("test")
-                                                     .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
-                                                     .judgeRequestMoreInfoByDate(now()).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText("test")
+                                                     .setRequestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
+                                                     .setJudgeRequestMoreInfoByDate(now()))
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicationIsUncloakedOnce(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.YES)
@@ -649,10 +649,10 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         @Test
         void shouldGenerateSendAppToOtherParty_whenAboutToSubmitEventIsCalled() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText("test")
-                                                     .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
-                                                     .judgeRequestMoreInfoByDate(now()).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText("test")
+                                                     .setRequestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
+                                                     .setJudgeRequestMoreInfoByDate(now()))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
@@ -698,7 +698,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 GaFinalOrderSelection selection) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                     .build()
-                    .toBuilder()
+                    .copy()
                     .finalOrderSelection(selection)
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -725,7 +725,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                     .build()
-                    .toBuilder()
+                    .copy()
                     .finalOrderSelection(selection)
                     .generalOrderDocument(wrapElements(caseDocument))
                     .build();
@@ -745,7 +745,7 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
             GaFinalOrderSelection selection) {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                 .build()
-                .toBuilder()
+                .copy()
                 .finalOrderSelection(selection)
                 .isGaApplicantLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
@@ -1001,8 +1001,8 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaApplicantLip(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .applicantBilingualLanguagePreference(YesOrNo.YES)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(GAJudgeDecisionOption.FREE_FORM_ORDER).build()).build();
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -1023,8 +1023,8 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaApplicantLip(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .respondentBilingualLanguagePreference(YesOrNo.YES)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(GAJudgeDecisionOption.FREE_FORM_ORDER).build()).build();
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1046,8 +1046,8 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
                 .isGaApplicantLip(YesOrNo.YES)
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .respondentBilingualLanguagePreference(YesOrNo.NO)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(GAJudgeDecisionOption.FREE_FORM_ORDER).build()).build();
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(GAJudgeDecisionOption.FREE_FORM_ORDER)).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1111,16 +1111,16 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         void shouldGenerateGeneralOrderDocument_whenAboutToSubmitEventIsCalledForWelshLipButDontHideIt() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .requestForInformationApplication()
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
                 .applicantBilingualLanguagePreference(YES)
                 .parentClaimantIsApplicant(YES)
                 .build();
-            caseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
-                                                     .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                                     .build()).build();
+            caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
+                                                     .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                                     ).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -1139,17 +1139,17 @@ class GeneratePDFDocumentCallbackHandlerTest extends GeneralApplicationBaseCallb
         void shouldGenerateGeneralOrderDocument_whenAboutToSubmitEventIsCalledForWelshLipButHideIt() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .requestForInformationApplication()
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                    GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).judgeRequestMoreInfoByDate(LocalDate.now().minusDays(1))
-                .judgeRequestMoreInfoText("test").build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                    GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).setJudgeRequestMoreInfoByDate(LocalDate.now().minusDays(1))
+                .setJudgeRequestMoreInfoText("test"))
                 .isGaApplicantLip(YES)
                 .isGaRespondentOneLip(YES)
                 .parentClaimantIsApplicant(YES)
                 .applicantBilingualLanguagePreference(YES)
                 .build();
-            caseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
-                                                                 .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                                                 .build()).build();
+            caseData = caseData.copy().judicialDecision(new GAJudicialDecision()
+                                                                 .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                                                 ).build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 

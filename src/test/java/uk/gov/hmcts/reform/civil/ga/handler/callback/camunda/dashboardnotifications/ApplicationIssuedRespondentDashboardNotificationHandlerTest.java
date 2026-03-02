@@ -61,7 +61,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
         @Test
         void shouldRecordApplicationSubmittedScenarioWhenFreeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -88,7 +88,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
         @Test
         void shouldNotRecordApplicationSubmittedScenarioWhenNotFreeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)

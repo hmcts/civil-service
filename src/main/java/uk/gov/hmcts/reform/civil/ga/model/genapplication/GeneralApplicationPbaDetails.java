@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 
@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
+@Accessors(chain = true)
 public class GeneralApplicationPbaDetails {
 
     private Fee fee;
@@ -38,5 +38,15 @@ public class GeneralApplicationPbaDetails {
         this.serviceReqReference = serviceReqReference;
         this.additionalPaymentServiceRef = additionalPaymentServiceRef;
         this.additionalPaymentDetails = additionalPaymentDetails;
+    }
+
+    public GeneralApplicationPbaDetails copy() {
+        return new GeneralApplicationPbaDetails()
+            .setFee(fee)
+            .setPaymentDetails(paymentDetails)
+            .setPaymentSuccessfulDate(paymentSuccessfulDate)
+            .setServiceReqReference(serviceReqReference)
+            .setAdditionalPaymentServiceRef(additionalPaymentServiceRef)
+            .setAdditionalPaymentDetails(additionalPaymentDetails);
     }
 }

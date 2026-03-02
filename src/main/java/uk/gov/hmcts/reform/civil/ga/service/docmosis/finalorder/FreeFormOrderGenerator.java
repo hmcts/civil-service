@@ -79,26 +79,26 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
     @Override
     public FreeFormOrder getTemplateData(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData, String authorisation, FlowFlag userType) {
 
-        FreeFormOrder.FreeFormOrderBuilder freeFormOrderBuilder = FreeFormOrder.builder()
-            .judgeNameTitle(caseData.getJudgeTitle())
-            .caseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-            .caseName(caseData.getCaseNameHmctsInternal())
-            .receivedDate(getDateFormatted(LocalDate.now()))
-            .freeFormRecitalText(caseData.getFreeFormRecitalText())
-            .freeFormOrderedText(caseData.getFreeFormOrderedText())
-            .freeFormOrderValue(getFreeFormOrderValue(caseData))
-            .courtName(docmosisService.getCaseManagementLocationVenueName(
+        FreeFormOrder freeFormOrder = new FreeFormOrder()
+            .setJudgeNameTitle(caseData.getJudgeTitle())
+            .setCaseNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setCaseName(caseData.getCaseNameHmctsInternal())
+            .setReceivedDate(getDateFormatted(LocalDate.now()))
+            .setFreeFormRecitalText(caseData.getFreeFormRecitalText())
+            .setFreeFormOrderedText(caseData.getFreeFormOrderedText())
+            .setFreeFormOrderValue(getFreeFormOrderValue(caseData))
+            .setCourtName(docmosisService.getCaseManagementLocationVenueName(
                 caseData,
                 authorisation
             ).getExternalShortName())
-            .siteName(caseData.getCaseManagementLocation().getSiteName())
-            .address(caseData.getCaseManagementLocation().getAddress())
-            .postcode(caseData.getCaseManagementLocation().getPostcode())
-            .isMultiParty(caseData.getIsMultiParty())
-            .claimant1Name(caseData.getClaimant1PartyName())
-            .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
-            .defendant1Name(caseData.getDefendant1PartyName())
-            .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null);
+            .setSiteName(caseData.getCaseManagementLocation().getSiteName())
+            .setAddress(caseData.getCaseManagementLocation().getAddress())
+            .setPostcode(caseData.getCaseManagementLocation().getPostcode())
+            .setIsMultiParty(caseData.getIsMultiParty())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setClaimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setDefendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null);
 
         if (List.of(
             FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT,
@@ -106,29 +106,28 @@ public class FreeFormOrderGenerator implements TemplateDataGenerator<FreeFormOrd
         ).contains(userType)) {
             boolean parentClaimantIsApplicant = caseData.identifyParentClaimantIsApplicant(caseData);
 
-            freeFormOrderBuilder
-                .partyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine1(caseData.partyAddressAddressLine1(
+            freeFormOrder
+                .setPartyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine1(caseData.partyAddressAddressLine1(
                     parentClaimantIsApplicant,
                     userType,
                     civilCaseData
                 ))
-                .partyAddressAddressLine2(caseData.partyAddressAddressLine2(
+                .setPartyAddressAddressLine2(caseData.partyAddressAddressLine2(
                     parentClaimantIsApplicant,
                     userType,
                     civilCaseData
                 ))
-                .partyAddressAddressLine3(caseData.partyAddressAddressLine3(
+                .setPartyAddressAddressLine3(caseData.partyAddressAddressLine3(
                     parentClaimantIsApplicant,
                     userType,
                     civilCaseData
                 ))
-                .partyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData))
-                .build();
+                .setPartyAddressPostCode(caseData.partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostTown(caseData.partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData));
         }
 
-        return freeFormOrderBuilder.build();
+        return freeFormOrder;
     }
 
     protected String getFreeFormOrderValue(GeneralApplicationCaseData caseData) {

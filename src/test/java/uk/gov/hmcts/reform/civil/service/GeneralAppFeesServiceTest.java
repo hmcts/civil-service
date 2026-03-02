@@ -661,7 +661,7 @@ class GeneralAppFeesServiceTest {
 
     private GeneralApplicationCaseData getFeeCaseGeneralApplication(List<GeneralApplicationTypes> types, YesOrNo hasAgreed,
                                                                     YesOrNo isWithNotice, LocalDate hearingScheduledDate) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = GeneralApplicationCaseData.builder();
+        GeneralApplicationCaseData builder = new GeneralApplicationCaseData();
         builder.generalAppType(GAApplicationType.builder().types(types).build());
         if (Objects.nonNull(hasAgreed)) {
             builder.generalAppRespondentAgreement(GARespondentOrderAgreement

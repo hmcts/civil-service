@@ -253,13 +253,12 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
             .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .judgeRecitalText("Sample Text")
-                                           .judgeApproveEditOptionDate(deadline)
-                                           .reasonForDecisionText("Sample Test")
-                                           .isOrderProcessedByStayScheduler(esProcessed)
-                                           .build()).build();
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                                           .setJudgeRecitalText("Sample Text")
+                                           .setJudgeApproveEditOptionDate(deadline)
+                                           .setReasonForDecisionText("Sample Test")
+                                           .setIsOrderProcessedByStayScheduler(esProcessed)).build();
     }
 
     private GeneralApplicationCaseData getConsentOrderCaseData(Long ccdId, GeneralApplicationTypes generalApplicationType,
@@ -268,24 +267,23 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
             .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
-            .approveConsentOrder(GAApproveConsentOrder.builder()
-                                     .consentOrderDescription("Testing prepopulated text")
-                                     .consentOrderDateToEnd(deadline)
-                                     .isOrderProcessedByStayScheduler(isProcessed)
-                                     .build())
+            .approveConsentOrder(new GAApproveConsentOrder()
+                                     .setConsentOrderDescription("Testing prepopulated text")
+                                     .setConsentOrderDateToEnd(deadline)
+                                     .setIsOrderProcessedByStayScheduler(isProcessed)
+                                     )
             .build();
     }
 
     private CaseDetails getCaseDetails(Long ccdId, GeneralApplicationTypes generalApplicationType,
                                  LocalDate deadline, YesOrNo isProcessed) {
         return CaseDetails.builder().id(ccdId).data(
-                Map.of("judicialDecisionMakeOrder", GAJudicialMakeAnOrder.builder()
-                           .makeAnOrder(APPROVE_OR_EDIT)
-                           .judgeRecitalText("Sample Text")
-                           .judgeApproveEditOptionDate(deadline)
-                           .reasonForDecisionText("Sample Test")
-                           .isOrderProcessedByStayScheduler(isProcessed)
-                           .build(),
+                Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder()
+                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                           .setJudgeRecitalText("Sample Text")
+                           .setJudgeApproveEditOptionDate(deadline)
+                           .setReasonForDecisionText("Sample Test")
+                           .setIsOrderProcessedByStayScheduler(isProcessed),
                        "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType))
                            .build()))
             .state(ORDER_MADE.toString()).build();
@@ -294,11 +292,10 @@ class CheckStayOrderDeadlineEndTaskHandlerTest {
     private CaseDetails getConsentOrderCaseDetails(Long ccdId, GeneralApplicationTypes generalApplicationType,
                                        LocalDate deadline, YesOrNo isProcessed) {
         return CaseDetails.builder().id(ccdId).data(
-                Map.of("approveConsentOrder", GAApproveConsentOrder.builder()
-                           .consentOrderDescription("Testing prepopulated text")
-                           .consentOrderDateToEnd(deadline)
-                           .isOrderProcessedByStayScheduler(isProcessed)
-                           .build(),
+                Map.of("approveConsentOrder", new GAApproveConsentOrder()
+                           .setConsentOrderDescription("Testing prepopulated text")
+                           .setConsentOrderDateToEnd(deadline)
+                           .setIsOrderProcessedByStayScheduler(isProcessed),
                        "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType))
                            .build()))
             .state(ORDER_MADE.toString()).build();

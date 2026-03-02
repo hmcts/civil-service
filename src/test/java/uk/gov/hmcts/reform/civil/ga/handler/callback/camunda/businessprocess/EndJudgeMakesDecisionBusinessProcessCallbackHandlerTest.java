@@ -82,7 +82,7 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends GeneralApp
     void shouldNotAddRespondentSolicitorDetail_WhenJudeOrderMake_WithNoticeApplication() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(YES).build();
-        caseData = caseData.toBuilder().isGaRespondentOneLip(YES).build();
+        caseData = caseData.copy().isGaRespondentOneLip(YES).build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
         when(judicialDecisionHelper.isOrderMakeDecisionMadeVisibleToDefendant(caseData)).thenReturn(false);
@@ -99,7 +99,7 @@ class EndJudgeMakesDecisionBusinessProcessCallbackHandlerTest extends GeneralApp
     void shouldNotAddRespondentSolicitorDetail_WhenJudeOrderMake_WithNoticeApplicationLipNotAdditionalPayment() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().judicialOrderMadeWithUncloakApplication(NO).build();
-        caseData = caseData.toBuilder().isGaRespondentOneLip(YES).build();
+        caseData = caseData.copy().isGaRespondentOneLip(YES).build();
 
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
         when(judicialDecisionHelper.isOrderMakeDecisionMadeVisibleToDefendant(caseData)).thenReturn(true);

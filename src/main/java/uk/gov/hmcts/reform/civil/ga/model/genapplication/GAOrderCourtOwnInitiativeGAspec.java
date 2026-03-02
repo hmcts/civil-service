@@ -2,15 +2,17 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 
+import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
+@NoArgsConstructor
 public class GAOrderCourtOwnInitiativeGAspec {
 
     private String orderCourtOwnInitiative;

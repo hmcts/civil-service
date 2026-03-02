@@ -55,7 +55,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     private CaseData buildCaseData(String caseId) {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS).build();
+        PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
             .toBuilder()
@@ -66,7 +66,7 @@ public class DefendantNocScenarioTest extends DashboardBaseIntegrationTest {
     }
 
     private CaseData buildCaseDataWithTrialArrangements(String caseId) {
-        PaymentDetails paymentDetails = PaymentDetails.builder().status(PaymentStatus.SUCCESS).build();
+        PaymentDetails paymentDetails = new PaymentDetails().setStatus(PaymentStatus.SUCCESS);
         return CaseDataBuilder.builder()
             .atStateClaimIssued1v1LiP().build()
             .toBuilder()

@@ -78,7 +78,7 @@ public class UploadTranslatedDocumentServiceTest {
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .build();
         // When
@@ -96,7 +96,7 @@ public class UploadTranslatedDocumentServiceTest {
     @Test
     void shouldNotProcessWhenNoTranslatedDocumentsPresent() {
         // Given
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(null) // No translated documents
             .build();
 
@@ -129,13 +129,13 @@ public class UploadTranslatedDocumentServiceTest {
         ));
         when(deadlinesCalculator.calculateApplicantResponseDeadline(
             any(LocalDateTime.class), any(Integer.class))).thenReturn(deadline);
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getGaDraftDocument()).isNotNull();
@@ -160,13 +160,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getWrittenRepConcurrentDocument().isEmpty()).isFalse();
@@ -192,13 +192,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_NOTICE_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getHearingNoticeDocument().isEmpty()).isFalse();
@@ -224,13 +224,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getDirectionOrderDocument().isEmpty()).isFalse();
@@ -256,13 +256,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getWrittenRepSequentialDocument().isEmpty()).isFalse();
@@ -288,13 +288,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getRequestForInformationDocument().isEmpty()).isFalse();
@@ -320,13 +320,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
         // Then
         assertThat(caseData.getHearingOrderDocument().isEmpty()).isFalse();
         assertThat(caseData.getPreTranslationGaDocuments().isEmpty()).isTrue();
@@ -351,13 +351,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getGeneralOrderDocument().isEmpty()).isFalse();
@@ -383,13 +383,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC)
             .build();
         //when
-        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.toBuilder());
+        uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(caseData.copy());
 
         // Then
         assertThat(caseData.getDismissalOrderDocument().isEmpty()).isFalse();
@@ -415,13 +415,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
         //when
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData builder = caseData.copy();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -449,13 +449,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPS_RESPONSE_DOC)
             .build();
         //when
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData builder = caseData.copy();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -483,13 +483,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
         //when
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData builder = caseData.copy();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -516,13 +516,13 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<CaseDocument>> preTranslationGaDocuments = new ArrayList<>(List.of(
             element(originalDocument)
         ));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocuments(preTranslationGaDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.MORE_INFO_RESPONSE_DOC)
             .build();
         //when
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+        GeneralApplicationCaseData builder = caseData.copy();
         uploadTranslatedDocumentService.updateGADocumentsWithOriginalDocuments(builder);
 
         // Then
@@ -539,9 +539,9 @@ public class UploadTranslatedDocumentServiceTest {
             .setDocumentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
             .file(mock(Document.class));
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("F1234")).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("F1234")))
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When
@@ -558,9 +558,9 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(new Fee().setCode("FREE")).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.APPLICATION_SUMMARY_DOC)
             .build();
         // When
@@ -577,7 +577,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC)
             .build();
@@ -595,7 +595,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
@@ -613,7 +613,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
             .build();
@@ -631,7 +631,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_ORDER_DOC)
             .build();
@@ -649,7 +649,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC)
             .build();
@@ -667,7 +667,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.FINAL_ORDER_DOC)
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
@@ -686,7 +686,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
@@ -704,7 +704,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC)
             .build();
@@ -722,7 +722,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
@@ -741,7 +741,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
             .build();
@@ -759,7 +759,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC)
             .build();
@@ -777,7 +777,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -795,7 +795,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -813,7 +813,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -831,7 +831,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -849,7 +849,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -867,7 +867,7 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
             .build();
@@ -959,7 +959,7 @@ public class UploadTranslatedDocumentServiceTest {
                           .setUploadTimestamp("01-01-2025"))
                 .build()).build());
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .build();
 
@@ -988,9 +988,9 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
-        GeneralApplicationCaseData updatedCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1007,9 +1007,9 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
-        GeneralApplicationCaseData updatedCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1026,9 +1026,9 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
-        GeneralApplicationCaseData updatedCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 
@@ -1045,9 +1045,9 @@ public class UploadTranslatedDocumentServiceTest {
             .file(mock(Document.class))
             .build();
         translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
-        GeneralApplicationCaseData updatedCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
 
         uploadTranslatedDocumentService.sendUserUploadNotification(caseData, updatedCaseData, "auth");
 

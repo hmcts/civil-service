@@ -187,7 +187,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithHearingDateWithHearingFeePBADetails();
-            caseData.setClaimIssuedPBADetails(SRPbaDetails.builder().serviceReqReference("123456").build());
+            caseData.setClaimIssuedPBADetails(new SRPbaDetails().setServiceReqReference("123456"));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -248,7 +248,7 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             //GIVEN
             caseData = CaseDataBuilder.builder().buildMakePaymentsCaseDataWithoutServiceRequestReference();
             caseData.setHearingDueDate(LocalDate.now().plusWeeks(1));
-            caseData.setHearingFeePBADetails(SRPbaDetails.builder().serviceReqReference("123").build());
+            caseData.setHearingFeePBADetails(new SRPbaDetails().setServiceReqReference("123"));
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_API, ABOUT_TO_SUBMIT);
             //WHEN
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -285,10 +285,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
-            SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
-                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
-                .build();
+            SRPbaDetails expected = new SRPbaDetails()
+                .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
+                .setServiceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
+                ;
 
             assertThat(actual).isEqualTo(expected);
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");
@@ -315,10 +315,10 @@ public class ServiceRequestAPIHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
             SRPbaDetails actual = responseCaseData.getHearingFeePBADetails();
-            SRPbaDetails expected = SRPbaDetails.builder()
-                .fee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
-                .serviceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
-                .build();
+            SRPbaDetails expected = new SRPbaDetails()
+                .setFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(10800)))
+                .setServiceReqReference(SUCCESSFUL_PAYMENT_REFERENCE)
+                ;
 
             assertThat(actual).isEqualTo(expected);
             verify(paymentsService).createServiceRequest(caseData, "BEARER_TOKEN");

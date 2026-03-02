@@ -527,9 +527,9 @@ class DashboardClaimStatusFactoryTest {
             new CcdDashboardDefendantClaimMatcher(previous, toggleService, eventHistory)
         );
         CaseData caseData = previous.toBuilder()
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(PaymentStatus.SUCCESS)
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(PaymentStatus.SUCCESS)
+                                          )
             .build();
         checkStatus(caseData, eventHistory,
                     DashboardClaimStatus.CLAIMANT_HWF_FEE_PAYMENT_OUTCOME,

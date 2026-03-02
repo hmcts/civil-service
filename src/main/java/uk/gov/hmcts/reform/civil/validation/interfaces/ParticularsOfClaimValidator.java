@@ -14,7 +14,7 @@ public interface ParticularsOfClaimValidator {
         CaseData caseData = callbackParams.getCaseData();
 
         return ofNullable(caseData.getServedDocumentFiles())
-            .orElse(ServedDocumentFiles.builder().build());
+            .orElse(new ServedDocumentFiles());
     }
 
     default CallbackResponse validateParticularsOfClaim(CallbackParams callbackParams) {

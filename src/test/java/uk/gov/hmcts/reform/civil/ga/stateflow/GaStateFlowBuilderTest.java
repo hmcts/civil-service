@@ -312,7 +312,7 @@ class GaStateFlowBuilderTest {
 
         @Test
         void shouldEvaluateStateAndGetStateHistory() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
 
             Predicate<GeneralApplicationCaseData> firstPredicate = c -> {
                 assertThat(c).isSameAs(caseData);
@@ -346,7 +346,7 @@ class GaStateFlowBuilderTest {
 
         @Test
         void shouldEvaluateStateAndFlags() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
 
             Predicate<GeneralApplicationCaseData> firstPredicate = c -> {
                 assertThat(c).isSameAs(caseData);
@@ -387,7 +387,7 @@ class GaStateFlowBuilderTest {
 
         @Test
         void shouldEvaluateStateAndGetStateHistory_whenAmbiguousTransitions() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
 
             GaStateFlow stateFlow = GaStateFlowBuilder.<FlowState>flow("FLOW")
                 .initial(FlowState.STATE_1)

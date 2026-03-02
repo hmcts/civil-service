@@ -67,7 +67,7 @@ public class HearingFeePaidClaimantScenarioTest extends DashboardBaseIntegration
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .build();
-        caseData = caseData.toBuilder().hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).reference("REFERENCE").build()).build();
+        caseData = caseData.toBuilder().hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS).setReference("REFERENCE")).build();
 
         handler.handle(callbackParams(caseData));
 

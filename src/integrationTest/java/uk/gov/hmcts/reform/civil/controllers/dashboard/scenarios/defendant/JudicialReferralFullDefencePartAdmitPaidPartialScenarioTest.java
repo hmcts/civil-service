@@ -31,7 +31,7 @@ public class JudicialReferralFullDefencePartAdmitPaidPartialScenarioTest extends
             .ccdCaseReference(Long.valueOf(caseId))
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-            .respondToClaim(RespondToClaim.builder().howMuchWasPaid(new BigDecimal("300000")).build())
+            .respondToClaim(new RespondToClaim().setHowMuchWasPaid(new BigDecimal("300000")))
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .specRespondent1Represented(YesOrNo.NO)

@@ -34,7 +34,7 @@ public class ClaimRejectedNotPaidScenarioTest extends DashboardBaseIntegrationTe
             .responseClaimMediationSpecRequired(YesOrNo.NO)
             .respondent1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTestForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
-            .respondToAdmittedClaim(RespondToClaim.builder().howMuchWasPaid(BigDecimal.valueOf(100000)).build())
+            .respondToAdmittedClaim(new RespondToClaim().setHowMuchWasPaid(BigDecimal.valueOf(100000)))
             .build();
 
         handler.handle(callbackParams(caseData));
