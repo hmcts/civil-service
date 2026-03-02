@@ -61,12 +61,15 @@ public class RateLimiterService {
             // Subsequent request in this time window
             counter = (AtomicInteger) valueWrapper.get();
             int currentCount = counter.incrementAndGet();
+            log.info("currentCount : {} and limit : {} ", currentCount, limit);
 
             // If this is a new time window, update the expiry time
             if (!expiryTimes.containsKey(cacheKey)) {
+                log.info("Inside expiryTimes cacheKey : {} and timeWindowSeconds : {} ", cacheKey, timeWindowSeconds);
                 updateExpiryTime(cacheKey, timeWindowSeconds);
             }
 
+            log.info("currentCount <= limit : {} ", currentCount <= limit);
             return currentCount <= limit;
         }
     }
@@ -76,6 +79,7 @@ public class RateLimiterService {
     }
 
     private void updateExpiryTime(String cacheKey, int timeWindowSeconds) {
+        log.info("cacheKey : {} and timeWindowSeconds {} ", cacheKey, timeWindowSeconds);
         expiryTimes.put(cacheKey, System.currentTimeMillis() + (timeWindowSeconds * 1000L));
         log.info("expiryTimes size : {} ", expiryTimes.size());
     }

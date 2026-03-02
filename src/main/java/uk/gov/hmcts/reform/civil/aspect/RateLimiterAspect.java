@@ -63,7 +63,8 @@ public class RateLimiterAspect {
                 response.getWriter().write("Rate limit exceeded. Please try again later.");
                 response.getWriter().flush();
             }
-
+            log.info("response status : {} ", response.getStatus());
+            log.info("response : {} ", response.toString());
             return null;
         }
     }
