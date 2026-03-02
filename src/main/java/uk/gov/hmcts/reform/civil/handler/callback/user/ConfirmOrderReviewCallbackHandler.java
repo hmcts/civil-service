@@ -172,6 +172,13 @@ public class ConfirmOrderReviewCallbackHandler extends CallbackHandler {
                 .build();
         }
         caseData.setEnableUploadEvent(YesOrNo.YES);
+        if (CaseState.DECISION_OUTCOME.toString().equals(callbackParams.getRequest().getCaseDetails().getState())) {
+            return AboutToStartOrSubmitCallbackResponse.builder()
+                .data(caseData.toMap(objectMapper))
+                .state(CaseState.CASE_PROGRESSION.toString())
+                .build();
+        }
+
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();

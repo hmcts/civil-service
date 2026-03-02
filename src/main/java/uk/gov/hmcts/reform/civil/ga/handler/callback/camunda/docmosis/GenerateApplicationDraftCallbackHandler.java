@@ -101,7 +101,7 @@ public class GenerateApplicationDraftCallbackHandler extends CallbackHandler imp
 
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         CaseDocument gaDraftDocument;
 
         if (gaForLipService.isGaForLip(caseData)) {

@@ -99,7 +99,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
         void shouldNotifyApplicantOnlyOneSolicitor_whenInvoked() {
             when(notificationsProperties.getNotifyDJNonDivergentSpecClaimantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -128,7 +128,7 @@ public class ClaimDJNonDivergentClaimantNotificationHandlerTest extends BaseCall
         void shouldNotifyClaimantSolicitorWith2Defendants_whenInvoked() {
             when(notificationsProperties.getNotifyDJNonDivergentSpecClaimantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 

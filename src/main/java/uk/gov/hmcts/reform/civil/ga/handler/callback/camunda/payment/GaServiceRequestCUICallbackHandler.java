@@ -64,10 +64,10 @@ public class GaServiceRequestCUICallbackHandler extends CallbackHandler implemen
             if (isServiceRequestNotRequested(caseData)) {
                 log.info("Calling payment service request (application fee) for case {}", caseData.getCcdCaseReference());
                 String serviceRequestReference = getServiceRequestReference(caseData, authToken);
-                caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                .serviceReqReference(serviceRequestReference)
-                                .fee(caseData.getGeneralAppPBADetails().getFee())
-                                .build())
+                caseData = caseData.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                .setServiceReqReference(serviceRequestReference)
+                                .setFee(caseData.getGeneralAppPBADetails().getFee())
+                                )
                     .build();
             }
         } catch (FeignException e) {

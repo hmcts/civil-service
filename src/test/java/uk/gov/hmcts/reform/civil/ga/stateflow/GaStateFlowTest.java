@@ -88,7 +88,7 @@ class GaStateFlowTest {
             when(mockedStateMachine.getExtendedState()).thenReturn(mockedExtendedState);
             when(mockedStateMachine.startReactively()).thenReturn(mockedMono);
 
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
 
             GaStateFlow stateFlow = new GaStateFlow(mockedStateMachine);
 

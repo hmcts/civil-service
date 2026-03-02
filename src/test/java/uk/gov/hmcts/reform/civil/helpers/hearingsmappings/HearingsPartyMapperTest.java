@@ -65,17 +65,17 @@ public class HearingsPartyMapperTest {
     @BeforeEach
     void setUp() {
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_TWO_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_TWO_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_TWO_LR_ORG_NAME)
+                                        ));
     }
 
     private String getLocalDateInString(LocalDate date) {

@@ -87,7 +87,7 @@ class FailedPaymentApplicantNotificationHandlerTest extends BaseCallbackHandlerT
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             handler.handle(params);
 

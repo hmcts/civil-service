@@ -64,20 +64,17 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
     OrganisationApi organisationApi;
 
     private static final String NEW_ORG_ID = "1234";
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+                               .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
 
     @BeforeEach
     void setUp() {

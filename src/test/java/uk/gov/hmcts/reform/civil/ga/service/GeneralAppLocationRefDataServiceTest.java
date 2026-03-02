@@ -184,8 +184,8 @@ class GeneralAppLocationRefDataServiceTest {
     }
 
     private LocationRefData getLocationRefData(String siteName, String region, String postcode, String courtAddress) {
-        return LocationRefData.builder().siteName(siteName).region(region)
-            .postcode(postcode).courtAddress(courtAddress).build();
+        return new LocationRefData().setSiteName(siteName).setRegion(region)
+            .setPostcode(postcode).setCourtAddress(courtAddress);
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {

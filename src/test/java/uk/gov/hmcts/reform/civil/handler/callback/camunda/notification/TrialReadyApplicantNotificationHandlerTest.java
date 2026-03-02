@@ -93,7 +93,7 @@ class TrialReadyApplicantNotificationHandlerTest {
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 

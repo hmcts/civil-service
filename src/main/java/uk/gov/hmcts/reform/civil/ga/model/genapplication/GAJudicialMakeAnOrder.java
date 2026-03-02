@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.ga.enums.GAJudgeOrderClaimantOrDefenseFixedList;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.FinalOrderShowToggle;
@@ -16,7 +17,8 @@ import java.util.List;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAJudicialMakeAnOrder {
 
     private List<FinalOrderShowToggle> showJudgeRecitalText;
@@ -94,5 +96,31 @@ public class GAJudicialMakeAnOrder {
         this.orderWithoutNotice = orderWithoutNotice;
         this.orderWithoutNoticeDate = orderWithoutNoticeDate;
         this.showReasonForDecision = showReasonForDecision;
+    }
+
+    public GAJudicialMakeAnOrder copy() {
+        return new GAJudicialMakeAnOrder()
+            .setShowJudgeRecitalText(showJudgeRecitalText)
+            .setJudgeRecitalText(judgeRecitalText)
+            .setMakeAnOrder(makeAnOrder)
+            .setOrderText(orderText)
+            .setDismissalOrderText(dismissalOrderText)
+            .setDirectionsText(directionsText)
+            .setDirectionsResponseByDate(directionsResponseByDate)
+            .setReasonForDecisionText(reasonForDecisionText)
+            .setJudgeApproveEditOptionDate(judgeApproveEditOptionDate)
+            .setDisplayjudgeApproveEditOptionDate(displayjudgeApproveEditOptionDate)
+            .setDisplayjudgeApproveEditOptionDoc(displayjudgeApproveEditOptionDoc)
+            .setJudgeApproveEditOptionDoc(judgeApproveEditOptionDoc)
+            .setIsOrderProcessedByStayScheduler(isOrderProcessedByStayScheduler)
+            .setJudicialByCourtsInitiative(judicialByCourtsInitiative)
+            .setDisplayjudgeApproveEditOptionDateForUnlessOrder(displayjudgeApproveEditOptionDateForUnlessOrder)
+            .setJudgeApproveEditOptionDateForUnlessOrder(judgeApproveEditOptionDateForUnlessOrder)
+            .setIsOrderProcessedByUnlessScheduler(isOrderProcessedByUnlessScheduler)
+            .setOrderCourtOwnInitiative(orderCourtOwnInitiative)
+            .setOrderCourtOwnInitiativeDate(orderCourtOwnInitiativeDate)
+            .setOrderWithoutNotice(orderWithoutNotice)
+            .setOrderWithoutNoticeDate(orderWithoutNoticeDate)
+            .setShowReasonForDecision(showReasonForDecision);
     }
 }

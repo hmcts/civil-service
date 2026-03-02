@@ -88,7 +88,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationLiPRespondentConsent_WhenParentCaseInEnglish() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
@@ -128,7 +128,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationLiPRespondentConsent_WhenParentCaseInWelsh() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
@@ -170,7 +170,7 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
         void shouldSendNotificationRespondentConsentForLR() {
             // Given
             GeneralApplicationCaseData caseData =
-                GeneralApplicationCaseData.builder()
+                new GeneralApplicationCaseData()
                     .applicantPartyName("applicant1")
                     .defendant1PartyName("respondent1")
                     .generalAppRespondentSolicitors(List.of(
@@ -190,9 +190,9 @@ public class TranslatedDocumentUploadedRespondentNotificationHandlerTest extends
             when(coreCaseDataService.getCase(any())).thenReturn(civil);
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
             when(gaForLipService.isLipResp(caseData)).thenReturn(false);
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder()
-                                                                                             .name("LegalRep")
-                                                                                             .build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation()
+                                                                                             .setName("LegalRep")
+                                                                                             ));
             when(notificationsProperties.getNotifyLRTranslatedDocumentUploaded()).thenReturn(
                 "template-id");
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

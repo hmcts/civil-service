@@ -1,12 +1,5 @@
 package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 
-import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,6 +17,14 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsTimelineHelper
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
 import uk.gov.hmcts.reform.civil.utils.PredicateUtils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+
+import static uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsEventSupport.createEvent;
 
 @Slf4j
 @Component
@@ -88,7 +89,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
                             String.format(
                                     "Defendant: %s has acknowledged: %s",
                                     caseData.getRespondent1().getPartyName(),
-                                    caseData.getRespondent1ClaimResponseIntentionType().getLabel())));
+                                    evaluateRespondent1IntentionType(caseData))));
         }
         if (PredicateUtils.defendant2AckExists.test(caseData)) {
             events.add(
@@ -99,7 +100,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
                             String.format(
                                     "Defendant: %s has acknowledged: %s",
                                     caseData.getRespondent2().getPartyName(),
-                                    caseData.getRespondent2ClaimResponseIntentionType().getLabel())));
+                                    evaluateRespondent2IntentionType(caseData))));
         }
         return events;
     }
@@ -116,7 +117,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
                                 "[1 of 2 - %s] Defendant: %s has acknowledged: %s",
                                 currentDate,
                                 caseData.getRespondent1().getPartyName(),
-                                caseData.getRespondent1ClaimResponseIntentionType().getLabel())));
+                                evaluateRespondent1IntentionType(caseData))));
         events.add(
                 buildAosEvent(
                         builder,
@@ -167,7 +168,7 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
                 new EventDetails()
                         .setResponseIntention(
                                 isRespondent1
-                                        ? caseData.getRespondent1ClaimResponseIntentionType().getLabel()
+                                        ? evaluateRespondent1IntentionType(caseData)
                                         : evaluateRespondent2IntentionType(caseData)));
     }
 
@@ -186,6 +187,13 @@ public class AcknowledgementOfServiceStrategy implements EventHistoryStrategy {
             return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
         }
         return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
+    }
+
+    private String evaluateRespondent1IntentionType(CaseData caseData) {
+        if (caseData.getRespondent1ClaimResponseIntentionType() != null) {
+            return caseData.getRespondent1ClaimResponseIntentionType().getLabel();
+        }
+        return caseData.getRespondent2ClaimResponseIntentionType().getLabel();
     }
 
     private boolean hasRelevantState(StateFlow stateFlow) {

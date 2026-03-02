@@ -111,7 +111,7 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 

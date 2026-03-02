@@ -269,9 +269,9 @@ class NotificationUtilsTest {
     void shouldReturnOrgName_whenOrgIsPresent() {
         OrganisationPolicy organisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("ORG123"));
 
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                                                                         .name("org name")
-                                                                                         .build()));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                                                                         .setName("org name")
+                                                                                         ));
 
         String actual = NotificationUtils.getRespondentLegalOrganizationName(
             organisationPolicy,
@@ -317,9 +317,9 @@ class NotificationUtilsTest {
     void shouldReturnApplicantOrgName_whenOrgIsPresent() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
 
-        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                                                                         .name("org name")
-                                                                                         .build()));
+        when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                                                                         .setName("org name")
+                                                                                         ));
 
         String actual = NotificationUtils.getApplicantLegalOrganizationName(
             caseData,

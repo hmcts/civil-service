@@ -98,7 +98,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         void shouldNotifyApplicantSolicitorForBreathingSpaceLifted() {
             when(notificationsProperties.getBreathingSpaceLiftedApplicantEmailTemplate()).thenReturn(APPLICANT_ID);
             when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("applicant solicitor org").build()));
+                anyString())).thenReturn(Optional.of(new Organisation().setName("applicant solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()
@@ -125,7 +125,7 @@ public class BreathingSpaceLiftedNotificationHandlerTest extends BaseCallbackHan
         void shouldNotifyRespondentSolicitorForBreathingSpaceLifted() {
             when(notificationsProperties.getBreathingSpaceLiftedRespondentEmailTemplate()).thenReturn(RESPONDENT_ID);
             when(organisationService.findOrganisationById(
-                anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+                anyString())).thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimIssued()

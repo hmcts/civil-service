@@ -12,6 +12,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
@@ -241,6 +243,24 @@ class ConfirmOrderReviewCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getData()).extracting("enableUploadEvent").isEqualTo(YesOrNo.YES.getLabel());
+        }
+
+        @Test
+        void shouldSetToDecisionOutcomeState_whenOrderIsNotFinalOrder_thenMoveToCaseProgressionState() {
+            CaseData caseData = CaseDataBuilder.builder().build();
+            caseData.setIsFinalOrder(NO);
+            caseData.setObligationDatePresent(NO);
+
+            CaseDetails caseDetails = CaseDetails.builder()
+                .state(CaseState.DECISION_OUTCOME.toString())
+                .caseTypeId("CIVIL")
+                .data(caseData.toMap(objectMapper)).build();
+
+            CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails).build();
+            CallbackParams params = callbackParamsOf(callbackRequest.getCaseDetails().getData(), caseData, ABOUT_TO_SUBMIT, null, CaseState.DECISION_OUTCOME);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getState()).isEqualTo(CaseState.CASE_PROGRESSION.name());
         }
 
         @Test

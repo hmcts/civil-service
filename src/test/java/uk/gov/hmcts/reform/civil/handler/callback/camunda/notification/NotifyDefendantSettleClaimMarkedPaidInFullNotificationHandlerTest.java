@@ -86,7 +86,7 @@ public class NotifyDefendantSettleClaimMarkedPaidInFullNotificationHandlerTest e
         void setup() {
             when(notificationsProperties.getNotifySettleClaimMarkedPaidInFullDefendantTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
             when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));

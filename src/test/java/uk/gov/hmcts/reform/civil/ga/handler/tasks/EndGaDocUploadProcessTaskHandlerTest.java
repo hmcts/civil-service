@@ -74,9 +74,8 @@ public class EndGaDocUploadProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder()
-            .caseId(CASE_ID)
-            .build();
+        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
+            .setCaseId(CASE_ID);
 
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         when(coreCaseDataService.startGaUpdate(CASE_ID, END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC)).thenReturn(
@@ -102,9 +101,8 @@ public class EndGaDocUploadProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
-        ExternalTaskInput externalTaskInput = ExternalTaskInput.builder()
-            .caseId(CASE_ID)
-            .build();
+        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
+            .setCaseId(CASE_ID);
 
         when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         when(coreCaseDataService.startGaUpdate(CASE_ID, END_DOC_UPLOAD_BUSINESS_PROCESS_GASPEC)).thenReturn(

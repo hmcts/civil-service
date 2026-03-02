@@ -44,11 +44,11 @@ class UpdatedRefNumberHWFCallbackHandlerTest extends GeneralApplicationBaseCallb
 
         @Test
         void shouldUpdateRefNumber_forApplicationHwf() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees())
-                .gaHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfReferenceNumber(NEW_HWF_REF_NUMBER).build())
+                .gaHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfReferenceNumber(NEW_HWF_REF_NUMBER))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -61,11 +61,11 @@ class UpdatedRefNumberHWFCallbackHandlerTest extends GeneralApplicationBaseCallb
 
         @Test
         void shouldUpdateRefNumber_forAdditionalHwf() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .generalAppHelpWithFees(new HelpWithFees())
-                .additionalHwfDetails(HelpWithFeesDetails.builder()
-                                  .hwfReferenceNumber(NEW_HWF_REF_NUMBER).build())
+                .additionalHwfDetails(new HelpWithFeesDetails()
+                                  .setHwfReferenceNumber(NEW_HWF_REF_NUMBER))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

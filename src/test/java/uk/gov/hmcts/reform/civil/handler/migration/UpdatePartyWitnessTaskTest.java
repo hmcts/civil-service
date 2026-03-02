@@ -42,8 +42,8 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateApplicantWitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
-        PartyFlagStructure witness2 = PartyFlagStructure.builder().firstName("Alice").lastName(null).build();
+        PartyFlagStructure witness1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
+        PartyFlagStructure witness2 = new PartyFlagStructure().setFirstName("Alice").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .applicantWitnesses(List.of(
@@ -66,7 +66,7 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateRespondent1WitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness = PartyFlagStructure.builder().firstName(null).lastName("Smith").build();
+        PartyFlagStructure witness = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
@@ -82,7 +82,7 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateRespondent2WitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness = PartyFlagStructure.builder().firstName("Bob").lastName(null).build();
+        PartyFlagStructure witness = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .respondent2Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
@@ -133,11 +133,11 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldAssignNewPartyIdWhenMissing() {
-        PartyFlagStructure witness = PartyFlagStructure.builder()
-            .firstName("Jane")
-            .lastName("Doe")
-            .partyID(null)
-            .build();
+        PartyFlagStructure witness = new PartyFlagStructure()
+            .setFirstName("Jane")
+            .setLastName("Doe")
+            .setPartyID(null)
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantWitnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
@@ -156,11 +156,11 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldNotChangeExistingPartyId() {
-        PartyFlagStructure witness = PartyFlagStructure.builder()
-            .firstName("Alex")
-            .lastName("Mason")
-            .partyID("existing-id-001")
-            .build();
+        PartyFlagStructure witness = new PartyFlagStructure()
+            .setFirstName("Alex")
+            .setLastName("Mason")
+            .setPartyID("existing-id-001")
+            ;
 
         CaseData caseData = CaseData.builder()
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))

@@ -62,7 +62,7 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ResponseDeadline(LocalDateTime.now())

@@ -41,10 +41,9 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                     .individualFirstName("Defendant")
                     .individualLastName("John")
                     .type(Party.Type.INDIVIDUAL).build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(responseDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(responseDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
@@ -95,10 +94,9 @@ public class FullOrPartAdmitPayBySetDateFromDefendantScenarioTest extends Dashbo
                         .soleTraderFirstName("Sole")
                         .soleTraderLastName("Trader")
                         .type(Party.Type.SOLE_TRADER).build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(admitPaymentDeadline)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(admitPaymentDeadline)
+                                               )
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .totalClaimAmount(new BigDecimal(1000))
             .build();
