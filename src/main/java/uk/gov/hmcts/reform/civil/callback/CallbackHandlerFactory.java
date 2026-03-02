@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.civil.aspect.NoOngoingBusinessProcess;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -31,21 +32,23 @@ public class CallbackHandlerFactory {
                                   CallbackHandler... callbackHandlers) {
         this.caseDetailsConverter = caseDetailsConverter;
         this.caseTypeHandlerKeyFactory = caseTypeHandlerKeyFactory;
-        for (CallbackHandler callbackHandler : callbackHandlers) {
-            for (CaseEvent handledEvent : callbackHandler.handledEvents()) {
-                eventHandlers.put(
-                    caseTypeHandlerKeyFactory.createHandlerKey(callbackHandler, handledEvent),
-                    callbackHandler
-                );
-            }
-        }
+        Arrays.asList(callbackHandlers).forEach(
+            callbackHandler ->
+                callbackHandler.handledEvents().forEach(
+                    handleEvent -> registerHandlerForEvent(callbackHandler, handleEvent)
+                ));
+    }
+
+    private void registerHandlerForEvent(CallbackHandler callbackHandler, CaseEvent handledEvent) {
+        caseTypeHandlerKeyFactory.createRegistrationKeys(callbackHandler, handledEvent)
+            .forEach(handlerKey -> eventHandlers.put(handlerKey, callbackHandler));
     }
 
     @EventAllowed
     @NoOngoingBusinessProcess
     @EventEmitter
     public CallbackResponse dispatch(CallbackParams callbackParams) {
-        final String eventId = caseTypeHandlerKeyFactory.createHandlerKey(callbackParams);
+        final String eventId = caseTypeHandlerKeyFactory.createDispatchKey(callbackParams);
 
         return ofNullable(eventHandlers.get(eventId))
             .map(h -> processEvent(h, callbackParams, eventId))

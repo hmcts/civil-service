@@ -16,4 +16,11 @@ public interface DashboardTaskContribution {
      * Returns the ordered dashboard tasks that need to be triggered for the activity id.
      */
     List<DashboardWorkflowTask> dashboardTasks();
+
+    /**
+     * Returns the case type this contribution applies to.
+     */
+    default DashboardCaseType caseType() {
+        return DashboardCaseType.CIVIL;
+    }
 }
