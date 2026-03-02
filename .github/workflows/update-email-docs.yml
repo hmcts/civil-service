@@ -12,17 +12,17 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Checkout civil-ccd-definition
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hmcts/civil-ccd-definition
           path: civil-ccd-definition
           fetch-depth: 0
       - name: Checkout civil-general-apps-ccd-definition
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: hmcts/civil-general-apps-ccd-definition
           path: civil-general-apps-ccd-definition
