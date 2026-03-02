@@ -5,12 +5,12 @@ import uk.gov.hmcts.reform.civil.notification.handlers.Notifier;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.service.CaseTaskTrackingService;
 
-import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.StandardDirectionOrderDJNotifyParties;
+import static uk.gov.hmcts.reform.civil.notification.handlers.CamundaProcessIdentifier.STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES;
 
 @Component
 public class StandardDirectionOrderDJNotifier extends Notifier {
 
-    private static final String TASK_ID = StandardDirectionOrderDJNotifyParties.toString();
+    private static final String TASK_ID = STANDARD_DIRECTION_ORDER_DJ_NOTIFY_PARTIES.toString();
 
     public StandardDirectionOrderDJNotifier(
         NotificationService notificationService,
