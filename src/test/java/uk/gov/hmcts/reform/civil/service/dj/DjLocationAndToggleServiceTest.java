@@ -65,7 +65,7 @@ class DjLocationAndToggleServiceTest {
 
     @Test
     void shouldPrepareDisposalTogglesLocationsAndHearingList() {
-        stubLocationMocks("123");
+        stubLocationMocks("123", true);
         stubHearingCategories();
 
         CaseData caseData = CaseDataBuilder.builder().build();
@@ -90,8 +90,40 @@ class DjLocationAndToggleServiceTest {
     }
 
     @Test
+    void shouldPrepareDisposalTogglesLocationsAndHearingListV1() {
+        stubLocationMocks("214320", false);
+        stubHearingCategories();
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCaseAccessCategory(CaseCategory.SPEC_CLAIM);
+        caseData.setCaseManagementOrderSelection(DISPOSAL_HEARING);
+
+        CaseLocationCivil civil = new CaseLocationCivil();
+        civil.setRegion("1");
+        civil.setBaseLocation("214320");
+        caseData.setCaseManagementLocation(civil);
+        caseData.setReasonForTransfer("Court Closed");
+
+        DirectionsOrderTaskContext context = buildContext(caseData, V_1);
+
+        CaseData result = service.prepareLocationsAndToggles(context);
+
+        assertThat(result.getDisposalHearingDisclosureOfDocumentsDJToggle())
+            .containsExactly(DisposalAndTrialHearingDJToggle.SHOW);
+        assertThat(result.getTrialHearingMethodInPersonDJ().getValue().getCode()).isEqualTo("214320");
+        assertThat(result.getDisposalHearingMethodInPersonDJ().getValue().getCode()).isEqualTo("214320");
+
+        DynamicList hearingList = result.getHearingMethodValuesDisposalHearingDJ();
+        assertThat(hearingList).isNotNull();
+        assertThat(hearingList.getListItems())
+            .extracting(DynamicListElement::getLabel)
+            .doesNotContain(HearingMethod.NOT_IN_ATTENDANCE.getLabel());
+        assertThat(hearingList.getValue().getLabel()).isEqualTo(HearingMethod.IN_PERSON.getLabel());
+    }
+
+    @Test
     void shouldPrepareTrialTogglesWhenNotDisposal() {
-        stubLocationMocks("456");
+        stubLocationMocks("456", true);
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
         caseData.setCaseManagementOrderSelection("TRIAL_HEARING");
@@ -220,17 +252,17 @@ class DjLocationAndToggleServiceTest {
             .thenReturn(Optional.of(categorySearchResult));
     }
 
-    private void stubLocationMocks(String epimmsId) {
+    private void stubLocationMocks(String epimmsId, boolean isRequire) {
         LocationRefData location = new LocationRefData();
         location.setEpimmsId(epimmsId);
         location.setSiteName("Court-" + epimmsId);
         List<LocationRefData> locations = List.of(location);
-
         RequestedCourt requestedCourt = new RequestedCourt();
-        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation(epimmsId));
-
+        requestedCourt.setCaseLocation(new CaseLocationCivil().setBaseLocation(epimmsId).setRegion("1"));
+        if (isRequire) {
+            when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
+        }
         when(locationReferenceDataService.getCourtLocationsForDefaultJudgments(AUTH_TOKEN)).thenReturn(locations);
-        when(locationHelper.getCaseManagementLocation(any())).thenReturn(Optional.of(requestedCourt));
         when(locationHelper.getMatching(locations, requestedCourt)).thenReturn(Optional.of(location));
     }
 

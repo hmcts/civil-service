@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackVersion;
+import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
-import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.dj.DisposalAndTrialHearingDJToggle;
+import uk.gov.hmcts.reform.civil.enums.dj.DisposalHearingMethodDJ;
 import uk.gov.hmcts.reform.civil.enums.sdo.HearingMethod;
 import uk.gov.hmcts.reform.civil.handler.callback.user.directionsorder.tasks.DirectionsOrderTaskContext;
+import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -18,8 +20,6 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
-import uk.gov.hmcts.reform.civil.helpers.LocationHelper;
-import uk.gov.hmcts.reform.civil.crd.model.CategorySearchResult;
 
 import java.util.List;
 import java.util.Optional;
@@ -144,7 +144,17 @@ public class DjLocationAndToggleService {
             callbackParams.getParams().get(BEARER_TOKEN).toString()
         );
 
-        Optional<RequestedCourt> preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+        Optional<RequestedCourt> preferredCourt;
+        if (caseData.getReasonForTransfer() != null
+            && caseData.getCaseManagementLocation() != null) {
+            RequestedCourt requestedCourt = new RequestedCourt();
+            requestedCourt.setCaseLocation(caseData.getCaseManagementLocation());
+            preferredCourt = Optional.of(requestedCourt);
+            log.info("setting location based on new case management location for caseID {}", caseData.getCcdCaseReference());
+        } else {
+            preferredCourt = locationHelper.getCaseManagementLocation(caseData);
+            log.info("setting default location for caseID {}", caseData.getCcdCaseReference());
+        }
         Optional<LocationRefData> selectedLocation = preferredCourt
             .flatMap(requestedCourt -> locationHelper.getMatching(locations, requestedCourt));
 
