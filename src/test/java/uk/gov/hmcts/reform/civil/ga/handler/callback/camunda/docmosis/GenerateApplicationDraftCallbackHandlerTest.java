@@ -424,6 +424,43 @@ class GenerateApplicationDraftCallbackHandlerTest extends GeneralApplicationBase
     }
 
     @Test
+    void shouldNotGenerateApplicationDraftDocument_whenJudgeHasMadeDecision_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
+        caseData = caseData.copy()
+            .judicialDecision(new uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialDecision())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("FREE"))).build();
+        when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
+    void shouldNotGenerateApplicationDraftDocument_whenNotLip_AndNoConditionMet_LR() {
+        when(gaForLipService.isGaForLip(any())).thenReturn(false);
+        // Non-urgent, With Notice, Paid - but maybe we want to test when NONE of the 4 conditions match.
+        // 1. Urgent and Free: NO (Not urgent)
+        // 2. Non-urgent, without notice, paid: NO (With notice)
+        // 3. Urgent and paid: NO (Not urgent)
+        // 4. RespondentsResponseSatisfied: NO (Assume false by default for this data)
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, YES, NO);
+        caseData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("NotFree"))).build();
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+        handler.handle(params);
+
+        verifyNoInteractions(generalApplicationDraftGenerator);
+    }
+
+    @Test
     void shouldNotGenerateApplicationDraftDocument_whenAboutToSubmitEventIsCalledAndFreeApp_Lip() {
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseDataLip(YES, NO, NO);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);

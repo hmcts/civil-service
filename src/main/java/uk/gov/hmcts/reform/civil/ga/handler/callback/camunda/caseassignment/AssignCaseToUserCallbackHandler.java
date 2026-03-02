@@ -15,24 +15,24 @@ import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.ga.callback.GeneralApplicationCallbackHandler;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
+import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
+import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
-import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
-import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
-import uk.gov.hmcts.reform.civil.ga.service.roleassignment.RolesAndAccessAssignmentService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.ASSIGN_GA_ROLES;
+
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
@@ -46,14 +46,11 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @Slf4j
 public class AssignCaseToUserCallbackHandler extends CallbackHandler implements GeneralApplicationCallbackHandler {
 
-    private final AssignCaseToRespondentSolHelper assignCaseToRespondentSolHelper;
-
-    private final ObjectMapper mapper;
-
-    private final GeneralAppFeesService generalAppFeesService;
-    private static final List<CaseEvent> EVENTS = List.of(ASSIGN_GA_ROLES);
     public static final String TASK_ID = "AssigningOfRoles";
-
+    private static final List<CaseEvent> EVENTS = List.of(ASSIGN_GA_ROLES);
+    private final AssignCaseToRespondentSolHelper assignCaseToRespondentSolHelper;
+    private final ObjectMapper mapper;
+    private final GeneralAppFeesService generalAppFeesService;
     private final CoreCaseUserService coreCaseUserService;
 
     private final CaseDetailsConverter caseDetailsConverter;
@@ -61,100 +58,6 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
     private final GaForLipService gaForLipService;
 
     private final RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
-
-    @Override
-    protected Map<String, Callback> callbacks() {
-        return Map.of(
-            callbackKey(ABOUT_TO_SUBMIT), this::assignOrgPolicy,
-            callbackKey(SUBMITTED), this::assignSolicitorCaseRole
-        );
-    }
-
-    private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
-        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        List<String> errors = new ArrayList<>();
-        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
-        String caseId = caseData.getCcdCaseReference().toString();
-        log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
-
-        try {
-
-            if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
-                GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
-                caseDataBuilder.applicant1OrganisationPolicy(
-                    new OrganisationPolicy().setOrganisation(new Organisation()
-                                                                 .setOrganisationID(applicantSolicitor.getOrganisationIdentifier()))
-                                                                 .setOrgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()));
-
-                if (!gaForLipService.isGaForLip(caseData)) {
-                    List<Element<GASolicitorDetailsGAspec>> applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
-                        .filter(userOrgId -> (userOrgId.getValue().getOrganisationIdentifier()
-                            .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor()
-                                .getOrganisationIdentifier()))).toList();
-                    caseDataBuilder.generalAppApplicantAddlSolicitors(applicantAddlSolList);
-                }
-            }
-
-            if (!gaForLipService.isGaForLip(caseData)) {
-                List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
-                    .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()
-                        .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()))).toList();
-                caseDataBuilder.generalAppRespondentSolicitors(respondentSolicitorsList);
-            }
-
-            /*
-             * Don't assign the case to respondent solicitors if GA is without notice
-             * Assign case to Respondent Solicitors only after the payment is made by Applicant.
-             * If the Application is Free Application, then assign the respondent roles during Initiation of GA
-             * */
-            if ((!caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)
-                && ((ofNullable(caseData.getGeneralAppInformOtherParty()).isPresent()
-                && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice()))
-                || (caseData.getGeneralAppRespondentAgreement() != null
-                && caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES))))
-                || (generalAppFeesService.isFreeApplication(caseData))) {
-
-                if (!gaForLipService.isGaForLip(caseData)) {
-
-                    List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
-                        .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()
-                            .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier()))).toList();
-
-                    List<Element<GASolicitorDetailsGAspec>> respondent2SolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
-                        .filter(userOrgId -> !(userOrgId.getValue().getOrganisationIdentifier()
-                            .equalsIgnoreCase(respondentSolicitorsList.get(0).getValue().getOrganisationIdentifier()))).toList();
-
-                    caseDataBuilder
-                        .respondent1OrganisationPolicy(
-                            new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(
-                                        respondentSolicitorsList.get(0).getValue()
-                                            .getOrganisationIdentifier())).setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()));
-
-                    if (!respondent2SolicitorsList.isEmpty()) {
-                        caseDataBuilder
-                            .respondent2OrganisationPolicy(
-                                new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(respondent2SolicitorsList.get(0)
-                                            .getValue().getOrganisationIdentifier())).setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName()));
-
-                    }
-                } else {
-                    /* GA for Lip*/
-                    caseDataBuilder.respondent1OrganisationPolicy(
-                        new OrganisationPolicy().setOrgPolicyCaseAssignedRole(DEFENDANT.getFormattedName()));
-                }
-
-            }
-
-            rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(caseData.getGeneralAppParentCaseLink().getCaseReference(), caseId);
-
-            return AboutToStartOrSubmitCallbackResponse.builder().data(caseDataBuilder.build().toMap(mapper)).errors(
-                    errors)
-                .build();
-
-        } catch (Exception e) {
-            throw e;
-        }
-    }
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
@@ -166,35 +69,124 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
         return EVENTS;
     }
 
+    @Override
+    protected Map<String, Callback> callbacks() {
+        return Map.of(
+            callbackKey(ABOUT_TO_SUBMIT),
+            this::assignOrgPolicy,
+            callbackKey(SUBMITTED),
+            this::assignSolicitorCaseRole
+        );
+    }
+
+    private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
+        var caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails()).copy();
+        var caseId = caseData.getCcdCaseReference().toString();
+        log.info("Assigning OrgPolicy for caseId: {}", caseId);
+
+        if (PENDING_APPLICATION_ISSUED.equals(caseData.getCcdState())) {
+            assignApplicantOrgPolicy(caseData);
+        }
+
+        assignRespondentOrgPolicy(caseData);
+
+        rolesAndAccessAssignmentService.copyAllocatedRolesFromRolesAndAccess(
+            caseData.getGeneralAppParentCaseLink().getCaseReference(),
+            caseId
+        );
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .data(caseData.toMap(mapper))
+            .errors(new ArrayList<>())
+            .build();
+    }
+
+    private void assignApplicantOrgPolicy(GeneralApplicationCaseData caseData) {
+        var applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
+        caseData.applicant1OrganisationPolicy(buildOrganisationPolicy(
+            applicantSolicitor,
+            APPLICANTSOLICITORONE.getFormattedName()
+        ));
+
+        if (!gaForLipService.isGaForLip(caseData)) {
+            var applicantOrgId = applicantSolicitor.getOrganisationIdentifier();
+            var applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
+                .filter(sol ->
+                            sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
+                .toList();
+            caseData.generalAppApplicantAddlSolicitors(applicantAddlSolList);
+        }
+    }
+
+    private void assignRespondentOrgPolicy(GeneralApplicationCaseData caseData) {
+        if (gaForLipService.isGaForLip(caseData)) {
+            assignRespondentLipOrgPolicy(caseData);
+            return;
+        }
+
+        var applicantOrgId = caseData.getGeneralAppApplnSolicitor().getOrganisationIdentifier();
+        var respondentSolicitorsList = caseData.getGeneralAppRespondentSolicitors().stream()
+            .filter(sol ->
+                        !sol.getValue().getOrganisationIdentifier().equalsIgnoreCase(applicantOrgId))
+            .toList();
+
+        caseData.generalAppRespondentSolicitors(respondentSolicitorsList);
+
+        if (shouldAssignRespondentSolicitorRoles(caseData)) {
+            /*
+             * Don't assign the case to respondent solicitors if GA is without notice
+             * Assign case to Respondent Solicitors only after the payment is made by Applicant.
+             * If the Application is Free Application, then assign the respondent roles during Initiation of GA
+             * */
+            assignRespondentSolicitorRoles(respondentSolicitorsList, caseData);
+        }
+    }
+
+    private void assignRespondentLipOrgPolicy(GeneralApplicationCaseData caseData) {
+        if (shouldAssignRespondentSolicitorRoles(caseData)) {
+            caseData.respondent1OrganisationPolicy(
+                new OrganisationPolicy().setOrgPolicyCaseAssignedRole(DEFENDANT.getFormattedName())
+            );
+        }
+    }
+
+    private boolean shouldAssignRespondentSolicitorRoles(GeneralApplicationCaseData caseData) {
+        var isNotPending = !PENDING_APPLICATION_ISSUED.equals(caseData.getCcdState());
+        var hasNoticeOrAgreement = (
+            ofNullable(caseData.getGeneralAppInformOtherParty()).isPresent()
+                && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice())
+        ) || (caseData.getGeneralAppRespondentAgreement() != null
+            && YES.equals(caseData.getGeneralAppRespondentAgreement().getHasAgreed())
+        );
+
+        return (isNotPending && hasNoticeOrAgreement) || generalAppFeesService.isFreeApplication(caseData);
+    }
+
+    private void assignRespondentSolicitorRoles(List<Element<GASolicitorDetailsGAspec>> respondentSolicitorsList,
+                                                GeneralApplicationCaseData caseData) {
+        if (respondentSolicitorsList.isEmpty()) {
+            return;
+        }
+
+        caseData.respondent1OrganisationPolicy(buildOrganisationPolicy(
+            respondentSolicitorsList.get(0).getValue(),
+            RESPONDENTSOLICITORONE.getFormattedName()
+        ));
+
+        if (respondentSolicitorsList.size() > 1) {
+            caseData.respondent2OrganisationPolicy(buildOrganisationPolicy(
+                respondentSolicitorsList.get(1).getValue(),
+                RESPONDENTSOLICITORTWO.getFormattedName()
+            ));
+        }
+    }
+
     private CallbackResponse assignSolicitorCaseRole(CallbackParams callbackParams) {
+        var caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
+        var caseId = caseData.getCcdCaseReference().toString();
 
-        GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
-        String caseId = caseData.getCcdCaseReference().toString();
-
-        if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
-            GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
-            if (!gaForLipService.isLipApp(caseData)) {
-                log.info("Assigning case to Applicant Solicitor One: {} and caseId: {}", applicantSolicitor.getId(), caseId);
-                coreCaseUserService.assignCase(caseId, applicantSolicitor.getId(),
-                    applicantSolicitor.getOrganisationIdentifier(), APPLICANTSOLICITORONE
-                );
-                List<Element<GASolicitorDetailsGAspec>> addlApplicantSolList = caseData.getGeneralAppApplicantAddlSolicitors();
-                if (Objects.nonNull(addlApplicantSolList) && !addlApplicantSolList.isEmpty()) {
-                    for (Element<GASolicitorDetailsGAspec> addlApplicantSolElement : addlApplicantSolList) {
-                        log.info("Assigning case to GA Applicant Solicitor One: {} and caseId: {}", addlApplicantSolElement.getValue().getId(), caseId);
-                        coreCaseUserService.assignCase(caseId, addlApplicantSolElement.getValue().getId(),
-                            addlApplicantSolElement.getValue().getOrganisationIdentifier(),
-                            APPLICANTSOLICITORONE
-                        );
-                    }
-                }
-            } else {
-                log.info("Assigning case to Applicant Solicitor: {} and caseId: {} with no org", applicantSolicitor.getId(), caseId);
-                coreCaseUserService.assignCase(caseId, applicantSolicitor.getId(),
-                    null, CLAIMANT
-                );
-            }
-
+        if (PENDING_APPLICATION_ISSUED.equals(caseData.getCcdState())) {
+            assignApplicantCaseRoles(caseData, caseId);
         }
 
         /*
@@ -202,18 +194,66 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
          * Assign case to Respondent Solicitors only after the payment is made by Applicant.
          * If the Application is Free Application, then assign the respondent roles during Initiation of GA
          * */
-        if ((!caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)
-            && ((ofNullable(caseData.getGeneralAppInformOtherParty()).isPresent()
-            && YES.equals(caseData.getGeneralAppInformOtherParty().getIsWithNotice()))
-            || (caseData.getGeneralAppRespondentAgreement() != null
-            && caseData.getGeneralAppRespondentAgreement().getHasAgreed().equals(YES))))
-            || (generalAppFeesService.isFreeApplication(caseData))) {
+        if (shouldAssignRespondentSolicitorRoles(caseData)) {
             log.info("Assigning case to Respondent Solicitor for caseId: {}", caseId);
             assignCaseToRespondentSolHelper.assignCaseToRespondentSolicitor(caseData, caseId);
         }
 
         return SubmittedCallbackResponse.builder().build();
+    }
 
+    private void assignApplicantCaseRoles(GeneralApplicationCaseData caseData, String caseId) {
+        var applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
+
+        if (gaForLipService.isLipApp(caseData)) {
+            log.info(
+                "Assigning case to Applicant Solicitor: {} and caseId: {} with no org",
+                applicantSolicitor.getId(),
+                caseId
+            );
+            coreCaseUserService.assignCase(caseId, applicantSolicitor.getId(), null, CLAIMANT);
+        } else {
+            log.info(
+                "Assigning case to Applicant Solicitor One: {} and caseId: {}",
+                applicantSolicitor.getId(),
+                caseId
+            );
+            coreCaseUserService.assignCase(
+                caseId,
+                applicantSolicitor.getId(),
+                applicantSolicitor.getOrganisationIdentifier(),
+                APPLICANTSOLICITORONE
+            );
+            assignAdditionalApplicantSolicitors(caseData, caseId);
+        }
+    }
+
+    private void assignAdditionalApplicantSolicitors(GeneralApplicationCaseData caseData, String caseId) {
+        var addlApplicantSolList = caseData.getGeneralAppApplicantAddlSolicitors();
+        if (addlApplicantSolList != null && !addlApplicantSolList.isEmpty()) {
+            for (var addlApplicantSolElement : addlApplicantSolList) {
+                log.info(
+                    "Assigning case to GA Applicant Solicitor One: {} and caseId: {}",
+                    addlApplicantSolElement.getValue().getId(),
+                    caseId
+                );
+                coreCaseUserService.assignCase(
+                    caseId,
+                    addlApplicantSolElement.getValue().getId(),
+                    addlApplicantSolElement.getValue().getOrganisationIdentifier(),
+                    APPLICANTSOLICITORONE
+                );
+            }
+        }
+    }
+
+    private OrganisationPolicy buildOrganisationPolicy(GASolicitorDetailsGAspec solicitor, String role) {
+        return new OrganisationPolicy().setOrganisation(
+            new Organisation().setOrganisationID(
+                solicitor.getOrganisationIdentifier())
+            )
+            .setOrgPolicyCaseAssignedRole(role
+        );
     }
 
 }

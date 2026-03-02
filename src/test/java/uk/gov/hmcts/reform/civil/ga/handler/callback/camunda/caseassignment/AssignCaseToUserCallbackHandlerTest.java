@@ -11,6 +11,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -557,6 +558,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             Map<String, Object> dataMap = objectMapper.convertValue(generalApplication, new TypeReference<>() {
             });
             params = callbackParamsOfPendingState(dataMap, CallbackType.SUBMITTED);
+        }
+
+        @Test
+        void shouldReturnSubmittedCallbackResponse() {
+            var response = assignCaseToUserHandler.handle(params);
+            assertThat(response).isInstanceOf(SubmittedCallbackResponse.class);
         }
 
         @Test
