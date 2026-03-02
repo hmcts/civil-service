@@ -46,5 +46,7 @@ public final class DashboardTaskIds {
     public static final String CREATE_SDO = "GenerateDashboardNotificationCreateSDO";
     public static final String FINAL_ORDER = "GenerateDashboardNotificationFinalOrder";
     public static final String STAY_LIFTED = "GenerateDashboardNotificationStayLifted";
+    public static final String INITIATE_COSC = "GenerateDashboardNotificationsInitiateCOSC";
+    public static final String PROCESS_COSC = "GenerateDashboardNotificationsProcessCOSC";
 
 }
