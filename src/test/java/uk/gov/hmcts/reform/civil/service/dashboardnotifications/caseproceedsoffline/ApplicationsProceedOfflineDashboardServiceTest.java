@@ -8,8 +8,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
+import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -37,15 +39,24 @@ class ApplicationsProceedOfflineDashboardServiceTest {
     private DashboardNotificationService dashboardNotificationService;
     @Mock
     private DashboardNotificationsParamsMapper mapper;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private TestDashboardService dashboardService;
 
     private static CaseData baseCaseData() {
-        List<Element<GeneralApplication>> generalApplications =
-            wrapElements(GeneralApplication.builder().build());
+        CaseLink caseLink = new CaseLink();
+        caseLink.setCaseReference("123");
 
-        return CaseDataBuilder.builder().build().toBuilder()
+        GeneralApplication generalApplication = new GeneralApplication();
+        generalApplication.setCaseLink(caseLink);
+
+        List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
+
+        return CaseDataBuilder.builder()
             .ccdCaseReference(1234L)
+            .build()
+            .toBuilder()
             .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(generalApplications)
             .build();
@@ -53,7 +64,13 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
     @BeforeEach
     void setup() {
-        dashboardService = new TestDashboardService(dashboardScenariosService, dashboardNotificationService, mapper);
+        dashboardService = new TestDashboardService(
+            dashboardScenariosService,
+            dashboardNotificationService,
+            mapper,
+            featureToggleService
+        );
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
     }
 
     @Test
@@ -127,6 +144,18 @@ class ApplicationsProceedOfflineDashboardServiceTest {
         verifyNoInteractions(dashboardScenariosService);
     }
 
+    @Test
+    void shouldSkipWhenFeatureDisabled() {
+        CaseData caseData = baseCaseData();
+        dashboardService.lip = true;
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+
+        dashboardService.notify(caseData, "auth");
+
+        verifyNoInteractions(dashboardNotificationService);
+        verifyNoInteractions(dashboardScenariosService);
+    }
+
     private void stubMapper() {
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
@@ -138,8 +167,9 @@ class ApplicationsProceedOfflineDashboardServiceTest {
 
         TestDashboardService(DashboardScenariosService dashboardScenariosService,
                              DashboardNotificationService dashboardNotificationService,
-                             DashboardNotificationsParamsMapper mapper) {
-            super(dashboardScenariosService, dashboardNotificationService, mapper);
+                             DashboardNotificationsParamsMapper mapper,
+                             FeatureToggleService featureToggleService) {
+            super(dashboardScenariosService, dashboardNotificationService, mapper, featureToggleService);
         }
 
         @Override
