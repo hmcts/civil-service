@@ -4,7 +4,7 @@ import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,7 +19,7 @@ class DatabaseConfigurationTest {
         context.run(it -> {
             assertThat(it).hasSingleBean(DataSourceTransactionManager.class);
             assertThat(it).hasSingleBean(Jdbi.class);
-            assertThat(it).hasSingleBean(ReferenceNumberRepository.class);
+            assertThat(it).hasSingleBean(CasemanReferenceNumberRepository.class);
             assertThat(it).hasBean("dataSource");
             assertThat(it).hasBean("dataSourceProxy");
         });
