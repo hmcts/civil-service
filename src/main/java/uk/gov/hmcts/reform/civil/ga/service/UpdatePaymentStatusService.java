@@ -43,7 +43,6 @@ public class UpdatePaymentStatusService {
             log.info("Creating event for updated payment status on caseReference: {}", caseReference);
             createEvent(caseData, caseReference);
         } catch (Exception ex) {
-            log.error("Failed to update payment status for caseReference: {}", caseReference, ex);
             throw new CaseDataUpdateException();
         }
     }
