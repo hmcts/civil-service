@@ -52,7 +52,9 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
     private final CaseDocumentClientApi caseDocumentClientApi;
     private final Tika tika;
 
-    @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
+    @Retryable(retryFor = {DocumentDownloadException.class},
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
     public CaseDocument uploadDocument(String authorisation, PDF pdf) {
         String originalFileName = pdf.getFileBaseName();
@@ -102,7 +104,9 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    @Retryable(value = {DocumentUploadException.class}, backoff = @Backoff(delay = 200))
+    @Retryable(retryFor = {DocumentDownloadException.class},
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
     public CaseDocument uploadDocument(String authorisation, UploadedDocument uploadedDocument) {
 
@@ -152,8 +156,10 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
 
     }
-
-    @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
+    
+    @Retryable(retryFor = {DocumentDownloadException.class},
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
     public byte[] downloadDocument(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
@@ -188,7 +194,9 @@ public class SecuredDocumentManagementService implements DocumentManagementServi
         }
     }
 
-    @Retryable(value = DocumentDownloadException.class, backoff = @Backoff(delay = 200))
+    @Retryable(retryFor = {DocumentDownloadException.class},
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 1000, multiplier = 2))
     @Override
     public DownloadedDocumentResponse downloadDocumentWithMetaData(String authorisation, String documentPath) {
         log.info("Downloading document {}", documentPath);
