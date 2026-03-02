@@ -144,8 +144,7 @@ class ClaimantResponseCuiDashboardNotificationsTaskTest {
         flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), lipJudgmentAdmission);
         flags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), joOnlineLiveEnabled);
 
-        return StateFlowDTO.builder()
-            .flags(flags)
-            .build();
+        return new StateFlowDTO()
+            .setFlags(flags);
     }
 }

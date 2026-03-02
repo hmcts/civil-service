@@ -190,9 +190,8 @@ class UploadTranslatedDocumentClaimantRejectsRepaymentPlanDashboardNotifications
         flags.put(FlowFlag.LIP_JUDGMENT_ADMISSION.name(), lipJudgmentAdmission);
         flags.put(FlowFlag.JO_ONLINE_LIVE_ENABLED.name(), joOnlineLiveEnabled);
 
-        return StateFlowDTO.builder()
-            .state(stateName == null ? null : State.from(stateName))
-            .flags(flags)
-            .build();
+        return new StateFlowDTO()
+            .setState(stateName == null ? null : State.from(stateName))
+            .setFlags(flags);
     }
 }
