@@ -37,7 +37,6 @@ public class RateLimiterService {
      */
     public boolean allowRequest(String ipAddress, int limit, int timeWindowSeconds) {
         Cache cache = cacheManager.getCache("ipRateLimitCache");
-        log.info("Cache {} loaded", cache);
         if (cache == null) {
             return true;
         }

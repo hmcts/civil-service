@@ -36,7 +36,6 @@ public class RateLimiterAspect {
         // Extract limit parameters
         int limit = rateLimitAnnotation.rateLimit();
         int timeWindowSeconds = rateLimitAnnotation.timeInSeconds();
-        log.info("limit : {} timeWindowSeconds : {} ", limit, timeWindowSeconds);
 
         // Get the current request and extract client IP
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
@@ -62,8 +61,7 @@ public class RateLimiterAspect {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                 response.getWriter().write("Rate limit exceeded. Please try again later.");
                 response.getWriter().flush();
-                log.info("response status : {} ", response.getStatus());
-                log.info("response : {} ", response.toString());
+                log.info("response status : {} for request : {} ", response.getStatus(), description);
             }
 
             return null;
