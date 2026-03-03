@@ -619,7 +619,7 @@ tasks.withType(Test).configureEach { t ->
   }
   useJUnitPlatform()
 
-  maxParallelForks = System.getenv("TEST_MAX_PARALLEL_FORKS") ?: 1
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   jvmArgs '-Xshare:off'
 
   // Keep within typical Jenkins container limits
