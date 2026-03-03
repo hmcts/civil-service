@@ -24,7 +24,7 @@ def versions = [
   junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.42',
+  lombok            : '1.18.38',
   camunda           : '7.20.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.6',
@@ -400,7 +400,7 @@ dependencies {
   }
   implementation group: 'org.apache.commons', name: 'commons-text', version: '1.15.0'
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.29'
-  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1.5.8'
+  implementation group: 'com.networknt', name: 'json-schema-validator', version: '1and this .5.9'
 
   implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin'
   implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
