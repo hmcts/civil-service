@@ -79,6 +79,15 @@ class PostcodeLookupServiceTest {
         );
     }
 
+    @Test
+    void shouldReturnExceptionWhenApiKeyIsEmpty() {
+        when(postcodeLookupConfiguration.getUrl()).thenReturn(LOOKUP_URL);
+        when(postcodeLookupConfiguration.getAccessKey()).thenReturn("");
+
+        assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
+            .isInstanceOf(RuntimeException.class);
+    }
+
     private void mockConfiguration() {
         when(postcodeLookupConfiguration.getUrl()).thenReturn(LOOKUP_URL);
         when(postcodeLookupConfiguration.getAccessKey()).thenReturn(ACCESS_KEY);

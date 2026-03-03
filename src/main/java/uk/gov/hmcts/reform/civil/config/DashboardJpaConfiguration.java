@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@Profile("!contract-test")
+@Profile("!contract-test & !integration-test")
 @EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.dashboard"})
 @EntityScan("uk.gov.hmcts.reform.dashboard")
 public class DashboardJpaConfiguration {

@@ -36,6 +36,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PBA_PAYMENT;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
@@ -175,5 +176,10 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
             body,
             Collections.emptyMap()
         );
+    }
+
+    @Test
+    void shouldReturnCorrectHandledEvent() {
+        assertThat(handler.handledEvents()).contains(MAKE_PBA_PAYMENT);
     }
 }

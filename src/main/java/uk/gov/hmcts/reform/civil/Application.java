@@ -8,7 +8,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableCamundaRestClient
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform.civil", "uk.gov.hmcts.reform.hmc"})
+@ComponentScan(basePackages = {
+    "uk.gov.hmcts.reform.civil",
+    "uk.gov.hmcts.reform.hmc",
+    "uk.gov.hmcts.reform.dashboard"
+})
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam.client",
     "uk.gov.hmcts.reform.civil",

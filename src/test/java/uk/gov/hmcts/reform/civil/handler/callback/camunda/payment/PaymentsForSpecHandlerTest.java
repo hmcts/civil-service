@@ -96,6 +96,19 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void testAboutToSubmit_handlerWith403BusinessError() {
+            when(paymentsService.createCreditAccountPayment(any(), anyString())).thenThrow(buildFeignException(403));
+            params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("claimIssuedPaymentDetails")
+                .extracting("errorMessage", "errorCode", "status")
+                .containsExactly(PAYMENT_ERROR_MESSAGE, PAYMENT_ERROR_CODE, FAILED.toString());
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
         void testAboutToSubmit_handlerWith400Error() {
             when(paymentsService.createCreditAccountPayment(any(), anyString())).thenThrow((buildFeignException(400)));
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

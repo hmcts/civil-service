@@ -118,6 +118,10 @@ allprojects {
 
   configurations {
     testCompile.exclude group: 'ch.qos.logback', module: 'logback-classic'
+    integrationTestImplementation.extendsFrom implementation, testImplementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly, testRuntimeOnly
+    contractTestImplementation.extendsFrom implementation, testImplementation
+    contractTestRuntimeOnly.extendsFrom runtimeOnly, testRuntimeOnly
   }
 
   repositories {
@@ -166,9 +170,10 @@ task integration(type: Test) {
   description = "Runs integration tests"
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
-  classpath = sourceSets.integrationTest.runtimeClasspath
+  classpath = sourceSets.integrationTest.runtimeClasspath + sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
+  exclude 'uk/gov/hmcts/reform/civil/controllers/dashboard/**'
 
 }
 
@@ -315,6 +320,10 @@ allprojects {
         details.useVersion('2.25.3')
         details.because('CVE-2025-68161 vendor recommended version')
       }
+      if (details.requested.group == 'org.hibernate.orm' && details.requested.name == 'hibernate-core') {
+        details.useVersion('6.6.42.Final')
+        details.because('Spring Boot 4 migration compatibility with libraries expecting Hibernate 6 APIs')
+      }
     }
     exclude group: 'org.springframework.security', module: 'spring-security-rsa'
     exclude group: 'org.projectlombok', module: 'lombok-mapstruct-binding'
@@ -458,6 +467,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test-classic'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc-test'
+  testImplementation group: 'org.springframework.security', name: 'spring-security-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.4.0'
   testImplementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.17.3'

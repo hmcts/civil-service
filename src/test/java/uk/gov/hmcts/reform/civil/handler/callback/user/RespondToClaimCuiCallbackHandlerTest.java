@@ -105,6 +105,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
     }
 
+    @Test
+    void shouldHandleDefendantResponseCuiEvent() {
+        assertThat(handler.handledEvents()).contains(DEFENDANT_RESPONSE_CUI);
+    }
+
     @Nested
     class AboutToSubmitCallback {
         LocalDateTime now;
@@ -480,6 +485,55 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedCaseData = getCaseData(response);
 
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
+        }
+
+        @Test
+        void shouldCreateRespondentLipResponseWhenMissingAndWelshDocumentLanguageProvided() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.ENGLISH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .caseDataLip(caseDataLiP)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData.setRespondToAdmittedClaimOwingAmount(BigDecimal.TEN);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getCaseDataLiP()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage())
+                .isEqualTo("ENGLISH");
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH);
+        }
+
+        @Test
+        void shouldCreateCaseDataLipWhenMissingAndWelshDocumentLanguageProvided() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getCaseDataLiP()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage())
+                .isEqualTo("WELSH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
         }
     }
