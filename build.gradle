@@ -233,6 +233,7 @@ sonarqube {
       ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
+    property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
   }
 }
 
@@ -606,10 +607,19 @@ tasks.register('runProviderPactVerification') {
   dependsOn tasks.named('providerContractTests')
 }
 
+task printAvailableProcessors {
+  doLast {
+    println "[DEBUG_LOG] Available Processors: ${Runtime.runtime.availableProcessors()}"
+  }
+}
+
 tasks.withType(Test).configureEach { t ->
+  doFirst {
+    logger.lifecycle("[DEBUG_LOG] Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
+  }
   useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  maxParallelForks = System.getenv("TEST_MAX_PARALLEL_FORKS") ?: 1
   jvmArgs '-Xshare:off'
 
   // Keep within typical Jenkins container limits

@@ -157,6 +157,8 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
+  env.SONAR_SKIP_COMPILE = "true"
+  env.TEST_MAX_PARALLEL_FORKS = 1
 
   onPR {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
