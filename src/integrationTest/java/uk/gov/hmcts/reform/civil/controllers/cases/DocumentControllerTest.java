@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +60,7 @@ import static uk.gov.hmcts.reform.civil.utils.ResourceReader.readString;
 
 @SpringBootTest(classes = {
     ClaimFormService.class,
-    JacksonAutoConfiguration.class})
+    TestJacksonAutoConfiguration.class})
 public class DocumentControllerTest extends BaseIntegrationTest {
 
     protected static final int DOC_UUID_LENGTH = 36;
@@ -74,10 +74,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @Autowired
     private ObjectMapper mapper;
 
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
 
     @Autowired
@@ -104,10 +104,10 @@ public class DocumentControllerTest extends BaseIntegrationTest {
     @InjectMocks
     private SealedClaimFormGeneratorForSpec sealedClaimFormGenerator;
 
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
 
-    @MockBean
+    @MockitoBean
     private DocmosisApiClient docmosisApiClient;
 
     @Mock

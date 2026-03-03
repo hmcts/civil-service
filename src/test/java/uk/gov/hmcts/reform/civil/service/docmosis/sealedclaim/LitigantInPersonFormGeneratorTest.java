@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sealedclaim;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.LIP_C
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     LitigantInPersonFormGenerator.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class LitigantInPersonFormGeneratorTest {
@@ -44,9 +44,9 @@ class LitigantInPersonFormGeneratorTest {
         .documentType(LITIGANT_IN_PERSON_CLAIM_FORM)
         .build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private LitigantInPersonFormGenerator litigantInPersonFormGenerator;

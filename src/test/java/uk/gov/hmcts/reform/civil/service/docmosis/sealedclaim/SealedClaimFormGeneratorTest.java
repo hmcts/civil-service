@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
@@ -48,7 +48,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseNa
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     SealedClaimFormGenerator.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class SealedClaimFormGeneratorTest {
@@ -66,15 +66,15 @@ class SealedClaimFormGeneratorTest {
     private final Representative representative1 = new Representative().setOrganisationName("test org");
     private final Representative representative2 = new Representative().setOrganisationName("test org2");
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
     @Autowired
     private SealedClaimFormGenerator sealedClaimFormGenerator;
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
 
     @BeforeEach

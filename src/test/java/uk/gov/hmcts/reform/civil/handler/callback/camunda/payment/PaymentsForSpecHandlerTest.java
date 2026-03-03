@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import feign.FeignException;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -98,7 +96,7 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
-        void testAboutToSubmit_handlerWith400Error() throws JsonProcessingException {
+        void testAboutToSubmit_handlerWith400Error() {
             when(paymentsService.createCreditAccountPayment(any(), anyString())).thenThrow((buildFeignException(400)));
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -117,17 +115,13 @@ class PaymentsForSpecHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getErrors()).contains("Technical error occurred");
         }
 
-        private FeignException buildFeignException(int status) throws JsonProcessingException {
-            return buildFeignClientException(status, objectMapper.writeValueAsBytes(
-                PaymentDto.builder()
-                    .statusHistories(new StatusHistoryDto[]{
-                        StatusHistoryDto.builder()
-                            .errorCode(PAYMENT_ERROR_CODE)
-                            .errorMessage(PAYMENT_ERROR_MESSAGE)
-                            .build()
-                    })
-                    .build()
-            ));
+        private FeignException buildFeignException(int status) {
+            String responseBody = String.format(
+                "{\"status_histories\":[{\"error_code\":\"%s\",\"error_message\":\"%s\"}]}",
+                PAYMENT_ERROR_CODE,
+                PAYMENT_ERROR_MESSAGE
+            );
+            return buildFeignClientException(status, responseBody.getBytes(UTF_8));
         }
 
         private FeignException buildFeignExceptionWithInvalidResponse(int status, String errorMsg) {

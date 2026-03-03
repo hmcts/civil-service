@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.controllers.dashboard.scenarios.claimant;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Ignore
+@Disabled
 public class GeneralAppAvailableScenarioTest extends BaseIntegrationTest {
 
     public static final String SCENARIO_GA_AVAILABLE = "Scenario.AAA6.GeneralApplication.ViewApplicationAvailable.Claimant";

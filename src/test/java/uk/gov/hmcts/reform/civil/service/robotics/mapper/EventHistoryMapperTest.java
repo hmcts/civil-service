@@ -49,9 +49,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
@@ -161,7 +161,7 @@ import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 @SpringBootTest(
         classes = {
-            JacksonAutoConfiguration.class,
+            TestJacksonAutoConfiguration.class,
             CaseDetailsConverter.class,
             SimpleStateFlowEngine.class,
             SimpleStateFlowBuilder.class,
@@ -217,9 +217,9 @@ class EventHistoryMapperTest {
     private static final Event EMPTY_EVENT = new Event();
     private static final String BEARER_TOKEN = "Bearer Token";
 
-    @MockBean private FeatureToggleService featureToggleService;
+    @MockitoBean private FeatureToggleService featureToggleService;
 
-    @MockBean LocationRefDataUtil locationRefDataUtil;
+    @MockitoBean LocationRefDataUtil locationRefDataUtil;
 
     @Autowired EventHistoryMapper mapper;
 
@@ -231,7 +231,7 @@ class EventHistoryMapperTest {
 
     @Autowired JudgmentByAdmissionStrategy judgmentByAdmissionStrategy;
 
-    @MockBean private Time time;
+    @MockitoBean private Time time;
 
     LocalDateTime localDateTime;
     List<LocationRefData> courtLocations;

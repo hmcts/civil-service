@@ -3,20 +3,18 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class JudgeCourtDetailsGroupTest {
 
-    @InjectMocks
-    private JudgeCourtDetailsPopulator judgeCourtDetailsPopulator;
+    private final JudgeCourtDetailsPopulator judgeCourtDetailsPopulator = new JudgeCourtDetailsPopulator();
     @Mock
     private UserDetails userDetails;
 

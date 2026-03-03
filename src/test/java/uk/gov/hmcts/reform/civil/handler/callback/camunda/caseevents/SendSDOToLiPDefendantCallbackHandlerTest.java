@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,15 +27,15 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     SendSDOToLiPDefendantCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 public class SendSDOToLiPDefendantCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private SendSDOToLiPDefendantCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private SendSDOBulkPrintService sendSDOBulkPrintService;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadService documentDownloadService;
 
     public static final String TASK_ID_DEFENDANT = "SendSDOToDefendantLIP";

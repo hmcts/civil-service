@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.callback;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.civil.config.JacksonConfiguration;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 
@@ -33,7 +34,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_EVENT;
     CallbackHandlerFactory.class,
     CaseDetailsConverter.class,
     CaseTypeHandlerKeyFactory.class,
-    JacksonAutoConfiguration.class},
+    JacksonConfiguration.class,
+    TestJacksonAutoConfiguration.class},
     properties = {"spring.main.allow-bean-definition-overriding=true"}
 )
 @Import(CallbackHandlerFactoryTest.OverrideBean.class)

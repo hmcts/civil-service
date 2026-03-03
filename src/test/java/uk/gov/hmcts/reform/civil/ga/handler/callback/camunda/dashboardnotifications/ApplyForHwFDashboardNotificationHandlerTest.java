@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -46,7 +46,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
     private GaDashboardNotificationsParamsMapper mapper;
     @InjectMocks
     private ApplyForHwFDashboardNotificationHandler handler;
-    @MockBean
+    @MockitoBean
     private ObjectMapper objectMapper;
 
     @Test

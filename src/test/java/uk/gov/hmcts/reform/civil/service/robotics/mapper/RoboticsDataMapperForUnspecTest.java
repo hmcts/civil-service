@@ -8,9 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
@@ -65,7 +65,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 @SpringBootTest(classes = {
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     SimpleStateFlowEngine.class,
     SimpleStateFlowBuilder.class,
@@ -109,21 +109,21 @@ class RoboticsDataMapperForUnspecTest {
             .setDxAddress(source.getDxAddress());
     }
 
-    @MockBean
+    @MockitoBean
     OrganisationApi organisationApi;
-    @MockBean
+    @MockitoBean
     AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     UserService userService;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     PrdAdminUserConfiguration userConfig;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     LocationRefDataUtil locationRefDataUtil;
     private static final String BEARER_TOKEN = "Bearer Token";
     LocalDateTime localDateTime;

@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.builders;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantDefendantNotAttending;
@@ -21,11 +18,10 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.FinalOrdersClaimantRepresentationList.CLAIMANT_NOT_ATTENDING;
 
-@ExtendWith(SpringExtension.class)
 public class ClaimantAttendsOrRepresentedTextBuilderTest {
 
-    @InjectMocks
-    private ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder;
+    private final ClaimantAttendsOrRepresentedTextBuilder claimantAttendsOrRepresentedTextBuilder =
+        new ClaimantAttendsOrRepresentedTextBuilder();
 
     @Test
     void testGetClaimantOneNotAttendedText() {

@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -23,13 +23,13 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.SEND_SETTLE_CLAIM_PAI
 
 @SpringBootTest(classes = {
     SettleClaimMarkedPaidInFullLiPDefendant1LetterHandler.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 public class SettleClaimMarkedPaidInFullLiPDefendant1LetterHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     private SettleClaimMarkedPaidInFullLiPDefendant1LetterHandler handler;
-    @MockBean
+    @MockitoBean
     private SettleClaimMarkedPaidInFullDefendantLiPLetterGenerator lipLetterGenerator;
 
     public static final String TASK_ID = "SendSettleClaimPaidInFullLetterLipDef";

@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -55,7 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAU
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     DefaultJudgmentNonDivergentSpecPiPLetterGenerator.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
 
@@ -118,28 +118,28 @@ class DefaultJudgmentNonDivergentSpecPiPLetterGeneratorTest {
                               .setDocumentFileName("file-name")
                               .setDocumentBinaryUrl("binary-url"));
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
     @Autowired
     private DefaultJudgmentNonDivergentSpecPiPLetterGenerator generator;
 
-    @MockBean
+    @MockitoBean
     private BulkPrintService bulkPrintService;
 
-    @MockBean
+    @MockitoBean
     private DocumentDownloadService documentDownloadService;
 
-    @MockBean
+    @MockitoBean
     private PinInPostConfiguration pipInPostConfiguration;
 
-    @MockBean
+    @MockitoBean
     private GeneralAppFeesService generalAppFeesService;
 
-    @MockBean
+    @MockitoBean
     private CivilStitchService civilStitchService;
 
     @BeforeEach

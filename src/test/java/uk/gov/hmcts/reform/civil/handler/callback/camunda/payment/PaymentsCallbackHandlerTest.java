@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -156,16 +155,12 @@ class PaymentsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @SneakyThrows
     private FeignException buildFeignException(int status) {
-        return buildFeignClientException(status, objectMapper.writeValueAsBytes(
-            PaymentDto.builder()
-                .statusHistories(new StatusHistoryDto[]{
-                    StatusHistoryDto.builder()
-                        .errorCode(PAYMENT_ERROR_CODE)
-                        .errorMessage(PAYMENT_ERROR_MESSAGE)
-                        .build()
-                })
-                .build()
-        ));
+        String responseBody = String.format(
+            "{\"status_histories\":[{\"error_code\":\"%s\",\"error_message\":\"%s\"}]}",
+            PAYMENT_ERROR_CODE,
+            PAYMENT_ERROR_MESSAGE
+        );
+        return buildFeignClientException(status, responseBody.getBytes(UTF_8));
     }
 
     private FeignException buildForbiddenFeignExceptionWithInvalidResponse() {

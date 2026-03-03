@@ -13,10 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailAttachment;
 import uk.gov.hmcts.reform.civil.sendgrid.EmailData;
@@ -51,11 +50,8 @@ class SendGridClientTest {
         .setAttachments(List.of());
     private static final String EMAIL_FROM = "from@server.net";
 
-    @MockBean
+    @MockitoBean
     private SendGrid sendGrid;
-
-    @Captor
-    private ArgumentCaptor<Request> requestCaptor;
 
     @Autowired
     private SendGridClient sendGridClient;
@@ -124,6 +120,7 @@ class SendGridClientTest {
 
             sendGridClient.sendEmail(EMAIL_FROM, EMAIL_DATA);
 
+            ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
             assertEquals(Method.POST, capturedRequest.getMethod());
@@ -142,6 +139,7 @@ class SendGridClientTest {
                 .setMessage("")
                 .setAttachments(List.of()));
 
+            ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
             assertTrue(capturedRequest.getBody().contains("\"content\":[{\"type\":\"text/plain\",\"value\":\" \"}]"));
@@ -158,6 +156,7 @@ class SendGridClientTest {
                 .setMessage("message")
                 .setAttachments(List.of(EmailAttachment.pdf(new byte[]{1, 2, 3}, "test.pdf"))));
 
+            ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
             verify(sendGrid).api(requestCaptor.capture());
             Request capturedRequest = requestCaptor.getValue();
             assertTrue(capturedRequest.getBody().contains("\"filename\":\"test.pdf\""));

@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.statemachine.ExtendedState;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.stateflow.exception.StateFlowException;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.ga.stateflow.StateFlowContext.EXTENDED_S
 import static uk.gov.hmcts.reform.civil.ga.stateflow.StateFlowContext.EXTENDED_STATE_FLAGS_KEY;
 import static uk.gov.hmcts.reform.civil.ga.stateflow.StateFlowContext.EXTENDED_STATE_HISTORY_KEY;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class GaStateFlowTest {
 
     private static String TEST_STATE = "TEST_STATE";

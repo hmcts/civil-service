@@ -9,8 +9,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -62,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.HEARI
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     HearingFormGenerator.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 public class HearingFormGeneratorTest {
 
@@ -91,19 +91,19 @@ public class HearingFormGeneratorTest {
         .setCourtTypeId("10").setCourtLocationCode("121")
         .setEpimmsId("000000");
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
     @Autowired
     private HearingFormGenerator generator;
-    @MockBean
+    @MockitoBean
     private DocumentHearingLocationHelper locationHelper;
 
     @BeforeEach
