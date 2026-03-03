@@ -160,15 +160,14 @@ public class ReferToJudgeOrLegalAdvisorHandlerTest extends GeneralApplicationBas
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)

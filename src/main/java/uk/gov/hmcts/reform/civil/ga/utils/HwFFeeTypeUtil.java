@@ -19,27 +19,25 @@ public class HwFFeeTypeUtil {
     private HwFFeeTypeUtil() {
     }
 
-    public static GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateHwfDetails(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+    public static GeneralApplicationCaseData updateHwfDetails(GeneralApplicationCaseData caseData) {
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         if (Objects.nonNull(caseData.getGeneralAppHelpWithFees())) {
             if (caseData.getCcdState().equals(CaseState.APPLICATION_ADD_PAYMENT)) {
                 caseDataBuilder.hwfFeeType(FeeType.ADDITIONAL);
                 if (Objects.isNull(caseData.getAdditionalHwfDetails())) {
-                    caseDataBuilder.additionalHwfDetails(HelpWithFeesDetails.builder()
-                                                             .hwfFeeType(FeeType.ADDITIONAL)
-                                                             .fee(caseData.getGeneralAppPBADetails().getFee())
-                                                             .hwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())
-                                                             .build());
+                    caseDataBuilder.additionalHwfDetails(new HelpWithFeesDetails()
+                        .setHwfFeeType(FeeType.ADDITIONAL)
+                        .setFee(caseData.getGeneralAppPBADetails().getFee())
+                        .setHwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber()));
 
                 }
             } else {
                 caseDataBuilder.hwfFeeType(FeeType.APPLICATION);
                 if (Objects.isNull(caseData.getGaHwfDetails())) {
-                    caseDataBuilder.gaHwfDetails(HelpWithFeesDetails.builder()
-                                                     .hwfFeeType(FeeType.APPLICATION)
-                                                     .fee(caseData.getGeneralAppPBADetails().getFee())
-                                                     .hwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber())
-                                                     .build());
+                    caseDataBuilder.gaHwfDetails(new HelpWithFeesDetails()
+                        .setHwfFeeType(FeeType.APPLICATION)
+                        .setFee(caseData.getGeneralAppPBADetails().getFee())
+                        .setHwfReferenceNumber(caseData.getGeneralAppHelpWithFees().getHelpWithFeesReferenceNumber()));
 
                 }
             }
@@ -72,7 +70,7 @@ public class HwFFeeTypeUtil {
     }
 
     public static GeneralApplicationCaseData updateOutstandingFee(GeneralApplicationCaseData caseData, String caseEventId) {
-        var updatedData = caseData.toBuilder();
+        var updatedData = caseData.copy();
         BigDecimal gaRemissionAmount = NO_REMISSION_HWF_GA == CaseEvent.valueOf(caseEventId)
                 ? BigDecimal.ZERO
                 : getGaRemissionAmount(caseData);
@@ -84,26 +82,24 @@ public class HwFFeeTypeUtil {
 
         if (caseData.isHWFTypeApplication() && BigDecimal.ZERO.compareTo(feeAmount) != 0) {
             outstandingFeeAmount = feeAmount.subtract(gaRemissionAmount);
-            updatedData.gaHwfDetails(
-                    caseData.getGaHwfDetails().toBuilder()
-                            .remissionAmount(gaRemissionAmount)
-                            .outstandingFee(outstandingFeeAmount)
-                            .build()
-            );
+            HelpWithFeesDetails updatedGaHwfDetails = caseData.getGaHwfDetails().copy();
+            updatedGaHwfDetails
+                .setRemissionAmount(gaRemissionAmount)
+                .setOutstandingFee(outstandingFeeAmount);
+            updatedData.gaHwfDetails(updatedGaHwfDetails);
         } else if (caseData.isHWFTypeAdditional() && BigDecimal.ZERO.compareTo(feeAmount) != 0) {
             outstandingFeeAmount = feeAmount.subtract(hearingRemissionAmount);
-            updatedData.additionalHwfDetails(
-                    caseData.getAdditionalHwfDetails().toBuilder()
-                            .remissionAmount(hearingRemissionAmount)
-                            .outstandingFee(outstandingFeeAmount)
-                            .build()
-            );
+            HelpWithFeesDetails updatedAdditionalHwfDetails = caseData.getAdditionalHwfDetails().copy();
+            updatedAdditionalHwfDetails
+                .setRemissionAmount(hearingRemissionAmount)
+                .setOutstandingFee(outstandingFeeAmount);
+            updatedData.additionalHwfDetails(updatedAdditionalHwfDetails);
         }
         return updatedData.build();
     }
 
     public static GeneralApplicationCaseData updateHwfReferenceNumber(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder();
+        GeneralApplicationCaseData updatedData = caseData.copy();
 
         if (Objects.nonNull(caseData.getFeePaymentOutcomeDetails())
                 && caseData.getFeePaymentOutcomeDetails().getHwfNumberAvailable() == YesOrNo.YES) {
@@ -116,7 +112,7 @@ public class HwFFeeTypeUtil {
         return updatedData.build();
     }
 
-    private static void clearHwfReferenceProperties(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder) {
+    private static void clearHwfReferenceProperties(GeneralApplicationCaseData caseDataBuilder) {
         GeneralApplicationCaseData caseData = caseDataBuilder.build();
         caseDataBuilder.feePaymentOutcomeDetails(caseData.getFeePaymentOutcomeDetails().copy()
                 .setHwfNumberAvailable(null)
@@ -124,18 +120,18 @@ public class HwFFeeTypeUtil {
     }
 
     public static void updateEventInHwfDetails(GeneralApplicationCaseData caseData,
-                                               GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+                                               GeneralApplicationCaseData caseDataBuilder,
                                                CaseEvent eventId) {
 
         if (caseData.getHwfFeeType().equals(FeeType.ADDITIONAL)) {
             HelpWithFeesDetails additionalFeeDetails =
                 Optional.ofNullable(caseData.getAdditionalHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseDataBuilder.additionalHwfDetails(additionalFeeDetails.toBuilder().hwfCaseEvent(eventId).build());
+            caseDataBuilder.additionalHwfDetails(additionalFeeDetails.copy().setHwfCaseEvent(eventId));
         }
         if (caseData.getHwfFeeType().equals(FeeType.APPLICATION)) {
             HelpWithFeesDetails gaHwfDetails =
                 Optional.ofNullable(caseData.getGaHwfDetails()).orElse(new HelpWithFeesDetails());
-            caseDataBuilder.gaHwfDetails(gaHwfDetails.toBuilder().hwfCaseEvent(eventId).build());
+            caseDataBuilder.gaHwfDetails(gaHwfDetails.copy().setHwfCaseEvent(eventId));
 
         }
     }

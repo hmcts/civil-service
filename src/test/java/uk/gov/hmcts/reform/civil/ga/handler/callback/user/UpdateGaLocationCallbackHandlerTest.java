@@ -224,7 +224,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         }
 
         private GeneralApplicationCaseData getParentCaseDataAfterUpdateFromCivilService(YesOrNo isConsented, YesOrNo isTobeNotified) {
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalApplications(wrapElements(getGeneralApplication(isConsented, isTobeNotified)))
                 .caseManagementLocation(CaseLocationCivil.builder()
                                             .baseLocation("00000")
@@ -261,7 +261,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
         private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                     getGeneralApplication(isConsented, isTobeNotified))
-                .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+                .copy().ccdCaseReference(CHILD_CCD_REF).build();
         }
     }
 }

@@ -107,9 +107,9 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
         @Test
         void shouldRespondWithStateChangedWithNoDocumentGeneration() {
             GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
-            GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
-                                                                                 .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                                                                 .build()).build();
+            GeneralApplicationCaseData updatedCaseData = caseData.copy().judicialDecision(new GAJudicialDecision()
+                                                                                 .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                                                                 ).build();
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -122,9 +122,9 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
         @Test
         void shouldRespondWithStateChangedWithNoDocumentGenerationWhenLipCaseWithJudicial() {
             GeneralApplicationCaseData caseData = getSampleGeneralApplicationCaseData(YES, NO, YES);
-            GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().judicialDecision(GAJudicialDecision.builder()
-                                                                                 .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                                                                 .build()).build();
+            GeneralApplicationCaseData updatedCaseData = caseData.copy().judicialDecision(new GAJudicialDecision()
+                                                                                 .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                                                                 ).build();
             CallbackParams params = callbackParamsOf(updatedCaseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -151,7 +151,7 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest extends GeneralApplica
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified, YesOrNo isUrgent) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplication(isConsented, isTobeNotified, isUrgent))
-            .toBuilder()
+            .copy()
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF)
