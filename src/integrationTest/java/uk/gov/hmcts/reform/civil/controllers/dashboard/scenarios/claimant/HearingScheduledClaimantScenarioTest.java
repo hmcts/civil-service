@@ -151,7 +151,7 @@ public class HearingScheduledClaimantScenarioTest extends DashboardBaseIntegrati
             .hearingDueDate(LocalDate.of(2024, 4, 1))
             .hearingDate(LocalDate.of(2024, 4, 1))
             .businessProcess(new BusinessProcess().setProcessInstanceId(""))
-            .hearingFeePaymentDetails(PaymentDetails.builder().status(PaymentStatus.SUCCESS).build())
+            .hearingFeePaymentDetails(new PaymentDetails().setStatus(PaymentStatus.SUCCESS))
             .applicant1Represented(YesOrNo.NO)
             .hearingLocation(list).build();
 

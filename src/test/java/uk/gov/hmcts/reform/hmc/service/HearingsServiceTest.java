@@ -80,13 +80,12 @@ class HearingsServiceTest {
         @Test
         void shouldGetHearingRequest() throws HmcException {
             PartyDetailsModel partyDetails = new PartyDetailsModel();
-            HearingGetResponse response = HearingGetResponse.builder()
-                .requestDetails(HearingRequestDetails.builder().build())
-                .hearingDetails(HearingDetails.builder().build())
-                .caseDetails(CaseDetailsHearing.builder().build())
-                .partyDetails(List.of(partyDetails))
-                .hearingResponse(HearingResponse.builder().build())
-                .build();
+            HearingGetResponse response = new HearingGetResponse()
+                .setRequestDetails(new HearingRequestDetails())
+                .setHearingDetails(new HearingDetails())
+                .setCaseDetails(new CaseDetailsHearing())
+                .setPartyDetails(List.of(partyDetails))
+                .setHearingResponse(new HearingResponse());
 
             when(hearingNoticeApi.getHearingRequest(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),
@@ -129,9 +128,9 @@ class HearingsServiceTest {
 
         private PartiesNotifiedResponse getPartiesNotified(LocalDateTime responseReceivedDateTime, Integer requestVersion,
                                                            LocalDateTime partiesNotified, JsonNode serviceData) {
-            return PartiesNotifiedResponse.builder().responseReceivedDateTime(responseReceivedDateTime)
-                .requestVersion(requestVersion).partiesNotified(partiesNotified).serviceData(
-                    PartiesNotifiedServiceData.builder().build()).build();
+            return new PartiesNotifiedResponse().setResponseReceivedDateTime(responseReceivedDateTime)
+                .setRequestVersion(requestVersion).setPartiesNotified(partiesNotified).setServiceData(
+                    new PartiesNotifiedServiceData());
         }
 
         private PartiesNotifiedResponses getPartiesNotifiedResponse() {
@@ -174,7 +173,7 @@ class HearingsServiceTest {
     @Nested
     class UpdatedPartiedNotifiedResponses {
         private final LocalDateTime time = LocalDateTime.of(2023, 5, 1, 15, 0);
-        private final  PartiesNotified partiesNotified = PartiesNotified.builder().serviceData(null).build();
+        private final  PartiesNotified partiesNotified = new PartiesNotified().setServiceData(null);
 
         @Test
         void shouldUpdatePartiesResponses_whenInvoked() {
@@ -255,11 +254,10 @@ class HearingsServiceTest {
 
         @Test
         void shouldGetNotifiedHearingResponses_whenInvoked() {
-            HearingsResponse hearings = HearingsResponse.builder()
-                .hmctsServiceCode(HMCTS_SERVICE_CODE)
-                .caseRef(CASE_ID.toString())
-                .caseHearings(List.of(CaseHearing.builder().build()))
-                .build();
+            HearingsResponse hearings = new HearingsResponse()
+                .setHmctsServiceCode(HMCTS_SERVICE_CODE)
+                .setCaseRef(CASE_ID.toString())
+                .setCaseHearings(List.of(new CaseHearing()));
 
             when(hearingNoticeApi.getHearings(
                 eq(USER_TOKEN), eq(SERVICE_TOKEN),

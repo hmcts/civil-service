@@ -179,18 +179,18 @@ public class SealedClaimLipResponseForm implements MappableObject {
     private static void addSelfEmploymentDetails(CaseData caseData, SealedClaimLipResponseForm form) {
         Optional.ofNullable(caseData.getSpecDefendant1SelfEmploymentDetails())
             .ifPresent(selfEmployDetails ->
-                           form.setSelfEmployment(Respondent1SelfEmploymentLRspec.builder()
-                                                     .amountOwed(selfEmployDetails.getAmountOwed() != null
+                           form.setSelfEmployment(new Respondent1SelfEmploymentLRspec()
+                                                     .setAmountOwed(selfEmployDetails.getAmountOwed() != null
                                                                      ? (MonetaryConversions.penniesToPounds(
                                                          selfEmployDetails.getAmountOwed())).setScale(2, RoundingMode.CEILING)
                                                                      : null)
-                                                     .annualTurnover(selfEmployDetails.getAnnualTurnover() != null
+                                                     .setAnnualTurnover(selfEmployDetails.getAnnualTurnover() != null
                                                                          ? (MonetaryConversions.penniesToPounds(
                                                          selfEmployDetails.getAnnualTurnover())).setScale(2, RoundingMode.CEILING)
                                                          : null)
-                                                     .jobTitle(selfEmployDetails.getJobTitle())
-                                                     .reason(selfEmployDetails.getReason())
-                                                     .build())
+                                                     .setJobTitle(selfEmployDetails.getJobTitle())
+                                                     .setReason(selfEmployDetails.getReason())
+                                                     )
             );
     }
 
@@ -242,13 +242,13 @@ public class SealedClaimLipResponseForm implements MappableObject {
         form.setCourtOrderDetails(
             Optional.ofNullable(caseData.getRespondent1CourtOrderDetails()).map(Collection::stream)
                 .orElseGet(Stream::empty)
-                .map(courtOrderDetails -> Respondent1CourtOrderDetails.builder()
-                    .claimNumberText(courtOrderDetails.getValue().getClaimNumberText())
-                    .amountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
-                    .monthlyInstalmentAmount(courtOrderDetails.getValue().getMonthlyInstalmentAmount() == null ? null
+                .map(courtOrderDetails -> new Respondent1CourtOrderDetails()
+                    .setClaimNumberText(courtOrderDetails.getValue().getClaimNumberText())
+                    .setAmountOwed(MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getAmountOwed()))
+                    .setMonthlyInstalmentAmount(courtOrderDetails.getValue().getMonthlyInstalmentAmount() == null ? null
                         : MonetaryConversions.penniesToPounds(courtOrderDetails.getValue().getMonthlyInstalmentAmount())
                     )
-                    .build())
+                    )
                 .toList()
         );
     }

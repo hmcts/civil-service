@@ -113,14 +113,11 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
 
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder()
-                            .responses(List.of(
-                                PartiesNotifiedResponse.builder()
-                                    .requestVersion(10)
-                                    .responseReceivedDateTime(LocalDateTime.now())
-                                    .build()
-                            ))
-                            .build());
+            .thenReturn(new PartiesNotifiedResponses()
+                            .setResponses(List.of(
+                                new PartiesNotifiedResponse()
+                                    .setRequestVersion(10)
+                                    .setResponseReceivedDateTime(LocalDateTime.now()))));
 
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString()))
@@ -143,7 +140,7 @@ class UpdateHmcPartiesNotifiedHandlerTest {
             .when(hearingsService).updatePartiesNotifiedResponse(anyString(), anyString(), anyInt(), any(), any());
 
         when(hearingsService.getPartiesNotifiedResponses(anyString(), anyString()))
-            .thenReturn(PartiesNotifiedResponses.builder().build());
+            .thenReturn(new PartiesNotifiedResponses());
 
         when(userService.getAccessToken(anyString(), anyString())).thenReturn(AUTH_TOKEN);
         when(userService.getUserInfo(anyString()))

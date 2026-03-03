@@ -289,19 +289,18 @@ public class ManageContactInformationUtils {
     private static PartyFlagStructure updateTopLevelPartyInfo(String partyId, String firstName, String lastName, String phoneNumber, String email,
                                                               List<PartyFlagStructure> existingParties) {
         return existingParties.stream().filter(p -> p.getPartyID().equals(partyId)).findFirst()
-            .map(p -> (p.toBuilder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .phone(phoneNumber)
-                .email(email)
-                .build()))
-            .orElse(PartyFlagStructure.builder()
-                .partyID(partyId)
-                .firstName(firstName)
-                .lastName(lastName)
-                .phone(phoneNumber)
-                .email(email)
-                .build());
+            .map(p -> (p.copy()
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setPhone(phoneNumber)
+                .setEmail(email)))
+            .orElse(new PartyFlagStructure()
+                .setPartyID(partyId)
+                .setFirstName(firstName)
+                .setLastName(lastName)
+                .setPhone(phoneNumber)
+                .setEmail(email)
+                );
     }
 
     private static String formatId(String partyChosen, String isAdmin, Party party) {
@@ -516,18 +515,17 @@ public class ManageContactInformationUtils {
                         .value(updateIndividualWithFormData(ofNullable(existing).orElse(new ArrayList<>()).stream()
                                 .filter(existingParty -> existingParty.getId().equals(updatedParty.getId()))
                                 .map(Element::getValue)
-                                .findFirst().orElse(PartyFlagStructure.builder().build()), updatedParty.getValue()))
+                                .findFirst().orElse(new PartyFlagStructure()), updatedParty.getValue()))
                         .build())
                 .toList();
     }
 
     private static PartyFlagStructure updateIndividualWithFormData(PartyFlagStructure individual, UpdatePartyDetailsForm form) {
-        return  individual.toBuilder()
-                .firstName(form.getFirstName())
-                .lastName(form.getLastName())
-                .email(form.getEmailAddress())
-                .phone(form.getPhoneNumber())
-                .build();
+        return  individual.copy()
+                .setFirstName(form.getFirstName())
+                .setLastName(form.getLastName())
+                .setEmail(form.getEmailAddress())
+                .setPhone(form.getPhoneNumber());
     }
 
     public static List<Element<UpdatePartyDetailsForm>> prepareOrgIndividuals(String partyId, CaseData caseData) {

@@ -158,7 +158,7 @@ class BundleCreationServiceTest {
         List<Element<Document>> particularsOfClaim = new ArrayList<>();
         Document document = new Document().setDocumentFileName(testFileName).setDocumentUrl(testUrl);
         particularsOfClaim.add(ElementUtils.element(document));
-        return ServedDocumentFiles.builder().particularsOfClaimDocument(particularsOfClaim).build();
+        return new ServedDocumentFiles().setParticularsOfClaimDocument(particularsOfClaim);
     }
 
     @Test

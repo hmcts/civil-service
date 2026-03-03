@@ -2,14 +2,12 @@ package uk.gov.hmcts.reform.hmc.model.hearing;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.DayOfWeek;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Builder(toBuilder = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

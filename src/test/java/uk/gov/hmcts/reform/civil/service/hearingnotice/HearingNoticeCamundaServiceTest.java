@@ -44,10 +44,9 @@ public class HearingNoticeCamundaServiceTest {
 
     @Test
     void shouldReturnExpectedProcessVariables() {
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0));
 
         HearingNoticeVariables expected = new HearingNoticeVariables()
             .setCaseId(1L)
@@ -70,10 +69,9 @@ public class HearingNoticeCamundaServiceTest {
 
     @Test
     void shouldCallRunTimeServiceSetVariablesWithExpectedVariables() {
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0));
 
         HearingNoticeVariables variables = new HearingNoticeVariables()
             .setCaseId(1L)

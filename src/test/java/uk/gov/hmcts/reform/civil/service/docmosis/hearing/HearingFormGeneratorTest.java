@@ -267,10 +267,10 @@ public class HearingFormGeneratorTest {
             .hearingDuration(HearingDuration.DAY_1)
             .caseManagementLocation(caseManagementLocation)
             .hearingNoticeList(HearingNoticeList.HEARING_OF_APPLICATION)
-            .hearingFeePaymentDetails(PaymentDetails.builder()
-                                          .status(SUCCESS)
-                                          .reference("REFERENCE")
-                                          .build())
+            .hearingFeePaymentDetails(new PaymentDetails()
+                                          .setStatus(SUCCESS)
+                                          .setReference("REFERENCE")
+                                          )
             .build();
 
         assertThat(generator.listingOrRelistingWithFeeDue(caseData)).isEqualTo("DO_NOT_SHOW");
@@ -279,13 +279,13 @@ public class HearingFormGeneratorTest {
     private static Stream<Arguments> provideTestCases() {
         return Stream.of(
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         PaymentDetails.builder().status(PaymentStatus.SUCCESS).build(), null, "DO_NOT_SHOW"),
+                         new PaymentDetails().setStatus(PaymentStatus.SUCCESS), null, "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
                          null, new FeePaymentOutcomeDetails().setHwfFullRemissionGrantedForHearingFee(YesOrNo.YES), "DO_NOT_SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW"),
+                         new PaymentDetails().setStatus(PaymentStatus.FAILED), null, "SHOW"),
             Arguments.of(CaseState.HEARING_READINESS, ListingOrRelisting.LISTING, YesOrNo.NO, YesOrNo.NO,
-                         PaymentDetails.builder().status(PaymentStatus.FAILED).build(), null, "SHOW")
+                         new PaymentDetails().setStatus(PaymentStatus.FAILED), null, "SHOW")
         );
     }
 

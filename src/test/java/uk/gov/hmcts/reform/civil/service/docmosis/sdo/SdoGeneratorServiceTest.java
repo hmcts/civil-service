@@ -338,9 +338,9 @@ public class SdoGeneratorServiceTest {
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .smallClaimsMethodInPerson(formValue)
             .build().toBuilder()
-            .smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
-                                                      .input("mediation representation")
-                                                      .build())
+            .smallClaimsMediationSectionStatement(
+                new SmallClaimsMediation().setInput("mediation representation")
+            )
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
             .thenReturn(locationRefData);

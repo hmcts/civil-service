@@ -70,15 +70,15 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
         @Test
         void shouldRecordApplicationIssueFeeRequiredScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee()
                                                    .setCalculatedAmountInPence(new BigDecimal(100000))
                                                    )
-                                          .build())
+                                          )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -101,18 +101,18 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
         @Test
         void shouldRecordApplicationSubmittedScenarioWhenInvokedForFreeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.ADJOURN_HEARING)).build())
                 .isGaApplicantLip(YesOrNo.YES)
                 .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(LocalDate.now().minusDays(20)).build())
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                          .fee(new Fee()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                          .setFee(new Fee()
                                                    .setCalculatedAmountInPence(new BigDecimal(0))
                                                    )
-                                          .build())
+                                          )
                 .build();
 
             HashMap<String, Object> scenarioParams = new HashMap<>();

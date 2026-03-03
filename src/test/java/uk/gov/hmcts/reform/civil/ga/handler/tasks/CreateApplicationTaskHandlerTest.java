@@ -464,7 +464,7 @@ public class CreateApplicationTaskHandlerTest {
         void shouldAddApplicantSolListForWithoutNoticeApplnAndGeneralRespAgreed() {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, YES, YES, YES, null);
-            GeneralApplicationCaseData caseData = buildOnlyData(generalApplication, NO, NO).toBuilder()
+            GeneralApplicationCaseData caseData = buildOnlyData(generalApplication, NO, NO).copy()
                 .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
                 .respondent1OrganisationIDCopy("respondent1").build();
 
@@ -664,7 +664,7 @@ public class CreateApplicationTaskHandlerTest {
             )).thenReturn(caseDataContent);
 
             when(coreCaseDataService.submitUpdate(any(), any()))
-                .thenReturn(GeneralApplicationCaseData.builder().generalAppParentCaseLink(
+                .thenReturn(new GeneralApplicationCaseData().generalAppParentCaseLink(
                     new GeneralAppParentCaseLink().setCaseReference("123")).build());
 
             createApplicationTaskHandler.execute(mockTask, externalTaskService);
@@ -945,9 +945,9 @@ public class CreateApplicationTaskHandlerTest {
             .gaDetailsRespondentSolTwo(gaDetailsRespondentSolTwoList)
             .businessProcess(new BusinessProcess().setStatus(STARTED)
             .setProcessInstanceId(PROCESS_INSTANCE_ID)).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
                 .generalAppEvidenceDocument(generalAppEvidenceDocument).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .claimantBilingualLanguagePreference(claimantBilingual ? "BOTH" : null)
             .respondent1LiPResponse(defendantBilingual
             ? new RespondentLiPResponse().setRespondent1ResponseLanguage("BOTH")

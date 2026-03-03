@@ -322,10 +322,9 @@ class NoticeOfDiscontinuanceFormGeneratorTest {
                 .claimantsConsentToDiscontinuance(YesOrNo.YES)
                 .courtPermissionNeeded(SettleDiscontinueYesOrNoList.YES)
                 .isPermissionGranted(SettleDiscontinueYesOrNoList.YES)
-                .permissionGrantedComplex(PermissionGranted.builder()
-                        .permissionGrantedJudge("Judge Name")
-                        .permissionGrantedDate(LocalDate.parse("2022-02-01"))
-                        .build())
+                .permissionGrantedComplex(new PermissionGranted()
+                        .setPermissionGrantedJudge("Judge Name")
+                        .setPermissionGrantedDate(LocalDate.parse("2022-02-01")))
                 .typeOfDiscontinuance(DiscontinuanceTypeList.PART_DISCONTINUANCE)
                 .partDiscontinuanceDetails("partial part")
                 .build();
