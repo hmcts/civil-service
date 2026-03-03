@@ -1,6 +1,7 @@
 package org.springframework.boot.actuate.health;
 
 public final class Health {
+
     private final Status status;
     private final Throwable error;
 
