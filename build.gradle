@@ -132,8 +132,8 @@ allprojects {
 sourceSets {
   integrationTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += main.output + main.compileClasspath
+      runtimeClasspath += main.output + main.runtimeClasspath
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
@@ -141,8 +141,8 @@ sourceSets {
 
   contractTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += main.output + main.compileClasspath
+      runtimeClasspath += main.output + main.runtimeClasspath
       srcDir file('src/contractTest/java')
     }
     resources.srcDir file('src/contractTest/resources')
@@ -327,6 +327,7 @@ dependencies {
   }
   implementation project(':dashboard-notifications')
   implementation group: 'org.springframework.data', name: 'spring-data-jpa'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure-classic-modules'
   implementation group: 'org.springframework.boot', name: 'spring-boot-persistence'
@@ -344,7 +345,7 @@ dependencies {
 
   // CVE-2025-48734 force update of commons-beanutils.
   implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
-  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.6.0'
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '3.0.2'
   implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
@@ -372,7 +373,7 @@ dependencies {
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
   }
-  implementation('com.github.hmcts:payments-java-client:1.6.7') {
+  implementation('com.github.hmcts:payments-java-client:1.6.8') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
     exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
   }
