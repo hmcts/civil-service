@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,7 +52,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}"
     })
-    @RateLimiter(rateLimit = 10, timeInSeconds = 60)
+    @RateLimiter
     @Operation(summary = "Validates case reference and pin")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -68,7 +69,7 @@ public class CaseAssignmentController {
     @PostMapping(path = {
         "/reference/{caseReference}/ocmc"
     })
-    @RateLimiter(rateLimit = 100, timeInSeconds = 60)
+    @RateLimiter
     @Operation(summary = "Validates case reference and pin for ocmc")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "302", description = "FOUND"),
@@ -84,7 +85,7 @@ public class CaseAssignmentController {
     @GetMapping(path = {
         "/reference/{caseReference}/defendant-link-status"
     })
-    @RateLimiter(rateLimit = 5, timeInSeconds = 60)
+    @RateLimiter
     @Operation(summary = "Check whether a claim is linked to a defendant")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
