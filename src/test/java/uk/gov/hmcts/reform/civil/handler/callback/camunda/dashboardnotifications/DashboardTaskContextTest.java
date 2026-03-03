@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotification
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 
 import java.util.Map;
@@ -12,17 +13,35 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TO
 class DashboardTaskContextTest {
 
     @Test
-    void shouldExposeCaseDataAndAuthToken() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(123L).build();
-        CallbackParams params = new CallbackParams()
-            .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "token"));
+    void shouldExposeGaCaseDataAndCaseType() {
+        GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData()
+            .ccdCaseReference(111L)
+            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(gaCaseData)
+            .isGeneralApplicationCaseType(true)
+            .params(Map.of(BEARER_TOKEN, "ga-token"));
 
-        DashboardTaskContext context = DashboardTaskContext.from(params);
+        DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
 
-        assertThat(context.caseData()).isSameAs(caseData);
-        assertThat(context.authToken()).isEqualTo("token");
-        assertThat(context.callbackParams()).isSameAs(params);
+        assertThat(context.caseType()).isEqualTo(DashboardCaseType.GENERAL_APPLICATION);
+        assertThat(context.generalApplicationCaseData()).isSameAs(gaCaseData);
+        assertThat(context.authToken()).isEqualTo("ga-token");
+    }
+
+    @Test
+    void shouldExposeCivilCaseDataAndCaseType() {
+        CaseData civilCaseData = CaseData.builder().build();
+        CallbackParams callbackParams = new CallbackParams()
+            .caseData(civilCaseData)
+            .isGeneralApplicationCaseType(false)
+            .params(Map.of(BEARER_TOKEN, "civil-token"));
+
+        DashboardTaskContext context = DashboardTaskContext.from(callbackParams);
+
+        assertThat(context.caseType()).isEqualTo(DashboardCaseType.CIVIL);
+        assertThat(context.caseData()).isSameAs(civilCaseData);
+        assertThat(context.authToken()).isEqualTo("civil-token");
     }
 
     @Test
