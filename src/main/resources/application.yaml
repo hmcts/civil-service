@@ -913,4 +913,4 @@ stitch-bundle:
 
 rateLimiter:
   rateLimit: ${RATE_LIMIT:100}
-  timeInSeconds: ${TIME_IN_SECONDS:60}
+  timeInSeconds: ${RATE_LIMITER_TIME_IN_SECONDS:60}
