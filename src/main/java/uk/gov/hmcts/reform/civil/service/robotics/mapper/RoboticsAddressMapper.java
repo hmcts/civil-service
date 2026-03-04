@@ -10,8 +10,8 @@ import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import java.util.List;
 import java.util.Optional;
 
-import static io.jsonwebtoken.lang.Collections.isEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.reform.civil.model.Address.fromContactInformation;
 
 @Service
