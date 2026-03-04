@@ -99,7 +99,7 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldUpdatePartyWithFlagsMeta() {
-            Party party = PartyBuilder.builder().individual().build();
+            Party party = new PartyBuilder().individual().build();
             Flags flags = new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of());
             Party expected = party.setFlags(flags);
 
@@ -110,7 +110,7 @@ class CaseFlagUtilsTest {
 
         @Test
         void shouldNotUpdatePartyFlagsIfFlagsExist() {
-            Party existingParty = PartyBuilder.builder().individual().build()
+            Party existingParty = new PartyBuilder().individual().build()
                 .setFlags(new Flags().setPartyName("Mr. John Rambo").setRoleOnCase("applicant").setDetails(List.of()));
 
             Party actual = CaseFlagUtils.updateParty("updatedField", existingParty);

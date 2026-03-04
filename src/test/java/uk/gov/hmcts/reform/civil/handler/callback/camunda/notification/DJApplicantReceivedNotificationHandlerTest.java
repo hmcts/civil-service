@@ -133,7 +133,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -164,7 +164,7 @@ class DJApplicantReceivedNotificationHandlerTest {
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //send Requested email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YES)
                 .defendantDetailsSpec(DynamicList.builder()
@@ -226,8 +226,8 @@ class DJApplicantReceivedNotificationHandlerTest {
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-                    .applicant1(PartyBuilder.builder().individual().build())
-                    .respondent1(PartyBuilder.builder().soleTrader().build())
+                    .applicant1(new PartyBuilder().individual().build())
+                    .respondent1(new PartyBuilder().soleTrader().build())
                     .respondent1Represented(YesOrNo.NO)
                     .specRespondent1Represented(YesOrNo.NO)
                     .applicant1Represented(YesOrNo.NO)

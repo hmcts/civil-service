@@ -208,8 +208,8 @@ public class CaseDataBuilderUnspec {
             .setCode("CODE")
             .setCalculatedAmountInPence(BigDecimal.valueOf(100))
             ;
-        applicant1 = PartyBuilder.builder().individual().build();
-        respondent1 = PartyBuilder.builder().soleTrader().build();
+        applicant1 = new PartyBuilder().individual().build();
+        respondent1 = new PartyBuilder().soleTrader().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2OrgRegistered = YES;
@@ -240,7 +240,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atStateClaimSubmittedTwoRespondentSameSolicitor() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = YES;
         return this;
     }
@@ -248,7 +248,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atStateClaimSubmittedTwoRespondentRepresentatives() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2Represented = YES;
         respondent2OrgRegistered = YES;
         respondent2SameLegalRepresentative = NO;
@@ -265,7 +265,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atStateClaimSubmitted2v1() {
         atStateClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         return this;
     }
 
@@ -278,7 +278,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState2v1DefendantUnrepresentedClaimSubmitted() {
         atStateClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         return this;
     }
@@ -286,7 +286,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState1v2OneDefendantUnrepresentedClaimSubmitted() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = YES;
         respondent2Represented = NO;
@@ -297,7 +297,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState1v2BothDefendantUnrepresentedClaimSubmitted() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent2Represented = NO;
         respondent1OrgRegistered = null;
@@ -315,7 +315,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState2v1DefendantUnregisteredClaimSubmitted() {
         atStateClaimSubmitted();
         addApplicant2 = YES;
-        applicant2 = PartyBuilder.builder().individual().build();
+        applicant2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         return this;
@@ -324,7 +324,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState1v2Solicitor1UnregisteredSolicitor2Registered() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = YES;
         respondent1OrgRegistered = NO;
         respondent2Represented = YES;
@@ -336,7 +336,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState1v2OneDefendantRepresentedUnregisteredOtherUnrepresentedClaimSubmitted() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent1Represented = NO;
         respondent1OrgRegistered = null;
         respondent2Represented = YES;
@@ -347,7 +347,7 @@ public class CaseDataBuilderUnspec {
     public CaseDataBuilderUnspec atState1v2BothDefendantRepresentedAndUnregistered() {
         atStateClaimSubmitted();
         addRespondent2 = YES;
-        respondent2 = PartyBuilder.builder().individual().build();
+        respondent2 = new PartyBuilder().individual().build();
         respondent2SameLegalRepresentative = NO;
         respondent1Represented = YES;
         respondent2Represented = YES;
@@ -363,7 +363,7 @@ public class CaseDataBuilderUnspec {
 
     public CaseDataBuilderUnspec multiPartyClaimTwoDefendantSolicitors() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = new PartyBuilder().individual().build();
         this.respondent2SameLegalRepresentative = NO;
         this.respondentSolicitor2Reference = "01234";
         return this;
@@ -371,14 +371,14 @@ public class CaseDataBuilderUnspec {
 
     public CaseDataBuilderUnspec multiPartyClaimOneDefendantSolicitor() {
         this.addRespondent2 = YES;
-        this.respondent2 = PartyBuilder.builder().individual().build();
+        this.respondent2 = new PartyBuilder().individual().build();
         this.respondent2SameLegalRepresentative = YES;
         return this;
     }
 
     public CaseDataBuilderUnspec multiPartyClaimTwoApplicants() {
         this.addApplicant2 = YES;
-        this.applicant2 = PartyBuilder.builder().individual("Jason").build();
+        this.applicant2 = new PartyBuilder().individual("Jason").build();
         return this;
     }
 

@@ -271,9 +271,9 @@ class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1FullDefence_whenIsRespondentResponseFullDefence_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
         //When
@@ -286,9 +286,9 @@ class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1And2FullDefence_whenIsRespondentResponseFullDefence_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
