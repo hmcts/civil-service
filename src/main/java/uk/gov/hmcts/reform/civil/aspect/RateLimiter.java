@@ -5,23 +5,19 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.springframework.beans.factory.annotation.Value;
-
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimiter {
 
     /**
      * The maximum number of requests allowed within the time window.
-     * Default is 100 requests.
+     * Default is -1 and will be used from config value.
      */
-    @Value("${rateLimiter.rateLimit}")
-    int rateLimit() default 5;
+    int rateLimit() default -1;
 
     /**
      * The time in seconds during which the limit applies.
-     * Default is 60 seconds (1 minute).
+     * Default is -1 and will be used from config value.
      */
-    @Value("${rateLimiter.timeInSeconds}")
-    int timeInSeconds() default 60;
+    int timeInSeconds() default -1;
 }

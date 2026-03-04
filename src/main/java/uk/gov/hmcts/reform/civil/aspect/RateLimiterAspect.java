@@ -11,6 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -23,6 +24,12 @@ public class RateLimiterAspect {
 
     private final RateLimiterService rateLimiterService;
 
+    @Value("${rateLimiter.rateLimit}")
+    private int defaultRateLimit;
+
+    @Value("${rateLimiter.timeInSeconds}")
+    private int defaultTimeInSeconds;
+
     public RateLimiterAspect(RateLimiterService rateLimiterService) {
         this.rateLimiterService = rateLimiterService;
     }
@@ -34,8 +41,14 @@ public class RateLimiterAspect {
         RateLimiter rateLimitAnnotation = method.getAnnotation(RateLimiter.class);
 
         // Extract limit parameters
-        int limit = rateLimitAnnotation.rateLimit();
-        int timeWindowSeconds = rateLimitAnnotation.timeInSeconds();
+        int limit = rateLimitAnnotation.rateLimit() == -1
+            ? defaultRateLimit
+            : rateLimitAnnotation.rateLimit();
+
+        int timeWindowSeconds = rateLimitAnnotation.timeInSeconds() == -1
+            ? defaultTimeInSeconds
+            : rateLimitAnnotation.timeInSeconds();
+        log.info("limit in Aspect : {} timeWindowSeconds : {} ", limit, timeWindowSeconds);
 
         // Get the current request and extract client IP
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
