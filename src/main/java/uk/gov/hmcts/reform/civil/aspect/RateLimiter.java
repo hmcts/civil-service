@@ -16,7 +16,7 @@ public @interface RateLimiter {
      * Default is 100 requests.
      */
     @Value("${rateLimiter.rateLimit}")
-    int rateLimit() default 100;
+    int rateLimit() default 5;
 
     /**
      * The time in seconds during which the limit applies.
