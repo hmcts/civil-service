@@ -46,6 +46,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 )
 @IgnoreNoPactsToVerify
 @EnabledIfEnvironmentVariable(named = "PACT_BROKER_FULL_URL", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "RUN_PROVIDER_PACT_VERIFICATION", matches = "true")
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
