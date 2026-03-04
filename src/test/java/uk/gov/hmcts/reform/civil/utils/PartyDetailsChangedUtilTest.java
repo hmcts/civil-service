@@ -36,10 +36,10 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_NoChanges() {
             CaseData current = CaseData.builder()
-                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant1(new PartyBuilder().individual().build())
                 .build();
             CaseData updated = CaseData.builder()
-                .applicant1(PartyBuilder.builder().individual().build())
+                .applicant1(new PartyBuilder().individual().build())
                 .build();
 
             assertNull(partyDetailsChangedUtil.buildChangesEvent(current, updated));
@@ -48,10 +48,10 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant1Changes() {
             CaseData current = CaseData.builder()
-                .applicant1(PartyBuilder.builder().company().build().setCompanyName("Company One"))
+                .applicant1(new PartyBuilder().company().build().setCompanyName("Company One"))
                 .build();
             CaseData updated = CaseData.builder()
-                .applicant1(PartyBuilder.builder().company().build().setCompanyName("Company Two"))
+                .applicant1(new PartyBuilder().company().build().setCompanyName("Company Two"))
                 .build();
 
             ContactDetailsUpdatedEvent actualEvent = partyDetailsChangedUtil.buildChangesEvent(current, updated);
@@ -66,12 +66,12 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Applicant2Changes() {
             CaseData current = CaseData.builder()
-                .applicant2(PartyBuilder.builder().individual().build()
+                .applicant2(new PartyBuilder().individual().build()
                                 .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .applicant2(PartyBuilder.builder().individual().build()
+                .applicant2(new PartyBuilder().individual().build()
                                 .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
@@ -87,12 +87,12 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent1Changes() {
             CaseData current = CaseData.builder()
-                .respondent1(PartyBuilder.builder().individual().build()
+                .respondent1(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .respondent1(PartyBuilder.builder().individual().build()
+                .respondent1(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
@@ -108,12 +108,12 @@ public class PartyDetailsChangedUtilTest {
         @Test
         public void testBuildChangesEvent_Respondent2Changes() {
             CaseData current = CaseData.builder()
-                .respondent2(PartyBuilder.builder().individual().build()
+                .respondent2(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("John").setIndividualLastName("Doe"))
                 .build();
 
             CaseData updated = CaseData.builder()
-                .respondent2(PartyBuilder.builder().individual().build()
+                .respondent2(new PartyBuilder().individual().build()
                                  .setIndividualFirstName("Jane").setIndividualLastName("Smith"))
                 .build();
 
@@ -490,8 +490,8 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_NoChanges() {
-            Party current = PartyBuilder.builder().individual().build();
-            Party updated = PartyBuilder.builder().individual().build();
+            Party current = new PartyBuilder().individual().build();
+            Party updated = new PartyBuilder().individual().build();
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
 
@@ -500,11 +500,11 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Individual() {
-            Party current = PartyBuilder.builder().individual().build()
+            Party current = new PartyBuilder().individual().build()
                 .setIndividualFirstName("Jane")
                 .setIndividualLastName("Carver");
 
-            Party updated = PartyBuilder.builder().individual().build()
+            Party updated = new PartyBuilder().individual().build()
                 .setIndividualFirstName("Jane")
                 .setIndividualLastName("Wilson");
 
@@ -521,11 +521,11 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_SoleTrader() {
-            Party current = PartyBuilder.builder().soleTrader().build()
+            Party current = new PartyBuilder().soleTrader().build()
                 .setSoleTraderFirstName("Jane")
                 .setSoleTraderLastName("Carver");
 
-            Party updated = PartyBuilder.builder().soleTrader().build()
+            Party updated = new PartyBuilder().soleTrader().build()
                 .setSoleTraderFirstName("Jane")
                 .setSoleTraderLastName("Wilson");
 
@@ -542,10 +542,10 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Company() {
-            Party current = PartyBuilder.builder().company().build()
+            Party current = new PartyBuilder().company().build()
                 .setCompanyName("Company One");
 
-            Party updated = PartyBuilder.builder().company().build()
+            Party updated = new PartyBuilder().company().build()
                 .setCompanyName("Company Two");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -561,10 +561,10 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_PartyNameChange_Organisation() {
-            Party current = PartyBuilder.builder().organisation().build()
+            Party current = new PartyBuilder().organisation().build()
                 .setOrganisationName("Organisation One");
 
-            Party updated = PartyBuilder.builder().organisation().build()
+            Party updated = new PartyBuilder().organisation().build()
                 .setOrganisationName("Organisation Two");
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -580,10 +580,10 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_AddressChange() {
-            Party current = PartyBuilder.builder().individual().build()
+            Party current = new PartyBuilder().individual().build()
                 .setPrimaryAddress(address("123 Main St", "City", "Country"));
 
-            Party updated = PartyBuilder.builder().individual().build()
+            Party updated = new PartyBuilder().individual().build()
                 .setPrimaryAddress(address("999 Main St", "City", "Country"));
 
             List<PartyDetailsChange> changes = partyDetailsChangedUtil.getChanges(current, updated);
@@ -599,12 +599,12 @@ public class PartyDetailsChangedUtilTest {
 
         @Test
         public void testGetChangesParty_MultipleChanges() {
-            Party current = PartyBuilder.builder().individual().build()
+            Party current = new PartyBuilder().individual().build()
                 .setIndividualFirstName("John")
                 .setIndividualLastName("Doe")
                 .setPrimaryAddress(address("123 Main St", "City", "Country"));
 
-            Party updated = PartyBuilder.builder().individual().build()
+            Party updated = new PartyBuilder().individual().build()
                 .setIndividualFirstName("Jane")
                 .setIndividualLastName("Smith")
                 .setPrimaryAddress(address("999 Elm St", "Town", "Country"));

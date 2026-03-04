@@ -34,10 +34,6 @@ public class PartyBuilder {
     private String partyPhone;
     private String legalRepHeading;
 
-    public static PartyBuilder builder() {
-        return new PartyBuilder();
-    }
-
     public PartyBuilder ofType(Party.Type type) {
         switch (type) {
             case INDIVIDUAL:

@@ -234,7 +234,7 @@ class ManageContactInformationUtilsTest {
                 .addApplicant1LitigationFriend()
                 .addApplicant2LitigationFriend()
                 .multiPartyClaimTwoApplicants()
-                .applicant2(PartyBuilder.builder().company().build())
+                .applicant2(new PartyBuilder().company().build())
                 .atStateApplicantRespondToDefenceAndProceed().build();
 
         List<DynamicListElement> options = new ArrayList<>();

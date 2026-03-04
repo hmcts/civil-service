@@ -164,7 +164,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentPartAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(Long.valueOf(caseId));
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setRespondent1RepaymentPlan(new RepaymentPlanLRspec()
                 .setFirstRepaymentDate(firstRepaymentDate)
@@ -198,7 +198,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullAdmissionSpec().build();
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(Long.valueOf(caseId));
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondent1Represented(YesOrNo.NO);
             caseData.setRespondent1RepaymentPlan(new RepaymentPlanLRspec()
                 .setFirstRepaymentDate(firstRepaymentDate)

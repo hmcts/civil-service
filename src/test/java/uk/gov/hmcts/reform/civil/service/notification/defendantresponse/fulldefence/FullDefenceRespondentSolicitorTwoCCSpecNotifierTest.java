@@ -66,7 +66,7 @@ class FullDefenceRespondentSolicitorTwoCCSpecNotifierTest {
     void shouldNotifyRespondentSolicitor2In1v2ScenarioSecondSol_whenV1CallbackInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
-            .respondent2(PartyBuilder.builder().soleTrader().build().setPartyID("res-2-party-id"))
+            .respondent2(new PartyBuilder().soleTrader().build().setPartyID("res-2-party-id"))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 
