@@ -67,7 +67,7 @@ class SdoPrePopulateServiceTest {
             new SdoDisposalNarrativeService(deadlineService)
         );
         SdoFastTrackSpecialistDirectionsService fastTrackSpecialistDirectionsService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
         SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService =
             new SdoFastTrackOrderDefaultsService(fastTrackNarrativeService, fastTrackSpecialistDirectionsService);
