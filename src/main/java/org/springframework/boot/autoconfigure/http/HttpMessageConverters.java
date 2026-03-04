@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> {
+
     // TODO(DTSCCI-3888): Remove this class once all transitive dependencies stop importing the
     // pre-Boot-4 HttpMessageConverters type from this package.
 
