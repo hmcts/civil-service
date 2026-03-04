@@ -39,7 +39,7 @@ class SdoTrackDefaultsServiceTest {
                 new SdoDisposalNarrativeService(deadlineService)
         );
         SdoFastTrackSpecialistDirectionsService specialistDirectionsService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
         SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(
                 fastTrackNarrativeService,
