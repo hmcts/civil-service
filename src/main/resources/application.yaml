@@ -915,7 +915,7 @@ court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
 
 other_remedy:
-  enabled: ${OTHER_REMEDY_ENABLED:true}
+  enabled: ${OTHER_REMEDY_ENABLED:false}
 
 
 stitch-bundle:
