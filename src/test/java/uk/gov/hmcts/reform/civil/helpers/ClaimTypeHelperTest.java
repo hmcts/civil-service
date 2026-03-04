@@ -16,7 +16,8 @@ public class ClaimTypeHelperTest {
         assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.BREACH_OF_CONTRACT)).isEqualTo(ClaimType.BREACH_OF_CONTRACT);
         assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.CONSUMER)).isEqualTo(ClaimType.CONSUMER);
         assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.CONSUMER_CREDIT)).isEqualTo(ClaimType.CONSUMER_CREDIT);
+        assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY)).isEqualTo(ClaimType.DAMAGES_AND_OTHER_REMEDY);
+        assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.HOUSING_DISREPAIR)).isEqualTo(ClaimType.HOUSING_DISREPAIR);
         assertThat(ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(ClaimTypeUnspec.OTHER)).isEqualTo(ClaimType.OTHER);
-
     }
 }

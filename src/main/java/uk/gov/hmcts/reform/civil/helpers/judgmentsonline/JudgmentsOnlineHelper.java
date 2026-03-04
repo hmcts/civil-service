@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import camundajar.impl.scala.collection.mutable.StringBuilder;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -305,12 +304,12 @@ public class JudgmentsOnlineHelper {
 
     public static  String formatAddress(JudgmentAddress address) {
         String formattedLine = new StringBuilder()
-            .addAll(formatAddressLine(address.getDefendantAddressLine1()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine2()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine3()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine4()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine5()))
-            .result().trim();
+            .append(formatAddressLine(address.getDefendantAddressLine1()))
+            .append(formatAddressLine(address.getDefendantAddressLine2()))
+            .append(formatAddressLine(address.getDefendantAddressLine3()))
+            .append(formatAddressLine(address.getDefendantAddressLine4()))
+            .append(formatAddressLine(address.getDefendantAddressLine5()))
+            .toString().trim();
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
     }
 
