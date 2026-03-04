@@ -6,32 +6,40 @@ import feign.codec.Encoder;
 import feign.form.spring.SpringFormEncoder;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.beans.BeansException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.GenericHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Compatibility shim for legacy HMCTS clients expecting the old SpringEncoder constructor.
  * Supports both Spring Cloud OpenFeign 5 and older constructor signatures.
+ * TODO(DTSCCI-3888): Delete this shim when all dependent libraries use Spring Cloud OpenFeign's
+ * native SpringEncoder for Boot 4 and no reflective/legacy constructor fallback is required.
  */
 public class SpringEncoder implements Encoder {
 
     private final SpringFormEncoder springFormEncoder;
     private final FeignEncoderProperties encoderProperties;
     private final ObjectProvider<FeignHttpMessageConverters> convertersProvider;
-    private final ObjectFactory<HttpMessageConverters> legacyConvertersFactory;
+    private final ObjectFactory<?> legacyConvertersFactory;
 
     public SpringEncoder(ObjectProvider<FeignHttpMessageConverters> converters) {
         this(new SpringFormEncoder(), new FeignEncoderProperties(), converters);
@@ -46,7 +54,7 @@ public class SpringEncoder implements Encoder {
         this.legacyConvertersFactory = null;
     }
 
-    public SpringEncoder(ObjectFactory<HttpMessageConverters> converters) {
+    public SpringEncoder(ObjectFactory<?> converters) {
         this.springFormEncoder = new SpringFormEncoder();
         this.encoderProperties = new FeignEncoderProperties();
         this.convertersProvider = null;
@@ -87,18 +95,48 @@ public class SpringEncoder implements Encoder {
 
     private List<HttpMessageConverter<?>> resolveConverters() {
         if (convertersProvider != null) {
-            FeignHttpMessageConverters feignConverters = convertersProvider.getObject();
-            if (feignConverters != null) {
-                return feignConverters.getConverters();
+            try {
+                FeignHttpMessageConverters feignConverters = convertersProvider.getObject();
+                if (feignConverters != null) {
+                    return feignConverters.getConverters();
+                }
+            } catch (BeansException ex) {
+                // Fall back to default encoder when converter beans are not present in slim test contexts.
             }
         }
         if (legacyConvertersFactory != null) {
-            HttpMessageConverters legacy = legacyConvertersFactory.getObject();
-            if (legacy != null) {
-                return legacy.getConverters();
+            try {
+                Object legacy = legacyConvertersFactory.getObject();
+                if (legacy != null) {
+                    Method getConverters = legacy.getClass().getMethod("getConverters");
+                    Object value = getConverters.invoke(legacy);
+                    if (value instanceof List<?> items) {
+                        List<HttpMessageConverter<?>> converted = new ArrayList<>();
+                        for (Object item : items) {
+                            if (item instanceof HttpMessageConverter<?> converter) {
+                                converted.add(converter);
+                            }
+                        }
+                        return converted;
+                    }
+                }
+            } catch (BeansException ex) {
+                // Fall back to default encoder when converter beans are not present in slim test contexts.
+            } catch (ReflectiveOperationException ex) {
+                // Fall back to default encoder when legacy converter container type is unavailable.
             }
         }
-        return List.of();
+        return defaultConverters();
+    }
+
+    private static List<HttpMessageConverter<?>> defaultConverters() {
+        MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
+        jacksonConverter.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        return List.of(
+            new ByteArrayHttpMessageConverter(),
+            new StringHttpMessageConverter(StandardCharsets.UTF_8),
+            jacksonConverter
+        );
     }
 
     private static MediaType resolveContentType(Map<String, Collection<String>> headers) {

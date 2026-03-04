@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.civil.consumer;
 
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 

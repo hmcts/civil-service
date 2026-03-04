@@ -16,6 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.civil.config.PaymentsConfiguration;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -95,13 +97,17 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
         paymentMap.put("availableBalance", "1000.00");
         paymentMap.put("accountName", "test.account.name");
 
+        String expectedRequestBody = new ObjectMapper()
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .writeValueAsString(paymentsService.buildRequest(caseData));
+
         return builder
             .given("An active account has sufficient funds for a payment", paymentMap)
             .uponReceiving("a request to create a payment in payments api with valid authorization")
             .path("/credit-account-payments")
             .headers(AUTHORIZATION_HEADER, AUTHORIZATION_TOKEN)
             .method(HttpMethod.POST.toString())
-            .body(createJsonObject(paymentsService.buildRequest(caseData)))
+            .body(expectedRequestBody)
             .willRespondWith()
             .matchHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .body(buildPBAPaymentResponseDsl("Success", "success", null, "Payment by account successful"))

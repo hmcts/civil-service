@@ -1,5 +1,7 @@
 package org.springframework.boot.actuate.health;
 
+// TODO(DTSCCI-3888): Remove this shim once all external dependencies are upgraded to the
+// Boot 4 actuator health API and no longer reference the legacy org.springframework.boot.actuate.health.Health type.
 public final class Health {
 
     private final Status status;
@@ -23,6 +25,7 @@ public final class Health {
     }
 
     public static final class Builder {
+
         private final Status status;
         private Throwable error;
 
