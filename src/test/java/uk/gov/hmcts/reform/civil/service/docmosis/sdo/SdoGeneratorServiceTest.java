@@ -437,7 +437,7 @@ public class SdoGeneratorServiceTest {
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
 
         SdoFastTrackSpecialistDirectionsService specialistService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
 
         CaseData caseData = baseCase.toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
