@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.model.FeeVersionDto;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.ccd.client.model.Classification;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import tools.jackson.databind.DeserializationFeature;
@@ -72,55 +73,55 @@ public class JacksonToolsCompatibilityConfiguration {
 
     abstract static class FeeLookupResponseDtoMixin {
 
-        @JsonProperty("fee_amount")
+        @JsonAlias("fee_amount")
         BigDecimal feeAmount;
     }
 
     abstract static class Fee2DtoMixin {
 
-        @JsonProperty("applicant_type")
+        @JsonAlias("applicant_type")
         Object applicantType;
-        @JsonProperty("channel_type")
+        @JsonAlias("channel_type")
         Object channelType;
-        @JsonProperty("current_version")
+        @JsonAlias("current_version")
         Object currentVersion;
-        @JsonProperty("event_type")
+        @JsonAlias("event_type")
         Object eventType;
-        @JsonProperty("fee_type")
+        @JsonAlias("fee_type")
         String feeType;
-        @JsonProperty("fee_versions")
+        @JsonAlias("fee_versions")
         List<?> feeVersions;
-        @JsonProperty("matching_version")
+        @JsonAlias("matching_version")
         Object matchingVersion;
-        @JsonProperty("max_range")
+        @JsonAlias("max_range")
         BigDecimal maxRange;
-        @JsonProperty("min_range")
+        @JsonAlias("min_range")
         BigDecimal minRange;
-        @JsonProperty("range_unit")
+        @JsonAlias("range_unit")
         String rangeUnit;
-        @JsonProperty("service_type")
+        @JsonAlias("service_type")
         Object serviceType;
-        @JsonProperty("unspecified_claim_amount")
+        @JsonAlias("unspecified_claim_amount")
         Boolean unspecifiedClaimAmount;
     }
 
     abstract static class FeeVersionDtoMixin {
 
-        @JsonProperty("flat_amount")
+        @JsonAlias("flat_amount")
         Object flatAmount;
-        @JsonProperty("memo_line")
+        @JsonAlias("memo_line")
         String memoLine;
-        @JsonProperty("natural_account_code")
+        @JsonAlias("natural_account_code")
         String naturalAccountCode;
-        @JsonProperty("percentage_amount")
+        @JsonAlias("percentage_amount")
         Object percentageAmount;
-        @JsonProperty("si_ref_id")
+        @JsonAlias("si_ref_id")
         String siRefId;
-        @JsonProperty("statutory_instrument")
+        @JsonAlias("statutory_instrument")
         String statutoryInstrument;
-        @JsonProperty("valid_from")
+        @JsonAlias("valid_from")
         Object validFrom;
-        @JsonProperty("valid_to")
+        @JsonAlias("valid_to")
         Object validTo;
     }
 }
