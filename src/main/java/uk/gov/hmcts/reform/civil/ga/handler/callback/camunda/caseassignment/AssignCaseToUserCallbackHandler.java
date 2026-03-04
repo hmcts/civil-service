@@ -85,14 +85,6 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
                     new OrganisationPolicy().setOrganisation(new Organisation()
                                                                  .setOrganisationID(applicantSolicitor.getOrganisationIdentifier()))
                                                                  .setOrgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()));
-
-                if (!gaForLipService.isGaForLip(caseData)) {
-                    List<Element<GASolicitorDetailsGAspec>> applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
-                        .filter(userOrgId -> (userOrgId.getValue().getOrganisationIdentifier()
-                            .equalsIgnoreCase(caseData.getGeneralAppApplnSolicitor()
-                                .getOrganisationIdentifier()))).toList();
-                    caseDataBuilder.generalAppApplicantAddlSolicitors(applicantAddlSolList);
-                }
             }
 
             if (!gaForLipService.isGaForLip(caseData)) {
