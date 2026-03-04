@@ -912,5 +912,5 @@ stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}
 
 rateLimiter:
-  rateLimit: ${RATE_LIMIT:100}
+  rateLimit: ${RATE_LIMIT:5}
   timeInSeconds: ${RATE_LIMITER_TIME_IN_SECONDS:60}
