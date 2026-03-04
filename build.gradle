@@ -24,8 +24,8 @@ def versions = [
   junitPlatform     : '1.14.3',
   springBoot        : springBoot.class.package.implementationVersion,
   springStatemachine: '4.0.0',
-  lombok            : '1.18.38',
-  camunda           : '7.20.0',
+  lombok            : '1.18.42',
+  camunda           : '7.24.0',
   testcontainers    : '1.21.4',
   pdfbox            : '3.0.6',
   tika              : '3.2.3'
@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.51.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
@@ -353,7 +353,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
   implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
@@ -427,7 +427,7 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: versions.pdfbox
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
-  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
+  implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.2.0'
 
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
@@ -438,8 +438,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.5'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.7'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.7'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
