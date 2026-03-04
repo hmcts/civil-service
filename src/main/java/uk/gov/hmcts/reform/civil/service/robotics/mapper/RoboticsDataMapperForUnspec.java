@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.enums.ClaimTypeUnspec;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.robotics.CaseHeader;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 import uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil;
 import uk.gov.hmcts.reform.civil.utils.OrgPolicyUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,15 +104,24 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
         if (!caseData.isLipvLipOneVOne()) {
             claimDetails.setAmountClaimed(caseData.getClaimValue().toPounds());
         }
-
-        claimDetails.setCourtFee(ofNullable(caseData.getClaimFee())
-                                     .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
-                                     .orElse(null));
+        claimDetails.setCourtFee(getClaimFee(caseData));
         claimDetails.setCaseIssuedDate(ofNullable(caseData.getIssueDate())
                                            .map(issueDate -> issueDate.format(ISO_DATE))
                                            .orElse(null));
         claimDetails.setCaseRequestReceivedDate(caseData.getSubmittedDate().toLocalDate().format(ISO_DATE));
         return claimDetails;
+    }
+
+    private BigDecimal getClaimFee(CaseData caseData) {
+        Optional<BigDecimal> claimFee = ofNullable(caseData.getClaimFee())
+            .map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()));
+        if (caseData.isOtherRemedyClaim() && YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+            log.info("Adding Other Remedy fee to the claim fee for case: {}", caseData.getCcdCaseReference());
+            BigDecimal otherRemedyFees = ofNullable(caseData.getOtherRemedyFee()).map(fee -> penniesToPounds(fee.getCalculatedAmountInPence()))
+                .orElse(BigDecimal.ZERO);
+            return claimFee.map(otherRemedyFees::add).orElse(otherRemedyFees);
+        }
+        return claimFee.orElse(null);
     }
 
     private CaseHeader buildCaseHeader(CaseData caseData, String authToken) {
@@ -127,6 +138,8 @@ public class RoboticsDataMapperForUnspec extends BaseRoboticsDataMapper {
     private String getCaseType(CaseData caseData) {
         if (ClaimTypeUnspec.PERSONAL_INJURY.equals(caseData.getClaimTypeUnSpec())) {
             return "PERSONAL INJURY";
+        } else if (ClaimTypeUnspec.HOUSING_DISREPAIR.equals(caseData.getClaimTypeUnSpec()) || ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(caseData.getClaimTypeUnSpec())) {
+            return "Multi/Other";
         }
         return "CLAIM - UNSPEC ONLY";
     }
