@@ -317,11 +317,11 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
     @Override
     protected List<LocationRefData> getSampleCourLocationsRefObject() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("11111").siteName("locationOfRegion2").courtAddress(
+            new LocationRefData()
+                .setEpimmsId("11111").setSiteName("locationOfRegion2").setCourtAddress(
                     "Prince William House, Peel Cross Road, Salford")
-                .postcode("M5 4RR")
-                .courtLocationCode("court1").build()
+                .setPostcode("M5 4RR")
+                .setCourtLocationCode("court1")
         ));
     }
 }

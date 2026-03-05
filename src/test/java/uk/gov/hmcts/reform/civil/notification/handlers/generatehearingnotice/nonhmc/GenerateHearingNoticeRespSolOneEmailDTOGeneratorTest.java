@@ -71,9 +71,8 @@ class GenerateHearingNoticeRespSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_FIELD)
-                .solicitorReferences(SolicitorReferences.builder()
-                        .respondentSolicitor1Reference(DEF_REF)
-                        .build())
+                .solicitorReferences(new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(DEF_REF))
                 .build();
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {

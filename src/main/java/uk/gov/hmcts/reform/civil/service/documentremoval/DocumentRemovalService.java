@@ -89,12 +89,11 @@ public class DocumentRemovalService {
             + "from CaseData JSON for case ID: %s", caseId));
 
         ((ObjectNode) caseDataJson).remove("documentToKeepCollection");
-        return DocumentRemovalCaseDataDTO.builder()
-            .documentsMarkedForDelete(documentsUserWantsDeletedList.stream()
+        return new DocumentRemovalCaseDataDTO()
+            .setDocumentsMarkedForDelete(documentsUserWantsDeletedList.stream()
                 .map(DocumentToKeepCollection::getValue)
                 .toList())
-            .caseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId))
-            .build();
+            .setCaseData(buildAmendedCaseDataFromRootNode(caseDataJson, caseId));
     }
 
     private LocalDateTime getUploadTimestampFromDocumentNode(JsonNode documentNode) {

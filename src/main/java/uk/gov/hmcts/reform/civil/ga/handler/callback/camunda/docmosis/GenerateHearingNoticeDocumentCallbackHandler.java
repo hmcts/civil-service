@@ -77,7 +77,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     private CallbackResponse generateHearingNoticeDocument(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Generate hearing notice document for case id: {}", caseData.getCcdCaseReference());
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         buildDocument(callbackParams, caseDataBuilder, caseData);
         postHearingFormWithCoverLetterLip(callbackParams, caseData);
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -85,7 +85,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
             .build();
     }
 
-    private void buildDocument(CallbackParams callbackParams, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    private void buildDocument(CallbackParams callbackParams, GeneralApplicationCaseData caseDataBuilder,
                                GeneralApplicationCaseData caseData) {
         if (featureToggleService.isGaForWelshEnabled() && caseData.isApplicationBilingual()) {
             List<Element<CaseDocument>> preTranslatedDocuments =
@@ -118,7 +118,7 @@ public class GenerateHearingNoticeDocumentCallbackHandler extends CallbackHandle
     }
 
     private void postHearingFormWithCoverLetterLip(CallbackParams callbackParams, GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData().build();
         if (gaForLipService.isGaForLip(caseData)) {
             civilCaseData = caseDetailsConverter
                 .toGeneralApplicationCaseData(coreCaseDataService

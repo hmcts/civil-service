@@ -143,7 +143,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         void shouldSendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail(boolean referenceWasProvided) {
             //When
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+                .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("Legal Rep Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -156,7 +156,8 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference(referenceWasProvided ? "Def Ref Num" : null).build())
+                .solicitorReferences(new SolicitorReferences()
+                    .setRespondentSolicitor1Reference(referenceWasProvided ? "Def Ref Num" : null))
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(1234567891234567L)
                 .addApplicant2(YesOrNo.NO)
@@ -197,7 +198,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference(null).build())
+                .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference(null))
                 .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(1234567891234567L)
@@ -208,7 +209,7 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
                 .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_CLAIMANT_SETTLE_THE_CLAIM.name()).build()).build();
             //When
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Legal Rep Name").build()));
+                .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("Legal Rep Name")));
             given(notificationsProperties.getNotifyDefendantLRClaimantSettleTheClaimTemplate()).willReturn(EMAIL_TEMPLATE_LR);
             notificationHandler.handle(params);
             //Then

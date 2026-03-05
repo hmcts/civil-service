@@ -102,7 +102,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @Test
     void checkCamundaActivityDefendantTest() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build());
@@ -113,7 +113,7 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @Test
     void checkCamundaActivityDefendant2Test() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData)
             .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED.toString()).build());

@@ -1,0 +1,19 @@
+{
+  "name": "RD Common Data - HearingChannel categories (AAA6)",
+  "request": {
+    "method": "GET",
+    "urlPath": "/refdata/commondata/lov/categories/HearingChannel",
+    "queryParameters": {
+      "serviceId": {
+        "equalTo": "AAA6"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "hearingChannelResponseAAA6.json"
+  }
+}

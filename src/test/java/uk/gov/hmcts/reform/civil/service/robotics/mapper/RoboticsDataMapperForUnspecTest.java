@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.civil.service.robotics.mapper;
 
 import feign.FeignException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
@@ -50,13 +53,16 @@ import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsCaseDataSuppor
 import uk.gov.hmcts.reform.civil.stateflow.simplegrammar.SimpleStateFlowBuilder;
 import uk.gov.hmcts.reform.civil.utils.LocationRefDataUtil;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -85,20 +91,29 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 @ExtendWith(SpringExtension.class)
 class RoboticsDataMapperForUnspecTest {
 
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-            .dxNumber("DX 12345")
-            .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+            .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
+
+    private ContactInformation copyContactInformation(ContactInformation source) {
+        return new ContactInformation()
+            .setAddressLine1(source.getAddressLine1())
+            .setAddressLine2(source.getAddressLine2())
+            .setAddressLine3(source.getAddressLine3())
+            .setPostCode(source.getPostCode())
+            .setCounty(source.getCounty())
+            .setCountry(source.getCountry())
+            .setTownCity(source.getTownCity())
+            .setDxAddress(source.getDxAddress());
+    }
 
     @MockBean
     OrganisationApi organisationApi;
@@ -246,7 +261,8 @@ class RoboticsDataMapperForUnspecTest {
         assertThat(firstSolicitor.getContactDX()).isEqualTo("DX 12345");
         assertThat(firstSolicitor.getContactEmailAddress()).isEqualTo("applicantsolicitor@example.com");
 
-        ContactInformation contactInformation = CONTACT_INFORMATION.toBuilder().addressLine1("line 1 provided").build();
+        ContactInformation contactInformation = copyContactInformation(CONTACT_INFORMATION)
+            .setAddressLine1("line 1 provided");
         CustomAssertions.assertThat(List.of(contactInformation))
             .isEqualTo(firstSolicitor.getAddresses().getContactAddress());
 
@@ -611,5 +627,47 @@ class RoboticsDataMapperForUnspecTest {
         details.setDx("Dx");
         details.setAddress(new Address());
         return details;
+    }
+
+    @Nested
+    class OtherRemedy {
+        @ParameterizedTest
+        @MethodSource("housingDisrepairClaimTypes")
+        void shouldReturnCorrectHeaderAndRoboticDataWithOtherRemedyFeeAppliedWhenDeclarationAdded(ClaimTypeUnspec claimTypeUnspec, ClaimType claimType) {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+                .otherRemedyClaimDeclarationAdded()
+                .otherRemedyFee(BigDecimal.valueOf(100))
+                .build();
+            caseData.setClaimTypeUnSpec(claimTypeUnspec);
+            caseData.setClaimType(claimType);
+            when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
+            RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+
+            assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(2);
+        }
+
+        @ParameterizedTest
+        @MethodSource("housingDisrepairClaimTypes")
+        void shouldReturnCorrectHeaderAndOnlyCourtFeeWithoutOtherRemedyFeeWhenDeclarationIsNotAdded(ClaimTypeUnspec claimTypeUnspec, ClaimType claimType) {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssuedUnrepresentedDefendants()
+                .otherRemedyFee(BigDecimal.valueOf(100))
+                .build();
+            caseData.setClaimTypeUnSpec(claimTypeUnspec);
+            caseData.setClaimType(claimType);
+            when(locationRefDataUtil.getPreferredCourtData(any(), any(), eq(true))).thenReturn("");
+            RoboticsCaseData roboticsCaseData = mapper.toRoboticsCaseData(caseData, BEARER_TOKEN);
+
+            assertThat(roboticsCaseData.getHeader().getCaseType()).isEqualTo("Multi/Other");
+
+            assertThat(roboticsCaseData.getClaimDetails().getCourtFee().intValue()).isEqualTo(1);
+        }
+
+        private static Stream<Arguments> housingDisrepairClaimTypes() {
+            return Stream.of(arguments(ClaimTypeUnspec.HOUSING_DISREPAIR, ClaimType.HOUSING_DISREPAIR),
+                             arguments(ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY, ClaimType.DAMAGES_AND_OTHER_REMEDY));
+        }
+
     }
 }

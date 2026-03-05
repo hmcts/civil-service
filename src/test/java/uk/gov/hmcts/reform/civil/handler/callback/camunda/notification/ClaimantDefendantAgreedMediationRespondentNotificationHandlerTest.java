@@ -158,7 +158,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondentLR_whenInvoked() {
             when(notificationsProperties.getNotifyRespondentLRMediationAgreementTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor org")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             Party respondent1 = PartyBuilder.builder().soleTrader()
@@ -187,7 +187,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondent1LR_whenInvokedCarm() {
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor org")));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
@@ -218,7 +218,7 @@ class ClaimantDefendantAgreedMediationRespondentNotificationHandlerTest extends 
         @Test
         void shouldNotifyRespondent2LR_whenInvokedCarm() {
             when(notificationsProperties.getNotifyDefendantLRForMediation()).thenReturn("template-mediation-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("defendant solicitor 2 org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("defendant solicitor 2 org")));
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));

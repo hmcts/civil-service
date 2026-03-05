@@ -84,30 +84,26 @@ public class PaymentServiceRequestHandler extends CallbackHandler implements Gen
             }
             log.info("after calling payment service request for case {}", caseData.getCcdCaseReference());
             GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-            GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder = pbaDetails.toBuilder();
-            pbaDetailsBuilder
-                    .fee(caseData.getGeneralAppPBADetails().getFee())
-                    .serviceReqReference(serviceRequestReference);
-            caseData = caseData.toBuilder()
-                .generalAppPBADetails(pbaDetailsBuilder
-                                          .fee(caseData.getGeneralAppPBADetails().getFee())
-                                          .serviceReqReference(serviceRequestReference).build())
-                .build();
+            GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails.copy()
+                .setFee(caseData.getGeneralAppPBADetails().getFee())
+                .setServiceReqReference(serviceRequestReference);
             if (freeGa || freeGaLip) {
                 PaymentDetails paymentDetails = ofNullable(pbaDetails.getPaymentDetails())
-                        .map(PaymentDetails::toBuilder)
-                        .orElse(PaymentDetails.builder())
-                        .status(SUCCESS)
-                        .customerReference(serviceRequestReference)
-                        .reference(serviceRequestReference)
-                        .errorCode(null)
-                        .errorMessage(null)
-                        .build();
-                pbaDetailsBuilder.paymentDetails(paymentDetails)
-                                .paymentSuccessfulDate(time.now()).build();
+                        .map(PaymentDetails::copy)
+                        .orElse(new PaymentDetails())
+                        .setStatus(SUCCESS)
+                        .setCustomerReference(serviceRequestReference)
+                        .setReference(serviceRequestReference)
+                        .setErrorCode(null)
+                        .setErrorMessage(null)
+                        ;
+                updatedPbaDetails
+                    .setPaymentDetails(paymentDetails)
+                    .setPaymentSuccessfulDate(time.now());
             }
-            caseData = caseData.toBuilder()
-                    .generalAppPBADetails(pbaDetailsBuilder.build()).build();
+            caseData = caseData.copy()
+                .generalAppPBADetails(updatedPbaDetails)
+                .build();
         } catch (FeignException e) {
             log.info(String.format("Http Status %s ", e.status()), e);
             errors.add(ERROR_MESSAGE);

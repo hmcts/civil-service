@@ -60,13 +60,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateDashboardNotificationWhenLipApplicantUploadDoc() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipResp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -74,7 +74,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .applicationIsUncloakedOnce(YES)
                 .parentClaimantIsApplicant(YES)
@@ -109,13 +109,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateDashboardNotificationWhenLRApplicantUploadDoc() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(gaForLipService.isLipApp(any(GeneralApplicationCaseData.class))).thenReturn(true);
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -123,7 +123,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .applicationIsUncloakedOnce(YES)
                 .parentClaimantIsApplicant(YES)
@@ -165,13 +165,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateDashboardNotificationWhenLipRespondentUploadDoc() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -185,7 +185,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .applicationIsUncloakedOnce(YES)
                 .parentClaimantIsApplicant(YES)
@@ -220,13 +220,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateDashboardNotificationWhenConsentOrder() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -240,7 +240,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentClaimantIsApplicant(YES)
@@ -275,13 +275,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateResponseDashboardNotificationWhenConsentOrderForRespondent() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -295,7 +295,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentClaimantIsApplicant(YES)
@@ -342,7 +342,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentCaseReference("1678356789555475")
@@ -390,7 +390,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentClaimantIsApplicant(YES)
@@ -426,13 +426,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldCreateResponseDashboardNotificationWhenConsentOrderForApplicant() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -446,7 +446,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentClaimantIsApplicant(YES)
@@ -480,13 +480,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldNotCreateOfflineResponseDashboardNotificationWhenConsentOrderForApplicant() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -498,7 +498,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .parentCaseReference("1678356767855475")
                 .generalAppConsentOrder(NO)
@@ -527,13 +527,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldNotCreateOfflineResponseDashboardNotificationWhenConsentOrderForRespondent() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -545,7 +545,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .parentCaseReference("1678356767855475")
                 .generalAppConsentOrder(NO)
@@ -574,13 +574,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldNotCreateResponseDashboardNotificationWhenConsentOrderForApplicant() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -592,7 +592,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(NO)
                 .parentClaimantIsApplicant(YES)
@@ -620,13 +620,13 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldNotCreateResponseDashboardNotificationWhenConsentOrderForRespondent() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -637,7 +637,7 @@ public class DocUploadDashboardNotificationServiceTest {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(NO)
                 .parentClaimantIsApplicant(YES)
@@ -665,17 +665,17 @@ public class DocUploadDashboardNotificationServiceTest {
         void shouldNotCreateDashboardNotificationWhenRoleIsNotApplicantOrRespondent() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(new Document()
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
                                                                               .setDocumentFileName("witness_document.pdf")
                                                                               .setDocumentUrl("http://dm-store:8080")
                                                                               .setDocumentBinaryUrl(
-                                                                                  "http://dm-store:8080/documents")).build()));
+                                                                                  "http://dm-store:8080/documents"))));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(NO)
                 .generalAppConsentOrder(YES)
                 .parentClaimantIsApplicant(YES)

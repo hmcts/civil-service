@@ -36,7 +36,7 @@ public class DocumentHearingLocationHelperTest {
         CaseData caseData = CaseData.builder().build();
         String authorisation = "authorisation";
 
-        LocationRefData location1 = LocationRefData.builder().build();
+        LocationRefData location1 = new LocationRefData();
         when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
             .thenReturn(Optional.of(location1));
         LocationRefData location = hearingLocationHelper.getHearingLocation(
@@ -59,10 +59,9 @@ public class DocumentHearingLocationHelperTest {
             .build();
         String authorisation = "authorisation";
 
-        LocationRefData location1 = LocationRefData.builder()
-            .regionId(caseData.getCaseManagementLocation().getRegion())
-            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
-            .build();
+        LocationRefData location1 = new LocationRefData()
+            .setRegionId(caseData.getCaseManagementLocation().getRegion())
+            .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
         when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
             .thenReturn(Optional.empty());
         when(locationRefDataService
@@ -90,10 +89,9 @@ public class DocumentHearingLocationHelperTest {
             .build();
         String authorisation = "authorisation";
 
-        LocationRefData location1 = LocationRefData.builder()
-            .regionId(caseData.getCaseManagementLocation().getRegion())
-            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
-            .build();
+        LocationRefData location1 = new LocationRefData()
+            .setRegionId(caseData.getCaseManagementLocation().getRegion())
+            .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
         when(locationRefDataService.getLocationMatchingLabel(fromForm, authorisation))
             .thenReturn(Optional.empty());
         when(locationRefDataService
@@ -101,10 +99,10 @@ public class DocumentHearingLocationHelperTest {
                              authorisation,
                              caseData.getCaseManagementLocation().getBaseLocation()
                          )).thenReturn(List.of(location1,
-                                               LocationRefData.builder()
-                                                   .regionId("region 2")
-                                                   .epimmsId("location 2")
-                                                   .build()));
+                                               new LocationRefData()
+                                                   .setRegionId("region 2")
+                                                   .setEpimmsId("location 2")
+                                                   ));
         LocationRefData location = hearingLocationHelper.getHearingLocation(
             fromForm,
             caseData,
@@ -126,16 +124,13 @@ public class DocumentHearingLocationHelperTest {
                                         )
             .build();
 
-        LocationRefData location1 = LocationRefData.builder()
-            .regionId(caseData.getCaseManagementLocation().getRegion())
-            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
-            .build();
+        LocationRefData location1 = new LocationRefData()
+            .setRegionId(caseData.getCaseManagementLocation().getRegion())
+            .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
-        when(locationRefDataService.getCcmccLocation(authorisation)).thenReturn(LocationRefData
-                                                                                            .builder()
-                                                                                            .epimmsId(ccmcEpimmId)
-                                                                                            .regionId("CCMCC region")
-                                                                                            .build());
+        when(locationRefDataService.getCcmccLocation(authorisation)).thenReturn(new LocationRefData()
+                                                                                            .setEpimmsId(ccmcEpimmId)
+                                                                                            .setRegionId("CCMCC region"));
         LocationRefData returnedLocation = hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
         Assertions.assertEquals(returnedLocation, location1);
@@ -153,16 +148,13 @@ public class DocumentHearingLocationHelperTest {
                                         )
             .build();
 
-        LocationRefData location1 = LocationRefData.builder()
-            .regionId(caseData.getCaseManagementLocation().getRegion())
-            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
-            .build();
+        LocationRefData location1 = new LocationRefData()
+            .setRegionId(caseData.getCaseManagementLocation().getRegion())
+            .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
-        when(locationRefDataService.getCnbcLocation(authorisation)).thenReturn(LocationRefData
-                                                                                    .builder()
-                                                                                    .epimmsId(cnbcEpimmId)
-                                                                                    .regionId("CNBC region")
-                                                                                    .build());
+        when(locationRefDataService.getCnbcLocation(authorisation)).thenReturn(new LocationRefData()
+                                                                                    .setEpimmsId(cnbcEpimmId)
+                                                                                    .setRegionId("CNBC region"));
         LocationRefData returnedLocation = hearingLocationHelper
             .getCaseManagementLocationDetailsNro(caseData, locationRefDataService, authorisation);
         Assertions.assertEquals(returnedLocation, location1);
@@ -171,12 +163,12 @@ public class DocumentHearingLocationHelperTest {
     @Test
     void whenNotCnbcOrCcmccLocation_thenReturnListOfHearingCourts() {
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-            LocationRefData.builder().epimmsId("00002").courtLocationCode("00002")
-                .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-            LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            new LocationRefData().setEpimmsId("00001").setCourtLocationCode("00001")
+                .setSiteName("court 1").setCourtAddress("1 address").setPostcode("Y01 7RB"),
+            new LocationRefData().setEpimmsId("00002").setCourtLocationCode("00002")
+                .setSiteName("court 2").setCourtAddress("2 address").setPostcode("Y02 7RB"),
+            new LocationRefData().setEpimmsId("00003").setCourtLocationCode("00003")
+                .setSiteName("court 3").setCourtAddress("3 address").setPostcode("Y03 7RB")
         );
         String authorisation = "authorisation";
         CaseData caseData = CaseData.builder()
@@ -187,10 +179,9 @@ public class DocumentHearingLocationHelperTest {
                                         )
             .build();
 
-        LocationRefData location1 = LocationRefData.builder()
-            .regionId(caseData.getCaseManagementLocation().getRegion())
-            .epimmsId(caseData.getCaseManagementLocation().getBaseLocation())
-            .build();
+        LocationRefData location1 = new LocationRefData()
+            .setRegionId(caseData.getCaseManagementLocation().getRegion())
+            .setEpimmsId(caseData.getCaseManagementLocation().getBaseLocation());
 
         when(locationRefDataService.getHearingCourtLocations(authorisation)).thenReturn(locations);
         LocationRefData returnedLocation = hearingLocationHelper
@@ -201,12 +192,12 @@ public class DocumentHearingLocationHelperTest {
     @Test
     void whenNoCaseLocationFound_thenReturnException() {
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-            LocationRefData.builder().epimmsId("00002").courtLocationCode("00002")
-                .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-            LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            new LocationRefData().setEpimmsId("00001").setCourtLocationCode("00001")
+                .setSiteName("court 1").setCourtAddress("1 address").setPostcode("Y01 7RB"),
+            new LocationRefData().setEpimmsId("00002").setCourtLocationCode("00002")
+                .setSiteName("court 2").setCourtAddress("2 address").setPostcode("Y02 7RB"),
+            new LocationRefData().setEpimmsId("00003").setCourtLocationCode("00003")
+                .setSiteName("court 3").setCourtAddress("3 address").setPostcode("Y03 7RB")
         );
         String authorisation = "authorisation";
         CaseData caseData = CaseData.builder()

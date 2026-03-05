@@ -66,7 +66,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             String validEmail = "john@example.com";
 
             CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                 .respondentSolicitor1EmailAddress(validEmail)
                 .build();
 
@@ -82,7 +82,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             String invalidEmail = "a@a";
 
             CaseData caseData = CaseData.builder()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(invalidEmail).build())
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(invalidEmail))
                 .respondentSolicitor1EmailAddress(invalidEmail)
                 .build();
 
@@ -107,7 +107,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetOrganisationPolicy_1v1() {
                 CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                    .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                     .respondentSolicitor1EmailAddress(validEmail)
                     .respondent1OrganisationIDCopy("QWERTY R")
                     .respondent1OrganisationPolicy(organisationPolicy)
@@ -133,7 +133,7 @@ class AmendPartyDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 expectedOrganisationPolicy2.setOrgPolicyCaseAssignedRole("orgassignedrole");
 
                 CaseData caseData = CaseData.builder()
-                    .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(validEmail).build())
+                    .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(validEmail))
                     .respondentSolicitor1EmailAddress(validEmail)
                     .respondent1OrganisationIDCopy("QWERTY R")
                     .respondent1OrganisationPolicy(organisationPolicy)

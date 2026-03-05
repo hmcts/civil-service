@@ -119,19 +119,18 @@ class LocationServiceTest {
 
     protected List<LocationRefData> getSampleCourLocationsRefObjectPostSdoNotInRefData() {
         return new ArrayList<>(List.of(
-            LocationRefData.builder()
-                .epimmsId("xxxxx")
-                .siteName("xxxxx")
-                .courtAddress("xxxxx")
-                .postcode("xxxxx")
-                .regionId("xxxxx")
-                .courtLocationCode("xxxxx")
-                .build()
+            new LocationRefData()
+                .setEpimmsId("xxxxx")
+                .setSiteName("xxxxx")
+                .setCourtAddress("xxxxx")
+                .setPostcode("xxxxx")
+                .setRegionId("xxxxx")
+                .setCourtLocationCode("xxxxx")
         ));
     }
 
     protected  uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil getExpectedGACaseLocation() {
-        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil = 
+        uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil caseLocationCivil =
             new uk.gov.hmcts.reform.civil.model.genapplication.CaseLocationCivil();
         caseLocationCivil.setRegion("xxxxx");
         caseLocationCivil.setBaseLocation("xxxxx");

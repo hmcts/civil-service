@@ -810,9 +810,8 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         private final String pageId = "fee";
         private Fee feeData;
-        private final Organisation organisation = Organisation.builder()
-            .paymentAccount(List.of("12345", "98765"))
-            .build();
+        private final Organisation organisation = new Organisation()
+            .setPaymentAccount(List.of("12345", "98765"));
         private final ObjectMapper mapper = new ObjectMapper();
 
         @BeforeEach
@@ -1332,11 +1331,10 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().build();
 
-            Organisation organisation = Organisation.builder()
-                .organisationIdentifier("1")
-                .companyNumber("1")
-                .name("Organisation1")
-                .build();
+            Organisation organisation = new Organisation()
+                .setOrganisationIdentifier("1")
+                .setCompanyNumber("1")
+                .setName("Organisation1");
 
             CallbackParams params = callbackParamsOf(caseData, MID, "populateClaimantSolicitor");
 
@@ -1944,12 +1942,11 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             @Test
             void shouldHandleCourtLocationData() {
-                LocationRefData locationA = LocationRefData.builder()
-                    .regionId("regionId1")
-                    .epimmsId("epimmsId1")
-                    .courtLocationCode("312")
-                    .siteName("Test Court")
-                    .build();
+                LocationRefData locationA = new LocationRefData()
+                    .setRegionId("regionId1")
+                    .setEpimmsId("epimmsId1")
+                    .setCourtLocationCode("312")
+                    .setSiteName("Test Court");
 
                 given(courtLocationUtility.findPreferredLocationData(any(), any(DynamicList.class)))
                     .willReturn(locationA);

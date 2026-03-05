@@ -187,7 +187,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")
                 ).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -521,7 +521,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         void validateApplicant1SolicitorEmail_shouldInvokeEmailValidationServiceAndReturnOutput() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicantSolicitor1UserDetails(
-                    IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()).build();
+                    new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-applicant1-solicitor-email");
 
             when(validateEmailService.validate(anyString())).thenReturn(mockErrors);

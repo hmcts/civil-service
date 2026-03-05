@@ -62,7 +62,12 @@ for file in "$MAPPINGS_DIR"/*.json; do
         if [[ "$BODY_FILE_PATH" == *.pdf ]]; then
           echo "Inlining PDF as base64"
           TMP_BASE64=$(mktemp)
-          base64 -w 0 "$BODY_FILE_PATH" > "$TMP_BASE64"
+          # Use portable base64 encoding (works on both Linux and macOS)
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            base64 -i "$BODY_FILE_PATH" | tr -d '\n' > "$TMP_BASE64"
+          else
+            base64 -w 0 "$BODY_FILE_PATH" > "$TMP_BASE64"
+          fi
           TMP_JSON=$(mktemp)
           jq --rawfile base64_content "$TMP_BASE64" '
             del(.response.bodyFileName) |
@@ -71,9 +76,8 @@ for file in "$MAPPINGS_DIR"/*.json; do
           rm "$TMP_BASE64"
         else
           echo "Inlining JSON/text body"
-          BODY_CONTENT=$(<"$BODY_FILE_PATH")
           TMP_JSON=$(mktemp)
-          jq --arg body "$BODY_CONTENT" '
+          jq --rawfile body "$BODY_FILE_PATH" '
             del(.response.bodyFileName) |
             .response.body = $body
           ' "$file" > "$TMP_JSON"

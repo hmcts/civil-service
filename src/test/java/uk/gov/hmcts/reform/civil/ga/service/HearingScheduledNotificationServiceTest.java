@@ -140,7 +140,7 @@ public class HearingScheduledNotificationServiceTest {
             .thenReturn("general-apps-notice-of-hearing-template-id");
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .build();
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
 
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
@@ -162,7 +162,7 @@ public class HearingScheduledNotificationServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .emailPartyReference("Claimant Reference: ABC limited - Defendant Reference: Defendant Ltd")
             .build();
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
 
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
@@ -184,7 +184,7 @@ public class HearingScheduledNotificationServiceTest {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingScheduledApplication(YesOrNo.NO)
             .build();
 
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(CaseState.CASE_PROGRESSION).build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(CaseState.CASE_PROGRESSION).build());
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
             .thenReturn(caseData);
@@ -223,7 +223,7 @@ public class HearingScheduledNotificationServiceTest {
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
             .thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
 
         hearingScheduledNotificationService.sendNotificationForDefendant(caseData);
         verify(notificationService, times(1)).sendMail(
@@ -249,7 +249,7 @@ public class HearingScheduledNotificationServiceTest {
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
             .thenReturn(caseData);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
         when(configuration.getSpecUnspecContact()).thenReturn("Email for Specified Claims: contactocmc@justice.gov.uk "
                                                                   + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
 
@@ -281,7 +281,7 @@ public class HearingScheduledNotificationServiceTest {
         when(solicitorEmailValidation
                  .validateSolicitorEmail(any(), any()))
             .thenReturn(caseData);
-        GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
+        GeneralApplicationCaseData claimantClaimIssueFlag = new GeneralApplicationCaseData().claimantBilingualLanguagePreference(Language.WELSH.toString()).build();
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
 
         hearingScheduledNotificationService.sendNotificationForClaimant(caseData);

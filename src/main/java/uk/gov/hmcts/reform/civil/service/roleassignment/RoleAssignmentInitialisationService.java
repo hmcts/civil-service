@@ -54,65 +54,61 @@ public class RoleAssignmentInitialisationService {
     private void assignHearingRoles(String userAuth) {
         log.info("Attempting to assign hearing roles");
         String userId = userService.getUserInfo(userAuth).getUid();
-        roleAssignmentService.assignUserRoles(
-            userId,
-            userAuth,
-            RoleAssignmentRequest.builder()
-                .roleRequest(RoleRequest.builder()
-                                 .assignerId(userId)
-                                 .reference(HEARINGS_SYSTEM_USER_REFERENCE)
-                                 .process(SYSTEM_USER_PROCESS)
-                                 .replaceExisting(true)
-                                 .build())
-                .requestedRoles(createCivilSystemRoles(userId, "hearing-manager", "hearing-viewer")).build()
-        );
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(userId)
+            .setReference(HEARINGS_SYSTEM_USER_REFERENCE)
+            .setProcess(SYSTEM_USER_PROCESS)
+            .setReplaceExisting(true);
+
+        RoleAssignmentRequest request = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(createCivilSystemRoles(userId, "hearing-manager", "hearing-viewer"));
+
+        roleAssignmentService.assignUserRoles(userId, userAuth, request);
         log.info("Assigned roles successfully");
     }
 
     private void assignCaseAllocatorToSystemUser(String userAuth) {
         log.info("Attempting to assign case allocator to system user");
         String userId = userService.getUserInfo(userAuth).getUid();
-        roleAssignmentService.assignUserRoles(
-            userId,
-            userAuth,
-            RoleAssignmentRequest.builder()
-                .roleRequest(RoleRequest.builder()
-                                 .assignerId(userId)
-                                 .reference(CASE_ALLOCATOR_SYSTEM_USER_REFERENCE)
-                                 .process(SYSTEM_USER_PROCESS)
-                                 .replaceExisting(true)
-                                 .build())
-                .requestedRoles(createAllocatedSystemRoles(userId, "CIVIL", "GENERALAPPLICATION")).build()
-        );
+        RoleRequest roleRequest = new RoleRequest()
+            .setAssignerId(userId)
+            .setReference(CASE_ALLOCATOR_SYSTEM_USER_REFERENCE)
+            .setProcess(SYSTEM_USER_PROCESS)
+            .setReplaceExisting(true);
+
+        RoleAssignmentRequest request = new RoleAssignmentRequest()
+            .setRoleRequest(roleRequest)
+            .setRequestedRoles(createAllocatedSystemRoles(userId, "CIVIL", "GENERALAPPLICATION"));
+
+        roleAssignmentService.assignUserRoles(userId, userAuth, request);
         log.info("Assigned case allocator roles successfully");
     }
 
     private List<RoleAssignment> createCivilSystemRoles(String userId, String... roleNames) {
-        return Arrays.asList(roleNames).stream().map(roleName -> RoleAssignment.builder()
-            .actorId(userId)
-            .actorIdType("IDAM")
-            .roleType(RoleType.ORGANISATION)
-            .classification("PUBLIC")
-            .grantType(GrantType.STANDARD)
-            .roleCategory(RoleCategory.SYSTEM)
-            .roleName(roleName)
-            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
-            .readOnly(false)
-            .build()).toList();
+        return Arrays.asList(roleNames).stream().map(roleName -> new RoleAssignment()
+            .setActorId(userId)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName(roleName)
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", "CIVIL"))
+            .setReadOnly(false)).toList();
     }
 
     private List<RoleAssignment> createAllocatedSystemRoles(String userId, String... caseTypes) {
-        return Arrays.asList(caseTypes).stream().map(caseType -> RoleAssignment.builder()
-            .actorId(userId)
-            .actorIdType("IDAM")
-            .roleType(RoleType.ORGANISATION)
-            .classification("PUBLIC")
-            .grantType(GrantType.STANDARD)
-            .roleCategory(RoleCategory.SYSTEM)
-            .roleName("case-allocator")
-            .attributes(Map.of("jurisdiction", "CIVIL", "caseType", caseType))
-            .readOnly(false)
-            .build()).toList();
+        return Arrays.asList(caseTypes).stream().map(caseType -> new RoleAssignment()
+            .setActorId(userId)
+            .setActorIdType("IDAM")
+            .setRoleType(RoleType.ORGANISATION)
+            .setClassification("PUBLIC")
+            .setGrantType(GrantType.STANDARD)
+            .setRoleCategory(RoleCategory.SYSTEM)
+            .setRoleName("case-allocator")
+            .setAttributes(Map.of("jurisdiction", "CIVIL", "caseType", caseType))
+            .setReadOnly(false)).toList();
     }
 
     private String getSystemUserToken() {

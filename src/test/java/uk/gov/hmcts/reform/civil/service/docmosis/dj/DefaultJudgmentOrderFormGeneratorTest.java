@@ -177,7 +177,7 @@ class DefaultJudgmentOrderFormGeneratorTest {
             .atStateClaimIssuedDisposalHearingInPersonDJ()
             .atStateDisposalHearingOrderMadeWithoutHearing()
             .build();
-        LocationRefData locationRefData = LocationRefData.builder().build();
+        LocationRefData locationRefData = new LocationRefData();
         when(djDisposalTemplateService.buildTemplate(eq(caseData), eq(BEARER_TOKEN)))
             .thenReturn(new DefaultJudgmentSDOOrderForm().setHearingLocation(locationRefData));
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);

@@ -64,20 +64,17 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
     OrganisationApi organisationApi;
 
     private static final String NEW_ORG_ID = "1234";
-    private static final ContactInformation CONTACT_INFORMATION = ContactInformation.builder()
-        .addressLine1("line 1")
-        .addressLine2("line 2")
-        .postCode("AB1 2XY")
-        .county("My county")
-        .dxAddress(List.of(DxAddress.builder()
-                               .dxNumber("DX 12345")
-                               .build()))
-        .build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .organisationIdentifier("QWERTY R")
-        .name("Org Name")
-        .contactInformation(List.of(CONTACT_INFORMATION))
-        .build();
+    private static final ContactInformation CONTACT_INFORMATION = new ContactInformation()
+        .setAddressLine1("line 1")
+        .setAddressLine2("line 2")
+        .setPostCode("AB1 2XY")
+        .setCounty("My county")
+        .setDxAddress(List.of(new DxAddress()
+                               .setDxNumber("DX 12345")));
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier("QWERTY R")
+        .setName("Org Name")
+        .setContactInformation(List.of(CONTACT_INFORMATION));
 
     @BeforeEach
     void setUp() {
@@ -172,7 +169,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .isEqualTo(updatedCaseData.getSolicitorReferences().getRespondentSolicitor1Reference());
             assertThat(updatedCaseData.getUnassignedCaseListDisplayOrganisationReferences()).isEmpty();
             assertThat(updatedCaseData.getApplicantSolicitor1UserDetails())
-                .isEqualTo(IdamUserDetails.builder().email("requester@example.com").build());
+                .isEqualTo(new IdamUserDetails().setEmail("requester@example.com"));
             assertThat(updatedCaseData.getApplicant1LRIndividuals()).isNull();
             assertThat(updatedCaseData.getRespondent1LRIndividuals()).isNotNull();
             assertThat(updatedCaseData.getQmRespondentSolicitor1Queries().getPartyName()).isEqualTo("Defendant");
@@ -900,7 +897,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .build();
@@ -983,7 +980,7 @@ public class UpdateCaseDetailsAfterNoCHandlerTest extends BaseCallbackHandlerTes
                 .changeOfRepresentation(true, false, NEW_ORG_ID, null, null)
                 .changeOrganisationRequestField(true, false, null, null, "requester@example.com")
                 .updateOrgPolicyAfterNoC(true, false, NEW_ORG_ID)
-                .claimantUserDetails(IdamUserDetails.builder().email("xyz@hmcts.com").id("1234").build())
+                .claimantUserDetails(new IdamUserDetails().setEmail("xyz@hmcts.com").setId("1234"))
                 .applicant1Represented(NO)
                 .anyRepresented(NO)
                 .claimantBilingualLanguagePreference("WELSH")

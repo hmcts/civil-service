@@ -64,7 +64,7 @@ class NotifyClaimantCaseStayedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
             .build();
@@ -94,7 +94,7 @@ class NotifyClaimantCaseStayedHandlerTest {
         caseData = caseData.toBuilder()
             .applicant1Represented(isApplicantLiP ? YesOrNo.NO : YesOrNo.YES)
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(email).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(email))
             .build();
         final CallbackParams params = new CallbackParams().caseData(caseData);
 

@@ -73,9 +73,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -85,7 +85,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .companyName("company name")
                              .build())
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .build();
         CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
@@ -127,9 +129,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -139,7 +141,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .companyName("company name")
                              .build())
             .respondentSolicitor2EmailAddress(recipient)
-            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .build();
         CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
@@ -181,9 +185,8 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -194,7 +197,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .build())
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
         CallbackParams params = new CallbackParams()
@@ -237,9 +242,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
@@ -250,7 +255,9 @@ class BreathingSpaceEnterNotificationHandlerTest {
                              .build())
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .build();
         CallbackParams params = new CallbackParams()
@@ -300,13 +307,14 @@ class BreathingSpaceEnterNotificationHandlerTest {
                             .type(Party.Type.COMPANY)
                             .companyName("company name")
                             .build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email(recipient)
-                                                .build())
-            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
-            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
-                                                          .name(solicitorName)
-                                                          .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail(recipient))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation()
+                                                                   .setOrganisationID(organisationId)))
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
+                                                          .setName(solicitorName)
+                                                          )
             .build();
         CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)

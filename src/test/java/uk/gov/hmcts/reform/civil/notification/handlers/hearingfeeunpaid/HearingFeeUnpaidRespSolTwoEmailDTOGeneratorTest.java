@@ -63,7 +63,7 @@ class HearingFeeUnpaidRespSolTwoEmailDTOGeneratorTest {
                 .build();
 
         when(organisationService.findOrganisationById("OrgId"))
-                .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("Test Org Name")));
 
         Map<String, String> properties = new HashMap<>();
         String formattedDate = formatLocalDate(caseData.getHearingDate(), DATE);

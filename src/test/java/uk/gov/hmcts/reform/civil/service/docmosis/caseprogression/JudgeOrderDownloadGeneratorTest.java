@@ -96,12 +96,12 @@ class JudgeOrderDownloadGeneratorTest {
         .documentType(JUDGE_FINAL_ORDER)
         .build();
 
-    private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-        .externalShortName("ExternalShortName")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+        .setExternalShortName("ExternalShortName")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
 
     @InjectMocks
     JudgeOrderDownloadGenerator judgeOrderDownloadGenerator;

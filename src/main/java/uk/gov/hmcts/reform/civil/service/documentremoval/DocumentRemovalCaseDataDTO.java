@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.documentremoval;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.civil.model.documentremoval.DocumentToKeep;
 import java.util.List;
 
 @Data
-@Builder
+@Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 public class DocumentRemovalCaseDataDTO {

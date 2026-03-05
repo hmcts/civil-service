@@ -57,6 +57,8 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.PARTIAL_REMISSION_HWF
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_HELP_WITH_FEE_NUMBER;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DECISION_MADE_ON_APPLICATIONS;
 import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SDO_ORDER;
+import static uk.gov.hmcts.reform.civil.enums.CaseState.All_FINAL_ORDERS_ISSUED;
+import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.FULL_DEFENCE;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec.PART_ADMISSION;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,6 +126,7 @@ class CcdClaimStatusDashboardFactoryTest {
     @Test
     void given_isEligibleForCCJ_whenGetStatus_thenReturnDefaultJudgementStatus() {
         CaseData claim = CaseData.builder()
+            .ccdState(All_FINAL_ORDERS_ISSUED)
             .respondent1ResponseDate(LocalDateTime.now())
             .respondent1ResponseDeadline(LocalDateTime.of(2022, 2, 2, 16, 0))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
@@ -344,11 +347,9 @@ class CcdClaimStatusDashboardFactoryTest {
     void given_mediation_whenGetSatus_mediationSuccessful() {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
-            .mediation(Mediation.builder()
-                           .mediationSuccessful(MediationSuccessful.builder()
-                                                    .mediationAgreement(MediationAgreementDocument.builder().build())
-                                                    .build())
-                           .build())
+            .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful().setMediationAgreement(new MediationAgreementDocument())
+                                                    )
+                           )
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -361,9 +362,8 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .ccdState(CaseState.JUDICIAL_REFERRAL)
             .respondent1ResponseDate(LocalDateTime.now())
-            .mediation(Mediation.builder()
-                           .unsuccessfulMediationReason("this is a reason")
-                           .build())
+            .mediation(new Mediation().setUnsuccessfulMediationReason("this is a reason")
+                           )
             .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
@@ -376,10 +376,8 @@ class CcdClaimStatusDashboardFactoryTest {
         CaseData claim = CaseData.builder()
             .respondent1ResponseDate(LocalDateTime.now())
             .ccdState(CaseState.IN_MEDIATION)
-            .mediation(Mediation.builder()
-                           .mediationSuccessful(MediationSuccessful.builder()
-                                                    .build())
-                           .build())
+            .mediation(new Mediation().setMediationSuccessful(new MediationSuccessful())
+                           )
             .build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
@@ -478,10 +476,10 @@ class CcdClaimStatusDashboardFactoryTest {
     }
 
     @Test
-    void given_claimantNotRespondedWithInDeadLine_whenGetStatus_claimEnded() {
+    void given_FullDefenceAndClaimantDontWantToProceed_whenGetStatus_claimEnded() {
         CaseData claim = CaseData.builder()
-            .respondent1ResponseDate(LocalDateTime.now().minusDays(2))
-            .applicant1ResponseDeadline(LocalDateTime.now().minusDays(1))
+            .applicant1ProceedWithClaim(YesOrNo.NO)
+            .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
         DashboardClaimStatus status =
             ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardDefendantClaimMatcher(

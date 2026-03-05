@@ -74,7 +74,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
                             .partyEmail("lipEmail@mail.com").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
@@ -109,7 +109,7 @@ class NotifyClaimantStayUpdateRequestedHandlerTest {
     @Test
     void sendNotificationShouldSendEmail() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
         CallbackParams params = new CallbackParams().caseData(caseData);
 

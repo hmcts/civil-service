@@ -47,11 +47,10 @@ public class UpdatePartyExpertsTask extends MigrationTask<CaseReference> {
             throw new IllegalArgumentException("CaseReference fields must not be null");
         }
 
-        UnaryOperator<PartyFlagStructure> updatePartyFlag = expert -> expert.toBuilder()
-            .firstName(defaultIfNull(expert.getFirstName()))
-            .lastName(defaultIfNull(expert.getLastName()))
-            .partyID(generatePartyIdIfNull(expert.getPartyID()))
-            .build();
+        UnaryOperator<PartyFlagStructure> updatePartyFlag = expert -> expert.copy()
+            .setFirstName(defaultIfNull(expert.getFirstName()))
+            .setLastName(defaultIfNull(expert.getLastName()))
+            .setPartyID(generatePartyIdIfNull(expert.getPartyID()));
 
         UnaryOperator<Expert> updateExpert = expert -> expert.copy()
             .setFirstName(defaultIfNull(expert.getFirstName()))

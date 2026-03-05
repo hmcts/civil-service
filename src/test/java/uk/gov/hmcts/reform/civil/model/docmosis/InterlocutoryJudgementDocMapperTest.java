@@ -122,9 +122,9 @@ public class InterlocutoryJudgementDocMapperTest {
         caseData = getCaseData();
         caseData = caseData.toBuilder()
             .defenceAdmitPartPaymentTimeRouteRequired(BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.of(2024, 10, 10))
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.of(2024, 10, 10))
+            )
             .build();
 
         // When
@@ -141,9 +141,9 @@ public class InterlocutoryJudgementDocMapperTest {
         caseData = getCaseData();
         caseData = caseData.toBuilder()
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-            .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
-                                                                .paymentSetDate(LocalDate.of(2024, 1, 1))
-                                                                .build())
+            .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate()
+                                                                .setPaymentSetDate(LocalDate.of(2024, 1, 1))
+                                                                )
             .build();
 
         // When
