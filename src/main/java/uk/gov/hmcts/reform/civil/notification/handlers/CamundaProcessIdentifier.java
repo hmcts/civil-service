@@ -61,5 +61,6 @@ public enum CamundaProcessIdentifier {
     RaiseQueryNotifier,
     OtherPartyQueryRaisedNotifier,
     InitiateCoscApplicationNotifier,
-    NotifyLipGenericTemplateNotifier;
+    NotifyLipGenericTemplateNotifier,
+    NotifyLipResetPinNotifier;
 }
