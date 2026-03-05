@@ -37,4 +37,9 @@ public class GenerateSpecDJFormRequestedDefendantEmailDTOGenerator extends Defen
         properties.put(APPLICANT_ONE_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.FALSE;
+    }
 }

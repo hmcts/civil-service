@@ -15,11 +15,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class GenerateSpecDJFormReceivedAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
+    private final GenerateSpecDJFormNotificationHelper notificationHelper;
     private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-applicant-received-notification-%s";
 
-    public GenerateSpecDJFormReceivedAppSolEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties) {
+    public GenerateSpecDJFormReceivedAppSolEmailDTOGenerator(OrganisationService organisationService,
+                                                            NotificationsProperties notificationsProperties,
+                                                            GenerateSpecDJFormNotificationHelper notificationHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.notificationHelper = notificationHelper;
     }
 
     @Override
@@ -38,5 +42,16 @@ public class GenerateSpecDJFormReceivedAppSolEmailDTOGenerator extends AppSolOne
         properties.put(CLAIM_NUMBER, caseData.getCcdCaseReference().toString());
         properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        if (!Boolean.TRUE.equals(super.getShouldNotify(caseData))) {
+            return false;
+        }
+        if (!notificationHelper.hasSecondRespondent(caseData)) {
+            return !caseData.isApplicantLipOneVOne();
+        }
+        return notificationHelper.hasJudgmentForBothDefendants(caseData);
     }
 }

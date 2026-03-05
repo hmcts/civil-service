@@ -39,4 +39,9 @@ public class GenerateSpecDJFormRequestedClaimantEmailDTOGenerator extends Claima
         properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent1()));
         return properties;
     }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.FALSE;
+    }
 }

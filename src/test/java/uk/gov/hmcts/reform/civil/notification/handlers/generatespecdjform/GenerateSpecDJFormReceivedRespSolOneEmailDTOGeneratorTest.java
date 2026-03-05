@@ -7,12 +7,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import uk.gov.hmcts.reform.civil.utils.NotificationUtils;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +46,13 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
     private GenerateSpecDJFormReceivedRespSolOneEmailDTOGenerator generator;
     private MockedStatic<NotificationUtils> notificationUtilsMockedStatic;
     private MockedStatic<PartyUtils> partyUtilsMockedStatic;
+    private GenerateSpecDJFormNotificationHelper notificationHelper;
 
     @BeforeEach
     void setUp() {
-        generator = new GenerateSpecDJFormReceivedRespSolOneEmailDTOGenerator(organisationService, notificationsProperties);
+        notificationHelper = new GenerateSpecDJFormNotificationHelper();
+        generator = new GenerateSpecDJFormReceivedRespSolOneEmailDTOGenerator(organisationService, notificationsProperties,
+            notificationHelper);
         notificationUtilsMockedStatic = mockStatic(NotificationUtils.class);
         partyUtilsMockedStatic = mockStatic(PartyUtils.class);
     }
@@ -95,5 +103,39 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
         assertThat(result).containsEntry(DEFENDANT_NAME, "Defendant 1");
         assertThat(result).containsEntry(CLAIMANT_NAME, "Applicant 1");
     }
-}
 
+    @Test
+    void shouldNotifyWhenOnlyOneDefendantExists() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotifyWhenBothDefendantsSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent1Represented(YesOrNo.YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YesOrNo.YES)
+            .defendantDetailsSpec(DynamicList.builder()
+                .value(DynamicListElement.builder().label("Both Defendants").build())
+                .build())
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyWhenOnlyOneOfTwoDefendantsSelected() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .respondent1Represented(YesOrNo.YES)
+            .respondent2(PartyBuilder.builder().individual().build())
+            .addRespondent2(YesOrNo.YES)
+            .defendantDetailsSpec(DynamicList.builder()
+                .value(DynamicListElement.builder().label("Second Defendant").build())
+                .build())
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+}

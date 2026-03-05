@@ -7,9 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -32,12 +36,15 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private GenerateSpecDJFormReceivedDefendantEmailDTOGenerator generator;
     private MockedStatic<PartyUtils> partyUtilsMockedStatic;
 
     @BeforeEach
     void setUp() {
-        generator = new GenerateSpecDJFormReceivedDefendantEmailDTOGenerator(notificationsProperties);
+        generator = new GenerateSpecDJFormReceivedDefendantEmailDTOGenerator(notificationsProperties, featureToggleService);
         partyUtilsMockedStatic = mockStatic(PartyUtils.class);
     }
 
@@ -81,5 +88,55 @@ class GenerateSpecDJFormReceivedDefendantEmailDTOGeneratorTest {
         assertThat(result).containsEntry(CLAIM_NUMBER_INTERIM, "1234567890123456");
         assertThat(result).containsEntry(DEFENDANT_NAME_INTERIM, "Defendant 1");
         assertThat(result).containsEntry(APPLICANT_ONE_NAME, "Applicant 1");
+    }
+
+    @Test
+    void shouldNotifyForLrvLipScenarioWhenEmailPresent() {
+        Party respondent = PartyBuilder.builder().individual().partyEmail("defendant@example.com").build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(respondent)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotifyForLipVLipWhenFeatureEnabled() {
+        Party respondent = PartyBuilder.builder().individual().partyEmail("defendant@example.com").build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(respondent)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyWhenLipVLipFeatureDisabled() {
+        Party respondent = PartyBuilder.builder().individual().partyEmail("defendant@example.com").build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(respondent)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotNotifyWhenNoPartyEmail() {
+        Party respondent = PartyBuilder.builder().individual().partyEmail(null).build();
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .respondent1(respondent)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 }

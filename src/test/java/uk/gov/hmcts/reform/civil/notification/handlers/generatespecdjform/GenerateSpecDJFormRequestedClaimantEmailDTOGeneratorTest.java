@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -92,5 +93,11 @@ class GenerateSpecDJFormRequestedClaimantEmailDTOGeneratorTest {
         assertThat(result).containsEntry(CLAIM_NUMBER, "000DC001");
         assertThat(result).containsEntry(DEFENDANT_NAME, "Defendant 1");
     }
-}
 
+    @Test
+    void shouldNeverNotifyLipClaimantForRequestedTemplate() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+}

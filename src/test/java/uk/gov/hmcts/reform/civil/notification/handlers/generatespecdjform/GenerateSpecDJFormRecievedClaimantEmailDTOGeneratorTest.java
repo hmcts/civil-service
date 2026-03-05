@@ -7,9 +7,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.util.HashMap;
@@ -33,12 +36,15 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
     @Mock
     private NotificationsProperties notificationsProperties;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     private GenerateSpecDJFormRecievedClaimantEmailDTOGenerator generator;
     private MockedStatic<PartyUtils> partyUtilsMockedStatic;
 
     @BeforeEach
     void setUp() {
-        generator = new GenerateSpecDJFormRecievedClaimantEmailDTOGenerator(notificationsProperties);
+        generator = new GenerateSpecDJFormRecievedClaimantEmailDTOGenerator(notificationsProperties, featureToggleService);
         partyUtilsMockedStatic = mockStatic(PartyUtils.class);
     }
 
@@ -92,5 +98,36 @@ class GenerateSpecDJFormRecievedClaimantEmailDTOGeneratorTest {
         assertThat(result).containsEntry(CLAIM_NUMBER, "000DC001");
         assertThat(result).containsEntry(DEFENDANT_NAME, "Defendant 1");
     }
-}
 
+    @Test
+    void shouldNotifyWhenLipVsLipAndToggleEnabled() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyWhenToggleDisabled() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.NO)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotNotifyWhenNotLipVsLip() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+            .applicant1Represented(YesOrNo.YES)
+            .respondent1Represented(YesOrNo.NO)
+            .build();
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+}

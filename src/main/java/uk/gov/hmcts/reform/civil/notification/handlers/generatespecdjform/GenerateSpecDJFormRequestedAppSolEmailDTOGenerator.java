@@ -15,11 +15,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameBasedOnType
 public class GenerateSpecDJFormRequestedAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
 
     private final NotificationsProperties notificationsProperties;
+    private final GenerateSpecDJFormNotificationHelper notificationHelper;
     private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-applicant-requested-notification-%s";
 
-    public GenerateSpecDJFormRequestedAppSolEmailDTOGenerator(OrganisationService organisationService, NotificationsProperties notificationsProperties) {
+    public GenerateSpecDJFormRequestedAppSolEmailDTOGenerator(OrganisationService organisationService,
+                                                             NotificationsProperties notificationsProperties,
+                                                             GenerateSpecDJFormNotificationHelper notificationHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.notificationHelper = notificationHelper;
     }
 
     @Override
@@ -47,5 +51,11 @@ public class GenerateSpecDJFormRequestedAppSolEmailDTOGenerator extends AppSolOn
             return caseData.getDefendantDetailsSpec().getValue().getLabel();
         }
         return getPartyNameBasedOnType(caseData.getRespondent1());
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && notificationHelper.hasSingleDefendantSelection(caseData);
     }
 }

@@ -81,5 +81,11 @@ class GenerateSpecDJFormRequestedDefendantEmailDTOGeneratorTest {
         assertThat(result).containsEntry(DEFENDANT_NAME_INTERIM, "Defendant 1");
         assertThat(result).containsEntry(APPLICANT_ONE_NAME, "Applicant 1");
     }
-}
 
+    @Test
+    void shouldNeverNotifyForRequestedDefendantTemplate() {
+        CaseData caseData = mock(CaseData.class);
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+}

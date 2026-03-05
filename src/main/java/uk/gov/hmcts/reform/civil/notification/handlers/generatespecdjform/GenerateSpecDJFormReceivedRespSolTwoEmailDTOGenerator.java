@@ -16,11 +16,14 @@ public class GenerateSpecDJFormReceivedRespSolTwoEmailDTOGenerator extends RespS
 
     private static final String REFERENCE_TEMPLATE_RECEIVED = "default-judgment-respondent-received-notification-%s";
     private final NotificationsProperties notificationsProperties;
+    private final GenerateSpecDJFormNotificationHelper notificationHelper;
 
     public GenerateSpecDJFormReceivedRespSolTwoEmailDTOGenerator(OrganisationService organisationService,
-                                                                NotificationsProperties notificationsProperties) {
+                                                                NotificationsProperties notificationsProperties,
+                                                                GenerateSpecDJFormNotificationHelper notificationHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.notificationHelper = notificationHelper;
     }
 
     @Override
@@ -41,5 +44,11 @@ public class GenerateSpecDJFormReceivedRespSolTwoEmailDTOGenerator extends RespS
         properties.put(DEFENDANT_NAME, getPartyNameBasedOnType(caseData.getRespondent2()));
         properties.put(CLAIMANT_NAME, getPartyNameBasedOnType(caseData.getApplicant1()));
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && notificationHelper.hasJudgmentForBothDefendants(caseData);
     }
 }

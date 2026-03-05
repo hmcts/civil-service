@@ -17,11 +17,14 @@ public class GenerateSpecDJFormRequestedRespSolOneEmailDTOGenerator extends Resp
 
     private static final String REFERENCE_TEMPLATE_REQUESTED = "default-judgment-respondent-requested-notification-%s";
     private final NotificationsProperties notificationsProperties;
+    private final GenerateSpecDJFormNotificationHelper notificationHelper;
 
     public GenerateSpecDJFormRequestedRespSolOneEmailDTOGenerator(OrganisationService organisationService,
-                                                                  NotificationsProperties notificationsProperties) {
+                                                                  NotificationsProperties notificationsProperties,
+                                                                  GenerateSpecDJFormNotificationHelper notificationHelper) {
         super(organisationService);
         this.notificationsProperties = notificationsProperties;
+        this.notificationHelper = notificationHelper;
     }
 
     @Override
@@ -52,5 +55,11 @@ public class GenerateSpecDJFormRequestedRespSolOneEmailDTOGenerator extends Resp
             return caseData.getDefendantDetailsSpec().getValue().getLabel();
         }
         return getPartyNameBasedOnType(caseData.getRespondent1());
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && notificationHelper.hasSingleDefendantSelection(caseData);
     }
 }
