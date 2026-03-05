@@ -367,6 +367,8 @@ public class CaseDataBuilder {
     protected DynamicList applicantSolicitor1PbaAccounts;
     protected Fee claimFee;
     protected Fee hearingFee;
+    protected Fee otherRemedyFee;
+    protected YesOrNo isClaimDeclarationAdded;
     protected StatementOfTruth applicantSolicitor1ClaimStatementOfTruth;
     protected StatementOfTruth uiStatementOfTruth;
     protected String paymentReference;
@@ -5610,6 +5612,16 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder setClaimTypeToOtherRemedy() {
+        this.claimTypeUnSpec = ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY;
+        return this;
+    }
+
+    public CaseDataBuilder setClaimTypeToHousingDisrepair() {
+        this.claimTypeUnSpec = ClaimTypeUnspec.HOUSING_DISREPAIR;
+        return this;
+    }
+
     public CaseDataBuilder setClaimNotificationDate() {
         claimNotificationDate = issueDate.plusDays(1).atStartOfDay();
         return this;
@@ -7861,6 +7873,8 @@ public class CaseDataBuilder {
             .nextDeadline(nextDeadline)
             .fixedCosts(fixedCosts)
             .queries(queries)
+            .otherRemedyFee(otherRemedyFee)
+            .isClaimDeclarationAdded(isClaimDeclarationAdded)
             .build();
     }
 
@@ -7894,4 +7908,36 @@ public class CaseDataBuilder {
         this.ccdCaseReference = ref;
         return this;
     }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
+    }
+
+    private OrganisationPolicy organisationPolicy(String organisationId, String role) {
+        OrganisationPolicy policy = new OrganisationPolicy();
+        if (organisationId != null) {
+            policy.setOrganisation(new Organisation().setOrganisationID(organisationId));
+        }
+        return policy.setOrgPolicyCaseAssignedRole(role);
+    }
+
+    public CaseDataBuilder otherRemedyFee(BigDecimal amount) {
+        otherRemedyFee = new Fee(amount, "CODE", "1");
+        return this;
+    }
+
+    public CaseDataBuilder otherRemedyClaimDeclarationAdded() {
+        isClaimDeclarationAdded = YES;
+        return this;
+    }
+
 }

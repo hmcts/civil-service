@@ -65,7 +65,7 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
         @Test
         void shouldRecordDeleteWrittenRepsRequiredApplicantScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.NO)
@@ -90,12 +90,12 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
         @Test
         void shouldRecordDeleteWrittenRepsRequiredRespondentScenarioWhenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(CONCURRENT_REPRESENTATIONS).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(CONCURRENT_REPRESENTATIONS))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -120,14 +120,14 @@ public class DeleteWrittenRepresentationNotificationDefendantHandlerTest extends
                 ? LocalDate.now()
                 : LocalDate.now().plusDays(-1);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .judicialDecisionMakeAnOrderForWrittenRepresentations(GAJudicialWrittenRepresentations.builder()
-                                                                          .writtenOption(SEQUENTIAL_REPRESENTATIONS)
-                                                                          .sequentialApplicantMustRespondWithin(LocalDate.now().plusDays(1))
-                                                                          .writtenSequentailRepresentationsBy(claimantDeadline).build())
+                .judicialDecisionMakeAnOrderForWrittenRepresentations(new GAJudicialWrittenRepresentations()
+                                                                          .setWrittenOption(SEQUENTIAL_REPRESENTATIONS)
+                                                                          .setSequentialApplicantMustRespondWithin(LocalDate.now().plusDays(1))
+                                                                          .setWrittenSequentailRepresentationsBy(claimantDeadline))
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
             when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);

@@ -212,4 +212,37 @@ class AcknowledgementOfServiceStrategyTest {
         assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
             .contains("Defendant: Firm A has acknowledged");
     }
+
+    @Test
+    void contributeAddsEventsForTwoDefendantsSameSolicitorAndRespondedOnBehalfOfSecondResThenRecordSameIntentionForResp1() {
+        Party respondent1 = new Party();
+        respondent1.setType(Party.Type.INDIVIDUAL);
+        respondent1.setIndividualFirstName("Alex");
+        respondent1.setIndividualLastName("Smith");
+        Party respondent2 = new Party();
+        respondent2.setType(Party.Type.INDIVIDUAL);
+        respondent2.setIndividualFirstName("Jamie");
+        respondent2.setIndividualLastName("Roe");
+
+        CaseData caseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
+            .respondent1AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 10, 0))
+            .respondent2(respondent2)
+            .respondent2SameLegalRepresentative(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
+            .respondentResponseIsSame(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
+            .respondent2ClaimResponseIntentionType(ResponseIntention.FULL_DEFENCE)
+            .respondent2AcknowledgeNotificationDate(LocalDateTime.of(2024, 3, 1, 11, 0))
+            .build();
+
+        EventHistory builder = new EventHistory();
+        strategy.contribute(builder, caseData, null);
+
+        assertThat(builder.getAcknowledgementOfServiceReceived()).hasSize(2);
+        assertThat(builder.getAcknowledgementOfServiceReceived().getFirst().getEventDetailsText())
+            .contains("[1 of 2 - 2024-03-15]");
+        assertThat(builder.getAcknowledgementOfServiceReceived().get(1).getEventDetailsText())
+            .contains("[2 of 2 - 2024-03-15]");
+        assertThat(builder.getAcknowledgementOfServiceReceived().get(1).getEventDetails().getResponseIntention())
+            .isEqualTo(ResponseIntention.FULL_DEFENCE.getLabel());
+    }
 }

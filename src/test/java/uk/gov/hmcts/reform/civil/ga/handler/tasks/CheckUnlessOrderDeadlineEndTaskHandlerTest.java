@@ -242,25 +242,23 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
             .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(APPROVE_OR_EDIT)
-                                           .judgeRecitalText("Sample Text")
-                                           .judgeApproveEditOptionDateForUnlessOrder(deadline)
-                                           .reasonForDecisionText("Sample Test")
-                                           .isOrderProcessedByUnlessScheduler(isProcessed)
-                                           .build()).build();
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                                           .setJudgeRecitalText("Sample Text")
+                                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                                           .setReasonForDecisionText("Sample Test")
+                                           .setIsOrderProcessedByUnlessScheduler(isProcessed)).build();
     }
 
     private CaseDetails getCaseDetails(Long ccdId, GeneralApplicationTypes generalApplicationType,
                                        LocalDate deadline, YesOrNo isProcessed) {
         return CaseDetails.builder().id(ccdId).data(
-                Map.of("judicialDecisionMakeOrder", GAJudicialMakeAnOrder.builder()
-                           .makeAnOrder(APPROVE_OR_EDIT)
-                           .judgeRecitalText("Sample Text")
-                           .judgeApproveEditOptionDateForUnlessOrder(deadline)
-                           .reasonForDecisionText("Sample Test")
-                           .isOrderProcessedByUnlessScheduler(isProcessed)
-                           .build(),
+                Map.of("judicialDecisionMakeOrder", new GAJudicialMakeAnOrder()
+                           .setMakeAnOrder(APPROVE_OR_EDIT)
+                           .setJudgeRecitalText("Sample Text")
+                           .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
+                           .setReasonForDecisionText("Sample Test")
+                           .setIsOrderProcessedByUnlessScheduler(isProcessed),
                        "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType)).build()))
             .state(ORDER_MADE.toString()).build();
     }

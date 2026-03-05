@@ -49,14 +49,14 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenApplicationFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(BUSINESS_PROCESS))
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
                     .setCustomerReference("RC-1604-0739-2145-4711")
-                    ).build())
+                    ))
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -79,15 +79,15 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenAdditionalFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
             .businessProcess(new BusinessProcess()
                                  .setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(BUSINESS_PROCESS))
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().additionalPaymentDetails(new PaymentDetails()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setAdditionalPaymentDetails(new PaymentDetails()
                                                                             .setCustomerReference("RC-1604-0739-2145-4711")
                                                                             )
-                                      .additionalPaymentServiceRef("2023-1701090705600").build())
+                                      .setAdditionalPaymentServiceRef("2023-1701090705600"))
             .applicationFeeAmountInPence(new BigDecimal("10000"))
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
