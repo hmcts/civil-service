@@ -38,21 +38,22 @@ import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesRefe
 @Slf4j
 public class StandardDirectionOrderDJDefendantNotificationHandler extends CallbackHandler implements NotificationData {
 
+    private static final String BOTH_DEFENDANTS = "Both Defendants";
+    private static final String CLAIM_NUMBER = "claimReferenceNumber";
+    private static final String LEGAL_ORG_NAME = "legalOrgName";
+    private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-defendant-%s";
+    private static final String TASK_ID_DEFENDANT = "StandardDirectionOrderDj";
+    private static final List<CaseEvent> EVENTS = List.of(
+        NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT,
+        NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2
+    );
+
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final ObjectMapper objectMapper;
     private final OrganisationService organisationService;
     private final NotificationsSignatureConfiguration configuration;
     private final FeatureToggleService featureToggleService;
-    private static final String BOTH_DEFENDANTS = "Both Defendants";
-    private static final String CLAIM_NUMBER = "claimReferenceNumber";
-    private static final String LEGAL_ORG_NAME = "legalOrgName";
-    private static final List<CaseEvent> EVENTS = List.of(
-            NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT,
-            NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2
-    );
-    private static final String REFERENCE_TEMPLATE_SDO_DJ = "sdo-dj-order-notification-defendant-%s";
-    private static final String TASK_ID_DEFENDANT = "StandardDirectionOrderDj";
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -67,56 +68,13 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
     }
 
     private CallbackResponse notifyDefendantSDOrderDj(CallbackParams callbackParams) {
-
         CaseData caseData = callbackParams.getCaseData();
         String eventId = callbackParams.getRequest().getEventId();
 
         if (eventId.equals(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())) {
-            if (checkDefendantRequested(caseData, caseData.getRespondent1().getPartyName())
-                    || checkIfBothDefendants(caseData)) {
-                try {
-                    notificationService.sendMail(
-                            caseData.isRespondent1NotRepresented()
-                                    ? caseData.getDefendantUserDetails().getEmail()
-                                    : caseData.getRespondentSolicitor1EmailAddress(),
-                            notificationsProperties.getStandardDirectionOrderDJTemplate(),
-                            addProperties(caseData),
-                            String.format(
-                                    REFERENCE_TEMPLATE_SDO_DJ,
-                                    caseData.getLegacyCaseReference()
-                            )
-                    );
-                } catch (Exception e) {
-                    log.error("Failed to send email to respondent 1 for case {} due to error {}",
-                            callbackParams.getRequest().getCaseDetails().getId(), e.getMessage());
-                }
-
-            }
+            notifyDefendant1(callbackParams, caseData);
         } else if (eventId.equals(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())) {
-            if (caseData.getAddRespondent2() != null && caseData.getAddRespondent2().equals(YesOrNo.YES)) {
-                if (checkDefendantRequested(caseData, caseData.getRespondent2().getPartyName())
-                        || checkIfBothDefendants(caseData)) {
-                    var scenario = getMultiPartyScenario(caseData);
-                    String targetEmail = scenario == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
-                            ? caseData.getRespondent1EmailAddress()
-                            : getRespondent2PartyEmail(caseData);
-                    try {
-                        notificationService.sendMail(
-                                targetEmail,
-                                notificationsProperties.getStandardDirectionOrderDJTemplate(),
-                                addPropertiesDef2(caseData),
-                                String.format(
-                                        REFERENCE_TEMPLATE_SDO_DJ,
-                                        caseData.getLegacyCaseReference()
-                                )
-                        );
-                    } catch (Exception e) {
-                        log.error("Failed to send email to respondent 2 for case {} due to error {}",
-                                callbackParams.getRequest().getCaseDetails().getId(), e.getMessage());
-                    }
-
-                }
-            }
+            notifyDefendant2(callbackParams, caseData);
         }
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -124,9 +82,73 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
                 .build();
     }
 
-    private static String getRespondent2PartyEmail(CaseData caseData) {
+    private void notifyDefendant1(CallbackParams callbackParams, CaseData caseData) {
+        if (isTargetDefendantNotSelected(caseData, caseData.getRespondent1().getPartyName())) {
+            return;
+        }
+
+        String recipientEmail = caseData.isRespondent1NotRepresented()
+            ? caseData.getDefendantUserDetails().getEmail()
+            : caseData.getRespondentSolicitor1EmailAddress();
+
+        sendDefendantNotification(
+            callbackParams,
+            caseData,
+            recipientEmail,
+            addProperties(caseData),
+            "respondent 1"
+        );
+    }
+
+    private void notifyDefendant2(CallbackParams callbackParams, CaseData caseData) {
+        if (!YesOrNo.YES.equals(caseData.getAddRespondent2())) {
+            return;
+        }
+        if (isTargetDefendantNotSelected(caseData, caseData.getRespondent2().getPartyName())) {
+            return;
+        }
+
+        // In 1v2 with a single legal rep, respondent 1's LR receives the defendant 2 notification.
+        String recipientEmail = getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_ONE_LEGAL_REP
+            ? caseData.getRespondent1EmailAddress()
+            : getDefendant2RecipientEmail(caseData);
+
+        sendDefendantNotification(
+            callbackParams,
+            caseData,
+            recipientEmail,
+            addPropertiesDef2(caseData),
+            "respondent 2"
+        );
+    }
+
+    private static String getDefendant2RecipientEmail(CaseData caseData) {
         return YesOrNo.YES.equals(caseData.getRespondent2Represented())
                 ? caseData.getRespondentSolicitor2EmailAddress() : caseData.getRespondent2().getPartyEmail();
+    }
+
+    private void sendDefendantNotification(
+        CallbackParams callbackParams,
+        CaseData caseData,
+        String recipientEmail,
+        Map<String, String> properties,
+        String recipientLabel
+    ) {
+        try {
+            notificationService.sendMail(
+                recipientEmail,
+                notificationsProperties.getStandardDirectionOrderDJTemplate(),
+                properties,
+                String.format(REFERENCE_TEMPLATE_SDO_DJ, caseData.getLegacyCaseReference())
+            );
+        } catch (Exception e) {
+            log.error(
+                "Failed to send email to {} for case {} due to error {}",
+                recipientLabel,
+                callbackParams.getRequest().getCaseDetails().getId(),
+                e.getMessage()
+            );
+        }
     }
 
     @Override
@@ -136,67 +158,65 @@ public class StandardDirectionOrderDJDefendantNotificationHandler extends Callba
 
     @Override
     public Map<String, String> addProperties(final CaseData caseData) {
-        HashMap<String, String> properties = new HashMap<>(Map.of(
-                LEGAL_ORG_NAME, getLegalOrganizationName(caseData),
-                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
-        ));
-        addAllFooterItems(caseData, properties, configuration,
-                featureToggleService.isPublicQueryManagementEnabled(caseData));
+        String organisationId = getRespondent1OrganisationId(caseData);
+        String legalOrgName = findOrganisationName(organisationId)
+            .orElse(caseData.getRespondent1().getPartyName());
 
-        return properties;
+        return addCommonProperties(caseData, legalOrgName);
     }
 
     public Map<String, String> addPropertiesDef2(final CaseData caseData) {
+        String organisationId = getRespondent2OrganisationId(caseData);
+        String legalOrgName = findOrganisationName(organisationId)
+            .orElse(caseData.getRespondent2().getPartyName());
+
+        return addCommonProperties(caseData, legalOrgName);
+    }
+
+    private Map<String, String> addCommonProperties(CaseData caseData, String legalOrgName) {
         HashMap<String, String> properties = new HashMap<>(Map.of(
-                LEGAL_ORG_NAME, getLegalOrganizationDef2Name(caseData),
-                CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
-                PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
-                CASEMAN_REF, caseData.getLegacyCaseReference()
+            LEGAL_ORG_NAME, legalOrgName,
+            CLAIM_NUMBER, caseData.getCcdCaseReference().toString(),
+            PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData),
+            CASEMAN_REF, caseData.getLegacyCaseReference()
         ));
         addAllFooterItems(caseData, properties, configuration,
-                featureToggleService.isPublicQueryManagementEnabled(caseData));
+                          featureToggleService.isPublicQueryManagementEnabled(caseData));
 
         return properties;
     }
 
-    private String getLegalOrganizationName(final CaseData caseData) {
+    private boolean isTargetDefendantNotSelected(CaseData caseData, String defendantName) {
+        // Defendant can be selected directly by name or implicitly through "Both Defendants".
+        return !isRequestedDefendant(caseData, defendantName) && !isBothDefendantsSelected(caseData);
+    }
+
+    private Optional<String> findOrganisationName(String organisationId) {
+        return Optional.ofNullable(organisationId)
+            .flatMap(organisationService::findOrganisationById)
+            .map(Organisation::getName);
+    }
+
+    private String getRespondent1OrganisationId(CaseData caseData) {
         if (nonNull(caseData.getRespondent1OrganisationPolicy().getOrganisation())) {
-            Optional<Organisation> organisation = organisationService
-                    .findOrganisationById(caseData.getRespondent1OrganisationPolicy()
-                            .getOrganisation().getOrganisationID());
-            if (organisation.isPresent()) {
-                return organisation.get().getName();
-            }
+            return caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
         }
-        return caseData.getRespondent1().getPartyName();
+        return null;
     }
 
-    private String getLegalOrganizationDef2Name(final CaseData caseData) {
-        Optional<Organisation> organisation = organisationService
-                .findOrganisationById(caseData.getRespondent2OrganisationPolicy() != null
-                        ? caseData.getRespondent2OrganisationPolicy()
-                        .getOrganisation().getOrganisationID() : caseData.getRespondent1OrganisationPolicy()
-                        .getOrganisation().getOrganisationID());
-        if (organisation.isPresent()) {
-            return organisation.get().getName();
+    private String getRespondent2OrganisationId(CaseData caseData) {
+        if (nonNull(caseData.getRespondent2OrganisationPolicy())) {
+            return caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
         }
-        return caseData.getRespondent2().getPartyName();
+        // For some 1v2 states only respondent 1 org policy exists; use it as a fallback for org lookup.
+        return getRespondent1OrganisationId(caseData);
     }
 
-    private Boolean checkIfBothDefendants(CaseData caseData) {
-        if (caseData.isRespondent1NotRepresented()) {
-            return false;
-        }
-        return BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
+    private boolean isBothDefendantsSelected(CaseData caseData) {
+        return !caseData.isRespondent1NotRepresented() && BOTH_DEFENDANTS.equals(caseData.getDefendantDetails().getValue().getLabel());
     }
 
-    private boolean checkDefendantRequested(final CaseData caseData, String defendantName) {
-        if (caseData.getDefendantDetails() != null) {
-            return defendantName.equals(caseData.getDefendantDetails().getValue().getLabel());
-        } else {
-            return false;
-        }
+    private boolean isRequestedDefendant(final CaseData caseData, String defendantName) {
+        return caseData.getDefendantDetails() != null && defendantName.equals(caseData.getDefendantDetails().getValue().getLabel());
     }
 }
