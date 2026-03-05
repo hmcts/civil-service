@@ -15,20 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_REFERENCE_NUMBER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
-import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_REFERENCES;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -48,12 +42,8 @@ public class RespondToQueryHelper {
                                                    boolean isLipOtherParty) {
         if (isLipOtherParty) {
             properties.put(PARTY_NAME, legalOrgNameOrPartyName);
-            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
         } else {
             properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, legalOrgNameOrPartyName);
-            properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
-            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
         }
         return properties;
     }
@@ -68,7 +58,6 @@ public class RespondToQueryHelper {
                                                           CaseData caseData,
                                                           String partyName) {
         properties.put(PARTY_NAME, partyName);
-        properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
         return addCustomProperties(properties, caseData, partyName, true);
     }
 
