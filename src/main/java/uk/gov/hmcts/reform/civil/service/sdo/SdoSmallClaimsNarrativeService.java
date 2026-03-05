@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -26,6 +28,12 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITN
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_D;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_E;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
@@ -47,6 +55,8 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
 
+    @Value("${other_remedy.enabled:false}")
+    private boolean otherRemedyEnabled;
     private final SdoDeadlineService sdoDeadlineService;
 
     public void applyJudgesRecital(CaseData caseData) {
@@ -132,5 +142,22 @@ public class SdoSmallClaimsNarrativeService {
         ));
         notes.setDate(orderDeadline);
         caseData.setSmallClaimsNotes(notes);
+    }
+
+    public void applyHousingDisrepair(CaseData caseData) {
+        if (otherRemedyEnabled) {
+            HousingDisrepair housingDisrepair = new HousingDisrepair();
+            housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
+            housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
+            housingDisrepair.setFirstReportDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
+            housingDisrepair.setClauseCBeforeDate(HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE);
+            housingDisrepair.setJointStatementDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
+            housingDisrepair.setClauseCAfterDate(HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE);
+            housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
+            housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
+            caseData.setSmallClaimsHousingDisrepair(housingDisrepair);
+        } else {
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
     }
 }

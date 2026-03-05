@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -77,7 +78,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.FastTrackCreditHire;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackDisclosureOfDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingNotes;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHearingTime;
-import uk.gov.hmcts.reform.civil.model.sdo.FastTrackHousingDisrepair;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgementDeductionValue;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackJudgesRecital;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackNotes;
@@ -194,7 +195,8 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private FastTrackBuildingDispute fastTrackBuildingDispute;
     private FastTrackClinicalNegligence fastTrackClinicalNegligence;
     private FastTrackCreditHire fastTrackCreditHire;
-    private FastTrackHousingDisrepair fastTrackHousingDisrepair;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private HousingDisrepair fastTrackHousingDisrepair;
     private FastTrackPersonalInjury fastTrackPersonalInjury;
     private FastTrackRoadTrafficAccident fastTrackRoadTrafficAccident;
     private FastTrackJudgesRecital fastTrackJudgesRecital;
@@ -222,6 +224,8 @@ public class CivilCaseData extends BaseCaseData implements MappableObject {
     private SmallClaimsNotes smallClaimsNotes;
     private SmallClaimsWitnessStatement smallClaimsWitnessStatement;
     private SmallClaimsFlightDelay smallClaimsFlightDelay;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private HousingDisrepair smallClaimsHousingDisrepair;
     private SDOHearingNotes sdoHearingNotes;
     private ReasonNotSuitableSDO reasonNotSuitableSDO;
     private  List<SmallTrack> smallClaims;

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.client.FeesApiClient;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.enums.AllocatedTrack;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
 import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
@@ -86,6 +87,18 @@ public class FeesClientService {
         } else {
             return feesApiClient.lookupFeeWithoutKeyword(service, jurisdiction1, jurisdiction2, channel, event, amount);
         }
+    }
+
+    public FeeLookupResponseDto lookupOtherRemedyFees(OtherRemedyFeesConfiguration otherRemedyFeesConfiguration, BigDecimal amount) {
+        return feesApiClient.lookupFeeWithAmount(
+            otherRemedyFeesConfiguration.getService(),
+            otherRemedyFeesConfiguration.getJurisdiction1(),
+            otherRemedyFeesConfiguration.getJurisdiction2(),
+            otherRemedyFeesConfiguration.getChannel(),
+            otherRemedyFeesConfiguration.getEvent(),
+            otherRemedyFeesConfiguration.getAnyOtherRemedyKeyword(),
+            amount
+        );
     }
 
     public Fee2Dto[] findRangeGroup(String channel, String event) {

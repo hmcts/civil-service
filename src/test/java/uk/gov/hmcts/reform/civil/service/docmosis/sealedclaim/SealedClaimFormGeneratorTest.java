@@ -169,6 +169,93 @@ class SealedClaimFormGeneratorTest {
         );
     }
 
+    @Nested
+    class OtherRemedy {
+        @Test
+        void shouldGenerateSealedClaimForm_when1V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
+                .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2DifferentSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoDefendantSolicitors().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1)))
+                .thenReturn(new DocmosisDocument(N1.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(representativeService).getRespondent2Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(any(SealedClaimForm.class), eq(N1));
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when2V1DataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimTwoApplicants().setClaimTypeToOtherRemedy().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL)
+            );
+        }
+
+        @Test
+        void shouldGenerateSealedClaimForm_when1V2SameSolicitorDataIsProvided() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .multiPartyClaimOneDefendantSolicitor().setClaimTypeToHousingDisrepair().build();
+
+            when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N1_MULTIPARTY_SAME_SOL)))
+                .thenReturn(new DocmosisDocument(N1_MULTIPARTY_SAME_SOL.getDocumentTitle(), bytes));
+
+            when(documentManagementService.uploadDocument(BEARER_TOKEN, new PDF(fileNameDiffSol, bytes, SEALED_CLAIM)))
+                .thenReturn(CASE_DOCUMENT);
+
+            CaseDocument caseDocument = sealedClaimFormGenerator.generate(caseData, BEARER_TOKEN);
+            assertThat(caseDocument).isNotNull().isEqualTo(CASE_DOCUMENT);
+
+            verify(representativeService).getRespondent1Representative(caseData);
+            verify(documentManagementService).uploadDocument(BEARER_TOKEN, new PDF(fileName, bytes, SEALED_CLAIM));
+            verify(documentGeneratorService).generateDocmosisDocument(
+                any(SealedClaimForm.class),
+                eq(N1_MULTIPARTY_SAME_SOL)
+            );
+        }
+    }
+
     private Representative getRepresentative() {
         Address serviceAddress = new Address();
         serviceAddress.setAddressLine1("AdmiralHouse");
