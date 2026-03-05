@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.robotics;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Data
@@ -23,7 +22,6 @@ public class Solicitor {
     private String contactEmailAddress;
     private String preferredMethodOfCommunication;
     private String reference;
-    @Getter(onMethod_ = {@JsonProperty("isPayee")})
     @JsonProperty("isPayee")
     private boolean isPayee;
 
