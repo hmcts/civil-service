@@ -38,6 +38,15 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 @RequiredArgsConstructor
 public class GenerateOrderNotificationHandler extends CallbackHandler implements NotificationData {
 
+    public static final String TASK_ID_APPLICANT = "GenerateOrderNotifyApplicantSolicitor1";
+    public static final String TASK_ID_APPLICANT_COURT_OFFICER_ORDER = "GenerateOrderNotifyApplicantCourtOfficerOrderSolicitor1";
+    public static final String TASK_ID_RESPONDENT_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor1";
+    public static final String TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor2";
+    public static final String TASK_ID_RESPONDENT1 = "GenerateOrderNotifyRespondentSolicitor1";
+    public static final String TASK_ID_RESPONDENT2 = "GenerateOrderNotifyRespondentSolicitor2";
+
+    private static final String REFERENCE_TEMPLATE = "generate-order-notification-%s";
+
     private final NotificationService notificationService;
     private final NotificationsProperties notificationsProperties;
     private final NotificationsSignatureConfiguration configuration;
@@ -52,12 +61,6 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER,
         NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER
     );
-    public static final String TASK_ID_APPLICANT = "GenerateOrderNotifyApplicantSolicitor1";
-    public static final String TASK_ID_APPLICANT_COURT_OFFICER_ORDER = "GenerateOrderNotifyApplicantCourtOfficerOrderSolicitor1";
-    public static final String TASK_ID_RESPONDENT_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor1";
-    public static final String TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER = "GenerateOrderNotifyRespondentCourtOfficerOrderSolicitor2";
-    public static final String TASK_ID_RESPONDENT1 = "GenerateOrderNotifyRespondentSolicitor1";
-    public static final String TASK_ID_RESPONDENT2 = "GenerateOrderNotifyRespondentSolicitor2";
 
     public String taskId = "";
 
@@ -92,14 +95,14 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         if (isSameRespondentSolicitor) {
             return AboutToStartOrSubmitCallbackResponse.builder().build();
         }
-        String emailAddress = getReceipientEmail(caseData);
+
+        String emailAddress = getRecipientEmail(caseData);
         if (StringUtils.isNotBlank(emailAddress)) {
-            String template = getReferenceTemplateString();
             notificationService.sendMail(
                 emailAddress,
                 getTemplate(caseData),
                 addProperties(caseData),
-                String.format(template, caseData.getLegacyCaseReference())
+                String.format(REFERENCE_TEMPLATE, caseData.getLegacyCaseReference())
             );
         }
         return AboutToStartOrSubmitCallbackResponse.builder().build();
@@ -109,6 +112,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         boolean isLip = false;
         boolean isLipWelsh = false;
         boolean isCourtOfficerOrderLipWelsh = false;
+
         if (isApplicantLip(caseData) && taskId.equals(TASK_ID_APPLICANT)) {
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
@@ -116,21 +120,26 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
             isCourtOfficerOrderLipWelsh = true;
-        } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT_COURT_OFFICER_ORDER)) {
+        }
+
+        else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT_COURT_OFFICER_ORDER)) {
             isLip = true;
             isLipWelsh = caseData.isRespondentResponseBilingual();
             isCourtOfficerOrderLipWelsh = true;
         } else if (isRespondent1Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT1)) {
             isLip = true;
             isLipWelsh = caseData.isRespondentResponseBilingual();
-        } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER)) {
+        }
+
+        else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER)) {
             isLip = true;
             isLipWelsh = caseData.isClaimantBilingual();
             isCourtOfficerOrderLipWelsh = true;
         } else if (isRespondent2Lip(caseData) && taskId.equals(TASK_ID_RESPONDENT2)) {
-            // TODO CIV-13814 not contemplated response 2 currently
+            // Note: CIV-13814 not contemplated response 2 currently
             isLip = true;
         }
+
         if (isLip) {
             if (isLipWelsh && isCourtOfficerOrderLipWelsh) {
                 return notificationsProperties.getNotifyLipUpdateTemplateBilingual();
@@ -144,15 +153,11 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
         }
     }
 
-    private String getReferenceTemplateString() {
-        return "generate-order-notification-%s";
-    }
-
     private boolean getIsSameRespondentSolicitor(CaseData caseData) {
         return taskId.equals(TASK_ID_RESPONDENT2) && caseData.getRespondent2SameLegalRepresentative() == YesOrNo.YES;
     }
 
-    private String getReceipientEmail(CaseData caseData) {
+    private String getRecipientEmail(CaseData caseData) {
         if (taskId.equals(TASK_ID_APPLICANT) || taskId.equals(TASK_ID_APPLICANT_COURT_OFFICER_ORDER)) {
             return isApplicantLip(caseData)
                 ? caseData.getApplicant1().getPartyEmail() : caseData.getApplicantSolicitor1UserDetails().getEmail();
@@ -172,7 +177,7 @@ public class GenerateOrderNotificationHandler extends CallbackHandler implements
 
     public String getLegalOrganizationName(CaseData caseData) {
 
-        String id = "";
+        String id;
         if (taskId.equals(TASK_ID_APPLICANT) || taskId.equals(TASK_ID_APPLICANT_COURT_OFFICER_ORDER)) {
             id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
         } else if (taskId.equals(TASK_ID_RESPONDENT1) || taskId.equals(TASK_ID_RESPONDENT_COURT_OFFICER_ORDER)) {
