@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 @Component
 public class ProcessCoscDashboardTaskContributor extends DashboardTaskContributor {
 
-    protected ProcessCoscDashboardTaskContributor(CertificateGeneratedDefendantDashboardTask defendantDashboardTask) {
+    public ProcessCoscDashboardTaskContributor(ProcessCoscCertificateGeneratedDefendantDashboardTask defendantDashboardTask) {
         super(DashboardTaskIds.PROCESS_COSC, defendantDashboardTask);
     }
 }

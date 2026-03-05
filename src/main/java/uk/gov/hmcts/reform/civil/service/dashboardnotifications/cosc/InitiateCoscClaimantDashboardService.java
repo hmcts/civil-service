@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -25,8 +26,8 @@ public class InitiateCoscClaimantDashboardService extends DashboardScenarioServi
         this.coscDashboardHelper = coscDashboardHelper;
     }
 
-    public void notifyInitiateCosc(CaseData caseData, String authToken) {
-        recordScenario(caseData, authToken);
+    public void notifyInitiateCosc(GeneralApplicationCaseData caseData, String authToken) {
+        recordScenario(coscDashboardHelper.getParentCaseData(caseData), authToken);
     }
 
     @Override

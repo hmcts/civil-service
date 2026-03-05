@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc;
 
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -34,6 +35,10 @@ public class CertificateGeneratedDefendantDashboardService extends DashboardScen
 
     public void notifyCertificateGenerated(CaseData caseData, String authToken) {
         recordScenario(caseData, authToken);
+    }
+
+    public void notifyCertificateGenerated(GeneralApplicationCaseData caseData, String authToken) {
+        recordScenario(coscDashboardHelper.getParentCaseData(caseData), authToken);
     }
 
     @Override

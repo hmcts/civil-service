@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
-import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc.InitiateCoscDefendantDashboardService;
 
 import static org.mockito.Mockito.verify;
@@ -27,9 +27,9 @@ class InitiateCoscDefendantDashboardTaskTest {
 
     @Test
     void shouldDelegateToService() {
-        CaseData caseData = CaseData.builder().ccdCaseReference(1L).build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1L);
 
-        when(context.caseData()).thenReturn(caseData);
+        when(context.generalApplicationCaseData()).thenReturn(caseData);
         when(context.authToken()).thenReturn(AUTH_TOKEN);
 
         task.execute(context);

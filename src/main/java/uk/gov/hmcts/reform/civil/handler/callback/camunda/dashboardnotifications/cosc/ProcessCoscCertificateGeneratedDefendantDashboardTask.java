@@ -6,11 +6,11 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc.CertificateGeneratedDefendantDashboardService;
 
 @Component
-public class CertificateGeneratedDefendantDashboardTask extends DashboardServiceTask {
+public class ProcessCoscCertificateGeneratedDefendantDashboardTask extends DashboardServiceTask {
 
     private final CertificateGeneratedDefendantDashboardService defendantDashboardService;
 
-    public CertificateGeneratedDefendantDashboardTask(CertificateGeneratedDefendantDashboardService defendantDashboardService) {
+    public ProcessCoscCertificateGeneratedDefendantDashboardTask(CertificateGeneratedDefendantDashboardService defendantDashboardService) {
         this.defendantDashboardService = defendantDashboardService;
     }
 

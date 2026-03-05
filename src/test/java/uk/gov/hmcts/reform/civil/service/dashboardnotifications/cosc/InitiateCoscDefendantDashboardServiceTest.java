@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
@@ -51,6 +51,17 @@ class InitiateCoscDefendantDashboardServiceTest {
     @InjectMocks
     private InitiateCoscDefendantDashboardService initiateCoscDefendantDashboardService;
 
+    private CaseData parentCaseData;
+    private GeneralApplicationCaseData gaCaseData;
+
+    @BeforeEach
+    void setUp() {
+        gaCaseData = new GeneralApplicationCaseData().parentCaseReference("123456");
+        parentCaseData = CaseData.builder().ccdCaseReference(123456L).build();
+
+        when(coscDashboardHelper.getParentCaseData(gaCaseData)).thenReturn(parentCaseData);
+    }
+
     @Test
     void shouldRecordScenario_whenInvoked() {
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -58,25 +69,20 @@ class InitiateCoscDefendantDashboardServiceTest {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+        parentCaseData.setRespondent1Represented(YesOrNo.NO);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.NO).build();
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(caseData, AUTH_TOKEN);
+        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
+            parentCaseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
+            parentCaseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }
@@ -99,15 +105,10 @@ class InitiateCoscDefendantDashboardServiceTest {
 
         List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
 
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+        parentCaseData.setGeneralApplications(gaApplications);
+        parentCaseData.setRespondent1Represented(YesOrNo.NO);
 
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.NO).build();
-        caseData.setGeneralApplications(gaApplications);
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(caseData, AUTH_TOKEN);
+        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             "54326781",
@@ -117,44 +118,25 @@ class InitiateCoscDefendantDashboardServiceTest {
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
+            parentCaseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
         verify(dashboardScenariosService).recordScenarios(
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
-            caseData.getCcdCaseReference().toString(),
+            parentCaseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }
 
     @Test
     void shouldNotRecordScenario_whenRespondentRepresented() {
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(false);
 
-        CaseLink caseLink = new CaseLink();
-        caseLink.setCaseReference("54326781");
+        parentCaseData.setRespondent1Represented(YesOrNo.YES);
 
-        GeneralApplication generalApplication = new GeneralApplication();
-        generalApplication.setCaseLink(caseLink);
-        GAApplicationType gaApplicationType = new GAApplicationType();
-        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        generalApplication.setGeneralAppType(gaApplicationType);
-
-        List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
-
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.YES).build();
-        caseData.setGeneralApplications(gaApplications);
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(caseData, AUTH_TOKEN);
+        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
         verifyNoInteractions(dashboardNotificationService);
@@ -162,31 +144,12 @@ class InitiateCoscDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenIsPaidInFull() {
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
 
-        CaseLink caseLink = new CaseLink();
-        caseLink.setCaseReference("54326781");
+        parentCaseData.setRespondent1Represented(YesOrNo.NO);
 
-        GeneralApplication generalApplication = new GeneralApplication();
-        generalApplication.setCaseLink(caseLink);
-        GAApplicationType gaApplicationType = new GAApplicationType();
-        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        generalApplication.setGeneralAppType(gaApplicationType);
-
-        List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
-
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.NO).build();
-        caseData.setGeneralApplications(gaApplications);
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(caseData, AUTH_TOKEN);
+        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
         verifyNoInteractions(dashboardNotificationService);
@@ -194,30 +157,9 @@ class InitiateCoscDefendantDashboardServiceTest {
 
     @Test
     void shouldNotRecordScenario_whenLipVLipDisabled() {
-        HashMap<String, Object> scenarioParams = new HashMap<>();
-        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
-        CaseLink caseLink = new CaseLink();
-        caseLink.setCaseReference("54326781");
-
-        GeneralApplication generalApplication = new GeneralApplication();
-        generalApplication.setCaseLink(caseLink);
-        GAApplicationType gaApplicationType = new GAApplicationType();
-        gaApplicationType.setTypes(singletonList(CONFIRM_CCJ_DEBT_PAID));
-        generalApplication.setGeneralAppType(gaApplicationType);
-
-        List<Element<GeneralApplication>> gaApplications = wrapElements(generalApplication);
-
-        CaseDataLiP caseDataLiP = new CaseDataLiP();
-        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
-            .caseDataLip(caseDataLiP)
-            .respondent1Represented(YesOrNo.NO).build();
-        caseData.setGeneralApplications(gaApplications);
-
-        initiateCoscDefendantDashboardService.notifyInitiateCosc(caseData, AUTH_TOKEN);
+        initiateCoscDefendantDashboardService.notifyInitiateCosc(gaCaseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
         verifyNoInteractions(dashboardNotificationService);

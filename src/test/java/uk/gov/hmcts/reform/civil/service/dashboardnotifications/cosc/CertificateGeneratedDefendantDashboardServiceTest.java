@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
+import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.common.Element;
@@ -52,7 +53,7 @@ class CertificateGeneratedDefendantDashboardServiceTest {
     private CertificateGeneratedDefendantDashboardService dashboardService;
 
     @Test
-    void shouldRecordScenario_whenInvoked() {
+    void shouldRecordScenario_whenInvoked_withCivilCaseData() {
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
         when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
@@ -78,6 +79,40 @@ class CertificateGeneratedDefendantDashboardServiceTest {
             AUTH_TOKEN,
             SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
             caseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldRecordScenarioWithCivilParentCase_whenInvoked_withGeneralApplicationCaseData() {
+
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(scenarioParams);
+        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
+        when(coscDashboardHelper.isMarkedPaidInFull(any())).thenReturn(true);
+
+        CaseDataLiP caseDataLiP = new CaseDataLiP();
+        caseDataLiP.setApplicant1SettleClaim(YesOrNo.YES);
+
+        GeneralApplicationCaseData gaCaseData = new GeneralApplicationCaseData().parentCaseReference("123456");
+        CaseData parentCaseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
+            .caseDataLip(caseDataLiP)
+            .respondent1Represented(YesOrNo.NO).build();
+
+        when(coscDashboardHelper.getParentCaseData(gaCaseData)).thenReturn(parentCaseData);
+
+        dashboardService.notifyCertificateGenerated(gaCaseData, AUTH_TOKEN);
+
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_PROOF_OF_DEBT_PAYMENT_APPLICATION_PROCESSED_DEFENDANT.getScenario(),
+            parentCaseData.getCcdCaseReference().toString(),
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardScenariosService).recordScenarios(
+            AUTH_TOKEN,
+            SCENARIO_AAA6_GENERAL_APPLICATION_AVAILABLE_DEFENDANT.getScenario(),
+            parentCaseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
     }

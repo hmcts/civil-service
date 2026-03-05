@@ -7,33 +7,34 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardTaskContext;
-import uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc.InitiateCoscClaimantDashboardService;
+import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.cosc.CertificateGeneratedDefendantDashboardService;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class InitiateCoscClaimantDashboardTaskTest {
+class InitiateCoscCertificateGeneratedDefendantDashboardTaskTest {
 
     private static final String AUTH_TOKEN = "Bearer";
 
     @Mock
-    private InitiateCoscClaimantDashboardService initiateCoscClaimantDashboardService;
+    private CertificateGeneratedDefendantDashboardService certificateGeneratedDefendantDashboardService;
     @Mock
     private DashboardTaskContext context;
 
     @InjectMocks
-    private InitiateCoscClaimantDashboardTask task;
+    private InitiateCoscCertificateGeneratedDefendantDashboardTask task;
 
     @Test
     void shouldDelegateToService() {
-        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().ccdCaseReference(1L);
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseDataBuilder().ccdCaseReference(1L).build();
 
         when(context.generalApplicationCaseData()).thenReturn(caseData);
         when(context.authToken()).thenReturn(AUTH_TOKEN);
 
         task.execute(context);
 
-        verify(initiateCoscClaimantDashboardService).notifyInitiateCosc(caseData, AUTH_TOKEN);
+        verify(certificateGeneratedDefendantDashboardService).notifyCertificateGenerated(caseData, AUTH_TOKEN);
     }
 }

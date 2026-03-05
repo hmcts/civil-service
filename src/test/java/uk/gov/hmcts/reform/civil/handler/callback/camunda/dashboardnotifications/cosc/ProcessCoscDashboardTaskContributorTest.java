@@ -11,8 +11,8 @@ class ProcessCoscDashboardTaskContributorTest {
 
     @Test
     void shouldExposeTaskIdAndTasks() {
-        CertificateGeneratedDefendantDashboardTask certificateGeneratedDefendantTask =
-            mock(CertificateGeneratedDefendantDashboardTask.class);
+        ProcessCoscCertificateGeneratedDefendantDashboardTask certificateGeneratedDefendantTask =
+            mock(ProcessCoscCertificateGeneratedDefendantDashboardTask.class);
 
         DashboardTaskContribution contribution = new ProcessCoscDashboardTaskContributor(
             certificateGeneratedDefendantTask

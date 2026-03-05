@@ -13,8 +13,8 @@ class InitiateCoscDashboardTaskContributorTest {
     void shouldExposeTaskIdAndTasks() {
         InitiateCoscDefendantDashboardTask defendantTask = mock(InitiateCoscDefendantDashboardTask.class);
         InitiateCoscClaimantDashboardTask claimantTask = mock(InitiateCoscClaimantDashboardTask.class);
-        CertificateGeneratedDefendantDashboardTask certificateGeneratedDefendantTask =
-            mock(CertificateGeneratedDefendantDashboardTask.class);
+        InitiateCoscCertificateGeneratedDefendantDashboardTask certificateGeneratedDefendantTask =
+            mock(InitiateCoscCertificateGeneratedDefendantDashboardTask.class);
 
         DashboardTaskContribution contribution = new InitiateCoscDashboardTaskContributor(
             claimantTask,
