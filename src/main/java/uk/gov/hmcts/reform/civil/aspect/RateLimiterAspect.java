@@ -53,7 +53,14 @@ public class RateLimiterAspect {
         // Get the current request and extract client IP
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
-        String ipAddress = request.getRemoteAddr();
+
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        } else {
+            // In case of multiple IPs, the first one is the client
+            ipAddress = ipAddress.split(",")[0];
+        }
 
         // Register this endpoint for rate limit tracking
         String requestURI = request.getRequestURI();
