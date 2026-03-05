@@ -67,7 +67,7 @@ class SdoPrePopulateServiceTest {
             new SdoDisposalNarrativeService(deadlineService)
         );
         SdoFastTrackSpecialistDirectionsService fastTrackSpecialistDirectionsService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
         SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService =
             new SdoFastTrackOrderDefaultsService(fastTrackNarrativeService, fastTrackSpecialistDirectionsService);
@@ -205,10 +205,9 @@ class SdoPrePopulateServiceTest {
     }
 
     private DirectionsOrderTaskContext buildContext(CaseData caseData) {
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, AUTH_TOKEN));
         return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
     }
 

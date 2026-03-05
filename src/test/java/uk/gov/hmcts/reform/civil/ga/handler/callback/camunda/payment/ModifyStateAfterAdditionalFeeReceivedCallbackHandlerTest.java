@@ -110,8 +110,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
 
     private final List<MakeAppAvailableCheckGAspec> makeAppAvailableCheck = List.of(MakeAppAvailableCheckGAspec.CONSENT_AGREEMENT_CHECKBOX);
 
-    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = GAMakeApplicationAvailableCheck.builder()
-        .makeAppAvailableCheck(makeAppAvailableCheck).build();
+    private final GAMakeApplicationAvailableCheck gaMakeApplicationAvailableCheck = new GAMakeApplicationAvailableCheck()
+        .setMakeAppAvailableCheck(makeAppAvailableCheck);
 
     @Test
     void shouldRespondWithStateChanged() {
@@ -150,8 +150,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(YesOrNo.NO)
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                           .email("test@gmail.com").organisationIdentifier("org1").build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(NO)
             .isGaRespondentTwoLip(NO)
@@ -178,8 +178,8 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     void shouldNotRespondWithStateChangedWhenApplicationUncloaked() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION))
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
@@ -202,7 +202,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldDispatchBusinessProcess_whenStatusIsReady() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder().parentCaseReference("1234").build();
+        caseData = caseData.copy().parentCaseReference("1234").build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
             .thenReturn(AWAITING_RESPONDENT_RESPONSE);
         when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
@@ -220,7 +220,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListActionNeeded_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -266,7 +266,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListInProgress_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -312,7 +312,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateTaskListAvailable_whenInvoked() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
                                               .value(GeneralApplicationsDetails.builder()
@@ -356,6 +356,110 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     }
 
     @Test
+    void shouldUpdateTaskListActionNeeded_whenParentClaimantIsApplicantNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.copy()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
+                                              .value(GeneralApplicationsDetails.builder()
+                                                         .parentClaimantIsApplicant(NO)
+                                                         .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
+                                                         .build())
+                                              .build()))
+            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
+                                                   .value(GADetailsRespondentSol.builder()
+                                                              .parentClaimantIsApplicant(NO)
+                                                              .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
+                                                              .build())
+                                                   .build()))
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldUpdateTaskListInProgress_whenParentClaimantIsApplicantNo() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.copy()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
+                                              .value(GeneralApplicationsDetails.builder()
+                                                         .parentClaimantIsApplicant(NO)
+                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
+                                                         .build())
+                                              .build()))
+            .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
+                                                   .value(GADetailsRespondentSol.builder()
+                                                              .parentClaimantIsApplicant(NO)
+                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
+                                                              .build())
+                                                   .build()))
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_IN_PROGRESS_DEFENDANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
+    }
+
+    @Test
+    void shouldNotUpdateTaskList_whenGaDetailsAreNull() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.copy()
+            .parentCaseReference("1234")
+            .claimantGaAppDetails(null)
+            .respondentSolGaAppDetails(null)
+            .build();
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        handler.handle(params);
+
+        verify(dashboardApiClient, times(0)).recordScenario(any(), any(), any(), any());
+    }
+
+    @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
         assertThat(handler.handledEvents()).contains(MODIFY_STATE_AFTER_ADDITIONAL_FEE_PAID);
     }
@@ -373,7 +477,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .parentClaimantIsApplicant(YES)
             .isGaApplicantLip(NO)
             .ccdCaseReference(CCD_CASE_REFERENCE).build()
-            .toBuilder().parentCaseReference("1234").build();
+            .copy().parentCaseReference("1234").build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -396,7 +500,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidPartialRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -406,7 +510,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isGaApplicantLip(YES)
             .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                                           .setHwfFullRemissionGrantedForAdditionalFee(NO))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(PARTIAL_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(PARTIAL_REMISSION_HWF_GA))
             .generalAppHelpWithFees(
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -440,7 +544,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidNoRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -448,7 +552,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
             .isGaRespondentOneLip(NO)
             .isGaApplicantLip(YES)
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
             .generalAppHelpWithFees(
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
@@ -482,7 +586,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidThroughWhenHwfIsRejected() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -494,7 +598,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
                     .setHelpWithFee(YES))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(NO_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(NO_REMISSION_HWF_GA))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -518,7 +622,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldUpdateClaimantTaskListIfGaApplicantLipAndFeeIsPaidFullRemission() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isMultiParty(NO)
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -532,7 +636,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                 new HelpWithFees()
                     .setHelpWithFeesReferenceNumber("ABC-DEF-IJK")
                     .setHelpWithFee(YES))
-            .additionalHwfDetails(HelpWithFeesDetails.builder().hwfCaseEvent(FULL_REMISSION_HWF_GA).build())
+            .additionalHwfDetails(new HelpWithFeesDetails().setHwfCaseEvent(FULL_REMISSION_HWF_GA))
             .ccdCaseReference(CCD_CASE_REFERENCE).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -583,10 +687,10 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(NO)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(
-                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
-            .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(
+                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
+            .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build()).build();
 
@@ -615,10 +719,10 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
             .isMultiParty(NO)
             .isGaApplicantLip(YES)
             .isGaRespondentOneLip(YES)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(
-                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build())
-            .ccdCaseReference(CCD_CASE_REFERENCE).build().toBuilder()
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(
+                                                     GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
+            .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).build();
 
@@ -643,11 +747,11 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldNotUpdateApplication_whenPaymentFailed() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(PaymentStatus.FAILED).build()).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)))
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -660,11 +764,11 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
     @Test
     void shouldNotUpdateParent_whenPaymentFailed() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .parentCaseReference("1234")
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .additionalPaymentDetails(PaymentDetails.builder()
-                                                                    .status(PaymentStatus.FAILED).build()).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setAdditionalPaymentDetails(new PaymentDetails()
+                                                                    .setStatus(PaymentStatus.FAILED)))
             .build();
         when(gaForLipService.isLipApp(caseData)).thenReturn(true);
         CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
@@ -673,6 +777,77 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
 
         verifyNoInteractions(parentCaseUpdateHelper);
         verifyNoInteractions(dashboardApiClient);
+    }
+
+    @Test
+    void shouldProceedWhenPaymentFailedButNotLip() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
+            .isMultiParty(YesOrNo.NO)
+            .generalAppRespondentSolicitors(getRespondentSolicitors())
+            .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
+                .email("test@gmail.com").organisationIdentifier("org1").build())
+            .makeAppVisibleToRespondents(gaMakeApplicationAvailableCheck)
+            .ccdCaseReference(CCD_CASE_REFERENCE)
+            .build();
+        caseData = caseData.copy()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                .setAdditionalPaymentDetails(new PaymentDetails().setStatus(PaymentStatus.FAILED)))
+            .build();
+
+        when(gaForLipService.isLipApp(caseData)).thenReturn(false);
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+
+        CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getErrors()).isNull();
+        assertThat(response.getState()).isEqualTo(AWAITING_RESPONDENT_RESPONSE.toString());
+        verify(assignCaseToRespondentSolHelper, times(1)).assignCaseToRespondentSolicitor(any(), any());
+    }
+
+    @Test
+    void shouldPreferActionNeededOverInProgress_whenBothPresent() {
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        caseData = caseData.copy()
+            .parentCaseReference("1234")
+            .build();
+
+        // Parent case data with both Action Needed and In Progress for the claimant
+        GeneralApplicationCaseData parentCaseData = GeneralApplicationCaseDataBuilder.builder().ccdCaseReference(CCD_CASE_REFERENCE).build();
+        parentCaseData = parentCaseData.copy()
+            .claimantGaAppDetails(List.of(
+                Element.<GeneralApplicationsDetails>builder().value(
+                    GeneralApplicationsDetails.builder()
+                        .parentClaimantIsApplicant(YES)
+                        .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()) // Action needed
+                        .build()).build(),
+                Element.<GeneralApplicationsDetails>builder().value(
+                    GeneralApplicationsDetails.builder()
+                        .parentClaimantIsApplicant(YES)
+                        .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()) // In progress
+                        .build()).build()
+            ))
+            .respondentSolGaAppDetails(null)
+            .build();
+
+        when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
+            .thenReturn(AWAITING_RESPONDENT_RESPONSE);
+        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(parentCaseData);
+        when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
+
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+        HashMap<String, Object> scenarioParams = new HashMap<>();
+
+        handler.handle(params);
+
+        verify(dashboardApiClient).recordScenario(
+            caseData.getParentCaseReference(),
+            SCENARIO_AAA6_GENERAL_APPLICATION_ACTION_NEEDED_CLAIMANT.getScenario(),
+            "BEARER_TOKEN",
+            ScenarioRequestParams.builder().params(scenarioParams).build()
+        );
     }
 
     public List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {

@@ -51,7 +51,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -61,7 +61,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
         @Test
         void shouldRecordApplicationSubmittedScenarioWhenFreeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
@@ -88,7 +88,7 @@ public class ApplicationIssuedRespondentDashboardNotificationHandlerTest extends
         @Test
         void shouldNotRecordApplicationSubmittedScenarioWhenNotFreeApplication() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)

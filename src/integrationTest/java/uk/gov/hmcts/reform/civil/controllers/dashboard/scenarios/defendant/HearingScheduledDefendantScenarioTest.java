@@ -33,7 +33,7 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
     void should_create_hearing_scheduled_scenario() throws Exception {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 
@@ -49,9 +49,8 @@ public class HearingScheduledDefendantScenarioTest extends DashboardBaseIntegrat
             .hearingLocation(list).build();
 
         CallbackParams callbackParams = callbackParams(caseData);
-        callbackParams = callbackParams.toBuilder().request(CallbackRequest.builder()
-                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT")
-                                                                .build()).build();
+        callbackParams = callbackParams.copy().request(CallbackRequest.builder()
+                                                                .eventId("CREATE_DASHBOARD_NOTIFICATION_HEARING_SCHEDULED_DEFENDANT").build());
 
         // When
         handler.handle(callbackParams);

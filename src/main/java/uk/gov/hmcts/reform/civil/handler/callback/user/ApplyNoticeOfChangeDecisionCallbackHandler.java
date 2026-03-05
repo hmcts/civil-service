@@ -125,7 +125,7 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
         ChangeOrganisationRequest preDecisionCor) {
         ChangeOrganisationRequest request = new ChangeOrganisationRequest();
         request.setCreatedBy(preDecisionCor.getCreatedBy());
-        request.setOrganisationToAdd(Organisation.builder().organisationID(ORG_ID_FOR_AUTO_APPROVAL).build());
+        request.setOrganisationToAdd(new Organisation().setOrganisationID(ORG_ID_FOR_AUTO_APPROVAL));
         caseData.setChangeOrganisationRequestField(request);
 
     }
@@ -160,14 +160,10 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
             updatedRequest.setCaseRoleId(caseRoleId);
             updatedRequest.setRequestTimestamp(changeOrganisationRequestField.getRequestTimestamp());
             if (orgIdCopyIfExists == null) {
-                updatedRequest.setOrganisationToRemove(Organisation.builder()
-                    .organisationID(null)
-                    .build());
+                updatedRequest.setOrganisationToRemove(new Organisation().setOrganisationID(null));
                 caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, updatedRequest);
             } else {
-                updatedRequest.setOrganisationToRemove(Organisation.builder()
-                    .organisationID(orgIdCopyIfExists)
-                    .build());
+                updatedRequest.setOrganisationToRemove(new Organisation().setOrganisationID(orgIdCopyIfExists));
                 caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST, updatedRequest);
             }
         }

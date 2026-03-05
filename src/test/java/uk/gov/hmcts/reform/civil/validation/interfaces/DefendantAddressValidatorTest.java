@@ -37,9 +37,8 @@ public class DefendantAddressValidatorTest {
     @Test
     void doNothing_whenAddressCorrect() {
         CaseData caseData = CaseData.builder().build();
-        CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData);
 
         AboutToStartOrSubmitCallbackResponse response = validator
             .validateCorrespondenceApplicantAddress(
@@ -60,9 +59,8 @@ public class DefendantAddressValidatorTest {
             .specAoSApplicantCorrespondenceAddressRequired(YesOrNo.NO)
             .specAoSApplicantCorrespondenceAddressdetails(address)
             .build();
-        CallbackParams params = CallbackParams.builder()
-            .caseData(caseData)
-            .build();
+        CallbackParams params = new CallbackParams()
+            .caseData(caseData);
 
         List<String> errors = List.of("error 1");
         Mockito.when(postcodeValidator.validate("postcode"))

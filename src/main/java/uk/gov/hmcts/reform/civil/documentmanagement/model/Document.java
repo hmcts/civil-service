@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -16,7 +15,6 @@ import java.time.format.DateTimeFormatter;
 
 @Accessors(chain = true)
 @Data
-@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
@@ -52,14 +50,13 @@ public class Document {
 
     @JsonIgnore
     public static Document toDocument(Document document, DocumentType documentType) {
-        return Document.builder()
-            .documentUrl(document.getDocumentUrl())
-            .documentBinaryUrl(document.getDocumentBinaryUrl())
-            .documentFileName(getDocumentName(documentType, document.getDocumentFileName()))
-            .documentHash(document.getDocumentHash())
-            .categoryID(document.getCategoryID())
-            .uploadTimestamp(document.getUploadTimestamp())
-            .build();
+        return new Document()
+            .setDocumentUrl(document.getDocumentUrl())
+            .setDocumentBinaryUrl(document.getDocumentBinaryUrl())
+            .setDocumentFileName(getDocumentName(documentType, document.getDocumentFileName()))
+            .setDocumentHash(document.getDocumentHash())
+            .setCategoryID(document.getCategoryID())
+            .setUploadTimestamp(document.getUploadTimestamp());
     }
 
     public static String getDocumentName(DocumentType documentType, String documentFileName) {

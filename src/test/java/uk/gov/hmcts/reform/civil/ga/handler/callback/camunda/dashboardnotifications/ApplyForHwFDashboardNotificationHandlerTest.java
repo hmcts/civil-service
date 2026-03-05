@@ -56,7 +56,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -73,7 +73,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
         @Test
         void shouldRecordApplicantScenario_ApplyForHwF_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-234-456"))
@@ -106,7 +106,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest extends GeneralApplicat
         @Test
         void shouldRecordApplicantScenario_ApplyForHwFAdditionalApplicationFee_whenInvoked() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
                                     .build())
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)

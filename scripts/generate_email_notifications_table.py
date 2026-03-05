@@ -1315,19 +1315,19 @@ def format_templates_html(entries: List[Dict[str, str]], notify_service_id: Opti
     parts = []
     for entry in entries:
         if entry.get('link'):
-            link = f"<a href='{entry['link']}'><code>{html.escape(entry['label'])}</code></a>"
+            link = f"<a class='template-link' href='{entry['link']}'><code>{html.escape(entry['label'])}</code></a>"
         elif entry.get('gov_id'):
             label = html.escape(entry['label'])
             if notify_service_id:
                 link = (
-                    f"<a href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
+                    f"<a class='template-link' href='https://www.notifications.service.gov.uk/services/{notify_service_id}/templates/"
                     f"{html.escape(entry['gov_id'])}'>{label}</a>"
                 )
             else:
                 link = f"<code>{label}</code>"
         elif entry.get('path'):
             viewer_url = f"{TEMPLATE_VIEWER_PATH}?path={html.escape(entry['path'])}"
-            link = f"<a href='{viewer_url}'><code>{html.escape(entry['label'])}</code></a>"
+            link = f"<a class='template-link' href='{viewer_url}'><code>{html.escape(entry['label'])}</code></a>"
         else:
             link = f"<code>{html.escape(entry['label'])}</code>"
         preview = entry.get('content')
@@ -1501,6 +1501,8 @@ def render_combined_html(rows: List[Dict[str, object]], notify_service_id: Optio
         "    h1 { margin-bottom: 0.25rem; }",
         "    details { margin-top: 0.25rem; }",
         "    details pre { background: #f8f8f8; padding: 0.5rem; overflow-x: auto; }",
+        "    .template-link { display: inline-block; border-radius: 4px; padding: 0 0.15rem; transition: background-color 120ms ease-in-out, box-shadow 120ms ease-in-out; }",
+        "    .template-link:hover, .template-link:focus-visible { background: #fff3bf; box-shadow: 0 0 0 2px #ffe066; text-decoration: none; outline: none; }",
         "  </style>",
         "</head>",
         "<body>",

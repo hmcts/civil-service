@@ -51,7 +51,7 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
                 .toBuilder()
                 .legacyCaseReference(LEGACY_REFERENCE)
                 .claimantUserDetails(
-                        IdamUserDetails.builder().email(EMAIL).build()
+                        new IdamUserDetails().setEmail(EMAIL)
                 )
                 .applicant1(
                         Party.builder()

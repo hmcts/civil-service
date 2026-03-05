@@ -1,17 +1,16 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.civil.config.GeneralAppFeesConfiguration;
 import uk.gov.hmcts.reform.civil.ga.config.GeneralAppLRDConfiguration;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
@@ -28,7 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 
-@SpringBootTest(classes = {GeneralAppFeesConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class GeneralAppLocationRefDataServiceTest {
 
     @Captor
@@ -51,12 +50,6 @@ class GeneralAppLocationRefDataServiceTest {
 
     @InjectMocks
     private GeneralAppLocationRefDataService refDataService;
-
-    @BeforeEach
-    void setUp() {
-        when(lrdConfiguration.getUrl()).thenReturn("dummy_url");
-        when(lrdConfiguration.getEndpoint()).thenReturn("/fees-register/fees/lookup");
-    }
 
     private List<LocationRefData> getAllLocationsRefDataResponse() {
         List<LocationRefData> responseData = new ArrayList<LocationRefData>();
@@ -191,8 +184,8 @@ class GeneralAppLocationRefDataServiceTest {
     }
 
     private LocationRefData getLocationRefData(String siteName, String region, String postcode, String courtAddress) {
-        return LocationRefData.builder().siteName(siteName).region(region)
-            .postcode(postcode).courtAddress(courtAddress).build();
+        return new LocationRefData().setSiteName(siteName).setRegion(region)
+            .setPostcode(postcode).setCourtAddress(courtAddress);
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {

@@ -110,10 +110,11 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                                  .partyName("Test2")
                                  .individualLastName("Test2 Lastname")
                                  .individualFirstName("Test2 Firstname").build())
-                .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                            .organisationID(ORG_NAME_RESPONDENT1).build()).build()).build();
+                .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation()
+                        .setOrganisationID(ORG_NAME_RESPONDENT1))).build();
 
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT1).build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME_RESPONDENT1)));
 
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT1_FOR_RECORD_JUDGMENT.name()).build()
@@ -148,9 +149,9 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
                                  .partyName("Test2")
                                  .individualLastName("Test2 Lastname")
                                  .individualFirstName("Test2 Firstname").build())
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                             .organisationID(ORG_NAME_RESPONDENT2).build()).build()).build();
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME_RESPONDENT2).build()));
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME_RESPONDENT2))).build();
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME_RESPONDENT2)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(

@@ -60,10 +60,10 @@ class JudicialRefDataServiceTest {
     @Test
     void shouldReturnLocations_whenLRDReturnsAllLocations() {
         List<JudgeRefData> judgeRefData = Arrays.asList(
-            JudgeRefData.builder().title("Mr").surname("Murphy").emailId("mr.murphy@email.com").build(),
-            JudgeRefData.builder().title("Mr").surname("McGee").emailId("mr.mcgee@email.com").build(),
-            JudgeRefData.builder().title("Mr").surname("Brad").emailId("mr.brad@email.com").build(),
-            JudgeRefData.builder().title("Mrs").surname("Lee").emailId("mrs.lee@email.com").build()
+            new JudgeRefData().setTitle("Mr").setSurname("Murphy").setEmailId("mr.murphy@email.com"),
+            new JudgeRefData().setTitle("Mr").setSurname("McGee").setEmailId("mr.mcgee@email.com"),
+            new JudgeRefData().setTitle("Mr").setSurname("Brad").setEmailId("mr.brad@email.com"),
+            new JudgeRefData().setTitle("Mrs").setSurname("Lee").setEmailId("mrs.lee@email.com")
         );
 
         when(authTokenGenerator.generate()).thenReturn("service_token");
@@ -98,6 +98,6 @@ class JudicialRefDataServiceTest {
     }
 
     private JudgeRefData getJudicialRefData(String title, String surname, String emailId) {
-        return JudgeRefData.builder().title(title).surname(surname).emailId(emailId).build();
+        return new JudgeRefData().setTitle(title).setSurname(surname).setEmailId(emailId);
     }
 }

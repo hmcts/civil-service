@@ -175,8 +175,7 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
             .applicant1Represented(YesOrNo.NO)
             .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
                              .type(Party.Type.INDIVIDUAL).build())
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(reason)).build())
+            .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(List.of(reason)))
             .build();
         return caseData;
     }

@@ -1,0 +1,14 @@
+{
+  "name": "PRD - Get Organisation by User ID",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/refdata/internal/v1/organisations/orgDetails/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "organisationByUserIdResponse.json"
+  }
+}

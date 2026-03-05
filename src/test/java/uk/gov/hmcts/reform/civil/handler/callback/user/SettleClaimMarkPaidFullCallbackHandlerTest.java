@@ -174,10 +174,9 @@ class SettleClaimMarkPaidFullCallbackHandlerTest extends BaseCallbackHandlerTest
             dynamicList.setValue(dynamicListElement);
             caseData.setClaimantWhoIsSettling(dynamicList);
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             //When
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);

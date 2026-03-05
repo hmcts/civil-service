@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -131,8 +132,10 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlFieldsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlOrderService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoOrderDetailsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoPrePopulateService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsNarrativeService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsOrderDefaultsService;
+import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSubmissionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoTrackDefaultsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoValidationService;
@@ -215,6 +218,7 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MESSAGE_NUMBER_CANNOT_BE_LESS_THAN_ZERO;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.ERROR_MINTI_DISPOSAL_NOT_ALLOWED;
 
+@TestPropertySource(properties = "other_remedy.enabled=false")
 @SpringBootTest(classes = {
     CreateSDOCallbackHandler.class,
     JacksonAutoConfiguration.class,
@@ -241,6 +245,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackH
     SdoFastTrackSpecialistDirectionsService.class,
     SdoSmallClaimsOrderDefaultsService.class,
     SdoSmallClaimsNarrativeService.class,
+    SdoSmallClaimsDirectionsService.class,
+    SdoFastTrackDirectionsService.class,
     SdoExpertEvidenceFieldsService.class,
     SdoDisclosureOfDocumentsFieldsService.class,
     SdoJudgementDeductionService.class,
@@ -412,6 +418,56 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .caseAccessCategory(UNSPEC_CLAIM)
+                .build();
+
+            CallbackParams params = callbackParamsOf(CallbackVersion.V_1, caseData, ABOUT_TO_START);
+            CaseDocument order = createCaseDocument();
+            when(sdoGeneratorService.generate(any(), any())).thenReturn(order);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            CaseData responseCaseData = objectMapper.convertValue(response.getData(), CaseData.class);
+
+            DynamicList expected = createStandardCourtList(preSelectedCourt);
+
+            assertThat(responseCaseData.getDisposalHearingMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getFastTrackMethodInPerson()).isEqualTo(expected);
+            assertThat(responseCaseData.getSmallClaimsMethodInPerson()).isEqualTo(expected);
+        }
+
+        @Test
+        void shouldPopulateLocationListsWhenTransferredOnlineHearingLocationShouldBeNewCaseManagementLocation() {
+            Category category = new Category();
+            category.setCategoryKey("HearingChannel");
+            category.setKey("INTER");
+            category.setValueEn("In Person");
+            category.setActiveFlag("Y");
+
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(category));
+            String preSelectedCourt = "214320";
+            List<LocationRefData> locations = List.of(
+                locationRefData("00001", "00001", "court 1", "1 address", "Y01 7RB"),
+                locationRefData(preSelectedCourt, preSelectedCourt, "court 2", "2 address", "Y02 7RB"),
+                locationRefData("00003", "00003", "court 3", "3 address", "Y03 7RB")
+            );
+            when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
+            when(categoryService.findCategoryByCategoryIdAndServiceId(any(), any(), any())).thenReturn(Optional.of(
+                categorySearchResult));
+
+            CaseLocationCivil civil = new CaseLocationCivil();
+            civil.setRegion("1");
+            civil.setBaseLocation("214320");
+
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
+                .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
+                .reasonForTransfer("Court Closed")
+                .transferCourtLocationList(DynamicList.builder()
+                                               .value(DynamicListElement.builder()
+                                                          .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                                                          .label("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
+                                                          .build()).build())
+                .caseManagementLocation(civil)
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();
 
@@ -1165,7 +1221,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData.setClaimsTrack(ClaimsTrack.smallClaimsTrack);
             caseData.setDrawDirectionsOrderRequired(NO);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(
-                params.toBuilder().caseData(caseData).build()
+                params.copy().caseData(caseData)
             );
 
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);

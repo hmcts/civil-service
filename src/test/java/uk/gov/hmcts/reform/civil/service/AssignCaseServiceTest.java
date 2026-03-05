@@ -28,10 +28,8 @@ public class AssignCaseServiceTest {
     private static final String UID = "abra-abra-cadabra";
     private static final String ORG_ID = "org_id";
     private static final UserInfo USER_INFO = UserInfo.builder().uid(UID).build();
-    private static final Organisation ORGANISATION = Organisation
-        .builder()
-        .organisationIdentifier(ORG_ID)
-        .build();
+    private static final Organisation ORGANISATION = new Organisation()
+        .setOrganisationIdentifier(ORG_ID);
 
     @Mock
     private CoreCaseUserService coreCaseUserService;

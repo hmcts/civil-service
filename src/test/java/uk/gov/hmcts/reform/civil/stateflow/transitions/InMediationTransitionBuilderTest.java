@@ -98,7 +98,7 @@ public class InMediationTransitionBuilderTest {
             .atStateMediationUnsuccessful(MultiPartyScenario.ONE_V_ONE)
             .takenOfflineByStaff()
             .build().toBuilder()
-            .mediation(Mediation.builder().build())
+            .mediation(new Mediation())
             .build();
 
         assertTrue(TakenOfflinePredicate.byStaff.and(MediationPredicate.beforeUnsuccessful).test(caseData));

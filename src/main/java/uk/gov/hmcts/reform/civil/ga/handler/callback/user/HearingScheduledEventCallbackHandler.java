@@ -64,7 +64,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
 
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         DynamicList dynamicLocationList = getLocationsFromList(locationRefDataService.getCourtLocations(authToken));
@@ -78,8 +78,8 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
                 .filter(l -> l.getLabel().equals(preLabel)).findFirst();
             first.ifPresent(dynamicLocationList::setValue);
         }
-        caseDataBuilder.gaHearingNoticeDetail(GAHearingNoticeDetail
-                                                  .builder().hearingLocation(dynamicLocationList).build());
+        caseDataBuilder.gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                                  .setHearingLocation(dynamicLocationList));
 
         if (caseData.getCcdState().equals(CaseState.ORDER_MADE)) {
             caseDataBuilder.gaHearingNoticeApplication(null)
@@ -102,7 +102,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
         List<String> errors = new ArrayList<>();
         LocalDateTime hearingDateTime = null;
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         LocalDate date = caseData.getGaHearingNoticeDetail().getHearingDate();
         String hourMinute = caseData.getGaHearingNoticeDetail().getHearingTimeHourMinute();
         if (hourMinute != null) {
@@ -139,7 +139,7 @@ public class HearingScheduledEventCallbackHandler extends CallbackHandler implem
         if (nonNull(caseData.getGaHearingNoticeDetail().getHearingLocation())) {
             caseData.getGaHearingNoticeDetail().getHearingLocation().setListItems(null);
         }
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData dataBuilder = caseData.copy();
         dataBuilder.businessProcess(BusinessProcess.readyGa(HEARING_SCHEDULED_GA)).build();
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(dataBuilder.build().toMap(objectMapper))
