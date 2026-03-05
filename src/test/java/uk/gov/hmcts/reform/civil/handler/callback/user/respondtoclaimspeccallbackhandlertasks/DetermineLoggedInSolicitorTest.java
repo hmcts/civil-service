@@ -45,10 +45,9 @@ class DetermineLoggedInSolicitorTest {
         determineLoggedInSolicitor = new DetermineLoggedInSolicitor(userService, coreCaseUserService, objectMapper);
         CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1234L).build();
         UserInfo userInfo = UserInfo.builder().uid("userId").build();
-        callbackParams = CallbackParams.builder()
+        callbackParams = new CallbackParams()
                 .caseData(caseData)
-                .params(Map.of(BEARER_TOKEN, "token"))
-                .build();
+                .params(Map.of(BEARER_TOKEN, "token"));
         when(userService.getUserInfo(any())).thenReturn(userInfo);
     }
 
@@ -147,9 +146,8 @@ class DetermineLoggedInSolicitorTest {
     }
 
     private CallbackParams buildCallbackParams(CaseData caseData) {
-        return CallbackParams.builder()
+        return new CallbackParams()
                 .caseData(caseData)
-                .params(Map.of(BEARER_TOKEN, "token"))
-                .build();
+                .params(Map.of(BEARER_TOKEN, "token"));
     }
 }

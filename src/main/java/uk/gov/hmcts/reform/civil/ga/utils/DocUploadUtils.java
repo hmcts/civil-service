@@ -32,7 +32,7 @@ public class DocUploadUtils {
 
     }
 
-    public static void addUploadDocumentByTypeToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addUploadDocumentByTypeToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                                      List<Element<UploadDocumentByType>> source, String role,
                                                      boolean updateScheduler) {
         caseDataBuilder.isDocumentVisible(DocUploadUtils.isDocumentVisible(caseData));
@@ -43,19 +43,26 @@ public class DocUploadUtils {
     public static List<Element<CaseDocument>> prepareUploadDocumentByType(List<Element<UploadDocumentByType>> source,
                                                                           final String role) {
         return source.stream()
-            .map(uploadDocumentByTypeElement -> ElementUtils.element(CaseDocument.builder()
-                                                                         .documentLink(uploadDocumentByTypeElement.getValue()
-                                                                                           .getAdditionalDocument().toBuilder().categoryID(
-                                                                                 AssignCategoryId.APPLICATIONS)
-                                                                                           .build())
-                                                                         .documentName(uploadDocumentByTypeElement.getValue().getDocumentType())
-                                                                         .createdBy(role)
-                                                                         .createdDatetime(LocalDateTime.now(ZoneId.of(
-                                                                             "Europe/London"))).build()))
+            .map(uploadDocumentByTypeElement -> {
+                Document additionalDocument = uploadDocumentByTypeElement.getValue().getAdditionalDocument();
+                Document documentLink = new Document()
+                    .setDocumentUrl(additionalDocument.getDocumentUrl())
+                    .setDocumentBinaryUrl(additionalDocument.getDocumentBinaryUrl())
+                    .setDocumentFileName(additionalDocument.getDocumentFileName())
+                    .setDocumentHash(additionalDocument.getDocumentHash())
+                    .setCategoryID(AssignCategoryId.APPLICATIONS)
+                    .setUploadTimestamp(additionalDocument.getUploadTimestamp());
+                CaseDocument caseDocument = new CaseDocument()
+                    .setDocumentLink(documentLink)
+                    .setDocumentName(uploadDocumentByTypeElement.getValue().getDocumentType())
+                    .setCreatedBy(role)
+                    .setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+                return ElementUtils.element(caseDocument);
+            })
             .toList();
     }
 
-    public static void addDocumentToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addDocumentToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                          List<Element<Document>> source, String role, CaseEvent event,
                                          boolean updateScheduler) {
         if (Objects.isNull(source) || source.isEmpty()) {
@@ -66,7 +73,7 @@ public class DocUploadUtils {
         addToAddl(caseData, caseDataBuilder, docs, role, updateScheduler);
     }
 
-    public static void addToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addToAddl(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                  List<Element<CaseDocument>> tobeAdded, String role,
                                  boolean updateScheduler) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
@@ -89,7 +96,7 @@ public class DocUploadUtils {
         caseDataBuilder.gaAddlDocStaff(addDocuments(tobeAdded, caseData.getGaAddlDocStaff()));
     }
 
-    public static void addDocumentToPreTranslation(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    public static void addDocumentToPreTranslation(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                                    List<Element<Document>> source, String role, CaseEvent event) {
         if (Objects.isNull(source) || source.isEmpty()) {
             return;
@@ -164,13 +171,23 @@ public class DocUploadUtils {
         DocumentType documentType = getDocumentType(event);
         String documentName = getDocumentName(event);
         return source.stream()
-            .map(doc -> ElementUtils.element(CaseDocument.builder()
-                                                 .documentLink(doc.getValue().toBuilder()
-                                                                   .categoryID(AssignCategoryId.APPLICATIONS).build())
-                                                 .documentName(documentName)
-                                                 .documentType(documentType)
-                                                 .createdBy(role)
-                                                 .createdDatetime(LocalDateTime.now(ZoneId.of("Europe/London"))).build()))
+            .map(doc -> {
+                Document value = doc.getValue();
+                Document documentLink = new Document()
+                    .setDocumentUrl(value.getDocumentUrl())
+                    .setDocumentBinaryUrl(value.getDocumentBinaryUrl())
+                    .setDocumentFileName(value.getDocumentFileName())
+                    .setDocumentHash(value.getDocumentHash())
+                    .setCategoryID(AssignCategoryId.APPLICATIONS)
+                    .setUploadTimestamp(value.getUploadTimestamp());
+                CaseDocument caseDocument = new CaseDocument()
+                    .setDocumentLink(documentLink)
+                    .setDocumentName(documentName)
+                    .setDocumentType(documentType)
+                    .setCreatedBy(role)
+                    .setCreatedDatetime(LocalDateTime.now(ZoneId.of("Europe/London")));
+                return ElementUtils.element(caseDocument);
+            })
             .toList();
     }
 
@@ -208,7 +225,7 @@ public class DocUploadUtils {
         return Objects.nonNull(caseData.getIsGaRespondentOneLip()) && caseData.getIsGaRespondentOneLip().equals(YES);
     }
 
-    public static void setRespondedValues(GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder, String role) {
+    public static void setRespondedValues(GeneralApplicationCaseData caseDataBuilder, String role) {
         if (role.equals(DocUploadUtils.APPLICANT)) {
             caseDataBuilder.isApplicantResponded(YES);
             caseDataBuilder.isRespondentResponded(null);

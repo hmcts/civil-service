@@ -67,14 +67,16 @@ class SdoCoverLetterAppendServiceTest {
         .setParty(partyDetails)
         .setClaimReferenceNumber("MC0001");
 
-    private static final CaseDocument caseDocument = CaseDocument.builder()
-        .documentType(SDO_ORDER)
-        .documentSize(5L)
-        .documentName("DocumentName.pdf")
-        .createdBy("CIVIL")
-        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
-        .documentLink(Document.builder().documentFileName("DocumentName.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
-        .build();
+    private static final CaseDocument caseDocument = new CaseDocument()
+        .setDocumentType(SDO_ORDER)
+        .setDocumentSize(5L)
+        .setDocumentName("DocumentName.pdf")
+        .setCreatedBy("CIVIL")
+        .setCreatedDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
+        .setDocumentLink(new Document().setDocumentFileName("DocumentName.pdf").setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
+    private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
+
+    private List<DocumentMetaData> specClaimTimelineDocuments;
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -83,10 +85,6 @@ class SdoCoverLetterAppendServiceTest {
         address.setPostCode(postCode);
         return address;
     }
-
-    private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
-
-    private List<DocumentMetaData> specClaimTimelineDocuments;
 
     @BeforeEach
     void setup() {
@@ -124,17 +122,15 @@ class SdoCoverLetterAppendServiceTest {
     }
 
     private CaseDocument buildStitchedDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SDO_ORDER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SDO_ORDER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 }

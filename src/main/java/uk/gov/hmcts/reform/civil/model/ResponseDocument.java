@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 
 @Data
-@Builder
 @NoArgsConstructor
 public class ResponseDocument {
 

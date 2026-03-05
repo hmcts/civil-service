@@ -290,7 +290,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void testGetChangedOrgReturnsOrganisationToRemoveId() {
             ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-            request.setOrganisationToRemove(Organisation.builder().organisationID(ORG_ID).build());
+            request.setOrganisationToRemove(new Organisation().setOrganisationID(ORG_ID));
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request))
                 .isEqualTo(ORG_ID);

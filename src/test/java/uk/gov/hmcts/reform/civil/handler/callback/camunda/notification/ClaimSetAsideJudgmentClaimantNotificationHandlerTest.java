@@ -99,7 +99,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
         void shouldNotifyApplicantOnlyOneSolicitor_whenInvoked() {
             when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -108,13 +108,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -147,13 +146,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

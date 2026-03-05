@@ -7,13 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.ga.event.DeleteExpiredResponseRespondentNotificationsEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.ga.service.GaCoreCaseDataService;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.search.DeleteExpiredResponseRespondentNotificationSearchService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 
@@ -24,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class DeleteExpiredResponseRespondentNotificationsHandlerTest {
 
     @Mock
@@ -37,12 +35,6 @@ class DeleteExpiredResponseRespondentNotificationsHandlerTest {
     private DeleteExpiredResponseRespondentNotificationSearchService searchService;
 
     @Mock
-    private CaseDetailsConverter caseDetailsConverter;
-
-    @Mock
-    private GaCoreCaseDataService coreCaseDataService;
-
-    @Mock
     private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
@@ -51,8 +43,6 @@ class DeleteExpiredResponseRespondentNotificationsHandlerTest {
     @BeforeEach
     void init() {
         when(mockTask.getTopicName()).thenReturn("test");
-        when(mockTask.getWorkerId()).thenReturn("worker");
-
     }
 
     @Test
@@ -63,8 +53,6 @@ class DeleteExpiredResponseRespondentNotificationsHandlerTest {
         final CaseDetails caseDetails = CaseDetails.builder().id(caseId).data(data).build();
 
         when(searchService.getApplications()).thenReturn((Set.of(caseDetails)));
-        when(coreCaseDataService.getCase(caseId)).thenReturn(caseDetails);
-        when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
 
         handler.execute(mockTask, externalTaskService);
 

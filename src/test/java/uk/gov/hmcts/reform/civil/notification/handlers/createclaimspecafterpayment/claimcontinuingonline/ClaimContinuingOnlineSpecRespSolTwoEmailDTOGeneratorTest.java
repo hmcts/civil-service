@@ -62,17 +62,13 @@ public class ClaimContinuingOnlineSpecRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .respondent1ResponseDeadline(LocalDateTime.now())
                 .respondent2ResponseDeadline(LocalDateTime.now())
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
-                .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                        .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                .organisationID("org2")
-                                .build())
-                        .build())
+                .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org2")))
                 .build();
 
         Map<String, String> initial = new HashMap<>();

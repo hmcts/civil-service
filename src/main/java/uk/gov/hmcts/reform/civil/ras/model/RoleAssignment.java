@@ -3,23 +3,24 @@ package uk.gov.hmcts.reform.civil.ras.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Data
-@Builder
+@Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 @AllArgsConstructor
 public class RoleAssignment {
 
     private String id;
 
-    @Builder.Default
     private String actorIdType = "IDAM";
 
     private Map<String, Object> attributes;
@@ -34,10 +35,8 @@ public class RoleAssignment {
 
     private ZonedDateTime created;
 
-    @Builder.Default
     private String status = "CREATE_REQUESTED";
 
-    @Builder.Default
     private String classification = "PUBLIC";
 
     private String actorId;

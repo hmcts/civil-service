@@ -74,21 +74,20 @@ class LipDefendantCaseAssignmentServiceTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         Party respondent1 = caseData.getRespondent1()
             .toBuilder().partyEmail(EMAIL).build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         Map<String, Object> data = Map.of("defendantUserDetails", defendantUserDetails,
                                           "respondent1", respondent1);
 
         when(caseDetailsConverter.toCaseData((CaseDetails) any())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,
@@ -126,22 +125,21 @@ class LipDefendantCaseAssignmentServiceTest {
                              .type(Party.Type.INDIVIDUAL)
                              .build())
             .build();
-        IdamUserDetails defendantUserDetails = IdamUserDetails.builder()
-            .id(USER_ID)
-            .email(EMAIL)
-            .build();
+        IdamUserDetails defendantUserDetails = new IdamUserDetails()
+            .setId(USER_ID)
+            .setEmail(EMAIL)
+            ;
         data.put("defendantUserDetails", defendantUserDetails);
         data.put("respondent1", caseData.getRespondent1().toBuilder().partyEmail(EMAIL).build());
         ReflectionTestUtils.setField(lipDefendantCaseAssignmentService, "caseFlagsLoggingEnabled", true);
         Optional<CaseDetails> caseDetails = Optional.of(CaseDetailsBuilder.builder().data(caseData).build());
         when(caseDetailsConverter.toCaseData(caseDetails.get())).thenReturn(caseData);
-        EventSubmissionParams params = EventSubmissionParams.builder()
-            .caseId(CASE_ID)
-            .userId(USER_ID)
-            .authorisation(AUTHORIZATION)
-            .event(ASSIGN_LIP_DEFENDANT)
-            .updates(data)
-            .build();
+        EventSubmissionParams params = new EventSubmissionParams()
+            .setCaseId(CASE_ID)
+            .setUserId(USER_ID)
+            .setAuthorisation(AUTHORIZATION)
+            .setEvent(ASSIGN_LIP_DEFENDANT)
+            .setUpdates(data);
         //When
         lipDefendantCaseAssignmentService.addLipDefendantToCaseDefendantUserDetails(
             AUTHORIZATION,

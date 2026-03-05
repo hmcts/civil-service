@@ -137,9 +137,9 @@ class UpdateWaCourtLocationsServiceTest {
         );
 
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
-            LocationRefData.builder().epimmsId("654321").region("north").regionId("2").siteName("liverpool somewhere").build(),
-            LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
+            new LocationRefData().setEpimmsId("123456").setRegion("south").setRegionId("1").setSiteName("london somewhere"),
+            new LocationRefData().setEpimmsId("654321").setRegion("north").setRegionId("2").setSiteName("liverpool somewhere"),
+            new LocationRefData().setEpimmsId("789654").setRegion("west").setRegionId("3").setSiteName("stoke somewhere")
         );
 
         DmnListingLocations dmnListingLocations = new DmnListingLocations()
@@ -196,9 +196,9 @@ class UpdateWaCourtLocationsServiceTest {
     void shouldThrowError_whenCourtNotFoundInHearingList() {
         when(featureToggleService.isMultiOrIntermediateTrackEnabled(any())).thenReturn(true);
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("xxxxx").region("south").regionId("1").siteName("london somewhere").build(),
-            LocationRefData.builder().epimmsId("yyyyy").region("north").regionId("2").siteName("liverpool somewhere").build(),
-            LocationRefData.builder().epimmsId("zzzzz").region("west").regionId("3").siteName("stoke somewhere").build()
+            new LocationRefData().setEpimmsId("xxxxx").setRegion("south").setRegionId("1").setSiteName("london somewhere"),
+            new LocationRefData().setEpimmsId("yyyyy").setRegion("north").setRegionId("2").setSiteName("liverpool somewhere"),
+            new LocationRefData().setEpimmsId("zzzzz").setRegion("west").setRegionId("3").setSiteName("stoke somewhere")
         );
 
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
@@ -277,9 +277,9 @@ class UpdateWaCourtLocationsServiceTest {
         );
 
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
-            LocationRefData.builder().epimmsId("654321").region("north").regionId("2").siteName("liverpool somewhere").build(),
-            LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
+            new LocationRefData().setEpimmsId("123456").setRegion("south").setRegionId("1").setSiteName("london somewhere"),
+            new LocationRefData().setEpimmsId("654321").setRegion("north").setRegionId("2").setSiteName("liverpool somewhere"),
+            new LocationRefData().setEpimmsId("789654").setRegion("west").setRegionId("3").setSiteName("stoke somewhere")
         );
 
         DmnListingLocations dmnListingLocations = new DmnListingLocations()
@@ -337,9 +337,9 @@ class UpdateWaCourtLocationsServiceTest {
         );
 
         List<LocationRefData> locations = List.of(
-            LocationRefData.builder().epimmsId("123456").region("south").regionId("1").siteName("london somewhere").build(),
-            LocationRefData.builder().epimmsId("654321").region("north").regionId("2").siteName("liverpool somewhere").build(),
-            LocationRefData.builder().epimmsId("789654").region("west").regionId("3").siteName("stoke somewhere").build()
+            new LocationRefData().setEpimmsId("123456").setRegion("south").setRegionId("1").setSiteName("london somewhere"),
+            new LocationRefData().setEpimmsId("654321").setRegion("north").setRegionId("2").setSiteName("liverpool somewhere"),
+            new LocationRefData().setEpimmsId("789654").setRegion("west").setRegionId("3").setSiteName("stoke somewhere")
         );
 
         DmnListingLocations dmnListingLocations = new DmnListingLocations()

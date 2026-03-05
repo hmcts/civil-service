@@ -68,7 +68,7 @@ class NotifyDefendantCaseStayedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
             .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
             .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
             .build();
@@ -115,7 +115,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .build();
         CallbackRequest request = CallbackRequest.builder()
             .eventId(isRespondent1 ? CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name() : CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE.name()).build();
-        CallbackParams params = CallbackParams.builder().request(request).caseData(caseData).build();
+        CallbackParams params = new CallbackParams().request(request).caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

@@ -23,10 +23,14 @@ public class MediationCSVLrvLrService extends MediationCSVService {
 
     @Override
     protected MediationParams getMediationParams(CaseData caseData) {
-        return MediationParams.builder()
-            .applicantOrganisation(organisationService.findOrganisationById(caseData.getApplicantOrganisationId()))
-            .defendantOrganisation(organisationService.findOrganisationById(caseData.getRespondent1OrganisationId()))
-            .caseData(caseData)
-            .build();
+        MediationParams mediationParams = new MediationParams();
+        mediationParams.setApplicantOrganisation(
+            organisationService.findOrganisationById(caseData.getApplicantOrganisationId())
+        );
+        mediationParams.setDefendantOrganisation(
+            organisationService.findOrganisationById(caseData.getRespondent1OrganisationId())
+        );
+        mediationParams.setCaseData(caseData);
+        return mediationParams;
     }
 }

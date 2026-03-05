@@ -37,7 +37,7 @@ variable "custom_alerts_enabled" {
 }
 
 variable "ccd_service_bus_status" {
-  type = string
+  type    = string
   default = "Active"
 }
 

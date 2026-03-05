@@ -64,7 +64,7 @@ public class GaDispatchBusinessProcessCallbackHandler extends CallbackHandler {
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Dispatch business process for caseId: {}", caseData.getCcdCaseReference());
         BusinessProcess businessProcess = caseData.getBusinessProcess();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         if (businessProcess.getStatus() == READY) {
             caseDataBuilder
                 .businessProcess(new BusinessProcess()

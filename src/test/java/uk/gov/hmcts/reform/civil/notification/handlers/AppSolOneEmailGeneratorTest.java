@@ -44,7 +44,7 @@ class AppSolOneEmailGeneratorTest {
     @Test
     void shouldReturnCorrectEmailAddress() {
         CaseData caseData = CaseData.builder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("test@example.com").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("test@example.com"))
             .build();
 
         String emailAddress = emailGenerator.getEmailAddress(caseData);

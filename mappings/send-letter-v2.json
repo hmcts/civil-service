@@ -1,0 +1,21 @@
+{
+  "name": "Send Letter API - v2 (LetterWithPdfsRequest)",
+  "request": {
+    "method": "POST",
+    "urlPath": "/letters",
+    "headers": {
+      "Content-Type": {
+        "contains": "application/vnd.uk.gov.hmcts.letter-service.in.letter.v2+json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "letter_id": "af0e7cd4-c0a4-4c4a-8f7e-1234567890ab"
+    }
+  }
+}

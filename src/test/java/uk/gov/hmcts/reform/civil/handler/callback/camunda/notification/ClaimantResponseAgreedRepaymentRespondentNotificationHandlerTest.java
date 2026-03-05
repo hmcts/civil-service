@@ -157,7 +157,7 @@ class ClaimantResponseAgreedRepaymentRespondentNotificationHandlerTest extends B
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getRespondentSolicitorCcjNotificationTemplate()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("test solicitor").build()));
+                .thenReturn(Optional.of(new Organisation().setName("test solicitor")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()

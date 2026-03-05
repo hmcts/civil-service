@@ -98,7 +98,7 @@ public class GeneralAppFeesService {
     }
 
     public Fee getFeeForGA(GeneralApplicationCaseData caseData) {
-        Fee result = Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE)).build();
+        Fee result = new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(Integer.MAX_VALUE));
         int typeSize = caseData.getGeneralAppType().getTypes().size();
         if (CollectionUtils.containsAny(caseData.getGeneralAppType().getTypes(), VARY_TYPES)) {
             //only minus 1 as VARY_PAYMENT_TERMS_OF_JUDGMENT can't be multi selected

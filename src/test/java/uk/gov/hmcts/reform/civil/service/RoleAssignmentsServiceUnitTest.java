@@ -64,6 +64,11 @@ class RoleAssignmentsServiceUnitTest {
     void shouldDelegateQueryByCaseIdAndRole() {
         RoleAssignmentServiceResponse response = new RoleAssignmentServiceResponse();
         List<String> roles = List.of("judge");
+        QueryRequest expectedQuery = new QueryRequest()
+            .setRoleType(roles)
+            .setRoleName(roles)
+            .setAttributes(Map.of("caseId", List.of(CASE_ID)));
+
         when(roleAssignmentsApi.getRoleAssignments(
             eq(AUTH),
             eq("service-token"),
@@ -72,11 +77,7 @@ class RoleAssignmentsServiceUnitTest {
             eq(null),
             eq("roleName"),
             eq(null),
-            eq(QueryRequest.builder()
-                .roleType(roles)
-                .roleName(roles)
-                .attributes(Map.of("caseId", List.of(CASE_ID)))
-                .build()),
+            eq(expectedQuery),
             eq(true)
         )).thenReturn(response);
 
@@ -85,7 +86,7 @@ class RoleAssignmentsServiceUnitTest {
 
     @Test
     void shouldDelegateAssignmentCreation() {
-        RoleAssignmentRequest request = RoleAssignmentRequest.builder().build();
+        RoleAssignmentRequest request = new RoleAssignmentRequest();
 
         service.assignUserRoles(ACTOR_ID, AUTH, request);
 
@@ -96,6 +97,10 @@ class RoleAssignmentsServiceUnitTest {
     void shouldGetRoleAssignmentsWithLabels() {
         RoleAssignmentServiceResponse response = new RoleAssignmentServiceResponse();
         List<String> roleNames = List.of("judge");
+        QueryRequest expectedQuery = new QueryRequest()
+            .setActorId(List.of(ACTOR_ID))
+            .setRoleName(roleNames);
+
         when(roleAssignmentsApi.getRoleAssignments(
             eq(AUTH),
             eq("service-token"),
@@ -104,7 +109,7 @@ class RoleAssignmentsServiceUnitTest {
             eq(100),
             eq(null),
             eq(null),
-            eq(QueryRequest.builder().actorId(ACTOR_ID).roleName(roleNames).build()),
+            eq(expectedQuery),
             eq(true)
         )).thenReturn(response);
 

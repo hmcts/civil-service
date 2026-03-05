@@ -9,14 +9,13 @@ public class PartyDetailsPopulator {
 
     private static final String PAPER_RESPONSE = "N";
 
-    public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
-                                                                Party party) {
+    public MediationLitigant populator(MediationLitigant litigant, Party party) {
         String partyRole = party.getFlags() != null ? party.getFlags().getRoleOnCase() : null;
-        return builder.partyID(party.getPartyID())
-            .partyRole(partyRole)
-            .partyType(party.getType())
-            .partyName(party.getPartyName())
-            .paperResponse(PAPER_RESPONSE);
+        return litigant.setPartyID(party.getPartyID())
+            .setPartyRole(partyRole)
+            .setPartyType(party.getType())
+            .setPartyName(party.getPartyName())
+            .setPaperResponse(PAPER_RESPONSE);
     }
 
 }

@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandle
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
@@ -51,7 +53,6 @@ import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationServic
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
 import uk.gov.hmcts.reform.civil.ga.service.ParentCaseUpdateHelper;
-import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.civil.utils.ElementUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -85,51 +86,40 @@ import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SuppressWarnings({"checkstyle:EmptyLineSeparator", "checkstyle:Indentation"})
-@SpringBootTest(classes = {
-    CaseDetailsConverter.class,
-    RespondToApplicationHandler.class,
-    JacksonAutoConfiguration.class,
-    AssignCategoryId.class
-},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
 public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @InjectMocks
     RespondToApplicationHandler handler;
 
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
-
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @Mock
     IdamClient idamClient;
-    @MockBean
+    @Mock
     GaForLipService gaForLipService;
-    @MockBean
+    @Mock
     ParentCaseUpdateHelper parentCaseUpdateHelper;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     protected GeneralAppLocationRefDataService locationRefDataService;
+
     List<Element<Document>> documents = new ArrayList<>();
+
     @BeforeEach
-        public void setUp() throws IOException {
-
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                                                                 .sub(DUMMY_EMAIL)
-                                                                 .uid(DEF_UID)
-                                                                 .build());
-
-        Document document = Document.builder().documentUrl("url").documentFileName("file").build();
+    public void setUp() throws IOException {
+        Document document = new Document().setDocumentUrl("url").setDocumentFileName("file");
         documents.add(ElementUtils.element(document));
     }
 
@@ -204,8 +194,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
-        when(gaForLipService.isLipApp(any())).thenReturn(false);
-        when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
                                                  CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -218,9 +206,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
-        when(gaForLipService.isLipApp(any())).thenReturn(true);
-        when(gaForLipService.isLipResp(any())).thenReturn(false);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -228,18 +214,22 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         verifyNoInteractions(dashboardNotificationService);
 
         assertThat(response).isNotNull();
+        assertThat(response.getConfirmationHeader()).isEqualTo("# You have provided the requested information");
     }
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenWelshFlagEnabledAndApplicantNotBilingual() {
         when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder().build();
+        when(gaForLipService.isGaForLip(any())).thenReturn(true);
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
+            .isGaApplicantLip(YES).applicantBilingualLanguagePreference(NO).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
         var response = (SubmittedCallbackResponse) handler.handle(params);
         verifyNoInteractions(dashboardNotificationService);
 
         assertThat(response).isNotNull();
+        assertThat(response.getConfirmationHeader()).isEqualTo("# You have provided the requested information");
     }
 
     @Test
@@ -248,7 +238,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).toBuilder()
+        GeneralApplicationCaseData casedata = getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).copy()
             .isGaApplicantLip(YES).applicantBilingualLanguagePreference(YES).build();
 
         CallbackParams params = callbackParamsOf(casedata, CallbackType.SUBMITTED);
@@ -305,8 +295,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceeding() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -322,12 +312,12 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackChecksApplicationStateBeforeProceedingForUrgentLip() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
         when(gaForLipService.isLipResp(any())).thenReturn(true);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseData =
-            GeneralApplicationCaseData.builder().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
+        GeneralApplicationCaseData caseData =
+            new GeneralApplicationCaseData().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
                     GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).generalAppType(
                     GAApplicationType
                         .builder()
@@ -343,16 +333,19 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(response).isNotNull();
         assertThat(response.getErrors()).isEqualTo(errors);
     }
+
     @Test
     void aboutToStartCallbackChecksRespondendResponseBeforeProceeding() {
 
+        mockIdamClient(DEF_UID);
+
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(SUMMARY_JUDGEMENT);
         updateCaseData.parentClaimantIsApplicant(YES)
             .generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -371,13 +364,15 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void aboutToStartCallbackChecksRespondendResponseBeforeProceeding_VaryJudgement() {
 
+        mockIdamClient(DEF_UID);
+
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         GeneralApplicationCaseData caseData = getCaseWithRespondentResponse();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(types).build()).build();
@@ -397,8 +392,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void aboutToStartCallbackAddsLocationDetails() {
 
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address").postcode("post code")
-                          .courtName("Court Name").region("Region").build());
+        locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address").setPostcode("post code")
+                          .setCourtName("Court Name").setRegion("Region"));
         when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
         CallbackParams params = callbackParamsOf(getCase(AWAITING_RESPONDENT_RESPONSE),
@@ -418,41 +413,39 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void midCallBackValidateDebtorPaymentDatePastDateError() {
         GeneralApplicationCaseData caseData = getCase(AWAITING_RESPONDENT_RESPONSE);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(types).build())
             .gaRespondentDebtorOffer(
-            GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
-            GARespondentDebtorOfferOptionsGAspec.DECLINE)
-                .paymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
-                .paymentSetDate(LocalDate.now().minusDays(2)).build());
+                new GARespondentDebtorOfferGAspec().setRespondentDebtorOffer(
+                    GARespondentDebtorOfferOptionsGAspec.DECLINE)
+                .setPaymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
+                .setPaymentSetDate(LocalDate.now().minusDays(2)));
 
         CallbackParams params = callbackParamsOf(updateCaseData.build(),
                                                  CallbackType.MID, "validate-debtor-offer");
 
-
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
         assertThat(response.getErrors()).isNotNull();
-        assertThat(response.getErrors().get(0)).isEqualTo(PAYMENT_DATE_CANNOT_BE_IN_PAST);
+        assertThat(response.getErrors().getFirst()).isEqualTo(PAYMENT_DATE_CANNOT_BE_IN_PAST);
     }
 
     @Test
     void midCallBackValidateDebtorPaymentDateIsFuture() {
         GeneralApplicationCaseData caseData = getCase(AWAITING_RESPONDENT_RESPONSE);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updateCaseData = caseData.toBuilder();
+        GeneralApplicationCaseData updateCaseData = caseData.copy();
         List<GeneralApplicationTypes> types = List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT);
         updateCaseData.generalAppType(GAApplicationType.builder().types(types).build())
             .gaRespondentDebtorOffer(
-                GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
+                new GARespondentDebtorOfferGAspec().setRespondentDebtorOffer(
                         GARespondentDebtorOfferOptionsGAspec.DECLINE)
-                    .paymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
-                    .paymentSetDate(LocalDate.now().plusDays(2)).build());
+                    .setPaymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
+                    .setPaymentSetDate(LocalDate.now().plusDays(2)));
 
         CallbackParams params = callbackParamsOf(updateCaseData.build(),
                                                  CallbackType.MID, "validate-debtor-offer");
-
 
         var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -531,75 +524,68 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private CallbackParams getParams(int trialRanges) {
         return switch (trialRanges) {
-            case 0 -> CallbackParams.builder()
+            case 0 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithInvalidTrailDateRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 1 -> CallbackParams.builder()
+                             .build());
+            case 1 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithInvalidDateToRange())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 2 -> CallbackParams.builder()
+                             .build());
+            case 2 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullFromAndToDate())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 3 -> CallbackParams.builder()
+                             .build());
+            case 3 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 4 -> CallbackParams.builder()
+                             .build());
+            case 4 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithUnavailableDatesBeforeToday())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 5 -> CallbackParams.builder()
+                             .build());
+            case 5 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullUnavailableDates())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            case 6 -> CallbackParams.builder()
+                             .build());
+            case 6 -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCaseWithNullUnavailableDateFrom())
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
-            default -> CallbackParams.builder()
+                             .build());
+            default -> new CallbackParams()
                 .type(CallbackType.MID)
                 .pageId("hearing-screen-response")
                 .caseData(getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION))
                 .request(CallbackRequest.builder()
                              .eventId("RESPOND_TO_APPLICATION")
-                             .build())
-                .build();
+                             .build());
         };
     }
 
     @Test
     void shouldReturn_Awaiting_Respondent_Response_1Def_2Responses() {
+        mockIdamClient(DEF_UID);
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -622,26 +608,25 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
         assertThat(responseCaseData.getRespondentsResponses()).hasSize(1);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                        .getHearingPreferredLocation().getListItems()).hasSize(1);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                        .getRespondentResponsePartyName()).isEqualTo("Defendant One - Defendant");
     }
 
     @Test
     void shouldReturn_Application_Submitted_Awaiting_Judicial_Decision_2Def_2Responses() {
+        mockIdamClient(DEF_UID);
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -654,8 +639,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
 
-        respondentsResponses.add(element(GARespondentResponse.builder()
-                                             .generalAppRespondent1Representative(YES).build()));
+        respondentsResponses.add(element(new GARespondentResponse()
+                                             .setGeneralAppRespondent1Representative(YES)));
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -667,15 +652,13 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
 
@@ -691,6 +674,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     @Test
     void shouldReturn_Application_Submitted_Awaiting_Judicial_Decision_1Def_1Response() {
+        mockIdamClient(DEF_UID);
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -698,8 +682,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-
-        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -708,20 +690,20 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         // GA CaseData
+        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
     @Test
     void shouldReturn_Application_Submitted_Awaiting_Judicial_Decision_1Def_1ResponseLip() {
+        mockIdamClient(DEF_UID);
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -729,9 +711,6 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .email(DUMMY_EMAIL).organisationIdentifier("org2").build();
 
         respondentSols.add(element(respondent1));
-
-        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
-        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().parentClaimantIsApplicant(NO).build();
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -744,16 +723,17 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                             .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                             .build());
         when(gaForLipService.isLipResp(any())).thenReturn(true);
+
         // GA CaseData
+        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
+        GeneralApplicationCaseData updatedCaseData = caseData.copy().parentClaimantIsApplicant(NO).build();
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(updatedCaseData);
 
         CallbackParams params = callbackParamsOf(updatedCaseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
@@ -768,8 +748,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         respondentSols.add(element(respondent2));
         respondentSols.add(element(respondent1));
         GeneralApplicationCaseData caseData = getCaseWithJudicialDecision(respondentSols, respondentsResponses);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.isMultiParty(YES);
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -779,24 +761,24 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
         assertThat(responseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails().getRespondentResponsePartyName())
+                       .getFirst().getValue().getGaHearingDetails().getRespondentResponsePartyName())
             .isEqualTo("Defendant Two - Defendant");
     }
 
     @Test
     void shouldReturn_Awaiting_Respondent_Response_2Def_1Response() {
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -819,15 +801,13 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
         assertThat(responseCaseData.getGeneralAppRespondent1Representative()
@@ -837,6 +817,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     @Test
     void shouldReturn_Awaiting_Respondent_Response_For_NoDef_NoResponse() {
+        mockIdamClient(DEF_UID);
 
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -848,15 +829,13 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseData);
 
         CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         assertThat(response).isNotNull();
     }
 
@@ -864,9 +843,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void shouldReturn_Null_WhenPreferredTypeNotInPerson() {
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -876,20 +857,18 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
         assertThat(responseCaseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails()
+                       .getFirst().getValue().getGaHearingDetails()
                        .getRespondentResponsePartyName()).isEqualTo("Claimant One - Claimant");
     }
 
@@ -897,12 +876,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     void shouldPopulatePreferredLocation_WhenRespondentIsLiP() {
 
         GeneralApplicationCaseData caseData = getCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build()).build();
         caseDataBuilder.hearingDetailsResp(caseData.getHearingDetailsResp().toBuilder()
                                                .hearingPreferencesPreferredType(GAHearingType.VIDEO).build());
         caseDataBuilder.isGaRespondentOneLip(YES);
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -912,25 +893,25 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
         assertThat(responseCaseData.getRespondentsResponses()
-                       .get(0).getValue().getGaHearingDetails()
+                       .getFirst().getValue().getGaHearingDetails()
                        .getHearingPreferredLocation().getValue().getLabel()).isEqualTo("ABCD - RG0 0AL");
     }
 
     @Test
     void shouldReturn_No_WhenRespondIsNotAcceptedByRespondent() {
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -939,37 +920,34 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
             .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
             .generalAppRespondReason("reason")
-            .generalAppRespondent1Representative(GARespondentRepresentative.builder()
-                                                     .generalAppRespondent1Representative(NO).build())
+            .generalAppRespondent1Representative(new GARespondentRepresentative()
+                                                     .setGeneralAppRespondent1Representative(NO))
             .generalAppRespondDocument(documents);
-
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
@@ -977,17 +955,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocRespondentSol().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentName()).isEqualTo("Respond evidence");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getCreatedBy()).isEqualTo("Respondent One");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent One");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
     }
 
     @Test
     void shouldReturn_No_WhenRespondIsNotAcceptedByRespondentTWO() {
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                .sub(DUMMY_EMAIL)
-                .uid(DEF2_UID)
-                .build());
+        mockIdamClient(DEF2_UID);
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
         when(coreCaseDataService.getCase(123L)).thenReturn(civil);
@@ -995,37 +970,34 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .defendant2PartyName("Defendant Two")
                 .defendant1PartyName("Defendant One")
                 .claimant1PartyName("Claimant One")
                 .claimant2PartyName("Claimant Two")
                 .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
                 .generalAppRespondReason("reason")
-                .generalAppRespondent1Representative(GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(NO).build())
+                .generalAppRespondent1Representative(new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(NO))
                 .generalAppRespondDocument(documents);
-
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
                 .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
 
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
 
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondReason()).isNull();
@@ -1033,15 +1005,15 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocStaff().size()).isEqualTo(1);
         assertThat(responseCaseData.getGaAddlDocRespondentSolTwo().size()).isEqualTo(1);
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentName()).isEqualTo("Respond evidence");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getCreatedBy()).isEqualTo("Respondent Two");
-        assertThat(responseCaseData.getGaAddlDoc().get(0).getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentName()).isEqualTo("Respond evidence");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getCreatedBy()).isEqualTo("Respondent Two");
+        assertThat(responseCaseData.getGaAddlDoc().getFirst().getValue().getDocumentLink().getCategoryID()).isEqualTo("applications");
     }
 
     @Test
     void shouldReturn_No_WhenConsentRespondIsNotAcceptedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
                 .generalAppType(GAApplicationType.builder().types(List.of(SUMMARY_JUDGEMENT)).build())
                 .generalAppConsentOrder(YES)
@@ -1049,14 +1021,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 .gaRespondentConsent(NO)
                 .generalAppRespondConsentDocument(documents);
 
+        mockIdamClient(DEF_UID);
+
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -1064,15 +1036,14 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(caseDetailsConverter.toGeneralApplicationCaseData(civil))
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0)
+        assertThat(responseCaseData.getRespondentsResponses().getFirst()
                 .getValue().getGaRespondentResponseReason()).isEqualTo("reason");
         assertThat(responseCaseData.getGeneralAppRespondConsentDocument()).isNull();
         assertThat(responseCaseData.getGeneralAppRespondConsentReason()).isNull();
@@ -1085,17 +1056,19 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_No_WhenDebtorIsDeclinedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         LocalDate planDate = LocalDate.of(2023, 11, 29);
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .gaRespondentDebtorOffer(
-            GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
+                new GARespondentDebtorOfferGAspec().setRespondentDebtorOffer(
                     GARespondentDebtorOfferOptionsGAspec.DECLINE)
-                    .debtorObjections("I have no money")
-                .paymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
-                .paymentSetDate(planDate).build())
+                    .setDebtorObjections("I have no money")
+                    .setPaymentPlan(GADebtorPaymentPlanGAspec.PAYFULL)
+                    .setPaymentSetDate(planDate))
             .generalAppRespondDebtorDocument(documents);
+
+        mockIdamClient(DEF_UID);
 
         // Civil Claim CaseDate
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -1105,14 +1078,12 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
         CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         String expectedReason = "Proposed payment plan is I will accept payment in full by a set date. " +
                 "Proposed set date is 29 November 2023. " +
@@ -1120,9 +1091,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                        .getGeneralAppRespondent1Representative()).isEqualTo(NO);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
         assertThat(responseCaseData.getGeneralAppRespondDebtorDocument()).isNull();
         assertThat(responseCaseData.getGaAddlDoc().size()).isEqualTo(1);
@@ -1133,25 +1104,26 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     @Test
     void shouldReturn_No_Instalment_WhenDebtorIsDeclinedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
                 .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .gaRespondentDebtorOffer(
-                GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
+                new GARespondentDebtorOfferGAspec().setRespondentDebtorOffer(
                     GARespondentDebtorOfferOptionsGAspec.DECLINE)
-                    .debtorObjections("I have no money")
-                    .paymentPlan(GADebtorPaymentPlanGAspec.INSTALMENT)
-                    .monthlyInstalment(new BigDecimal(1234)).build())
+                    .setDebtorObjections("I have no money")
+                    .setPaymentPlan(GADebtorPaymentPlanGAspec.INSTALMENT)
+                    .setMonthlyInstalment(new BigDecimal(1234)))
             .generalAppRespondDebtorDocument(documents);
+
+        mockIdamClient(DEF_UID);
 
         // GA CaseData
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
@@ -1165,26 +1137,25 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         String expectedReason = "Proposed payment plan is I will accept the following instalments per month." +
                 " Proposed instalments per month is 12.34 pounds." +
                 " Objections to the debtor's proposals is I have no money";
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                 .getGaRespondentResponseReason()).isEqualTo(expectedReason);
     }
 
     @Test
     void shouldReturn_Yes_WhenDebtorIsAcceptedByRespondent() {
         GeneralApplicationCaseData caseData = getCaseWithPreferredTypeInPersonLocationNull();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder.parentClaimantIsApplicant(NO)
             .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
             .gaRespondentDebtorOffer(
-                GARespondentDebtorOfferGAspec.builder().respondentDebtorOffer(
+                new GARespondentDebtorOfferGAspec().setRespondentDebtorOffer(
                         GARespondentDebtorOfferOptionsGAspec.ACCEPT)
-                    .paymentPlan(GADebtorPaymentPlanGAspec.PAYFULL).build());
+                    .setPaymentPlan(GADebtorPaymentPlanGAspec.PAYFULL));
 
-        CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
+        mockIdamClient(DEF_UID);
 
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
@@ -1194,23 +1165,24 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         // GA Case Data
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(caseDataBuilder.build());
 
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams params = callbackParamsOf(caseDataBuilder.build(), CallbackType.ABOUT_TO_SUBMIT);
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
         assertThat(response).isNotNull();
         assertThat(responseCaseData.getHearingDetailsResp()).isNull();
-        assertThat(responseCaseData.getRespondentsResponses().get(0).getValue()
+        assertThat(responseCaseData.getRespondentsResponses().getFirst().getValue()
                        .getGeneralAppRespondent1Representative()).isEqualTo(YES);
     }
 
     @Test
     void shouldReturn_Null_RespondentResponseAfterAddingToCollections() {
+        mockIdamClient(DEF_UID);
 
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
@@ -1219,17 +1191,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
         respondentSols.add(element(respondent1));
 
-        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
         DynamicList dynamicListTest = fromList(getSampleCourLocations());
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        GeneralApplicationCaseData updatedCaseData = caseData.toBuilder().hearingDetailsResp(GAHearingDetails.builder()
-                                                                               .hearingPreferredLocation(
-                                                                                   dynamicListTest)
-                                                                               .hearingPreferencesPreferredType(
-                                                                                   GAHearingType.IN_PERSON)
-                                                                               .build()).build();
         // Civil Claim Case Data
         CaseDetails civil = CaseDetails.builder().id(123L).build();
         when(coreCaseDataService.getCase(123L)).thenReturn(civil);
@@ -1237,15 +1202,19 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
             .thenReturn(getCivilCaseData(DUMMY_EMAIL, DUMMY_EMAIL, DUMMY_EMAIL));
 
         // GA Case Data
+        GeneralApplicationCaseData caseData = getCase(respondentSols, respondentsResponses);
+        GeneralApplicationCaseData updatedCaseData = caseData.copy()
+            .hearingDetailsResp(GAHearingDetails.builder()
+                                    .hearingPreferredLocation(dynamicListTest)
+                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
+                                    .build()).build();
         CaseDetails ga = CaseDetails.builder().id(456L).build();
-        when(coreCaseDataService.getCase(456L)).thenReturn(ga);
         when(caseDetailsConverter.toGeneralApplicationCaseData(ga))
             .thenReturn(updatedCaseData);
 
         CallbackParams params = callbackParamsOf(updatedCaseData, CallbackType.ABOUT_TO_SUBMIT);
-        CallbackParams.CallbackParamsBuilder callbackParamsBuilder = params.toBuilder();
-        callbackParamsBuilder.request(CallbackRequest.builder().caseDetails(ga).build());
-        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsBuilder.build());
+        CallbackParams callbackParamsWithRequest = paramsWithRequest(params, CallbackRequest.builder().caseDetails(ga).build());
+        var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsWithRequest);
 
         assertThat(response).isNotNull();
         GeneralApplicationCaseData responseCaseData = getResponseCaseData(response);
@@ -1254,12 +1223,19 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         assertThat(responseCaseData.getRespondentsResponses()).hasSize(1);
     }
 
+    private void mockIdamClient(String defUid) {
+        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
+                                                                 .sub(DUMMY_EMAIL)
+                                                                 .uid(defUid)
+                                                                 .build());
+    }
+
     private GeneralApplicationCaseData getResponseCaseData(AboutToStartOrSubmitCallbackResponse response) {
         return objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
     }
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDateFrom() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .unavailableTrialRequiredYesOrNo(YES)
                                     .generalAppUnavailableDates(null)
@@ -1268,7 +1244,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithNullUnavailableDates() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .unavailableTrialRequiredYesOrNo(YES)
                                     .generalAppUnavailableDates(getUnavailableNullDateList())
@@ -1277,7 +1253,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidTrailDateRange() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .trialRequiredYesOrNo(YES)
                                     .trialDateFrom(TRIAL_DATE_FROM_INVALID)
@@ -1287,7 +1263,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithInvalidDateToRange() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .trialRequiredYesOrNo(YES)
                                     .trialDateFrom(TRIAL_DATE_FROM_INVALID)
@@ -1297,8 +1273,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithNullFromAndToDate() {
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1312,10 +1288,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithPreferredTypeInPersonLocationNull() {
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1330,8 +1306,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithUnavailableDates() {
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1344,8 +1320,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private GeneralApplicationCaseData getCaseWithUnavailableDatesBeforeToday() {
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1382,10 +1358,10 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
 
     private GeneralApplicationCaseData getCaseWithRespondentResponse() {
 
-        respondentsResponses.add(element(GARespondentResponse.builder()
-                                             .generalAppRespondent1Representative(NO)
-                                             .gaRespondentDetails(DEF_UID).build()));
-        return GeneralApplicationCaseData.builder().parentClaimantIsApplicant(YES)
+        respondentsResponses.add(element(new GARespondentResponse()
+                                             .setGeneralAppRespondent1Representative(NO)
+                                             .setGaRespondentDetails(DEF_UID)));
+        return new GeneralApplicationCaseData().parentClaimantIsApplicant(YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1415,19 +1391,18 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -1437,7 +1412,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1457,19 +1432,18 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                       .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                       .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                       .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -1479,7 +1453,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
@@ -1500,9 +1474,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YES)
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(respondentSols)
@@ -1513,11 +1487,11 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                     .build())
             .respondentsResponses(respondentsResponses)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1543,9 +1517,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                         .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(respondentSols)
@@ -1556,9 +1530,9 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                     .build())
             .respondentsResponses(respondentsResponses)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
@@ -1567,8 +1541,8 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                 GAApplicationType
                     .builder()
                     .types(types).build())
-            .judicialDecision(GAJudicialDecision.builder().decision(
-                GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(
+                GAJudgeDecisionOption.MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
             .businessProcess(new BusinessProcess()
                                  .setCamundaEvent(CAMUNDA_EVENT)
                                  .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
@@ -1599,11 +1573,16 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
                                           .email(DUMMY_EMAIL).organisationIdentifier("1").build())
             .respondentSolicitor1EmailAddress(respondent1SolEmail)
             .respondentSolicitor2EmailAddress(respondent2SolEmail)
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .id("123")
-                                                .email(applicantEmail)
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setId("123")
+                                                .setEmail(applicantEmail)
+                                                )
             .respondent2SameLegalRepresentative(NO)
             .build();
+    }
+
+    private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
+        return params.copy()
+            .request(request);
     }
 }

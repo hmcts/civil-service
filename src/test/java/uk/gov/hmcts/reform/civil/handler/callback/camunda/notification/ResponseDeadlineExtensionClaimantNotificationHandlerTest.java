@@ -105,7 +105,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         @Test
         void shouldSendEmailToClaimantLR() {
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             given(notificationsProperties.getClaimantDeadlineExtension()).willReturn(emailTemplate);
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));

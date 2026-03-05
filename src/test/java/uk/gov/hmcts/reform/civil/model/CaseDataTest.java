@@ -611,11 +611,7 @@ class CaseDataTest {
         //Given
         String organisationId = "1245";
         CaseData caseData = CaseData.builder()
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(organisationId)))
             .build();
         //When
         String result = caseData.getApplicantOrganisationId();
@@ -647,7 +643,7 @@ class CaseDataTest {
     void isTranslatedDocumentUploaded_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DEFENCE_TRANSLATED_DOCUMENT).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DEFENCE_TRANSLATED_DOCUMENT))).build();
         //When
         //Then
         assertTrue(caseData.isTranslatedDocumentUploaded());
@@ -656,7 +652,7 @@ class CaseDataTest {
     @Test
     void getSDOOrderDocument_WhenItPresent() {
         CaseData caseData = CaseData.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(SDO_ORDER).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(SDO_ORDER))).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
         //Then
@@ -667,10 +663,10 @@ class CaseDataTest {
     void getSDOOrderDocument_shouldReturnLatest_WhenItPresent() {
         CaseData caseData = CaseData.builder()
             .systemGeneratedCaseDocuments(wrapElements(
-                CaseDocument.builder().documentType(SDO_ORDER)
-                    .createdDatetime(LocalDateTime.now().minusDays(2)).documentName("Doc1").build(),
-                CaseDocument.builder().documentType(SDO_ORDER)
-                    .createdDatetime(LocalDateTime.now().minusDays(1)).documentName("Doc2").build()
+                new CaseDocument().setDocumentType(SDO_ORDER)
+                    .setCreatedDatetime(LocalDateTime.now().minusDays(2)).setDocumentName("Doc1"),
+                new CaseDocument().setDocumentType(SDO_ORDER)
+                    .setCreatedDatetime(LocalDateTime.now().minusDays(1)).setDocumentName("Doc2")
             )).build();
         //When
         Optional<Element<CaseDocument>> caseDocument = caseData.getSDODocument();
@@ -901,7 +897,7 @@ class CaseDataTest {
     void shouldReturnClaimFeeInPence_whenClaimFeeExists() {
         //Given
         CaseData caseData = CaseData.builder()
-            .claimFee(Fee.builder().calculatedAmountInPence(CLAIM_FEE).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(CLAIM_FEE))
             .build();
         //When
         BigDecimal fee = caseData.getCalculatedClaimFeeInPence();
@@ -1106,8 +1102,8 @@ class CaseDataTest {
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
                 .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now().plusDays(1)).build())
+                .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                                   .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1123,8 +1119,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1138,8 +1134,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().plusDays(1))
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(3)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1153,8 +1149,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .respondent1RespondToSettlementAgreementDeadline(LocalDateTime.now().minusDays(1))
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(3)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(3)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1170,8 +1166,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().plusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().plusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1187,8 +1183,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondent1RepaymentPlan(RepaymentPlanLRspec.builder()
-                                              .firstRepaymentDate(LocalDate.now().minusDays(1)).build())
+                .respondent1RepaymentPlan(new RepaymentPlanLRspec()
+                                              .setFirstRepaymentDate(LocalDate.now().minusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1204,8 +1200,8 @@ class CaseDataTest {
 
             CaseData caseData = CaseData.builder()
                 .caseDataLiP(caseDataLiP)
-                .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                                   .whenWillThisAmountBePaid(LocalDate.now().minusDays(1)).build())
+                .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                                   .setWhenWillThisAmountBePaid(LocalDate.now().minusDays(1)))
                 .build();
             //When
             boolean isJudgementDateNotPermitted = caseData.isJudgementDateNotPermitted();
@@ -1229,8 +1225,8 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .applicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE)
-                .applicant1RequestedPaymentDateForDefendantSpec(PaymentBySetDate.builder()
-                                                                    .paymentSetDate(LocalDate.now().plusDays(1)).build())
+                .applicant1RequestedPaymentDateForDefendantSpec(new PaymentBySetDate()
+                                                                    .setPaymentSetDate(LocalDate.now().plusDays(1)))
                 .caseDataLiP(new CaseDataLiP()
                                  .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                             .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT))
@@ -1330,9 +1326,8 @@ class CaseDataTest {
     class CoSC {
         @Test
         void shouldReturnTrue_CoscCertExists() {
-            CaseDocument caseDocument = CaseDocument.builder()
-                .documentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT)
-                .build();
+            CaseDocument caseDocument = new CaseDocument()
+                .setDocumentType(DocumentType.CERTIFICATE_OF_DEBT_PAYMENT);
             CaseData caseData = CaseData.builder()
                 .systemGeneratedCaseDocuments(wrapElements(caseDocument))
                 .build();
@@ -1353,9 +1348,9 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
-                .respondToClaim(RespondToClaim.builder()
-                                    .howMuchWasPaid(new BigDecimal(1000))
-                                    .build())
+                .respondToClaim(new RespondToClaim()
+                                    .setHowMuchWasPaid(new BigDecimal(1000))
+                                    )
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1369,9 +1364,9 @@ class CaseDataTest {
             //Given
             CaseData caseData = CaseData.builder()
                 .respondent1ClaimResponseTypeForSpec(PART_ADMISSION)
-                .respondToAdmittedClaim(RespondToClaim.builder()
-                                            .howMuchWasPaid(new BigDecimal(1000))
-                                            .build())
+                .respondToAdmittedClaim(new RespondToClaim()
+                                            .setHowMuchWasPaid(new BigDecimal(1000))
+                                            )
                 .totalClaimAmount(new BigDecimal(1000))
                 .build();
             //When
@@ -1397,7 +1392,7 @@ class CaseDataTest {
         void shouldReturnTrueIfHearingFeePaymentStatusSuccess() {
             //Given
             CaseData caseData = CaseData.builder()
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(SUCCESS).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(SUCCESS))
                 .build();
             //When
             boolean isHearingFeePaid = caseData.isHearingFeePaid();
@@ -1426,7 +1421,7 @@ class CaseDataTest {
         void shouldReturnFalseIfHearingPaymentIsNotSuccess() {
             //Given
             CaseData caseData = CaseData.builder()
-                .hearingFeePaymentDetails(PaymentDetails.builder().status(FAILED).build())
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(FAILED))
                 .build();
             //When
             boolean isHearingFeePaid = caseData.isHearingFeePaid();
@@ -1465,28 +1460,28 @@ class CaseDataTest {
         return Stream.of(
             Arguments.of(DocumentType.SDO_ORDER, new ArrayList<>(), Optional.empty()),
             Arguments.of(DocumentType.SDO_ORDER,
-                         List.of(ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())),
+                         List.of(ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))),
                          Optional.empty()
             ),
             Arguments.of(DocumentType.SDO_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.SDO_ORDER)),
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.SDO_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.SDO_ORDER)))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)))
             ),
             Arguments.of(DocumentType.JUDGE_FINAL_ORDER,
                          List.of(
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()),
-                             ElementUtils.element(CaseDocument.builder().documentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT).build())
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)),
+                             ElementUtils.element(new CaseDocument().setDocumentType(DocumentType.DEFENCE_TRANSLATED_DOCUMENT))
                          ),
-                         Optional.of(List.of(CaseDocument.builder().documentType(DocumentType.JUDGE_FINAL_ORDER).build()))
+                         Optional.of(List.of(new CaseDocument().setDocumentType(DocumentType.JUDGE_FINAL_ORDER)))
             )
         );
     }
@@ -1525,7 +1520,7 @@ class CaseDataTest {
     @Test
     void shouldReturnApplicantSolicitor1UserDetailsEmail() {
         CaseData caseData = CaseData.builder().applicantSolicitor1UserDetails(
-            IdamUserDetails.builder().email("test@test.com").build()
+            new IdamUserDetails().setEmail("test@test.com")
         ).build();
         assertEquals("test@test.com", caseData.getApplicantSolicitor1UserDetailsEmail());
     }
@@ -1539,7 +1534,7 @@ class CaseDataTest {
     @Test
     void shouldReturnClaimantUserDetailsEmail() {
         CaseData caseData = CaseData.builder().claimantUserDetails(
-            IdamUserDetails.builder().email("test@test.com").build()
+            new IdamUserDetails().setEmail("test@test.com")
         ).build();
         assertEquals("test@test.com", caseData.getClaimantUserDetailsEmail());
     }
@@ -1578,5 +1573,4 @@ class CaseDataTest {
         assertNull(caseData.getRespondent1PartyEmail());
     }
 }
-
 

@@ -73,7 +73,7 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
     private CallbackResponse assignOrgPolicy(CallbackParams callbackParams) {
         GeneralApplicationCaseData caseData = caseDetailsConverter.toGeneralApplicationCaseData(callbackParams.getRequest().getCaseDetails());
         List<String> errors = new ArrayList<>();
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         String caseId = caseData.getCcdCaseReference().toString();
         log.info("CaseData in AssignCaseToUserCallbackHandler: {}", caseId);
 
@@ -81,11 +81,10 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
 
             if (caseData.getCcdState().equals(PENDING_APPLICATION_ISSUED)) {
                 GASolicitorDetailsGAspec applicantSolicitor = caseData.getGeneralAppApplnSolicitor();
-                caseDataBuilder.applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                    .organisation(Organisation.builder()
-                        .organisationID(applicantSolicitor.getOrganisationIdentifier())
-                        .build())
-                    .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()).build());
+                caseDataBuilder.applicant1OrganisationPolicy(
+                    new OrganisationPolicy().setOrganisation(new Organisation()
+                                                                 .setOrganisationID(applicantSolicitor.getOrganisationIdentifier()))
+                                                                 .setOrgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName()));
 
                 if (!gaForLipService.isGaForLip(caseData)) {
                     List<Element<GASolicitorDetailsGAspec>> applicantAddlSolList = caseData.getGeneralAppRespondentSolicitors().stream()
@@ -127,29 +126,21 @@ public class AssignCaseToUserCallbackHandler extends CallbackHandler implements 
 
                     caseDataBuilder
                         .respondent1OrganisationPolicy(
-                            OrganisationPolicy.builder()
-                                .organisation(Organisation.builder()
-                                    .organisationID(
+                            new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(
                                         respondentSolicitorsList.get(0).getValue()
-                                            .getOrganisationIdentifier()).build())
-                                .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()).build());
+                                            .getOrganisationIdentifier())).setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORONE.getFormattedName()));
 
                     if (!respondent2SolicitorsList.isEmpty()) {
                         caseDataBuilder
                             .respondent2OrganisationPolicy(
-                                OrganisationPolicy.builder()
-                                    .organisation(Organisation.builder()
-                                        .organisationID(respondent2SolicitorsList.get(0)
-                                            .getValue().getOrganisationIdentifier())
-                                        .build())
-                                    .orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName()).build());
+                                new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID(respondent2SolicitorsList.get(0)
+                                            .getValue().getOrganisationIdentifier())).setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName()));
 
                     }
                 } else {
                     /* GA for Lip*/
                     caseDataBuilder.respondent1OrganisationPolicy(
-                        OrganisationPolicy.builder()
-                            .orgPolicyCaseAssignedRole(DEFENDANT.getFormattedName()).build());
+                        new OrganisationPolicy().setOrgPolicyCaseAssignedRole(DEFENDANT.getFormattedName()));
                 }
 
             }

@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.cmc.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import net.minidev.json.annotate.JsonIgnore;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 
@@ -12,7 +13,8 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Accessors(chain = true)
+@Data
 public class Response {
 
     private RespondentResponseType responseType;

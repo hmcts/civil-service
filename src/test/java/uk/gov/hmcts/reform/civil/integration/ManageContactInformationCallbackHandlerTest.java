@@ -182,20 +182,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .applicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                                                                   .firstName("Claimant")
-                                                                   .lastName("OrgIndividual")
-                                                                   .email("claiamnt-orgindividual@example.com")
-                                                                   .phone("07867654543")
-                                                                   .partyID("party-id")
-                                                                   .build())))
-                .respondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                                                                    .firstName("Defendant")
-                                                                    .lastName("OrgIndividual")
-                                                                    .email("defendant-orgindividual@example.com")
-                                                                    .phone("07867654543")
-                                                                    .partyID("party-id")
-                                                                    .build())))
+                .applicant1OrgIndividuals(wrapElements(List.of(new PartyFlagStructure()
+                                                                   .setFirstName("Claimant")
+                                                                   .setLastName("OrgIndividual")
+                                                                   .setEmail("claiamnt-orgindividual@example.com")
+                                                                   .setPhone("07867654543")
+                                                                   .setPartyID("party-id")
+                                                                   )))
+                .respondent1OrgIndividuals(wrapElements(List.of(new PartyFlagStructure()
+                                                                    .setFirstName("Defendant")
+                                                                    .setLastName("OrgIndividual")
+                                                                    .setEmail("defendant-orgindividual@example.com")
+                                                                    .setPhone("07867654543")
+                                                                    .setPartyID("party-id")
+                                                                    )))
                 .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
                 .ccdCaseReference(123L)
                 .build();
@@ -889,20 +889,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             expectedExpert1 = dqExpert.copy().setFirstName("First").setLastName("Name")
                 .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
                 .setPartyID(PARTY_ID);
-            expectedExpertFlags = PartyFlagStructure.builder()
-                .partyID(PARTY_ID)
-                .firstName("First")
-                .lastName("Name")
-                .build();
+            expectedExpertFlags = new PartyFlagStructure()
+                .setPartyID(PARTY_ID)
+                .setFirstName("First")
+                .setLastName("Name")
+                ;
             dqWitness = new Witness().setFirstName("dq").setLastName("dq").setPartyID("id");
             expectedWitness1 = new Witness().setFirstName("First").setLastName("Name")
                 .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
                 .setPartyID(PARTY_ID);
-            expectedWitnessFlags = PartyFlagStructure.builder()
-                .partyID(PARTY_ID)
-                .firstName("First")
-                .lastName("Name")
-                .build();
+            expectedWitnessFlags = new PartyFlagStructure()
+                .setPartyID(PARTY_ID)
+                .setFirstName("First")
+                .setLastName("Name")
+                ;
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(INDIVIDUAL).build())
@@ -1029,13 +1029,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder().firstName("Claimant")
-                .firstName("Claimant")
-                .lastName("LRIndividual")
-                .email("claiamnt-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure().setFirstName("Claimant")
+                .setFirstName("Claimant")
+                .setLastName("LRIndividual")
+                .setEmail("claiamnt-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1078,13 +1078,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant1")
-                .lastName("LRIndividual")
-                .email("defendant1-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant1")
+                .setLastName("LRIndividual")
+                .setEmail("defendant1-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1127,13 +1127,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant2")
-                .lastName("LRIndividual")
-                .email("defendant2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant2")
+                .setLastName("LRIndividual")
+                .setEmail("defendant2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1176,13 +1176,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Claimant1")
-                .lastName("OrgIndividual")
-                .email("claiamnt-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Claimant1")
+                .setLastName("OrgIndividual")
+                .setEmail("claiamnt-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1225,13 +1225,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Claimant2")
-                .lastName("OrgIndividual")
-                .email("claiamnt2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Claimant2")
+                .setLastName("OrgIndividual")
+                .setEmail("claiamnt2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1274,13 +1274,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant1")
-                .lastName("OrgIndividual")
-                .email("defendant1-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant1")
+                .setLastName("OrgIndividual")
+                .setEmail("defendant1-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1323,13 +1323,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant2")
-                .lastName("OrgIndividual")
-                .email("defendant2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant2")
+                .setLastName("OrgIndividual")
+                .setEmail("defendant2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
