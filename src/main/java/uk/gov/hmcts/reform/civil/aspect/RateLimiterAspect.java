@@ -14,6 +14,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -54,13 +55,7 @@ public class RateLimiterAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
 
-        String ipAddress = request.getHeader("X-Forwarded-For");
-        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
-            ipAddress = request.getRemoteAddr();
-        } else {
-            // In case of multiple IPs, the first one is the client
-            ipAddress = ipAddress.split(",")[0];
-        }
+        String ipAddress = getClientIp(request);
 
         // Register this endpoint for rate limit tracking
         String requestURI = request.getRequestURI();
@@ -86,5 +81,23 @@ public class RateLimiterAspect {
 
             return null;
         }
+    }
+
+    public static String getClientIp(HttpServletRequest request) {
+        String[] headers = {
+            "X-Forwarded-For",
+            "X-Real-IP",
+            "True-Client-IP",
+            "Forwarded"
+        };
+        for (String header : headers) {
+            String value = request.getHeader(header);
+            if (value != null && !StringUtils.isEmpty(value) && !"unknown".equalsIgnoreCase(value)) {
+                log.info("ipAddress for header {} is : {} ", header, value);
+                return value.split(",")[0].trim();
+            }
+        }
+        log.info("ipAddress outside is : {} ", request.getRemoteAddr());
+        return request.getRemoteAddr();
     }
 }
