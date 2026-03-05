@@ -120,23 +120,26 @@ public class JudgmentsOnlineHelperTest {
 
     @Test
     void testAddress() {
-        JudgmentAddress address = JudgmentsOnlineHelper
+        Address inputAddress = new Address();
+        inputAddress.setAddressLine1("sdjhvjdshvsjhdvjhdjkvheddadasdadasdadddadadaddsvjdhkhdskedevdhv");
+        inputAddress.setAddressLine3("sdjhvjdshv sjhdvjhdjkvhdsv jdhkhdskvdhv");
+        inputAddress.setAddressLine2("fdkbmkbklmklf kfmkvbfkvfl fbmkflbmklfmkfvfdkvfv mdvkfldfmfv");
+        inputAddress.setPostCode("fhbfv");
+        inputAddress.setPostTown("dfjbgjkhgjhgkjhdjkbh;hb;kjdkdfkgjdfkgkfgkldjgdf");
+        inputAddress.setCounty("fdkgjblkfgjbklgj");
+        inputAddress.setCountry("dfjnbgjkfbjkjkg");
+
+        JudgmentAddress judgmentAddress = JudgmentsOnlineHelper
             .getJudgmentAddress(
-                Address.builder()
-                    .addressLine1("sdjhvjdshvsjhdvjhdjkvheddadasdadasdadddadadaddsvjdhkhdskedevdhv")
-                    .addressLine3("sdjhvjdshv sjhdvjhdjkvhdsv jdhkhdskvdhv")
-                    .addressLine2("fdkbmkbklmklf kfmkvbfkvfl fbmkflbmklfmkfvfdkvfv mdvkfldfmfv")
-                    .postCode("fhbfv")
-                    .postTown("dfjbgjkhgjhgkjhdjkbh;hb;kjdkdfkgjdfkgkfgkldjgdf")
-                    .county("fdkgjblkfgjbklgj").country("dfjnbgjkfbjkjkg").build(),
+                inputAddress,
                 new RoboticsAddressMapper(new AddressLinesMapper())
             );
-        assertThat(address).isNotNull();
-        assertThat(address.getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine2().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine3().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine4().length()).isLessThanOrEqualTo(35);
-        assertThat(address.getDefendantAddressLine5().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress).isNotNull();
+        assertThat(judgmentAddress.getDefendantAddressLine1().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine2().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine3().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine4().length()).isLessThanOrEqualTo(35);
+        assertThat(judgmentAddress.getDefendantAddressLine5().length()).isLessThanOrEqualTo(35);
     }
 
     @Test

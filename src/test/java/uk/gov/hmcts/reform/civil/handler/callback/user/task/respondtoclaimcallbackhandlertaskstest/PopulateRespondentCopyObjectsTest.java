@@ -92,10 +92,9 @@ class PopulateRespondentCopyObjectsTest  {
         respondent1Flags.setRoleOnCase("Defendant 2");
         caseData.getRespondent2().setFlags(respondent2Flags);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) populateRespondentCopyObjects.execute(callbackParams);
@@ -121,10 +120,9 @@ class PopulateRespondentCopyObjectsTest  {
             .build();
         caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
         AboutToStartOrSubmitCallbackResponse response =
@@ -143,10 +141,9 @@ class PopulateRespondentCopyObjectsTest  {
             .build();
         caseData.setCcdCaseReference(1234L);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
@@ -169,10 +166,9 @@ class PopulateRespondentCopyObjectsTest  {
 
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) populateRespondentCopyObjects.execute(callbackParams);
@@ -193,10 +189,9 @@ class PopulateRespondentCopyObjectsTest  {
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(false);
         when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"))
-            .build();
+            .params(Map.of(BEARER_TOKEN, "BEARER TOKEN"));
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) populateRespondentCopyObjects.execute(callbackParams);

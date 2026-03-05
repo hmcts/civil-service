@@ -31,7 +31,7 @@ public class HttpResponseHeadersService {
                     taskToComplete.getId()
                 );
                 String encodedClientContext = encodeClientContext(
-                    ClientContextWrapper.builder().clientContext(clientContext).build());
+                    new ClientContextWrapper().setClientContext(clientContext));
                 response.addHeader("client-context", encodedClientContext);
             }
         } catch (Exception e) {

@@ -120,15 +120,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueriesCollection)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 
@@ -153,15 +152,14 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
 
         return CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email("applicant@email.com")
-                                                .build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail("applicant@email.com")
+                                                )
             .respondentSolicitor1EmailAddress("respondent1@email.com")
             .respondentSolicitor2EmailAddress("respondent2@email.com")
             .queries(caseQueries)
-            .businessProcess(BusinessProcess.builder()
-                                 .processInstanceId("123")
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setProcessInstanceId("123"))
             .build();
     }
 
@@ -229,7 +227,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @BeforeEach
         void setUp() {
             when(organisationService.findOrganisationById(any()))
-                .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
             when(notificationsProperties.getQueryResponseReceived()).thenReturn(TEMPLATE_ID);
             when(notificationsProperties.getQueryLrPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_lR_ID);
             when(notificationsProperties.getQueryLipWelshPublicResponseReceived()).thenReturn(TEMPLATE_PUBLIC_WELSH_LIP_ID);
@@ -249,9 +247,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyApplicantLR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("7")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("7"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -273,9 +269,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyRespondent1LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("11")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("11"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -297,9 +291,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyRespondent2LR_whenResponseToQueryReceivedMultipleFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -321,9 +313,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyApplicantLR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -345,9 +335,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyRespondent1LR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("9")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("9"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -369,9 +357,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyRespondent2LR_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -447,9 +433,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyClaimantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -473,9 +457,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyClaimantLipForBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("5")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("5"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -500,9 +482,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyDefendantLip_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -511,7 +491,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             OffsetDateTime now = OffsetDateTime.now();
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .respondent1Represented(YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -529,9 +509,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
         @Test
         void shouldNotifyDefendantLipBilingual_whenResponseToQueryReceivedNoFollowUpQueries() {
             when(runtimeService.getProcessVariables(any()))
-                .thenReturn(QueryManagementVariables.builder()
-                                .queryId("15")
-                                .build());
+                .thenReturn(new QueryManagementVariables().setQueryId("15"));
             when(coreCaseUserService.getUserCaseRoles(
                 any(),
                 any()
@@ -540,7 +518,7 @@ class QueryResponseSolicitorNotificationHandlerTest extends BaseCallbackHandlerT
             CaseData caseData = createCaseDataWithQueries(now);
             caseData = caseData.toBuilder()
                 .respondent1Represented(YesOrNo.NO)
-                .defendantUserDetails(IdamUserDetails.builder().email("sole.trader@email.com").build())
+                .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                 .caseDataLiP(new CaseDataLiP().setRespondent1LiPResponse(
                     new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())))
                 .build();

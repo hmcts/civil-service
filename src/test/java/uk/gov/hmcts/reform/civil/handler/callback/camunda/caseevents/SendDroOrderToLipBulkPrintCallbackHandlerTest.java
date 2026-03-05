@@ -78,7 +78,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DECISION_MADE_ON_APPLICATIONS))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_DRO_ORDER_TO_LIP_DEFENDANT.name());
 
@@ -96,7 +96,7 @@ public class SendDroOrderToLipBulkPrintCallbackHandlerTest extends BaseCallbackH
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
         // given
         CaseData caseData = CaseDataBuilder.builder()
-            .systemGeneratedCaseDocuments(wrapElements(CaseDocument.builder().documentType(DECISION_MADE_ON_APPLICATIONS).build())).build();
+            .systemGeneratedCaseDocuments(wrapElements(new CaseDocument().setDocumentType(DECISION_MADE_ON_APPLICATIONS))).build();
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(SEND_DRO_ORDER_TO_LIP_CLAIMANT.name());
 

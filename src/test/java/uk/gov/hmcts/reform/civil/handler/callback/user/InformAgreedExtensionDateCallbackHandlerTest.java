@@ -379,10 +379,9 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
                 .extensionDate(RESPONSE_DEADLINE.toLocalDate().plusDays(14))
                 .build();
             caseData.setCaseAccessCategory(SPEC_CLAIM);
-            caseData.setBusinessProcess(BusinessProcess.builder()
-                                     .camundaEvent(InformAgreedExtensionDateCallbackHandler
-                                                       .SPEC_ACKNOWLEDGEMENT_OF_SERVICE)
-                                     .build());
+            caseData.setBusinessProcess(new BusinessProcess()
+                                     .setCamundaEvent(InformAgreedExtensionDateCallbackHandler
+                                                       .SPEC_ACKNOWLEDGEMENT_OF_SERVICE));
             when(workingDayIndicator.isWorkingDay(any(LocalDate.class))).thenReturn(true);
 
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);

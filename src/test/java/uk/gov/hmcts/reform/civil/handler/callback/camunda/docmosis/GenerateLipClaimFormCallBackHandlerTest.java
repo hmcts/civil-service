@@ -167,13 +167,12 @@ class GenerateLipClaimFormCallBackHandlerTest extends BaseCallbackHandlerTest {
 
     private CallbackParams buildCallbackParams(CaseData caseData, String eventId) {
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(eventId)
                          .build())
             .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "BEARER_TOKEN"))
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
     }
 }

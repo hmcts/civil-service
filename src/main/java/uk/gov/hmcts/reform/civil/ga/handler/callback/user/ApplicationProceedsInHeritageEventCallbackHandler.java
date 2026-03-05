@@ -59,13 +59,12 @@ public class ApplicationProceedsInHeritageEventCallbackHandler extends CallbackH
         if (!NON_LIVE_STATES.contains(caseData.getCcdState())) {
             log.info("Changing state to APPLICATION_CLOSED for caseId: {}", caseId);
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder
                 .businessProcess(
-                    BusinessProcess.builder()
-                        .camundaEvent(APPLICATION_PROCEEDS_IN_HERITAGE.name())
-                        .status(BusinessProcessStatus.FINISHED)
-                        .build())
+                    new BusinessProcess()
+                        .setCamundaEvent(APPLICATION_PROCEEDS_IN_HERITAGE.name())
+                        .setStatus(BusinessProcessStatus.FINISHED))
                 .applicationTakenOfflineDate(time.now());
             if (gaForLipService.isGaForLip(caseData)) {
                 if (gaForLipService.isLipApp(caseData)) {

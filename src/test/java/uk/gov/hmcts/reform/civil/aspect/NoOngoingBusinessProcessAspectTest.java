@@ -103,7 +103,7 @@ class NoOngoingBusinessProcessAspectTest {
                 CREATE_CLAIM.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -131,7 +131,7 @@ class NoOngoingBusinessProcessAspectTest {
                 CREATE_CLAIM.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -153,7 +153,7 @@ class NoOngoingBusinessProcessAspectTest {
                 UPDATE_CASE_DATA.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -174,7 +174,7 @@ class NoOngoingBusinessProcessAspectTest {
                 REMOVE_DOCUMENT.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -193,7 +193,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(SUBMITTED, CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .request(CallbackRequest.builder().eventId(CREATE_CLAIM.name()).build())
                 .build();
@@ -237,7 +237,7 @@ class NoOngoingBusinessProcessAspectTest {
                 START_BUSINESS_PROCESS.name(),
                 CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build()
             );
 
@@ -279,7 +279,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
@@ -300,7 +300,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_START, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())
@@ -322,7 +322,7 @@ class NoOngoingBusinessProcessAspectTest {
 
             CallbackParams callbackParams = CallbackParamsBuilder.builder()
                 .of(SUBMITTED, GeneralApplicationCaseDataBuilder.builder()
-                    .businessProcess(BusinessProcess.builder().status(status).build())
+                    .businessProcess(new BusinessProcess().setStatus(status))
                     .build())
                 .isGeneralApplicationCase(true)
                 .request(CallbackRequest.builder().eventId(INITIATE_GENERAL_APPLICATION.name()).build())

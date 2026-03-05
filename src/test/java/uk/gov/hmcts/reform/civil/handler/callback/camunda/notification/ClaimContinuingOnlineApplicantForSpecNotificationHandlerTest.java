@@ -109,7 +109,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_in1v1_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -139,7 +139,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_when1v2_SameLegalRep() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -169,7 +169,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_when1v2_TwoLegalReps() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnline1v2ForSpec()).thenReturn(TEMPLATE_1v2);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -199,7 +199,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_in2v1() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -262,7 +262,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_whenRespondent1NotRepresented() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
@@ -294,7 +294,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
         void shouldNotifyClaimantSolicitor_whenRespondent1IsRepresented() {
             when(notificationsProperties.getClaimantSolicitorClaimContinuingOnlineForSpec()).thenReturn(TEMPLATE);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+                .thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 

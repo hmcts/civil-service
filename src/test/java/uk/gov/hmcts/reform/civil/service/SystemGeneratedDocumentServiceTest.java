@@ -39,7 +39,7 @@ class SystemGeneratedDocumentServiceTest {
         );
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
             .getSystemGeneratedDocumentsWithAddedDocument(translatedDocument, callbackParams.getCaseData());
@@ -82,7 +82,7 @@ class SystemGeneratedDocumentServiceTest {
         );
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setSystemGeneratedCaseDocuments(new ArrayList<>());
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
             .getHearingDocumentsWithAddedDocumentWelsh(translatedDocument, callbackParams.getCaseData());
@@ -107,7 +107,7 @@ class SystemGeneratedDocumentServiceTest {
         );
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setCourtOfficersOrders(new ArrayList<>());
-        CallbackParams callbackParams = CallbackParams.builder().caseData(caseData).build();
+        CallbackParams callbackParams = new CallbackParams().caseData(caseData);
         //When
         List<Element<CaseDocument>> result = systemGeneratedDocumentService
             .getCourtOfficerOrdersWithAddedDocument(translatedDocument, callbackParams.getCaseData());

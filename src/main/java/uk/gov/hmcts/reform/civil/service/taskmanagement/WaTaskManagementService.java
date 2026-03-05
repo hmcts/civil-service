@@ -37,14 +37,13 @@ public class WaTaskManagementService {
             return new ArrayList<>();
         }
 
-        SearchTaskRequest request = SearchTaskRequest.builder()
-            .searchParameters(List.of(
-                SearchParameterList.builder()
-                    .key(SearchParameterKey.CASE_ID)
-                    .operator(SearchOperator.IN)
-                    .values(List.of(caseId))
-                    .build()))
-            .build();
+        SearchParameterList searchParameter = new SearchParameterList()
+            .setKey(SearchParameterKey.CASE_ID)
+            .setOperator(SearchOperator.IN)
+            .setValues(List.of(caseId));
+
+        SearchTaskRequest request = new SearchTaskRequest()
+            .setSearchParameters(List.of(searchParameter));
 
         log.info("wa task search request: {}", request);
 

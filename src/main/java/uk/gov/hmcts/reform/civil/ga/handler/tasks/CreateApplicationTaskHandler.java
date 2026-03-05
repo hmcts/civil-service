@@ -92,10 +92,9 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
                                                               coreCaseDataService.caseDataContentFromStartEventResponse(
                                                                   startEventResponse,
                                                                   caseData.toMap(mapper)));
-        return ExternalTaskData.builder()
-            .parentCaseData(parentCaseData)
-            .updateGeneralApplicationCaseData(generalAppCaseData)
-            .build();
+        return new ExternalTaskData()
+            .setParentCaseData(parentCaseData)
+            .setUpdateGeneralApplicationCaseData(generalAppCaseData);
     }
 
     private GeneralApplicationCaseData withoutNoticeNoConsent(GeneralApplication generalApplication,
@@ -171,7 +170,7 @@ public class CreateApplicationTaskHandler extends BaseExternalTaskHandler {
             }
         }
 
-        return caseData.toBuilder()
+        return caseData.copy()
             .claimantGaAppDetails(applications)
             .respondentSolGaAppDetails(respondentSpecficGADetails)
             .respondentSolTwoGaAppDetails(respondentTwoSpecficGADetails)

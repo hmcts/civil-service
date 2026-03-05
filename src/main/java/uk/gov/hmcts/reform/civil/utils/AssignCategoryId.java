@@ -38,42 +38,39 @@ public class AssignCategoryId {
         if (documentUpload == null || documentUpload.getDocumentLink() == null) {
             return null;
         }
-        Document document = Document.builder()
-                .categoryID(theID)
-                .documentFileName(documentUpload.getDocumentLink().getDocumentFileName())
-                .documentBinaryUrl(documentUpload.getDocumentLink().getDocumentBinaryUrl())
-                .documentHash(documentUpload.getDocumentLink().getDocumentHash())
-                .documentUrl(documentUpload.getDocumentLink().getDocumentUrl())
-                .build();
-        return CaseDocument.builder()
-                .documentName(documentUpload.getDocumentName())
-                .documentType(documentUpload.getDocumentType())
-                .documentLink(document)
-                .documentSize(documentUpload.getDocumentSize())
-                .createdBy(documentUpload.getCreatedBy())
-                .createdDatetime(documentUpload.getCreatedDatetime())
-                .build();
+        Document document = new Document()
+                .setCategoryID(theID)
+                .setDocumentFileName(documentUpload.getDocumentLink().getDocumentFileName())
+                .setDocumentBinaryUrl(documentUpload.getDocumentLink().getDocumentBinaryUrl())
+                .setDocumentHash(documentUpload.getDocumentLink().getDocumentHash())
+                .setDocumentUrl(documentUpload.getDocumentLink().getDocumentUrl());
+        return new CaseDocument()
+                .setDocumentName(documentUpload.getDocumentName())
+                .setDocumentType(documentUpload.getDocumentType())
+                .setDocumentLink(document)
+                .setDocumentSize(documentUpload.getDocumentSize())
+                .setCreatedBy(documentUpload.getCreatedBy())
+                .setCreatedDatetime(documentUpload.getCreatedDatetime());
     }
 
     public List<Element<CaseDocument>> copyCaseDocumentListWithCategoryId(
             List<Element<CaseDocument>> source, String theID) {
         return source.stream().map(caseDocument -> {
             Document sourceDocument = caseDocument.getValue().getDocumentLink();
-            Document document = Document.builder()
-                    .categoryID(theID)
-                    .documentFileName(sourceDocument.getDocumentFileName())
-                    .documentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
-                    .documentHash(sourceDocument.getDocumentHash())
-                    .documentUrl(sourceDocument.getDocumentUrl())
-                    .build();
-            return element(CaseDocument.builder()
-                    .documentName(caseDocument.getValue().getDocumentName())
-                    .documentType(caseDocument.getValue().getDocumentType())
-                    .documentLink(document)
-                    .documentSize(caseDocument.getValue().getDocumentSize())
-                    .createdBy(caseDocument.getValue().getCreatedBy())
-                    .createdDatetime(caseDocument.getValue().getCreatedDatetime())
-                    .build());
+            Document document = new Document()
+                    .setCategoryID(theID)
+                    .setDocumentFileName(sourceDocument.getDocumentFileName())
+                    .setDocumentBinaryUrl(sourceDocument.getDocumentBinaryUrl())
+                    .setDocumentHash(sourceDocument.getDocumentHash())
+                    .setDocumentUrl(sourceDocument.getDocumentUrl());
+            CaseDocument clonedDocument = new CaseDocument()
+                .setDocumentName(caseDocument.getValue().getDocumentName())
+                .setDocumentType(caseDocument.getValue().getDocumentType())
+                .setDocumentLink(document)
+                .setDocumentSize(caseDocument.getValue().getDocumentSize())
+                .setCreatedBy(caseDocument.getValue().getCreatedBy())
+                .setCreatedDatetime(caseDocument.getValue().getCreatedDatetime());
+            return element(clonedDocument);
         }).toList();
     }
 
@@ -82,13 +79,12 @@ public class AssignCategoryId {
         return source.stream().map(documentElement -> {
             MediationNonAttendanceStatement statement = documentElement.getValue();
             Document value = statement.getDocument();
-            Document updatedDocument = Document.builder()
-                .categoryID(theID)
-                .documentFileName(value.getDocumentFileName())
-                .documentBinaryUrl(value.getDocumentBinaryUrl())
-                .documentHash(value.getDocumentHash())
-                .documentUrl(value.getDocumentUrl())
-                .build();
+            Document updatedDocument = new Document()
+                .setCategoryID(theID)
+                .setDocumentFileName(value.getDocumentFileName())
+                .setDocumentBinaryUrl(value.getDocumentBinaryUrl())
+                .setDocumentHash(value.getDocumentHash())
+                .setDocumentUrl(value.getDocumentUrl());
             MediationNonAttendanceStatement clone = new MediationNonAttendanceStatement();
             clone.setYourName(statement.getYourName());
             clone.setDocumentDate(statement.getDocumentDate());
@@ -103,13 +99,12 @@ public class AssignCategoryId {
         return source.stream().map(documentElement -> {
             MediationDocumentsReferredInStatement statement = documentElement.getValue();
             Document value = statement.getDocument();
-            Document updatedDocument = Document.builder()
-                .categoryID(theID)
-                .documentFileName(value.getDocumentFileName())
-                .documentBinaryUrl(value.getDocumentBinaryUrl())
-                .documentHash(value.getDocumentHash())
-                .documentUrl(value.getDocumentUrl())
-                .build();
+            Document updatedDocument = new Document()
+                .setCategoryID(theID)
+                .setDocumentFileName(value.getDocumentFileName())
+                .setDocumentBinaryUrl(value.getDocumentBinaryUrl())
+                .setDocumentHash(value.getDocumentHash())
+                .setDocumentUrl(value.getDocumentUrl());
             MediationDocumentsReferredInStatement clone = new MediationDocumentsReferredInStatement();
             clone.setDocumentType(statement.getDocumentType());
             clone.setDocumentDate(statement.getDocumentDate());

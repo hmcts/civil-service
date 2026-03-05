@@ -48,7 +48,7 @@ class JudgmentAmountsCalculatorTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .hwfFeeType(FeeType.CLAIMISSUED)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .claimIssuedHwfDetails(new HelpWithFeesDetails().setOutstandingFeeInPounds(BigDecimal.valueOf(50)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .totalClaimAmount(new BigDecimal(2000))
@@ -64,11 +64,11 @@ class JudgmentAmountsCalculatorTest {
     void shouldReturnClaimFeeWithFixedCosts_whenFixedCostsAreProvided() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
-            .fixedCosts(FixedCosts.builder()
-                .fixedCostAmount("1000")
-                .claimFixedCosts(YesOrNo.YES)
-                .build())
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("1000")).build())
+            .fixedCosts(new FixedCosts()
+                .setFixedCostAmount("1000")
+                .setClaimFixedCosts(YesOrNo.YES)
+                )
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal("1000")))
             .build();
 
         BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);
@@ -81,12 +81,12 @@ class JudgmentAmountsCalculatorTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .paymentConfirmationDecisionSpec(YesOrNo.YES)
             .totalClaimAmount(new BigDecimal("5000"))
-            .fixedCosts(FixedCosts.builder()
-                .fixedCostAmount("1000")
-                .claimFixedCosts(YesOrNo.YES)
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setFixedCostAmount("1000")
+                .setClaimFixedCosts(YesOrNo.YES)
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.YES)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("9000")).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal("9000")))
             .build();
 
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(new BigDecimal("50.00"));
@@ -101,12 +101,12 @@ class JudgmentAmountsCalculatorTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .paymentConfirmationDecisionSpec(YesOrNo.NO)
             .totalClaimAmount(new BigDecimal("5000"))
-            .fixedCosts(FixedCosts.builder()
-                .fixedCostAmount("1000")
-                .claimFixedCosts(YesOrNo.YES)
-                .build())
+            .fixedCosts(new FixedCosts()
+                .setFixedCostAmount("1000")
+                .setClaimFixedCosts(YesOrNo.YES)
+                )
             .claimFixedCostsOnEntryDJ(YesOrNo.NO)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal("8000")).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal("8000")))
             .build();
 
         BigDecimal claimFee = judgmentAmountsCalculator.getClaimFee(caseData);

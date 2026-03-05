@@ -40,15 +40,14 @@ class GaInvalidHwFCallbackHandlerTest {
     class AboutToSubmit {
         @Test
         void shouldSubmit_InvalidHwFEvent() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(AWAITING_RESPONDENT_RESPONSE)
                 .hwfFeeType(FeeType.APPLICATION)
                 .generalAppHelpWithFees(new HelpWithFees()).build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .type(CallbackType.ABOUT_TO_SUBMIT)
-                .caseData(caseData)
-                .build();
+                .caseData(caseData);
 
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);

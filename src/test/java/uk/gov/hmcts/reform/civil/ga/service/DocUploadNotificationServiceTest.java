@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.civil.ga.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.notification.NotificationDataGA;
@@ -47,34 +47,31 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 import static uk.gov.hmcts.reform.civil.ga.utils.EmailFooterUtils.RAISE_QUERY_LR;
 
-@SpringBootTest(classes = {
-    DocUploadNotificationService.class,
-    JacksonAutoConfiguration.class
-})
+@ExtendWith(MockitoExtension.class)
 public class DocUploadNotificationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private DocUploadNotificationService docUploadNotificationService;
 
-    @MockBean
+    @Mock
     private NotificationService notificationService;
 
-    @MockBean
+    @Mock
     private NotificationsProperties notificationsProperties;
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @MockBean
+    @Mock
     private CoreCaseDataService coreCaseDataService;
 
-    @MockBean
+    @Mock
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @Mock
     private NotificationsSignatureConfiguration configuration;
 
     private static final Long CASE_REFERENCE = 111111L;
@@ -89,16 +86,6 @@ public class DocUploadNotificationServiceTest {
     class AboutToSubmitCallback {
         @BeforeEach
         void setup() {
-            when(notificationsProperties.getEvidenceUploadTemplate())
-                .thenReturn("general-apps-notice-of-document-template-id");
-            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
-                .thenReturn("ga-notice-of-document-lip-appln-template-id");
-            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
-                .thenReturn("ga-notice-of-document-lip-appln-welsh-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
-                .thenReturn("ga-notice-of-document-lip-respondent-template-id");
-            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
-                .thenReturn("ga-notice-of-document-lip-respondent-welsh-template-id");
             when(configuration.getHmctsSignature()).thenReturn("Online Civil Claims \n HM Courts & Tribunal Service");
             when(configuration.getPhoneContact()).thenReturn("For anything related to hearings, call 0300 123 5577 "
                                                                  + "\n For all other matters, call 0300 123 7050");
@@ -114,8 +101,10 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void appNotificationShouldSendWhenInvoked() {
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(true, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
@@ -128,9 +117,10 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void appNotificationWithSolicitorReferenceAdded() {
-
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
             GeneralApplicationCaseData caseData = getCaseData(false, NO, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
@@ -143,7 +133,9 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void respNotificationShouldSendTwice1V2() {
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().ccdState(
+            when(notificationsProperties.getEvidenceUploadTemplate())
+                .thenReturn("general-apps-notice-of-document-template-id");
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().ccdState(
                 CaseState.CASE_PROGRESSION).build());
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
@@ -160,13 +152,15 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked() {
+            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplate())
+                .thenReturn("ga-notice-of-document-lip-appln-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = getCaseData(true, YES, NO);
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
             docUploadNotificationService.notifyApplicantEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
                 DUMMY_EMAIL,
@@ -178,14 +172,16 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipApplicantNotificationShouldSendWhenInvoked_whenMainClaimIssuedInWelsh() {
+            when(notificationsProperties.getLipGeneralAppApplicantEmailTemplateInWelsh())
+                .thenReturn("ga-notice-of-document-lip-appln-welsh-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(gaForLipService.isLipApp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData =
-                getCaseData(true, YES, NO).toBuilder().applicantBilingualLanguagePreference(YES).build();
-            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().applicantBilingualLanguagePreference(
+                getCaseData(true, YES, NO).copy().applicantBilingualLanguagePreference(YES).build();
+            GeneralApplicationCaseData claimantClaimIssueFlag = new GeneralApplicationCaseData().applicantBilingualLanguagePreference(
                     YES)
                 .claimantBilingualLanguagePreference("WELSH").build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
@@ -200,6 +196,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend() {
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplate())
+                .thenReturn("ga-notice-of-document-lip-respondent-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -212,9 +210,9 @@ public class DocUploadNotificationServiceTest {
                 .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
             respondentSols.add(element(respondent1));
 
-            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).copy()
                 .generalAppRespondentSolicitors(respondentSols).build();
-            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(new GeneralApplicationCaseData().build());
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
             verify(notificationService, times(1)).sendMail(
                 DUMMY_EMAIL,
@@ -226,6 +224,8 @@ public class DocUploadNotificationServiceTest {
 
         @Test
         void lipRespondentNotificationShouldSend_whenRespondentResponseInWelsh() {
+            when(notificationsProperties.getLipGeneralAppRespondentEmailTemplateInWelsh())
+                .thenReturn("ga-notice-of-document-lip-respondent-welsh-template-id");
             when(configuration.getSpecUnspecContact()).thenReturn(
                 "Email for Specified Claims: contactocmc@justice.gov.uk "
                     + "\n Email for Damages Claims: damagesclaims@justice.gov.uk");
@@ -238,9 +238,9 @@ public class DocUploadNotificationServiceTest {
                 .email(DUMMY_EMAIL).surname(Optional.of("surname")).forename("forename").organisationIdentifier("2").build();
             respondentSols.add(element(respondent1));
 
-            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).toBuilder()
+            GeneralApplicationCaseData caseData = getCaseData(true, NO, YES).copy()
                 .generalAppRespondentSolicitors(respondentSols).respondentBilingualLanguagePreference(YES).build();
-            GeneralApplicationCaseData claimantClaimIssueFlag = GeneralApplicationCaseData.builder().respondentBilingualLanguagePreference(YES)
+            GeneralApplicationCaseData claimantClaimIssueFlag = new GeneralApplicationCaseData().respondentBilingualLanguagePreference(YES)
                 .respondent1LiPResponse(new RespondentLiPResponse().setRespondent1ResponseLanguage(Language.BOTH.toString())).build();
             when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(claimantClaimIssueFlag);
             docUploadNotificationService.notifyRespondentEvidenceUpload(caseData);
@@ -348,29 +348,23 @@ public class DocUploadNotificationServiceTest {
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                                   .email(DUMMY_EMAIL).organisationIdentifier("1").build())
                     .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
                     .applicantPartyName("App")
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
                     .isGaRespondentOneLip(isGaRespondentOneLip)
                     .isGaApplicantLip(isGaApplicantLip)
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
                     .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                     .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                     .parentClaimantIsApplicant(YES)
                     .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .organisation(Organisation.builder().organisationID("1").build())
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("2").build())
-                                                       .build())
-                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("3").build())
-                                                       .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+                    .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
                     .ccdCaseReference(CASE_REFERENCE)
                     .build();
             } else {
@@ -379,29 +373,23 @@ public class DocUploadNotificationServiceTest {
                     .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                                   .email(DUMMY_EMAIL).organisationIdentifier("1").build())
                     .generalAppRespondentSolicitors(respondentSols)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
                     .applicantPartyName("App")
                     .claimant1PartyName("CL")
                     .defendant1PartyName("DEF")
                     .isGaRespondentOneLip(isGaRespondentOneLip)
                     .isGaApplicantLip(isGaApplicantLip)
-                    .businessProcess(BusinessProcess.builder().status(STARTED)
-                                         .processInstanceId(PROCESS_INSTANCE_ID).build())
+                    .businessProcess(new BusinessProcess().setStatus(STARTED)
+                                         .setProcessInstanceId(PROCESS_INSTANCE_ID))
                     .gaInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                     .gaUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
                     .parentClaimantIsApplicant(YES)
                     .gaRespondentOrderAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                     .respondentSolicitor1EmailAddress(DUMMY_EMAIL)
                     .respondentSolicitor2EmailAddress(DUMMY_EMAIL)
-                    .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                                      .organisation(Organisation.builder().organisationID("1").build())
-                                                      .build())
-                    .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("2").build())
-                                                       .build())
-                    .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                                       .organisation(Organisation.builder().organisationID("3").build())
-                                                       .build())
+                    .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
+                    .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+                    .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
                     .ccdCaseReference(CASE_REFERENCE)
                     .build();
             }

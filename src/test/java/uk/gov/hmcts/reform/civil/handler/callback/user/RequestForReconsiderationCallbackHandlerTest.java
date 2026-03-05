@@ -96,8 +96,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                   .element(new CaseDocument()
                                                                .setDocumentType(DocumentType.SDO_ORDER)
-                                                               .setCreatedDatetime(LocalDateTime.now().minusDays(6)))))
-                .build();
+                                                               .setCreatedDatetime(LocalDateTime.now().minusDays(6))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -133,8 +132,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .setCreatedDatetime(LocalDateTime.now().minusDays(10))),
                     ElementUtils.element(new CaseDocument()
                                              .setDocumentType(DocumentType.SDO_ORDER)
-                                             .setCreatedDatetime(LocalDateTime.now().minusDays(6)))))
-                .build();
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(6))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("APPLICANTSOLICITORONE"));
@@ -156,8 +154,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                                              .setCreatedDatetime(LocalDateTime.now().minusDays(10))),
                     ElementUtils.element(new CaseDocument()
                                              .setDocumentType(DocumentType.SDO_ORDER)
-                                             .setCreatedDatetime(LocalDateTime.now().minusDays(7)))))
-                .build();
+                                             .setCreatedDatetime(LocalDateTime.now().minusDays(7))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -175,8 +172,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
                 .systemGeneratedCaseDocuments(List.of(ElementUtils
                                                           .element(new CaseDocument()
                                                                        .setDocumentType(DocumentType.SDO_ORDER)
-                                                                       .setCreatedDatetime(LocalDateTime.now().minusDays(7)))))
-                .build();
+                                                                       .setCreatedDatetime(LocalDateTime.now().minusDays(7))))).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
             //When: handler is called with ABOUT_TO_START event
@@ -663,10 +659,9 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
         @Test
         void whenSubmitted_thenIncludeHeader() {
             CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
-                .type(CallbackType.SUBMITTED)
-                .build();
+                .type(CallbackType.SUBMITTED);
             SubmittedCallbackResponse response =
                 (SubmittedCallbackResponse) handler.handle(params);
             assertThat(response.getConfirmationHeader()).isEqualTo("# Your request has been submitted");

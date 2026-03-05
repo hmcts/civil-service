@@ -35,10 +35,10 @@ public class RepresentedLitigantPopulator {
         this.organisationService = organisationService;
     }
 
-    public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
-                                                                MediationContactInformation mediationContactInformation,
-                                                                MediationAvailability mediationAvailability,
-                                                                OrganisationPolicy organisationPolicy, String solicitorEmail) {
+    public MediationLitigant populator(MediationLitigant litigant,
+                                       MediationContactInformation mediationContactInformation,
+                                       MediationAvailability mediationAvailability,
+                                       OrganisationPolicy organisationPolicy, String solicitorEmail) {
 
         String solicitorOrgName = getSolicitorOrgName(organisationPolicy);
         String mediationContactName = getMediationContactName(mediationContactInformation);
@@ -49,14 +49,14 @@ public class RepresentedLitigantPopulator {
 
         List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationAvailability);
 
-        return builder.represented(true)
-            .solicitorOrgName(solicitorOrgName)
-            .litigantEmail(solicitorEmail)
-            .litigantTelephone(null)
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationContactNumber)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid);
+        return litigant.setRepresented(true)
+            .setSolicitorOrgName(solicitorOrgName)
+            .setLitigantEmail(solicitorEmail)
+            .setLitigantTelephone(null)
+            .setMediationContactName(mediationContactName)
+            .setMediationContactNumber(mediationContactNumber)
+            .setMediationContactEmail(mediationEmail)
+            .setDateRangeToAvoid(dateRangeToAvoid);
     }
 
     @Nullable
@@ -93,23 +93,21 @@ public class RepresentedLitigantPopulator {
         List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
         for (UnavailableDate unavailableDate : unavailableDates) {
             if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getDate()))
-                                                  .dateTo(formatDate(unavailableDate.getDate()))
-                                                  .build());
+                toMediationUnavailability.add(new MediationUnavailability()
+                                                  .setDateFrom(formatDate(unavailableDate.getDate()))
+                                                  .setDateTo(formatDate(unavailableDate.getDate())));
             }
             if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getFromDate()))
-                                                  .dateTo(formatDate(unavailableDate.getToDate()))
-                                                  .build());
+                toMediationUnavailability.add(new MediationUnavailability()
+                                                  .setDateFrom(formatDate(unavailableDate.getFromDate()))
+                                                  .setDateTo(formatDate(unavailableDate.getToDate())));
             }
         }
         return toMediationUnavailability;
     }
 
     private List<MediationUnavailability> getDefaultUnavailableList() {
-        return List.of(MediationUnavailability.builder().build());
+        return List.of(new MediationUnavailability());
     }
 
     private String formatDate(LocalDate unavailableDate) {

@@ -182,20 +182,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .type(COMPANY)
                                  .companyName("Test Inc")
                                  .build())
-                .applicant1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                                                                   .firstName("Claimant")
-                                                                   .lastName("OrgIndividual")
-                                                                   .email("claiamnt-orgindividual@example.com")
-                                                                   .phone("07867654543")
-                                                                   .partyID("party-id")
-                                                                   .build())))
-                .respondent1OrgIndividuals(wrapElements(List.of(PartyFlagStructure.builder()
-                                                                    .firstName("Defendant")
-                                                                    .lastName("OrgIndividual")
-                                                                    .email("defendant-orgindividual@example.com")
-                                                                    .phone("07867654543")
-                                                                    .partyID("party-id")
-                                                                    .build())))
+                .applicant1OrgIndividuals(wrapElements(List.of(new PartyFlagStructure()
+                                                                   .setFirstName("Claimant")
+                                                                   .setLastName("OrgIndividual")
+                                                                   .setEmail("claiamnt-orgindividual@example.com")
+                                                                   .setPhone("07867654543")
+                                                                   .setPartyID("party-id")
+                                                                   )))
+                .respondent1OrgIndividuals(wrapElements(List.of(new PartyFlagStructure()
+                                                                    .setFirstName("Defendant")
+                                                                    .setLastName("OrgIndividual")
+                                                                    .setEmail("defendant-orgindividual@example.com")
+                                                                    .setPhone("07867654543")
+                                                                    .setPartyID("party-id")
+                                                                    )))
                 .ccdState(CaseState.AWAITING_APPLICANT_INTENTION)
                 .ccdCaseReference(123L)
                 .build();
@@ -865,10 +865,9 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
         private static final String PARTY_ID = "party-id";
         private static final ContactDetailsUpdatedEvent EVENT =
-            ContactDetailsUpdatedEvent.builder()
-                .summary("Summary")
-                .description("Description")
-                .build();
+            new ContactDetailsUpdatedEvent()
+                .setSummary("Summary")
+                .setDescription("Description");
         private static MockedStatic partyIdMock;
 
         @BeforeAll
@@ -890,20 +889,20 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             expectedExpert1 = dqExpert.copy().setFirstName("First").setLastName("Name")
                 .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
                 .setPartyID(PARTY_ID);
-            expectedExpertFlags = PartyFlagStructure.builder()
-                .partyID(PARTY_ID)
-                .firstName("First")
-                .lastName("Name")
-                .build();
+            expectedExpertFlags = new PartyFlagStructure()
+                .setPartyID(PARTY_ID)
+                .setFirstName("First")
+                .setLastName("Name")
+                ;
             dqWitness = new Witness().setFirstName("dq").setLastName("dq").setPartyID("id");
             expectedWitness1 = new Witness().setFirstName("First").setLastName("Name")
                 .setEventAdded("Manage Contact Information Event").setDateAdded(LocalDate.now())
                 .setPartyID(PARTY_ID);
-            expectedWitnessFlags = PartyFlagStructure.builder()
-                .partyID(PARTY_ID)
-                .firstName("First")
-                .lastName("Name")
-                .build();
+            expectedWitnessFlags = new PartyFlagStructure()
+                .setPartyID(PARTY_ID)
+                .setFirstName("First")
+                .setLastName("Name")
+                ;
 
             CaseData caseDataBefore = CaseDataBuilder.builder()
                 .applicant1(Party.builder().type(INDIVIDUAL).build())
@@ -958,7 +957,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(YES).build(), responseData.getContactDetailsUpdatedEvent());
+                EVENT.copy().setSubmittedByCaseworker(YES), responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -1011,7 +1010,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(YES).build(),
+                EVENT.copy().setSubmittedByCaseworker(YES),
                 responseData.getContactDetailsUpdatedEvent()
             );
             verify(coreCaseDataService).triggerGeneralApplicationEvent(
@@ -1030,13 +1029,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder().firstName("Claimant")
-                .firstName("Claimant")
-                .lastName("LRIndividual")
-                .email("claiamnt-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure().setFirstName("Claimant")
+                .setFirstName("Claimant")
+                .setLastName("LRIndividual")
+                .setEmail("claiamnt-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1079,13 +1078,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant1")
-                .lastName("LRIndividual")
-                .email("defendant1-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant1")
+                .setLastName("LRIndividual")
+                .setEmail("defendant1-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1128,13 +1127,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant2")
-                .lastName("LRIndividual")
-                .email("defendant2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant2")
+                .setLastName("LRIndividual")
+                .setEmail("defendant2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1177,13 +1176,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Claimant1")
-                .lastName("OrgIndividual")
-                .email("claiamnt-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Claimant1")
+                .setLastName("OrgIndividual")
+                .setEmail("claiamnt-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1226,13 +1225,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Claimant2")
-                .lastName("OrgIndividual")
-                .email("claiamnt2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Claimant2")
+                .setLastName("OrgIndividual")
+                .setEmail("claiamnt2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1275,13 +1274,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant1")
-                .lastName("OrgIndividual")
-                .email("defendant1-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant1")
+                .setLastName("OrgIndividual")
+                .setEmail("defendant1-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1324,13 +1323,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                                                 .type(INDIVIDUAL).flags(respondent1Flags).build()).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
-            PartyFlagStructure expected = PartyFlagStructure.builder()
-                .firstName("Defendant2")
-                .lastName("OrgIndividual")
-                .email("defendant2-lrindividual@example.com")
-                .phone("07867654543")
-                .partyID("party-id")
-                .build();
+            PartyFlagStructure expected = new PartyFlagStructure()
+                .setFirstName("Defendant2")
+                .setLastName("OrgIndividual")
+                .setEmail("defendant2-lrindividual@example.com")
+                .setPhone("07867654543")
+                .setPartyID("party-id")
+                ;
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -1403,7 +1402,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             assertEquals(MANAGE_CONTACT_INFORMATION.name(), responseData.getBusinessProcess().getCamundaEvent());
             assertEquals(READY, responseData.getBusinessProcess().getStatus());
             assertEquals(
-                EVENT.toBuilder().submittedByCaseworker(NO).build(), responseData.getContactDetailsUpdatedEvent());
+                EVENT.copy().setSubmittedByCaseworker(NO), responseData.getContactDetailsUpdatedEvent());
         }
 
         @Test
@@ -2214,9 +2213,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                            .build())
                     .applicant1(Party.builder()
                                     .type(INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .postCode(null)
-                                                        .build())
+                                    .primaryAddress(new Address())
                                     .build())
                     .build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2425,6 +2422,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {CLAIMANT_ONE_ID, CLAIMANT_TWO_ID})
             void shouldReturnErrorForClaimantManageInformation(String partyChosenId) {
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -2436,22 +2440,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                             .build())
                                            .build())
                     .applicant1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .addressLine1("Line 1 test again for more than 35 characters")
-                                                        .addressLine2("Line 1 test again for more than 35 characters")
-                                                        .addressLine3("Line 1 test again for more than 35 characters")
-                                                        .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("PostCode more than 8 characters")
-                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .primaryAddress(invalidAddress)
                                     .build())
                     .applicant2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                    .primaryAddress(Address.builder()
-                                                        .addressLine1("Line 1 test again for more than 35 characters")
-                                                        .addressLine2("Line 1 test again for more than 35 characters")
-                                                        .addressLine3("Line 1 test again for more than 35 characters")
-                                                        .county("Line 1 test again for more than 35 characters")
-                                                        .postCode("PostCode more than 8 characters")
-                                                        .postTown("Line 1 test again for more than 35 characters").build())
+                                    .primaryAddress(invalidAddress)
                                     .build())
                     .build();
 
@@ -2542,6 +2534,13 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             @ParameterizedTest
             @ValueSource(strings = {DEFENDANT_ONE_ID, DEFENDANT_TWO_ID})
             void shouldReturnErrorForDefendantManageInformation(String partyChosenId) {
+                Address invalidAddress = new Address();
+                invalidAddress.setAddressLine1("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine2("Line 1 test again for more than 35 characters");
+                invalidAddress.setAddressLine3("Line 1 test again for more than 35 characters");
+                invalidAddress.setCounty("Line 1 test again for more than 35 characters");
+                invalidAddress.setPostCode("PostCode more than 8 characters");
+                invalidAddress.setPostTown("Line 1 test again for more than 35 characters");
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .caseAccessCategory(CaseCategory.SPEC_CLAIM)
@@ -2553,22 +2552,10 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                                             .build())
                                            .build())
                     .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(Address.builder()
-                                                         .addressLine1("Line 1 test again for more than 35 characters")
-                                                         .addressLine2("Line 1 test again for more than 35 characters")
-                                                         .addressLine3("Line 1 test again for more than 35 characters")
-                                                         .county("Line 1 test again for more than 35 characters")
-                                                         .postCode("PostCode more than 8 characters")
-                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .primaryAddress(invalidAddress)
                                      .build())
                     .respondent2(Party.builder().type(Party.Type.INDIVIDUAL)
-                                     .primaryAddress(Address.builder()
-                                                         .addressLine1("Line 1 test again for more than 35 characters")
-                                                         .addressLine2("Line 1 test again for more than 35 characters")
-                                                         .addressLine3("Line 1 test again for more than 35 characters")
-                                                         .county("Line 1 test again for more than 35 characters")
-                                                         .postCode("PostCode more than 8 characters")
-                                                         .postTown("Line 1 test again for more than 35 characters").build())
+                                     .primaryAddress(invalidAddress)
                                      .build())
                     .build();
 

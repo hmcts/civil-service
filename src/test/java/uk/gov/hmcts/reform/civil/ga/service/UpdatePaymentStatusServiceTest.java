@@ -49,15 +49,14 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenApplicationFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().paymentDetails(PaymentDetails.builder()
-                    .customerReference("RC-1604-0739-2145-4711")
-                    .build()).build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setPaymentDetails(new PaymentDetails()
+                    .setCustomerReference("RC-1604-0739-2145-4711")
+                    ))
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
 
@@ -80,16 +79,15 @@ class UpdatePaymentStatusServiceTest {
     @Test
     public void shouldSubmitCitizenAdditionalFeePaymentEvent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .ccdState(CASE_PROGRESSION)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .camundaEvent(BUSINESS_PROCESS)
-                                 .build())
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().additionalPaymentDetails(PaymentDetails.builder()
-                                                                            .customerReference("RC-1604-0739-2145-4711")
-                                                                            .build())
-                                      .additionalPaymentServiceRef("2023-1701090705600").build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY)
+                                 .setCamundaEvent(BUSINESS_PROCESS))
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setAdditionalPaymentDetails(new PaymentDetails()
+                                                                            .setCustomerReference("RC-1604-0739-2145-4711")
+                                                                            )
+                                      .setAdditionalPaymentServiceRef("2023-1701090705600"))
             .applicationFeeAmountInPence(new BigDecimal("10000"))
             .build();
         CaseDetails caseDetails = buildCaseDetails(caseData);
@@ -129,6 +127,8 @@ class UpdatePaymentStatusServiceTest {
     }
 
     private CardPaymentStatusResponse getCardPaymentStatusResponse() {
-        return CardPaymentStatusResponse.builder().paymentReference("1234").status(PaymentStatus.SUCCESS.name()).build();
+        return new CardPaymentStatusResponse()
+            .setPaymentReference("1234")
+            .setStatus(PaymentStatus.SUCCESS.name());
     }
 }

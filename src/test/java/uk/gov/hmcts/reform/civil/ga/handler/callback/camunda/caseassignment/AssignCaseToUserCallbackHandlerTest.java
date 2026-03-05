@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
@@ -45,6 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
 import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
@@ -55,35 +57,51 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.ADJOURN
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SUMMARY_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    AssignCaseToUserCallbackHandler.class,
-    AssignCaseToRespondentSolHelper.class,
-    GaForLipService.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
     private AssignCaseToUserCallbackHandler assignCaseToUserHandler;
 
-    @MockBean
+    private AssignCaseToRespondentSolHelper assignCaseToRespondentSolHelper;
+
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @MockBean
+    @Mock
     private RolesAndAccessAssignmentService rolesAndAccessAssignmentService;
+
+    @Mock
+    private GaForLipService gaForLipService;
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
 
     private CallbackParams params;
     private GeneralApplication generalApplication;
     private GeneralApplication generalApplicationWithNotice;
 
     public static final Long CASE_ID = 1594901956117591L;
+
+    @BeforeEach
+    void initHandler() {
+        assignCaseToRespondentSolHelper = new AssignCaseToRespondentSolHelper(coreCaseUserService, gaForLipService);
+        assignCaseToUserHandler = new AssignCaseToUserCallbackHandler(
+            assignCaseToRespondentSolHelper,
+            objectMapper,
+            generalAppFeesService,
+            coreCaseUserService,
+            caseDetailsConverter,
+            gaForLipService,
+            rolesAndAccessAssignmentService
+        );
+    }
+
     public static final int RESPONDENT_ONE = 0;
     public static final int RESPONDENT_TWO = 1;
     public static final String SPEC_CLAIM = "SPEC_CLAIM";
@@ -125,12 +143,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(UNSPEC_CLAIM)
                     .isMultiParty(YES)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -202,12 +220,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .isMultiParty(YesOrNo.NO)
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
                     .generalAppSuperClaimType(UNSPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -239,7 +257,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignDefendantRoleForGALip {
         @BeforeEach
         void setup() {
-
+            when(gaForLipService.isLipResp(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -264,13 +282,13 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .isMultiParty(YesOrNo.NO)
                     .defendant1PartyName("Respondent1")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -291,9 +309,9 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
             assignCaseToUserHandler.handle(params);
             verify(coreCaseUserService, times(1))
                     .assignCase(CASE_ID.toString(),
-                            generalApplication
-                                    .getGeneralAppRespondentSolicitors().get(0).getValue().getId(), null,
-                            CaseRole.DEFENDANT
+                                generalApplication
+                                    .getGeneralAppRespondentSolicitors().getFirst().getValue().getId(), null,
+                                CaseRole.DEFENDANT
                 );
         }
     }
@@ -334,12 +352,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .claimant2PartyName("Applicant2")
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -397,12 +415,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .claimant2PartyName("Applicant2")
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -428,6 +446,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipResp {
         @BeforeEach
         void setup() {
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -460,12 +479,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .claimant2PartyName("Applicant2")
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -498,6 +517,7 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
     class AssignRolesSpecCaseLipApp {
         @BeforeEach
         void setup() {
+            when(gaForLipService.isLipApp(any())).thenReturn(true);
             List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
             GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -524,12 +544,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
                     .defendant1PartyName("Respondent1")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -585,13 +605,13 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .isGaRespondentOneLip(NO)
                     .isGaApplicantLip(NO)
                     .isGaRespondentTwoLip(NO)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -657,12 +677,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .generalAppSuperClaimType(SPEC_CLAIM)
                     .isMultiParty(YesOrNo.NO)
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             generalApplication = builder.build();
@@ -748,11 +768,11 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .claimant2PartyName("Applicant2")
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder().id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails().setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .build();
 
             GeneralApplication.GeneralApplicationBuilder builderWithNotice = GeneralApplication.builder();
@@ -772,12 +792,12 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                     .claimant2PartyName("Applicant2")
                     .defendant2PartyName("Respondent2")
                     .generalAppSuperClaimType(SPEC_CLAIM)
-                    .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
-                    .civilServiceUserRoles(IdamUserDetails.builder()
-                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                            .email("applicant@someorg.com")
-                            .build())
-                    .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                    .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
+                    .civilServiceUserRoles(new IdamUserDetails()
+                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                            .setEmail("applicant@someorg.com")
+                            )
+                    .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                     .isGaRespondentOneLip(NO)
                     .isGaApplicantLip(NO)
                     .isGaRespondentTwoLip(NO)
@@ -875,13 +895,13 @@ public class AssignCaseToUserCallbackHandlerTest extends GeneralApplicationBaseC
                 .defendant1PartyName("Respondent1")
                 .claimant2PartyName("Applicant2")
                 .defendant2PartyName("Respondent2")
-                .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("12342341").build())
+                .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("12342341"))
                 .generalAppSuperClaimType(claimType)
-                .civilServiceUserRoles(IdamUserDetails.builder()
-                        .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                        .email("applicant@someorg.com")
-                        .build())
-                .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+                .civilServiceUserRoles(new IdamUserDetails()
+                        .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                        .setEmail("applicant@someorg.com")
+                        )
+                .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
                 .build();
 
         GeneralApplication caseData = builder.build();

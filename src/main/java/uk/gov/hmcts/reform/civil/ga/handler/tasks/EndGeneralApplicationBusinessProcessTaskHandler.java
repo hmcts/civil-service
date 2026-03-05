@@ -43,7 +43,7 @@ public class EndGeneralApplicationBusinessProcessTaskHandler extends BaseExterna
         BusinessProcess businessProcess = data.getBusinessProcess();
         coreCaseDataService.submitGaUpdate(caseId, caseDataContent(startEventResponse, businessProcess));
 
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private CaseDataContent caseDataContent(StartEventResponse startEventResponse, BusinessProcess businessProcess) {

@@ -44,7 +44,8 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldRemoveCaseNoteWhenIdMatches() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to remove").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to remove");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);
@@ -54,10 +55,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(noteId.toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", noteId.toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -67,12 +65,14 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldRemoveCaseNoteWhenIdMatchesAndLeaveOtherNotes() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to remove").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to remove");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);
         caseNotes.add(element);
-        CaseNote note2 = CaseNote.builder().note("Note to retain").build();
+        CaseNote note2 = new CaseNote();
+        note2.setNote("Note to retain");
         Element<CaseNote> element2 = element(note2);
         element2.setId(UUID.randomUUID());
         caseNotes.add(element2);
@@ -81,10 +81,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(noteId.toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", noteId.toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -95,7 +92,8 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldNotRemoveCaseNoteWhenIdDoesNotMatch() {
         UUID noteId = UUID.randomUUID();
-        CaseNote note = CaseNote.builder().note("Note to keep").build();
+        CaseNote note = new CaseNote();
+        note.setNote("Note to keep");
         List<Element<CaseNote>> caseNotes = new ArrayList<>();
         Element<CaseNote> element = element(note);
         element.setId(noteId);
@@ -105,10 +103,7 @@ class RemoveCaseNoteTaskTest {
             .caseNotes(caseNotes)
             .build();
 
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(UUID.randomUUID().toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", UUID.randomUUID().toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
@@ -119,13 +114,17 @@ class RemoveCaseNoteTaskTest {
     @Test
     void shouldHandleNullCaseNotes() {
         CaseData caseData = CaseData.builder().build();
-        CaseNoteReference caseNoteReference = CaseNoteReference.builder()
-            .caseReference("123")
-            .caseNoteElementId(UUID.randomUUID().toString())
-            .build();
+        CaseNoteReference caseNoteReference = caseNoteReference("123", UUID.randomUUID().toString());
 
         CaseData result = task.migrateCaseData(caseData, caseNoteReference);
 
         assertThat(result.getCaseNotes()).isNull();
+    }
+
+    private CaseNoteReference caseNoteReference(String caseRef, String noteId) {
+        CaseNoteReference reference = new CaseNoteReference();
+        reference.setCaseReference(caseRef);
+        reference.setCaseNoteElementId(noteId);
+        return reference;
     }
 }

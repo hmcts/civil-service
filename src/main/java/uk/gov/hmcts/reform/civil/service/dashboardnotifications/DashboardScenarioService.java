@@ -29,9 +29,7 @@ public abstract class DashboardScenarioService {
         String caseReference = resolveCaseReference(caseData);
         log.info("Evaluating dashboard scenarios for case {}", caseReference);
 
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        ScenarioRequestParams scenarioParams = scenarioRequestParamsFrom(caseData);
 
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
@@ -108,5 +106,11 @@ public abstract class DashboardScenarioService {
 
     protected void beforeRecordScenario(CaseData caseData, String authToken) {
         // hook for subclasses
+    }
+
+    protected ScenarioRequestParams scenarioRequestParamsFrom(CaseData caseData) {
+        return ScenarioRequestParams.builder()
+            .params(mapper.mapCaseDataToParams(caseData))
+            .build();
     }
 }

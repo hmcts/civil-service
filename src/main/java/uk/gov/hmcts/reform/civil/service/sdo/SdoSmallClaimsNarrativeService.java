@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictPages;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsRestrictWitness;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2SmallClaimsWitnessStatements;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsCreditHire;
+import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsDocuments;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsFlightDelay;
 import uk.gov.hmcts.reform.civil.model.sdo.SmallClaimsHearing;
@@ -26,6 +28,12 @@ import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.WITN
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.DATE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_A;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_B;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_D;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_DISREPAIR_CLAUSE_E;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
@@ -47,86 +55,109 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
 
+    @Value("${other_remedy.enabled:false}")
+    private boolean otherRemedyEnabled;
     private final SdoDeadlineService sdoDeadlineService;
 
     public void applyJudgesRecital(CaseData caseData) {
-        caseData.setSmallClaimsJudgesRecital(SmallClaimsJudgesRecital.builder()
-                                                  .input(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA)
-                                                  .build());
+        SmallClaimsJudgesRecital judgesRecital = new SmallClaimsJudgesRecital();
+        judgesRecital.setInput(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
+        caseData.setSmallClaimsJudgesRecital(judgesRecital);
     }
 
     public void applyDocumentDirections(CaseData caseData) {
-        caseData.setSmallClaimsDocuments(SmallClaimsDocuments.builder()
-                                             .input1(SMALL_CLAIMS_DOCUMENTS_UPLOAD)
-                                             .input2(SMALL_CLAIMS_DOCUMENTS_WARNING)
-                                             .build());
+        SmallClaimsDocuments documents = new SmallClaimsDocuments();
+        documents.setInput1(SMALL_CLAIMS_DOCUMENTS_UPLOAD);
+        documents.setInput2(SMALL_CLAIMS_DOCUMENTS_WARNING);
+        caseData.setSmallClaimsDocuments(documents);
     }
 
     public void applyWitnessStatements(CaseData caseData) {
-        caseData.setSdoR2SmallClaimsWitnessStatementOther(SdoR2SmallClaimsWitnessStatements.builder()
-                                                             .sdoStatementOfWitness(WITNESS_STATEMENT_TEXT)
-                                                             .isRestrictWitness(NO)
-                                                             .sdoR2SmallClaimsRestrictWitness(SdoR2SmallClaimsRestrictWitness.builder()
-                                                                                              .noOfWitnessClaimant(2)
-                                                                                              .noOfWitnessDefendant(2)
-                                                                                              .partyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT)
-                                                                                              .build())
-                                                             .isRestrictPages(NO)
-                                                             .sdoR2SmallClaimsRestrictPages(SdoR2SmallClaimsRestrictPages.builder()
-                                                                                         .witnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1)
-                                                                                         .noOfPages(12)
-                                                                                         .fontDetails(RESTRICT_NUMBER_PAGES_TEXT2)
-                                                                                         .build())
-                                                             .text(WITNESS_DESCRIPTION_TEXT)
-                                                             .build());
+        SdoR2SmallClaimsRestrictWitness restrictWitness = new SdoR2SmallClaimsRestrictWitness();
+        restrictWitness.setNoOfWitnessClaimant(2);
+        restrictWitness.setNoOfWitnessDefendant(2);
+        restrictWitness.setPartyIsCountedAsWitnessTxt(RESTRICT_WITNESS_TEXT);
+
+        SdoR2SmallClaimsRestrictPages restrictPages = new SdoR2SmallClaimsRestrictPages();
+        restrictPages.setWitnessShouldNotMoreThanTxt(RESTRICT_NUMBER_PAGES_TEXT1);
+        restrictPages.setNoOfPages(12);
+        restrictPages.setFontDetails(RESTRICT_NUMBER_PAGES_TEXT2);
+
+        SdoR2SmallClaimsWitnessStatements witnessStatements = new SdoR2SmallClaimsWitnessStatements();
+        witnessStatements.setSdoStatementOfWitness(WITNESS_STATEMENT_TEXT);
+        witnessStatements.setIsRestrictWitness(NO);
+        witnessStatements.setSdoR2SmallClaimsRestrictWitness(restrictWitness);
+        witnessStatements.setIsRestrictPages(NO);
+        witnessStatements.setSdoR2SmallClaimsRestrictPages(restrictPages);
+        witnessStatements.setText(WITNESS_DESCRIPTION_TEXT);
+        caseData.setSdoR2SmallClaimsWitnessStatementOther(witnessStatements);
     }
 
     public void applyCreditHire(CaseData caseData) {
-        caseData.setSmallClaimsCreditHire(SmallClaimsCreditHire.builder()
-                                              .input1(CREDIT_HIRE_DISCLOSURE_SDO)
-                                              .input2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
-                                              .date1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
-                                              .input3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
-                                              .input4(CREDIT_HIRE_PARTIES_LIAISE)
-                                              .date2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
-                                              .input5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)
-                                              .input6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO)
-                                              .date3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8))
-                                              .input7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO)
-                                              .date4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10))
-                                              .input11(CREDIT_HIRE_WITNESS_LIMIT_SDO)
-                                              .build());
+        SmallClaimsCreditHire creditHire = new SmallClaimsCreditHire();
+        creditHire.setInput1(CREDIT_HIRE_DISCLOSURE_SDO);
+        creditHire.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO);
+        creditHire.setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
+        creditHire.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO);
+        creditHire.setInput4(CREDIT_HIRE_PARTIES_LIAISE);
+        creditHire.setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6));
+        creditHire.setInput5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY);
+        creditHire.setInput6(CREDIT_HIRE_DEFENDANT_UPLOAD_SDO);
+        creditHire.setDate3(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
+        creditHire.setInput7(CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO);
+        creditHire.setDate4(sdoDeadlineService.nextWorkingDayFromNowWeeks(10));
+        creditHire.setInput11(CREDIT_HIRE_WITNESS_LIMIT_SDO);
+        caseData.setSmallClaimsCreditHire(creditHire);
     }
 
     public void applyRoadTrafficAccident(CaseData caseData) {
-        caseData.setSmallClaimsRoadTrafficAccident(SmallClaimsRoadTrafficAccident.builder()
-                                                       .input(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS)
-                                                       .build());
+        SmallClaimsRoadTrafficAccident roadTrafficAccident = new SmallClaimsRoadTrafficAccident();
+        roadTrafficAccident.setInput(ROAD_TRAFFIC_ACCIDENT_SMALL_CLAIMS);
+        caseData.setSmallClaimsRoadTrafficAccident(roadTrafficAccident);
     }
 
     public void applyFlightDelaySection(CaseData caseData,
                                         List<OrderDetailsPagesSectionsToggle> checkList) {
-        caseData.setSmallClaimsFlightDelay(SmallClaimsFlightDelay.builder()
-                                                   .smallClaimsFlightDelayToggle(checkList)
-                                                   .relatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE)
-                                                   .legalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE)
-                                                   .build());
+        SmallClaimsFlightDelay flightDelay = new SmallClaimsFlightDelay();
+        flightDelay.setSmallClaimsFlightDelayToggle(checkList);
+        flightDelay.setRelatedClaimsInput(FLIGHT_DELAY_RELATED_CLAIMS_NOTICE);
+        flightDelay.setLegalDocumentsInput(FLIGHT_DELAY_LEGAL_ARGUMENTS_NOTICE);
+        caseData.setSmallClaimsFlightDelay(flightDelay);
     }
 
     public void applyHearingSection(CaseData caseData) {
-        caseData.setSmallClaimsHearing(SmallClaimsHearing.builder()
-                                               .input1(SMALL_CLAIMS_HEARING_LISTING_NOTICE)
-                                               .input2(SMALL_CLAIMS_HEARING_FEE_WARNING)
-                                               .build());
+        SmallClaimsHearing hearing = new SmallClaimsHearing();
+        hearing.setInput1(SMALL_CLAIMS_HEARING_LISTING_NOTICE);
+        hearing.setInput2(SMALL_CLAIMS_HEARING_FEE_WARNING);
+        caseData.setSmallClaimsHearing(hearing);
     }
 
     public void applyNotesSection(CaseData caseData) {
-        caseData.setSmallClaimsNotes(SmallClaimsNotes.builder()
-                                              .input(String.format(
-                                                  "%s %s.",
-                                                  ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
-                                                  DateFormatHelper.formatLocalDate(sdoDeadlineService.workingDaysFromNow(5), DATE)
-                                              ))
-                                              .build());
+        SmallClaimsNotes notes = new SmallClaimsNotes();
+        var orderDeadline = sdoDeadlineService.workingDaysFromNow(5);
+        notes.setInput(String.format(
+            "%s %s.",
+            ORDER_WITHOUT_HEARING_RECEIVED_BY_COURT_NO_ARTICLE,
+            DateFormatHelper.formatLocalDate(orderDeadline, DATE)
+        ));
+        notes.setDate(orderDeadline);
+        caseData.setSmallClaimsNotes(notes);
+    }
+
+    public void applyHousingDisrepair(CaseData caseData) {
+        if (otherRemedyEnabled) {
+            HousingDisrepair housingDisrepair = new HousingDisrepair();
+            housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
+            housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
+            housingDisrepair.setFirstReportDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(4));
+            housingDisrepair.setClauseCBeforeDate(HOUSING_DISREPAIR_CLAUSE_C_BEFORE_DATE);
+            housingDisrepair.setJointStatementDateBy(sdoDeadlineService.nextWorkingDayFromNowWeeks(8));
+            housingDisrepair.setClauseCAfterDate(HOUSING_DISREPAIR_CLAUSE_C_AFTER_DATE);
+            housingDisrepair.setClauseD(HOUSING_DISREPAIR_CLAUSE_D);
+            housingDisrepair.setClauseE(HOUSING_DISREPAIR_CLAUSE_E);
+            caseData.setSmallClaimsHousingDisrepair(housingDisrepair);
+        } else {
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
     }
 }

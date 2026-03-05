@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.dashboardnotifications;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CallbackType;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.model.GARespondentRepresentative;
@@ -52,23 +55,25 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_PA
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    CaseDetailsConverter.class,
-    CreateApplicationRespondedDashboardNotificationHandler.class,
-    JacksonAutoConfiguration.class,
-},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
 public class CreateApplicationRespondedDashboardNotificationHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @Mock
     private DocUploadDashboardNotificationService dashboardNotificationService;
-    @MockBean
+    @Mock
     IdamClient idamClient;
-    @MockBean
+    @Mock
     GaForLipService gaForLipService;
-    @Autowired
+
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @InjectMocks
     CreateApplicationRespondedDashboardNotificationHandler handler;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
@@ -110,7 +115,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRvLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
         when(gaForLipService.isLipApp(any())).thenReturn(false);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -123,7 +127,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLipVLR() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -135,7 +138,6 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
 
     @Test
     void buildResponseConfirmationReturnsCorrectMessageWhenGaHasLipAndVaryJudgeApppLRVLip() {
-        when(gaForLipService.isGaForLip(any())).thenReturn(true);
         when(gaForLipService.isLipApp(any())).thenReturn(true);
         when(gaForLipService.isLipResp(any())).thenReturn(false);
         CallbackParams params = callbackParamsOf(getVaryCase(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION),
@@ -152,19 +154,18 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -174,17 +175,15 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }
@@ -211,19 +210,18 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
         Optional<DynamicListElement> first = dynamicListTest.getListItems().stream().findFirst();
         first.ifPresent(dynamicListTest::setValue);
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .defendant2PartyName("Defendant Two")
             .defendant1PartyName("Defendant One")
             .claimant1PartyName("Claimant One")
             .claimant2PartyName("Claimant Two")
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(dynamicListTest)
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .build())
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(dynamicListTest)
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON))
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferredLocation(dynamicListTest)
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -233,17 +231,15 @@ public class CreateApplicationRespondedDashboardNotificationHandlerTest extends 
                     .builder()
                     .types(types).build())
             .parentClaimantIsApplicant(NO)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("123").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("123"))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
                                           .email("abc@gmail.com").id(APP_UID).build())
             .generalAppRespondentSolicitors(getRespondentSolicitors())
-            .businessProcess(BusinessProcess
-                                 .builder()
-                                 .camundaEvent(CAMUNDA_EVENT)
-                                 .processInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
-                                 .status(BusinessProcessStatus.STARTED)
-                                 .activityId(ACTIVITY_ID)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setCamundaEvent(CAMUNDA_EVENT)
+                                 .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
+                                 .setStatus(BusinessProcessStatus.STARTED)
+                                 .setActivityId(ACTIVITY_ID))
             .ccdState(state)
             .build();
     }

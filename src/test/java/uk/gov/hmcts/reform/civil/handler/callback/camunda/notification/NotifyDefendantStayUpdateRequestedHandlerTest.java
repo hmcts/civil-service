@@ -102,10 +102,10 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @Test
     void checkCamundaActivityDefendantTest() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendantStayUpdateRequested", response);
     }
@@ -113,10 +113,10 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @Test
     void checkCamundaActivityDefendant2Test() {
         caseData = caseData.toBuilder()
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("respondentSolicitor@hmcts.net").build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("respondentSolicitor@hmcts.net"))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT2_STAY_UPDATE_REQUESTED.toString()).build());
         var response = handler.camundaActivityId(params);
         assertEquals("NotifyDefendant2StayUpdateRequested", response);
     }
@@ -137,8 +137,8 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
             .respondent1Represented(YesOrNo.YES)
             .respondent2Represented(YesOrNo.YES)
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(caseEvent.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(caseEvent.toString()).build());
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         when(notificationsProperties.getNotifyLRStayUpdateRequested()).thenReturn("solicitor-template");
@@ -183,8 +183,8 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))
             .build();
-        CallbackParams params = CallbackParams.builder().caseData(caseData)
-            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build()).build();
+        CallbackParams params = new CallbackParams().caseData(caseData)
+            .request(CallbackRequest.builder().eventId(NOTIFY_DEFENDANT_STAY_UPDATE_REQUESTED.toString()).build());
 
         if (ENGLISH.equals(language)) {
             when(notificationsProperties.getNotifyLipStayUpdateRequested()).thenReturn("default-template");
@@ -263,4 +263,3 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
         return expectedProperties;
     }
 }
-

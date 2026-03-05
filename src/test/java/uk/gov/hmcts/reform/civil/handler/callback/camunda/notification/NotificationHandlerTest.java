@@ -62,7 +62,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldNotifyParties() {
             when(notifierFactory.getNotifier(TASK_ID)).thenReturn(notifier);
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
-                BusinessProcess.builder().activityId(TASK_ID).build()
+                new BusinessProcess().setActivityId(TASK_ID)
             ).build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
 
@@ -75,7 +75,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
         void shouldRecordNotifications() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().businessProcess(
-                BusinessProcess.builder().activityId(TASK_ID).build()
+                new BusinessProcess().setActivityId(TASK_ID)
             ).notificationSummary("Summary of notifications").build();
 
             StartEventResponse response = StartEventResponse.builder()
@@ -102,7 +102,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("Attempted: NotifierA, NotifierB || Errors: Error1")
                 .build();
 
@@ -145,7 +145,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - notification summary without errors
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("Attempted: NotifierA, NotifierB")
                 .build();
 
@@ -186,7 +186,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - notification summary with errors
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("Attempted: NotifierA || Errors: Failed to send email")
                 .build();
 
@@ -227,7 +227,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - null notification summary
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary(null)
                 .build();
 
@@ -268,7 +268,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - summary without "Attempted: " prefix
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("NotifierA, NotifierB")
                 .build();
 
@@ -308,7 +308,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - complex summary with multiple notifiers and errors
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("Attempted: NotifierA, NotifierB, NotifierC || Errors: Error1, Error2, Error3")
                 .build();
 
@@ -355,7 +355,7 @@ class NotificationHandlerTest extends BaseCallbackHandlerTest {
             // Given - errors delimiter present but errors section is empty/blank
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+                .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
                 .notificationSummary("Attempted: NotifierA || Errors: ")
                 .build();
 

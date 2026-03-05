@@ -28,7 +28,8 @@ class SdoFastTrackTemplateServiceTest {
         locationHelper,
         classificationService,
         fastTrackDirectionsService,
-        templateFieldService
+        templateFieldService,
+        false
     );
 
     @Test

@@ -48,10 +48,9 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .paymentSetDate(whenWillPay)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                             .builder()
-                                             .whenWillThisAmountBePaid(whenWillPay)
-                                             .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                             .setWhenWillThisAmountBePaid(whenWillPay)
+                                             )
             .respondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000))
             .build();
 
@@ -111,10 +110,9 @@ public class DefendantResponseOrgORCompPayBySetDateScenarioTest extends Dashboar
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
             .paymentSetDate(whenWillPay)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec
-                                               .builder()
-                                               .whenWillThisAmountBePaid(whenWillPay)
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(whenWillPay)
+                                               )
             .totalClaimAmount(new BigDecimal(1000))
             .build();
 

@@ -20,8 +20,8 @@ public class MediationCSVLipVLipService extends MediationCSVService {
 
     @Override
     protected MediationParams getMediationParams(CaseData caseData) {
-        return MediationParams.builder()
-                .caseData(caseData)
-                .build();
+        MediationParams mediationParams = new MediationParams();
+        mediationParams.setCaseData(caseData);
+        return mediationParams;
     }
 }

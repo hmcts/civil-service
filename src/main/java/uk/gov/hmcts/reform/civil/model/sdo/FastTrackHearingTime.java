@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.model.sdo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrackHearingTimeEstimate;
 
@@ -11,9 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Accessors(chain = true)
 public class FastTrackHearingTime {
 
     private LocalDate dateFrom;

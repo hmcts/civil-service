@@ -84,7 +84,7 @@ class CoreCaseDataServiceV2Test {
         private static final String CASE_ID = "1";
         private static final String USER_ID = "User1";
         private final CaseData caseData = new CaseDataBuilder().atStateClaimDraftMock()
-            .businessProcess(BusinessProcess.builder().status(BusinessProcessStatus.READY).build())
+            .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
         private final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .data(caseData)
@@ -93,13 +93,13 @@ class CoreCaseDataServiceV2Test {
         @BeforeEach
         void setUp() {
             List<LocationRefData> mockLocation = new ArrayList<>();
-            LocationRefData locationRefData = LocationRefData.builder()
-                .region("1")
-                .epimmsId("12345")
-                .courtAddress("Central London")
-                .postcode("LJ09 EMM")
-                .siteName("London SX12 2345")
-                .build();
+            LocationRefData locationRefData = new LocationRefData()
+                .setRegion("1")
+                .setEpimmsId("12345")
+                .setCourtAddress("Central London")
+                .setPostcode("LJ09 EMM")
+                .setSiteName("London SX12 2345")
+                ;
             mockLocation.add(locationRefData);
             when(locationReferenceDataService.getCourtLocationsByEpimmsId(anyString(), anyString())).thenReturn(mockLocation);
             when(userService.getUserInfo(USER_AUTH_TOKEN)).thenReturn(UserInfo.builder().uid(USER_ID).build());

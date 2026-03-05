@@ -157,7 +157,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldReturnLocationList_whenLocationsAreQueried() {
                 List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().courtName("Court Name").region("Region").build());
+                locations.add(new LocationRefData().setCourtName("Court Name").setRegion("Region"));
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -308,9 +308,9 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
                 caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
                 List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().siteName("Loc").courtAddress("1").postcode("1")
-                                  .courtName("Court Name").region("Region").regionId("1").courtVenueId("000")
-                                  .epimmsId("123456").build());
+                locations.add(new LocationRefData().setSiteName("Loc").setCourtAddress("1").setPostcode("1")
+                                  .setCourtName("Court Name").setRegion("Region").setRegionId("1").setCourtVenueId("000")
+                                  .setEpimmsId("123456"));
                 when(locationRefDataService.getCourtLocationsForDefaultJudgments(any())).thenReturn(locations);
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
                 var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -342,7 +342,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldCallExternalTaskAndDeleteLocationList_whenAboutToSubmit() {
                 List<LocationRefData> locations = new ArrayList<>();
-                locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("123456").build());
+                locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("123456"));
                 when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(
                     any(),
                     any()

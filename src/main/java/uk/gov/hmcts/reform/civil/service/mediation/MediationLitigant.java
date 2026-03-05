@@ -2,21 +2,19 @@ package uk.gov.hmcts.reform.civil.service.mediation;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.Party;
 
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Builder(toBuilder = true)
-@EqualsAndHashCode
 @Data
+@Accessors(chain = true)
+@EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MediationLitigant {
 

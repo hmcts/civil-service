@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.helpers.judgmentsonline;
 
-import camundajar.impl.scala.collection.mutable.StringBuilder;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -275,14 +274,14 @@ public class JudgmentsOnlineHelper {
 
     public static JudgmentAddress getJudgmentAddress(Address address, RoboticsAddressMapper addressMapper) {
 
-        Address newAddress = Address.builder()
-            .addressLine1(removeWelshCharacters(address.getAddressLine1()))
-            .addressLine2(removeWelshCharacters(address.getAddressLine2()))
-            .addressLine3(removeWelshCharacters(address.getAddressLine3()))
-            .postCode(removeWelshCharacters(address.getPostCode()))
-            .postTown(removeWelshCharacters(address.getPostTown()))
-            .county(removeWelshCharacters(address.getCounty()))
-            .country(removeWelshCharacters(address.getCountry())).build();
+        Address newAddress = new Address();
+        newAddress.setAddressLine1(removeWelshCharacters(address.getAddressLine1()));
+        newAddress.setAddressLine2(removeWelshCharacters(address.getAddressLine2()));
+        newAddress.setAddressLine3(removeWelshCharacters(address.getAddressLine3()));
+        newAddress.setPostCode(removeWelshCharacters(address.getPostCode()));
+        newAddress.setPostTown(removeWelshCharacters(address.getPostTown()));
+        newAddress.setCounty(removeWelshCharacters(address.getCounty()));
+        newAddress.setCountry(removeWelshCharacters(address.getCountry()));
 
         RoboticsAddress roboticsAddress = addressMapper.toRoboticsAddress(newAddress);
         JudgmentAddress judgmentAddress = new JudgmentAddress();
@@ -305,12 +304,12 @@ public class JudgmentsOnlineHelper {
 
     public static  String formatAddress(JudgmentAddress address) {
         String formattedLine = new StringBuilder()
-            .addAll(formatAddressLine(address.getDefendantAddressLine1()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine2()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine3()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine4()))
-            .addAll(formatAddressLine(address.getDefendantAddressLine5()))
-            .result().trim();
+            .append(formatAddressLine(address.getDefendantAddressLine1()))
+            .append(formatAddressLine(address.getDefendantAddressLine2()))
+            .append(formatAddressLine(address.getDefendantAddressLine3()))
+            .append(formatAddressLine(address.getDefendantAddressLine4()))
+            .append(formatAddressLine(address.getDefendantAddressLine5()))
+            .toString().trim();
         return formattedLine.length() > 0 ? formattedLine.substring(0, formattedLine.length() - 1) : "";
     }
 

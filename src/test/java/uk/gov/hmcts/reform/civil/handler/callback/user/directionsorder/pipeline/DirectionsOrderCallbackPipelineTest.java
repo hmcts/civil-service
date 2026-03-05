@@ -65,7 +65,7 @@ class DirectionsOrderCallbackPipelineTest {
         CallbackRequest request = CallbackRequest.builder().eventId("EVENT").build();
         DirectionsOrderTaskContext context = new DirectionsOrderTaskContext(
                 initial,
-                CallbackParams.builder().request(request).build(),
+                new CallbackParams().request(request),
                 DirectionsOrderLifecycleStage.PRE_POPULATE
         );
 

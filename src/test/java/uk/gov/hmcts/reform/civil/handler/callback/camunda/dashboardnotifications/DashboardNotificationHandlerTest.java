@@ -41,18 +41,18 @@ class DashboardNotificationHandlerTest {
     void setup() {
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(123L)
-            .businessProcess(BusinessProcess.builder().activityId(TASK_ID).build())
+            .businessProcess(new BusinessProcess().setActivityId(TASK_ID))
             .build();
 
-        callbackParams = CallbackParams.builder()
+        callbackParams = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
-            .caseData(caseData)
-            .build();
+            .caseData(caseData);
     }
 
     @Test
     void shouldDispatchToRegisteredHandlers() {
-        when(registry.workflowsFor(TASK_ID)).thenReturn(List.of(handlerOne, handlerTwo));
+        when(registry.workflowsFor(TASK_ID, DashboardCaseType.CIVIL))
+            .thenReturn(List.of(handlerOne, handlerTwo));
 
         handler.handle(callbackParams);
 
@@ -62,11 +62,11 @@ class DashboardNotificationHandlerTest {
 
     @Test
     void shouldNotFailWhenNoHandlersRegistered() {
-        when(registry.workflowsFor(TASK_ID)).thenReturn(List.of());
+        when(registry.workflowsFor(TASK_ID, DashboardCaseType.CIVIL)).thenReturn(List.of());
 
         handler.handle(callbackParams);
 
-        verify(registry).workflowsFor(TASK_ID);
+        verify(registry).workflowsFor(TASK_ID, DashboardCaseType.CIVIL);
         verifyNoInteractions(handlerOne, handlerTwo);
     }
 }

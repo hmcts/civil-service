@@ -1,21 +1,23 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
@@ -23,14 +25,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.DISPATCHED;
 import static uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus.READY;
 
-@SpringBootTest(classes = {
-    GaDispatchBusinessProcessCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class GaDispatchBusinessProcessCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @InjectMocks
     private GaDispatchBusinessProcessCallbackHandler handler;
 
     @Nested
@@ -101,11 +102,10 @@ class GaDispatchBusinessProcessCallbackHandlerTest extends GeneralApplicationBas
     }
 
     private BusinessProcess businessProcessWithStatus(BusinessProcessStatus status) {
-        return BusinessProcess.builder()
-            .camundaEvent("testCamundaEvent")
-            .activityId("testActivityId")
-            .processInstanceId("testProcessInstanceId")
-            .status(status)
-            .build();
+        return new BusinessProcess()
+            .setCamundaEvent("testCamundaEvent")
+            .setActivityId("testActivityId")
+            .setProcessInstanceId("testProcessInstanceId")
+            .setStatus(status);
     }
 }

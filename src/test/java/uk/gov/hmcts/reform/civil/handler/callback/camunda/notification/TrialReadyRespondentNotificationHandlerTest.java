@@ -103,7 +103,7 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         void shouldNotifyRespondentSolicitorOne_whenInvoked() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -127,7 +127,7 @@ class TrialReadyRespondentNotificationHandlerTest extends BaseCallbackHandlerTes
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithDiffSol() {
             when(notificationsProperties.getSolicitorTrialReady()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 

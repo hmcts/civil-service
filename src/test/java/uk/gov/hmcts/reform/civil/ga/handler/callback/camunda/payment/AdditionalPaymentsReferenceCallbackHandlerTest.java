@@ -3,27 +3,26 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.payment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import feign.Request;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionHelper;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
 import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static feign.Request.HttpMethod.GET;
@@ -39,12 +38,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.OBTAIN_ADDITIONAL_PAYMENT_REF;
 import static uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION;
 
-@SpringBootTest(classes = {
-    AdditionalPaymentsReferenceCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
-
+@ExtendWith(MockitoExtension.class)
 class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplicationBaseCallbackHandlerTest {
 
     private static final String PAYMENT_REQUEST_REFERENCE = "RC-1234-1234-1234-1234";
@@ -53,40 +47,30 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
     public static final String UNEXPECTED_RESPONSE_BODY = "unexpected response body";
     public static final String EXCEPTION_MESSAGE = "exception message";
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @Autowired
+    @InjectMocks
     private AdditionalPaymentsReferenceCallbackHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
     private CallbackParams params;
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
 
-    @MockBean
+    @Mock
     JudicialDecisionHelper judicialDecisionHelper;
-
-    @BeforeEach
-    public void setup() {
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
-    }
 
     @Nested
     class MakeAdditionalPaymentReference {
 
-        @BeforeEach
-        void setup() {
-
+        @Test
+        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication()  {
             when(paymentsService.createServiceRequestGa(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder().serviceRequestReference(PAYMENT_REQUEST_REFERENCE)
                                 .build());
-        }
-
-        @Test
-        void shouldMakeAdditionalPaymentReference_whenJudgeUncloakedApplication()  {
             var caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(
                     REQUEST_MORE_INFORMATION, YesOrNo.NO, YesOrNo.NO)
@@ -167,7 +151,7 @@ class AdditionalPaymentsReferenceCallbackHandlerTest  extends GeneralApplication
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GeneralApplicationMakeAdditionalPayment");
         }
 
         @Test

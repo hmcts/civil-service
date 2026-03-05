@@ -77,9 +77,9 @@ class DirectionOrderGeneratorTest {
     private GeneralAppLocationRefDataService generalAppLocationRefDataService;
 
     private static final List<LocationRefData> locationRefData = Arrays
-        .asList(LocationRefData.builder().epimmsId("1").externalShortName("Reading").build(),
-                LocationRefData.builder().epimmsId("2").externalShortName("London").build(),
-                LocationRefData.builder().epimmsId("3").externalShortName("Manchester").build());
+        .asList(new LocationRefData().setEpimmsId("1").setExternalShortName("Reading"),
+                new LocationRefData().setEpimmsId("2").setExternalShortName("London"),
+                new LocationRefData().setEpimmsId("3").setExternalShortName("Manchester"));
 
     @BeforeEach
     public void setUp() {
@@ -93,7 +93,7 @@ class DirectionOrderGeneratorTest {
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(DIRECTION_ORDER)))
             .thenReturn(new DocmosisDocument(DIRECTION_ORDER.getDocumentTitle(), bytes));
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+            .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build();
 
         directionOrderGenerator.generate(caseData, BEARER_TOKEN);
@@ -131,7 +131,7 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
@@ -140,7 +140,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = directionOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -175,7 +175,7 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("3").build())
@@ -187,7 +187,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = directionOrderGenerator.getTemplateData(null, caseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -210,25 +210,24 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option2() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build())
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                           .directionsText("Test Direction")
-                                                           .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                           .setDirectionsText("Test Direction")
+                                                           .setJudicialByCourtsInitiative(
                                                                GAByCourtsInitiativeGAspec.OPTION_2)
-                                                           .orderWithoutNotice("abcdef")
-                                                           .orderWithoutNoticeDate(LocalDate.now())
-                                                           .reasonForDecisionText("Test Reason")
-                                                           .showReasonForDecision(YesOrNo.YES)
-                                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                                                           .directionsResponseByDate(LocalDate.now())
-                                                           .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                                           .judgeRecitalText("Test Judge's recital")
-                                                           .build()).build();
+                                                           .setOrderWithoutNotice("abcdef")
+                                                           .setOrderWithoutNoticeDate(LocalDate.now())
+                                                           .setReasonForDecisionText("Test Reason")
+                                                           .setShowReasonForDecision(YesOrNo.YES)
+                                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                                                           .setDirectionsResponseByDate(LocalDate.now())
+                                                           .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                                           .setJudgeRecitalText("Test Judge's recital")).build();
             GeneralApplicationCaseData updateCaseData = caseDataBuilder.build();
 
             when(docmosisService.reasonAvailable(any())).thenReturn(YesOrNo.NO);
@@ -236,7 +235,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcdef ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
 
             var templateData = directionOrderGenerator.getTemplateData(null, updateCaseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -270,22 +269,21 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_Option3() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .isMultiParty(YES)
                 .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                          .directionsText("Test Direction")
-                                                          .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                          .setDirectionsText("Test Direction")
+                                                          .setJudicialByCourtsInitiative(
                                                               GAByCourtsInitiativeGAspec.OPTION_3)
-                                                          .showReasonForDecision(YesOrNo.YES)
-                                                          .reasonForDecisionText("Test Reason")
-                                                          .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                                                          .directionsResponseByDate(LocalDate.now())
-                                                          .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                                          .judgeRecitalText("Test Judge's recital")
-                                                          .build()).build();
+                                                          .setShowReasonForDecision(YesOrNo.YES)
+                                                          .setReasonForDecisionText("Test Reason")
+                                                          .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                                                          .setDirectionsResponseByDate(LocalDate.now())
+                                                          .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                                          .setJudgeRecitalText("Test Judge's recital")).build();
 
             GeneralApplicationCaseData updateCaseData = caseDataBuilder.build();
 
@@ -294,7 +292,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn(StringUtils.EMPTY);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Reading").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Reading"));
 
             var templateData = directionOrderGenerator.getTemplateData(null, updateCaseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
@@ -326,26 +324,25 @@ class DirectionOrderGeneratorTest {
 
         @Test
         void whenJudgeMakeDecision_ShouldHideRecital_whileUnchecked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                     .build();
 
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                    .directionsText("Test Direction")
-                    .judicialByCourtsInitiative(
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                    .setDirectionsText("Test Direction")
+                    .setJudicialByCourtsInitiative(
                             GAByCourtsInitiativeGAspec.OPTION_3)
-                    .showReasonForDecision(YesOrNo.NO)
-                    .reasonForDecisionText("Test Reason")
-                    .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                    .directionsResponseByDate(LocalDate.now())
-                    .judgeRecitalText("Test Judge's recital")
-                    .build()).build();
+                    .setShowReasonForDecision(YesOrNo.NO)
+                    .setReasonForDecisionText("Test Reason")
+                    .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                    .setDirectionsResponseByDate(LocalDate.now())
+                    .setJudgeRecitalText("Test Judge's recital")).build();
 
             GeneralApplicationCaseData updateCaseData = caseDataBuilder.build();
 
             when(docmosisService.populateJudgeReason(any())).thenReturn(StringUtils.EMPTY);
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
             var templateData = directionOrderGenerator.getTemplateData(null, updateCaseData, "auth", FlowFlag.ONE_RESPONDENT_REPRESENTATIVE);
 
             assertNull(templateData.getJudgeRecital());
@@ -362,7 +359,7 @@ class DirectionOrderGeneratorTest {
             when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(POST_JUDGE_DIRECTION_ORDER_LIP)))
                 .thenReturn(new DocmosisDocument(DIRECTION_ORDER.getDocumentTitle(), bytes));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("London").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("London"));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build();
 
             directionOrderGenerator.generate(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(), caseData, BEARER_TOKEN,
@@ -379,7 +376,7 @@ class DirectionOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1_LipRespondent() {
 
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)
@@ -392,7 +389,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = directionOrderGenerator
                 .getTemplateData(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(), caseData, "auth",
@@ -424,7 +421,7 @@ class DirectionOrderGeneratorTest {
         @Test
         void whenJudgeMakeDecision_ShouldGetHearingOrderData_1v1_Lip() {
 
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication().build().copy()
                 .defendant2PartyName(null)
                 .claimant2PartyName(null)
                 .parentClaimantIsApplicant(YES)
@@ -437,7 +434,7 @@ class DirectionOrderGeneratorTest {
             when(docmosisService.populateJudicialByCourtsInitiative(any()))
                 .thenReturn("abcd ".concat(LocalDate.now().format(DATE_FORMATTER)));
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder().epimmsId("2").externalShortName("Manchester").build());
+                .thenReturn(new LocationRefData().setEpimmsId("2").setExternalShortName("Manchester"));
 
             var templateData = directionOrderGenerator
                 .getTemplateData(GeneralApplicationCaseDataBuilder.builder().getCivilCaseData(), caseData, "auth", FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT);

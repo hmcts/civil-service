@@ -57,7 +57,7 @@ public class GaInvalidHwFCallbackHandler extends CallbackHandler implements Gene
     }
 
     private GeneralApplicationCaseData setUpBusinessProcess(GeneralApplicationCaseData caseData) {
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedData = caseData.toBuilder()
+        GeneralApplicationCaseData updatedData = caseData.copy()
                 .businessProcess(BusinessProcess.readyGa(NOTIFY_APPLICANT_LIP_HWF));
         log.info("Start business process NOTIFY_APPLICANT_LIP_HWF for caseId: {}", caseData.getCcdCaseReference());
         HwFFeeTypeUtil.updateEventInHwfDetails(caseData, updatedData, INVALID_HWF_REFERENCE_GA);

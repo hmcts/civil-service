@@ -44,7 +44,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
         log.info("Job '{}' found {} case(s)", externalTask.getTopicName(), cases.size());
 
         cases.forEach(this::fireEventForStateChange);
-        return ExternalTaskData.builder().build();
+        return new ExternalTaskData();
     }
 
     private List<GeneralApplicationCaseData> getUnlessOrderCasesThatAreEndingToday() {
@@ -74,9 +74,9 @@ public class CheckUnlessOrderDeadlineEndTaskHandler extends BaseExternalTaskHand
 
     private GeneralApplicationCaseData updateCaseData(GeneralApplicationCaseData caseData) {
         GAJudicialMakeAnOrder judicialDecisionMakeOrder = caseData.getJudicialDecisionMakeOrder();
-        caseData = caseData.toBuilder()
+        caseData = caseData.copy()
             .judicialDecisionMakeOrder(
-                judicialDecisionMakeOrder.toBuilder().isOrderProcessedByUnlessScheduler(YesOrNo.YES).build())
+                judicialDecisionMakeOrder.copy().setIsOrderProcessedByUnlessScheduler(YesOrNo.YES))
             .build();
         return caseData;
     }

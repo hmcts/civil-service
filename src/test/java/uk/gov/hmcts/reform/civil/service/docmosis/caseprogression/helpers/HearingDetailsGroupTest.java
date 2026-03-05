@@ -50,7 +50,7 @@ public class HearingDetailsGroupTest {
                                                  .setLengthList(HearingLengthFinalOrderList.HOUR_1))
                                                  .build();
 
-        LocationRefData caseManagementLocationDetails = LocationRefData.builder().build();
+        LocationRefData caseManagementLocationDetails = new LocationRefData();
 
         JudgeFinalOrderForm form = new JudgeFinalOrderForm();
 

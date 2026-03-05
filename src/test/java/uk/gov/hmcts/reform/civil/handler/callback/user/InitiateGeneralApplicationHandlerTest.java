@@ -152,8 +152,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
         + " on this application."
         + "<br/> <p>  The other party's legal representative has been notified that you have"
         + " submitted this application";
-    private static final Fee FEE275 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(27500)).code("FEE0444").version("1").build();
+    private static final Fee FEE275 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(27500)).setCode("FEE0444").setVersion("1");
 
     @BeforeEach
     void setup() {
@@ -1563,9 +1563,8 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                               .urgentAppConsiderationDate(APP_DATE_EPOCH)
                                               .build())
             .isMultiParty(NO)
-            .businessProcess(BusinessProcess.builder()
-                                 .status(BusinessProcessStatus.READY)
-                                 .build())
+            .businessProcess(new BusinessProcess()
+                                 .setStatus(BusinessProcessStatus.READY))
             .build();
         return getEmptyTestCase(caseData)
             .toBuilder()

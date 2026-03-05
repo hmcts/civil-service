@@ -17,9 +17,9 @@ public class DjWelshLanguageService {
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
 
     public SdoR2WelshLanguageUsage buildWelshUsage() {
-        return SdoR2WelshLanguageUsage.builder()
-            .description(WELSH_LANG_DESCRIPTION)
-            .build();
+        SdoR2WelshLanguageUsage welshLanguageUsage = new SdoR2WelshLanguageUsage();
+        welshLanguageUsage.setDescription(WELSH_LANG_DESCRIPTION);
+        return welshLanguageUsage;
     }
 
     public String buildOrderMadeWithoutHearingText(LocalDate deadlineDate) {

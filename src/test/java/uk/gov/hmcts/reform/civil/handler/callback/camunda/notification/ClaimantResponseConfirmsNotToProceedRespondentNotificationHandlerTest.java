@@ -99,7 +99,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         void shouldNotifyRespondentSolicitor_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+                .thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -168,7 +168,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+                .thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -189,7 +189,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         void shouldNotifyRespondentSolicitor2_whenInvoked_spec() {
             when(notificationsProperties.getRespondentSolicitorNotifyNotToProceedSpec()).thenReturn("spec-template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+                .thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
@@ -214,7 +214,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         void shouldNotifyApplicantSolicitor_whenInvokedWithCcEvent() {
             when(notificationsProperties.getClaimantSolicitorConfirmsNotToProceed()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+                .thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -234,7 +234,7 @@ class ClaimantResponseConfirmsNotToProceedRespondentNotificationHandlerTest exte
         @Test
         void shouldNotifyRespondentSolicitor_whenInvoked_spec_partadmit() {
             when(notificationsProperties.getNotifyRespondentSolicitorPartAdmitPayImmediatelyAcceptedSpec()).thenReturn("spec-template-part-admit-id");
-            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(Organisation.builder().name("respondent solicitor org").build()));
+            when(organisationService.findOrganisationById(anyString())).thenReturn(Optional.of(new Organisation().setName("respondent solicitor org")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()

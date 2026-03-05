@@ -43,14 +43,14 @@ public class GeneralApplicationTaskHandler extends BaseExternalTaskHandler {
         log.info("Started GA update event for case ID: {} with event: {}", externalTask.getId(), variables.getCaseEvent());
         GeneralApplicationCaseData startEventData = caseDetailsConverter.toGeneralApplicationCaseData(startEventResponse.getCaseDetails());
         BusinessProcess businessProcess = startEventData
-            .getBusinessProcess().toBuilder()
-            .activityId(externalTask.getActivityId()).build();
+            .getBusinessProcess().copy()
+            .setActivityId(externalTask.getActivityId());
         CaseDataContent caseDataContent = caseDataContent(startEventResponse, businessProcess,
                                                           variables, startEventData.getGeneralAppParentCaseLink());
 
         var caseData = coreCaseDataService.submitGaUpdate(generalApplicationCaseId, caseDataContent);
 
-        return ExternalTaskData.builder().parentCaseData(caseData).build();
+        return new ExternalTaskData().setParentCaseData(caseData);
     }
 
     @Override
@@ -71,8 +71,8 @@ public class GeneralApplicationTaskHandler extends BaseExternalTaskHandler {
 
         if (generalAppParentCaseLink == null
             || StringUtils.isBlank(generalAppParentCaseLink.getCaseReference())) {
-            updatedData.put("generalAppParentCaseLink", GeneralAppParentCaseLink.builder()
-                .caseReference(variables.getCaseId()).build());
+            updatedData.put("generalAppParentCaseLink", new GeneralAppParentCaseLink()
+                .setCaseReference(variables.getCaseId()));
         }
 
         return CaseDataContent.builder()

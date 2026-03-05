@@ -56,7 +56,7 @@ class MigrateCaseQueriesTaskTest {
             .qmApplicantSolicitorQueries(oldCollection)
             .build();
 
-        CaseReference caseReference = CaseReference.builder().caseReference("123").build();
+        CaseReference caseReference = caseReference("123");
 
         CaseData result = task.migrateCaseData(caseData, caseReference);
 
@@ -69,11 +69,17 @@ class MigrateCaseQueriesTaskTest {
     @Test
     void shouldNotMigrateWhenNoOldCaseQueriesExist() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseReference = CaseReference.builder().caseReference("123").build();
+        CaseReference caseReference = caseReference("123");
 
         CaseData result = task.migrateCaseData(caseData, caseReference);
 
         assertThat(result.getQueries()).isNull();
         assertThat(result.getQmApplicantSolicitorQueries()).isNull();
+    }
+
+    private CaseReference caseReference(String value) {
+        CaseReference reference = new CaseReference();
+        reference.setCaseReference(value);
+        return reference;
     }
 }

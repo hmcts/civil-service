@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.service.docmosis.finalorder;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.PDF;
@@ -76,9 +77,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.ASSISTED_ORDER_FORM;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_JUDGE_ASSISTED_ORDER_FORM_LIP;
 
-@SpringBootTest(classes = {
-    AssistedOrderFormGenerator.class
-})
+@ExtendWith(MockitoExtension.class)
 class AssistedOrderFormGeneratorTest {
 
     private static final String RECITAL_RECORDED_TEXT = "It is recorded that";
@@ -103,16 +102,16 @@ class AssistedOrderFormGeneratorTest {
 
     private static final String INTERIM_PAYMENT_TEXT = "An interim payment of £500.00 on account of costs shall be paid by 4pm on";
 
-    @MockBean
+    @Mock
     private DocumentManagementService documentManagementService;
 
-    @MockBean
+    @Mock
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @Mock
     private DocmosisService docmosisService;
 
-    @Autowired
+    @InjectMocks
     private AssistedOrderFormGenerator generator;
 
     @Test
@@ -137,22 +136,20 @@ class AssistedOrderFormGeneratorTest {
 
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
-        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).toBuilder()
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("9")
                                         .postcode("BA 117").build())
             .claimant2PartyName(null).build();
 
-        when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_FORM)))
-            .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
         doThrow(new IllegalArgumentException("Court Name is not found in location data"))
             .when(docmosisService).getCaseManagementLocationVenueName(any(), any());
         Exception exception =
             assertThrows(
                 IllegalArgumentException.class, ()
                     -> generator.generate(caseData, BEARER_TOKEN)
-            );
+        );
         String expectedMessage = "Court Name is not found in location data";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
@@ -161,14 +158,15 @@ class AssistedOrderFormGeneratorTest {
     @Test
     void shouldGenerateAssistedOrderDocument() {
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("Reading")
-                            .build());
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("Reading")
+            );
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(ASSISTED_ORDER_FORM)))
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
-        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).toBuilder()
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("1")
@@ -212,11 +210,12 @@ class AssistedOrderFormGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
         when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-            .thenReturn(LocationRefData.builder()
-                            .epimmsId("2")
-                            .externalShortName("London")
-                            .build());
-        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(YES).toBuilder()
+            .thenReturn(
+                new LocationRefData()
+                    .setEpimmsId("2")
+                    .setExternalShortName("London")
+            );
+        GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(YES).copy()
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("2")
@@ -259,9 +258,9 @@ class AssistedOrderFormGeneratorTest {
         furtherHearingShowOption.add(FinalOrderShowToggle.SHOW);
         List<FinalOrderShowToggle> appealShowOption = new ArrayList<>();
         appealShowOption.add(FinalOrderShowToggle.SHOW);
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(1644495739087775L)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1644495739087775").build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1644495739087775"))
             .claimant1PartyName("ClaimantName")
             .defendant1PartyName("defendant1PartyName")
             .claimant2PartyName("Test Claimant2 Name")
@@ -272,57 +271,55 @@ class AssistedOrderFormGeneratorTest {
                                         .address("london court")
                                         .postcode("BA 117").build())
             .assistedOrderMadeSelection(YES)
-            .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+            .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
             .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-            .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                             .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
-                                             .otherRepresentation(DetailText.builder().detailText(OTHER_ORIGIN_TEXT).build()).build())
+            .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                             .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
+                                             .setOtherRepresentation(new DetailText().setDetailText(OTHER_ORIGIN_TEXT)))
             .assistedOrderRecitals(recitalsOrderShowOption)
-            .assistedOrderRecitalsRecorded(AssistedOrderRecitalRecord.builder().text(RECITAL_RECORDED_TEXT).build())
+            .assistedOrderRecitalsRecorded(new AssistedOrderRecitalRecord().setText(RECITAL_RECORDED_TEXT))
             .assistedOrderOrderedThatText(TEST_TEXT)
             .assistedCostTypes(AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-            .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                  .makeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
-                                                  .assistedOrderCostsMakeAnOrderTopList(
+            .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                  .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
+                                                  .setAssistedOrderCostsMakeAnOrderTopList(
                                                       AssistedOrderCostDropdownList.COSTS)
-                                                  .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build())
+                                                  .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)))
             .publicFundingCostsProtection(YES)
             .assistedOrderFurtherHearingToggle(furtherHearingShowOption)
-            .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                    .listFromDate(LocalDate.now().minusDays(5))
-                                                    .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                    .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(2)
-                                                                              .lengthListOtherHours(5)
-                                                                              .lengthListOtherMinutes(30).build())
-                                                    .datesToAvoid(NO)
-                                                    .hearingLocationList(DynamicList.builder().value(
+            .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                    .setListFromDate(LocalDate.now().minusDays(5))
+                                                    .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                    .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(2)
+                                                                              .setLengthListOtherHours(5)
+                                                                              .setLengthListOtherMinutes(30))
+                                                    .setDatesToAvoid(NO)
+                                                    .setHearingLocationList(DynamicList.builder().value(
                                                         DynamicListElement.builder().label("Other location").build()).build())
-                                                    .alternativeHearingLocation(DynamicList.builder().value(
+                                                    .setAlternativeHearingLocation(DynamicList.builder().value(
                                                         DynamicListElement.builder().label(
                                                             "Site Name 2 - Address2 - 28000").build()).build())
-                                                    .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                    .setHearingMethods(GAJudicialHearingType.TELEPHONE))
             .assistedOrderAppealToggle(appealShowOption)
-            .assistedOrderAppealDetails(AssistedOrderAppealDetails.builder()
-                                            .appealOrigin(AppealOriginTypes.DEFENDANT)
-                                            .permissionToAppeal(PermissionToAppealTypes.GRANTED)
-                                            .appealTypeChoicesForGranted(
-                                                AppealTypeChoices.builder()
-                                                    .assistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
-                                                    .appealChoiceOptionA(
-                                                        AppealTypeChoiceList.builder()
-                                                            .appealGrantedRefusedDate(LocalDate.now().plusDays(14))
-                                                            .build()).build()).build())
+            .assistedOrderAppealDetails(new AssistedOrderAppealDetails()
+                                            .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                                            .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)
+                                            .setAppealTypeChoicesForGranted(
+                                                new AppealTypeChoices()
+                                                    .setAssistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
+                                                    .setAppealChoiceOptionA(
+                                                        new AppealTypeChoiceList()
+                                                            .setAppealGrantedRefusedDate(LocalDate.now().plusDays(14))
+                                                            )))
             .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-            .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                          .detailText(TEST_TEXT)
-                                          .date(LocalDate.now())
-                                          .build())
+            .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                          .setDetailText(TEST_TEXT)
+                                          .setDate(LocalDate.now())
+                                          )
             .assistedOrderGiveReasonsYesNo(YES)
-            .assistedOrderGiveReasonsDetails(AssistedOrderGiveReasonsDetails
-                                                 .builder()
-                                                 .reasonsText(TEST_TEXT)
-                                                 .build())
+            .assistedOrderGiveReasonsDetails(new AssistedOrderGiveReasonsDetails()
+                                                 .setReasonsText(TEST_TEXT))
             .build();
 
     }
@@ -332,9 +329,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_CostsReserved() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.COSTS_RESERVED)
-                .costReservedDetails(DetailText.builder().detailText(TEST_TEXT).build()).build();
+                .costReservedDetails(new DetailText().setDetailText(TEST_TEXT)).build();
             String assistedOrderString = generator.getCostsReservedText(caseData);
 
             assertThat(assistedOrderString).contains(TEST_TEXT);
@@ -342,7 +339,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenSelected_CostsReserved_detailTextIsEmpty() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.COSTS_RESERVED)
                 .build();
             String assistedOrderString = generator.getCostsReservedText(caseData);
@@ -352,9 +349,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnValue_WhenSelected_BeSpokeCostOrder() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.BESPOKE_COSTS_ORDER)
-                .assistedOrderCostsBespoke(BeSpokeCostDetailText.builder().detailText("test").build())
+                .assistedOrderCostsBespoke(new BeSpokeCostDetailText().setDetailText("test"))
                 .build();
             String assistedOrderString = generator.getBespokeCostOrderText(caseData);
 
@@ -363,7 +360,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenSelected_NotCostsReserved() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.NO_ORDER_TO_COST)
                 .build();
             String assistedOrderString = generator.getCostsReservedText(caseData);
@@ -373,13 +370,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Claimant_SummarilyAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             String assistedOrderString = generator.getSummarilyAssessed(caseData);
 
             assertThat(assistedOrderString).contains(CLAIMANT_SUMMARILY_ASSESSED_TEXT);
@@ -387,13 +384,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Defendant_SummarilyAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             String assistedOrderString = generator.getSummarilyAssessed(caseData);
 
             assertThat(assistedOrderString).contains(DEFENDANT_SUMMARILY_ASSESSED_TEXT);
@@ -401,9 +398,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsEmpty() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder().build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             String assistedOrderString = generator.getSummarilyAssessed(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -411,7 +408,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsListIsEmpty() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                 AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).build();
             String assistedOrderString = generator.getSummarilyAssessed(caseData);
 
@@ -420,13 +417,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDifferentText_WhenSelected_Defendant_SubjectSummarilyAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             String assistedOrderString = generator.getSummarilyAssessed(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -434,14 +431,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Claimant_SummarilyAssessedDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5))).build();
             LocalDate assistedOrderDropdownDate = generator.getSummarilyAssessedDate(caseData);
 
             assertThat(assistedOrderDropdownDate).isEqualTo(LocalDate.now().minusDays(5));
@@ -449,10 +446,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_MakeAnOrderForCostsIsNull_SummarilyAssessedDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             LocalDate assistedOrderDropdownDate = generator.getSummarilyAssessedDate(caseData);
 
             assertThat(assistedOrderDropdownDate).isNull();
@@ -460,13 +456,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_MakeAnOrderForCostsListIsNull_SummarilyAssessedDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5))).build();
             LocalDate assistedOrderDropdownDate = generator.getSummarilyAssessedDate(caseData);
 
             assertThat(assistedOrderDropdownDate).isNull();
@@ -474,13 +470,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_MakeAnOrderForCostsListDropdownIsNotCosts_SummarilyAssessedDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderCostsFirstDropdownDate(LocalDate.now().minusDays(5))).build();
             LocalDate assistedOrderDropdownDate = generator.getSummarilyAssessedDate(caseData);
 
             assertThat(assistedOrderDropdownDate).isNull();
@@ -488,15 +484,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Claimant_DetailedAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
-                                                          AssistedOrderCostDropdownList.INDEMNITY_BASIS).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
+                                                          AssistedOrderCostDropdownList.INDEMNITY_BASIS)).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).contains(CLAIMANT_DETAILED_INDEMNITY_ASSESSED_TEXT);
@@ -504,15 +500,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Claimant_StandardDetailedAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.CLAIMANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
-                                                          AssistedOrderCostDropdownList.STANDARD_BASIS).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
+                                                          AssistedOrderCostDropdownList.STANDARD_BASIS)).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).contains(CLAIMANT_DETAILED_STANDARD_ASSESSED_TEXT);
@@ -520,15 +516,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Defendant_StandardDetailedAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
-                                                          AssistedOrderCostDropdownList.STANDARD_BASIS).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
+                                                          AssistedOrderCostDropdownList.STANDARD_BASIS)).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).contains(DEFENDANT_DETAILED_STANDARD_ASSESSED_TEXT);
@@ -536,15 +532,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Defendant_IndemnityDetailedAssessed() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
-                                                          AssistedOrderCostDropdownList.INDEMNITY_BASIS).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
+                                                          AssistedOrderCostDropdownList.INDEMNITY_BASIS)).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).contains(DEFENDANT_DETAILED_INDEMNITY_ASSESSED_TEXT);
@@ -552,9 +548,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsEmpty_Detailed_Assessment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder().build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -562,7 +558,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsListIsEmpty_Detailed_Assessment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                 AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
@@ -571,13 +567,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDifferentText_WhenSelected_Defendant_CostsDetailed_Assessment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             String assistedOrderString = generator.getDetailedAssessment(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -585,9 +581,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsEmpty_InterimPayment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder().build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             String assistedOrderString = generator.getInterimPayment(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -595,7 +591,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsListIsEmpty_InterimPayment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                 AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).build();
             String assistedOrderString = generator.getInterimPayment(caseData);
 
@@ -604,13 +600,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDifferentText_WhenSelected_Defendant_CostsInterimPayment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             String assistedOrderString = generator.getInterimPayment(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -618,15 +614,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDifferentText_WhenSelected_Defendant_CostsInterimPayment_No() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList2(
-                                                          AssistedOrderCostDropdownList.NO).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList2(
+                                                          AssistedOrderCostDropdownList.NO)).build();
             String assistedOrderString = generator.getInterimPayment(caseData);
 
             assertThat(assistedOrderString).isNull();
@@ -634,19 +630,19 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_Defendant_InterimPayment() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
                                                           AssistedOrderCostDropdownList.INDEMNITY_BASIS)
-                                                      .assistedOrderAssessmentSecondDropdownList2(
+                                                      .setAssistedOrderAssessmentSecondDropdownList2(
                                                           AssistedOrderCostDropdownList.YES)
-                                                      .assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
-                                                          50000)).build()).build();
+                                                      .setAssistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
+                                                          50000))).build();
             String assistedOrderString = generator.getInterimPayment(caseData);
 
             assertThat(assistedOrderString).contains(INTERIM_PAYMENT_TEXT);
@@ -654,21 +650,21 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_WhenSelected_Defendant_InterimPaymentDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.SUBJECT_DETAILED_ASSESSMENT)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
-                                                      .assistedOrderAssessmentSecondDropdownList1(
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))
+                                                      .setAssistedOrderAssessmentSecondDropdownList1(
                                                           AssistedOrderCostDropdownList.INDEMNITY_BASIS)
-                                                      .assistedOrderAssessmentSecondDropdownList2(
+                                                      .setAssistedOrderAssessmentSecondDropdownList2(
                                                           AssistedOrderCostDropdownList.YES)
-                                                      .assistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
+                                                      .setAssistedOrderAssessmentThirdDropdownAmount(BigDecimal.valueOf(
                                                           50000))
-                                                      .assistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(
-                                                          10)).build()).build();
+                                                      .setAssistedOrderAssessmentThirdDropdownDate(LocalDate.now().plusDays(
+                                                          10))).build();
             LocalDate assistedOrderDate = generator.getInterimPaymentDate(caseData);
 
             assertThat(assistedOrderDate).isEqualTo(LocalDate.now().plusDays(10));
@@ -676,9 +672,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsEmpty_InterimPaymentDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder().build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             LocalDate assistedOrderDate = generator.getInterimPaymentDate(caseData);
 
             assertThat(assistedOrderDate).isNull();
@@ -686,7 +682,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_WhenMakeAnOrderForCostsListIsEmpty_InterimPaymentDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                 AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS).build();
             LocalDate assistedOrderDate = generator.getInterimPaymentDate(caseData);
 
@@ -695,13 +691,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDifferentText_WhenSelected_Defendant_CostsInterimPaymentDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             LocalDate assistedOrderDate = generator.getInterimPaymentDate(caseData);
 
             assertThat(assistedOrderDate).isNull();
@@ -709,14 +705,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenQocsProtectionEnabled() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .makeAnOrderForCostsYesOrNo(YesOrNo.YES)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setMakeAnOrderForCostsYesOrNo(YesOrNo.YES)
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             Boolean checkQocsFlag = generator.checkIsQocsProtectionEnabled(caseData);
 
             assertThat(checkQocsFlag).isTrue();
@@ -724,14 +720,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenQocsProtectionDisabled() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .makeAnOrderForCostsYesOrNo(YesOrNo.NO)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setMakeAnOrderForCostsYesOrNo(YesOrNo.NO)
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             Boolean checkQocsFlag = generator.checkIsQocsProtectionEnabled(caseData);
 
             assertThat(checkQocsFlag).isFalse();
@@ -739,13 +735,13 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenQocsProtectionDisabled_YesOrNoIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder()
-                                                      .makeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
-                                                      .assistedOrderCostsMakeAnOrderTopList(
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()
+                                                      .setMakeAnOrderForCostsList(AssistedOrderCostDropdownList.DEFENDANT)
+                                                      .setAssistedOrderCostsMakeAnOrderTopList(
                                                           AssistedOrderCostDropdownList.COSTS)
-                                                      .assistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900)).build()).build();
+                                                      .setAssistedOrderCostsFirstDropdownAmount(BigDecimal.valueOf(78900))).build();
             Boolean checkQocsFlag = generator.checkIsQocsProtectionEnabled(caseData);
 
             assertThat(checkQocsFlag).isFalse();
@@ -753,9 +749,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenQocsProtectionDisabled_MakeAnOrderForCostsIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedCostTypes(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedCostTypes(
                     AssistedCostTypesList.MAKE_AN_ORDER_FOR_DETAILED_COSTS)
-                .assistedOrderMakeAnOrderForCosts(AssistedOrderCost.builder().build()).build();
+                .assistedOrderMakeAnOrderForCosts(new AssistedOrderCost()).build();
             Boolean checkQocsFlag = generator.checkIsQocsProtectionEnabled(caseData);
 
             assertThat(checkQocsFlag).isFalse();
@@ -769,7 +765,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_FurtherHearing_NotSelected() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingToggle(null)
                 .build();
             Boolean checkToggle = generator.checkFurtherHearingToggle(caseData);
@@ -779,7 +775,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_FurtherHearingOption_Null() {
             furtherHearingShowOption.add(null);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingToggle(furtherHearingShowOption)
                 .build();
             Boolean checkToggle = generator.checkFurtherHearingToggle(caseData);
@@ -789,7 +785,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_FurtherHearingOption_NotShow() {
             furtherHearingShowOption.add(FinalOrderShowToggle.HIDE);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingToggle(furtherHearingShowOption)
                 .build();
             Boolean checkToggle = generator.checkFurtherHearingToggle(caseData);
@@ -799,7 +795,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldNotReturnNull_When_FurtherHearingOption_Show() {
             furtherHearingShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingToggle(furtherHearingShowOption)
                 .build();
             Boolean checkToggle = generator.checkFurtherHearingToggle(caseData);
@@ -808,9 +804,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnYes_When_FurtherHearing_CheckListToDateExists() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().listToDate(LocalDate.now().minusDays(
-                    5)).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails().setListToDate(LocalDate.now().minusDays(
+                    5)))
                 .build();
             YesOrNo checkListToDate = generator.checkListToDate(caseData);
             assertThat(checkListToDate).isEqualTo(YesOrNo.YES);
@@ -818,9 +814,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNo_When_FurtherHearing_CheckListToDateDoesNotExists() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().listFromDate(LocalDate.now().minusDays(
-                    5)).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails().setListFromDate(LocalDate.now().minusDays(
+                    5)))
                 .build();
             YesOrNo checkListToDate = generator.checkListToDate(caseData);
             assertThat(checkListToDate).isEqualTo(YesOrNo.NO);
@@ -828,8 +824,8 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNo_When_FurtherHearing_ListToDateDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails())
                 .build();
             YesOrNo checkListToDate = generator.checkListToDate(caseData);
             assertThat(checkListToDate).isEqualTo(YesOrNo.NO);
@@ -837,9 +833,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnYes_When_FurtherHearing_ListToDateExists() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().listToDate(LocalDate.now().minusDays(
-                    5)).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails().setListToDate(LocalDate.now().minusDays(
+                    5)))
                 .build();
             LocalDate getListToDate = generator.getFurtherHearingListToDate(caseData);
             assertThat(getListToDate).isEqualTo(LocalDate.now().minusDays(5));
@@ -847,9 +843,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnListToDate_When_FurtherHearing_ListToDateDoesNotExists() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().listFromDate(LocalDate.now().minusDays(
-                    5)).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails().setListFromDate(LocalDate.now().minusDays(
+                    5)))
                 .build();
             LocalDate getListToDate = generator.getFurtherHearingListToDate(caseData);
             assertThat(getListToDate).isNull();
@@ -857,8 +853,8 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNo_When_FurtherHearing_DetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails())
                 .build();
             LocalDate getListToDate = generator.getFurtherHearingListToDate(caseData);
             assertThat(getListToDate).isNull();
@@ -866,9 +862,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_ListFromDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder().listFromDate(LocalDate.now().minusDays(
-                    5)).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails().setListFromDate(LocalDate.now().minusDays(
+                    5)))
                 .build();
             LocalDate getListFromDate = generator.getFurtherHearingListFromDate(caseData);
             assertThat(getListFromDate).isEqualTo(LocalDate.now().minusDays(5));
@@ -876,7 +872,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_ListFromDateDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             LocalDate getListFromDate = generator.getFurtherHearingListFromDate(caseData);
             assertThat(getListFromDate).isNull();
@@ -884,10 +880,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_When_FurtherHearing_HearingMethodExists() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingMethodText = generator.getFurtherHearingMethod(caseData);
             assertThat(hearingMethodText).contains("TELEPHONE");
@@ -895,7 +891,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_HearingMethodDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             String hearingMethodText = generator.getFurtherHearingMethod(caseData);
             assertThat(hearingMethodText).isNull();
@@ -903,11 +899,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_When_FurtherHearing_HearingDurationExists_Hours() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.HOURS_2)
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.HOURS_2)
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).contains("2 hours");
@@ -915,67 +911,67 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_When_FurtherHearing_HearingDurationExists_Other() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isEqualTo("2 days 5 hours 30 minutes");
 
-            caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 0)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isEqualTo("5 hours 30 minutes");
 
-            caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 0)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(0).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(0))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isEqualTo("5 hours");
 
-            caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 5)
-                                                                                  .lengthListOtherHours(0)
-                                                                                  .lengthListOtherMinutes(0).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(0)
+                                                                                  .setLengthListOtherMinutes(0))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isEqualTo("5 days");
 
-            caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 0)
-                                                                                  .lengthListOtherHours(0)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(0)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isEqualTo("30 minutes");
@@ -983,7 +979,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_HearingDurationDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             String hearingDurationText = generator.getFurtherHearingDuration(caseData);
             assertThat(hearingDurationText).isNull();
@@ -991,16 +987,16 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrue_When_FurtherHearing_checkDatesToAvoidIsYes() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.YES)
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.YES)
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             Boolean datesToAvoid = generator.checkDatesToAvoid(caseData);
             assertThat(datesToAvoid).isTrue();
@@ -1008,16 +1004,16 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrue_When_FurtherHearing_checkDatesToAvoidIsNo() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.NO)
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.NO)
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             Boolean datesToAvoid = generator.checkDatesToAvoid(caseData);
             assertThat(datesToAvoid).isFalse();
@@ -1025,7 +1021,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNo_When_FurtherHearing_checkDatesToAvoidDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             Boolean datesToAvoid = generator.checkDatesToAvoid(caseData);
             assertThat(datesToAvoid).isFalse();
@@ -1033,19 +1029,19 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_FurtherHearingDatesToAvoidIsYes() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.YES)
-                                                        .datesToAvoidDateDropdown(AssistedOrderDateHeard.builder().datesToAvoidDates(
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.YES)
+                                                        .setDatesToAvoidDateDropdown(new AssistedOrderDateHeard().setDatesToAvoidDates(
                                                                 LocalDate.now().plusDays(7))
-                                                                                      .build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                      )
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             LocalDate datesToAvoid = generator.getFurtherHearingDatesToAvoid(caseData);
             assertThat(datesToAvoid).isEqualTo(LocalDate.now().plusDays(7));
@@ -1053,16 +1049,16 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_FurtherHearingDatesToAvoidIsNo() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.NO)
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.NO)
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             LocalDate datesToAvoid = generator.getFurtherHearingDatesToAvoid(caseData);
             assertThat(datesToAvoid).isNull();
@@ -1070,7 +1066,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_FurtherHearing_DatesToAvoidDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             LocalDate datesToAvoid = generator.getFurtherHearingDatesToAvoid(caseData);
             assertThat(datesToAvoid).isNull();
@@ -1078,21 +1074,21 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_FurtherHearingLocationIsOtherLocation() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.NO)
-                                                        .hearingLocationList(DynamicList.builder().value(
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.NO)
+                                                        .setHearingLocationList(DynamicList.builder().value(
                                                             DynamicListElement.builder().label("Other location").build()).build())
-                                                        .alternativeHearingLocation(DynamicList.builder().value(
+                                                        .setAlternativeHearingLocation(DynamicList.builder().value(
                                                             DynamicListElement.builder().label(
                                                                 "Site Name 2 - Address2 - 28000").build()).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingLocation = generator.getFurtherHearingLocation(caseData);
             assertThat(hearingLocation).contains("Site Name 2 - Address2 - 28000");
@@ -1100,19 +1096,19 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDate_When_FurtherHearing_FurtherHearingLocationIsCcmcc() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .locationName("ccmcc location")
-                .assistedOrderFurtherHearingDetails(AssistedOrderFurtherHearingDetails.builder()
-                                                        .listFromDate(LocalDate.now().minusDays(5))
-                                                        .lengthOfNewHearing(LengthOfHearing.OTHER)
-                                                        .lengthOfHearingOther(HearingLength.builder().lengthListOtherDays(
+                .assistedOrderFurtherHearingDetails(new AssistedOrderFurtherHearingDetails()
+                                                        .setListFromDate(LocalDate.now().minusDays(5))
+                                                        .setLengthOfNewHearing(LengthOfHearing.OTHER)
+                                                        .setLengthOfHearingOther(new HearingLength().setLengthListOtherDays(
                                                                 2)
-                                                                                  .lengthListOtherHours(5)
-                                                                                  .lengthListOtherMinutes(30).build())
-                                                        .datesToAvoid(YesOrNo.NO)
-                                                        .hearingLocationList(DynamicList.builder().value(
+                                                                                  .setLengthListOtherHours(5)
+                                                                                  .setLengthListOtherMinutes(30))
+                                                        .setDatesToAvoid(YesOrNo.NO)
+                                                        .setHearingLocationList(DynamicList.builder().value(
                                                             DynamicListElement.builder().label("ccmcc location").build()).build())
-                                                        .hearingMethods(GAJudicialHearingType.TELEPHONE).build())
+                                                        .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingLocation = generator.getFurtherHearingLocation(caseData);
             assertThat(hearingLocation).contains("ccmcc location");
@@ -1120,7 +1116,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_FurtherHearing_LocationDetailsNotFound() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderFurtherHearingDetails(null).build();
             String furtherHearingLocation = generator.getFurtherHearingLocation(caseData);
             assertThat(furtherHearingLocation).isNull();
@@ -1131,7 +1127,7 @@ class AssistedOrderFormGeneratorTest {
     class Recitals {
         @Test
         void shouldReturnNull_When_Recitals_NotSelected() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderRecitals(null)
                 .build();
             Boolean checkToggle = generator.checkRecitalsToggle(caseData);
@@ -1142,7 +1138,7 @@ class AssistedOrderFormGeneratorTest {
         void shouldReturnNull_RecitalOption_Null() {
             List<FinalOrderShowToggle> recitalsOrderShowOption = new ArrayList<>();
             recitalsOrderShowOption.add(null);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderRecitals(recitalsOrderShowOption)
                 .build();
             Boolean checkToggle = generator.checkRecitalsToggle(caseData);
@@ -1153,7 +1149,7 @@ class AssistedOrderFormGeneratorTest {
         void shouldReturnNull_When_RecitalOption_NotShow() {
             List<FinalOrderShowToggle> recitalsOrderShowOption = new ArrayList<>();
             recitalsOrderShowOption.add(FinalOrderShowToggle.HIDE);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderRecitals(recitalsOrderShowOption)
                 .build();
             Boolean checkToggle = generator.checkRecitalsToggle(caseData);
@@ -1164,7 +1160,7 @@ class AssistedOrderFormGeneratorTest {
         void shouldNotReturnNull_When_RecitalOption_Show() {
             List<FinalOrderShowToggle> recitalsOrderShowOption = new ArrayList<>();
             recitalsOrderShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderRecitals(recitalsOrderShowOption)
                 .build();
             Boolean checkToggle = generator.checkRecitalsToggle(caseData);
@@ -1173,7 +1169,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_recitalsRecordedIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderRecitalsRecorded(null)
                 .build();
             String assistedOrderString = generator.getRecitalRecordedText(caseData);
@@ -1182,8 +1178,8 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_When_recitalsRecordedIsNotNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .assistedOrderRecitalsRecorded(AssistedOrderRecitalRecord.builder().text(RECITAL_RECORDED_TEXT).build())
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .assistedOrderRecitalsRecorded(new AssistedOrderRecitalRecord().setText(RECITAL_RECORDED_TEXT))
                 .build();
             String assistedOrderString = generator.getRecitalRecordedText(caseData);
             assertThat(assistedOrderString).contains(RECITAL_RECORDED_TEXT);
@@ -1197,7 +1193,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_judgeHeardFromShowOption_NotSelected() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(null)
                 .build();
             Boolean checkToggle = generator.checkJudgeHeardFromToggle(caseData);
@@ -1207,7 +1203,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_judgeHeardFromShowOptionOption_Null() {
             judgeHeardFromShowOption.add(null);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             Boolean checkToggle = generator.checkJudgeHeardFromToggle(caseData);
@@ -1217,7 +1213,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_judgeHeardFromShowOption_NotShow() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.HIDE);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             Boolean checkToggle = generator.checkJudgeHeardFromToggle(caseData);
@@ -1227,7 +1223,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldNotReturnNull_When_judgeHeardFromShowOption_Show() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             Boolean checkToggle = generator.checkJudgeHeardFromToggle(caseData);
@@ -1237,11 +1233,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_RepresentationTypeIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 )
                 .build();
             String representationType = generator.getJudgeHeardFromRepresentation(caseData);
             assertThat(representationType).contains("Claimant and Defendant");
@@ -1250,7 +1246,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_RepresentationTypeIsNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             String representationType = generator.getJudgeHeardFromRepresentation(caseData);
@@ -1260,16 +1256,16 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_ClaimantRepresentationIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             String claimantRepresentationType = generator.getClaimantRepresentation(caseData);
             assertThat(claimantRepresentationType).contains("Counsel for claimant");
@@ -1278,7 +1274,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_ClaimantRepresentationTypeDetailsIsNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             String representationType = generator.getClaimantRepresentation(caseData);
@@ -1288,16 +1284,16 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_DefendantRepresentationIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             String defendantRepresentationType = generator.getDefendantRepresentation(caseData);
             assertThat(defendantRepresentationType).contains("Solicitor for defendant");
@@ -1306,7 +1302,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantRepresentationTypeDetailsIsNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
             String representationType = generator.getDefendantRepresentation(caseData);
@@ -1316,19 +1312,19 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_DefendantTwoRepresentationIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .defendantTwoRepresentation(
+                                                                                      .setDefendantTwoRepresentation(
                                                                                           DefendantRepresentationType.COST_DRAFTSMAN_FOR_THE_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             String defendantRepresentationType = generator.getDefendantTwoRepresentation(caseData);
             assertThat(defendantRepresentationType).contains("Cost draftsman for the defendant");
@@ -1337,17 +1333,17 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_DefendantTwoRepresentationIsNotNull_1v1() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.NO)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             String defendantRepresentationType = generator.getDefendantTwoRepresentation(caseData);
             assertThat(defendantRepresentationType).isNull();
@@ -1356,7 +1352,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantTwoRepresentationTypeDetailsIsNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .build();
@@ -1367,17 +1363,17 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnTrue_When_applicationIs_1v2() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             Boolean multipartyFlag = generator.checkIsMultiparty(caseData);
             assertThat(multipartyFlag).isTrue();
@@ -1386,17 +1382,17 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnFalse_When_applicationIs_1v1() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.NO)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
-                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT).build())
-                                                 .build())
+                                                                                      .setClaimantRepresentation(
+                                                                                          ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT))
+                                                 )
                 .build();
             Boolean multipartyFlag = generator.checkIsMultiparty(caseData);
             assertThat(multipartyFlag).isFalse();
@@ -1405,21 +1401,21 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_DefendantNotAttendedIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.DEFENDANT_NOT_ATTENDING)
-                                                                                      .claimantRepresentation(
+                                                                                      .setClaimantRepresentation(
                                                                                           ClaimantRepresentationType.SOLICITOR_FOR_CLAIMANT)
-                                                                                      .heardFromDefendantNotAttend(
-                                                                                          HeardDefendantNotAttend.builder()
-                                                                                              .listDef(
+                                                                                      .setHeardFromDefendantNotAttend(
+                                                                                          new HeardDefendantNotAttend()
+                                                                                              .setListDef(
                                                                                                   ClaimantDefendantNotAttendingType.NOT_GIVEN_NOTICE_OF_APPLICATION)
-                                                                                              .build()).build())
-                                                 .build())
+                                                                                              ))
+                                                 )
                 .build();
             String heardDefendantNotAttended = generator.getHeardDefendantNotAttend(caseData);
             assertThat(heardDefendantNotAttended).contains("The defendant was not given notice of this application");
@@ -1428,10 +1424,10 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantNotAttending_OtherRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION))
                 .build();
             String heardDefendantNotAttended = generator.getHeardDefendantNotAttend(caseData);
             assertThat(heardDefendantNotAttended).isNull();
@@ -1440,7 +1436,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantNotAttendDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
                 .build();
@@ -1451,25 +1447,24 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_DefendantTwoNotAttendedIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantTwoRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantTwoRepresentation(
                                                                                           DefendantRepresentationType.DEFENDANT_NOT_ATTENDING)
-                                                                                      .defendantRepresentation(
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
+                                                                                      .setClaimantRepresentation(
                                                                                           ClaimantRepresentationType.COUNSEL_FOR_CLAIMANT)
-                                                                                      .heardFromDefendantTwoNotAttend(
-                                                                                          HeardDefendantTwoNotAttend.builder()
-                                                                                              .listDefTwo(
+                                                                                      .setHeardFromDefendantTwoNotAttend(
+                                                                                          new HeardDefendantTwoNotAttend()
+                                                                                              .setListDefTwo(
                                                                                                   ClaimantDefendantNotAttendingType.NOT_GIVEN_NOTICE_OF_APPLICATION)
-                                                                                              .build())
-                                                                                      .build())
-                                                 .build())
+                                                                                              ))
+                                                 )
                 .build();
             String heardDefendantNotAttended = generator.getHeardDefendantTwoNotAttend(caseData);
             assertThat(heardDefendantNotAttended).contains("The defendant was not given notice of this application");
@@ -1478,11 +1473,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantTwoNotAttending_OtherRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION))
                 .build();
             String heardDefendantNotAttended = generator.getHeardDefendantTwoNotAttend(caseData);
             assertThat(heardDefendantNotAttended).isNull();
@@ -1491,11 +1486,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantTwoNotAttending_OtherRepresentation_1v1() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.NO)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION))
                 .build();
             String heardDefendantNotAttended = generator.getHeardDefendantTwoNotAttend(caseData);
             assertThat(heardDefendantNotAttended).isNull();
@@ -1504,7 +1499,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_DefendantTwoNotAttendDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .isMultiParty(YesOrNo.YES)
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
@@ -1516,22 +1511,22 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnValue_When_ClaimantNotAttendedIsNotNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
-                                                 .claimantDefendantRepresentation(ClaimantDefendantRepresentation.builder()
-                                                                                      .defendantRepresentation(
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT)
+                                                 .setClaimantDefendantRepresentation(new ClaimantDefendantRepresentation()
+                                                                                      .setDefendantRepresentation(
                                                                                           DefendantRepresentationType.SOLICITOR_FOR_DEFENDANT)
-                                                                                      .claimantRepresentation(
+                                                                                      .setClaimantRepresentation(
                                                                                           ClaimantRepresentationType.CLAIMANT_NOT_ATTENDING)
-                                                                                      .heardFromClaimantNotAttend(
-                                                                                          HeardClaimantNotAttend.builder()
-                                                                                              .listClaim(
+                                                                                      .setHeardFromClaimantNotAttend(
+                                                                                          new HeardClaimantNotAttend()
+                                                                                              .setListClaim(
                                                                                                   ClaimantDefendantNotAttendingType
                                                                                                       .NOT_GIVEN_NOTICE_OF_APPLICATION_CLAIMANT)
-                                                                                              .build()).build())
-                                                 .build())
+                                                                                              ))
+                                                 )
                 .build();
             String heardClaimantNotAttended = generator.getHeardClaimantNotAttend(caseData);
             assertThat(heardClaimantNotAttended).contains("The claimant was not given notice of this application");
@@ -1540,10 +1535,10 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_OtherRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION))
                 .build();
             String heardClaimantNotAttended = generator.getHeardClaimantNotAttend(caseData);
             assertThat(heardClaimantNotAttended).isNull();
@@ -1552,7 +1547,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_ClaimantNotAttendDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
                 .build();
@@ -1563,10 +1558,10 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnTrue_When_SelectionIs_OtherRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION))
                 .build();
             Boolean selection = generator.checkIsOtherRepresentation(caseData);
             assertThat(selection).isTrue();
@@ -1575,10 +1570,10 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnFalse_When_SelectionIs_ClaimantOrDefendantRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT))
                 .build();
             Boolean selection = generator.checkIsOtherRepresentation(caseData);
             assertThat(selection).isFalse();
@@ -1587,7 +1582,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnFalse_When_SelectionDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
                 .build();
@@ -1598,11 +1593,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnText_When_SelectionIs_OtherRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
-                                                 .otherRepresentation(DetailText.builder().detailText(OTHER_ORIGIN_TEXT).build()).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
+                                                 .setOtherRepresentation(new DetailText().setDetailText(OTHER_ORIGIN_TEXT)))
                 .build();
             String detailText = generator.getOtherRepresentationText(caseData);
             assertThat(detailText).contains(OTHER_ORIGIN_TEXT);
@@ -1611,10 +1606,10 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_SelectionIs_ClaimantOrDefendantRepresentation() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.CLAIMANT_AND_DEFENDANT))
                 .build();
             String detailText = generator.getOtherRepresentationText(caseData);
             assertThat(detailText).isNull();
@@ -1623,7 +1618,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnNull_When_SelectionDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
                 .build();
@@ -1636,13 +1631,13 @@ class AssistedOrderFormGeneratorTest {
             List<FinalOrderConsideredToggle> judgeConsideredPapers = new ArrayList<>();
             judgeConsideredPapers.add(FinalOrderConsideredToggle.CONSIDERED);
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .typeRepresentationJudgePapersList(judgeConsideredPapers)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
 
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
-                                                 .otherRepresentation(DetailText.builder().detailText(OTHER_ORIGIN_TEXT).build()).build())
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
+                                                 .setOtherRepresentation(new DetailText().setDetailText(OTHER_ORIGIN_TEXT)))
                 .build();
             Boolean judgeConsidered = generator.checkIsJudgeConsidered(caseData);
             assertThat(judgeConsidered).isTrue();
@@ -1653,12 +1648,12 @@ class AssistedOrderFormGeneratorTest {
             List<FinalOrderConsideredToggle> judgeConsideredPapers = new ArrayList<>();
             judgeConsideredPapers.add(FinalOrderConsideredToggle.NOT_CONSIDERED);
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .typeRepresentationJudgePapersList(judgeConsideredPapers)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
-                                                 .otherRepresentation(DetailText.builder().detailText(OTHER_ORIGIN_TEXT).build()).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
+                                                 .setOtherRepresentation(new DetailText().setDetailText(OTHER_ORIGIN_TEXT)))
                 .build();
             Boolean judgeConsidered = generator.checkIsJudgeConsidered(caseData);
             assertThat(judgeConsidered).isFalse();
@@ -1667,11 +1662,11 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnFalse_When_JudgePapersListIsNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
-                .assistedOrderRepresentation(AssistedOrderHeardRepresentation.builder()
-                                                 .representationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
-                                                 .otherRepresentation(DetailText.builder().detailText(OTHER_ORIGIN_TEXT).build()).build())
+                .assistedOrderRepresentation(new AssistedOrderHeardRepresentation()
+                                                 .setRepresentationType(HeardFromRepresentationTypes.OTHER_REPRESENTATION)
+                                                 .setOtherRepresentation(new DetailText().setDetailText(OTHER_ORIGIN_TEXT)))
                 .build();
             Boolean judgeConsidered = generator.checkIsJudgeConsidered(caseData);
             assertThat(judgeConsidered).isFalse();
@@ -1680,7 +1675,7 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldReturnFalse_When_JudgePapersListDetailsAreNull() {
             judgeHeardFromShowOption.add(FinalOrderShowToggle.SHOW);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderJudgeHeardFrom(judgeHeardFromShowOption)
                 .assistedOrderRepresentation(null)
                 .build();
@@ -1694,12 +1689,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenOrderMadeWithInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-                .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             Boolean checkInitiativeOrWithoutNotice = generator.checkInitiativeOrWithoutNotice(caseData);
             assertThat(checkInitiativeOrWithoutNotice).isTrue();
@@ -1707,7 +1702,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenOrderMadeWithWithoutNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.WITHOUT_NOTICE)
                 .build();
             Boolean checkInitiativeOrWithoutNotice = generator.checkInitiativeOrWithoutNotice(caseData);
@@ -1716,7 +1711,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeWithOherTypeExceptWithOutNoticeOrInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.NONE)
                 .build();
             Boolean checkInitiativeOrWithoutNotice = generator.checkInitiativeOrWithoutNotice(caseData);
@@ -1725,12 +1720,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhen_OrderMadeWithInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-                .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             Boolean checkInitiative = generator.checkInitiative(caseData);
             assertThat(checkInitiative).isTrue();
@@ -1738,7 +1733,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeWithOherTypeExceptInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.WITHOUT_NOTICE)
                 .build();
             Boolean checkInitiativeOrWithoutNotice = generator.checkInitiative(caseData);
@@ -1747,12 +1742,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTextWhen_OrderMadeWithInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-                .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             String orderMadeOnText = generator.getOrderMadeOnText(caseData);
             assertThat(orderMadeOnText).contains(TEST_TEXT);
@@ -1760,12 +1755,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTextWhen_OrderMadeWithWithoutNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.WITHOUT_NOTICE)
-                .orderMadeOnWithOutNotice(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnWithOutNotice(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             String orderMadeOnText = generator.getOrderMadeOnText(caseData);
             assertThat(orderMadeOnText).contains(TEST_TEXT);
@@ -1773,7 +1768,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNullWhen_OrderMadeWithNone() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.NONE)
                 .build();
             String orderMadeOnText = generator.getOrderMadeOnText(caseData);
@@ -1782,12 +1777,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnInitiativeDateWhen_OrderMadeWithInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-                .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             LocalDate orderMadeDate = generator.getOrderMadeCourtInitiativeDate(caseData);
             assertThat(orderMadeDate).isEqualTo(LocalDate.now());
@@ -1795,12 +1790,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnInitiativeDateNullWhen_OrderMadeWithoutNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.WITHOUT_NOTICE)
-                .orderMadeOnWithOutNotice(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnWithOutNotice(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             LocalDate orderMadeDate = generator.getOrderMadeCourtInitiativeDate(caseData);
             assertThat(orderMadeDate).isNull();
@@ -1808,12 +1803,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnWithoutNoticeDateWhen_OrderMadeWithoutNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.WITHOUT_NOTICE)
-                .orderMadeOnWithOutNotice(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnWithOutNotice(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             LocalDate orderMadeDate = generator.getOrderMadeCourtWithOutNoticeDate(caseData);
             assertThat(orderMadeDate).isEqualTo(LocalDate.now());
@@ -1821,12 +1816,12 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnWithoutNoticeDateNull_When_OrderMadeWithInitiative() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .orderMadeOnOption(OrderMadeOnTypes.COURTS_INITIATIVE)
-                .orderMadeOnOwnInitiative(DetailTextWithDate.builder()
-                                              .detailText(TEST_TEXT)
-                                              .date(LocalDate.now())
-                                              .build())
+                .orderMadeOnOwnInitiative(new DetailTextWithDate()
+                                              .setDetailText(TEST_TEXT)
+                                              .setDate(LocalDate.now())
+                                              )
                 .build();
             LocalDate orderMadeDate = generator.getOrderMadeCourtWithOutNoticeDate(caseData);
             assertThat(orderMadeDate).isNull();
@@ -1838,7 +1833,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_OrderAppeal_NotSelected() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderAppealToggle(null)
                 .build();
             Boolean checkToggle = generator.checkAppealToggle(caseData);
@@ -1849,7 +1844,7 @@ class AssistedOrderFormGeneratorTest {
         void shouldReturnNull_When_OrderAppealOption_Null() {
             List<FinalOrderShowToggle> recitalsOrderShowOption = new ArrayList<>();
             recitalsOrderShowOption.add(null);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderAppealToggle(recitalsOrderShowOption)
                 .build();
             Boolean checkToggle = generator.checkAppealToggle(caseData);
@@ -1860,7 +1855,7 @@ class AssistedOrderFormGeneratorTest {
         void shouldReturnNull_When_OrderAppealOption_NotShow() {
             List<FinalOrderShowToggle> recitalsOrderShowOption = new ArrayList<>();
             recitalsOrderShowOption.add(FinalOrderShowToggle.HIDE);
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderAppealToggle(recitalsOrderShowOption)
                 .build();
             Boolean checkToggle = generator.checkAppealToggle(caseData);
@@ -1869,9 +1864,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_ClaimantOrDefendantAppeal_Claimant() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.CLAIMANT).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.CLAIMANT)).build();
             String assistedOrderString = generator.getClaimantOrDefendantAppeal(caseData);
 
             assertThat(assistedOrderString).contains("claimant");
@@ -1879,9 +1874,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_ClaimantOrDefendantAppeal_Defendant() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)).build();
             String assistedOrderString = generator.getClaimantOrDefendantAppeal(caseData);
 
             assertThat(assistedOrderString).contains("defendant");
@@ -1889,10 +1884,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhenSelected_ClaimantOrDefendantAppeal_Other() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.OTHER)
-                    .otherOriginText("test other origin text").build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.OTHER)
+                    .setOtherOriginText("test other origin text")).build();
             String assistedOrderString = generator.getClaimantOrDefendantAppeal(caseData);
 
             assertThat(assistedOrderString).contains(OTHER_ORIGIN_TEXT);
@@ -1900,7 +1895,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_AppealDetails_Null() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             String assistedOrderString = generator.getClaimantOrDefendantAppeal(caseData);
 
             assertThat(assistedOrderString).contains("");
@@ -1908,9 +1903,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_AppealOrigin_isNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    ).build();
             String assistedOrderString = generator.getClaimantOrDefendantAppeal(caseData);
 
             assertThat(assistedOrderString).contains("");
@@ -1918,10 +1913,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenIsAppealGranted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.GRANTED).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)).build();
             Boolean isAppealGranted = generator.isAppealGranted(caseData);
 
             assertThat(isAppealGranted).isTrue();
@@ -1929,10 +1924,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenAppealIsRefused() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)).build();
             Boolean isAppealGranted = generator.isAppealGranted(caseData);
 
             assertThat(isAppealGranted).isFalse();
@@ -1940,10 +1935,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenIsAppealNotGranted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED)
-                    .build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)
+                    ).build();
             Boolean isAppealGranted = generator.isAppealGranted(caseData);
 
             assertThat(isAppealGranted).isFalse();
@@ -1951,14 +1946,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhentableAorBIsSelected_Granted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.GRANTED)
-                    .appealTypeChoicesForGranted(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
-                            .build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)
+                    .setAppealTypeChoicesForGranted(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
+                            )).build();
             String assistedOrderString = generator.checkCircuitOrHighCourtJudge(caseData);
 
             assertThat(assistedOrderString).contains("A");
@@ -1966,14 +1961,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhentableAorBIsSelected_Refused() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED)
-                    .appealTypeChoicesForRefused(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelectionRefuse(
-                                PermissionToAppealTypes.CIRCUIT_COURT_JUDGE).build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)
+                    .setAppealTypeChoicesForRefused(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelectionRefuse(
+                                PermissionToAppealTypes.CIRCUIT_COURT_JUDGE))).build();
             String assistedOrderString = generator.checkCircuitOrHighCourtJudge(caseData);
 
             assertThat(assistedOrderString).contains("A");
@@ -1981,15 +1976,15 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhentableBIsSelected_Refused() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED)
-                    .appealTypeChoicesForRefused(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelectionRefuse(
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)
+                    .setAppealTypeChoicesForRefused(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelectionRefuse(
                                 PermissionToAppealTypes.HIGH_COURT_JUDGE)
-                            .build()).build()).build();
+                            )).build();
             String assistedOrderString = generator.checkCircuitOrHighCourtJudge(caseData);
 
             assertThat(assistedOrderString).contains("B");
@@ -1997,14 +1992,14 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_WhentableBIsSelected_Granted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.GRANTED)
-                    .appealTypeChoicesForGranted(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelection(PermissionToAppealTypes.HIGH_COURT_JUDGE)
-                            .build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)
+                    .setAppealTypeChoicesForGranted(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelection(PermissionToAppealTypes.HIGH_COURT_JUDGE)
+                            )).build();
             String assistedOrderString = generator.checkCircuitOrHighCourtJudge(caseData);
 
             assertThat(assistedOrderString).contains("B");
@@ -2012,17 +2007,17 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnAppealDate_WhentableA_Granted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.GRANTED)
-                    .appealTypeChoicesForGranted(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
-                            .appealChoiceOptionA(
-                                AppealTypeChoiceList.builder()
-                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(14))
-                                    .build()).build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)
+                    .setAppealTypeChoicesForGranted(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelection(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
+                            .setAppealChoiceOptionA(
+                                new AppealTypeChoiceList()
+                                    .setAppealGrantedRefusedDate(LocalDate.now().plusDays(14))
+                                    ))).build();
             LocalDate assistedOrderAppealDate = generator.getAppealDate(caseData);
 
             assertThat(assistedOrderAppealDate).isEqualTo(LocalDate.now().plusDays(14));
@@ -2030,17 +2025,17 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnAppealDate_WhentableB_Granted() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.GRANTED)
-                    .appealTypeChoicesForGranted(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelection(PermissionToAppealTypes.HIGH_COURT_JUDGE)
-                            .appealChoiceOptionB(
-                                AppealTypeChoiceList.builder()
-                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(14))
-                                    .build()).build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.GRANTED)
+                    .setAppealTypeChoicesForGranted(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelection(PermissionToAppealTypes.HIGH_COURT_JUDGE)
+                            .setAppealChoiceOptionB(
+                                new AppealTypeChoiceList()
+                                    .setAppealGrantedRefusedDate(LocalDate.now().plusDays(14))
+                                    ))).build();
             LocalDate assistedOrderAppealDate = generator.getAppealDate(caseData);
 
             assertThat(assistedOrderAppealDate).isEqualTo(LocalDate.now().plusDays(14));
@@ -2048,17 +2043,17 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnAppealDate_WhentableA_Refused() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED)
-                    .appealTypeChoicesForRefused(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelectionRefuse(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
-                            .appealChoiceOptionA(
-                                AppealTypeChoiceList.builder()
-                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(14)).build())
-                            .build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)
+                    .setAppealTypeChoicesForRefused(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelectionRefuse(PermissionToAppealTypes.CIRCUIT_COURT_JUDGE)
+                            .setAppealChoiceOptionA(
+                                new AppealTypeChoiceList()
+                                    .setAppealGrantedRefusedDate(LocalDate.now().plusDays(14)))
+                            )).build();
             LocalDate assistedOrderAppealDate = generator.getAppealDate(caseData);
 
             assertThat(assistedOrderAppealDate).isEqualTo(LocalDate.now().plusDays(14));
@@ -2066,18 +2061,18 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnAppealDate_WhentableB_Refused() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().assistedOrderAppealDetails(
-                AssistedOrderAppealDetails.builder()
-                    .appealOrigin(AppealOriginTypes.DEFENDANT)
-                    .permissionToAppeal(PermissionToAppealTypes.REFUSED)
-                    .appealTypeChoicesForRefused(
-                        AppealTypeChoices.builder()
-                            .assistedOrderAppealJudgeSelectionRefuse(PermissionToAppealTypes.HIGH_COURT_JUDGE)
-                            .appealChoiceOptionB(
-                                AppealTypeChoiceList.builder()
-                                    .appealGrantedRefusedDate(LocalDate.now().plusDays(14))
-                                    .build())
-                            .build()).build()).build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().assistedOrderAppealDetails(
+                new AssistedOrderAppealDetails()
+                    .setAppealOrigin(AppealOriginTypes.DEFENDANT)
+                    .setPermissionToAppeal(PermissionToAppealTypes.REFUSED)
+                    .setAppealTypeChoicesForRefused(
+                        new AppealTypeChoices()
+                            .setAssistedOrderAppealJudgeSelectionRefuse(PermissionToAppealTypes.HIGH_COURT_JUDGE)
+                            .setAppealChoiceOptionB(
+                                new AppealTypeChoiceList()
+                                    .setAppealGrantedRefusedDate(LocalDate.now().plusDays(14))
+                                    )
+                            )).build();
             LocalDate assistedOrderAppealDate = generator.getAppealDate(caseData);
 
             assertThat(assistedOrderAppealDate).isEqualTo(LocalDate.now().plusDays(14));
@@ -2085,7 +2080,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNullAppealDate_WhenAssistedOrderAppealDetailsAreNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
             LocalDate assistedOrderAppealDate = generator.getAppealDate(caseData);
 
             assertThat(assistedOrderAppealDate).isNull();
@@ -2097,10 +2092,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenOrderMadeSelectionIsSingleDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                    AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                    new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
                 .build();
             Boolean isSingleDate = generator.checkIsSingleDate(caseData);
             assertThat(isSingleDate).isTrue();
@@ -2108,10 +2103,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotSingleDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(10)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(10))))
                 .build();
             Boolean isSingleDate = generator.checkIsSingleDate(caseData);
             assertThat(isSingleDate).isFalse();
@@ -2119,7 +2114,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotExist() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             Boolean isSingleDate = generator.checkIsSingleDate(caseData);
@@ -2128,10 +2123,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnSingleDateWhenOrderMadeSelectionIsSingleDate() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                    AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                    new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
                 .build();
             LocalDate assistedOrderDate = generator.getOrderMadeSingleDate(caseData);
             assertThat(assistedOrderDate).isEqualTo(LocalDate.now());
@@ -2139,7 +2134,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNullWhenOrderMadeSelectionIsNo() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             LocalDate assistedOrderDate = generator.getOrderMadeSingleDate(caseData);
@@ -2148,9 +2143,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNullWhenOrderMadeHeardsDetailsAreNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails())
                 .build();
             LocalDate assistedOrderDate = generator.getOrderMadeSingleDate(caseData);
             assertThat(assistedOrderDate).isNull();
@@ -2158,11 +2153,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenOrderMadeSelectionIsDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(10))
-                        .dateRangeTo(LocalDate.now().minusDays(5)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(10))
+                        .setDateRangeTo(LocalDate.now().minusDays(5))))
                 .build();
             Boolean isSingleDate = generator.checkIsDateRange(caseData);
             assertThat(isSingleDate).isTrue();
@@ -2170,10 +2165,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                    AssistedOrderDateHeard.builder().singleDate(LocalDate.now().minusDays(10)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                    new AssistedOrderDateHeard().setSingleDate(LocalDate.now().minusDays(10))))
                 .build();
             Boolean isSingleDate = generator.checkIsDateRange(caseData);
             assertThat(isSingleDate).isFalse();
@@ -2181,7 +2176,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotExistForDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             Boolean isSingleDate = generator.checkIsDateRange(caseData);
@@ -2190,11 +2185,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDateRangeFrom_WhenOrderMadeSelectionIsDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(10))
-                        .dateRangeTo(LocalDate.now().minusDays(5)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(10))
+                        .setDateRangeTo(LocalDate.now().minusDays(5))))
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeFrom(caseData);
             assertThat(dateRange).isEqualTo(LocalDate.now().minusDays(10));
@@ -2202,11 +2197,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldNotReturnDateRangeFrom_WhenOrderMadeSelectionIsDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder()
-                        .dateRangeTo(LocalDate.now().minusDays(5)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard()
+                        .setDateRangeTo(LocalDate.now().minusDays(5))))
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeFrom(caseData);
             assertThat(dateRange).isNull();
@@ -2214,7 +2209,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldNotReturnDateRangeFrom_WhenOrderMadeSelectionIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeFrom(caseData);
@@ -2223,11 +2218,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnDateRangeTo_WhenOrderMadeSelectionIsDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder().dateRangeFrom(LocalDate.now().minusDays(10))
-                        .dateRangeTo(LocalDate.now().minusDays(5)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard().setDateRangeFrom(LocalDate.now().minusDays(10))
+                        .setDateRangeTo(LocalDate.now().minusDays(5))))
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeTo(caseData);
             assertThat(dateRange).isEqualTo(LocalDate.now().minusDays(5));
@@ -2235,11 +2230,11 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldNotReturnDateRangeTo_WhenOrderMadeSelectionIsDateRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().dateRangeSelection(
-                    AssistedOrderDateHeard.builder()
-                        .dateRangeFrom(LocalDate.now().minusDays(5)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setDateRangeSelection(
+                    new AssistedOrderDateHeard()
+                        .setDateRangeFrom(LocalDate.now().minusDays(5))))
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeTo(caseData);
             assertThat(dateRange).isNull();
@@ -2247,7 +2242,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldNotReturnDateRangeTo_WhenOrderMadeSelectionIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             LocalDate dateRange = generator.getOrderMadeDateRangeTo(caseData);
@@ -2256,10 +2251,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnTrueWhenOrderMadeSelectionIsBeSpokeRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().beSpokeRangeSelection(
-                    AssistedOrderDateHeard.builder().beSpokeRangeText("beSpoke text").build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setBeSpokeRangeSelection(
+                    new AssistedOrderDateHeard().setBeSpokeRangeText("beSpoke text")))
                 .build();
             Boolean isBeSpokeRange = generator.checkIsBeSpokeRange(caseData);
             assertThat(isBeSpokeRange).isTrue();
@@ -2267,10 +2262,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotBeSpokeRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                    AssistedOrderDateHeard.builder().singleDate(LocalDate.now().minusDays(10)).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                    new AssistedOrderDateHeard().setSingleDate(LocalDate.now().minusDays(10))))
                 .build();
             Boolean isBeSpokeRange = generator.checkIsBeSpokeRange(caseData);
             assertThat(isBeSpokeRange).isFalse();
@@ -2278,7 +2273,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnFalseWhenOrderMadeSelectionIsNotExistForBeSpokeRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             Boolean isBeSpokeRange = generator.checkIsBeSpokeRange(caseData);
@@ -2287,10 +2282,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnBeSpokeTextWhenOrderMadeSelectionIsBeSpokeRange() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().beSpokeRangeSelection(
-                    AssistedOrderDateHeard.builder().beSpokeRangeText("beSpoke text").build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setBeSpokeRangeSelection(
+                    new AssistedOrderDateHeard().setBeSpokeRangeText("beSpoke text")))
                 .build();
             String beSpokeRangeText = generator.getOrderMadeBeSpokeText(caseData);
             assertThat(beSpokeRangeText).contains("beSpoke text");
@@ -2298,7 +2293,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldNotReturnBeSpokeTextWhenOrderMadeSelectionIsNo() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.NO)
                 .build();
             String beSpokeRangeText = generator.getOrderMadeBeSpokeText(caseData);
@@ -2307,10 +2302,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNullWhenOrderMadeSelectionIsBeSpokeRangeAndIsNull() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderMadeSelection(YesOrNo.YES)
-                .assistedOrderMadeDateHeardDetails(AssistedOrderMadeDateHeardDetails.builder().singleDateSelection(
-                    AssistedOrderDateHeard.builder().singleDate(LocalDate.now()).build()).build())
+                .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
+                    new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
                 .build();
             String beSpokeRangeText = generator.getOrderMadeBeSpokeText(caseData);
             assertThat(beSpokeRangeText).isNull();
@@ -2322,7 +2317,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_GiveReasons_Null() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderGiveReasonsYesNo(null)
                 .build();
             String assistedOrderString = generator.getReasonText(caseData);
@@ -2331,7 +2326,7 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_GiveReasons_SelectedOption_No() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderGiveReasonsYesNo(YesOrNo.NO)
                 .build();
             String assistedOrderString = generator.getReasonText(caseData);
@@ -2340,9 +2335,9 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnNull_When_GiveReasonsText_Null() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderGiveReasonsYesNo(YesOrNo.YES)
-                .assistedOrderGiveReasonsDetails(AssistedOrderGiveReasonsDetails.builder().build())
+                .assistedOrderGiveReasonsDetails(new AssistedOrderGiveReasonsDetails())
                 .build();
             String assistedOrderString = generator.getReasonText(caseData);
             assertNull(assistedOrderString);
@@ -2350,12 +2345,10 @@ class AssistedOrderFormGeneratorTest {
 
         @Test
         void shouldReturnText_When_GiveReasonsText() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .assistedOrderGiveReasonsYesNo(YesOrNo.YES)
-                .assistedOrderGiveReasonsDetails(AssistedOrderGiveReasonsDetails
-                                                     .builder()
-                                                     .reasonsText(TEST_TEXT)
-                                                     .build())
+                .assistedOrderGiveReasonsDetails(new AssistedOrderGiveReasonsDetails()
+                                                     .setReasonsText(TEST_TEXT))
                 .build();
             String assistedOrderString = generator.getReasonText(caseData);
             assertNotNull(assistedOrderString);
@@ -2373,17 +2366,18 @@ class AssistedOrderFormGeneratorTest {
         @Test
         void shouldGenerateAssistedOrderDocument() {
             when(docmosisService.getCaseManagementLocationVenueName(any(), any()))
-                .thenReturn(LocationRefData.builder()
-                                .epimmsId("2")
-                                .externalShortName("Reading")
-                                .build());
+                .thenReturn(
+                    new LocationRefData()
+                        .setEpimmsId("2")
+                        .setExternalShortName("Reading")
+                );
             when(documentGeneratorService.generateDocmosisDocument(
                 any(MappableObject.class),
                 eq(POST_JUDGE_ASSISTED_ORDER_FORM_LIP)
             ))
                 .thenReturn(new DocmosisDocument(POST_JUDGE_ASSISTED_ORDER_FORM_LIP.getDocumentTitle(), bytes));
 
-            GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).toBuilder()
+            GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                             .address("london court")

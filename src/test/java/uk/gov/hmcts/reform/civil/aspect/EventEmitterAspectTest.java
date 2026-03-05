@@ -98,7 +98,7 @@ class EventEmitterAspectTest {
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessCamundaEvent_whenBPStatusIsNotReadyAndPIIdnull(BusinessProcessStatus status) {
         final GeneralApplication generalApplication = GeneralApplication.builder()
-            .businessProcess(BusinessProcess.builder().status(status).build())
+            .businessProcess(new BusinessProcess().setStatus(status))
             .build();
         final CallbackParams callbackParams = callbackParamsForSubmittedGeneralApplicationCase(
             1L,
@@ -116,8 +116,8 @@ class EventEmitterAspectTest {
     @ParameterizedTest
     @EnumSource(value = BusinessProcessStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"READY"})
     void shouldNotEmitBusinessProcessGACamundaEvent_whenBPStatusIsNotReadyAndPIIdnull(BusinessProcessStatus status) {
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .businessProcess(BusinessProcess.builder().status(status).build())
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .businessProcess(new BusinessProcess().setStatus(status))
             .build();
         final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .id(1L)
@@ -144,7 +144,7 @@ class EventEmitterAspectTest {
     @SneakyThrows
     @Test
     void shouldNotEmitBusinessProcessCamundaEvent_whenGAIsNull() {
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .build();
         final CaseDetails caseDetails = CaseDetailsBuilder.builder()
             .id(1L)
@@ -251,7 +251,7 @@ class EventEmitterAspectTest {
     private CallbackParams callbackParamsForSubmittedWith(Long caseId, GeneralApplication generalApplication, CaseEvent event, boolean isGaCase) {
         final List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        final GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        final GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(caseId)
             .build();
@@ -280,7 +280,7 @@ class EventEmitterAspectTest {
 
     private CaseData buildCaseDataWithBusinessProcessStatus(BusinessProcessStatus status) {
         return CaseData.builder()
-            .businessProcess(BusinessProcess.builder().status(status).build())
+            .businessProcess(new BusinessProcess().setStatus(status))
             .build();
     }
 }

@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.civil.model.taskmanagement;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
-@Getter
-@EqualsAndHashCode
-@ToString
-@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class GetTasksResponse {
 
     private List<Task> tasks;

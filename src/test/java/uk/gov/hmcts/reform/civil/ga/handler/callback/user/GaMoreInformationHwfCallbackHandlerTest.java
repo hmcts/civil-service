@@ -43,7 +43,7 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
         @Test
         void shouldValidationMoreInformationGa_withInvalidDate() {
             //Given
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .helpWithFeesMoreInformationGa(
                         new HelpWithFeesMoreInformation()
                         .setHwFMoreInfoDocumentDate(LocalDate.now()))
@@ -58,7 +58,7 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
         @Test
         void shouldValidationMoreInformationAdditional_withInvalidDate() {
             //Given
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .helpWithFeesMoreInformationAdditional(
                     new HelpWithFeesMoreInformation()
@@ -77,10 +77,10 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
         @Test
         void shouldCallSubmitMoreInformationHwfAboutToSubmitApplication() {
             //Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(MORE_INFORMATION_HWF_GA)
-                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(MORE_INFORMATION_HWF_GA)
+                .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET);
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .gaHwfDetails(hwfeeDetails)
                 .hwfFeeType(
                     FeeType.APPLICATION)
@@ -99,10 +99,10 @@ class GaMoreInformationHwfCallbackHandlerTest extends GeneralApplicationBaseCall
         @Test
         void shouldCallSubmitMoreInformationHwfAboutToSubmitAdditional() {
             //Given
-            HelpWithFeesDetails hwfeeDetails = HelpWithFeesDetails.builder()
-                .hwfCaseEvent(MORE_INFORMATION_HWF_GA)
-                .noRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET).build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+            HelpWithFeesDetails hwfeeDetails = new HelpWithFeesDetails()
+                .setHwfCaseEvent(MORE_INFORMATION_HWF_GA)
+                .setNoRemissionDetailsSummary(NoRemissionDetailsSummary.FEES_REQUIREMENT_NOT_MET);
+            GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .additionalHwfDetails(hwfeeDetails)
                 .hwfFeeType(
                     FeeType.ADDITIONAL)
