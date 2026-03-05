@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
@@ -137,5 +138,36 @@ class CalculateFeeTaskTest extends BaseCallbackHandlerTest {
         Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
         assertThat(responseData.get("claimFee")).isNotNull();
         assertThat(responseData.get("claimFee").toString()).contains("calculatedAmountInPence=0");
+    }
+
+    @Test
+    void shouldCalculateFeesSuccessfullyForOtherRemedy() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(10000L));
+        caseData.setClaimValue(claimValue);
+        SolicitorReferences solicitorReferences = new SolicitorReferences();
+        solicitorReferences.setApplicantSolicitor1Reference("REF123");
+        caseData.setSolicitorReferences(solicitorReferences);
+        caseData.setIsClaimDeclarationAdded(YesOrNo.YES);
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setCustomerReference("CUST123");
+        caseData.setClaimIssuedPaymentDetails(paymentDetails);
+
+        final List<String> pbaAccounts = List.of("PBA1234567");
+        Fee fee = new Fee();
+        fee.setCalculatedAmountInPence(BigDecimal.valueOf(1000L));
+        given(feesService.getFeeDataByClaimValue(any())).willReturn(fee);
+        given(feesService.getFeeDataForOtherRemedy(any())).willReturn(fee);
+        Organisation organisation = new Organisation();
+        organisation.setPaymentAccount(pbaAccounts);
+        given(organisationService.findOrganisation(any())).willReturn(Optional.of(organisation));
+
+        CallbackResponse response = calculateFeeTask.calculateFees(caseData, "authToken");
+
+        assertThat(response).isNotNull();
+        Map<String, Object> responseData = ((AboutToStartOrSubmitCallbackResponse) response).getData();
+        assertThat(responseData.get("claimFee")).isNotNull();
+        assertThat(responseData.get("applicantSolicitor1PbaAccounts")).isNotNull();
     }
 }
