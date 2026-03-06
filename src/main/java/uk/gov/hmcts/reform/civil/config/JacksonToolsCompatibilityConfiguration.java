@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.civil.model.FeeLookupResponseDto;
 import uk.gov.hmcts.reform.civil.model.FeeVersionDto;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.CaseAssignmentUserRole;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.Classification;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -32,6 +33,7 @@ public class JacksonToolsCompatibilityConfiguration {
             builder.configure(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS, false);
             builder.addMixIn(CaseAssignmentUserRole.class, CaseAssignmentUserRoleMixin.class);
             builder.addMixIn(CaseDetails.class, CaseDetailsMixin.class);
+            builder.addMixIn(CallbackRequest.class, CallbackRequestMixin.class);
             builder.addMixIn(FeeLookupResponseDto.class, FeeLookupResponseDtoMixin.class);
             builder.addMixIn(Fee2Dto.class, Fee2DtoMixin.class);
             builder.addMixIn(FeeVersionDto.class, FeeVersionDtoMixin.class);
@@ -66,6 +68,18 @@ public class JacksonToolsCompatibilityConfiguration {
             @JsonProperty("security_classification") Classification securityClassification,
             @JsonProperty("callback_response_status") String callbackResponseStatus,
             @JsonProperty("version") Integer version
+        ) {
+            // Mixin constructor only; no implementation required.
+        }
+    }
+
+    abstract static class CallbackRequestMixin {
+
+        @JsonCreator
+        CallbackRequestMixin(
+            @JsonProperty("case_details") @JsonAlias("caseDetails") CaseDetails caseDetails,
+            @JsonProperty("case_details_before") @JsonAlias("caseDetailsBefore") CaseDetails caseDetailsBefore,
+            @JsonProperty("event_id") @JsonAlias("eventId") String eventId
         ) {
             // Mixin constructor only; no implementation required.
         }
