@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
+import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -111,6 +113,44 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimDetailsOptions"));
         }
+
+        @Test
+        void shouldIncludeDefendantTwoOption_whenRespondentTwoExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            List<String> optionLabels = updatedData.getDefendantSolicitorNotifyClaimDetailsOptions().getListItems()
+                .stream()
+                .map(item -> item.getLabel())
+                .toList();
+
+            assertThat(optionLabels).contains("Defendant Two: " + caseData.getRespondent2().getPartyName());
+        }
+
+        @Test
+        void shouldNotIncludeDefendantTwoOption_whenRespondentTwoDoesNotExist() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimNotified_1v1()
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            List<String> optionLabels = updatedData.getDefendantSolicitorNotifyClaimDetailsOptions().getListItems()
+                .stream()
+                .map(item -> item.getLabel())
+                .toList();
+
+            assertThat(optionLabels).noneMatch(label -> label.startsWith("Defendant Two: "));
+        }
     }
 
     @Nested
@@ -130,6 +170,47 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+
+        @Test
+        void shouldThrowWarningWhenSelectedOptionIsNotBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            String defendantOneOption = "Defendant One: " + caseData.getRespondent1().getPartyName();
+            caseData.setDefendantSolicitorNotifyClaimDetailsOptions(
+                DynamicList.fromList(
+                    List.of("Both", defendantOneOption),
+                    label -> label,
+                    defendantOneOption,
+                    false
+                )
+            );
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+        }
+
+        @Test
+        void shouldNotThrowWarningWhenSelectedOptionIsBoth() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .build();
+            caseData.setDefendantSolicitorNotifyClaimDetailsOptions(
+                DynamicList.fromList(
+                    List.of("Both", "Defendant One: " + caseData.getRespondent1().getPartyName()),
+                    label -> label,
+                    "Both",
+                    false
+                )
+            );
+
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getWarnings()).isEmpty();
         }
     }
 
@@ -267,6 +348,43 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .containsEntry("respondent1ResponseDeadline", newDate.format(ISO_DATE_TIME))
                 .containsEntry("respondent2ResponseDeadline", newDate.format(ISO_DATE_TIME))
                 .containsEntry("claimDismissedDeadline", sixMonthDate.format(ISO_DATE_TIME));
+        }
+
+        @Test
+        void shouldUseLipPathFor1v2DifferentRep_whenOnlyDefendant2IsLip() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
+                .respondent1Represented(YES)
+                .respondent2Represented(YES)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate);
+            assertThat(updatedData.getRespondent2ResponseDeadline()).isEqualTo(newDate);
+            assertThat(updatedData.getAddLegalRepDeadlineRes1()).isNull();
+            assertThat(updatedData.getAddLegalRepDeadlineRes2()).isNull();
+        }
+
+        @Test
+        void shouldNotSetRespondentDeadlines_whenRespondent1MissingAndRespondent2NotAdded() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            LocalDateTime originalAddLegalRepDeadlineRes1 = caseData.getAddLegalRepDeadlineRes1();
+            caseData.setRespondent1(null);
+            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setAddRespondent2(NO);
+            caseData.setDefendant1LIPAtClaimIssued(YES);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
+
+            assertThat(updatedData.getRespondent1ResponseDeadline()).isNull();
+            assertThat(updatedData.getRespondent2ResponseDeadline()).isNull();
+            assertThat(updatedData.getAddLegalRepDeadlineRes1()).isEqualTo(originalAddLegalRepDeadlineRes1);
+            assertThat(updatedData.getAddLegalRepDeadlineRes2()).isNull();
         }
 
         @Test
@@ -713,6 +831,45 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotApplyBothDefendantLipValidation_whenOnlyOneDefendantIsLip() {
+            LocalDate past = LocalDate.now().minusDays(1);
+            when(time.now()).thenReturn(LocalDateTime.now());
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lr_1Lip()
+                .setCoSClaimDetailsWithDate(true, true, past, past, past.minusDays(1), past.minusDays(1), true, true)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).doesNotContain(NotifyClaimDetailsCallbackHandler.BOTH_CERTIFICATE_SERVED_SAME_DATE);
+        }
+
+        @Test
+        void shouldFailBothDefendantLipValidation_whenDefendant1DateIsMissing() {
+            LocalDate past = LocalDate.now().minusDays(1);
+            when(time.now()).thenReturn(LocalDateTime.now());
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
+                .setCoSClaimDetailsWithDate(true, true, past, past, past, past, true, true)
+                .build();
+            caseData.setCosNotifyClaimDetails1(null);
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).contains(NotifyClaimDetailsCallbackHandler.BOTH_CERTIFICATE_SERVED_SAME_DATE);
+        }
+
+        @Test
         void shouldPassValidateCertificateOfService_whenHasFile() {
             LocalDate past = LocalDate.now().minusDays(1);
             when(time.now()).thenReturn(LocalDateTime.now());
@@ -815,6 +972,240 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(successResponse.getErrors().size()).isEqualTo(1);
             assertThat(successResponse.getErrors()).contains(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+        }
+
+        @Test
+        void shouldSetCosDocSavedToNoAndAddMandatoryError_whenDefendant1CosExistsWithoutEvidence() {
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseData.builder()
+                .cosNotifyClaimDetails1(new CertificateOfService().setCosDocSaved(YES))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(caseData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
+            assertThat(response.getErrors()).contains(NotifyClaimDetailsCallbackHandler.DOC_SERVED_MANDATORY);
+        }
+
+        @Test
+        void shouldNotUpdateCosForDefendant1_whenCosIsMissing() {
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseData.builder().build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(caseData.getCosNotifyClaimDetails1()).isNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+
+        @Test
+        void shouldSetCosDocSavedToNoAndAddMandatoryError_whenDefendant2CosExistsWithoutEvidence() {
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseData.builder()
+                .defendant1LIPAtClaimIssued(NO)
+                .defendant2LIPAtClaimIssued(NO)
+                .cosNotifyClaimDetails2(new CertificateOfService().setCosDocSaved(YES))
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(caseData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(NO);
+            assertThat(response.getErrors()).contains(NotifyClaimDetailsCallbackHandler.DOC_SERVED_MANDATORY);
+        }
+
+        @Test
+        void shouldNotUpdateCosForDefendant2_whenCosIsMissing() {
+            when(serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(any()))
+                .thenReturn(List.of());
+
+            CaseData caseData = CaseData.builder()
+                .defendant1LIPAtClaimIssued(NO)
+                .defendant2LIPAtClaimIssued(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
+            AboutToStartOrSubmitCallbackResponse response =
+                (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(caseData.getCosNotifyClaimDetails2()).isNull();
+            assertThat(response.getErrors()).isEmpty();
+        }
+    }
+
+    @Nested
+    class PrivateMethodBranchCoverage {
+
+        @Test
+        void shouldReturnFalseForConfirmationForLip_whenBothLipFlagsAreNo() {
+            boolean confirmationForLip = (boolean) ReflectionTestUtils.invokeMethod(
+                handler,
+                "isConfirmationForLip",
+                CaseData.builder()
+                    .defendant1LIPAtClaimIssued(NO)
+                    .defendant2LIPAtClaimIssued(NO)
+                    .build()
+            );
+
+            assertThat(confirmationForLip).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseForBothDefendantLip_whenDefendant1LipFlagIsMissing() {
+            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+                handler,
+                "isBothDefendantLip",
+                CaseData.builder()
+                    .defendant2LIPAtClaimIssued(YES)
+                    .build()
+            );
+
+            assertThat(bothDefendantLip).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseForBothDefendantLip_whenDefendant2LipFlagIsNo() {
+            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+                handler,
+                "isBothDefendantLip",
+                CaseData.builder()
+                    .defendant1LIPAtClaimIssued(YES)
+                    .defendant2LIPAtClaimIssued(NO)
+                    .build()
+            );
+
+            assertThat(bothDefendantLip).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseForBothDefendantLip_whenDefendant2LipFlagIsMissing() {
+            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+                handler,
+                "isBothDefendantLip",
+                CaseData.builder()
+                    .defendant1LIPAtClaimIssued(YES)
+                    .build()
+            );
+
+            assertThat(bothDefendantLip).isFalse();
+        }
+
+        @Test
+        void shouldReturnFalseForSameDateOfService_whenOnlyDefendant1CosExists() {
+            LocalDate today = LocalDate.now();
+            boolean sameDateOfService = (boolean) ReflectionTestUtils.invokeMethod(
+                handler,
+                "isBothDefendantWithSameDateOfService",
+                CaseData.builder()
+                    .cosNotifyClaimDetails1(new CertificateOfService()
+                                                .setCosDateDeemedServedForDefendant(today))
+                    .build()
+            );
+
+            assertThat(sameDateOfService).isFalse();
+        }
+
+        @Test
+        void shouldReturnCurrentTimeWhenDeemedDatesAreMissing_onBothCosObjects() {
+            LocalDateTime now = LocalDateTime.of(2024, 1, 10, 10, 0);
+            when(time.now()).thenReturn(now);
+
+            CaseData caseData = CaseData.builder()
+                .cosNotifyClaimDetails1(new CertificateOfService())
+                .cosNotifyClaimDetails2(new CertificateOfService())
+                .build();
+
+            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+                handler,
+                "getEarliestDateOfService",
+                caseData
+            );
+
+            assertThat(earliestDate).isEqualTo(now);
+        }
+
+        @Test
+        void shouldReturnSecondDeemedDateWhenFirstIsAfterSecond() {
+            LocalDateTime now = LocalDateTime.of(2024, 1, 10, 9, 30);
+            when(time.now()).thenReturn(now);
+
+            LocalDate defendant1DeemedDate = LocalDate.of(2024, 1, 12);
+            LocalDate defendant2DeemedDate = LocalDate.of(2024, 1, 11);
+
+            CaseData caseData = CaseData.builder()
+                .cosNotifyClaimDetails1(new CertificateOfService()
+                                            .setCosDateDeemedServedForDefendant(defendant1DeemedDate))
+                .cosNotifyClaimDetails2(new CertificateOfService()
+                                            .setCosDateDeemedServedForDefendant(defendant2DeemedDate))
+                .build();
+
+            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+                handler,
+                "getEarliestDateOfService",
+                caseData
+            );
+
+            assertThat(earliestDate).isEqualTo(defendant2DeemedDate.atTime(now.toLocalTime()));
+        }
+
+        @Test
+        void shouldReturnFirstDeemedDateWhenFirstIsBeforeSecond() {
+            LocalDateTime now = LocalDateTime.of(2024, 1, 10, 9, 30);
+            when(time.now()).thenReturn(now);
+
+            LocalDate defendant1DeemedDate = LocalDate.of(2024, 1, 10);
+            LocalDate defendant2DeemedDate = LocalDate.of(2024, 1, 11);
+
+            CaseData caseData = CaseData.builder()
+                .cosNotifyClaimDetails1(new CertificateOfService()
+                                            .setCosDateDeemedServedForDefendant(defendant1DeemedDate))
+                .cosNotifyClaimDetails2(new CertificateOfService()
+                                            .setCosDateDeemedServedForDefendant(defendant2DeemedDate))
+                .build();
+
+            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+                handler,
+                "getEarliestDateOfService",
+                caseData
+            );
+
+            assertThat(earliestDate).isEqualTo(defendant1DeemedDate.atTime(now.toLocalTime()));
+        }
+
+        @Test
+        void shouldInitialiseServedDocumentFilesWhenMissingInSaveCosDetailsDoc() {
+            Document evidenceDocument = new Document()
+                .setDocumentUrl("fake-url")
+                .setDocumentFileName("evidence.pdf")
+                .setDocumentBinaryUrl("binary-url");
+
+            List<Element<Document>> evidence = new ArrayList<>();
+            evidence.add(element(evidenceDocument));
+
+            CaseData caseData = CaseData.builder()
+                .cosNotifyClaimDetails1(new CertificateOfService().setCosEvidenceDocument(evidence))
+                .servedDocumentFiles(null)
+                .build();
+
+            CaseData updatedCaseData = (CaseData) ReflectionTestUtils.invokeMethod(
+                handler,
+                "saveCoSDetailsDoc",
+                caseData,
+                1
+            );
+
+            assertThat(updatedCaseData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(updatedCaseData.getServedDocumentFiles()).isNotNull();
+            assertThat(updatedCaseData.getServedDocumentFiles().getOther()).hasSize(1);
         }
     }
 }
