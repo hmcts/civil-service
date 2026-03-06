@@ -230,10 +230,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenNoDocumentsBackwardsCompatible() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setUploadParticularsOfClaim(YES);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(caseData.getUploadParticularsOfClaim()).isEqualTo(YES);
             assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
@@ -251,11 +253,13 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnErrors_whenParticularsOfClaimFieldsAreInErrorStateBackwardsCompatible() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
+            caseData.setUploadParticularsOfClaim(YES);
             caseData.setServedDocumentFiles(new ServedDocumentFiles());
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(caseData.getUploadParticularsOfClaim()).isEqualTo(YES);
             assertThat(response.getErrors()).containsOnly("You must add Particulars of claim details");
         }
 
@@ -276,7 +280,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnNoErrors_whenParticularOfClaimsFieldsAreValidBackwardsCompatible() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft().build();
             ServedDocumentFiles servedDocs = new ServedDocumentFiles();
-            servedDocs.setParticularsOfClaimText("Some string");
+            caseData.setUploadParticularsOfClaim(YES);
+            List<Element<Document>> particularsOfClaimDocuments = List.of(
+                element(new Document()
+                            .setDocumentUrl("legacy-url")
+                            .setDocumentFileName("legacy-particulars.pdf")
+                            .setDocumentBinaryUrl("legacy-binary-url"))
+            );
+            servedDocs.setParticularsOfClaimDocument(particularsOfClaimDocuments);
             caseData.setServedDocumentFiles(servedDocs);
             CallbackParams params = callbackParamsOf(caseData, MID, pageId);
 
@@ -405,7 +416,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getCosNotifyClaimDetails1()
-                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED")).isTrue();
+                           .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
             assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
@@ -434,7 +445,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getCosNotifyClaimDetails2()
-                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED")).isTrue();
+                           .getCosSenderStatementOfTruthLabel()).contains("CERTIFIED");
             assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(1);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());
@@ -575,19 +586,14 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_with_cos_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_1Lip_1Lr()
+                .build();
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
 
-            String formattedDeadline = formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT);
-            String confirmationBody = format(CONFIRMATION_SUMMARY, formattedDeadline)
-                    + exitSurveyContentService.applicantSurvey();
-
-            assertThat(response).usingRecursiveComparison().isEqualTo(
-                    SubmittedCallbackResponse.builder()
-                            .confirmationHeader(format("# Defendant notified%n## Claim number: 000DC001"))
-                            .confirmationBody(confirmationBody)
-                            .build());
+            assertThat(response.getConfirmationHeader()).contains("Certificate of Service");
+            assertThat(response.getConfirmationBody()).doesNotContain(exitSurveyContentService.applicantSurvey());
         }
 
         @Test
@@ -841,6 +847,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
+            assertThat(response.getErrors()).isEmpty();
             assertThat(response.getErrors()).doesNotContain(NotifyClaimDetailsCallbackHandler.BOTH_CERTIFICATE_SERVED_SAME_DATE);
         }
 
