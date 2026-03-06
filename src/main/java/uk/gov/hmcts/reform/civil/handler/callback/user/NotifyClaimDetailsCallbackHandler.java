@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -281,7 +282,9 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
+        String formattedDeadline = ofNullable(caseData.getRespondent1ResponseDeadline())
+            .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+            .orElse("N/A");
         String confirmationBody = format(getConfirmationBody(caseData), formattedDeadline) + getSurveySuffix(caseData);
         return buildSubmittedConfirmation(caseData, confirmationBody);
     }
