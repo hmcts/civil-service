@@ -26,10 +26,11 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
@@ -261,13 +262,21 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
 
         // 1v2 different reps can produce two active response deadlines; use the earlier one as the nextDeadline.
         if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
-            caseData.setNextDeadline(deadlinesCalculator.nextDeadline(Arrays.asList(respondent1Deadline, respondent2Deadline)).toLocalDate());
+            List<LocalDateTime> deadlines = Stream.of(respondent1Deadline, respondent2Deadline)
+                .filter(Objects::nonNull)
+                .toList();
+            if (!deadlines.isEmpty()) {
+                caseData.setNextDeadline(deadlinesCalculator.nextDeadline(deadlines).toLocalDate());
+            }
             caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
                 ofNullable(caseData.getSolicitorReferences()).map(SolicitorReferences::getRespondentSolicitor1Reference).orElse(null),
                 caseData.getRespondentSolicitor2Reference()));
         } else {
             // Other scenarios have one effective respondent deadline at this stage.
-            caseData.setNextDeadline(ofNullable(respondent1Deadline).orElse(respondent2Deadline).toLocalDate());
+            LocalDateTime effectiveDeadline = ofNullable(respondent1Deadline).orElse(respondent2Deadline);
+            if (effectiveDeadline != null) {
+                caseData.setNextDeadline(effectiveDeadline.toLocalDate());
+            }
             caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(caseData));
         }
     }
