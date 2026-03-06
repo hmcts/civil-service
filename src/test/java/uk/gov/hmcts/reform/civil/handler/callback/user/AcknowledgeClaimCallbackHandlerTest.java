@@ -207,7 +207,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("No");
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
         }
 
         @Test
@@ -226,7 +226,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("Yes");
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
         }
 
         @Test
@@ -243,7 +243,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("Yes");
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
         }
 
     }
@@ -372,6 +372,42 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(time.now()).thenReturn(acknowledgementDate);
             when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
 
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent2DeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenBothDeadlinesAreNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1DeadlineIsNull_1v2TwoLegalRep() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
         }
 
         @Test
