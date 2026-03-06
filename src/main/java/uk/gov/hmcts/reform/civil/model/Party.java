@@ -81,8 +81,18 @@ public class Party {
         return getPartyName(false);
     }
 
+    @JsonIgnore
+    public String getStoredPartyName() {
+        return partyName;
+    }
+
     public String getPartyTypeDisplayValue() {
         return this.getType().getDisplayValue();
+    }
+
+    @JsonIgnore
+    public String getStoredPartyTypeDisplayValue() {
+        return partyTypeDisplayValue;
     }
 
     @JsonIgnore

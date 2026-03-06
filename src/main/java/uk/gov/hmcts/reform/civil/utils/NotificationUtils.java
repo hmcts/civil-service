@@ -59,12 +59,6 @@ public class NotificationUtils {
 
     public static final String REFERENCE_NOT_PROVIDED = "Not provided";
 
-    public static boolean isRespondent1(CallbackParams callbackParams, CaseEvent matchEvent) {
-        CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
-        return caseEvent.equals(matchEvent);
-    }
-
-    @SuppressWarnings("java:S4144")
     public static boolean isEvent(CallbackParams callbackParams, CaseEvent matchEvent) {
         CaseEvent caseEvent = CaseEvent.valueOf(callbackParams.getRequest().getEventId());
         return caseEvent.equals(matchEvent);
@@ -130,16 +124,6 @@ public class NotificationUtils {
         }
     }
 
-    public static boolean shouldSkipEventForRespondent1LiP(CaseData caseData) {
-        return NO.equals(caseData.getRespondent1Represented())
-            && caseData.getRespondentSolicitor1EmailAddress() == null;
-    }
-
-    public static boolean shouldSkipEventForRespondent2LiP(CaseData caseData) {
-        return NO.equals(caseData.getRespondent2Represented())
-            && caseData.getRespondentSolicitor2EmailAddress() == null;
-    }
-
     public static String getFormattedHearingDate(LocalDate localDate) {
         return localDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
@@ -193,10 +177,13 @@ public class NotificationUtils {
     public static String getApplicantLegalOrganizationName(CaseData caseData, OrganisationService organisationService) {
         if (caseData.getApplicant1OrganisationPolicy().getOrganisation() != null
             && caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
+
             String id = caseData.getApplicant1OrganisationPolicy().getOrganisation().getOrganisationID();
             Optional<Organisation> organisation = organisationService.findOrganisationById(id);
-            return organisation.isPresent() ? organisation.get().getName() :
-                caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
+
+            return organisation.isPresent()
+                ? organisation.get().getName()
+                : caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
         }
         return caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName();
     }
@@ -204,21 +191,27 @@ public class NotificationUtils {
     public static String getLegalOrganizationNameForRespondent(CaseData caseData, boolean isRespondent1, OrganisationService organisationService) {
         String legalOrganisationName = null;
         String id = null;
+
         if (isRespondent1) {
+
             if (caseData.getRespondent1OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID();
             } else if (caseData.getRespondent1OrganisationIDCopy() != null) {
                 id = caseData.getRespondent1OrganisationIDCopy();
             }
+
         } else {
+
             if (caseData.getRespondent2OrganisationPolicy().getOrganisation() != null
                 && caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID() != null) {
                 id = caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID();
             } else if (caseData.getRespondent2OrganisationIDCopy() != null) {
                 id = caseData.getRespondent2OrganisationIDCopy();
             }
+
         }
+
         if (id != null) {
             Optional<Organisation> organisation = organisationService.findOrganisationById(id);
             if (organisation.isPresent()) {
@@ -239,10 +232,12 @@ public class NotificationUtils {
     public static String buildPartiesReferencesEmailSubject(CaseData caseData) {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
+
         boolean addRespondent2Reference = ONE_V_TWO_TWO_LEGAL_REP.equals(getMultiPartyScenario(caseData));
 
         stringBuilder.append(buildClaimantReferenceEmailSubject(caseData));
-        if (stringBuilder.length() > 0) {
+
+        if (!stringBuilder.isEmpty()) {
             stringBuilder.append(" - ");
         }
 
@@ -256,9 +251,11 @@ public class NotificationUtils {
             });
 
         if (addRespondent2Reference) {
-            if (stringBuilder.length() > 0) {
+
+            if (!stringBuilder.isEmpty()) {
                 stringBuilder.append(" - ");
             }
+
             stringBuilder.append("Defendant 2 reference: ");
             String respondent2Reference = caseData.getSolicitorReferences() != null
                 && caseData.getSolicitorReferences().getRespondentSolicitor2Reference() != null
@@ -276,6 +273,7 @@ public class NotificationUtils {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Claimant reference: ");
+
         Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
             .ifPresentOrElse(ref -> {
                 stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
@@ -287,8 +285,8 @@ public class NotificationUtils {
     public static final Set<CaseState> qmNotAllowedStates = EnumSet.of(PENDING_CASE_ISSUED, CLOSED,
                                                                        PROCEEDS_IN_HERITAGE_SYSTEM, CASE_DISMISSED);
 
-    private static boolean queryNotAllowedCaseStates(CaseData caseData) {
-        return qmNotAllowedStates.contains(caseData.getCcdState());
+    private static boolean queryAllowedCaseStates(CaseData caseData) {
+        return !qmNotAllowedStates.contains(caseData.getCcdState());
     }
 
     public static Map<String, String> addAllFooterItems(CaseData caseData, Map<String, String> properties,
@@ -325,7 +323,7 @@ public class NotificationUtils {
     public static Map<String, String> addSpecAndUnspecContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isPublicQMEnabled) {
-        if (!queryNotAllowedCaseStates(caseData)
+        if (queryAllowedCaseStates(caseData)
             && (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
             properties.put(SPEC_UNSPEC_CONTACT, configuration.getRaiseQueryLr());
         } else {
@@ -337,7 +335,7 @@ public class NotificationUtils {
     public static Map<String, String> addLipContact(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
                                                     boolean isPublicQMEnabled) {
 
-        if (isPublicQMEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+        if (isPublicQMEnabled && queryAllowedCaseStates(caseData) && caseData.isLipCase()) {
             properties.put(LIP_CONTACT, configuration.getRaiseQueryLip());
         } else {
             properties.put(LIP_CONTACT, configuration.getLipContactEmail());
@@ -348,7 +346,7 @@ public class NotificationUtils {
     public static Map<String, String> addLipContactWelsh(CaseData caseData, Map<String, String> properties, NotificationsSignatureConfiguration configuration,
                                                          boolean isPublicQMEnabled) {
 
-        if (isPublicQMEnabled && !queryNotAllowedCaseStates(caseData) && caseData.isLipCase()) {
+        if (isPublicQMEnabled && queryAllowedCaseStates(caseData) && caseData.isLipCase()) {
             properties.put(LIP_CONTACT_WELSH, configuration.getRaiseQueryLipWelsh());
         } else {
             properties.put(LIP_CONTACT_WELSH, configuration.getLipContactEmailWelsh());
@@ -359,7 +357,7 @@ public class NotificationUtils {
     public static Map<String, String> addCnbcContact(CaseData caseData, Map<String, String> properties,
                                                               NotificationsSignatureConfiguration configuration,
                                                               boolean isPublicQMEnabled) {
-        if (!queryNotAllowedCaseStates(caseData)
+        if (queryAllowedCaseStates(caseData)
             && (!caseData.isLipCase() || (caseData.isLipCase() && isPublicQMEnabled))) {
             properties.put(CNBC_CONTACT, configuration.getRaiseQueryLr());
         } else {
