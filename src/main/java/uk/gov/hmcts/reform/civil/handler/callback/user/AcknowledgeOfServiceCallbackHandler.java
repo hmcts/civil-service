@@ -84,7 +84,7 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
 
         List<String> errors = new ArrayList<>();
         var responseDeadline = caseData.getRespondent1ResponseDeadline();
-        if (dateTime.toLocalDate().isAfter(responseDeadline.toLocalDate())) {
+        if (responseDeadline != null && dateTime.toLocalDate().isAfter(responseDeadline.toLocalDate())) {
             errors.add("Deadline to file Acknowledgement of Service has passed, option is not available.");
         }
 
@@ -119,7 +119,9 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
     private CallbackResponse setNewResponseDeadline(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         LocalDateTime responseDeadline = caseData.getRespondent1ResponseDeadline();
-        LocalDateTime newResponseDate = deadlinesCalculator.plus14DaysAt4pmDeadline(responseDeadline);
+        LocalDateTime newResponseDate = ofNullable(responseDeadline)
+            .map(deadlinesCalculator::plus14DaysAt4pmDeadline)
+            .orElse(null);
         Party updatedRespondent1 = caseData.getRespondent1();
         if (caseData.getRespondent1Copy() != null) {
             updatedRespondent1.setPrimaryAddress(caseData.getRespondent1Copy().getPrimaryAddress());
