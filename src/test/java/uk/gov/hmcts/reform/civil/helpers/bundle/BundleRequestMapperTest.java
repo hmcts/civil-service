@@ -192,10 +192,9 @@ class BundleRequestMapperTest {
     }
 
     private static Party party(String name) {
-        return Party.builder()
-            .individualLastName("lastname")
-            .partyName(name)
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        return new Party()
+            .setIndividualLastName("lastname")
+            .setPartyName(name)
+            .setType(Party.Type.INDIVIDUAL);
     }
 }

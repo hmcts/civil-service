@@ -52,7 +52,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void should_go_to_claim_settled_state() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
@@ -86,7 +86,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void should_include_header_and_body() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(SUBMITTED, caseData).build();
             SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler
                 .handle(params);
@@ -96,7 +96,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void should_disable_task_list_items() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setCcdCaseReference(1234L);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -121,7 +121,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void should_not_disable_task_list_items_when_qmlr_is_on_and_eacourt() {
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(true);
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setCcdCaseReference(1234L);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);
@@ -146,7 +146,7 @@ class SettleClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void should_disable_task_list_items_when_qmlr_is_on_and_non_eaCourt() {
             when(featureToggleService.isLocationWhiteListed(any())).thenReturn(false);
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setCcdCaseReference(1234L);
             caseData.setApplicant1Represented(YesOrNo.NO);
             caseData.setRespondent1Represented(YesOrNo.NO);

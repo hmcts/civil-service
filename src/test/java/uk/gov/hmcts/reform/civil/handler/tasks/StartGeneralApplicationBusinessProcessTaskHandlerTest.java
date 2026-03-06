@@ -139,7 +139,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     @EnumSource(value = BusinessProcessStatus.class, names = {"READY", "DISPATCHED"})
     void shouldStartBusinessProcess_whenValidBusinessProcessStatusWithOneGA(BusinessProcessStatus status) {
 
-        CaseData caseData = getTestCaseData(new CaseDataBuilder().build());
+        CaseData caseData = getTestCaseData(new CaseDataBuilder().build()).build();
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -164,7 +164,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
     @Test
     void shouldStartBusinessProcess_whenValidBusinessProcessStatusWithMultipleGA() {
 
-        CaseData caseData = getTestCaseDataWithMultipleGA(new CaseDataBuilder().build());
+        CaseData caseData = getTestCaseDataWithMultipleGA(new CaseDataBuilder().build()).build();
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -188,7 +188,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
     @Test
     void shouldNotUpdateBusinessProcess_whenInputStatusIsStartedAndHaveDifferentProcessInstanceId() {
-        CaseData caseData = getStartedTestCaseData(new CaseDataBuilder().build());
+        CaseData caseData = getStartedTestCaseData(new CaseDataBuilder().build()).build();
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 
@@ -210,7 +210,7 @@ class StartGeneralApplicationBusinessProcessTaskHandlerTest extends BaseCallback
 
     @Test
     void shouldRaiseBpmnError_whenBusinessProcessStatusIsFinished() {
-        CaseData caseData = getFinishedTestCaseDataWithProcessID(new CaseDataBuilder().build());
+        CaseData caseData = getFinishedTestCaseDataWithProcessID(new CaseDataBuilder().build()).build();
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(caseDetails).build();
 

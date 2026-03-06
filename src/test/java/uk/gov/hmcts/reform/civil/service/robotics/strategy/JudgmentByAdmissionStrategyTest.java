@@ -87,7 +87,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(10));
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(responseDate);
         caseData.setJoJudgementByAdmissionIssueDate(null);
@@ -218,7 +218,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.ZERO);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         LocalDateTime issueDate = LocalDateTime.of(2024, 3, 5, 15, 30);
         caseData.setJoJudgementByAdmissionIssueDate(issueDate);
@@ -257,7 +257,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeAmountInPounds(BigDecimal.valueOf(5));
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            .buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
         caseData.setRespondent1Represented(YesOrNo.NO);
         caseData.setCaseDataLiP(caseDataLiP);
@@ -301,7 +301,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         LocalDateTime issueDate = LocalDateTime.of(2024, 7, 10, 14, 0);
         caseData.setJoJudgementByAdmissionIssueDate(issueDate);
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -336,7 +336,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setApplicant1Represented(YesOrNo.YES);
         caseData.setRespondent1Represented(YesOrNo.YES);
         caseData.setTotalInterest(new BigDecimal("250"));
@@ -367,7 +367,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         LocalDateTime issueDate = LocalDateTime.of(2024, 9, 1, 11, 30);
         caseData.setJoJudgementByAdmissionIssueDate(issueDate);
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(
@@ -393,7 +393,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setCcjPaymentDetails(ccjPaymentDetails);
         caseData.setApplicant1ResponseDate(null);
 
@@ -427,7 +427,7 @@ class JudgmentByAdmissionStrategyTest {
         ccjPaymentDetails.setCcjPaymentPaidSomeOption(YesOrNo.YES);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudmentOnlineCaseDataWithPaymentImmediately();
+            .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
         caseData.setCaseDataLiP(caseDataLiP);
         caseData.setApplicant1RepaymentOptionForDefendantSpec(PaymentType.SET_DATE);
         caseData.setApplicant1RequestedPaymentDateForDefendantSpec(paymentBySetDate);

@@ -120,14 +120,14 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
             .respondent1(defendant)
             .addRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
 
         given(documentDownloadService.downloadDocument(
             any(),
@@ -153,14 +153,14 @@ class RecordJudgmentDeterminationOfMeansPiPLetterGeneratorTest {
     @Test
     void shouldGetTemplateFeesCorrectly() {
         //Given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)
             .respondent1(defendant)
             .addRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost())
-            .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+            .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
 
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
             .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));

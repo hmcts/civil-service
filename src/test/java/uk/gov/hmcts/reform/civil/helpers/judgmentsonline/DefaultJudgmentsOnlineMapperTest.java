@@ -50,7 +50,7 @@ class DefaultJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v1() {
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
         JudgmentDetails activeJudgment = defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
@@ -73,7 +73,7 @@ class DefaultJudgmentsOnlineMapperTest {
     @Test
     void testIfDefaultJudgmentIsMarkedActive_1v2_Divergent() {
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v2DivergentCase().build();
         JudgmentDetails activeJudgment = defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);

@@ -54,7 +54,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsHistoricSetAsideApplication() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //SET ASIDE
@@ -73,7 +73,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsHistoricSetAsideDefence() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //SET ASIDE
@@ -91,7 +91,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsHistoricSetAsideError() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         caseData.setActiveJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData));
 
         //SET ASIDE
@@ -111,7 +111,7 @@ class SetAsideJudgmentsOnlineMapperTest {
 
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
 
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
 
         //SET ASIDE
@@ -131,7 +131,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     void testIfRTLIsUpdatedCorrectly(String rtlState) {
         //Given
         when(interestCalculator.calculateInterest(any(CaseData.class))).thenReturn(BigDecimal.ZERO);
-        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case();
+        CaseData caseData = CaseDataBuilder.builder().getDefaultJudgment1v1Case().build();
         caseData.setActiveJudgment(defaultJudgmentOnlineMapper.addUpdateActiveJudgment(caseData));
         caseData.getActiveJudgment().setRtlState(rtlState);
         //When
@@ -148,7 +148,7 @@ class SetAsideJudgmentsOnlineMapperTest {
     @Test
     void testIfSetAsideApplicationDateUpdatedCorrectly() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
         CaseData updatedCaseData = caseData.toBuilder()
             .activeJudgment(recordJudgmentMapper.addUpdateActiveJudgment(caseData))
             .joSetAsideReason(JudgmentSetAsideReason.JUDGE_ORDER)

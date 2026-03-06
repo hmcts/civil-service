@@ -1669,4 +1669,8 @@ public class CaseData extends CaseDataParent implements MappableObject {
             && (ClaimTypeUnspec.DAMAGES_AND_OTHER_REMEDY.equals(this.getClaimTypeUnSpec())
             || ClaimTypeUnspec.HOUSING_DISREPAIR.equals(this.getClaimTypeUnSpec()));
     }
+
+    public CaseData build() {
+        return this;
+    }
 }

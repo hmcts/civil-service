@@ -110,7 +110,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
 
@@ -128,7 +128,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldReturnError_whenRespondentRespondsAgain1v2SameLegalRep() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .build();
@@ -145,7 +145,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             stubUserRoles(true, false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2Represented(YES)
@@ -234,7 +234,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .addApplicant2(YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .addRespondent2(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -256,7 +256,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().individual()
+                .respondent1(new PartyBuilder().individual()
                     .individualDateOfBirth(LocalDate.now().plusDays(1))
                     .build())
                 .build();
@@ -270,9 +270,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoErrorsWhenRespondentsAreNull() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().individual()
+                .respondent1(new PartyBuilder().individual()
                                  .build())
-                .respondent2(PartyBuilder.builder().individual()
+                .respondent2(new PartyBuilder().individual()
                                  .build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -284,7 +284,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().soleTrader()
+                .respondent1(new PartyBuilder().soleTrader()
                     .soleTraderDateOfBirth(LocalDate.now().plusDays(1))
                     .build())
                 .build();
@@ -298,7 +298,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().individual()
+                .respondent1(new PartyBuilder().individual()
                     .individualDateOfBirth(LocalDate.now().minusYears(1))
                     .build())
                 .build();
@@ -312,7 +312,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(PartyBuilder.builder().soleTrader()
+                .respondent1(new PartyBuilder().soleTrader()
                     .soleTraderDateOfBirth(LocalDate.now().minusYears(1))
                     .build())
                 .build();
@@ -415,9 +415,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             stubCaseRoles(false, true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -430,11 +430,11 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             stubCaseRoles(true, true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -447,7 +447,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             stubCaseRoles(false, false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
@@ -459,7 +459,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldCopyRespondentPrimaryAddresses_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateRespondentFullDefenceAfterNotificationAcknowledgement()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .build();
             String address = "test address";
@@ -483,7 +483,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor1v1() {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1Copy(new PartyBuilder().individual().build());
             caseData.setAddApplicant2(NO);
             caseData.setAddRespondent2(NO);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -511,9 +511,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldSetNewResponseDeadlineAndUpdateBusinessProcess_whenInvokedFor2v1() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent1Copy(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1Copy(new PartyBuilder().individual().build());
             caseData.setAddApplicant2(YES);
-            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setApplicant2(new PartyBuilder().individual().build());
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -541,8 +541,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -573,9 +573,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged1v2SameSolicitor()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .build();
 
@@ -611,9 +611,9 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2Represented(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
                 .build();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -646,8 +646,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2Represented(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
                 .build();
 
             String respondent2Address = "respondent2 address";
@@ -674,8 +674,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldSetCaseListDisplayDefendantSolicitorReferences() {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .respondent1Copy(PartyBuilder.builder().individual().build())
-                .respondent2Copy(PartyBuilder.builder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
+                .respondent2Copy(new PartyBuilder().individual().build())
                 .multiPartyClaimTwoDefendantSolicitors().build();
             SolicitorReferences solicitorReferencesCopy = new SolicitorReferences();
             solicitorReferencesCopy.setRespondentSolicitor1Reference("abc");

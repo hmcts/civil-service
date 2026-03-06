@@ -63,7 +63,7 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     @MockBean
     private PaymentsConfiguration paymentsConfiguration;
 
-    private CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseDataWithPba(ACCOUNT_NUMBER);
+    private CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseDataWithPba(ACCOUNT_NUMBER).build();
 
     @Pact(consumer = "civil_service")
     public RequestResponsePact doCardPaymentRequest(PactDslWithProvider builder)

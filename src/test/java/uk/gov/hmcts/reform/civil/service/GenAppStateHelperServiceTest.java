@@ -146,7 +146,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             getOriginalStatusOfGeneralApplication_applicationClosed()
-                );
+                ).build();
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                 caseData,
@@ -174,7 +174,7 @@ class GenAppStateHelperServiceTest {
                                             false,
                                             false, false,
                                             Map.of()
-                );
+                ).build();
 
             CaseData response = service.updateApplicationDetailsInClaim(
                 caseData,
@@ -203,7 +203,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             applications
-                );
+                ).build();
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                 caseData,
                 APPLICATION_CLOSED_TEXT,
@@ -222,7 +222,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             getOriginalStatusOfGeneralApplication_applicationOffline()
-                );
+                ).build();
 
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                 caseData,
@@ -251,7 +251,7 @@ class GenAppStateHelperServiceTest {
                                             false,
                                             false, false,
                                             Map.of()
-                );
+                ).build();
 
             CaseData response = service.updateApplicationDetailsInClaim(
                 caseData,
@@ -280,7 +280,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             applications
-                );
+                ).build();
             CaseData updatedData = service.updateApplicationDetailsInClaim(
                 caseData,
                 APPLICATION_OFFLINE_TEXT,
@@ -418,7 +418,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             getOriginalStatusOfGeneralApplication_applicationClosed()
-                );
+                ).build();
 
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setRegion("2");
@@ -464,7 +464,7 @@ class GenAppStateHelperServiceTest {
                                             false,
                                             false, false,
                                             Map.of()
-                );
+                ).build();
 
             CaseData response = service.updateApplicationLocationDetailsInClaim(caseData, authToken);
 
@@ -485,7 +485,7 @@ class GenAppStateHelperServiceTest {
                                             true,
                                             true, true,
                                             getOriginalStatusOfGeneralApplication()
-                );
+                ).build();
 
             service.triggerEvent(caseData, MAIN_CASE_CLOSED);
 

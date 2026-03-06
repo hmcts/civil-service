@@ -1543,7 +1543,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
     static Stream<Arguments> testDataUnspec() {
         CaseData scenario1 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         DynamicListElement selectedCourt = createDynamicListElement("00002", "court 2 - 2 address - Y02 7RB");
         DynamicList fastTrackSelection = cloneDynamicListWithValue(options, selectedCourt);
         scenario1.setCaseAccessCategory(UNSPEC_CLAIM);
@@ -1554,7 +1554,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario2 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario2.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario2.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
         scenario2.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1564,7 +1564,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario3 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         DynamicList disposalSelection = cloneDynamicListWithValue(options, selectedCourt);
         scenario3.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario3.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
@@ -1575,7 +1575,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario4 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         DynamicList smallClaimsSelection = cloneDynamicListWithValue(options, selectedCourt);
         scenario4.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario4.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
@@ -1585,7 +1585,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario5 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario5.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario5.setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
         scenario5.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1595,7 +1595,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario6 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario6.setCaseAccessCategory(UNSPEC_CLAIM);
         scenario6.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
         scenario6.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1629,7 +1629,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario1 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario1.setCaseAccessCategory(SPEC_CLAIM);
         scenario1.setResponseClaimTrack("SMALL_CLAIM");
         scenario1.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1638,7 +1638,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario2 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario2.setCaseAccessCategory(SPEC_CLAIM);
         scenario2.setResponseClaimTrack("SMALL_CLAIM");
         scenario2.setFastTrackMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1648,7 +1648,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario3 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario3.setCaseAccessCategory(SPEC_CLAIM);
         scenario3.setResponseClaimTrack("SMALL_CLAIM");
         scenario3.setDrawDirectionsOrderRequired(YES);
@@ -1657,7 +1657,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario4 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario4.setCaseAccessCategory(SPEC_CLAIM);
         scenario4.setResponseClaimTrack("FAST_CLAIM");
         scenario4.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1667,7 +1667,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario5 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario5.setCaseAccessCategory(SPEC_CLAIM);
         scenario5.setResponseClaimTrack("FAST_CLAIM");
         scenario5.setDrawDirectionsOrderRequired(YES);
@@ -1676,7 +1676,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario6 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario6.setCaseAccessCategory(SPEC_CLAIM);
         scenario6.setResponseClaimTrack("FAST_CLAIM");
         scenario6.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1685,7 +1685,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario7 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario7.setCaseAccessCategory(SPEC_CLAIM);
         scenario7.setResponseClaimTrack("FAST_CLAIM");
         scenario7.setSmallClaimsMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));
@@ -1695,7 +1695,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario8 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario8.setCaseAccessCategory(SPEC_CLAIM);
         scenario8.setResponseClaimTrack("FAST_CLAIM");
         scenario8.setDrawDirectionsOrderRequired(YES);
@@ -1704,7 +1704,7 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         CaseData scenario9 = withCaseManagementLocation(
             CaseDataBuilder.builder().atStateClaimDraft().build()
-        );
+        ).build();
         scenario9.setCaseAccessCategory(SPEC_CLAIM);
         scenario9.setResponseClaimTrack("SMALL_CLAIM");
         scenario9.setDisposalHearingMethodInPerson(cloneDynamicListWithValue(options, selectedCourt));

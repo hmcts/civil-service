@@ -133,7 +133,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setCcdState(CaseState.HEARING_READINESS);
+            .setCcdState(CaseState.HEARING_READINESS).build();
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
         caseData.setHearingFeePaymentDetails(null);
 
@@ -155,7 +155,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setCcdState(CaseState.HEARING_READINESS);
+            .setCcdState(CaseState.HEARING_READINESS).build();
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
         PaymentDetails paymentDetails = new PaymentDetails();
         paymentDetails.setStatus(PaymentStatus.SUCCESS);
@@ -178,7 +178,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setCcdState(CaseState.CASE_PROGRESSION);
+            .setCcdState(CaseState.CASE_PROGRESSION).build();
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
         service.notifyHearingScheduled(caseData, AUTH_TOKEN);
@@ -197,7 +197,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setCcdState(CaseState.HEARING_READINESS);
+            .setCcdState(CaseState.HEARING_READINESS).build();
         caseData.setListingOrRelisting(ListingOrRelisting.RELISTING);
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
 
@@ -217,7 +217,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM).build();
         caseData.setTrialReadyApplicant(null);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
@@ -238,7 +238,7 @@ class HearingScheduledClaimantDashboardServiceTest {
             .ccdCaseReference(Long.parseLong(CASE_ID))
             .applicant1Represented(YesOrNo.NO)
             .build()
-            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM);
+            .setAllocatedTrack(AllocatedTrack.FAST_CLAIM).build();
         caseData.setTrialReadyApplicant(YesOrNo.YES);
 
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());

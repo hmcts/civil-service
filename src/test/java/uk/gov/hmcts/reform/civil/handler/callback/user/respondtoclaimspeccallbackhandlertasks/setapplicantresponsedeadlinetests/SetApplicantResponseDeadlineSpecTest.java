@@ -165,7 +165,7 @@ class SetApplicantResponseDeadlineSpecTest {
                         .respondent1DQ(new Respondent1DQ())
                         .respondent2(respondent2)
                         .respondent2Copy(respondent2Copy)
-        );
+        ).build();
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 
@@ -207,7 +207,7 @@ class SetApplicantResponseDeadlineSpecTest {
                         .respondent1Copy(respondent1)
                         .respondent1DQ(new Respondent1DQ())
                         .respondent2(respondent2)
-        );
+        ).build();
 
         CallbackParams callbackParams = buildCallbackParams(caseData);
 

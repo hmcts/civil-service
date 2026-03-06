@@ -25,7 +25,7 @@ public class DefendantRecordJudgementScenarioTest extends  DashboardBaseIntegrat
                 .atStateClaimDetailsNotified()
                 .legacyCaseReference("reference")
                 .respondent1Represented(YesOrNo.NO)
-                .buildJudgmentOnlineCaseDataWithDeterminationMeans();
+                .buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
 
         when(featureToggleService.isJudgmentOnlineLive()).thenReturn(true);
 

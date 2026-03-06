@@ -550,7 +550,7 @@ public class SdoGeneratorServiceTest {
             .fastClaims(fastTrackList)
             .build();
 
-        caseData  = prePopulateNihlFields(caseData.toBuilder());
+        caseData  = prePopulateNihlFields(caseData.toBuilder()).build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         verify(documentManagementService)
@@ -578,7 +578,7 @@ public class SdoGeneratorServiceTest {
             .trialAdditionalDirectionsForFastTrack(fastTrackList)
             .build();
 
-        caseData  = prePopulateNihlFields(caseData.toBuilder());
+        caseData  = prePopulateNihlFields(caseData.toBuilder()).build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
         //assertThat(caseDocument).isNotNull();

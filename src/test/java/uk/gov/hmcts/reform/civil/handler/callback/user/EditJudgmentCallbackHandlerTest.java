@@ -90,7 +90,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldPopulateIfRTLRadioDisplay(YesOrNo value) {
             //Given: Casedata in All_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoIsRegisteredWithRTL(value);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
             caseData.setActiveJudgment(recordMapper.addUpdateActiveJudgment(caseData));
@@ -149,7 +149,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State and RTL is Yes in active judgment
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.YES);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.NO);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
@@ -212,7 +212,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
@@ -257,7 +257,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             //Given : Casedata in All_FINAL_ORDERS_ISSUED State
             when(addressMapper.toRoboticsAddress(any())).thenReturn(new RoboticsAddress());
             when(interestCalculator.calculateInterest(any())).thenReturn(BigDecimal.ZERO);
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
             RecordJudgmentOnlineMapper recordMapper = new RecordJudgmentOnlineMapper(time, addressMapper);
@@ -304,7 +304,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldThrowErrorIfNoActiveJudgment() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             caseData.setJoIsRegisteredWithRTL(YesOrNo.NO);
             caseData.setJoShowRegisteredWithRTLOption(YesOrNo.YES);
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -326,7 +326,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             JudgmentInstalmentDetails judgmentInstalmentDetails = new JudgmentInstalmentDetails();
             judgmentInstalmentDetails.setStartDate(LocalDate.now().minusDays(2));
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoInstalmentDetails(judgmentInstalmentDetails);
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
@@ -338,7 +338,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidatePaymentPaidByDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
             //When: handler is called with MID event
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -348,7 +348,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldValidateOrderDate() {
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             caseData.setJoOrderMadeDate(LocalDate.now().plusDays(2));
 
             CallbackParams params = callbackParamsOf(caseData, MID, "validateDates");
@@ -363,7 +363,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
             JudgmentPaymentPlan judgmentPaymentPlan = new JudgmentPaymentPlan();
             judgmentPaymentPlan.setType(PaymentPlanSelection.PAY_BY_DATE);
             judgmentPaymentPlan.setPaymentDeadlineDate(LocalDate.now().plusDays(2));
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
             caseData.setJoOrderMadeDate(LocalDate.now().minusDays(2));
             caseData.setJoPaymentPlan(judgmentPaymentPlan);
 
@@ -378,7 +378,7 @@ class EditJudgmentCallbackHandlerTest extends BaseCallbackHandlerTest {
     class SubmittedCallback {
         @Test
         void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED);

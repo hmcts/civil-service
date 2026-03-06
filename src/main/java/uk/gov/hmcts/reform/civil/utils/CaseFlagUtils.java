@@ -97,7 +97,7 @@ public class CaseFlagUtils {
 
     public static Party updateParty(String roleOnCase, Party partyToUpdate) {
         return partyToUpdate != null ? partyToUpdate.getFlags() != null ? partyToUpdate :
-            partyToUpdate.toBuilder().flags(createFlags(partyToUpdate.getPartyName(), roleOnCase)).build() : null;
+            partyToUpdate.setFlags(createFlags(partyToUpdate.getPartyName(), roleOnCase)) : null;
     }
 
     public static LitigationFriend updateLitFriend(String roleOnCase, LitigationFriend litFriendToUpdate) {
@@ -354,7 +354,7 @@ public class CaseFlagUtils {
                 .setRoleOnCase(existingFlags.getRoleOnCase())
                 .setDetails(existingFlags.getDetails())
             : createFlags(party.getPartyName(), null);
-        return party.toBuilder().flags(updatedFlags).build();
+        return party.setFlags(updatedFlags);
     }
 
     private static LitigationFriend updatePartyNameForLitigationFriendFlags(LitigationFriend litigationFriend) {

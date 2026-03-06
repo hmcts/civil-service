@@ -42,7 +42,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
     public void setup() {
         objectMapper = new ObjectMapper();
         handler = new ServiceRequestCUICallbackHandler(paymentsService, objectMapper);
-        caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+        caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().build();
     }
 
     @Nested
@@ -56,7 +56,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldMakePaymentServiceRequestForClaimFee_whenInvoked() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().build();
             caseData.setServiceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE);
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
@@ -72,7 +72,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotMakeAnyServiceRequest_whenServiceRequestHasBeenInvokedPreviously() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().build();
             caseData.setServiceRequestReference(CaseDataBuilder.CUSTOMER_REFERENCE);
             params = callbackParamsOf(caseData, CREATE_SERVICE_REQUEST_CUI_CLAIM_ISSUE, ABOUT_TO_SUBMIT);
 
@@ -89,7 +89,7 @@ public class ServiceRequestCUICallbackHandlerTest extends BaseCallbackHandlerTes
         @Test
         void shouldNotMakeAnyServiceRequest_whenClaimantHasRequestedHelpWithFees() {
             // GIVEN
-            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee();
+            caseData = CaseDataBuilder.builder().buildCuiCaseDataWithFee().build();
             caseData.setCaseDataLiP(new CaseDataLiP()
                                  .setHelpWithFees(
                                      new HelpWithFees()

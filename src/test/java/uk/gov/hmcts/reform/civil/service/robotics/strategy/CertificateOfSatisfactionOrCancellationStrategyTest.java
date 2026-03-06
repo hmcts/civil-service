@@ -58,7 +58,7 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
         LocalDate paidDate = LocalDate.of(2024, 3, 5);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
         caseData.setJoMarkedPaidInFullIssueDate(issueDate);
         caseData.setJoCoscRpaStatus(CoscRPAStatus.CANCELLED);
         caseData.setJoFullyPaymentMadeDate(paidDate);
@@ -95,7 +95,7 @@ class CertificateOfSatisfactionOrCancellationStrategyTest {
         certOfSC.setDebtPaymentEvidence(debtPaymentEvidence);
 
         CaseData caseData = CaseDataBuilder.builder()
-            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc();
+            .buildJudgmentOnlineCaseWithMarkJudgementPaidAfter31DaysForCosc().build();
         Element<CaseDocument> certificateElement = ElementUtils.element(certificateDoc);
         caseData.setSystemGeneratedCaseDocuments(List.of(certificateElement));
         caseData.setCertOfSC(certOfSC);
