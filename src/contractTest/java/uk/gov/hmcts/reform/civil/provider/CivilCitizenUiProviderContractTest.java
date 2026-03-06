@@ -18,6 +18,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -43,6 +45,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
     providerBranch = "${pact.provider.branch}"
 )
 @IgnoreNoPactsToVerify
+@EnabledIfEnvironmentVariable(named = "PACT_BROKER_FULL_URL", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "RUN_PROVIDER_PACT_VERIFICATION", matches = "true")
 class CivilCitizenUiProviderContractTest {
 
     private static final String AUTH_HEADER = "Bearer some-access-token";
@@ -67,7 +71,12 @@ class CivilCitizenUiProviderContractTest {
 
     @BeforeEach
     void beforeEach(PactVerificationContext context) {
-        String brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
+        String brokerUrl = System.getProperty("PACT_BROKER_FULL_URL");
+        if (brokerUrl == null || brokerUrl.isBlank()) {
+            brokerUrl = System.getenv("PACT_BROKER_FULL_URL");
+        }
+        assumeTrue(brokerUrl != null && !brokerUrl.isBlank(),
+            "PACT_BROKER_FULL_URL must be set to run provider pact verification");
         if (brokerUrl != null && !brokerUrl.isBlank()) {
             System.setProperty("pactbroker.url", brokerUrl);
         }

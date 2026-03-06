@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AppealList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.ApplicationAppealList;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,11 +19,9 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(SpringExtension.class)
 public class AppealInitiativeGroupTest {
 
-    @InjectMocks
-    private AppealInitiativePopulator appealInitiativePopulator;
+    private final AppealInitiativePopulator appealInitiativePopulator = new AppealInitiativePopulator();
 
     @Test
     void shouldPopulateAppealDetails_WhenAppealGrantedAndCircuitCourt() {

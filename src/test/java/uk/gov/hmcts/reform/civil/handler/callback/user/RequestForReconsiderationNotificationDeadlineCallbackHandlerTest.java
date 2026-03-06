@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
@@ -31,16 +31,16 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.REQUEST_FOR_RECONSIDE
 @SpringBootTest(classes = {
     RequestForReconsiderationNotificationDeadlineCallbackHandler.class,
     DashboardScenariosService.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class
 })
 class RequestForReconsiderationNotificationDeadlineCallbackHandlerTest {
 
     @Autowired
     private RequestForReconsiderationNotificationDeadlineCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private DashboardNotificationsParamsMapper mapper;
-    @MockBean
+    @MockitoBean
     private DashboardScenariosService dashboardScenariosService;
 
     @Test

@@ -22,7 +22,7 @@ public class RequestFilter extends OncePerRequestFilter {
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         ContentCachingRequestWrapper cachedBodyHttpServletRequest =
-            new ContentCachingRequestWrapper(request);
+            new ContentCachingRequestWrapper(request, Integer.MAX_VALUE);
 
         // Force caching for all content types
         cachedBodyHttpServletRequest.getInputStream();

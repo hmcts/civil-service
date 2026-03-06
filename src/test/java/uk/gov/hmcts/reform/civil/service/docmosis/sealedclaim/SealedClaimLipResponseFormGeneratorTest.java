@@ -4,10 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
@@ -85,32 +84,31 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     SealedClaimLipResponseFormGenerator.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class
 })
 class SealedClaimLipResponseFormGeneratorTest {
 
     private static final String AUTHORIZATION = "authorization";
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
     @Autowired
     private SealedClaimLipResponseFormGenerator generator;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
-    @Captor
-    ArgumentCaptor<PDF> uploadDocumentArgumentCaptor;
 
     @Test
     void shouldGenerateDocumentSuccessfully() {
         when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
+        ArgumentCaptor<PDF> argumentCaptor = ArgumentCaptor.forClass(PDF.class);
         //Given
         CaseData caseData = commonData().build();
 
@@ -131,9 +129,9 @@ class SealedClaimLipResponseFormGeneratorTest {
         verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
         verify(documentManagementService).uploadDocument(
             eq(AUTHORIZATION),
-            uploadDocumentArgumentCaptor.capture()
+            argumentCaptor.capture()
         );
-        PDF document = uploadDocumentArgumentCaptor.getValue();
+        PDF document = argumentCaptor.getValue();
         assertThat(document.getDocumentType()).isEqualTo(DEFENDANT_DEFENCE);
     }
 
@@ -141,6 +139,7 @@ class SealedClaimLipResponseFormGeneratorTest {
     void shouldGenerateDocumentSuccessfully_AfterCarmEnabled() {
         when(interestCalculator.claimAmountPlusInterestToDate(any())).thenReturn(new BigDecimal(2000));
         when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
+        ArgumentCaptor<PDF> argumentCaptor = ArgumentCaptor.forClass(PDF.class);
         LocalDate whenWillPay = LocalDate.now().plusDays(5);
         //Given
         CaseData.CaseDataBuilder<?, ?> builder = commonData()
@@ -170,9 +169,9 @@ class SealedClaimLipResponseFormGeneratorTest {
         verify(documentGeneratorService).generateDocmosisDocument(templateData, DEFENDANT_RESPONSE_LIP_SPEC);
         verify(documentManagementService).uploadDocument(
             eq(AUTHORIZATION),
-            uploadDocumentArgumentCaptor.capture()
+            argumentCaptor.capture()
         );
-        PDF document = uploadDocumentArgumentCaptor.getValue();
+        PDF document = argumentCaptor.getValue();
         assertThat(document.getDocumentType()).isEqualTo(DEFENDANT_DEFENCE);
     }
 

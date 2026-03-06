@@ -8,7 +8,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableCamundaRestClient
-@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
+@ComponentScan(basePackages = {
+    "uk.gov.hmcts.reform.civil",
+    "uk.gov.hmcts.reform.hmc",
+    "uk.gov.hmcts.reform.dashboard"
+})
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.idam.client",
     "uk.gov.hmcts.reform.civil",
@@ -17,7 +21,8 @@ import org.springframework.context.annotation.ComponentScan;
     "uk.gov.hmcts.reform.civil.ras",
     "uk.gov.hmcts.reform.cmc",
     "uk.gov.hmcts.reform.civil.crd",
-    "uk.gov.hmcts.reform.hmc"
+    "uk.gov.hmcts.reform.hmc",
+    "uk.gov.hmcts.reform.payments.client"
 })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {

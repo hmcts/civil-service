@@ -5,12 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -88,6 +87,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -120,7 +120,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     ValidateUnavailableDates.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
@@ -139,10 +139,10 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
     @Autowired
@@ -157,28 +157,27 @@ class RespondToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockitoBean
     private IStateFlowEngine stateFlowEngine;
 
-    @Mock
-    private StateFlow mockedStateFlow;
+    private final StateFlow mockedStateFlow = mock(StateFlow.class);
 
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
     @Nested

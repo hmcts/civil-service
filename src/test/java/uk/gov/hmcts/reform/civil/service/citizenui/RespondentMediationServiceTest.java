@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.citizenui;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.constants.SpecJourneyConstantLRSpec;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.handler.callback.user.spec.show.DefendantResponseShowTag;
@@ -16,11 +13,9 @@ import static uk.gov.hmcts.reform.civil.enums.CaseCategory.SPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
 public class RespondentMediationServiceTest {
 
-    @InjectMocks
-    RespondentMediationService respondentMediationService;
+    private final RespondentMediationService respondentMediationService = new RespondentMediationService();
 
     @Test
     void whenNotSmallClaim() {

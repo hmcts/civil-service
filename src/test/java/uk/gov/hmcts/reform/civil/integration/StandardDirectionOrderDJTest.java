@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -147,7 +147,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @SpringBootTest(classes = {
     DefaultJudgmentOrderFormGenerator.class,
     StandardDirectionOrderDJ.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     AssignCategoryId.class,
     LocationHelper.class,
     DirectionsOrderCallbackPipeline.class,
@@ -192,19 +192,19 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private StandardDirectionOrderDJ handler;
-    @MockBean
+    @MockitoBean
     private DefaultJudgmentOrderFormGenerator defaultJudgmentOrderFormGenerator;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private CategoryService categoryService;
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
 
     @Nested

@@ -83,7 +83,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, defendant response cui before about to submit: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                callbackParams.getCaseData().getRespondent1().getFlags()
+                getRespondent1Flags(callbackParams.getCaseData())
             );
         }
 
@@ -123,7 +123,7 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             log.info(
                 "case id: {}, defendant response cui after about to submit: {}",
                 callbackParams.getRequest().getCaseDetails().getId(),
-                caseData.getRespondent1().getFlags()
+                getRespondent1Flags(caseData)
             );
         }
 
@@ -187,5 +187,9 @@ public class RespondToClaimCuiCallbackHandler extends CallbackHandler {
             caseData.setDefendantLanguagePreferenceDisplay(PreferredLanguage.fromString(respondentLanguageString));
         }
         return caseData;
+    }
+
+    private Object getRespondent1Flags(CaseData caseData) {
+        return caseData != null && caseData.getRespondent1() != null ? caseData.getRespondent1().getFlags() : null;
     }
 }

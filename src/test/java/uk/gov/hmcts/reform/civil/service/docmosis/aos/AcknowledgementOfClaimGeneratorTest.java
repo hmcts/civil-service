@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseNa
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     AcknowledgementOfClaimGenerator.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class AcknowledgementOfClaimGeneratorTest {
 
@@ -75,13 +75,13 @@ class AcknowledgementOfClaimGeneratorTest {
 
     private final Representative representative = new Representative().setOrganisationName("test org");
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private RepresentativeService representativeService;
 
     @Autowired

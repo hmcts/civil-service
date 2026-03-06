@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.camunda.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
 import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
 
 import java.util.ArrayList;
@@ -112,13 +112,14 @@ public class MakeBulkClaimPaymentCallbackHandler extends CallbackHandler {
 
     private void updateWithBusinessError(CaseData caseData, FeignException exception) {
         try {
-            var paymentObject = objectMapper.readValue(exception.contentUTF8(), PaymentDto.class);
-            var status = paymentObject.getStatusHistories()[0];
+            JsonNode status = objectMapper.readTree(exception.contentUTF8())
+                .path("status_histories")
+                .path(0);
             PaymentDetails paymentDetails = ofNullable(caseData.getClaimIssuedPaymentDetails())
                 .orElse(new PaymentDetails());
             paymentDetails.setStatus(FAILED);
-            paymentDetails.setErrorCode(status.getErrorCode());
-            paymentDetails.setErrorMessage(status.getErrorMessage());
+            paymentDetails.setErrorCode(status.path("error_code").asText(null));
+            paymentDetails.setErrorMessage(status.path("error_message").asText(null));
 
             caseData.setClaimIssuedPaymentDetails(paymentDetails);
         } catch (JsonProcessingException jsonException) {

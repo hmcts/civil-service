@@ -9,9 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -66,22 +66,22 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     RespondToClaimCuiCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseFlagsInitialiser.class
 })
 class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     OrganisationService organisationService;
-    @MockBean
+    @MockitoBean
     UpdateCaseManagementDetailsService updateCaseManagementDetailsService;
-    @MockBean
+    @MockitoBean
     RequestedCourtForClaimDetailsTab requestedCourtForClaimDetailsTab;
     @Autowired
     private RespondToClaimCuiCallbackHandler handler;
@@ -103,6 +103,11 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getErrors()).isNull();
         }
+    }
+
+    @Test
+    void shouldHandleDefendantResponseCuiEvent() {
+        assertThat(handler.handledEvents()).contains(DEFENDANT_RESPONSE_CUI);
     }
 
     @Nested
@@ -480,6 +485,55 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedCaseData = getCaseData(response);
 
             assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage()).isEqualTo("WELSH");
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
+        }
+
+        @Test
+        void shouldCreateRespondentLipResponseWhenMissingAndWelshDocumentLanguageProvided() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            CaseDataLiP caseDataLiP = new CaseDataLiP();
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.ENGLISH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .caseDataLip(caseDataLiP)
+                .respondent1DQ(respondent1DQ)
+                .build();
+            caseData.setRespondToAdmittedClaimOwingAmount(BigDecimal.TEN);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getCaseDataLiP()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage())
+                .isEqualTo("ENGLISH");
+            assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(ENGLISH);
+        }
+
+        @Test
+        void shouldCreateCaseDataLipWhenMissingAndWelshDocumentLanguageProvided() {
+            when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
+            WelshLanguageRequirements welshLanguageRequirements = new WelshLanguageRequirements();
+            welshLanguageRequirements.setDocuments(Language.WELSH);
+            Respondent1DQ respondent1DQ = new Respondent1DQ();
+            respondent1DQ.setRespondent1DQLanguage(welshLanguageRequirements);
+            CaseData caseData = CaseDataBuilder.builder()
+                .totalClaimAmount(BigDecimal.valueOf(1000))
+                .respondent1DQ(respondent1DQ)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+            CaseData updatedCaseData = getCaseData(response);
+
+            assertThat(updatedCaseData.getCaseDataLiP()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse()).isNotNull();
+            assertThat(updatedCaseData.getCaseDataLiP().getRespondent1LiPResponse().getRespondent1ResponseLanguage())
+                .isEqualTo("WELSH");
             assertThat(updatedCaseData.getDefendantLanguagePreferenceDisplay()).isEqualTo(WELSH);
         }
     }

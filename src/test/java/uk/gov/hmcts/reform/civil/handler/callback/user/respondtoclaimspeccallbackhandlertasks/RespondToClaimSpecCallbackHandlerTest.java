@@ -9,14 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -155,7 +153,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     RespondToClaimSpecCallbackHandler.class,
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     DateOfBirthValidator.class,
     UnavailableDateValidator.class,
@@ -176,42 +174,41 @@ class RespondToClaimSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     private RespondToClaimSpecCallbackHandler handler;
     @Autowired
     private ObjectMapper objectMapper;
-    @MockBean
+    @MockitoBean
     private Time time;
-    @MockBean
+    @MockitoBean
     private PaymentDateValidator validator;
-    @MockBean
+    @MockitoBean
     private UnavailableDateValidator dateValidator;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
     @Autowired
     private UserService userService;
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
-    @Mock
+    @MockitoBean
     private StateFlow mockedStateFlow;
-    @MockBean
+    @MockitoBean
     private SimpleStateFlowEngine stateFlowEngine;
-    @Mock
+    @MockitoBean
     private DateOfBirthValidator dateOfBirthValidator;
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineExtensionCalculatorService;
-    @MockBean
+    @MockitoBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
-    @Spy
     private List<RespondToClaimConfirmationTextSpecGenerator> confirmationTextGenerators = List.of(
             new FullAdmitAlreadyPaidConfirmationText(),
             new FullAdmitSetDateConfirmationText(),
