@@ -506,7 +506,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(1234L);
             caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(admitPaymentDeadline));
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
             caseData.setRespondToAdmittedClaimOwingAmountPounds(new BigDecimal(1000));
@@ -538,7 +538,7 @@ class DefendantResponseDefendantNotificationHandlerTest extends BaseCallbackHand
             caseData.setLegacyCaseReference("reference");
             caseData.setCcdCaseReference(1234L);
             caseData.setRespondent1Represented(YesOrNo.NO);
-            caseData.setRespondent1(PartyBuilder.builder().company().build());
+            caseData.setRespondent1(new PartyBuilder().company().build());
             caseData.setRespondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec(admitPaymentDeadline));
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
             caseData.setTotalClaimAmount(new BigDecimal(1000));
