@@ -14,12 +14,16 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.model.citizenui.CaseDataLiP;
 import uk.gov.hmcts.reform.civil.model.citizenui.RespondentLiPResponse;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
+import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -27,8 +31,13 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -36,10 +45,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLI
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER;
+import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_APPLICANT_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT1;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT2;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER;
+import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.GenerateOrderNotificationHandler.TASK_ID_RESPONDENT_COURT_OFFICER_ORDER;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CASEMAN_REF;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
@@ -56,6 +69,8 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.No
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_HMCTS_SIGNATURE;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_OPENING_HOURS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.WELSH_PHONE_CONTACT;
+
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject;
 import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getAllPartyNames;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,12 +103,31 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
             CallbackRequest.builder().eventId(
+                NOTIFY_APPLICANT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()).build()))
+            .isEqualTo(TASK_ID_APPLICANT_COURT_OFFICER_ORDER);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
+                NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()).build()))
+            .isEqualTo(TASK_ID_RESPONDENT_COURT_OFFICER_ORDER);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
+                NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER.name()).build()).build()))
+            .isEqualTo(TASK_ID_RESPONDENT2_COURT_OFFICER_ORDER);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId(
                 NOTIFY_RESPONDENT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()).build()))
             .isEqualTo(TASK_ID_RESPONDENT1);
 
         assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
             CallbackRequest.builder().eventId(
                 NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()).build()))
+            .isEqualTo(TASK_ID_RESPONDENT2);
+
+        assertThat(handler.camundaActivityId(CallbackParamsBuilder.builder().request(
+            CallbackRequest.builder().eventId("OTHER_EVENT").build()).build()))
             .isEqualTo(TASK_ID_RESPONDENT2);
     }
 
@@ -103,14 +137,14 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
         @BeforeEach
         void setUp() {
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
-            when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
-            when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
-            when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
-            when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
-            when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
-            when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
-            when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
-            when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            lenient().when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
+            lenient().when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));
+            lenient().when(configuration.getOpeningHours()).thenReturn((String) configMap.get("openingHours"));
+            lenient().when(configuration.getWelshHmctsSignature()).thenReturn((String) configMap.get("welshHmctsSignature"));
+            lenient().when(configuration.getWelshPhoneContact()).thenReturn((String) configMap.get("welshPhoneContact"));
+            lenient().when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
+            lenient().when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
+            lenient().when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
         }
 
         @Test
@@ -157,7 +191,10 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
-            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build();
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent2(Party.builder().type(Party.Type.INDIVIDUAL).partyName("Resp 2").partyEmail("respondentsolicitor2@example.com").build())
+                .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
+                .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
             ).build();
@@ -326,7 +363,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             ).build();
             //when: handler is called
             handler.handle(params);
-            //then: email should be sent to applicant
+            //then: email should be sent to the applicant
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id-lip",
@@ -342,7 +379,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
+            //given: case where applicant Lip has email & a bilingual flag is on and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH").build();
@@ -351,7 +388,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             ).build();
             //when: handler is called
             handler.handle(params);
-            //then: email should be sent to applicant
+            //then: email should be sent to the applicant
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id-lip-translate",
@@ -367,7 +404,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
-            //given: case where applicant Lip has email & bilingual flag is on and notify for applicant is called
+            //given: case where applicant Lip has email & a bilingual flag is on and notify for applicant is called
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
                 .applicant1Represented(YesOrNo.NO)
                 .claimantBilingualLanguagePreference("BOTH").build();
@@ -376,7 +413,7 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             ).build();
             //when: handler is called
             handler.handle(params);
-            //then: email should be sent to applicant
+            //then: email should be sent to the applicant
             verify(notificationService).sendMail(
                 "rambo@email.com",
                 "template-id-lip-translate",
@@ -385,14 +422,148 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             );
         }
 
+        @Test
+        void shouldNotNotify_whenRespondent2SameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(anyString(), anyString(), any(), anyString());
+        }
+
+        @Test
+        void shouldNotNotify_whenEmailIsEmpty() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(""))
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(anyString(), anyString(), any(), anyString());
+        }
+
+        @Test
+        void shouldGetLegalOrganizationName_whenOrganisationIsPresent() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                                  .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation()
+                                                                    .setOrganisationID("ID")))
+                .build();
+            when(organisationService.findOrganisationById("ID"))
+                .thenReturn(Optional.of(new Organisation().setName("Org Name")));
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                anyString(),
+                anyString(),
+                org.mockito.ArgumentMatchers.argThat(properties -> "Org Name".equals(properties.get(CLAIM_LEGAL_ORG_NAME_SPEC))),
+                anyString()
+            );
+        }
+
+        @Test
+        void shouldGetLegalOrganizationName_whenOrganisationIsNotPresent() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                                  .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation()
+                                                                    .setOrganisationID("ID")))
+                .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("SOT Name"))
+                .build();
+            when(organisationService.findOrganisationById("ID")).thenReturn(Optional.empty());
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                anyString(),
+                anyString(),
+                org.mockito.ArgumentMatchers.argThat(properties -> "SOT Name".equals(properties.get(CLAIM_LEGAL_ORG_NAME_SPEC))),
+                anyString()
+            );
+        }
+
+        @Test
+        void shouldGetLegalOrganizationName_whenPolicyIsNull() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1OrganisationPolicy(null)
+                .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("SOT Name"))
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                anyString(),
+                anyString(),
+                org.mockito.ArgumentMatchers.argThat(properties -> "SOT Name".equals(properties.get(CLAIM_LEGAL_ORG_NAME_SPEC))),
+                anyString()
+            );
+        }
+
+        @Test
+        void shouldGetLegalOrganizationName_whenOrganisationIsNull() {
+            when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(null))
+                .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth().setName("SOT Name"))
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_APPLICANT_SOLICITOR1_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                anyString(),
+                anyString(),
+                org.mockito.ArgumentMatchers.argThat(properties -> "SOT Name".equals(properties.get(CLAIM_LEGAL_ORG_NAME_SPEC))),
+                anyString()
+            );
+        }
+
         @NotNull
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> properties = new HashMap<>(addCommonProperties(false));
-            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, handler.getLegalOrganizationName(caseData));
+            properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getLegalOrganizationName(caseData));
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
-            properties.put(PARTY_REFERENCES, "Claimant reference: 12345 - Defendant reference: 6789");
+            properties.put(PARTY_REFERENCES, uk.gov.hmcts.reform.civil.utils.NotificationUtils.buildPartiesReferencesEmailSubject(caseData));
             properties.put(CASEMAN_REF, "000DC001");
             return properties;
+        }
+
+        private String getLegalOrganizationName(CaseData caseData) {
+            String id = Optional.ofNullable(caseData.getApplicant1OrganisationPolicy())
+                .map(OrganisationPolicy::getOrganisation)
+                .map(uk.gov.hmcts.reform.ccd.model.Organisation::getOrganisationID)
+                .orElse(null);
+
+            return Optional.ofNullable(id)
+                .flatMap(organisationService::findOrganisationById)
+                .map(uk.gov.hmcts.reform.civil.prd.model.Organisation::getName)
+                .orElseGet(() -> caseData.getApplicantSolicitor1ClaimStatementOfTruth().getName());
         }
 
         @NotNull
@@ -401,6 +572,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
             properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
             return properties;
         }
 
@@ -410,6 +583,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(PARTY_NAME, caseData.getRespondent2().getPartyName());
             properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
             return properties;
         }
 
@@ -419,6 +594,8 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             properties.put(CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString());
             properties.put(PARTY_NAME, caseData.getApplicant1().getPartyName());
             properties.put(CLAIMANT_V_DEFENDANT, getAllPartyNames(caseData));
+            properties.put(PARTY_REFERENCES, buildPartiesReferencesEmailSubject(caseData));
+            properties.put(CASEMAN_REF, caseData.getLegacyCaseReference());
             return properties;
         }
 
@@ -442,5 +619,120 @@ public class GenerateOrderNotificationHandlerTest extends BaseCallbackHandlerTes
             }
             return expectedProperties;
         }
+
+        @Test
+        void shouldNotNotifyRespondent2_whenSameSolicitor() {
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent2SameLegalRepresentative(YesOrNo.YES)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_GENERATE_ORDER.name()).build()
+            ).build();
+
+            lenient().when(notificationsProperties.getGenerateOrderNotificationTemplate()).thenReturn("template-id");
+
+            handler.handle(params);
+
+            verify(notificationService, never()).sendMail(
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyMap(),
+                org.mockito.ArgumentMatchers.anyString()
+            );
+        }
+
+        @Test
+        void shouldNotifyCOORespondent1Lip_whenInvokedNonBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO).build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR1_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "sole.trader@email.com",
+                "template-id-lip",
+                getRespondentNotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyCOORespondent2Lip_whenInvokedBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplateBilingual())
+                .thenReturn("template-id-lip-translate");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .respondent2Represented(YesOrNo.NO)
+                .claimantBilingualLanguagePreference(Language.BOTH.toString())
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Alex")
+                                 .individualLastName("Richards")
+                                 .partyName("Mr. Alex Richards")
+                                 .partyEmail("respondentLip2@gmail.com")
+                                 .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentLip2@gmail.com",
+                "template-id-lip-translate",
+                getRespondent2NotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
+
+        @Test
+        void shouldNotifyCOORespondent2Lip_whenInvokedNonBilingual() {
+            when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id-lip");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));
+            when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck().build().toBuilder()
+                .respondent1Represented(YesOrNo.NO)
+                .respondent2Represented(YesOrNo.NO)
+                .respondent2(Party.builder()
+                                 .type(Party.Type.INDIVIDUAL)
+                                 .individualTitle("Mr.")
+                                 .individualFirstName("Alex")
+                                 .individualLastName("Richards")
+                                 .partyName("Mr. Alex Richards")
+                                 .partyEmail("respondentLip2@gmail.com")
+                                 .build())
+                .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(NOTIFY_RESPONDENT_SOLICITOR2_FOR_COURT_OFFICER_ORDER.name()).build()
+            ).build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                "respondentLip2@gmail.com",
+                "template-id-lip",
+                getRespondent2NotificationDataMapLip(caseData),
+                "generate-order-notification-000DC001"
+            );
+        }
     }
+
 }
