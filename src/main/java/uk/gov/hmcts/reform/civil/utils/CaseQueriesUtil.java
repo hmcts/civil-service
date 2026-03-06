@@ -15,12 +15,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CASEWORKER_QUERY_DOCUMENT_ATTACHMENTS;
 import static java.util.Objects.nonNull;
 
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.CLAIMANT_QUERY_DOCUMENT_ATTACHMENTS;
 import static uk.gov.hmcts.reform.civil.enums.DocCategory.DEFENDANT_QUERY_DOCUMENT_ATTACHMENTS;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.APPLICANTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.CLAIMANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.DEFENDANT;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORONE;
+import static uk.gov.hmcts.reform.civil.enums.CaseRole.RESPONDENTSOLICITORTWO;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
@@ -32,6 +38,7 @@ import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicito
 public class CaseQueriesUtil {
 
     private static final String UNSUPPORTED_ROLE_ERROR = "Unsupported case role for query management.";
+    public static final String ROLE_METADATA_DELIMITER = "::";
 
     private CaseQueriesUtil() {
         //NO-OP
@@ -39,11 +46,27 @@ public class CaseQueriesUtil {
 
     public static List<String> getUserRoleForQuery(CaseData caseData,
                                                    CoreCaseUserService coreCaseUserService, String queryId) {
-        String createdBy = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
+        CaseMessage caseMessage = unwrapElements(caseData.getQueries().getCaseMessages()).stream()
             .filter(m -> m.getId().equals(queryId)).findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId))
-            .getCreatedBy();
-        return coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), createdBy);
+            .orElseThrow(() -> new IllegalArgumentException("No query found for queryId " + queryId));
+
+        CreatedByRoleMetadata metadata = extractRoleMetadata(caseMessage.getCreatedBy());
+        List<String> roles = coreCaseUserService.getUserCaseRoles(
+            caseData.getCcdCaseReference().toString(),
+            metadata.userId
+        );
+
+        if ((roles == null || roles.isEmpty()) && metadata.persistedRole != null) {
+            return List.of(metadata.persistedRole);
+        }
+
+        return roles;
+    }
+
+    public static String buildCreatedByWithRoleMetadata(String userId, List<String> roles) {
+        String identifier = stripRoleMetadata(userId);
+        Optional<String> persistedRole = resolveSupportedRole(roles);
+        return persistedRole.map(role -> identifier + ROLE_METADATA_DELIMITER + role).orElse(identifier);
     }
 
     // Still required as QM collections are not migrated after NOC so still necessary to update the old query collection party name.
@@ -220,6 +243,55 @@ public class CaseQueriesUtil {
                                  "Successfully migrated [{}] queries for caseId {}",
                                  collection.getPartyName(), caseDataBefore.getCcdCaseReference()
                              ));
+        }
+    }
+
+    private static String stripRoleMetadata(String value) {
+        if (value == null) {
+            return null;
+        }
+        int index = value.indexOf(ROLE_METADATA_DELIMITER);
+        return index >= 0 ? value.substring(0, index) : value;
+    }
+
+    private static Optional<String> resolveSupportedRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return Optional.empty();
+        }
+        if (isApplicantSolicitor(roles)) {
+            return Optional.of(APPLICANTSOLICITORONE.getFormattedName());
+        } else if (isRespondentSolicitorOne(roles)) {
+            return Optional.of(RESPONDENTSOLICITORONE.getFormattedName());
+        } else if (isRespondentSolicitorTwo(roles)) {
+            return Optional.of(RESPONDENTSOLICITORTWO.getFormattedName());
+        } else if (isLIPClaimant(roles)) {
+            return Optional.of(CLAIMANT.getFormattedName());
+        } else if (isLIPDefendant(roles)) {
+            return Optional.of(DEFENDANT.getFormattedName());
+        }
+        return Optional.empty();
+    }
+
+    private static CreatedByRoleMetadata extractRoleMetadata(String createdBy) {
+        if (createdBy == null) {
+            return new CreatedByRoleMetadata(null, null);
+        }
+        int index = createdBy.indexOf(ROLE_METADATA_DELIMITER);
+        if (index < 0) {
+            return new CreatedByRoleMetadata(createdBy, null);
+        }
+        String userId = createdBy.substring(0, index);
+        String role = createdBy.substring(index + ROLE_METADATA_DELIMITER.length());
+        return new CreatedByRoleMetadata(userId, role.isBlank() ? null : role);
+    }
+
+    private static final class CreatedByRoleMetadata {
+        private final String userId;
+        private final String persistedRole;
+
+        private CreatedByRoleMetadata(String userId, String persistedRole) {
+            this.userId = userId;
+            this.persistedRole = persistedRole;
         }
     }
 }
