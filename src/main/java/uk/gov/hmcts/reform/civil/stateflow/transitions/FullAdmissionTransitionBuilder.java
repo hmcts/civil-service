@@ -64,19 +64,22 @@ public class FullAdmissionTransitionBuilder extends MidTransitionBuilder {
 
             // For lip journeys
             .moveTo(FULL_ADMIT_JUDGMENT_ADMISSION, transitions)
-            .onlyWhen(LipPredicate.ccjRequestJudgmentByAdmission
-                .and(PaymentPredicate.payImmediatelyPartAdmit).and(LipPredicate.isLiPvLiPCase), transitions)
+            .onlyWhen(fullAdmitJudgementAdmission(), transitions)
 
             .moveTo(TAKEN_OFFLINE_BY_STAFF, transitions)
             .onlyWhen(TakenOfflinePredicate.byStaff
                 .and(ClaimantPredicate.beforeResponse).and(not(LipPredicate.ccjRequestJudgmentByAdmission)), transitions)
 
             .moveTo(PAST_APPLICANT_RESPONSE_DEADLINE_AWAITING_CAMUNDA, transitions)
-            .onlyWhen(OutOfTimePredicate.notBeingTakenOffline, transitions)
+            .onlyWhen(OutOfTimePredicate.notBeingTakenOffline.and(not(fullAdmitJudgementAdmission())), transitions)
 
             .moveTo(TAKEN_OFFLINE_SPEC_DEFENDANT_NOC_AFTER_JBA, transitions)
             .onlyWhen(isDefendantNoCOnlineForCase.and(PaymentPredicate.payImmediatelyPartAdmit)
                 .and(TakenOfflinePredicate.isDefendantNoCOnlineForCaseAfterJBA), transitions);
+    }
+
+    private static Predicate<CaseData> fullAdmitJudgementAdmission() {
+        return LipPredicate.ccjRequestJudgmentByAdmission.and(PaymentPredicate.payImmediatelyPartAdmit).and(LipPredicate.isLiPvLiPCase);
     }
 
     public final Predicate<CaseData> isDefendantNoCOnlineForCase = featureToggleService::isDefendantNoCOnlineForCase;
