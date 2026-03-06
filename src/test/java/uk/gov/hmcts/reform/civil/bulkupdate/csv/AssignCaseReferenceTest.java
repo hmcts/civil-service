@@ -12,14 +12,13 @@ class AssignCaseReferenceTest {
 
     @Test
     void shouldPopulateFieldsFromExcelRow() throws Exception {
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
-
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", "12345");
         rowValues.put("userId", "user1");
         rowValues.put("organisationId", "org1");
         rowValues.put("caseRole", "CREATOR");
 
+        AssignCaseReference assignCaseReference = new AssignCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertEquals("12345", assignCaseReference.getCaseReference());
@@ -30,14 +29,13 @@ class AssignCaseReferenceTest {
 
     @Test
     void shouldHandleNullValues() throws Exception {
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
-
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", null);
         rowValues.put("userId", null);
         rowValues.put("organisationId", null);
         rowValues.put("caseRole", null);
 
+        AssignCaseReference assignCaseReference = new AssignCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertNull(assignCaseReference.getCaseReference());
@@ -48,11 +46,10 @@ class AssignCaseReferenceTest {
 
     @Test
     void shouldIgnoreMissingFields() throws Exception {
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
-
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", "99999");
 
+        AssignCaseReference assignCaseReference = new AssignCaseReference();
         assignCaseReference.fromExcelRow(rowValues);
 
         assertEquals("99999", assignCaseReference.getCaseReference());

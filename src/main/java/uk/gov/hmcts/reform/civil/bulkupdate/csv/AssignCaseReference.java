@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonPropertyOrder({"caseReference"})
 @SuppressWarnings("java:S1700")

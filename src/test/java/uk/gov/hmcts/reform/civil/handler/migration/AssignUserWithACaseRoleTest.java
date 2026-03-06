@@ -27,14 +27,13 @@ class AssignUserWithACaseRoleTest {
 
     @Test
     void shouldAssignCaseRoleSuccessfully() {
-        CaseData caseData = CaseData.builder().build();
-
         AssignCaseReference assignCaseReference = new AssignCaseReference();
         assignCaseReference.setCaseReference("12345");
         assignCaseReference.setUserId("user1");
         assignCaseReference.setOrganisationId("org1");
         assignCaseReference.setCaseRole("CREATOR");
 
+        CaseData caseData = CaseData.builder().build();
         assignUserWithACaseRole.migrateCaseData(caseData, assignCaseReference);
 
         verify(coreCaseUserService).assignCase(
