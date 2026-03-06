@@ -216,7 +216,7 @@ task functional(description: 'Runs the functional tests.') {
     runNightlyApiTests, runApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn test, jacocoTestReport
+project.tasks['sonarqube'].dependsOn jacocoTestReport
 
 // excluding controllers from Sonar due to https://tools.hmcts.net/jira/browse/DTSCCI-254
 // https://tools.hmcts.net/jira/browse/DTSCCI-311 ticket to write unit test for each controller
@@ -234,6 +234,8 @@ sonarqube {
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
     property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.branch.cache.enabled", "true"
+    property "sonar.working.directory", "${buildDir}/sonar"
   }
 }
 
