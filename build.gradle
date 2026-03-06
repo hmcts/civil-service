@@ -216,7 +216,7 @@ task functional(description: 'Runs the functional tests.') {
     runNightlyApiTests, runApiTests))
 }
 
-project.tasks['sonarqube'].dependsOn jacocoTestReport
+project.tasks['sonarqube'].dependsOn test, jacocoTestReport
 
 // excluding controllers from Sonar due to https://tools.hmcts.net/jira/browse/DTSCCI-254
 // https://tools.hmcts.net/jira/browse/DTSCCI-311 ticket to write unit test for each controller
