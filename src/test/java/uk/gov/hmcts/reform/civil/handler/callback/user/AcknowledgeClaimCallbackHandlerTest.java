@@ -234,7 +234,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .addApplicant2(YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .addRespondent2(NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -610,8 +610,8 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(NO)
                 .respondent2Represented(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
-                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
+                .respondent1Copy(new PartyBuilder().individual().build())
                 .build();
 
             String respondent2Address = "respondent2 address";
