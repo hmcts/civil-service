@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -170,14 +171,16 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private String getOrgIdCopyIfExists(CaseDetails caseDetails, String caseRole) {
-        if (!isApplicant(caseRole)) {
-            if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
-                return objectMapper.convertValue(caseDetails.getData().get(
-                    "respondent1OrganisationIDCopy"), String.class);
-            } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                return objectMapper.convertValue(caseDetails.getData().get(
-                    "respondent2OrganisationIDCopy"), String.class);
-            }
+        if (isApplicant(caseRole)) {
+            return null;
+        }
+        if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+            return objectMapper.convertValue(caseDetails.getData().get(
+                "respondent1OrganisationIDCopy"), String.class);
+        }
+        if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+            return objectMapper.convertValue(caseDetails.getData().get(
+                "respondent2OrganisationIDCopy"), String.class);
         }
         return null;
     }
@@ -191,12 +194,15 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
     }
 
     private String getFormerEmail(String caseRole, CaseData caseData) {
-        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
-            && caseData.getApplicantSolicitor1UserDetails() != null) {
-            return caseData.getApplicantSolicitor1UserDetails().getEmail();
-        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
+        if (caseRole.equals(CaseRole.APPLICANTSOLICITORONE.getFormattedName())) {
+            return Optional.ofNullable(caseData.getApplicantSolicitor1UserDetails())
+                .map(uk.gov.hmcts.reform.civil.model.IdamUserDetails::getEmail)
+                .orElse(null);
+        }
+        if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
             return caseData.getRespondentSolicitor1EmailAddress();
-        } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
+        }
+        if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
             return caseData.getRespondentSolicitor2EmailAddress();
         }
         return null;
@@ -231,24 +237,17 @@ public class ApplyNoticeOfChangeDecisionCallbackHandler extends CallbackHandler 
      * @return string of org to remove id
      */
     public String getChangedOrg(CaseData caseData, ChangeOrganisationRequest request) {
-        String caseRole = request.getCaseRoleId().getValue().getCode();
-        if (request.getOrganisationToRemove() == null) {
-            if (!isApplicant(caseRole)) {
-                if (caseRole.equals(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())) {
-                    String respondent1OrganisationIDCopy = caseData.getRespondent1OrganisationIDCopy();
-                    if (respondent1OrganisationIDCopy != null) {
-                        return respondent1OrganisationIDCopy;
-                    }
-                } else if (caseRole.equals(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName())) {
-                    String respondent2OrganisationIDCopy = caseData.getRespondent2OrganisationIDCopy();
-                    if (respondent2OrganisationIDCopy != null) {
-                        return respondent2OrganisationIDCopy;
-                    }
-                }
-            }
-        } else {
+        if (request.getOrganisationToRemove() != null) {
             return request.getOrganisationToRemove().getOrganisationID();
         }
+
+        String caseRole = request.getCaseRoleId().getValue().getCode();
+        if (CaseRole.RESPONDENTSOLICITORONE.getFormattedName().equals(caseRole)) {
+            return caseData.getRespondent1OrganisationIDCopy();
+        } else if (CaseRole.RESPONDENTSOLICITORTWO.getFormattedName().equals(caseRole)) {
+            return caseData.getRespondent2OrganisationIDCopy();
+        }
+
         return null;
     }
 }
