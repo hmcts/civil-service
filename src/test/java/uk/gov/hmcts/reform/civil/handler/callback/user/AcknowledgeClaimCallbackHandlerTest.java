@@ -207,7 +207,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("No");
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
         }
 
         @Test
@@ -226,7 +226,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("Yes");
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
         }
 
         @Test
@@ -243,7 +243,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .handle(params);
 
             assertThat(response.getErrors()).isNull();
-            assertThat(response.getData().get("isRespondent1")).isEqualTo("Yes");
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
         }
 
     }
