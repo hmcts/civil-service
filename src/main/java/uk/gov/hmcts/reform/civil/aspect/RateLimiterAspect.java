@@ -92,12 +92,13 @@ public class RateLimiterAspect {
         };
         for (String header : headers) {
             String value = request.getHeader(header);
+            log.info("value for header : {} is :{} ", header, value);
             if (value != null && !StringUtils.isEmpty(value) && !"unknown".equalsIgnoreCase(value)) {
                 log.info("ipAddress for header {} is : {} ", header, value);
                 return value.split(",")[0].trim();
             }
         }
-        log.info("ipAddress outside is : {} ", request.getRemoteAddr());
+        log.info("ipAddress request.getRemoteAddr() is : {} ", request.getRemoteAddr());
         return request.getRemoteAddr();
     }
 }
