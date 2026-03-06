@@ -13,9 +13,11 @@ import uk.gov.hmcts.reform.civil.callback.CaseEvent;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +36,21 @@ public class ManageStayCallbackHandler extends CallbackHandler {
     private static final List<CaseEvent> EVENTS = List.of(MANAGE_STAY);
 
     private final FeatureToggleService featureToggleService;
+    private final DeadlinesCalculator deadlinesCalculator;
 
     private static final String HEADER_CONFIRMATION_LIFT_STAY = "# You have lifted the stay from this \n\n # case \n\n ## All parties have been notified";
     private static final String HEADER_CONFIRMATION_REQUEST_UPDATE = "# You have requested an update on \n\n # this case \n\n ## All parties have been notified";
     private static final String BODY_CONFIRMATION = "&nbsp;";
     private static final String LIFT_STAY = "LIFT_STAY";
-    private static final String REQUEST_UPDATE = "REQUEST_UPDATE";
 
     private static final Map<String, CaseState> STATE_MAP = Map.of(
         CaseState.IN_MEDIATION.name(), CaseState.JUDICIAL_REFERRAL,
         CaseState.JUDICIAL_REFERRAL.name(), CaseState.JUDICIAL_REFERRAL,
         CaseState.CASE_PROGRESSION.name(), CaseState.CASE_PROGRESSION,
         CaseState.HEARING_READINESS.name(), CaseState.CASE_PROGRESSION,
-        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION
+        CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING.name(), CaseState.CASE_PROGRESSION,
+        CaseState.DECISION_OUTCOME.name(), CaseState.CASE_PROGRESSION,
+        CaseState.All_FINAL_ORDERS_ISSUED.name(), CaseState.CASE_PROGRESSION
     );
 
     private final ObjectMapper mapper;
@@ -80,15 +84,18 @@ public class ManageStayCallbackHandler extends CallbackHandler {
 
     private CallbackResponse manageStay(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        CaseState newState = nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)
-            ? STATE_MAP.getOrDefault(caseData.getPreStayState(), caseData.getCcdState())
-            : caseData.getCcdState();
-        caseData.setBusinessProcess(BusinessProcess.ready(
-            LIFT_STAY.equals(caseData.getManageStayOption()) ? STAY_LIFTED : STAY_UPDATE_REQUESTED
-        ));
-        caseData.setManageStayUpdateRequestDate(
-            REQUEST_UPDATE.equals(caseData.getManageStayOption()) ? LocalDate.now() : null
-        );
+        CaseState newState;
+        if (nonNull(caseData.getManageStayOption()) && caseData.getManageStayOption().equals(LIFT_STAY)) {
+            newState = STATE_MAP.getOrDefault(caseData.getPreStayState(), CaseState.valueOf(caseData.getPreStayState()));
+            caseData.setBusinessProcess(BusinessProcess.ready(STAY_LIFTED));
+            caseData.setManageStayUpdateRequestDate(null);
+            updateDeadlinesAfterLiftingStay(caseData);
+            caseData.setCaseStayDate(null);
+        } else {
+            newState = caseData.getCcdState();
+            caseData.setBusinessProcess(BusinessProcess.ready(STAY_UPDATE_REQUESTED));
+            caseData.setManageStayUpdateRequestDate(LocalDate.now());
+        }
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(mapper))
             .state(newState.name())
@@ -112,6 +119,39 @@ public class ManageStayCallbackHandler extends CallbackHandler {
             .confirmationBody(BODY_CONFIRMATION)
             .build();
 
+    }
+
+    private void updateDeadlinesAfterLiftingStay(CaseData caseData) {
+        if (nonNull(caseData.getCaseStayDate())) {
+            long daysSinceCaseStay = ChronoUnit.DAYS.between(caseData.getCaseStayDate(), LocalDate.now());
+
+            CaseState preStayState = CaseState.valueOf(caseData.getPreStayState());
+
+            switch (preStayState) {
+                case AWAITING_RESPONDENT_ACKNOWLEDGEMENT -> {
+                    if (nonNull(caseData.getRespondent1ResponseDeadline())) {
+                        caseData.setRespondent1ResponseDeadline(
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getRespondent1ResponseDeadline(), daysSinceCaseStay)
+                        );
+                    }
+                    if (nonNull(caseData.getRespondent2ResponseDeadline())) {
+                        caseData.setRespondent2ResponseDeadline(
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getRespondent2ResponseDeadline(), daysSinceCaseStay)
+                        );
+                    }
+                }
+                case AWAITING_APPLICANT_INTENTION -> {
+                    if (nonNull(caseData.getApplicant1ResponseDeadline())) {
+                        caseData.setApplicant1ResponseDeadline(
+                            deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getApplicant1ResponseDeadline(), daysSinceCaseStay)
+                        );
+                    }
+                }
+                default -> {
+
+                }
+            }
+        }
     }
 
 }
