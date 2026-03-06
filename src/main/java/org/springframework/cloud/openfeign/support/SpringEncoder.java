@@ -54,6 +54,16 @@ public class SpringEncoder implements Encoder {
         this.legacyConvertersFactory = null;
     }
 
+    public SpringEncoder(SpringFormEncoder springFormEncoder,
+                         ObjectFactory<?> converters,
+                         FeignEncoderProperties encoderProperties,
+                         ObjectProvider<?> ignoredCustomizerProvider) {
+        this.springFormEncoder = springFormEncoder;
+        this.encoderProperties = encoderProperties;
+        this.convertersProvider = null;
+        this.legacyConvertersFactory = converters;
+    }
+
     public SpringEncoder(ObjectFactory<?> converters) {
         this.springFormEncoder = new SpringFormEncoder();
         this.encoderProperties = new FeignEncoderProperties();
