@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.CertificateOfService;
 import uk.gov.hmcts.reform.civil.model.DocumentWithRegex;
 import uk.gov.hmcts.reform.civil.model.ServedDocumentFiles;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
+import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
@@ -44,7 +45,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -93,7 +93,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     private ExitSurveyContentService exitSurveyContentService;
 
     @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
@@ -111,7 +111,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertTrue(response.getData().containsKey("defendantSolicitorNotifyClaimDetailsOptions"));
+            assertThat(response.getData()).containsKey("defendantSolicitorNotifyClaimDetailsOptions");
         }
 
         @Test
@@ -127,7 +127,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             List<String> optionLabels = updatedData.getDefendantSolicitorNotifyClaimDetailsOptions().getListItems()
                 .stream()
-                .map(item -> item.getLabel())
+                .map(DynamicListElement::getLabel)
                 .toList();
 
             assertThat(optionLabels).contains("Defendant Two: " + caseData.getRespondent2().getPartyName());
@@ -146,7 +146,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             List<String> optionLabels = updatedData.getDefendantSolicitorNotifyClaimDetailsOptions().getListItems()
                 .stream()
-                .map(item -> item.getLabel())
+                .map(DynamicListElement::getLabel)
                 .toList();
 
             assertThat(optionLabels).noneMatch(label -> label.startsWith("Defendant Two: "));
@@ -157,8 +157,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
     class MidEventValidateOptionsCallback {
 
         private static final String PAGE_ID = "validateNotificationOption";
-        public static final String WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR =
-            "Your claim will progress offline if you only notify one Defendant of the claim details.";
 
         @Test
         void shouldThrowWarning_whenNotifyingOnlyOneRespondentSolicitor() {
@@ -169,7 +167,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+            assertThat(response.getWarnings()).contains(NotifyClaimDetailsCallbackHandler.WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
         @Test
@@ -190,7 +188,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
-            assertThat(response.getWarnings()).contains(WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
+            assertThat(response.getWarnings()).contains(NotifyClaimDetailsCallbackHandler.WARNING_ONLY_NOTIFY_ONE_DEFENDANT_SOLICITOR);
         }
 
         @Test
@@ -406,8 +404,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getCosNotifyClaimDetails1()
-                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
-            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
+                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED")).isTrue();
+            assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(1);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(2));
             assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
@@ -435,8 +433,8 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
             assertThat(updatedData.getCosNotifyClaimDetails2()
-                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED"));
-            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(1);
+                           .getCosSenderStatementOfTruthLabel().contains("CERTIFIED")).isTrue();
+            assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(1);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getNextDeadline()).isEqualTo(newDate.minusDays(2).toLocalDate());
             assertThat(updatedData.getClaimDetailsNotificationDate()).isEqualTo(time.now());
@@ -462,7 +460,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(2);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
@@ -480,10 +478,6 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .thenReturn(newDate.minusDays(3));
             when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
                 .thenReturn(newDate.minusDays(2));
-            when(deadlinesCalculator.plus14DaysDeadline(cos1Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(3));
-            when(deadlinesCalculator.plus14DaysDeadline(cos2Date.atTime(15, 05)))
-                    .thenReturn(newDate.minusDays(2));
 
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified_1v2_andNotifyBothCoS()
@@ -493,7 +487,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = mapper.convertValue(response.getData(), CaseData.class);
 
-            assertThat(updatedData.getServedDocumentFiles().getOther().size()).isEqualTo(2);
+            assertThat(updatedData.getServedDocumentFiles().getOther()).hasSize(2);
             assertThat(updatedData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getCosNotifyClaimDetails2().getCosDocSaved()).isEqualTo(YES);
             assertThat(updatedData.getRespondent1ResponseDeadline()).isEqualTo(newDate.minusDays(3));
@@ -761,7 +755,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(2);
+            assertThat(successResponse.getErrors()).hasSize(2);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
 
@@ -783,7 +777,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(2);
+            assertThat(successResponse.getErrors()).hasSize(2);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
 
@@ -804,7 +798,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails2");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors()).hasSize(1);
         }
 
         @Test
@@ -902,7 +896,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors()).hasSize(1);
         }
 
         @Test
@@ -923,7 +917,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors()).hasSize(1);
             assertThat(successResponse.getErrors()).contains(DATE_OF_SERVICE_DATE_OLDER_THAN_14DAYS);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
@@ -946,7 +940,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors()).hasSize(1);
             assertThat(successResponse.getErrors()).contains(DATE_OF_SERVICE_DATE_IS_WORKING_DAY);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
@@ -969,7 +963,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
             CallbackParams params = callbackParamsOf(caseData, MID, "validateCosNotifyClaimDetails1");
             AboutToStartOrSubmitCallbackResponse successResponse =
                 (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(successResponse.getErrors().size()).isEqualTo(1);
+            assertThat(successResponse.getErrors()).hasSize(1);
             assertThat(successResponse.getErrors()).contains(DATE_OF_SERVICE_NOT_GREATER_THAN_2_WORKING_DAYS);
             assertThat(params.getCaseData().getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(NO);
         }
@@ -1047,7 +1041,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnFalseForConfirmationForLip_whenBothLipFlagsAreNo() {
-            boolean confirmationForLip = (boolean) ReflectionTestUtils.invokeMethod(
+            boolean confirmationForLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isConfirmationForLip",
                 CaseData.builder()
@@ -1061,7 +1055,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnFalseForBothDefendantLip_whenDefendant1LipFlagIsMissing() {
-            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+            boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
                 CaseData.builder()
@@ -1074,7 +1068,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnFalseForBothDefendantLip_whenDefendant2LipFlagIsNo() {
-            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+            boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
                 CaseData.builder()
@@ -1088,7 +1082,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnFalseForBothDefendantLip_whenDefendant2LipFlagIsMissing() {
-            boolean bothDefendantLip = (boolean) ReflectionTestUtils.invokeMethod(
+            boolean bothDefendantLip = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantLip",
                 CaseData.builder()
@@ -1102,7 +1096,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnFalseForSameDateOfService_whenOnlyDefendant1CosExists() {
             LocalDate today = LocalDate.now();
-            boolean sameDateOfService = (boolean) ReflectionTestUtils.invokeMethod(
+            boolean sameDateOfService = ReflectionTestUtils.invokeMethod(
                 handler,
                 "isBothDefendantWithSameDateOfService",
                 CaseData.builder()
@@ -1124,7 +1118,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .cosNotifyClaimDetails2(new CertificateOfService())
                 .build();
 
-            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+            LocalDateTime earliestDate = ReflectionTestUtils.invokeMethod(
                 handler,
                 "getEarliestDateOfService",
                 caseData
@@ -1148,7 +1142,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .setCosDateDeemedServedForDefendant(defendant2DeemedDate))
                 .build();
 
-            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+            LocalDateTime earliestDate = ReflectionTestUtils.invokeMethod(
                 handler,
                 "getEarliestDateOfService",
                 caseData
@@ -1172,7 +1166,7 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                                             .setCosDateDeemedServedForDefendant(defendant2DeemedDate))
                 .build();
 
-            LocalDateTime earliestDate = (LocalDateTime) ReflectionTestUtils.invokeMethod(
+            LocalDateTime earliestDate = ReflectionTestUtils.invokeMethod(
                 handler,
                 "getEarliestDateOfService",
                 caseData
@@ -1196,16 +1190,16 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .servedDocumentFiles(null)
                 .build();
 
-            CaseData updatedCaseData = (CaseData) ReflectionTestUtils.invokeMethod(
+            ReflectionTestUtils.invokeMethod(
                 handler,
                 "saveCoSDetailsDoc",
                 caseData,
                 1
             );
 
-            assertThat(updatedCaseData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
-            assertThat(updatedCaseData.getServedDocumentFiles()).isNotNull();
-            assertThat(updatedCaseData.getServedDocumentFiles().getOther()).hasSize(1);
+            assertThat(caseData.getCosNotifyClaimDetails1().getCosDocSaved()).isEqualTo(YES);
+            assertThat(caseData.getServedDocumentFiles()).isNotNull();
+            assertThat(caseData.getServedDocumentFiles().getOther()).hasSize(1);
         }
     }
 }
