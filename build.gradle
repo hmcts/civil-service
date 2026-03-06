@@ -154,6 +154,8 @@ tasks.withType(JavaCompile) {
 
 test {
   failFast = true
+  // Enable parallel execution within each fork for speed
+  systemProperty 'junit.jupiter.execution.parallel.enabled', 'true'
 }
 
 tasks.withType(Copy) {
@@ -623,6 +625,8 @@ tasks.withType(Test).configureEach { t ->
 
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   jvmArgs '-Xshare:off'
+  // Use Parallel GC for faster, short-lived test forks
+  jvmArgs '-XX:+UseParallelGC'
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"
