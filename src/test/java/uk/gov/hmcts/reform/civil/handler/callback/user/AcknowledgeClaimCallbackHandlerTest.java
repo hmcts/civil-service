@@ -375,6 +375,17 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotThrowNPE_whenRespondent2DeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
         void shouldPopulateRespondent2Flag_WhenInvoked() {
             stubCaseRoles(false, true);
             CaseData caseData = CaseDataBuilder.builder()

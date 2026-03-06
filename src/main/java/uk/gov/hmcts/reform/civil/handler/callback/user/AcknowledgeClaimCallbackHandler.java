@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.MultiPartyScenario;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
@@ -91,9 +92,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
     private CallbackResponse populateRespondentCopyObjects(CallbackParams callbackParams) {
         var caseData = callbackParams.getCaseData();
         caseData.setRespondent1Copy(caseData.getRespondent1());
-        if (ofNullable(caseData.getRespondent2()).isPresent()) {
-            caseData.setRespondent2Copy(caseData.getRespondent2());
-        }
+        ofNullable(caseData.getRespondent2()).ifPresent(caseData::setRespondent2Copy);
 
         // Show an error message if the defendant tries to submit a response again ONE_V_TWO_TWO_LEGAL_REP
         if ((solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORONE)
@@ -106,8 +105,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         }
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
-        if ((multiPartyScenario.equals(ONE_V_ONE) || multiPartyScenario.equals(TWO_V_ONE)
-            || multiPartyScenario.equals(ONE_V_TWO_ONE_LEGAL_REP))
+        if ((List.of(ONE_V_ONE, TWO_V_ONE, ONE_V_TWO_ONE_LEGAL_REP).contains(multiPartyScenario))
             && caseData.getRespondent1AcknowledgeNotificationDate() != null) {
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .errors(List.of(ERROR_DEFENDANT_RESPONSE_SUBMITTED))
@@ -148,8 +146,12 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         applyCopiedRespondentAddresses(caseData);
         setRespondent2DocumentGenerationUser(caseData, userInfo);
 
-        LocalDateTime respondent1NewDeadline = deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent1ResponseDeadline());
-        LocalDateTime respondent2NewDeadline = deadlinesCalculator.plus14DaysDeadline(caseData.getRespondent2ResponseDeadline());
+        LocalDateTime respondent1NewDeadline = ofNullable(caseData.getRespondent1ResponseDeadline())
+            .map(deadlinesCalculator::plus14DaysDeadline)
+            .orElse(null);
+        LocalDateTime respondent2NewDeadline = ofNullable(caseData.getRespondent2ResponseDeadline())
+            .map(deadlinesCalculator::plus14DaysDeadline)
+            .orElse(null);
 
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
         boolean isRespondent2Solicitor = solicitorRepresentsOneOrBothRespondents(callbackParams, RESPONDENTSOLICITORTWO);
@@ -261,7 +263,7 @@ public class AcknowledgeClaimCallbackHandler extends CallbackHandler {
         if (getMultiPartyScenario(caseData) == MultiPartyScenario.ONE_V_TWO_TWO_LEGAL_REP) {
             caseData.setNextDeadline(deadlinesCalculator.nextDeadline(Arrays.asList(respondent1Deadline, respondent2Deadline)).toLocalDate());
             caseData.setCaseListDisplayDefendantSolicitorReferences(getAllDefendantSolicitorReferences(
-                caseData.getSolicitorReferences() != null ? caseData.getSolicitorReferences().getRespondentSolicitor1Reference() : null,
+                ofNullable(caseData.getSolicitorReferences()).map(SolicitorReferences::getRespondentSolicitor1Reference).orElse(null),
                 caseData.getRespondentSolicitor2Reference()));
         } else {
             // Other scenarios have one effective respondent deadline at this stage.
