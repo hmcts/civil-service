@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.notify.NotificationService;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
@@ -29,9 +30,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
@@ -95,6 +98,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             when(configuration.getWelshOpeningHours()).thenReturn((String) configMap.get("welshOpeningHours"));
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
         }
 
@@ -168,6 +172,48 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                             .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
                             .build())
                     .build();
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyDefendantSolicitor2Defendants_whenInvokedAndAddRespondent2IsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .addRespondent2(null)
+                    .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verifyNoInteractions(notificationService);
+        }
+
+        @Test
+        void shouldNotNotifyDefendantSolicitor2Defendants_whenDefendant2NotRequested() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build().toBuilder()
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Someone Else")
+                                                             .build())
+                                              .build())
+                    .build();
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .build())
+                    .build();
+
             handler.handle(params);
 
             verifyNoInteractions(notificationService);
@@ -249,6 +295,219 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     any(),
                     any()
             );
+        }
+
+        @Test
+        void shouldNotifyRespondent1Lip_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .build().toBuilder()
+                    .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
+                    .respondent1Represented(NO)
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Mr. Sole Trader")
+                                                             .build())
+                                              .build())
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    eq("sole.trader@email.com"),
+                    eq("template-id-sdo"),
+                    argThat(map -> "Mr. Sole Trader".equals(map.get("legalOrgName"))),
+                    eq("sdo-dj-order-notification-defendant-000DC001")
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent2_whenScenarioIsOneVTwoOneLegalRep() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v2AndSameRepresentative()
+                    .atStateClaimDetailsNotified_1v2_andNotifyOnlyOneSolicitor()
+                    .build().toBuilder()
+                    .respondent2SameLegalRepresentative(YES)
+                    .respondent1EmailAddress("respondentsolicitor@example.com")
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Mr. John Rambo")
+                                                             .build())
+                                              .build())
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    eq("respondentsolicitor@example.com"),
+                    eq("template-id-sdo"),
+                    anyMap(),
+                    eq("sdo-dj-order-notification-defendant-000DC001")
+            );
+        }
+
+        @Test
+        void shouldNotifyRespondent2Lip_whenInvoked() {
+            when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build().toBuilder()
+                    .addRespondent2(YES)
+                    .respondent2Represented(NO)
+                    .respondent2(uk.gov.hmcts.reform.civil.model.Party.builder()
+                                         .type(uk.gov.hmcts.reform.civil.model.Party.Type.INDIVIDUAL)
+                                         .individualFirstName("John")
+                                         .individualLastName("Rambo")
+                                         .partyName("Mr. John Rambo")
+                                         .partyEmail("rambo@email.com")
+                                         .build())
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Both Defendants")
+                                                             .build())
+                                              .build())
+                    .respondent2OrganisationPolicy(null)
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    eq("rambo@email.com"),
+                    eq("template-id-sdo"),
+                    anyMap(),
+                    eq("sdo-dj-order-notification-defendant-000DC001")
+            );
+        }
+
+        @Test
+        void shouldReturnRespondent1Name_whenOrganisationNotFound() {
+            when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .build().toBuilder()
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Mr. Sole Trader")
+                                                             .build())
+                                              .build())
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    anyString(),
+                    anyString(),
+                    argThat(map -> "Mr. Sole Trader".equals(map.get("legalOrgName"))),
+                    anyString()
+            );
+        }
+
+        @Test
+        void shouldReturnRespondent2Name_whenOrganisationNotFound() {
+            when(organisationService.findOrganisationById(anyString()))
+                    .thenReturn(Optional.empty());
+
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                    .build().toBuilder()
+                    .respondent2OrganisationPolicy(null)
+                    .defendantDetails(uk.gov.hmcts.reform.civil.model.common.DynamicList.builder()
+                                              .value(uk.gov.hmcts.reform.civil.model.common.DynamicListElement.builder()
+                                                             .label("Mr. John Rambo")
+                                                             .build())
+                                              .build())
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT2.name())
+                            .caseDetails(CaseDetails.builder().id(123L).build())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+
+            verify(notificationService).sendMail(
+                    anyString(),
+                    anyString(),
+                    argThat(map -> "Mr. John Rambo".equals(map.get("legalOrgName"))),
+                    anyString()
+            );
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckIfBothDefendantsAndRespondent1NotRepresented() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimIssued1v1UnrepresentedDefendant()
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .build())
+                    .build();
+
+            handler.handle(params);
+            verify(notificationService, times(0)).sendMail(any(), any(), any(), any());
+        }
+
+        @Test
+        void shouldReturnFalse_whenCheckDefendantRequestedAndDefendantDetailsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                    .atStateClaimDetailsNotified()
+                    .build();
+
+            CallbackParams params = CallbackParamsBuilder.builder()
+                    .of(ABOUT_TO_SUBMIT, caseData)
+                    .request(CallbackRequest.builder()
+                            .eventId(NOTIFY_DIRECTION_ORDER_DJ_DEFENDANT.name())
+                            .build())
+                    .build();
+
+            assertThrows(NullPointerException.class, () -> handler.handle(params));
+            verifyNoInteractions(notificationService);
         }
 
         @Test
