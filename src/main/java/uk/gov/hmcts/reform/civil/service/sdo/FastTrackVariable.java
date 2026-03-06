@@ -26,7 +26,8 @@ public enum FastTrackVariable {
     TRIAL_DATE_TO_TOGGLE(caseData -> caseData.getFastTrackHearingTime() != null
         && caseData.getFastTrackHearingTime().getDateToToggle() != null),
     WELSH_TOGGLE(caseData -> caseData.getSdoR2FastTrackUseOfWelshToggle() != null),
-    TRIAL_BUNDLE_TOGGLE(caseData -> caseData.getFastTrackTrialBundleToggle() != null);
+    TRIAL_BUNDLE_TOGGLE(caseData -> caseData.getFastTrackTrialBundleToggle() != null),
+    PENAL_NOTICE_TOGGLE(caseData -> caseData.getFastTrackPenalNoticeToggle() != null);
 
     private final Predicate<CaseData> predicate;
 
