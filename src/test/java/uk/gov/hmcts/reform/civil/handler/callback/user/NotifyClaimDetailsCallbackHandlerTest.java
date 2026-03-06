@@ -369,11 +369,12 @@ class NotifyClaimDetailsCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotSetRespondentDeadlines_whenRespondent1MissingAndRespondent2NotAdded() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
-            LocalDateTime originalAddLegalRepDeadlineRes1 = caseData.getAddLegalRepDeadlineRes1();
             caseData.setRespondent1(null);
             caseData.setRespondent2(PartyBuilder.builder().individual().build());
             caseData.setAddRespondent2(NO);
             caseData.setDefendant1LIPAtClaimIssued(YES);
+
+            LocalDateTime originalAddLegalRepDeadlineRes1 = caseData.getAddLegalRepDeadlineRes1();
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
