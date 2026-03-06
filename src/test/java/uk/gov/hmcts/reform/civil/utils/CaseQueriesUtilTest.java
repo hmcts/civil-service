@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -296,6 +297,26 @@ class CaseQueriesUtilTest {
         List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "3");
 
         assertThat(roles).containsOnly(CaseRole.RESPONDENTSOLICITORTWO.toString());
+    }
+
+    @Test
+    void shouldReturnPersistedRole_whenUserNoLongerHasCaseRole() {
+        CaseMessage applicantMsg = new CaseMessage();
+        applicantMsg.setId("4");
+        applicantMsg.setCreatedBy("user" + CaseQueriesUtil.ROLE_METADATA_DELIMITER
+            + CaseRole.APPLICANTSOLICITORONE.getFormattedName());
+        CaseQueriesCollection queries = new CaseQueriesCollection();
+        queries.setCaseMessages(wrapElements(applicantMsg));
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        caseData.setCcdCaseReference(1L);
+        caseData.setQueries(queries);
+
+        when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(Collections.emptyList());
+
+        List<String> roles = CaseQueriesUtil.getUserRoleForQuery(caseData, coreCaseUserService, "4");
+
+        assertThat(roles).containsExactly(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
     }
 
     @Test
