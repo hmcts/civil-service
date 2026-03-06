@@ -9,6 +9,8 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ExternalTaskData;
 import uk.gov.hmcts.reform.civil.exceptions.InvalidCaseDataException;
@@ -27,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.utils.CaseDataContentConverter.caseDataC
 public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHandler {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final CaseDetailsConverter caseDetailsConverter;
     private final ObjectMapper mapper;
     private final IStateFlowEngine stateFlowEngine;
 
@@ -43,8 +46,21 @@ public class CoscApplicationAfterPaymentTaskHandler extends BaseExternalTaskHand
                 .orElseThrow(() -> new InvalidCaseDataException("The case event was not provided"));
 
             StartEventResponse startEventResponse = coreCaseDataService.startUpdate(civilCaseId, caseEvent);
+            CaseData startEventData = caseDetailsConverter.toCaseData(startEventResponse.getCaseDetails());
+            BusinessProcess businessProcess = startEventData.getBusinessProcess()
+                .updateActivityId(externalTask.getActivityId());
 
-            var data = coreCaseDataService.submitUpdate(civilCaseId, caseDataContentFromStartEventResponse(startEventResponse, Map.of()));
+            if (!businessProcess.hasSameProcessInstanceId(externalTask.getProcessInstanceId())) {
+                businessProcess.updateProcessInstanceId(externalTask.getProcessInstanceId());
+            }
+
+            var data = coreCaseDataService.submitUpdate(
+                civilCaseId,
+                caseDataContentFromStartEventResponse(
+                    startEventResponse,
+                    Map.of("businessProcess", businessProcess)
+                )
+            );
             return new ExternalTaskData().setCaseData(data);
 
         } catch (NumberFormatException ne) {
