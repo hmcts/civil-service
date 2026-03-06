@@ -76,6 +76,7 @@ public abstract class GaDashboardScenarioService {
         return "unknown";
     }
 
+    @SuppressWarnings("java:S1172")
     protected abstract String getScenario(GeneralApplicationCaseData caseData);
 
     protected String getExtraScenario() {
@@ -86,10 +87,12 @@ public abstract class GaDashboardScenarioService {
         return new HashMap<>();
     }
 
+    @SuppressWarnings("java:S1172")
     protected boolean shouldRecordScenario(GeneralApplicationCaseData caseData) {
         return true;
     }
 
+    @SuppressWarnings("java:S1172")
     protected boolean shouldRecordExtraScenario(GeneralApplicationCaseData caseData) {
         return false;
     }

@@ -14,6 +14,16 @@
       "enabled": false
     },
     {
+      "matchPackageNames": [
+        "com.github.hmcts:auth-checker-lib",
+        "com.github.hmcts:payments-java-client",
+        "org.camunda.bpm:camunda-engine-rest-core",
+        "org.camunda.bpm:camunda-external-task-client"
+      ],
+      "matchUpdateTypes": ["minor", "patch"],
+      "enabled": false
+    },
+    {
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "All non-major updates",
       "groupSlug": "all-non-major",

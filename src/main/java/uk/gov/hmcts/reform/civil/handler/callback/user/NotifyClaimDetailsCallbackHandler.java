@@ -32,13 +32,13 @@ import uk.gov.hmcts.reform.civil.validation.interfaces.ParticularsOfClaimValidat
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
@@ -88,8 +88,7 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     public static final String BOTH_CERTIFICATE_SERVED_SAME_DATE =
         "The date of service for defendant 1 and defendant 2 must be the same";
-
-    public static final LocalTime END_OF_BUSINESS_DAY = LocalTime.of(16, 0, 0);
+    private static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
 
     private final ExitSurveyContentService exitSurveyContentService;
     private final ObjectMapper objectMapper;
@@ -119,76 +118,22 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        LocalDateTime notificationDateTime = time.now();
-        final LocalDateTime currentDateTime = notificationDateTime;
+        LocalDateTime callbackReceivedAt = time.now();
         MultiPartyScenario multiPartyScenario = getMultiPartyScenario(caseData);
 
-        caseData = saveCoSDetailsDoc(caseData, 1);
-        caseData = saveCoSDetailsDoc(caseData, 2);
+        saveCoSDetailsDoc(caseData, 1);
+        saveCoSDetailsDoc(caseData, 2);
 
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP && isConfirmationForLip(caseData)) {
-            multiPartyScenario = null;
-        }
-        LocalDate notificationDate = notificationDateTime.toLocalDate();
+        // LiP involvement switches this event to date-based deadlines even in 1v2 two-LR scenarios.
+        boolean useTwoRepAlignedDeadlineFlow = multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP
+            && !isConfirmationForLip(caseData);
 
-        //Set R1 and R2 response deadlines, as both are represented
-        if (multiPartyScenario == ONE_V_TWO_TWO_LEGAL_REP) {
-            caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS));
-            caseData.setClaimDetailsNotificationDate(currentDateTime);
-            LocalDateTime plus14Days = deadlinesCalculator.plus14DaysDeadline(notificationDateTime);
-            caseData.setAddLegalRepDeadlineRes1(plus14Days);
-            caseData.setAddLegalRepDeadlineRes2(plus14Days);
-            caseData.setRespondent1ResponseDeadline(plus14Days);
-            caseData.setRespondent2ResponseDeadline(plus14Days);
-            caseData.setNextDeadline(plus14Days.toLocalDate());
-            caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                6,
-                notificationDate
-            ));
+        if (useTwoRepAlignedDeadlineFlow) {
+            setDeadlinesForFullyRepresentedFlow(caseData, callbackReceivedAt);
         } else {
-            //When CoS Enabled, this will return earlier date of CoS (also applicable for both LiP defendants)
-            //these 2 fields are used for setting Deadlines
-            notificationDateTime = getEarliestDateOfService(caseData);
-            notificationDate = notificationDateTime.toLocalDate();
-
-            caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS));
-            caseData.setClaimDetailsNotificationDate(currentDateTime);
-            caseData.setNextDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime).toLocalDate());
-            caseData.setClaimDismissedDeadline(deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(
-                6,
-                notificationDate
-            ));
-
-            if (Objects.nonNull(caseData.getRespondent1())) {
-                caseData.setRespondent1ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
-            }
-
-            if (Objects.nonNull(caseData.getRespondent1())
-                && NO.equals(caseData.getRespondent1Represented())) {
-                caseData.setAddLegalRepDeadlineRes1(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
-            }
-
-            if (Objects.nonNull(caseData.getRespondent2())
-                && YES.equals(caseData.getAddRespondent2())) {
-                caseData.setRespondent2ResponseDeadline(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
-            }
-
-            if (Objects.nonNull(caseData.getRespondent2())
-                && YES.equals(caseData.getAddRespondent2())
-                && NO.equals(caseData.getRespondent2Represented())) {
-                caseData.setAddLegalRepDeadlineRes2(deadlinesCalculator.plus14DaysDeadline(notificationDateTime));
-            }
-
-            if (areAnyRespondentsLitigantInPerson(caseData))  {
-                if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
-                    caseData.setCosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()));
-                }
-                if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
-                    caseData.setCosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()));
-                }
-            }
+            setDeadlinesFromServiceDateFlow(caseData, callbackReceivedAt);
         }
-        //assign category ids to documents uploaded as part of notify claim details
+        // Assign category IDs to documents uploaded as part of 'notify claim details'.
         assignNotifyParticularOfClaimCategoryIds(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
@@ -196,59 +141,107 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
                 .build();
     }
 
-    private LocalDateTime getEarliestDateOfService(CaseData caseData) {
-        LocalDateTime date = time.now();
-        LocalDateTime deemedDate1 = null;
-        LocalDateTime deemedDate2 = null;
+    // Used when both respondents are represented and receive aligned deadlines from callback time.
+    private void setDeadlinesForFullyRepresentedFlow(CaseData caseData, LocalDateTime callbackReceivedAt) {
+        LocalDateTime plus14Days = deadlinesCalculator.plus14DaysDeadline(callbackReceivedAt);
+        applyCommonNotificationFields(caseData, callbackReceivedAt, plus14Days, callbackReceivedAt.toLocalDate());
 
-        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails1().getCosDateDeemedServedForDefendant())) {
-            deemedDate1 = caseData.getCosNotifyClaimDetails1()
-                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
+        caseData.setAddLegalRepDeadlineRes1(plus14Days);
+        caseData.setAddLegalRepDeadlineRes2(plus14Days);
+        caseData.setRespondent1ResponseDeadline(plus14Days);
+        caseData.setRespondent2ResponseDeadline(plus14Days);
+    }
+
+    // Used when deadlines are based on the earliest deemed service date (including CoS/LiP flows).
+    private void setDeadlinesFromServiceDateFlow(CaseData caseData, LocalDateTime callbackReceivedAt) {
+        LocalDateTime effectiveServiceDateTime = getEarliestDateOfService(caseData);
+        LocalDateTime plus14Days = deadlinesCalculator.plus14DaysDeadline(effectiveServiceDateTime);
+        applyCommonNotificationFields(caseData, callbackReceivedAt, plus14Days, effectiveServiceDateTime.toLocalDate());
+
+        boolean hasRespondent1 = Objects.nonNull(caseData.getRespondent1());
+        boolean hasRespondent2 = Objects.nonNull(caseData.getRespondent2())
+            && YES.equals(caseData.getAddRespondent2());
+
+        if (hasRespondent1) {
+            caseData.setRespondent1ResponseDeadline(plus14Days);
         }
 
-        if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())
-            && Objects.nonNull(caseData.getCosNotifyClaimDetails2().getCosDateDeemedServedForDefendant())) {
-            deemedDate2 = caseData.getCosNotifyClaimDetails2()
-                .getCosDateDeemedServedForDefendant().atTime(time.now().toLocalTime());
+        if (hasRespondent1 && NO.equals(caseData.getRespondent1Represented())) {
+            caseData.setAddLegalRepDeadlineRes1(plus14Days);
         }
 
-        if (deemedDate1 != null && deemedDate2 != null) {
-            return deemedDate1.isBefore(deemedDate2) ? deemedDate1 : deemedDate2;
-        } else if (deemedDate1 != null) {
-            return deemedDate1;
-        } else if (deemedDate2 != null) {
-            return deemedDate2;
-        } else {
-            // If both deemedDate1 and deemedDate2 are null, use the current date and time
-            return date;
+        if (hasRespondent2) {
+            caseData.setRespondent2ResponseDeadline(plus14Days);
+        }
+
+        if (hasRespondent2 && NO.equals(caseData.getRespondent2Represented())) {
+            caseData.setAddLegalRepDeadlineRes2(plus14Days);
+        }
+
+        updateLipStatementOfTruthLabels(caseData);
+    }
+
+    private void applyCommonNotificationFields(
+        CaseData caseData,
+        LocalDateTime callbackReceivedAt,
+        LocalDateTime responseDeadline,
+        LocalDate dismissedDeadlineDate
+    ) {
+        caseData.setBusinessProcess(BusinessProcess.ready(NOTIFY_DEFENDANT_OF_CLAIM_DETAILS));
+        caseData.setClaimDetailsNotificationDate(callbackReceivedAt);
+        caseData.setNextDeadline(responseDeadline.toLocalDate());
+        caseData.setClaimDismissedDeadline(
+            deadlinesCalculator.addMonthsToDateToNextWorkingDayAtMidnight(6, dismissedDeadlineDate)
+        );
+    }
+
+    private void updateLipStatementOfTruthLabels(CaseData caseData) {
+        if (!areAnyRespondentsLitigantInPerson(caseData)) {
+            return;
+        }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
+            caseData.setCosNotifyClaimDetails1(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails1()));
+        }
+        if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
+            caseData.setCosNotifyClaimDetails2(updateStatementOfTruthForLip(caseData.getCosNotifyClaimDetails2()));
         }
     }
 
-    private CaseData saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
-        CertificateOfService cosNotifyClaimDetails;
+    private LocalDateTime getEarliestDateOfService(CaseData caseData) {
+        LocalDateTime currentDateTime = time.now();
+
+        return Stream.of(caseData.getCosNotifyClaimDetails1(), caseData.getCosNotifyClaimDetails2())
+            .filter(Objects::nonNull)
+            .map(CertificateOfService::getCosDateDeemedServedForDefendant)
+            .filter(Objects::nonNull)
+            .map(date -> date.atTime(currentDateTime.toLocalTime()))
+            .min(LocalDateTime::compareTo)
+            .orElse(currentDateTime);
+    }
+
+    private void saveCoSDetailsDoc(CaseData caseData, int lipNumber) {
+        CertificateOfService certificateOfService;
         if (lipNumber == 1) {
-            cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails1();
+            certificateOfService = caseData.getCosNotifyClaimDetails1();
         } else {
-            cosNotifyClaimDetails = caseData.getCosNotifyClaimDetails2();
+            certificateOfService = caseData.getCosNotifyClaimDetails2();
         }
-        if (Objects.nonNull(cosNotifyClaimDetails)) {
-            cosNotifyClaimDetails.setCosDocSaved(YES);
+        if (Objects.nonNull(certificateOfService)) {
+            certificateOfService.setCosDocSaved(YES);
             if (Objects.isNull(caseData.getServedDocumentFiles())) {
                 caseData.setServedDocumentFiles(new ServedDocumentFiles());
             }
             if (Objects.isNull(caseData.getServedDocumentFiles().getOther())) {
                 caseData.getServedDocumentFiles().setOther(new ArrayList<>());
             }
-            List<Document> cosDoc = ElementUtils
-                    .unwrapElements(cosNotifyClaimDetails
+            List<Document> cosDocuments = ElementUtils
+                    .unwrapElements(certificateOfService
                             .getCosEvidenceDocument());
             caseData.getServedDocumentFiles().getOther()
-                    .addAll(cosDoc.stream()
+                    .addAll(cosDocuments.stream()
                             .map(document -> ElementUtils.element(new DocumentWithRegex(document)))
                             .toList());
         }
-        return caseData;
     }
 
     private SubmittedCallbackResponse buildConfirmationWithSolicitorOptions(CallbackParams callbackParams) {
@@ -259,20 +252,8 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
         }
 
         String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
-
-        String confirmationText = getConfirmationBody(caseData);
-
-        String body = format(confirmationText, formattedDeadline)
-                + (isConfirmationForLip(caseData)
-                ? "" : exitSurveyContentService.applicantSurvey());
-
-        return SubmittedCallbackResponse.builder()
-                .confirmationHeader(String.format(
-                        getConfirmationHeader(caseData),
-                        caseData.getLegacyCaseReference()
-                ))
-                .confirmationBody(body)
-                .build();
+        String confirmationBody = format(getConfirmationBody(caseData), formattedDeadline) + getSurveySuffix(caseData);
+        return buildSubmittedConfirmation(caseData, confirmationBody);
     }
 
     private String getConfirmationBody(CaseData caseData) {
@@ -301,18 +282,19 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
         String formattedDeadline = formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT);
+        String confirmationBody = format(getConfirmationBody(caseData), formattedDeadline) + getSurveySuffix(caseData);
+        return buildSubmittedConfirmation(caseData, confirmationBody);
+    }
 
-        String body = format(getConfirmationBody(caseData), formattedDeadline)
-                + (isConfirmationForLip(caseData)
-                ? "" : exitSurveyContentService.applicantSurvey());
-
+    private SubmittedCallbackResponse buildSubmittedConfirmation(CaseData caseData, String confirmationBody) {
         return SubmittedCallbackResponse.builder()
-                .confirmationHeader(String.format(
-                        getConfirmationHeader(caseData),
-                        caseData.getLegacyCaseReference()
-                ))
-                .confirmationBody(body)
-                .build();
+            .confirmationHeader(format(getConfirmationHeader(caseData), caseData.getLegacyCaseReference()))
+            .confirmationBody(confirmationBody)
+            .build();
+    }
+
+    private String getSurveySuffix(CaseData caseData) {
+        return isConfirmationForLip(caseData) ? "" : exitSurveyContentService.applicantSurvey();
     }
 
     private CallbackResponse prepareDefendantSolicitorOptions(CallbackParams callbackParams) {
@@ -358,14 +340,14 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
     private CallbackResponse validateCoSDetailsDefendant1(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        ArrayList<String> errors = new ArrayList<>();
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())) {
             caseData.getCosNotifyClaimDetails1().setCosDocSaved(NO);
         }
 
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils
             .getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails1());
-        errors.addAll(dateValidationErrorMessages);
+
+        ArrayList<String> errors = new ArrayList<>(dateValidationErrorMessages);
 
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails1())
                 && isMandatoryDocMissing(caseData.getCosNotifyClaimDetails1())) {
@@ -380,12 +362,12 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
 
     private CallbackResponse validateCoSDetailsDefendant2(final CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        ArrayList<String> errors = new ArrayList<>();
         if (Objects.nonNull(caseData.getCosNotifyClaimDetails2())) {
             caseData.getCosNotifyClaimDetails2().setCosDocSaved(NO);
         }
         List<String> dateValidationErrorMessages = serviceOfDateValidationMessageUtils.getServiceOfDateValidationMessages(caseData.getCosNotifyClaimDetails2());
-        errors.addAll(dateValidationErrorMessages);
+
+        ArrayList<String> errors = new ArrayList<>(dateValidationErrorMessages);
 
         if (isBothDefendantLip(caseData) && !isBothDefendantWithSameDateOfService(caseData)) {
             errors.add(BOTH_CERTIFICATE_SERVED_SAME_DATE);
@@ -434,27 +416,31 @@ public class NotifyClaimDetailsCallbackHandler extends CallbackHandler implement
             || (YES.equals(caseData.getAddRespondent2()) && (caseData.getRespondent2Represented() == NO));
     }
 
-    static final String PARTICULARS_OF_CLAIM = "particularsOfClaim";
-
     private void assignNotifyParticularOfClaimCategoryIds(CaseData caseData) {
-        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
-                                                      Element::getValue, PARTICULARS_OF_CLAIM
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getServedDocumentFiles().getParticularsOfClaimDocument(),
+            Element::getValue,
+            PARTICULARS_OF_CLAIM
         );
-        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getMedicalReport(),
-                                                      document -> document.getValue().getDocument(),
-                                                      PARTICULARS_OF_CLAIM
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getServedDocumentFiles().getMedicalReport(),
+            document -> document.getValue().getDocument(),
+            PARTICULARS_OF_CLAIM
         );
-        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getScheduleOfLoss(),
-                                                      document -> document.getValue().getDocument(),
-                                                      PARTICULARS_OF_CLAIM
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getServedDocumentFiles().getScheduleOfLoss(),
+            document -> document.getValue().getDocument(),
+            PARTICULARS_OF_CLAIM
         );
-        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getCertificateOfSuitability(),
-                                                      document -> document.getValue().getDocument(),
-                                                      PARTICULARS_OF_CLAIM
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getServedDocumentFiles().getCertificateOfSuitability(),
+            document -> document.getValue().getDocument(),
+            PARTICULARS_OF_CLAIM
         );
-        assignCategoryId.assignCategoryIdToCollection(caseData.getServedDocumentFiles().getOther(),
-                                                      document -> document.getValue().getDocument(),
-                                                      PARTICULARS_OF_CLAIM
+        assignCategoryId.assignCategoryIdToCollection(
+            caseData.getServedDocumentFiles().getOther(),
+            document -> document.getValue().getDocument(),
+            PARTICULARS_OF_CLAIM
         );
     }
 
