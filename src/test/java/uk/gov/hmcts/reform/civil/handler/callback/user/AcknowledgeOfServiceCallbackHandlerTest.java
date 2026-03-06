@@ -138,6 +138,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
         }
 
+        @Test
+        void populateRespondentCopy1_shouldNotThrowNPE_whenDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
+
+            handler.handle(params);
+        }
+
     }
 
     @Nested
@@ -319,6 +330,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(((AboutToStartOrSubmitCallbackResponse) response)
                            .getData().get("respondent1ResponseDeadline"))
                 .hasToString(newDeadline);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1ResponseDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
         }
     }
 

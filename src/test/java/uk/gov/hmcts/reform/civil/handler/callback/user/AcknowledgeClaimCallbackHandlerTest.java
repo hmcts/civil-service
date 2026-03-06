@@ -44,7 +44,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -90,9 +89,6 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private AssignCategoryId assignCategoryId;
-
     @MockBean
     private FeatureToggleService featureToggleService;
 
@@ -101,6 +97,14 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Nested
     class AboutToStartCallback {
+
+        private void stubUserRoles(boolean respondentSolicitorOne, boolean respondentSolicitorTwo) {
+            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE)))
+                .thenReturn(respondentSolicitorOne);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(respondentSolicitorTwo);
+        }
 
         @Test
         void shouldPopulateRespondentCopies_WhenAboutToStartIsInvoked() {
@@ -138,8 +142,7 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
         @Test
         void shouldReturnError_whenRespondentRespondsAgain1v2DifferentLegalRep() {
-            when(userService.getUserInfo(anyString())).thenReturn(UserInfo.builder().uid("uid").build());
-            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).thenReturn(true);
+            stubUserRoles(true, false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -168,6 +171,79 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .containsEntry("respondent1Copy", response.getData().get("respondent1"));
             assertThat(response.getData().get("respondent2Copy")).isNull();
+        }
+
+        @Test
+        void shouldReturnError_whenRespondent2RespondsAgain1v2DifferentLegalRep() {
+            stubUserRoles(false, true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .respondent2OrgRegistered(YES)
+                .respondent2Represented(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).containsExactly("Defendant acknowledgement has already been recorded");
+        }
+
+        @Test
+        void shouldSetIsRespondent1ToNo_whenSolicitorRepresentsRespondent2Only() {
+            stubUserRoles(false, true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondent2OrgRegistered(YES)
+                .respondent2Represented(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "No");
+        }
+
+        @Test
+        void shouldNotReturnError_whenRespondent1AcknowledgeDateIsMissing() {
+            stubUserRoles(true, false);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
+                .respondent2OrgRegistered(YES)
+                .respondent2Represented(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .build();
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
+        }
+
+        @Test
+        void shouldNotReturnError_whenMultiPartyScenarioIsTwoVOneAndNoAcknowledgementExists() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .addApplicant2(YES)
+                .applicant2(PartyBuilder.builder().individual().build())
+                .addRespondent2(NO)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
+
+            AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
+                .handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData()).containsEntry("isRespondent1", "Yes");
         }
 
     }
@@ -249,10 +325,42 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     }
 
     @Nested
+    class MidEventSolicitorReferenceCallback {
+
+        private static final String PAGE_ID = "solicitor-reference";
+
+        @Test
+        void shouldPopulateSolicitorReferenceCopy_whenMidSolicitorReferenceIsInvoked() {
+            SolicitorReferences solicitorReferences = new SolicitorReferences()
+                .setApplicantSolicitor1Reference("app-ref")
+                .setRespondentSolicitor1Reference("resp1-ref")
+                .setRespondentSolicitor2Reference("resp2-ref");
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setSolicitorReferences(solicitorReferences);
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getErrors()).isNull();
+            assertThat(response.getData())
+                .containsEntry("solicitorReferencesCopy", response.getData().get("solicitorReferences"));
+        }
+    }
+
+    @Nested
     class AboutToSubmitCallback {
         private LocalDateTime newDeadline;
         private LocalDateTime nextDeadline;
         private LocalDateTime acknowledgementDate;
+
+        private void stubCaseRoles(boolean respondentSolicitorOne, boolean respondentSolicitorTwo) {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE)))
+                .thenReturn(respondentSolicitorOne);
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO)))
+                .thenReturn(respondentSolicitorTwo);
+        }
 
         @BeforeEach
         void setup() {
@@ -267,11 +375,44 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotThrowNPE_whenRespondent2DeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenBothDeadlinesAreNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1DeadlineIsNull_1v2TwoLegalRep() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
         void shouldPopulateRespondent2Flag_WhenInvoked() {
-            // Given
-            given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+            stubCaseRoles(false, true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -279,19 +420,14 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            // Then
             assertThat(response.getData().get("respondent2DocumentGeneration")).isEqualTo("userRespondent2");
         }
 
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvoked() {
-            // Given
-            given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(true);
+            stubCaseRoles(true, true);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent2(PartyBuilder.builder().individual().build())
@@ -301,31 +437,22 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .respondent2Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            // Then
             assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
-
         }
 
         @Test
         void shouldNotPopulateRespondent2Flag_WhenInvokedNoUser() {
-            // Given
-            given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(false);
-            given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORONE))).willReturn(false);
+            stubCaseRoles(false, false);
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .respondent1Copy(PartyBuilder.builder().individual().build())
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            // When
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
-            // Then
             assertThat(response.getData().get("respondent2DocumentGeneration")).isNull();
-
         }
 
         @Test
@@ -509,6 +636,38 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             assertThat(response.getData())
                 .extracting("nextDeadline").isEqualTo(nextDeadline.toLocalDate().toString());
+        }
+
+        @Test
+        void shouldSetNewResponseDeadlineForRespondent2WithoutCopy_whenInvokedFor1V2DiffSolicitor2() {
+            when(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).thenReturn(true);
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledgedRespondent2()
+                .addRespondent2(YES)
+                .respondent2SameLegalRepresentative(NO)
+                .respondent2Represented(YES)
+                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent1Copy(PartyBuilder.builder().individual().build())
+                .build();
+
+            String respondent2Address = "respondent2 address";
+            caseData.getRespondent2().setPrimaryAddress(AddressBuilder.defaults().addressLine1(respondent2Address).build());
+            SolicitorReferences solicitorReferencesCopy = new SolicitorReferences();
+            solicitorReferencesCopy.setRespondentSolicitor1Reference("abc");
+            caseData.setSolicitorReferencesCopy(solicitorReferencesCopy);
+
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData())
+                .containsEntry("respondent2ResponseDeadline", newDeadline.format(ISO_DATE_TIME))
+                .containsEntry("respondent2AcknowledgeNotificationDate", acknowledgementDate.format(ISO_DATE_TIME));
+            assertThat(response.getData())
+                .extracting("respondent2").extracting("primaryAddress").extracting("AddressLine1")
+                .isEqualTo(respondent2Address);
+            assertThat(response.getData())
+                .extracting("caseListDisplayDefendantSolicitorReferences").isEqualTo("abc, 01234");
         }
 
         @Test
