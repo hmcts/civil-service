@@ -24,7 +24,7 @@ public class SdoDisclosureOfDocumentsFieldsService {
     public void populateFastTrackDisclosureOfDocuments(CaseData caseData) {
         FastTrackDisclosureOfDocuments disclosure = new FastTrackDisclosureOfDocuments()
             .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
-            .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+            .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(2))
             .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
             .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(5))
             .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)

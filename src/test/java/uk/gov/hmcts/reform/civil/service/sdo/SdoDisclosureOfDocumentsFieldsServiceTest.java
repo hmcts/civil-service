@@ -34,10 +34,10 @@ class SdoDisclosureOfDocumentsFieldsServiceTest {
 
     @Test
     void shouldPopulateDisclosureFieldsWithExpectedDates() {
-        LocalDate date4Weeks = LocalDate.of(2024, 9, 1);
+        LocalDate date2Weeks = LocalDate.of(2024, 9, 1);
         LocalDate date5Weeks = LocalDate.of(2024, 9, 8);
         LocalDate date8Weeks = LocalDate.of(2024, 9, 29);
-        when(deadlineService.nextWorkingDayFromNowWeeks(4)).thenReturn(date4Weeks);
+        when(deadlineService.nextWorkingDayFromNowWeeks(2)).thenReturn(date2Weeks);
         when(deadlineService.nextWorkingDayFromNowWeeks(5)).thenReturn(date5Weeks);
         when(deadlineService.nextWorkingDayFromNowWeeks(8)).thenReturn(date8Weeks);
 
@@ -47,7 +47,7 @@ class SdoDisclosureOfDocumentsFieldsServiceTest {
 
         FastTrackDisclosureOfDocuments disclosure = caseData.getFastTrackDisclosureOfDocuments();
         assertThat(disclosure).isNotNull();
-        assertThat(disclosure.getDate1()).isEqualTo(date4Weeks);
+        assertThat(disclosure.getDate1()).isEqualTo(date2Weeks);
         assertThat(disclosure.getDate2()).isEqualTo(date5Weeks);
         assertThat(disclosure.getDate3()).isEqualTo(date8Weeks);
         assertThat(disclosure.getInput1()).isEqualTo(FAST_TRACK_DISCLOSURE_STANDARD_SDO);

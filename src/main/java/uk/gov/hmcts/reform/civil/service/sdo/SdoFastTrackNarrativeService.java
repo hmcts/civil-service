@@ -79,7 +79,7 @@ public class SdoFastTrackNarrativeService {
     private void applyDisclosureOfDocuments(CaseData caseData) {
         caseData.setFastTrackDisclosureOfDocuments((new FastTrackDisclosureOfDocuments())
                                                        .setInput1(FAST_TRACK_DISCLOSURE_STANDARD_SDO)
-                                                       .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(4))
+                                                       .setDate1(sdoDeadlineService.nextWorkingDayFromNowWeeks(2))
                                                        .setInput2(FAST_TRACK_DISCLOSURE_INSPECTION)
                                                        .setDate2(sdoDeadlineService.nextWorkingDayFromNowWeeks(6))
                                                        .setInput3(FAST_TRACK_DISCLOSURE_REQUESTS_WITHIN_SEVEN_DAYS_SDO)

@@ -56,7 +56,7 @@ class SdoFastTrackNarrativeServiceTest {
             .isEqualTo(JUDGES_RECITAL_STATEMENTS_OF_CASE_WITH_COMMA);
         assertThat(caseData.getFastTrackDisclosureOfDocuments())
             .extracting(FastTrackDisclosureOfDocuments::getInput1, FastTrackDisclosureOfDocuments::getDate1)
-            .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(4));
+            .containsExactly(FAST_TRACK_DISCLOSURE_STANDARD_SDO, workingDayBase.plusWeeks(2));
         assertThat(caseData.getSdoR2FastTrackWitnessOfFact().getSdoWitnessDeadlineDate())
             .isEqualTo(calendarBase.plusDays(70));
         assertThat(caseData.getFastTrackSchedulesOfLoss())
