@@ -50,6 +50,16 @@ class PostcodeLookupServiceTest {
     }
 
     @Test
+    void shouldReturnTrueWhenCountryIsWales() {
+        mockConfiguration();
+        String response = "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"CF10 1EP\",\"COUNTRY\":\"Wales\"}}]}";
+        mockExchangeResponse(new ResponseEntity<>(response, HttpStatus.OK));
+
+        assertThat(postcodeLookupService.validatePostCodeForDefendant("CF10 1EP"))
+            .isTrue();
+    }
+
+    @Test
     void shouldReturnFalseWhenPostcodeNotFound() {
         mockConfiguration();
         mockExchangeResponse(new ResponseEntity<>("{}", HttpStatus.NOT_FOUND));

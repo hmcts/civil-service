@@ -15,6 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.enums.dq.Language;
@@ -54,6 +55,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.DEFENDANT_RESPONSE_CUI;
 import static uk.gov.hmcts.reform.civil.enums.AllocatedTrack.MULTI_CLAIM;
 import static uk.gov.hmcts.reform.civil.enums.EventAddedEvents.DEFENDANT_RESPONSE_EVENT;
@@ -108,6 +110,16 @@ class RespondToClaimCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldHandleDefendantResponseCuiEvent() {
         assertThat(handler.handledEvents()).contains(DEFENDANT_RESPONSE_CUI);
+    }
+
+    @Test
+    void shouldReturnNoErrorWhenSubmittedIsInvoked() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+        CallbackResponse response = handler.handle(params);
+
+        assertThat(response).isNotNull();
     }
 
     @Nested
