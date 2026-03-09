@@ -183,6 +183,7 @@ public class CaseData extends CaseDataParent implements MappableObject {
     private  Party applicant1;
     private  Party applicant2;
     private  CorrectEmail applicantSolicitor1CheckEmail;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private  IdamUserDetails applicantSolicitor1UserDetails;
     private  YesOrNo addApplicant2;
     private  YesOrNo addRespondent2;
