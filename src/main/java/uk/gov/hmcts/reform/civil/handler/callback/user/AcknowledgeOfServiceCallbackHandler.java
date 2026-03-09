@@ -159,7 +159,9 @@ public class AcknowledgeOfServiceCallbackHandler extends CallbackHandler impleme
 
         String body = format(
             CONFIRMATION_SUMMARY,
-            formatLocalDateTime(caseData.getRespondent1ResponseDeadline(), DATE_TIME_AT),
+            ofNullable(caseData.getRespondent1ResponseDeadline())
+                .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+                .orElse("N/A"),
             format("/cases/case-details/%s#CaseDocuments", caseData.getCcdCaseReference())
         )
             + exitSurveyContentService.respondentSurvey();
