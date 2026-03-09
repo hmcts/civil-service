@@ -6,12 +6,11 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-/**
- * Helper component for Standard Direction Order DJ email generators.
- * Provides common functionality to reduce code duplication.
- */
 @Component
 public class StandardDirectionOrderDJEmailDTOGeneratorBase {
+
+    protected static final String LEGAL_ORG_NAME = "legalOrgName";
+    protected static final String CLAIM_NUMBER = "claimReferenceNumber";
 
     private final NotificationsProperties notificationsProperties;
 
@@ -19,23 +18,14 @@ public class StandardDirectionOrderDJEmailDTOGeneratorBase {
         this.notificationsProperties = notificationsProperties;
     }
 
-    /**
-     * Gets the email template ID for Standard Direction Order DJ notifications.
-     *
-     * @param caseData the case data
-     * @return the template ID
-     */
     public String getEmailTemplateId(CaseData caseData) {
-        return StandardDirectionOrderDJBaseEmailDTOGenerator.getTemplateId(notificationsProperties);
+        return notificationsProperties.getStandardDirectionOrderDJTemplate();
     }
 
-    /**
-     * Adds the claim reference number to the properties map.
-     *
-     * @param properties the properties map to populate
-     * @param caseData the case data
-     */
     public void addClaimReferenceNumber(Map<String, String> properties, CaseData caseData) {
-        StandardDirectionOrderDJBaseEmailDTOGenerator.addClaimReferenceNumber(properties, caseData);
+        Long caseReference = caseData.getCcdCaseReference();
+        if (caseReference != null) {
+            properties.put(CLAIM_NUMBER, caseReference.toString());
+        }
     }
 }

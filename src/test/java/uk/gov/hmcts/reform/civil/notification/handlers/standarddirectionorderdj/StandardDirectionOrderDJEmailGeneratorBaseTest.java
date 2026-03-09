@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("common-java:DuplicatedBlocks")
 abstract class StandardDirectionOrderDJEmailGeneratorBaseTest<T> {
 
     protected static final String TEMPLATE_ID = "template-id";
