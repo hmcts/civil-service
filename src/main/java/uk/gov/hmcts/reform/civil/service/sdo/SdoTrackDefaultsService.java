@@ -62,6 +62,13 @@ public class SdoTrackDefaultsService {
             caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
             caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
         }
+        else {
+            caseData.setSmallClaimsPenalNotice(null);
+            caseData.setFastTrackPenalNotice(null);
+            caseData.setSmallClaimsPenalNoticeToggle(null);
+            caseData.setFastTrackPenalNoticeToggle(null);
+            caseData.setSmallClaimsHousingDisrepair(null);
+        }
     }
 
     private void populatePpiFields(CaseData caseData) {
