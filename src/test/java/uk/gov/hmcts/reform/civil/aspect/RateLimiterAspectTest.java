@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import uk.gov.hmcts.reform.civil.service.RateLimiterService;
@@ -125,6 +126,32 @@ class RateLimiterAspectTest {
         assertNull(result);
         verify(response).setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
         assertTrue(stringWriter.toString().contains("Rate limit exceeded"));
+        verifyNoMoreInteractions(joinPoint);
+    }
+
+    @Test
+    void shouldHandleMissingResponseGracefullyWhenRateLimitExceeded() throws Throwable {
+        // given
+        Method method = TestController.class.getMethod("limitedEndpoint");
+
+        when(methodSignature.getMethod()).thenReturn(method);
+        when(request.getRemoteAddr()).thenReturn("10.10.10.10");
+        when(request.getRequestURI()).thenReturn("/no-response");
+        when(rateLimiterService.allowRequest("10.10.10.10", 5, 60))
+            .thenReturn(false);
+        when(request.getHeaderNames())
+            .thenReturn(Collections.enumeration(Collections.emptyList()));
+
+        RequestContextHolder.setRequestAttributes(
+            new ServletRequestAttributes(request)
+        );
+
+        // when
+        Object result = aspect.checkRateLimit(joinPoint);
+
+        // then
+        assertNull(result);
+        verifyNoInteractions(response);
         verifyNoMoreInteractions(joinPoint);
     }
 
