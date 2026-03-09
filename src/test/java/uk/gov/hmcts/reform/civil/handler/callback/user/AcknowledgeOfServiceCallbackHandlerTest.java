@@ -138,6 +138,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
             Assertions.assertEquals(errors, ((AboutToStartOrSubmitCallbackResponse) response).getErrors());
         }
 
+        @Test
+        void populateRespondentCopy1_shouldNotThrowNPE_whenDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_START);
+
+            handler.handle(params);
+        }
+
     }
 
     @Nested
@@ -320,6 +331,17 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                            .getData().get("respondent1ResponseDeadline"))
                 .hasToString(newDeadline);
         }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1ResponseDeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateClaimDetailsNotified()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
     }
 
     @Nested
@@ -352,6 +374,34 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
 
+        @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .legacyCaseReference("000MC001")
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String body = format(
+                CONFIRMATION_SUMMARY,
+                "N/A",
+                format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+            ) + exitSurveyContentService.respondentSurvey();
+
+            // Then
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format(
+                        "# You have acknowledged the claim%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
+                    .confirmationBody(body)
+                    .build());
+        }
     }
 
     private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
