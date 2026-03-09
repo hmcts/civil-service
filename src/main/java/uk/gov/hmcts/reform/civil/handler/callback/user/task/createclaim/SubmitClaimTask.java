@@ -262,7 +262,7 @@ public class SubmitClaimTask {
             caseData.setApplicantSolicitor1UserDetails(idam);
         } else {
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
-            idam.setEmail(applicantSolicitor1UserDetails.getEmail());
+            idam.setEmail(applicantSolicitor1UserDetails != null ? applicantSolicitor1UserDetails.getEmail() : null);
             caseData.setApplicantSolicitor1UserDetails(idam);
         }
 

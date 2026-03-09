@@ -324,7 +324,6 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CorrectEmail correctEmail = new CorrectEmail();
         correctEmail.setEmail(userDetails.getEmail());
         caseData.setApplicantSolicitor1CheckEmail(correctEmail);
-        caseData.setApplicantSolicitor1UserDetails(new IdamUserDetails());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -348,8 +347,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         CaseData caseData = callbackParams.getCaseData();
 
         if (!caseData.getApplicantSolicitor1CheckEmail().isCorrect()) {
+            IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
+            String email = userDetails != null ? userDetails.getEmail() : null;
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validateEmailService.validate(caseData.getApplicantSolicitor1UserDetails().getEmail()))
+                .errors(validateEmailService.validate(email))
                 .build();
         }
 
@@ -619,7 +620,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
             IdamUserDetails applicantSolicitor1UserDetails = caseData.getApplicantSolicitor1UserDetails();
             IdamUserDetails  idamUserDetails = new IdamUserDetails();
             idamUserDetails.setId(userDetails.getId());
-            idamUserDetails.setEmail(applicantSolicitor1UserDetails.getEmail());
+            idamUserDetails.setEmail(applicantSolicitor1UserDetails != null ? applicantSolicitor1UserDetails.getEmail() : null);
             caseData.setApplicantSolicitor1UserDetails(idamUserDetails);
         }
 

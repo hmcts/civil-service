@@ -275,7 +275,6 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         correctEmail.setEmail(userDetails.getEmail());
         CaseData caseData = callbackParams.getCaseData();
         caseData.setApplicantSolicitor1CheckEmail(correctEmail);
-        caseData.setApplicantSolicitor1UserDetails(new IdamUserDetails());
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -288,8 +287,10 @@ public class CreateClaimSpecCallbackHandler extends CallbackHandler implements P
         CaseData caseData = callbackParams.getCaseData();
 
         if (!caseData.getApplicantSolicitor1CheckEmail().isCorrect()) {
+            IdamUserDetails userDetails = caseData.getApplicantSolicitor1UserDetails();
+            String email = userDetails != null ? userDetails.getEmail() : null;
             return AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(validateEmailService.validate(caseData.getApplicantSolicitor1UserDetails().getEmail()))
+                .errors(validateEmailService.validate(email))
                 .build();
         }
 
