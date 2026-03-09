@@ -375,6 +375,42 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldNotThrowNPE_whenRespondent2DeadlineIsNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenBothDeadlinesAreNull() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
+        void shouldNotThrowNPE_whenRespondent1DeadlineIsNull_1v2TwoLegalRep() {
+            CaseData caseData = CaseDataBuilder.builder()
+                .atStateNotificationAcknowledged()
+                .multiPartyClaimTwoDefendantSolicitors()
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            handler.handle(params);
+        }
+
+        @Test
         void shouldPopulateRespondent2Flag_WhenInvoked() {
             stubCaseRoles(false, true);
             CaseData caseData = CaseDataBuilder.builder()
@@ -675,6 +711,27 @@ class AcknowledgeClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
                             + "(/cases/case-details/%s#CaseDocuments)",
 
                         formatLocalDateTime(RESPONSE_DEADLINE, DATE_TIME_AT), caseData.getCcdCaseReference())
+                        + exitSurveyContentService.respondentSurvey())
+                    .build());
+        }
+
+        @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, CallbackType.SUBMITTED);
+
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# You have acknowledged the claim%n## Claim number: 000DC001"))
+                    .confirmationBody(format(
+                        "<br />You need to respond to the claim before %s."
+                            + "%n%n[Download the Acknowledgement of Claim form]"
+                            + "(/cases/case-details/%s#CaseDocuments)",
+
+                        "N/A", caseData.getCcdCaseReference())
                         + exitSurveyContentService.respondentSurvey())
                     .build());
         }
