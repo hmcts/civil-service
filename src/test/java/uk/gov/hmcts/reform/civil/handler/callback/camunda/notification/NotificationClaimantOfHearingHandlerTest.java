@@ -720,6 +720,74 @@ class NotificationClaimantOfHearingHandlerTest {
                 "notification-of-hearing-lip-000HN001"
             );
         }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedWithFailedPayment() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2022, 10, 7))
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .hearingReferenceNumber("000HN001")
+                .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
+                .hearingTimeHourMinute("1530")
+                .hearingDueDate(LocalDate.of(2022, 11, 23))
+                .hearingFeePaymentDetails(new PaymentDetails().setStatus(uk.gov.hmcts.reform.civil.enums.PaymentStatus.FAILED))
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .hearingNoticeList(HearingNoticeList.SMALL_CLAIMS)
+                .listingOrRelisting(ListingOrRelisting.LISTING)
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+            // When
+            when(notificationsProperties.getHearingListedFeeClaimantLrTemplate())
+                .thenReturn("test-template-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicantemail@hmcts.net",
+                "test-template-fee-claimant-id",
+                getNotificationFeeDataMap(caseData, false),
+                "notification-of-hearing-000HN001"
+            );
+        }
+
+        @Test
+        void shouldNotifyApplicantSolicitor_whenInvokedRelistingAndOther() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+                .hearingDate(LocalDate.of(2022, 10, 7))
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicantemail@hmcts.net"))
+                .respondentSolicitor1EmailAddress("respondent1email@hmcts.net")
+                .hearingReferenceNumber("000HN001")
+                .hearingTimeHourMinute("0830")
+                .addApplicant2(YesOrNo.NO)
+                .addRespondent2(YesOrNo.NO)
+                .hearingNoticeList(HearingNoticeList.OTHER)
+                .listingOrRelisting(ListingOrRelisting.RELISTING)
+                .solicitorReferences(new SolicitorReferences()
+                                         .setApplicantSolicitor1Reference("12345")
+                                         .setRespondentSolicitor1Reference("6789"))
+                .build();
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
+                .request(CallbackRequest.builder().eventId("NOTIFY_CLAIMANT_HEARING").build()).build();
+            // When
+            when(notificationsProperties.getHearingListedNoFeeClaimantLrTemplate())
+                .thenReturn("test-template-no-fee-claimant-id");
+            Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
+            when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
+            handler.handle(params);
+            // Then
+            verify(notificationService).sendMail(
+                "applicantemail@hmcts.net",
+                "test-template-no-fee-claimant-id",
+                getNotificationNoFeeOtherHearingTypeDataMap(caseData),
+                "notification-of-hearing-000HN001"
+            );
+        }
     }
 
     @NotNull
