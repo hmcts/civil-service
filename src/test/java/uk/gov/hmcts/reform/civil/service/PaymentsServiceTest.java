@@ -93,7 +93,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData().build();
+        CaseData caseData = CaseDataBuilder.builder().buildMakePaymentsCaseData();
         paymentsService.validateRequest(caseData);
         assertThat(caseData).isNotNull();
     }
@@ -101,7 +101,7 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequest_whenValidCaseDetails() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData().build();
+        CaseData caseData = CaseDataBuilder.builder().buildClaimIssuedPaymentCaseData();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequest(caseData, AUTH_TOKEN);
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
 

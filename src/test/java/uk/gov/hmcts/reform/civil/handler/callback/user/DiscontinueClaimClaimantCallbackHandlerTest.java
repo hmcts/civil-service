@@ -244,7 +244,7 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
                 .applicant2(new PartyBuilder().individual().build())
                 .respondent1(new PartyBuilder().individual().build())
                 .respondent2(new PartyBuilder().individual().build())
-                .buildClaimIssuedPaymentCaseData().build();
+                .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
 

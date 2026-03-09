@@ -108,7 +108,7 @@ class NotifyClaimantJudgmentByAdmissionNotificationHandlerTest extends BaseCallb
                 .ccdCaseReference(12345L)
                 .atStateClaimDraft()
                 .applicant1Represented(YesOrNo.YES)
-                .buildJudmentOnlineCaseDataWithPaymentImmediately().build();
+                .buildJudmentOnlineCaseDataWithPaymentImmediately();
 
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)

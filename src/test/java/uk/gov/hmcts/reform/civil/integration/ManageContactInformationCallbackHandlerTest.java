@@ -893,7 +893,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                 .applicant2(new Party().setType(INDIVIDUAL))
                 .respondent1(new Party().setType(INDIVIDUAL))
                 .respondent2(new Party().setType(INDIVIDUAL))
-                .buildClaimIssuedPaymentCaseData().build();
+                .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }
 
@@ -910,7 +910,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setIndividualFirstName("Dis")
                                  .setIndividualLastName("Guy")
                                  .setType(INDIVIDUAL).setFlags(respondent1Flags))
-                .buildClaimIssuedPaymentCaseData().build();
+                .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             CaseData updated = CaseDataBuilder.builder()
@@ -951,7 +951,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setIndividualFirstName("Dis")
                                  .setIndividualLastName("Guy")
                                  .setType(INDIVIDUAL).setFlags(respondent1Flags))
-                .buildClaimIssuedPaymentCaseData().build();
+                .buildClaimIssuedPaymentCaseData();
 
             CaseData caseDataBefore = GeneralApplicationDetailsBuilder.builder()
                 .getTestCaseData(caseData);
@@ -1008,7 +1008,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure().setFirstName("Claimant")
@@ -1055,7 +1055,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1102,7 +1102,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1149,7 +1149,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1196,7 +1196,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1243,7 +1243,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1290,7 +1290,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
             CaseData caseDataBefore = CaseDataBuilder.builder().respondent1(new Party()
                                                                                 .setIndividualFirstName("Dis")
                                                                                 .setIndividualLastName("Guy")
-                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData().build();
+                                                                                .setType(INDIVIDUAL).setFlags(respondent1Flags)).buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
             PartyFlagStructure expected = new PartyFlagStructure()
@@ -1339,7 +1339,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                                  .setIndividualFirstName("Dis")
                                  .setIndividualLastName("Guy")
                                  .setType(INDIVIDUAL).setFlags(respondent1Flags))
-                .buildClaimIssuedPaymentCaseData().build();
+                .buildClaimIssuedPaymentCaseData();
 
             CaseData updated = CaseDataBuilder.builder()
                 .atStateApplicantRespondToDefenceAndProceed()
@@ -2074,7 +2074,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant2LitigationFriend()
                     .addRespondent1LitigationFriend()
                     .addRespondent2LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2115,7 +2115,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2134,7 +2134,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = CaseDataBuilder.builder()
@@ -2232,7 +2232,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .addApplicant1LitigationFriend()
                     .addApplicant2LitigationFriend()
                     .addRespondent1LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
@@ -2290,7 +2290,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent2(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CaseData caseData = caseDataBefore.toBuilder()
@@ -2317,7 +2317,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .addApplicant1LitigationFriend()
                     .addRespondent1LitigationFriend()
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
 
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
@@ -2396,7 +2396,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2423,7 +2423,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2502,7 +2502,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
 
                 CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
@@ -2525,7 +2525,7 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
                     .applicant2(new Party().setType(INDIVIDUAL))
                     .respondent1(new Party().setType(INDIVIDUAL))
                     .respondent2(new Party().setType(INDIVIDUAL))
-                    .buildClaimIssuedPaymentCaseData().build();
+                    .buildClaimIssuedPaymentCaseData();
                 given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
             }
 

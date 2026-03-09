@@ -95,7 +95,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentSolicitor1_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
@@ -134,7 +134,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
 
         @Test
         void shouldNotifyRespondentSolicitor2_whenInvoked() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .respondentSolicitor1EmailAddress("respondent1@example.com")
                 .respondentSolicitor2EmailAddress("respondent2@example.com")
@@ -176,7 +176,7 @@ class RecordJudgmentDeterminationMeansRespondentNotificationHandlerTest extends 
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             when(notificationsProperties.getNotifyLipUpdateTemplate()).thenReturn("template-id");
 
-            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans().build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
                 .applicant1(new Party()
                                 .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")

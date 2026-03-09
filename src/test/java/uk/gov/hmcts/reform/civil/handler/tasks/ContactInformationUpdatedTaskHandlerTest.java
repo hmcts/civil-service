@@ -87,7 +87,7 @@ class ContactInformationUpdatedTaskHandlerTest {
                 new ContactDetailsUpdatedEvent()
                     .setDescription("Best description")
                     .setSummary("Even better summary")
-                    .setSubmittedByCaseworker(YES)).build();
+                    .setSubmittedByCaseworker(YES));
 
         CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
         when(coreCaseDataService.startUpdate(CASE_ID, CONTACT_INFORMATION_UPDATED))

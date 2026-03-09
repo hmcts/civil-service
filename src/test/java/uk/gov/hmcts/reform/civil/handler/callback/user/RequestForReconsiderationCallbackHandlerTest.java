@@ -658,7 +658,7 @@ class RequestForReconsiderationCallbackHandlerTest extends BaseCallbackHandlerTe
     class SubmittedCallback {
         @Test
         void whenSubmitted_thenIncludeHeader() {
-            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
+            CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
             CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(CallbackType.SUBMITTED);

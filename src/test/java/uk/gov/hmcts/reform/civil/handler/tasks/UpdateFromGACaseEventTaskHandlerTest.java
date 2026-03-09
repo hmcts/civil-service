@@ -103,9 +103,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithGeneralOrderPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithGeneralOrderPDFDocument(new CaseDataBuilder().build());
         CaseData updatedCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithGeneralOrderStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithGeneralOrderStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -140,13 +140,13 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithDismissalOrderPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDismissalOrderPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
 
         CaseData updatedCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithDismissalOrderStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDismissalOrderStaffPDFDocument(new CaseDataBuilder().build());
 
         when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, ADD_PDF_TO_MAIN_CASE)).thenReturn(startEventResponse);
 
@@ -178,10 +178,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithDirectionOrderPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDirectionOrderPDFDocument(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithDirectionOrderStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDirectionOrderStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -216,9 +216,9 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithHearingNoticeDocumentPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithHearingNoticeDocumentPDFDocument(new CaseDataBuilder().build());
         CaseData updatedCaseData = new GeneralApplicationDetailsBuilder()
-            .getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument((new CaseDataBuilder().build())).build();
+            .getTestCaseDataWithHearingNoticeStaffDocumentPDFDocument((new CaseDataBuilder().build()));
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
                 .thenReturn(generalCaseData);
@@ -246,7 +246,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 true,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
 
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
@@ -264,7 +264,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 true,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
 
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "generalOrder", "1")).isTrue();
@@ -281,7 +281,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 false,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
 
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
@@ -299,7 +299,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 false,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
 
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isFalse();
@@ -317,7 +317,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 true,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
 
         assertThat(handler.canViewResp(caseData, generalAppCaseData, "", "2")).isTrue();
@@ -416,10 +416,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @SuppressWarnings("unchecked")
     void shouldAddToCivilDocsCopy() throws Exception {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build()
-            .setRespondent1Represented(YesOrNo.NO).build();
+            .setRespondent1Represented(YesOrNo.NO);
 
         Method gaGetter = ReflectionUtils.findMethod(
             CaseData.class,
@@ -446,11 +446,11 @@ public class UpdateFromGACaseEventTaskHandlerTest {
     @SuppressWarnings("unchecked")
     void shouldAddToCivilDocsCopyIfGADocsNotInCivilDocs() throws Exception {
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData caseData = GeneralApplicationDetailsBuilder.builder()
             .getTestCaseDataWithDirectionOrderStaffPDFDocument(new CaseDataBuilder().atStateClaimDraft().build())
-            .setRespondent1Represented(YesOrNo.NO).build();
+            .setRespondent1Represented(YesOrNo.NO);
 
         Method gaGetter = ReflectionUtils.findMethod(
             CaseData.class,
@@ -528,7 +528,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
                 true,
                 true,
                 Map.of("1234", "Order Made")
-            ).build();
+            );
         CaseData generalAppCaseData = new CaseDataBuilder().ccdCaseReference(1234L).build();
         generalAppCaseData.setDirectionOrderDocument(singletonList(new Element<CaseDocument>()
                                                                        .setId(UUID.fromString(uid))
@@ -560,10 +560,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithConsentOrderPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithConsentOrderPDFDocument(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithConsentOrderStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithConsentOrderStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -598,10 +598,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocument(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -638,10 +638,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -678,10 +678,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocument(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -718,10 +718,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -762,10 +762,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -802,10 +802,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftApplicationPDFDocumentLip(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDraftStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -840,10 +840,10 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithAdditionalDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithAdditionalDocument(new CaseDataBuilder().build());
 
         CaseData updatedCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithAddlDocStaffPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithAddlDocStaffPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -893,7 +893,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDirectionOrderPDFDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDirectionOrderPDFDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -950,7 +950,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
         CaseData generalCaseData = GeneralApplicationDetailsBuilder.builder()
-            .getTestCaseDataWithDirectionResponseDocument(new CaseDataBuilder().build()).build();
+            .getTestCaseDataWithDirectionResponseDocument(new CaseDataBuilder().build());
 
         when(caseDetailsConverter.toGACaseData(coreCaseDataService.getCase(parseLong(GENERAL_APP_CASE_ID))))
             .thenReturn(generalCaseData);
@@ -1078,7 +1078,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
         CaseData gaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
             .setGaAddlDocBundle(singletonList(new Element<CaseDocument>()
                                                   .setId(UUID.fromString(uid))
-                                                  .setValue(pdfDocument))).build();
+                                                  .setValue(pdfDocument)));
 
         assertThat(handler.mergeBundle(gaCaseData).getGaAddlDoc().size()).isEqualTo(1);
 
@@ -1096,7 +1096,7 @@ public class UpdateFromGACaseEventTaskHandlerTest {
 
         CaseData nextGaCaseData = new CaseDataBuilder().atStateClaimDraft().build()
                 .setGaAddlDoc(addlDoc)
-                .setGaAddlDocBundle(addlDocBundle).build();
+                .setGaAddlDocBundle(addlDocBundle);
 
         assertThat(handler.mergeBundle(nextGaCaseData).getGaAddlDoc().size()).isEqualTo(2);
     }
