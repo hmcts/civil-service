@@ -22,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 @Aspect
 @Component
+@SuppressWarnings("all")
 public class RateLimiterAspect {
 
     private final RateLimiterService rateLimiterService;
