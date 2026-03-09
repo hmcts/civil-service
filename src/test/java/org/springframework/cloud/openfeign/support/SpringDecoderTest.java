@@ -138,6 +138,25 @@ class SpringDecoderTest {
     }
 
     @Test
+    void shouldDecodePdfAsResourceWhenProvidedFeignConvertersLackResourceConverter() throws Exception {
+        ObjectProvider<FeignHttpMessageConverters> provider = mockFeignConvertersProvider();
+        FeignHttpMessageConverters converters = mock(FeignHttpMessageConverters.class);
+        when(converters.getConverters()).thenReturn(List.of(new MappingJackson2HttpMessageConverter()));
+        when(provider.getObject()).thenReturn(converters);
+        SpringDecoder decoder = new SpringDecoder(provider);
+
+        Object decoded = decoder.decode(
+            binaryResponse(200, "application/pdf", "pdf-content".getBytes(StandardCharsets.UTF_8)),
+            Resource.class
+        );
+
+        assertThat(decoded).isInstanceOfSatisfying(
+            Resource.class,
+            resource -> assertThat(readResource(resource)).isEqualTo("pdf-content".getBytes(StandardCharsets.UTF_8))
+        );
+    }
+
+    @Test
     void shouldFallbackToDefaultConvertersWhenLegacyFactoryHasNoGetConvertersMethod() throws Exception {
         ObjectFactory<?> legacyFactory = Object::new;
         SpringDecoder decoder = new SpringDecoder(legacyFactory, mockAnyObjectProvider());

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpMessageConverterExtractor;
@@ -72,7 +73,7 @@ public class SpringDecoder implements Decoder {
             try {
                 FeignHttpMessageConverters feignConverters = convertersProvider.getObject();
                 if (feignConverters != null) {
-                    return feignConverters.getConverters();
+                    return ensureEssentialConverters(feignConverters.getConverters());
                 }
             } catch (BeansException ex) {
                 // Fall through to legacy/default converters.
@@ -92,7 +93,7 @@ public class SpringDecoder implements Decoder {
                             }
                         }
                         if (!converted.isEmpty()) {
-                            return converted;
+                            return ensureEssentialConverters(converted);
                         }
                     }
                 }
@@ -101,11 +102,34 @@ public class SpringDecoder implements Decoder {
             }
         }
 
-        return List.of(
+        return ensureEssentialConverters(List.of(
             new ByteArrayHttpMessageConverter(),
             new StringHttpMessageConverter(StandardCharsets.UTF_8),
             new MappingJackson2HttpMessageConverter()
-        );
+        ));
+    }
+
+    private static List<HttpMessageConverter<?>> ensureEssentialConverters(List<HttpMessageConverter<?>> converters) {
+        List<HttpMessageConverter<?>> resolved = new ArrayList<>();
+        if (converters != null) {
+            resolved.addAll(converters);
+        }
+        addIfMissing(resolved, ByteArrayHttpMessageConverter.class, ByteArrayHttpMessageConverter::new);
+        addIfMissing(resolved, ResourceHttpMessageConverter.class, ResourceHttpMessageConverter::new);
+        addIfMissing(resolved, StringHttpMessageConverter.class, () -> new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        addIfMissing(resolved, MappingJackson2HttpMessageConverter.class, MappingJackson2HttpMessageConverter::new);
+        return resolved;
+    }
+
+    private static <T extends HttpMessageConverter<?>> void addIfMissing(
+        List<HttpMessageConverter<?>> converters,
+        Class<T> converterType,
+        java.util.function.Supplier<T> factory
+    ) {
+        boolean exists = converters.stream().anyMatch(converterType::isInstance);
+        if (!exists) {
+            converters.add(factory.get());
+        }
     }
 
     private static final class FeignResponseAdapter implements ClientHttpResponse {
