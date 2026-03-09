@@ -17,6 +17,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -87,12 +88,13 @@ public class SpringEncoder implements Encoder {
 
         List<HttpMessageConverter<?>> converters = resolveConverters();
         for (HttpMessageConverter<?> converter : converters) {
-            if (!canWrite(converter, requestBody, bodyType, contentType)) {
+            HttpMessageConverter<?> effectiveConverter = adaptConverterForRequest(converter, request);
+            if (!canWrite(effectiveConverter, requestBody, bodyType, contentType)) {
                 continue;
             }
             try {
                 FeignOutputMessage output = new FeignOutputMessage();
-                write(converter, requestBody, bodyType, contentType, output);
+                write(effectiveConverter, requestBody, bodyType, contentType, output);
                 output.getHeaders().forEach((k, v) -> request.header(k, v.toArray(String[]::new)));
                 request.body(output.bodyAsBytes(), StandardCharsets.UTF_8);
                 return;
@@ -109,7 +111,7 @@ public class SpringEncoder implements Encoder {
             try {
                 FeignHttpMessageConverters feignConverters = convertersProvider.getObject();
                 if (feignConverters != null) {
-                    return withJacksonSerializerCompatibility(feignConverters.getConverters());
+                    return withJacksonDateCompatibility(feignConverters.getConverters());
                 }
             } catch (BeansException ex) {
                 // Fall back to default encoder when converter beans are not present in slim test contexts.
@@ -128,7 +130,7 @@ public class SpringEncoder implements Encoder {
                                 converted.add(converter);
                             }
                         }
-                        return withJacksonSerializerCompatibility(converted);
+                        return withJacksonDateCompatibility(converted);
                     }
                 }
             } catch (BeansException ex) {
@@ -137,7 +139,7 @@ public class SpringEncoder implements Encoder {
                 // Fall back to default encoder when legacy converter container type is unavailable.
             }
         }
-        return withJacksonSerializerCompatibility(defaultConverters());
+        return withJacksonDateCompatibility(defaultConverters());
     }
 
     private static List<HttpMessageConverter<?>> defaultConverters() {
@@ -150,18 +152,39 @@ public class SpringEncoder implements Encoder {
         );
     }
 
-    private static List<HttpMessageConverter<?>> withJacksonSerializerCompatibility(List<HttpMessageConverter<?>> converters) {
+    private static List<HttpMessageConverter<?>> withJacksonDateCompatibility(List<HttpMessageConverter<?>> converters) {
         if (converters == null) {
             return List.of();
         }
         converters.stream()
             .filter(MappingJackson2HttpMessageConverter.class::isInstance)
             .map(MappingJackson2HttpMessageConverter.class::cast)
-            .forEach(converter -> {
-                converter.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-                converter.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            });
+            .forEach(converter -> converter.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false));
         return converters;
+    }
+
+    private static HttpMessageConverter<?> adaptConverterForRequest(HttpMessageConverter<?> converter, RequestTemplate request) {
+        if (!(converter instanceof MappingJackson2HttpMessageConverter jacksonConverter)) {
+            return converter;
+        }
+        if (!isCcdEventSubmissionRequest(request)) {
+            return converter;
+        }
+        MappingJackson2HttpMessageConverter adapted = new MappingJackson2HttpMessageConverter();
+        ObjectMapper mapper = jacksonConverter.getObjectMapper().copy();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        adapted.setObjectMapper(mapper);
+        return adapted;
+    }
+
+    private static boolean isCcdEventSubmissionRequest(RequestTemplate request) {
+        String url = request.url();
+        if (url == null) {
+            return false;
+        }
+        return "POST".equalsIgnoreCase(request.method())
+            && url.contains("/caseworkers/")
+            && url.contains("/events");
     }
 
     private static MediaType resolveContentType(Map<String, Collection<String>> headers) {
