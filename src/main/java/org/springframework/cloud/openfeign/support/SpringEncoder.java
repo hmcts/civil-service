@@ -16,6 +16,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -108,7 +109,7 @@ public class SpringEncoder implements Encoder {
             try {
                 FeignHttpMessageConverters feignConverters = convertersProvider.getObject();
                 if (feignConverters != null) {
-                    return feignConverters.getConverters();
+                    return withJacksonSerializerCompatibility(feignConverters.getConverters());
                 }
             } catch (BeansException ex) {
                 // Fall back to default encoder when converter beans are not present in slim test contexts.
@@ -127,7 +128,7 @@ public class SpringEncoder implements Encoder {
                                 converted.add(converter);
                             }
                         }
-                        return converted;
+                        return withJacksonSerializerCompatibility(converted);
                     }
                 }
             } catch (BeansException ex) {
@@ -136,7 +137,7 @@ public class SpringEncoder implements Encoder {
                 // Fall back to default encoder when legacy converter container type is unavailable.
             }
         }
-        return defaultConverters();
+        return withJacksonSerializerCompatibility(defaultConverters());
     }
 
     private static List<HttpMessageConverter<?>> defaultConverters() {
@@ -147,6 +148,20 @@ public class SpringEncoder implements Encoder {
             new StringHttpMessageConverter(StandardCharsets.UTF_8),
             jacksonConverter
         );
+    }
+
+    private static List<HttpMessageConverter<?>> withJacksonSerializerCompatibility(List<HttpMessageConverter<?>> converters) {
+        if (converters == null) {
+            return List.of();
+        }
+        converters.stream()
+            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+            .map(MappingJackson2HttpMessageConverter.class::cast)
+            .forEach(converter -> {
+                converter.getObjectMapper().configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+                converter.getObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            });
+        return converters;
     }
 
     private static MediaType resolveContentType(Map<String, Collection<String>> headers) {
