@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.config;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ public class TestJacksonAutoConfiguration {
         mapper.findAndRegisterModules();
         modulesProvider.getIfAvailable(List::of).forEach(mapper::registerModule);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
 }
