@@ -81,18 +81,8 @@ public class Party {
         return getPartyName(false);
     }
 
-    @JsonIgnore
-    public String getStoredPartyName() {
-        return partyName;
-    }
-
     public String getPartyTypeDisplayValue() {
         return this.getType().getDisplayValue();
-    }
-
-    @JsonIgnore
-    public String getStoredPartyTypeDisplayValue() {
-        return partyTypeDisplayValue;
     }
 
     @JsonIgnore
@@ -128,5 +118,31 @@ public class Party {
     @JsonIgnore
     public LocalDate getDateOfBirth() {
         return Optional.ofNullable(individualDateOfBirth).orElse(soleTraderDateOfBirth);
+    }
+
+    public Party copy() {
+        return new Party()
+            .setPartyID(partyID)
+            .setType(type)
+            .setIndividualTitle(individualTitle)
+            .setIndividualFirstName(individualFirstName)
+            .setIndividualLastName(individualLastName)
+            .setIndividualDateOfBirth(individualDateOfBirth)
+            .setCompanyName(companyName)
+            .setOrganisationName(organisationName)
+            .setSoleTraderTitle(soleTraderTitle)
+            .setSoleTraderFirstName(soleTraderFirstName)
+            .setSoleTraderLastName(soleTraderLastName)
+            .setSoleTraderTradingAs(soleTraderTradingAs)
+            .setSoleTraderDateOfBirth(soleTraderDateOfBirth)
+            .setPrimaryAddress(primaryAddress)
+            .setPartyName(partyName)
+            .setBulkClaimPartyName(bulkClaimPartyName)
+            .setPartyTypeDisplayValue(partyTypeDisplayValue)
+            .setPartyEmail(partyEmail)
+            .setPartyPhone(partyPhone)
+            .setLegalRepHeading(legalRepHeading)
+            .setUnavailableDates(unavailableDates)
+            .setFlags(flags);
     }
 }

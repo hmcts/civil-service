@@ -89,29 +89,7 @@ public class UpdatePartyDetailsTask extends MigrationTask<PartyDetailsCaseRefere
             return original;
         }
 
-        Party builder = new Party()
-            .setPartyID(original.getPartyID())
-            .setType(original.getType())
-            .setIndividualTitle(original.getIndividualTitle())
-            .setIndividualFirstName(original.getIndividualFirstName())
-            .setIndividualLastName(original.getIndividualLastName())
-            .setIndividualDateOfBirth(original.getIndividualDateOfBirth())
-            .setCompanyName(original.getCompanyName())
-            .setOrganisationName(original.getOrganisationName())
-            .setSoleTraderTitle(original.getSoleTraderTitle())
-            .setSoleTraderFirstName(original.getSoleTraderFirstName())
-            .setSoleTraderLastName(original.getSoleTraderLastName())
-            .setSoleTraderTradingAs(original.getSoleTraderTradingAs())
-            .setSoleTraderDateOfBirth(original.getSoleTraderDateOfBirth())
-            .setPrimaryAddress(original.getPrimaryAddress())
-            .setPartyName(original.getStoredPartyName())
-            .setBulkClaimPartyName(original.getBulkClaimPartyName())
-            .setPartyTypeDisplayValue(original.getStoredPartyTypeDisplayValue())
-            .setPartyEmail(original.getPartyEmail())
-            .setPartyPhone(original.getPartyPhone())
-            .setLegalRepHeading(original.getLegalRepHeading())
-            .setUnavailableDates(original.getUnavailableDates())
-            .setFlags(original.getFlags());
+        Party builder = original.copy();
 
         // Common fields
         builder.setPartyID(updateIfExists(updates.getPartyID(), original.getPartyID()));

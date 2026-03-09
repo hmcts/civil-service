@@ -122,6 +122,21 @@ class CaseFlagsInitialiserTest {
     }
 
     @Test
+    void shouldInitialiseDistinctApplicantFlagsWhenApplicantsShareSameInstance() {
+        Party sharedApplicant = new PartyBuilder().individual().build();
+        CaseData caseData = CaseData.builder()
+            .applicant1(sharedApplicant)
+            .applicant2(sharedApplicant)
+            .build();
+
+        caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.CREATE_CLAIM, caseData);
+
+        assertThat(caseData.getApplicant1()).isNotSameAs(caseData.getApplicant2());
+        assertThat(caseData.getApplicant1().getFlags().getRoleOnCase()).isEqualTo("Claimant 1");
+        assertThat(caseData.getApplicant2().getFlags().getRoleOnCase()).isEqualTo("Claimant 2");
+    }
+
+    @Test
     void shouldInitialiseCaseFlagsForAddLitigationFriendEvent() {
         var respondent1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         var respondent2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
