@@ -158,6 +158,8 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
   env.SONAR_SKIP_COMPILE = "true"
+  // Only run checkstyle on PR pipeline
+  env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
 
   onPR {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])

@@ -53,6 +53,15 @@ allprojects {
     maxWarnings = 0
     toolVersion = '10.26.1'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+    ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
+  }
+
+// Only create HTML Checkstyle reports
+  tasks.withType(Checkstyle).configureEach {
+    reports {
+      xml.required = false
+      html.required = true
+    }
   }
 
   jacoco {
@@ -78,6 +87,10 @@ allprojects {
     // range of 0-10 fails the build, anything greater and it doesn't fail the build
     failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'config/owasp/suppressions.xml'
+    nvd {
+      // Reduce NVD database update frequency for faster CI runs
+      validForHours = 24
+    }
 
     analyzers {
       // Disable scanning of .NET related binaries
@@ -168,7 +181,6 @@ task integration(type: Test) {
   classpath = sourceSets.integrationTest.runtimeClasspath
   failFast = true
   testLogging.showStandardStreams = false
-
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -234,6 +246,8 @@ sonarqube {
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
     property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.branch.cache.enabled", "true"
+    property "sonar.working.directory", "${buildDir}/sonar"
   }
 }
 
@@ -607,12 +621,6 @@ tasks.register('runProviderPactVerification') {
   dependsOn tasks.named('providerContractTests')
 }
 
-task printAvailableProcessors {
-  doLast {
-    println "[DEBUG_LOG] Available Processors: ${Runtime.runtime.availableProcessors()}"
-  }
-}
-
 tasks.withType(Test).configureEach { t ->
   doFirst {
     logger.lifecycle("[DEBUG_LOG] Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
@@ -621,6 +629,8 @@ tasks.withType(Test).configureEach { t ->
 
   maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   jvmArgs '-Xshare:off'
+  // Use Parallel GC for faster, short-lived test forks
+  jvmArgs '-XX:+UseParallelGC'
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"
