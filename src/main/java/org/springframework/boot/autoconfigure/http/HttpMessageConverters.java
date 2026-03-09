@@ -1,6 +1,7 @@
 package org.springframework.boot.autoconfigure.http;
 
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,9 +25,15 @@ public class HttpMessageConverters implements Iterable<HttpMessageConverter<?>> 
     }
 
     public HttpMessageConverters(boolean addDefaultConverters, Collection<HttpMessageConverter<?>> converters) {
-        this.converters = Collections.unmodifiableList(postProcessConverters(
-            converters == null ? List.of() : new ArrayList<>(converters)
-        ));
+        List<HttpMessageConverter<?>> resolvedConverters = new ArrayList<>();
+        if (addDefaultConverters) {
+            // Mirror Boot's legacy behavior by seeding with framework defaults.
+            resolvedConverters.addAll(new RestTemplate().getMessageConverters());
+        }
+        if (converters != null) {
+            resolvedConverters.addAll(converters);
+        }
+        this.converters = Collections.unmodifiableList(postProcessConverters(resolvedConverters));
     }
 
     protected List<HttpMessageConverter<?>> postProcessConverters(List<HttpMessageConverter<?>> converters) {

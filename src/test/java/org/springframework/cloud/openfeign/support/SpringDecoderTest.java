@@ -10,6 +10,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.core.io.Resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -57,6 +58,21 @@ class SpringDecoderTest {
         assertThat(decoded).isInstanceOfSatisfying(
             Map.class,
             value -> assertThat(((Map<?, ?>) value).get("name")).isEqualTo("civil")
+        );
+    }
+
+    @Test
+    void shouldDecodePdfAsResourceUsingLegacyConvertersConstructorDefaults() throws Exception {
+        ObjectFactory<?> legacyFactory = () -> new HttpMessageConverters(List.of());
+        ObjectProvider<?> ignoredCustomizerProvider = mockAnyObjectProvider();
+        SpringDecoder decoder = new SpringDecoder(legacyFactory, ignoredCustomizerProvider);
+        Response response = binaryResponse(200, "application/pdf", "pdf-content".getBytes(StandardCharsets.UTF_8));
+
+        Object decoded = decoder.decode(response, Resource.class);
+
+        assertThat(decoded).isInstanceOfSatisfying(
+            Resource.class,
+            resource -> assertThat(readResource(resource)).isEqualTo("pdf-content".getBytes(StandardCharsets.UTF_8))
         );
     }
 
@@ -226,6 +242,32 @@ class SpringDecoderTest {
             .headers(Map.of("Content-Type", List.of("application/json")))
             .body(body)
             .build();
+    }
+
+    private static Response binaryResponse(int status, String contentType, byte[] body) {
+        Request request = Request.create(
+            Request.HttpMethod.GET,
+            "http://localhost/document",
+            Map.of(),
+            null,
+            StandardCharsets.UTF_8,
+            null
+        );
+        return Response.builder()
+            .request(request)
+            .status(status)
+            .reason("reason")
+            .headers(Map.of("Content-Type", List.of(contentType)))
+            .body(body)
+            .build();
+    }
+
+    private static byte[] readResource(Resource resource) {
+        try {
+            return resource.getContentAsByteArray();
+        } catch (IOException exception) {
+            throw new AssertionError(exception);
+        }
     }
 
     private static ClientHttpResponse createAdapter(Response response) throws Exception {
