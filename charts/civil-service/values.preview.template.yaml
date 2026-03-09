@@ -25,6 +25,7 @@ java:
     HMC_HEARINGS_SUBSCRIPTION_ENABLED: false
     HMC_API_URL: http://${SERVICE_NAME}-wiremock
     RD_PROFESSIONAL_API_URL: http://${SERVICE_NAME}-wiremock
+    RD_COMMONDATA_API_URL: http://${SERVICE_NAME}-wiremock
     DOCMOSIS_TORNADO_URL: http://${SERVICE_NAME}-wiremock
     SEND_LETTER_URL: http://${SERVICE_NAME}-wiremock
     FEES_API_URL: http://${SERVICE_NAME}-wiremock
@@ -57,7 +58,9 @@ java:
     SPRING_CLOUD_BOOTSTRAP_ENABLED: true
     MANAGEMENT_HEALTH_FEES_ENABLED: false
     SENDGRID_HOST: ${SERVICE_NAME}-wiremock
+    RTL_API_URL: http://${SERVICE_NAME}-wiremock
     SENDGRID_TEST: true
+    OTHER_REMEDY_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil

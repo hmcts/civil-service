@@ -43,9 +43,9 @@ public class DefendantResponseFullPartAdmitAfterNocClaimantScenarioTest extends 
             .applicant1Represented(NO)
             .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("defendant").individualLastName("person").build())
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondToClaim(RespondToClaim.builder()
-                                .howMuchWasPaid(new BigDecimal(100000))
-                                .build())
+            .respondToClaim(new RespondToClaim()
+                                .setHowMuchWasPaid(new BigDecimal(100000))
+                                )
             .totalClaimAmount(new BigDecimal(1000))
             .build();
         handler.handle(callbackParams(caseData));

@@ -90,16 +90,16 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
                         .setDocumentFileName("filename").setDocumentHash("hash")
                         .setDocumentBinaryUrl("binaryUrl"))
                 .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT).setDocumentSize(12L);
-        gaCaseData = GeneralApplicationCaseData.builder()
+        gaCaseData = new GeneralApplicationCaseData()
                 .generalAppParentCaseLink(
                         new GeneralAppParentCaseLink().setCaseReference("123"))
                 .gaDraftDocument(ElementUtils.wrapElements(caseDocumentNow))
                 .build();
-        civilCaseDataEmpty = GeneralApplicationCaseData.builder().build();
-        civilCaseDataOld = GeneralApplicationCaseData.builder()
+        civilCaseDataEmpty = new GeneralApplicationCaseData().build();
+        civilCaseDataOld = new GeneralApplicationCaseData()
                 .gaDraftDocStaff(ElementUtils.wrapElements(caseDocumentOld))
                 .build();
-        civilCaseDataNow = GeneralApplicationCaseData.builder()
+        civilCaseDataNow = new GeneralApplicationCaseData()
                 .gaDraftDocStaff(ElementUtils.wrapElements(caseDocumentNow))
                 .build();
     }
@@ -125,7 +125,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
 
     @Test
     void updated_should_success_ga_has_no_doc() {
-        GeneralApplicationCaseData emptyCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData emptyCaseData = new GeneralApplicationCaseData().build();
         assertThat(waitCivilDocUpdatedTaskHandler.checkCivilDocUpdated(emptyCaseData)).isTrue();
     }
 
@@ -192,11 +192,11 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         when(mockTask.getAllVariables()).thenReturn(variables);
         when(gaForLipService.isGaForLip(any())).thenReturn(true);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
-        GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
+        GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .gaDraftDocument(singletonList(
             Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                 .value(pdfDocument).build())).build();
@@ -224,11 +224,11 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
         when(mockTask.getAllVariables()).thenReturn(variables);
         when(gaForLipService.isGaForLip(any())).thenReturn(false);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .build();
 
-        GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().toBuilder()
+        GeneralApplicationCaseData updatedCaseData =  GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeDraftAppCaseData().copy()
             .gaDraftDocument(singletonList(
                 Element.<CaseDocument>builder().id(UUID.fromString(uid1))
                     .value(pdfDocument).build())).build();
@@ -304,7 +304,7 @@ public class WaitCivilDocUpdatedTaskHandlerTest {
                                                  "Translated_draft_application_2024-12-02 15:45:15.pdf")
                                              .setDocumentBinaryUrl("binary-url-translated-2"))).build()
         );
-        GeneralApplicationCaseData gaLipCaseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData gaLipCaseData = new GeneralApplicationCaseData()
             .applicantBilingualLanguagePreference(YesOrNo.YES)
             .gaDraftDocument(draftDocumentsList)
             .build();

@@ -25,7 +25,7 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testJudgeNotMadeDismissalOrder_noJudicialDecision() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData().build();
 
         boolean result = GaFlowPredicate.judgeMadeDismissalOrder.test(caseData);
 
@@ -34,13 +34,12 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testJudgeNotMadeDismissalOrder_decisionRequestMoreInfo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                  .build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)
-                                           .build()).build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                  )
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)).build();
 
         boolean result = GaFlowPredicate.judgeMadeDismissalOrder.test(caseData);
 
@@ -49,13 +48,12 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testJudgeNotMadeDismissalOrder_approveOrEdit() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_AN_ORDER)
-                                  .build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                           .build()).build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER)
+                                  )
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)).build();
 
         boolean result = GaFlowPredicate.judgeMadeDismissalOrder.test(caseData);
 
@@ -64,13 +62,12 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testJudgeMadeDismissalOrder() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_AN_ORDER)
-                                  .build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                  .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)
-                                  .build()).build();
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER)
+                                  )
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                  .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)).build();
 
         boolean result = GaFlowPredicate.judgeMadeDismissalOrder.test(caseData);
 
@@ -79,15 +76,14 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsWelshJudgeDecision_dismissalOrder() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.MAKE_AN_ORDER)
-                                  .build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)
-                                           .build()).build();
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER)
+                                  )
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.DISMISS_THE_APPLICATION)).build();
 
         boolean result = GaFlowPredicate.isWelshJudgeDecision.test(caseData);
 
@@ -96,18 +92,17 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsWelshJudgeDecision_ListForHearing() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.LIST_FOR_A_HEARING)
-                                  .build())
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .judgeHearingCourtLocationText1("test")
-                                        .judgeHearingTimeEstimateText1("test")
-                                        .hearingPreferencesPreferredTypeLabel1("test")
-                                        .judgeHearingSupportReqText1("test")
-                                        .build()).build();
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.LIST_FOR_A_HEARING)
+                                  )
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setJudgeHearingCourtLocationText1("test")
+                                        .setJudgeHearingTimeEstimateText1("test")
+                                        .setHearingPreferencesPreferredTypeLabel1("test")
+                                        .setJudgeHearingSupportReqText1("test")).build();
 
         boolean result = GaFlowPredicate.isWelshJudgeDecision.test(caseData);
 
@@ -116,14 +111,14 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsWelshJudgeDecision_RequestForMoreInfo() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                  .build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION).build()).build();
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                  )
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.REQUEST_MORE_INFORMATION)).build();
 
         boolean result = GaFlowPredicate.isWelshJudgeDecision.test(caseData);
 
@@ -132,14 +127,14 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsWelshJudgeDecision_JudgeUncloaksApplication() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .applicantBilingualLanguagePreference(YesOrNo.YES)
-            .judicialDecision(GAJudicialDecision.builder()
-                                  .decision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
-                                  .build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY).build()).build();
+            .judicialDecision(new GAJudicialDecision()
+                                  .setDecision(GAJudgeDecisionOption.REQUEST_MORE_INFO)
+                                  )
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY)).build();
 
         boolean result = GaFlowPredicate.isWelshJudgeDecision.test(caseData);
 
@@ -148,13 +143,13 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsFreeApplication() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                        .paymentDetails(PaymentDetails.builder()
-                                                            .status(PaymentStatus.SUCCESS).build())
-                                        .fee(new Fee().setCode("FREE")).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                        .setPaymentDetails(new PaymentDetails()
+                                                            .setStatus(PaymentStatus.SUCCESS))
+                                        .setFee(new Fee().setCode("FREE")))
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);
@@ -164,13 +159,13 @@ public class GaFlowPredicateTest {
 
     @Test
     public void testIsNotFreeApplication() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
             .generalAppType(GAApplicationType.builder().types(Collections.singletonList(GeneralApplicationTypes.ADJOURN_HEARING)).build())
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .paymentDetails(PaymentDetails.builder()
-                                                          .status(PaymentStatus.SUCCESS).build())
-                                      .fee(new Fee().setCode("Not_Free")).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setPaymentDetails(new PaymentDetails()
+                                                          .setStatus(PaymentStatus.SUCCESS))
+                                      .setFee(new Fee().setCode("Not_Free")))
             .applicantBilingualLanguagePreference(YesOrNo.YES).build();
 
         boolean result = GaFlowPredicate.isFreeFeeWelshApplication.test(caseData);

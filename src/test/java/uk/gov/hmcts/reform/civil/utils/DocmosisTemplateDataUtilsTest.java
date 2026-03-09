@@ -443,7 +443,7 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenSolicitorReferencesMissing() {
-            SolicitorReferences solicitorReferences = SolicitorReferences.builder().build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences();
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference(null)
@@ -459,11 +459,9 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateProvidedValues_whenSolicitorReferencesAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .respondentSolicitor1Reference("Respondent ref")
-                .build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences()
+                .setApplicantSolicitor1Reference("Applicant ref")
+                .setRespondentSolicitor1Reference("Respondent ref");
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .respondentSolicitor2Reference("Respondent 2 ref")
@@ -480,10 +478,8 @@ class DocmosisTemplateDataUtilsTest {
 
         @Test
         void shouldPopulateNotProvided_whenOneReferencesNotAvailable() {
-            SolicitorReferences solicitorReferences = SolicitorReferences
-                .builder()
-                .applicantSolicitor1Reference("Applicant ref")
-                .build();
+            SolicitorReferences solicitorReferences = new SolicitorReferences()
+                .setApplicantSolicitor1Reference("Applicant ref");
             CaseData caseData = CaseData.builder()
                 .solicitorReferences(solicitorReferences)
                 .build();

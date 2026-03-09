@@ -246,9 +246,8 @@ public class DashboardClaimInfoServiceTest {
                                             .setStatementOfValueInPennies(
                                                 new BigDecimal("100000")))
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",
@@ -337,9 +336,8 @@ public class DashboardClaimInfoServiceTest {
                                                 new BigDecimal("100000")))
                             .respondToAdmittedClaimOwingAmountPounds(PART_ADMIT_PAY_IMMEDIATELY_AMOUNT)
                             .respondToClaimAdmitPartLRspec(
-                                RespondToClaimAdmitPartLRspec
-                                    .builder()
-                                    .whenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()).build())
+                                new RespondToClaimAdmitPartLRspec()
+                                    .setWhenWillThisAmountBePaid(DATE_IN_2025.toLocalDate()))
                             .build());
         DashboardResponse claimsForDefendant = dashboardClaimInfoService.getDashboardDefendantResponse(
             "authorisation",

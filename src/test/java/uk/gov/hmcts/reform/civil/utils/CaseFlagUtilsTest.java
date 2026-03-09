@@ -1013,9 +1013,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setApplicant1LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                     .firstName("Legally").lastName("Rep")
-                                                                     .build()));
+                caseData.setApplicant1LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                     .setFirstName("Legally").setLastName("Rep")
+                                                                     ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1039,14 +1039,14 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getApplicant1LRIndividuals()).get(0);
 
-                caseData.setApplicant1LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                                     .flags(new Flags()
+                caseData.setApplicant1LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                     .setFlags(new Flags()
                                                                                 .setPartyName("Legal Rep")
                                                                                 .setRoleOnCase("Civil - Organisation")
                                                                                 .setDetails(wrapElements(List.of(
                                                                                     new FlagDetail().setName("flag name")))))
-                                                                     .firstName("Legally").lastName("Rep")
-                                                                     .build()));
+                                                                     .setFirstName("Legally").setLastName("Rep")
+                                                                     ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1068,9 +1068,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_LEGAL_REP_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setRespondent1LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                      .firstName("Legally").lastName("Rep")
-                                                                      .build()));
+                caseData.setRespondent1LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1094,15 +1094,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent1LRIndividuals()).get(0);
 
-                caseData.setRespondent1LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                                      .flags(new Flags()
+                caseData.setRespondent1LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                      .setFlags(new Flags()
                                                                                  .setPartyName("Legal Rep")
                                                                                  .setRoleOnCase("Civil - Organisation")
                                                                                  .setDetails(wrapElements(List.of(
                                                                                      new FlagDetail().setName(
                                                                                          "flag name")))))
-                                                                      .firstName("Legally").lastName("Rep")
-                                                                      .build()));
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1124,9 +1124,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_LEGAL_REP_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setRespondent2LRIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                      .firstName("Legally").lastName("Rep")
-                                                                      .build()));
+                caseData.setRespondent2LRIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1150,15 +1150,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2LRIndividuals()).get(0);
 
-                caseData.setRespondent2LRIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                                      .flags(new Flags()
+                caseData.setRespondent2LRIndividuals(wrapElements(lrIndividual.copy()
+                                                                      .setFlags(new Flags()
                                                                                  .setPartyName("Legal Rep")
                                                                                  .setRoleOnCase("Civil - Organisation")
                                                                                  .setDetails(wrapElements(List.of(
                                                                                      new FlagDetail().setName(
                                                                                          "flag name")))))
-                                                                      .firstName("Legally").lastName("Rep")
-                                                                      .build()));
+                                                                      .setFirstName("Legally").setLastName("Rep")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1184,9 +1184,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_ORG_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setApplicant1OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                      .firstName("Org").lastName("Ind")
-                                                                      .build()));
+                caseData.setApplicant1OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1210,15 +1210,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant1OrgIndividuals()).get(0);
 
-                caseData.setApplicant1OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                                      .flags(new Flags()
+                caseData.setApplicant1OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                      .setFlags(new Flags()
                                                                                  .setPartyName("Org Person")
                                                                                  .setRoleOnCase("Mr. John Rambo")
                                                                                  .setDetails(wrapElements(List.of(
                                                                                      new FlagDetail().setName(
                                                                                          "flag name")))))
-                                                                      .firstName("Org").lastName("Ind")
-                                                                      .build()));
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1241,9 +1241,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_TWO_ORG_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setApplicant2OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                      .firstName("Org").lastName("Ind")
-                                                                      .build()));
+                caseData.setApplicant2OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1268,15 +1268,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getApplicant2OrgIndividuals()).get(0);
 
-                caseData.setApplicant2OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                                      .flags(new Flags()
+                caseData.setApplicant2OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                      .setFlags(new Flags()
                                                                                  .setPartyName("Org Person")
                                                                                  .setRoleOnCase("Mr. Jason Rambo")
                                                                                  .setDetails(wrapElements(List.of(
                                                                                      new FlagDetail().setName(
                                                                                          "flag name")))))
-                                                                      .firstName("Org").lastName("Ind")
-                                                                      .build()));
+                                                                      .setFirstName("Org").setLastName("Ind")
+                                                                      ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1298,9 +1298,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_ORG_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setRespondent1OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                       .firstName("Org").lastName("Ind")
-                                                                       .build()));
+                caseData.setRespondent1OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1324,15 +1324,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure orgIndividual = unwrapElements(caseData.getRespondent1OrgIndividuals()).get(0);
 
-                caseData.setRespondent1OrgIndividuals(wrapElements(orgIndividual.toBuilder()
-                                                                       .flags(new Flags()
+                caseData.setRespondent1OrgIndividuals(wrapElements(orgIndividual.copy()
+                                                                       .setFlags(new Flags()
                                                                                   .setPartyName("Org Person")
                                                                                   .setRoleOnCase("Mr. Sole Trader")
                                                                                   .setDetails(wrapElements(List.of(
                                                                                       new FlagDetail().setName(
                                                                                           "flag name")))))
-                                                                       .firstName("Org").lastName("Ind")
-                                                                       .build()));
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1355,9 +1355,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_ORG_INDIVIDUALS_ID).build())
                     .build();
 
-                caseData.setRespondent2OrgIndividuals(wrapElements(PartyFlagStructure.builder()
-                                                                       .firstName("Org").lastName("Ind")
-                                                                       .build()));
+                caseData.setRespondent2OrgIndividuals(wrapElements(new PartyFlagStructure()
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1382,15 +1382,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure lrIndividual = unwrapElements(caseData.getRespondent2OrgIndividuals()).get(0);
 
-                caseData.setRespondent2OrgIndividuals(wrapElements(lrIndividual.toBuilder()
-                                                                       .flags(new Flags()
+                caseData.setRespondent2OrgIndividuals(wrapElements(lrIndividual.copy()
+                                                                       .setFlags(new Flags()
                                                                                   .setPartyName("Org Person")
                                                                                   .setRoleOnCase("Mr. John Rambo")
                                                                                   .setDetails(wrapElements(List.of(
                                                                                       new FlagDetail().setName(
                                                                                           "flag name")))))
-                                                                       .firstName("Org").lastName("Ind")
-                                                                       .build()));
+                                                                       .setFirstName("Org").setLastName("Ind")
+                                                                       ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1416,9 +1416,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_EXPERTS_ID).build())
                     .build();
 
-                caseData.setApplicantExperts(wrapElements(PartyFlagStructure.builder()
-                                                              .firstName("Ex").lastName("Pert")
-                                                              .build()));
+                caseData.setApplicantExperts(wrapElements(new PartyFlagStructure()
+                                                              .setFirstName("Ex").setLastName("Pert")
+                                                              ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1442,14 +1442,14 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantExperts()).get(0);
 
-                caseData.setApplicantExperts(wrapElements(newParty.toBuilder()
-                                                              .flags(new Flags()
+                caseData.setApplicantExperts(wrapElements(newParty.copy()
+                                                              .setFlags(new Flags()
                                                                          .setPartyName("Exxxx Pert")
                                                                          .setRoleOnCase("Claimant solicitor expert")
                                                                          .setDetails(wrapElements(List.of(
                                                                              new FlagDetail().setName("flag name")))))
-                                                              .firstName("Ex").lastName("Pert")
-                                                              .build()));
+                                                              .setFirstName("Ex").setLastName("Pert")
+                                                              ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1471,9 +1471,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_EXPERTS_ID).build())
                     .build();
 
-                caseData.setRespondent1Experts(wrapElements(PartyFlagStructure.builder()
-                                                                .firstName("Ex").lastName("Pert")
-                                                                .build()));
+                caseData.setRespondent1Experts(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1497,14 +1497,14 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Experts()).get(0);
 
-                caseData.setRespondent1Experts(wrapElements(newParty.toBuilder()
-                                                                .flags(new Flags()
+                caseData.setRespondent1Experts(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
                                                                            .setPartyName("Exxxx Pert")
                                                                            .setRoleOnCase("Defendant solicitor 1 expert")
                                                                            .setDetails(wrapElements(List.of(
                                                                                new FlagDetail().setName("flag name")))))
-                                                                .firstName("Ex").lastName("Pert")
-                                                                .build()));
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1526,9 +1526,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_EXPERTS_ID).build())
                     .build();
 
-                caseData.setRespondent2Experts(wrapElements(PartyFlagStructure.builder()
-                                                                .firstName("Ex").lastName("Pert")
-                                                                .build()));
+                caseData.setRespondent2Experts(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1553,14 +1553,14 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Experts()).get(0);
 
-                caseData.setRespondent2Experts(wrapElements(newParty.toBuilder()
-                                                                .flags(new Flags()
+                caseData.setRespondent2Experts(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
                                                                            .setPartyName("Exxxx Pert")
                                                                            .setRoleOnCase("Defendant solicitor 2 expert")
                                                                            .setDetails(wrapElements(List.of(
                                                                                new FlagDetail().setName("flag name")))))
-                                                                .firstName("Ex").lastName("Pert")
-                                                                .build()));
+                                                                .setFirstName("Ex").setLastName("Pert")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1586,9 +1586,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(CLAIMANT_ONE_WITNESSES_ID).build())
                     .build();
 
-                caseData.setApplicantWitnesses(wrapElements(PartyFlagStructure.builder()
-                                                                .firstName("Wit").lastName("Ness")
-                                                                .build()));
+                caseData.setApplicantWitnesses(wrapElements(new PartyFlagStructure()
+                                                                .setFirstName("Wit").setLastName("Ness")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1612,14 +1612,14 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getApplicantWitnesses()).get(0);
 
-                caseData.setApplicantWitnesses(wrapElements(newParty.toBuilder()
-                                                                .flags(new Flags()
+                caseData.setApplicantWitnesses(wrapElements(newParty.copy()
+                                                                .setFlags(new Flags()
                                                                            .setPartyName("Wittyness")
                                                                            .setRoleOnCase("Claimant solicitor witness")
                                                                            .setDetails(wrapElements(List.of(
                                                                                new FlagDetail().setName("flag name")))))
-                                                                .firstName("Wit").lastName("Ness")
-                                                                .build()));
+                                                                .setFirstName("Wit").setLastName("Ness")
+                                                                ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1641,9 +1641,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_ONE_WITNESSES_ID).build())
                     .build();
 
-                caseData.setRespondent1Witnesses(wrapElements(PartyFlagStructure.builder()
-                                                                  .firstName("Wit").lastName("Ness")
-                                                                  .build()));
+                caseData.setRespondent1Witnesses(wrapElements(new PartyFlagStructure()
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1667,15 +1667,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent1Witnesses()).get(0);
 
-                caseData.setRespondent1Witnesses(wrapElements(newParty.toBuilder()
-                                                                  .flags(new Flags()
+                caseData.setRespondent1Witnesses(wrapElements(newParty.copy()
+                                                                  .setFlags(new Flags()
                                                                              .setPartyName("Wittyness")
                                                                              .setRoleOnCase(
                                                                                  "Defendant solicitor 1 witness")
                                                                              .setDetails(wrapElements(List.of(
                                                                                  new FlagDetail().setName("flag name")))))
-                                                                  .firstName("Wit").lastName("Ness")
-                                                                  .build()));
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1697,9 +1697,9 @@ class CaseFlagUtilsTest {
                     .updateDetailsForm(UpdateDetailsForm.builder().partyChosenId(DEFENDANT_TWO_WITNESSES_ID).build())
                     .build();
 
-                caseData.setRespondent2Witnesses(wrapElements(PartyFlagStructure.builder()
-                                                                  .firstName("Wit").lastName("Ness")
-                                                                  .build()));
+                caseData.setRespondent2Witnesses(wrapElements(new PartyFlagStructure()
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 
@@ -1724,15 +1724,15 @@ class CaseFlagUtilsTest {
 
                 PartyFlagStructure newParty = unwrapElements(caseData.getRespondent2Witnesses()).get(0);
 
-                caseData.setRespondent2Witnesses(wrapElements(newParty.toBuilder()
-                                                                  .flags(new Flags()
+                caseData.setRespondent2Witnesses(wrapElements(newParty.copy()
+                                                                  .setFlags(new Flags()
                                                                              .setPartyName("Wittyness")
                                                                              .setRoleOnCase(
                                                                                  "Defendant solicitor 2 witness")
                                                                              .setDetails(wrapElements(List.of(
                                                                                  new FlagDetail().setName("flag name")))))
-                                                                  .firstName("Wit").lastName("Ness")
-                                                                  .build()));
+                                                                  .setFirstName("Wit").setLastName("Ness")
+                                                                  ));
 
                 CaseFlagUtils.createOrUpdateFlags(caseData, organisationService);
 

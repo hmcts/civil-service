@@ -217,15 +217,11 @@ class MediationPredicateTest {
             when(caseData.getRespondent2()).thenReturn(null);
             // Applicant1 agreed (SPEC) -> negate of NOT agreed
             uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec app1Spec =
-                uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec.builder()
-                    .hasAgreedFreeMediation(YES)
-                    .build();
+                new uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec(YES);
             when(caseData.getApplicant1ClaimMediationSpecRequired()).thenReturn(app1Spec);
             // MP applicant agreed (or absent) -> negate of NOT required applicant MP
             uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec mpSpec =
-                uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec.builder()
-                    .hasAgreedFreeMediation(YES)
-                    .build();
+                new uk.gov.hmcts.reform.civil.model.SmallClaimMedicalLRspec(YES);
             when(caseData.getApplicantMPClaimMediationSpecRequired()).thenReturn(mpSpec);
             // General claimant agreed flag must be false
             when(caseData.hasClaimantAgreedToFreeMediation()).thenReturn(false);

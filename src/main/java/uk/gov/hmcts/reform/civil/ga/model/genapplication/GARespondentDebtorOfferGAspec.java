@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
 import uk.gov.hmcts.reform.civil.ga.enums.GADebtorPaymentPlanGAspec;
 import uk.gov.hmcts.reform.civil.ga.enums.GARespondentDebtorOfferOptionsGAspec;
 
@@ -12,7 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
+@NoArgsConstructor
 public class GARespondentDebtorOfferGAspec {
 
     private GARespondentDebtorOfferOptionsGAspec respondentDebtorOffer;

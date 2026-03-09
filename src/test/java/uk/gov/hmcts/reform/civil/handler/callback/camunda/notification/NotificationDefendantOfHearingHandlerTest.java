@@ -192,7 +192,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .hearingTimeHourMinute("1530")
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
-                .solicitorReferences(SolicitorReferences.builder().build())
+                .solicitorReferences(new SolicitorReferences())
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT1_HEARING").build()).build();
@@ -226,7 +226,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789").build())
+                .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference("6789"))
                 .respondentSolicitor2Reference("10111213")
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
@@ -263,7 +263,7 @@ public class NotificationDefendantOfHearingHandlerTest {
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YES)
                 .respondent2(Party.builder().type(Party.Type.COMPANY).companyName("Party2").build())
-                .solicitorReferences(SolicitorReferences.builder().respondentSolicitor1Reference("6789").build())
+                .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference("6789"))
                 .build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData)
                 .request(CallbackRequest.builder().eventId("NOTIFY_DEFENDANT2_HEARING").build()).build();

@@ -142,28 +142,22 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 01, 01, 0, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 01, 01, 12, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 02, 02, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                     List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+                        new HearingDaySchedule()
+                            .setHearingVenueId(EPIMS)
+                            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                        .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
         Fee expectedFee = new Fee();
@@ -218,28 +212,22 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                     List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+                        new HearingDaySchedule()
+                            .setHearingVenueId(EPIMS)
+                            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
         Fee expectedFee = new Fee();
@@ -251,10 +239,9 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         params.getRequest().setEventId(GENERATE_HEARING_NOTICE_HMC.name());
         var expectedHearingDays = List.of(
-            HearingDay.builder()
-                .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 10, 0, 0))
-                .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 12, 0, 0))
-                .build()
+            new HearingDay()
+                .setHearingStartDateTime(LocalDateTime.of(2023, 07, 01, 10, 0, 0))
+                .setHearingEndDateTime(LocalDateTime.of(2023, 07, 01, 12, 0, 0))
         );
 
         HearingNoticeVariables updatedVars = new HearingNoticeVariables();
@@ -300,28 +287,22 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                     List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+                        new HearingDaySchedule()
+                            .setHearingVenueId(EPIMS)
+                            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), any())).thenReturn(List.of(CASE_DOCUMENT));
 
@@ -364,28 +345,22 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                     List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+                        new HearingDaySchedule()
+                            .setHearingVenueId(EPIMS)
+                            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), eq(HEARING_NOTICE_HMC)))
             .thenReturn(List.of(CASE_DOCUMENT));
@@ -432,28 +407,22 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         when(locationRefDataService.getHearingCourtLocations(anyString()))
             .thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 07, 01, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 07, 01, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 06, 02, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(
                     List.of(
-                        HearingDaySchedule.builder()
-                            .hearingVenueId(EPIMS)
-                            .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                            .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                            .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+                        new HearingDaySchedule()
+                            .setHearingVenueId(EPIMS)
+                            .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                            .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(eq(caseData), eq(hearing), anyString(), anyString(), anyString(), eq(HEARING_NOTICE_HMC)))
             .thenReturn(List.of(CASE_DOCUMENT));
@@ -507,27 +476,21 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         List<LocationRefData> locations = List.of(new LocationRefData().setEpimmsId(EPIMS));
         when(locationRefDataService.getHearingCourtLocations(anyString())).thenReturn(locations);
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 6, 2, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                    HearingDaySchedule.builder()
-                        .hearingVenueId(EPIMS)
-                        .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                        .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                        .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(
+                    new HearingDaySchedule()
+                        .setHearingVenueId(EPIMS)
+                        .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                        .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
             .thenReturn(List.of(CASE_DOCUMENT));
@@ -573,27 +536,21 @@ class GenerateHearingNoticeHmcHandlerTest extends BaseCallbackHandlerTest {
         inputVariables.setCaseId(CASE_ID);
 
         when(camundaService.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(inputVariables);
-        HearingDay hearingDay = HearingDay.builder()
-            .hearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
-            .hearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0))
-            .build();
+        HearingDay hearingDay = new HearingDay()
+            .setHearingStartDateTime(LocalDateTime.of(2023, 7, 1, 9, 0, 0))
+            .setHearingEndDateTime(LocalDateTime.of(2023, 7, 1, 11, 0, 0));
         LocalDateTime hearingResponseDate = LocalDateTime.of(2023, 6, 2, 0, 0, 0);
-        HearingGetResponse hearing = HearingGetResponse.builder()
-            .hearingResponse(HearingResponse.builder().hearingDaySchedule(List.of(
-                    HearingDaySchedule.builder()
-                        .hearingVenueId(EPIMS)
-                        .hearingStartDateTime(hearingDay.getHearingStartDateTime())
-                        .hearingEndDateTime(hearingDay.getHearingEndDateTime())
-                        .build()))
-                                 .receivedDateTime(hearingResponseDate)
-                                 .build())
-            .requestDetails(HearingRequestDetails.builder()
-                                .versionNumber(VERSION_NUMBER)
-                                .build())
-            .hearingDetails(HearingDetails.builder()
-                                .hearingType(TRIAL_HEARING_TYPE)
-                                .build())
-            .build();
+        HearingGetResponse hearing = new HearingGetResponse()
+            .setHearingResponse(new HearingResponse().setHearingDaySchedule(List.of(
+                    new HearingDaySchedule()
+                        .setHearingVenueId(EPIMS)
+                        .setHearingStartDateTime(hearingDay.getHearingStartDateTime())
+                        .setHearingEndDateTime(hearingDay.getHearingEndDateTime())))
+                                 .setReceivedDateTime(hearingResponseDate))
+            .setRequestDetails(new HearingRequestDetails()
+                                .setVersionNumber(VERSION_NUMBER))
+            .setHearingDetails(new HearingDetails()
+                                .setHearingType(TRIAL_HEARING_TYPE));
         when(hearingsService.getHearingResponse(anyString(), anyString())).thenReturn(hearing);
         when(hearingNoticeHmcGenerator.generate(any(), eq(hearing), anyString(), nullable(String.class), anyString(), eq(HEARING_NOTICE_HMC)))
             .thenReturn(List.of(CASE_DOCUMENT));

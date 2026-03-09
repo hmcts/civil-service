@@ -87,10 +87,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
@@ -123,9 +121,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
+                new RespondToClaimAdmitPartLRspec()
+                    .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
@@ -157,9 +154,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
+                new RespondToClaimAdmitPartLRspec()
+                    .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
@@ -246,9 +242,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
+                new RespondToClaimAdmitPartLRspec()
+                    .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();
@@ -280,9 +275,8 @@ class FullDefenceApplicantSolicitorOneSpecNotifierTest {
             .respondent2ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondToClaimAdmitPartLRspec(
-                RespondToClaimAdmitPartLRspec.builder()
-                    .whenWillThisAmountBePaid(whenWillPay)
-                    .build()
+                new RespondToClaimAdmitPartLRspec()
+                    .setWhenWillThisAmountBePaid(whenWillPay)
             )
             .build();
         caseData = caseData.toBuilder().caseAccessCategory(SPEC_CLAIM).build();

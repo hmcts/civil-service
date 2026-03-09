@@ -61,7 +61,7 @@ public class MigrateGaCaseDataCallbackHandlerTest extends GeneralApplicationBase
     public void shouldReturnCorrectEvent() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplication())
-            .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+            .copy().ccdCaseReference(CHILD_CCD_REF).build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         assertThat(handler.handledEvents()).contains(migrateCase);
     }
@@ -73,7 +73,7 @@ public class MigrateGaCaseDataCallbackHandlerTest extends GeneralApplicationBase
         public void shouldNotThrowError_WhenMigrateCaseDataSuccessfully() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                     getGeneralApplication())
-                .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+                .copy().ccdCaseReference(CHILD_CCD_REF).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isNull();

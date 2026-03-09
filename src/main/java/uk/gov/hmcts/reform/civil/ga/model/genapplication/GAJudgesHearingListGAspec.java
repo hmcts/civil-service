@@ -2,9 +2,10 @@ package uk.gov.hmcts.reform.civil.ga.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.ga.enums.GAJudicialHearingType;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.SupportRequirements;
@@ -14,7 +15,8 @@ import java.util.List;
 
 @Setter
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
+@Accessors(chain = true)
 public class GAJudgesHearingListGAspec {
 
     private GAJudicialHearingType hearingPreferencesPreferredType;
@@ -73,5 +75,25 @@ public class GAJudgesHearingListGAspec {
         this.judgeSignLanguage = judgeSignLanguage;
         this.judgeLanguageInterpreter = judgeLanguageInterpreter;
 
+    }
+
+    public GAJudgesHearingListGAspec copy() {
+        return new GAJudgesHearingListGAspec()
+            .setHearingPreferencesPreferredType(hearingPreferencesPreferredType)
+            .setHearingPreferredLocation(hearingPreferredLocation)
+            .setJudicialTimeEstimate(judicialTimeEstimate)
+            .setJudicialTimeEstimateDays(judicialTimeEstimateDays)
+            .setJudicialTimeEstimateHours(judicialTimeEstimateHours)
+            .setJudicialTimeEstimateMinutes(judicialTimeEstimateMinutes)
+            .setJudicialSupportRequirement(judicialSupportRequirement)
+            .setJudgeSignLanguage(judgeSignLanguage)
+            .setJudgeLanguageInterpreter(judgeLanguageInterpreter)
+            .setJudgeOtherSupport(judgeOtherSupport)
+            .setAddlnInfoCourtStaff(addlnInfoCourtStaff)
+            .setJudgeHearingTimeEstimateText1(judgeHearingTimeEstimateText1)
+            .setJudgeHearingCourtLocationText1(judgeHearingCourtLocationText1)
+            .setHearingPreferencesPreferredTypeLabel1(hearingPreferencesPreferredTypeLabel1)
+            .setJudgeHearingSupportReqText1(judgeHearingSupportReqText1)
+            .setJudicialVulnerabilityText(judicialVulnerabilityText);
     }
 }

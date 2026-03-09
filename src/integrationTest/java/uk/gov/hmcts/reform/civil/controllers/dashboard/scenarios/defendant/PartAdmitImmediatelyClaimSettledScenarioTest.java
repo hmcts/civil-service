@@ -34,9 +34,9 @@ public class PartAdmitImmediatelyClaimSettledScenarioTest extends DashboardBaseI
             .applicant1AcceptPartAdmitPaymentPlanSpec(null)
             .respondent1Represented(YesOrNo.NO)
             .respondToAdmittedClaimOwingAmountPounds(BigDecimal.valueOf(100))
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.of(2024, 1, 1))
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.of(2024, 1, 1))
+                                               )
             .build();
 
         handler.handle(callbackParams(caseData));
