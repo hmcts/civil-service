@@ -374,6 +374,34 @@ class AcknowledgeOfServiceCallbackHandlerTest extends BaseCallbackHandlerTest {
                     .build());
         }
 
+        @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            // Given
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
+                .legacyCaseReference("000MC001")
+                .build();
+            caseData.setRespondent1ResponseDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+
+            // When
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String body = format(
+                CONFIRMATION_SUMMARY,
+                "N/A",
+                format("/cases/case-details/%s#CaseDocuments", CASE_ID)
+            ) + exitSurveyContentService.respondentSurvey();
+
+            // Then
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format(
+                        "# You have acknowledged the claim%n## Claim number: %s",
+                        REFERENCE_NUMBER
+                    ))
+                    .confirmationBody(body)
+                    .build());
+        }
     }
 
     private CallbackParams paramsWithRequest(CallbackParams params, CallbackRequest request) {
