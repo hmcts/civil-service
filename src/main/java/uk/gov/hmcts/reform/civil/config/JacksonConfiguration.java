@@ -1,17 +1,12 @@
 package uk.gov.hmcts.reform.civil.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -31,15 +26,5 @@ public class JacksonConfiguration {
         module.addSerializer(new LocalDateSerializer(DATE_FORMATTER));
         module.addSerializer(new LocalDateTimeSerializer(DATE_TIME_FORMATTER));
         return module;
-    }
-
-    @Bean
-    @Primary
-    public ObjectMapper objectMapper(ObjectProvider<List<Module>> modulesProvider) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.findAndRegisterModules();
-        modulesProvider.getIfAvailable(List::of).forEach(mapper::registerModule);
-        mapper.setDateFormat(new SimpleDateFormat(DATE_TIME_FORMAT, Locale.UK));
-        return mapper;
     }
 }
