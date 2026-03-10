@@ -49,7 +49,7 @@ run_functional_test_groups() {
 run_functional_tests() {
   echo "Running functional tests on ${ENVIRONMENT} env"
   if [ "$ENVIRONMENT" = "aat" ]; then
-    yarn test:api-prod 
+    yarn test:api-prod
   elif [ -z "$PR_FT_GROUPS" ]; then
     yarn test:api-nonprod
   else

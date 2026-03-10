@@ -111,7 +111,7 @@ class CourtOfficerOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
-            .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, "BEARER_TOKEN");
@@ -131,7 +131,7 @@ class CourtOfficerOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
-            .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, "BEARER_TOKEN");
