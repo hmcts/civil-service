@@ -67,7 +67,7 @@ class DefendantResponseDefendantDashboardServiceTest {
         lenient().when(caseData.isFullAdmitPayImmediatelyClaimSpec()).thenReturn(false);
         lenient().when(caseData.isPartAdmitPayImmediatelyClaimSpec()).thenReturn(false);
         lenient().when(caseData.hasDefendantAgreedToFreeMediation()).thenReturn(false);
-        lenient().when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        lenient().when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.INDIVIDUAL));
         return caseData;
     }
 
@@ -93,7 +93,7 @@ class DefendantResponseDefendantDashboardServiceTest {
     void shouldRecordSetDateScenarioForOrganisations() {
         CaseData caseData = mockBaseCaseData(2001L);
         when(caseData.isPayBySetDate()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.COMPANY).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.COMPANY));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -174,7 +174,7 @@ class DefendantResponseDefendantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(2006L);
         when(caseData.isPayByInstallment()).thenReturn(true);
         when(caseData.isPartAdmitClaimSpec()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.COMPANY).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.COMPANY));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -191,7 +191,7 @@ class DefendantResponseDefendantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(2007L);
         when(caseData.isPayByInstallment()).thenReturn(true);
         when(caseData.isFullAdmitClaimSpec()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.INDIVIDUAL));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 

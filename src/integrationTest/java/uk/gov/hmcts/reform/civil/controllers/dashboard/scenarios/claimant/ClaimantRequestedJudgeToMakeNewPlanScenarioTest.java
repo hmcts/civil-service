@@ -33,10 +33,10 @@ public class ClaimantRequestedJudgeToMakeNewPlanScenarioTest extends DashboardBa
                              .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1ChoosesHowToProceed(
                                  ChooseHowToProceed.REQUEST_A_CCJ).setClaimantResponseOnCourtDecision(
                                  ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)))
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr")
-                            .individualFirstName("Claimant").build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName(
-                "Defendant").individualLastName("Guy").build())
+            .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualTitle("Mr")
+                            .setIndividualFirstName("Claimant"))
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualTitle("Mr").setIndividualFirstName(
+                "Defendant").setIndividualLastName("Guy"))
             .build();
 
         handler.handle(callbackParams(caseData));
