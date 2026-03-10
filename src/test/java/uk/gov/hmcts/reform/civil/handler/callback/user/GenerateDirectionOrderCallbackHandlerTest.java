@@ -1711,7 +1711,9 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             when(judgeFinalOrderGenerator.generate(any(), any())).thenReturn(finalOrder);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(callbackParamsOf(caseData, MID, PAGE_ID));
 
-            assertThat(response.getErrors()).doesNotContain(PENAL_NOTICE_CONTENT_REQUIRED);
+            assertThat(response.getErrors())
+                .filteredOn(PENAL_NOTICE_CONTENT_REQUIRED::equals)
+                .isEmpty();
         }
     }
 
