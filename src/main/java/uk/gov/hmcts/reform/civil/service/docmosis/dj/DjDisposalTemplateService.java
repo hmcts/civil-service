@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getSdoDjOrderLitigiousPartyName;
 
 @Service
 @RequiredArgsConstructor

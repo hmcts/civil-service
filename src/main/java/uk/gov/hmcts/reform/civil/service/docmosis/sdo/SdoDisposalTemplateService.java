@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDisposalDirectionsService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -46,10 +47,13 @@ public class SdoDisposalTemplateService {
             .setRespondent1PartyName(getRespondent1NameWithLitigiousFriend(caseData))
             .setRespondent2PartyName(getRespondent2NameWithLitigiousFriend(caseData))
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
+            .setApplicant2PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
             .setApplicant2(caseData.getApplicant2())
             .setRespondent1(caseData.getRespondent1())
+            .setRespondent1PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
             .setHasRespondent2(caseClassificationService.hasRespondent2(caseData))
             .setRespondent2(caseData.getRespondent2())
+            .setRespondent2PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
             .setDrawDirectionsOrderRequired(caseData.getDrawDirectionsOrderRequired())
             .setDrawDirectionsOrder(caseData.getDrawDirectionsOrder())
             .setDisposalHearingJudgesRecital(caseData.getDisposalHearingJudgesRecital())

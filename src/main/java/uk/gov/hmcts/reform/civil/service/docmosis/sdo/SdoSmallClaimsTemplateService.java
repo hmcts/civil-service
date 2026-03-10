@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SmallClaimsVariable;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
