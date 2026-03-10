@@ -38,12 +38,12 @@ class DefRepresentedDefendantLipEmailDTOGeneratorTest {
         baseCaseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
             .legacyCaseReference("LEGACY123456")
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .individualTitle("Mrs")
-                             .individualFirstName("Jane")
-                             .individualLastName("Defendant")
-                             .partyName("Jane Defendant").build())
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setIndividualTitle("Mrs")
+                             .setIndividualFirstName("Jane")
+                             .setIndividualLastName("Defendant")
+                             .setPartyName("Jane Defendant"))
             .build();
     }
 

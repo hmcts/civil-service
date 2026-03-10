@@ -40,8 +40,8 @@ public class DefendantResponseFullDefenceDisputeAllCarmScenarioTest extends Dash
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE)
             .defenceRouteRequired(SpecJourneyConstantLRSpec.DISPUTES_THE_CLAIM)
             .responseClaimMediationSpecRequired(YesOrNo.NO)
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
             .totalClaimAmount(new BigDecimal(1000))
             .responseClaimTrack(SMALL_CLAIM.name())
                 .build();
