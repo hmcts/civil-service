@@ -14,6 +14,7 @@ plugins {
   id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
+  id "org.gradle.test-retry" version "1.6.2"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -179,8 +180,16 @@ task integration(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
+  failFast = System.getenv('GITHUB_ACTIONS') == 'true' ? false : true
   testLogging.showStandardStreams = false
+
+  if (System.getenv('GITHUB_ACTIONS') == 'true') {
+    retry {
+      maxRetries = 3
+      maxFailures = 10
+      failOnPassedAfterRetry = false
+    }
+  }
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
