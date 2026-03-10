@@ -250,7 +250,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            boolean alreadyProcessed = ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            boolean alreadyProcessed = false;
             if (incident.getIncidentMessage() != null) {
                 if (ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find()) {
                     alreadyProcessed = true;
