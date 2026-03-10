@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
+import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ class SettleClaimPaidInFullNotificationRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId() {
-        CaseData caseData = CaseData.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
         when(notificationsProperties.getNotifySettleClaimMarkedPaidInFullDefendantTemplate()).thenReturn(TEMPLATE_ID);
 
         String actualTemplate = generator.getEmailTemplateId(caseData);
@@ -54,7 +55,7 @@ class SettleClaimPaidInFullNotificationRespSolTwoEmailDTOGeneratorTest {
         uk.gov.hmcts.reform.ccd.model.OrganisationPolicy organisationPolicy =
             new uk.gov.hmcts.reform.ccd.model.OrganisationPolicy()
                 .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id"));
-        CaseData caseData = CaseData.builder()
+        CaseData caseData = CaseDataBuilder.builder()
             .respondent2OrganisationPolicy(organisationPolicy)
             .build();
 
