@@ -125,18 +125,16 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
+                new GAPbaDetails().setFee(
                         new Fee()
                             .setCode("FE203")
                             .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                             .setVersion("1")
-                            )
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                            ).setServiceReqReference(CUSTOMER_REFERENCE))
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+            .generalAppStatementOfTruth(new GAStatementOfTruth())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
                                                              .email("abc@gmail.com").build()))

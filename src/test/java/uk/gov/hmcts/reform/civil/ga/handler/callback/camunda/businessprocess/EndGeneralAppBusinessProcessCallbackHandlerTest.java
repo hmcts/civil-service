@@ -174,12 +174,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("0000"))
                 .build();
 
-            GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
-                .caseState("Awaiting Application Payment")
-                .caseLink(CaseLink.builder()
-                              .caseReference("1234")
-                              .build())
-                .build();
+            GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"));
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .claimantGaAppDetails(wrapElements(claimantCollection))
                 .build();
@@ -220,12 +215,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
                 .build();
 
-            GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
-                .caseState("Awaiting Application Payment")
-                .caseLink(CaseLink.builder()
-                              .caseReference("1234")
-                              .build())
-                .build();
+            GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"));
 
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .claimantGaAppDetails(wrapElements(claimantCollection))
@@ -268,12 +258,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("PAY")))
                 .build();
 
-            GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
-                .caseState("Awaiting Application Payment")
-                .caseLink(CaseLink.builder()
-                              .caseReference("1234")
-                              .build())
-                .build();
+            GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"));
 
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
                 .claimantGaAppDetails(wrapElements(claimantCollection))
@@ -321,12 +306,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .build();
 
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
-                .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                                                       .caseState("Awaiting Application Payment")
-                                                       .caseLink(CaseLink.builder()
-                                                                     .caseReference("1234")
-                                                                     .build())
-                                                       .build()))
+                .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"))))
                 .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
@@ -372,12 +352,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .build();
 
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
-                .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                                                       .caseState("Awaiting Application Payment")
-                                                       .caseLink(CaseLink.builder()
-                                                                     .caseReference("1234")
-                                                                     .build())
-                                                       .build()))
+                .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"))))
                 .build();
 
             when(coreCaseDataService.caseDataContentFromStartEventResponse(any(), anyMap())).thenCallRealMethod();
@@ -480,12 +455,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                 .build();
 
             GeneralApplicationCaseData parentCaseData = new GeneralApplicationCaseData()
-                .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                                                       .caseState("Awaiting Application Payment")
-                                                       .caseLink(CaseLink.builder()
-                                                                     .caseReference("1234")
-                                                                     .build())
-                                                       .build()))
+                .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234"))))
                 .build();
 
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
@@ -582,12 +552,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         }
 
         public StartEventResponse getStartEventResponse() {
-            GeneralApplicationsDetails claimantCollection = GeneralApplicationsDetails.builder()
-                .caseState("Awaiting Application Payment")
-                .caseLink(CaseLink.builder()
-                              .caseReference("1234L")
-                              .build())
-                .build();
+            GeneralApplicationsDetails claimantCollection = new GeneralApplicationsDetails().setCaseState("Awaiting Application Payment").setCaseLink(new CaseLink("1234L"));
 
             GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .claimantGaAppDetails(wrapElements(claimantCollection))
@@ -1336,28 +1301,25 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return GeneralApplication.builder()
-                .caseLink(CaseLink.builder().caseReference("1646003133062762").build())
+                .caseLink(new CaseLink("1646003133062762"))
                     .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
                     .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
                     .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
-                    GAPbaDetails.builder()
-                        .paymentDetails(new PaymentDetails()
+                    new GAPbaDetails().setPaymentDetails(new PaymentDetails()
                                             .setStatus(PaymentStatus.SUCCESS)
                                             .setReference("RC-1658-4258-2679-9795")
                                             .setCustomerReference(CUSTOMER_REFERENCE)
-                                            )
-                        .fee(
+                                            ).setFee(
                             new Fee()
                                 .setCode("FE203")
                                 .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                                 .setVersion("1")
-                                )
-                        .serviceReqReference(CUSTOMER_REFERENCE).build())
+                                ).setServiceReqReference(CUSTOMER_REFERENCE))
                     .generalAppDetailsOfOrder(STRING_CONSTANT)
                     .generalAppReasonsOfOrder(STRING_CONSTANT)
-                    .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                    .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                    .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                    .generalAppStatementOfTruth(new GAStatementOfTruth())
                     .generalAppHearingDetails(GAHearingDetails.builder().build())
                     .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
                             .email("abc@gmail.com").build()))
@@ -1371,28 +1333,25 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         private GeneralApplication getGeneralApplicationVary(YesOrNo isConsented, YesOrNo isTobeNotified, List<Element<GARespondentResponse>> respondentsResponses) {
 
             return GeneralApplication.builder()
-                .caseLink(CaseLink.builder().caseReference("1646003133062762").build())
+                .caseLink(new CaseLink("1646003133062762"))
                 .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
-                    GAPbaDetails.builder()
-                        .paymentDetails(new PaymentDetails()
+                    new GAPbaDetails().setPaymentDetails(new PaymentDetails()
                                             .setStatus(PaymentStatus.SUCCESS)
                                             .setReference("RC-1658-4258-2679-9795")
                                             .setCustomerReference(CUSTOMER_REFERENCE)
-                                            )
-                        .fee(
+                                            ).setFee(
                             new Fee()
                                 .setCode("FE203")
                                 .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                                 .setVersion("1")
-                                )
-                        .serviceReqReference(CUSTOMER_REFERENCE).build())
+                                ).setServiceReqReference(CUSTOMER_REFERENCE))
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppStatementOfTruth(new GAStatementOfTruth())
                 .generalAppHearingDetails(GAHearingDetails.builder().build())
                 .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
                                                                  .email("abc@gmail.com").build()))
@@ -1408,28 +1367,25 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                                               List<Element<GARespondentResponse>> respondentResponses,
                                                               List<Element<GASolicitorDetailsGAspec>> respondentDetails) {
             return GeneralApplication.builder()
-                .caseLink(CaseLink.builder().caseReference("1646003133062762").build())
+                .caseLink(new CaseLink("1646003133062762"))
                 .generalAppType(GAApplicationType.builder().types(List.of(VARY_PAYMENT_TERMS_OF_JUDGMENT)).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
-                    GAPbaDetails.builder()
-                        .paymentDetails(new PaymentDetails()
+                    new GAPbaDetails().setPaymentDetails(new PaymentDetails()
                                             .setStatus(PaymentStatus.SUCCESS)
                                             .setReference("RC-1658-4258-2679-9795")
                                             .setCustomerReference(CUSTOMER_REFERENCE)
-                                            )
-                        .fee(
+                                            ).setFee(
                             new Fee()
                                 .setCode("FE203")
                                 .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                                 .setVersion("1")
-                                )
-                        .serviceReqReference(CUSTOMER_REFERENCE).build())
+                                ).setServiceReqReference(CUSTOMER_REFERENCE))
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppStatementOfTruth(new GAStatementOfTruth())
                 .generalAppHearingDetails(GAHearingDetails.builder().build())
                 .isMultiParty(isConsented)
                 .respondentsResponses(respondentResponses)
@@ -1442,23 +1398,21 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
 
         private GeneralApplication getGeneralApplicationBeforePayment(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return GeneralApplication.builder()
-                .caseLink(CaseLink.builder().caseReference("1646003133062762L").build())
+                .caseLink(new CaseLink("1646003133062762L"))
                 .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
                 .generalAppPBADetails(
-                    GAPbaDetails.builder()
-                        .fee(
+                    new GAPbaDetails().setFee(
                             new Fee()
                                 .setCode("FE203")
                                 .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                                 .setVersion("1")
-                                )
-                        .serviceReqReference(CUSTOMER_REFERENCE).build())
+                                ).setServiceReqReference(CUSTOMER_REFERENCE))
                 .generalAppDetailsOfOrder(STRING_CONSTANT)
                 .generalAppReasonsOfOrder(STRING_CONSTANT)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-                .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+                .generalAppStatementOfTruth(new GAStatementOfTruth())
                 .generalAppHearingDetails(GAHearingDetails.builder().build())
                 .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
                                                                  .email("abc@gmail.com").build()))
@@ -1616,34 +1570,27 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
         private GeneralApplicationCaseData getParentCaseDataBeforeUpdate(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return new GeneralApplicationCaseData()
                     .generalApplications(wrapElements(getGeneralApplication(isConsented, isTobeNotified)))
-                    .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                            .caseLink(CaseLink.builder().caseReference(CHILD_CCD_REF.toString()).build())
-                            .caseState("General Application Issue Pending")
-                            .build()))
-                    .gaDetailsMasterCollection(wrapElements(GeneralApplicationsDetails.builder()
-                                                                .caseLink(CaseLink.builder()
-                                                                              .caseReference(CHILD_CCD_REF.toString())
-                                                                              .build())
-                                                                .caseState("General Application Issue Pending")
-                                                                .build()))
-                    .respondentSolGaAppDetails(wrapElements(GADetailsRespondentSol.builder()
-                             .caseLink(CaseLink.builder().caseReference(CHILD_CCD_REF.toString()).build())
-                             .caseState("General Application Issue Pending")
-                             .build()))
-                    .respondentSolTwoGaAppDetails(wrapElements(GADetailsRespondentSol.builder()
-                              .caseLink(CaseLink.builder().caseReference(CHILD_CCD_REF.toString()).build())
-                              .caseState("General Application Issue Pending")
-                              .build()))
+                    .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails()
+                        .setCaseLink(new CaseLink(CHILD_CCD_REF.toString()))
+                        .setCaseState("General Application Issue Pending")))
+                    .gaDetailsMasterCollection(wrapElements(new GeneralApplicationsDetails()
+                        .setCaseLink(new CaseLink(CHILD_CCD_REF.toString()))
+                        .setCaseState("General Application Issue Pending")))
+                    .respondentSolGaAppDetails(wrapElements(new GADetailsRespondentSol()
+                        .setCaseLink(new CaseLink(CHILD_CCD_REF.toString()))
+                        .setCaseState("General Application Issue Pending")))
+                    .respondentSolTwoGaAppDetails(wrapElements(new GADetailsRespondentSol()
+                        .setCaseLink(new CaseLink(CHILD_CCD_REF.toString()))
+                        .setCaseState("General Application Issue Pending")))
                     .build();
         }
 
         private GeneralApplicationCaseData getParentCaseDataBeforeUpdateCollection(YesOrNo isConsented, YesOrNo isTobeNotified) {
             return new GeneralApplicationCaseData()
                 .generalApplications(wrapElements(getGeneralApplication(isConsented, isTobeNotified)))
-                .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                                                       .caseLink(CaseLink.builder().caseReference(CHILD_CCD_REF.toString()).build())
-                                                       .caseState("Awaiting Application Payment")
-                                                       .build()))
+                .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails()
+                    .setCaseLink(new CaseLink(CHILD_CCD_REF.toString()))
+                    .setCaseState("Awaiting Application Payment")))
                 .build();
         }
 
@@ -1707,7 +1654,7 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
                                             dynamicListTest)
                                         .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                         .build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .respondentsResponses(respondentsResponses)
                 .generalAppRespondent1Representative(

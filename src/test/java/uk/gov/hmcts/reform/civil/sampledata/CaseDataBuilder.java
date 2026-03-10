@@ -5479,7 +5479,7 @@ public class CaseDataBuilder {
                     .types(types)
                     .build())
 
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
+                .caseLink(new CaseLink("12345678"))
                 .businessProcess(new BusinessProcess()
                     .setCamundaEvent("NotifyRoboticsOnCaseHandedOffline"))
                 .build());
@@ -5490,12 +5490,11 @@ public class CaseDataBuilder {
 
     public CaseDataBuilder getGeneralStrikeOutApplicationsDetailsWithCaseState(final String caseState) {
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetails = wrapElements(
-            GeneralApplicationsDetails.builder()
-                .generalApplicationType(STRIKE_OUT.getDisplayedValue())
-                .caseState(caseState)
-                .generalAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
-                .caseLink(CaseLink.builder().caseReference("12345678").build())
-                .build()
+            new GeneralApplicationsDetails()
+                .setGeneralApplicationType(STRIKE_OUT.getDisplayedValue())
+                .setCaseState(caseState)
+                .setGeneralAppSubmittedDateGAspec(SUBMITTED_DATE_TIME)
+                .setCaseLink(new CaseLink("12345678"))
         );
 
         this.generalApplicationsDetails = generalApplicationsDetails;

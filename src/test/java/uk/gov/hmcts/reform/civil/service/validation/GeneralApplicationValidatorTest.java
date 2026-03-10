@@ -37,10 +37,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
     //Urgency Date validation
     @Test
     void shouldReturnErrors_whenApplicationIsUrgentButConsiderationDateIsNotProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(null)
-            .build();
+        GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement().setGeneralAppUrgency(YES).setUrgentAppConsiderationDate(null);
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -49,10 +46,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldReturnErrors_whenApplicationIsNotUrgentButConsiderationDateIsProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(NO)
-            .urgentAppConsiderationDate(LocalDate.now())
-            .build();
+        GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement().setGeneralAppUrgency(NO).setUrgentAppConsiderationDate(LocalDate.now());
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -61,10 +55,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldReturnErrors_whenUrgencyConsiderationDateIsInPastForUrgentApplication() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(LocalDate.now().minusDays(1))
-            .build();
+        GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement().setGeneralAppUrgency(YES).setUrgentAppConsiderationDate(LocalDate.now().minusDays(1));
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -73,10 +64,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldNotCauseAnyErrors_whenUrgencyConsiderationDateIsInFutureForUrgentApplication() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(YES)
-            .urgentAppConsiderationDate(LocalDate.now())
-            .build();
+        GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement().setGeneralAppUrgency(YES).setUrgentAppConsiderationDate(LocalDate.now());
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -85,10 +73,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
-        GAUrgencyRequirement urgencyRequirement = GAUrgencyRequirement.builder()
-            .generalAppUrgency(NO)
-            .urgentAppConsiderationDate(null)
-            .build();
+        GAUrgencyRequirement urgencyRequirement = new GAUrgencyRequirement().setGeneralAppUrgency(NO).setUrgentAppConsiderationDate(null);
 
         List<String> errors = service.validateUrgencyDates(urgencyRequirement);
 
@@ -203,10 +188,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasNullDateFrom() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(null)
-            .unavailableTrialDateTo(null)
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(null).setUnavailableTrialDateTo(null);
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
             .trialRequiredYesOrNo(YES)
@@ -223,10 +205,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldReturnErrors_whenUnavailabilityIsSetButDateRangeProvidedHasDateFromAfterDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now().plusDays(1))
-            .unavailableTrialDateTo(LocalDate.now())
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now().plusDays(1)).setUnavailableTrialDateTo(LocalDate.now());
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
             .trialRequiredYesOrNo(YES)
@@ -258,10 +237,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithNullDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(null)
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now()).setUnavailableTrialDateTo(null);
 
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
             .trialRequiredYesOrNo(YES)
@@ -278,10 +254,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsValidWithSameDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now())
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now()).setUnavailableTrialDateTo(LocalDate.now());
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
             .trialRequiredYesOrNo(YES)
             .trialDateFrom(LocalDate.now())
@@ -297,10 +270,7 @@ class GeneralApplicationValidatorTest extends LocationRefSampleDataBuilder {
 
     @Test
     void shouldNotReturnErrors_whenUnavailabilityIsSetAndDateFromIsBeforeDateTo() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now().plusDays(1))
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now()).setUnavailableTrialDateTo(LocalDate.now().plusDays(1));
         GAHearingDetails hearingDetails = GAHearingDetails.builder()
             .trialRequiredYesOrNo(YES)
             .trialDateFrom(LocalDate.now())

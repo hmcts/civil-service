@@ -294,7 +294,7 @@ public class StateGeneratorServiceTest {
                                       )
             .generalAppRespondentSolicitors(getRespondentSolicitors())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
             .build();
 
         when(judicialDecisionHelper.isApplicationUncloakedWithAdditionalFee(any())).thenReturn(true);

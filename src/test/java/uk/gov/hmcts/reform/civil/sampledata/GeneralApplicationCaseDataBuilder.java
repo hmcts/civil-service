@@ -771,10 +771,7 @@ public class GeneralApplicationCaseDataBuilder {
             .applicantPartyName("Test Applicant Name")
             .createdDate(SUBMITTED_DATE_TIME)
             .locationName("County Court")
-            .caseManagementLocation(CaseLocationCivil.builder()
-                                        .siteName("County Court")
-                                        .baseLocation("2")
-                                        .region("4").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("County Court").setBaseLocation("2").setRegion("4"))
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
@@ -802,10 +799,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("2")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("2").setPostcode("BA 117"))
             .freeFormRecitalText("abcd")
             .freeFormOrderedText("abcd")
             .orderOnCourtsList(OrderOnCourtsList.ORDER_ON_COURT_INITIATIVE)
@@ -850,10 +844,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("2")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("2").setPostcode("BA 117"))
             .isMultiParty(NO)
             .createdDate(SUBMITTED_DATE_TIME)
             .generalAppType(GAApplicationType.builder()
@@ -881,9 +872,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setPostcode("BA 117"))
             .isMultiParty(NO)
             .createdDate(SUBMITTED_DATE_TIME)
             .generalAppType(GAApplicationType.builder()
@@ -911,9 +900,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setPostcode("BA 117"))
             .isMultiParty(NO)
             .createdDate(SUBMITTED_DATE_TIME)
             .generalAppType(GAApplicationType.builder()
@@ -943,10 +930,7 @@ public class GeneralApplicationCaseDataBuilder {
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
@@ -975,10 +959,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
@@ -1018,10 +999,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .createdDate(LocalDateTime.now())
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .judicialGeneralHearingOrderRecital("Test Judge's recital")
             .judicialGOHearingDirections("Test hearing direction")
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isAgreed).build())
@@ -1042,16 +1020,12 @@ public class GeneralApplicationCaseDataBuilder {
 
         GASolicitorDetailsGAspec respondent2 = GASolicitorDetailsGAspec.builder().id("id")
             .email(DUMMY_EMAIL).organisationIdentifier("3").build();
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
-            .caseLink(CaseLink.builder()
-                          .caseReference(String.valueOf(CASE_ID)).build())
-            .build();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
-            .caseLink(CaseLink.builder()
-                          .caseReference(String.valueOf(CASE_ID)).build())
-            .build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setCaseState(LISTING_FOR_A_HEARING.getDisplayedValue())
+            .setCaseLink(new CaseLink(String.valueOf(CASE_ID)));
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setCaseState(LISTING_FOR_A_HEARING.getDisplayedValue())
+            .setCaseLink(new CaseLink(String.valueOf(CASE_ID)));
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
         return new GeneralApplicationCaseData()
@@ -1087,20 +1061,15 @@ public class GeneralApplicationCaseDataBuilder {
             .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
             .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
             .judicialDecision(new GAJudicialDecision().setDecision(LIST_FOR_A_HEARING))
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .businessProcess(new BusinessProcess().setCamundaEvent(HEARING_SCHEDULED))
             .applicationIsCloaked(isCloak)
             .generalAppRespondentSolicitors(respondentSols)
-            .gaDetailsMasterCollection(wrapElements(GeneralApplicationsDetails.builder()
-                                                        .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
-                                                        .caseLink(CaseLink.builder()
-                                                                      .caseReference(String.valueOf(CASE_ID)).build())
-                                                        .build()))
+            .gaDetailsMasterCollection(wrapElements(new GeneralApplicationsDetails()
+                .setCaseState(LISTING_FOR_A_HEARING.getDisplayedValue())
+                .setCaseLink(new CaseLink(String.valueOf(CASE_ID)))))
             .claimantGaAppDetails(
                 wrapElements(generalApplicationsDetails
                 ))
@@ -1129,10 +1098,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
                 new GAOrderCourtOwnInitiativeGAspec()
@@ -1162,9 +1128,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant1PartyName("Test Defendant1 Name")
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setPostcode("BA 117"))
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
                 new GAOrderCourtOwnInitiativeGAspec()
@@ -1189,10 +1153,7 @@ public class GeneralApplicationCaseDataBuilder {
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .judgeTitle("John Doe")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("2")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("2").setPostcode("BA 117"))
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
                 new GAOrderCourtOwnInitiativeGAspec()
@@ -1221,10 +1182,7 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .locationName("Nottingham County Court and Family Court (and Crown)")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("2")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("2").setPostcode("BA 117"))
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .defendant2PartyName("Test Defendant2 Name")
@@ -1309,16 +1267,12 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(isCloak)
             .submittedOn(APPLICATION_SUBMITTED_DATE)
-            .gaDetailsMasterCollection(wrapElements(GeneralApplicationsDetails.builder()
-                                                        .caseState(APPLICATION_ADD_PAYMENT.getDisplayedValue())
-                                                        .caseLink(CaseLink.builder()
-                                                                      .caseReference(String.valueOf(CASE_ID)).build())
-                                                        .build()))
-            .claimantGaAppDetails(wrapElements(GeneralApplicationsDetails.builder()
-                                                   .caseState(APPLICATION_ADD_PAYMENT.getDisplayedValue())
-                                                   .caseLink(CaseLink.builder()
-                                                                 .caseReference(String.valueOf(CASE_ID)).build())
-                                                   .build()));
+            .gaDetailsMasterCollection(wrapElements(new GeneralApplicationsDetails()
+                .setCaseState(APPLICATION_ADD_PAYMENT.getDisplayedValue())
+                .setCaseLink(new CaseLink(String.valueOf(CASE_ID)))))
+            .claimantGaAppDetails(wrapElements(new GeneralApplicationsDetails()
+                .setCaseState(APPLICATION_ADD_PAYMENT.getDisplayedValue())
+                .setCaseLink(new CaseLink(String.valueOf(CASE_ID)))));
     }
 
     public GeneralApplicationCaseData adjournOrVacateHearingApplication(
@@ -1373,11 +1327,9 @@ public class GeneralApplicationCaseDataBuilder {
 
         GeneralApplicationCaseData caseDataBuilder = build().copy();
         caseDataBuilder.ccdCaseReference(1L);
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
-            .caseLink(CaseLink.builder()
-                          .caseReference(String.valueOf(CASE_ID)).build())
-            .build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setCaseState(LISTING_FOR_A_HEARING.getDisplayedValue())
+            .setCaseLink(new CaseLink(String.valueOf(CASE_ID)));
 
         if (withGADetails) {
             caseDataBuilder.claimantGaAppDetails(
@@ -1391,11 +1343,9 @@ public class GeneralApplicationCaseDataBuilder {
                 ));
         }
 
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
-            .caseLink(CaseLink.builder()
-                          .caseReference(String.valueOf(CASE_ID)).build())
-            .build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setCaseState(LISTING_FOR_A_HEARING.getDisplayedValue())
+            .setCaseLink(new CaseLink(String.valueOf(CASE_ID)));
         if (withGADetailsResp) {
             caseDataBuilder.respondentSolGaAppDetails(wrapElements(gaDetailsRespondentSol));
         }

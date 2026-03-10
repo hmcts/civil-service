@@ -295,13 +295,9 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         respSupportReq2
             .add(GAHearingSupportRequirements.LANGUAGE_INTERPRETER);
         List<Element<GAUnavailabilityDates>> resp1UnavailabilityDates = new ArrayList<>();
-        resp1UnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                         .unavailableTrialDateTo(LocalDate.now().plusDays(5))
-                                         .unavailableTrialDateFrom(LocalDate.now()).build()));
+        resp1UnavailabilityDates.add(element(new GAUnavailabilityDates().setUnavailableTrialDateTo(LocalDate.now().plusDays(5)).setUnavailableTrialDateFrom(LocalDate.now())));
         List<Element<GAUnavailabilityDates>> resp2UnavailabilityDates = new ArrayList<>();
-        resp2UnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                         .unavailableTrialDateTo(LocalDate.now().plusDays(3))
-                                         .unavailableTrialDateFrom(LocalDate.now()).build()));
+        resp2UnavailabilityDates.add(element(new GAUnavailabilityDates().setUnavailableTrialDateTo(LocalDate.now().plusDays(3)).setUnavailableTrialDateFrom(LocalDate.now())));
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
             .add(element(new GARespondentResponse()
@@ -352,9 +348,9 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .generalAppRespondentSolicitors(respondentSols)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppStatementOfTruth(new GAStatementOfTruth())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
                                                                         .listItems(List.of(location2))
@@ -415,28 +411,22 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
         DynamicListElement location2 = DynamicListElement.builder()
             .code(String.valueOf(UUID.randomUUID())).label("Site Name 2 - Address2 - 28000").build();
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
-        appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                                 .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-                                                 .unavailableTrialDateFrom(LocalDate.now()).build()));
+        appUnavailabilityDates.add(element(new GAUnavailabilityDates().setUnavailableTrialDateTo(LocalDate.now().plusDays(2)).setUnavailableTrialDateFrom(LocalDate.now())));
         return GeneralApplication.builder()
             .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
             .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
+                new GAPbaDetails().setFee(
                         new Fee()
                             .setCode("FE203")
                             .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                             .setVersion("1")
-                            )
-                    .serviceReqReference(CUSTOMER_REFERENCE)
-                    .paymentSuccessfulDate(LocalDateTime.now())
-                    .build())
+                            ).setServiceReqReference(CUSTOMER_REFERENCE).setPaymentSuccessfulDate(LocalDateTime.now()))
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+            .generalAppStatementOfTruth(new GAStatementOfTruth())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
                                                                         .listItems(List.of(location2))
@@ -460,28 +450,24 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
 
     private GeneralApplication getGeneralApplicationWithDeadlineReached(YesOrNo isConsented, YesOrNo isTobeNotified) {
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
-        appUnavailabilityDates.add(element(GAUnavailabilityDates.builder()
-                                               .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-                                               .unavailableTrialDateFrom(LocalDate.now()).build()));
+        appUnavailabilityDates.add(element(new GAUnavailabilityDates().setUnavailableTrialDateTo(LocalDate.now().plusDays(2)).setUnavailableTrialDateFrom(LocalDate.now())));
         return GeneralApplication.builder()
             .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
             .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .generalAppPBADetails(
-                GAPbaDetails.builder()
-                    .fee(
+                new GAPbaDetails().setFee(
                         new Fee()
                             .setCode("FE203")
                             .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
                             .setVersion("1")
-                            )
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                            ).setServiceReqReference(CUSTOMER_REFERENCE))
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppDateDeadline(LocalDateTime.now().minusDays(2))
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO))
+            .generalAppStatementOfTruth(new GAStatementOfTruth())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferredLocation(DynamicList.builder()
                                                                         .listItems(List.of(location1))

@@ -634,11 +634,8 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplicationCaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         civilCase.getClaimantGaAppDetails().add(Element.<GeneralApplicationsDetails>builder()
-                                                    .value(GeneralApplicationsDetails.builder()
-                                                               .caseLink(CaseLink.builder()
-                                                                             .caseReference(
-                                                                                 GeneralApplicationCaseDataBuilder.CASE_ID.toString())
-                                                                             .build()).build()).build());
+                                                    .value(new GeneralApplicationsDetails().setCaseLink(new CaseLink(
+                                                                                 GeneralApplicationCaseDataBuilder.CASE_ID.toString()))).build());
 
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
@@ -660,11 +657,8 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplicationCaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         civilCase.getRespondentSolGaAppDetails().add(Element.<GADetailsRespondentSol>builder()
-                                                         .value(GADetailsRespondentSol.builder()
-                                                                    .caseLink(CaseLink.builder()
-                                                                                  .caseReference(
-                                                                                      GeneralApplicationCaseDataBuilder.CASE_ID.toString())
-                                                                                  .build()).build()).build());
+                                                         .value(new GADetailsRespondentSol().setCaseLink(new CaseLink(
+                                                                                      GeneralApplicationCaseDataBuilder.CASE_ID.toString()))).build());
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
         GeneralApplicationCaseData gaCase = getGaVaryCaseDataForCollection(
@@ -686,10 +680,7 @@ class ParentCaseUpdateHelperTest {
         GeneralApplicationCaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         List<Element<GeneralApplicationsDetails>> translationList = new ArrayList<>();
         translationList.add(Element.<GeneralApplicationsDetails>builder()
-                                .value(GeneralApplicationsDetails.builder()
-                                           .caseLink(CaseLink.builder()
-                                                         .caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString())
-                                                         .build()).build()).build());
+                                .value(new GeneralApplicationsDetails().setCaseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))).build());
         GeneralApplicationCaseData updatedCaseData = civilCase.copy().gaDetailsTranslationCollection(
             translationList).build();
         when(coreCaseDataService.startUpdate(any(), any())).thenReturn(getStartEventResponse(YES, NO));
@@ -717,10 +708,7 @@ class ParentCaseUpdateHelperTest {
         GeneralApplicationCaseData civilCase = getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         List<Element<GeneralApplicationsDetails>> translationList = new ArrayList<>();
         translationList.add(Element.<GeneralApplicationsDetails>builder()
-                                .value(GeneralApplicationsDetails.builder()
-                                           .caseLink(CaseLink.builder()
-                                                         .caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString())
-                                                         .build()).build()).build());
+                                .value(new GeneralApplicationsDetails().setCaseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))).build());
         GeneralApplicationCaseData updatedCaseData = civilCase.copy().gaDetailsTranslationCollection(
             translationList).build();
 
@@ -761,40 +749,40 @@ class ParentCaseUpdateHelperTest {
     private GeneralApplicationCaseData getCaseWithApplicationData(Boolean withRespondentSol) {
         GeneralApplication generalApplication = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetailsList = Lists.newArrayList();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
 
         List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = Lists.newArrayList();
-        GeneralApplicationsDetails gaDetailsMasterColl = GeneralApplicationsDetails.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GeneralApplicationsDetails gaDetailsMasterColl = new GeneralApplicationsDetails()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         gaDetailsMasterCollection.add(element(gaDetailsMasterColl));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolListTwo = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSolTwo = GADetailsRespondentSol.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GADetailsRespondentSol gaDetailsRespondentSolTwo = new GADetailsRespondentSol()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         gaDetailsRespondentSolListTwo.add(element(gaDetailsRespondentSolTwo));
 
         List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
@@ -979,40 +967,40 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetailsList = Lists.newArrayList();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
 
         List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = Lists.newArrayList();
-        GeneralApplicationsDetails gaDetailsMasterColl = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GeneralApplicationsDetails gaDetailsMasterColl = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsMasterCollection.add(element(gaDetailsMasterColl));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolListTwo = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSolTwo = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSolTwo = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsRespondentSolListTwo.add(element(gaDetailsRespondentSolTwo));
 
         List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
@@ -1049,42 +1037,42 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetailsList = Lists.newArrayList();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
         List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
         builder.generalApplications(generalApplications);
 
         List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = Lists.newArrayList();
-        GeneralApplicationsDetails gaDetailsMasterColl = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GeneralApplicationsDetails gaDetailsMasterColl = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsMasterCollection.add(element(gaDetailsMasterColl));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolListTwo = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSolTwo = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(PENDING_APPLICATION_ISSUED.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSolTwo = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(PENDING_APPLICATION_ISSUED.toString());
         gaDetailsRespondentSolListTwo.add(element(gaDetailsRespondentSolTwo));
 
         switch (role) {
@@ -1116,42 +1104,42 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
         List<Element<GeneralApplicationsDetails>> generalApplicationsDetailsList = Lists.newArrayList();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
         List<Element<GeneralApplication>> generalApplications = wrapElements(generalApplication);
         builder.generalApplications(generalApplications);
 
         List<Element<GeneralApplicationsDetails>> gaDetailsMasterCollection = Lists.newArrayList();
-        GeneralApplicationsDetails gaDetailsMasterColl = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GeneralApplicationsDetails gaDetailsMasterColl = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         gaDetailsMasterCollection.add(element(gaDetailsMasterColl));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolListTwo = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSolTwo = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSolTwo = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         gaDetailsRespondentSolListTwo.add(element(gaDetailsRespondentSolTwo));
 
         switch (role) {
@@ -1185,22 +1173,22 @@ class ParentCaseUpdateHelperTest {
 
         GeneralApplication generalApplication = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList = Lists.newArrayList();
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
 
         switch (role) {
@@ -1224,14 +1212,14 @@ class ParentCaseUpdateHelperTest {
         // Claimant Collection with one element
         GeneralApplication generalApplication01 = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(3451956117501L)).build())
+            .caseLink(new CaseLink(String.valueOf(3451956117501L)))
             .build();
 
-        GeneralApplicationsDetails claimantCollectionElement01 = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication01.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication01.getCaseLink())
-            .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString()).build();
+        GeneralApplicationsDetails claimantCollectionElement01 = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication01.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication01.getCaseLink())
+            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString());
 
         List<Element<GeneralApplicationsDetails>> claimantCollection
             = Lists.newArrayList((element(claimantCollectionElement01)));
@@ -1241,14 +1229,14 @@ class ParentCaseUpdateHelperTest {
         // Master Collection with One element
         GeneralApplication gaMaster001 = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(3451956117501L)).build())
+            .caseLink(new CaseLink(String.valueOf(3451956117501L)))
             .build();
 
-        GeneralApplicationsDetails masterElement001 = GeneralApplicationsDetails.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(gaMaster001.getGeneralAppSubmittedDateGAspec())
-            .caseLink(gaMaster001.getCaseLink())
-            .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString()).build();
+        GeneralApplicationsDetails masterElement001 = new GeneralApplicationsDetails()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(gaMaster001.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(gaMaster001.getCaseLink())
+            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString());
 
         List<Element<GeneralApplicationsDetails>> masterCollection
             = Lists.newArrayList((element(masterElement001)));
@@ -1258,25 +1246,25 @@ class ParentCaseUpdateHelperTest {
         // Construct respondent One collection with 2 GAs
         GeneralApplication respondentOne01 = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(3451956117501L)).build())
+            .caseLink(new CaseLink(String.valueOf(3451956117501L)))
             .build();
 
         GeneralApplication respondentOne02 = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(GeneralApplicationCaseDataBuilder.CASE_ID.toString()).build())
+            .caseLink(new CaseLink(GeneralApplicationCaseDataBuilder.CASE_ID.toString()))
             .build();
 
-        GADetailsRespondentSol respondentSolOneElement01 = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(respondentOne01.getGeneralAppSubmittedDateGAspec())
-            .caseLink(respondentOne01.getCaseLink())
-            .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString()).build();
+        GADetailsRespondentSol respondentSolOneElement01 = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(respondentOne01.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(respondentOne01.getCaseLink())
+            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString());
 
-        GADetailsRespondentSol respondentSolOneElement02 = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.STAY_THE_CLAIM.toString())
-            .generalAppSubmittedDateGAspec(respondentOne02.getGeneralAppSubmittedDateGAspec())
-            .caseLink(respondentOne02.getCaseLink())
-            .caseState(AWAITING_APPLICATION_PAYMENT.toString()).build();
+        GADetailsRespondentSol respondentSolOneElement02 = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.STAY_THE_CLAIM.toString())
+            .setGeneralAppSubmittedDateGAspec(respondentOne02.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(respondentOne02.getCaseLink())
+            .setCaseState(AWAITING_APPLICATION_PAYMENT.toString());
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList =
             Lists.newArrayList(element(respondentSolOneElement01), element(respondentSolOneElement02));
@@ -1288,14 +1276,14 @@ class ParentCaseUpdateHelperTest {
         // Build Respondent Two Collection with One element
         GeneralApplication generalApplication3 = GeneralApplication
             .builder()
-            .caseLink(CaseLink.builder().caseReference(String.valueOf(3451956117501L)).build())
+            .caseLink(new CaseLink(String.valueOf(3451956117501L)))
             .build();
 
-        GADetailsRespondentSol respondentSolTwoGA1 = GADetailsRespondentSol.builder()
-            .generalApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
-            .generalAppSubmittedDateGAspec(generalApplication3.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication3.getCaseLink())
-            .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString()).build();
+        GADetailsRespondentSol respondentSolTwoGA1 = new GADetailsRespondentSol()
+            .setGeneralApplicationType(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT.toString())
+            .setGeneralAppSubmittedDateGAspec(generalApplication3.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication3.getCaseLink())
+            .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.toString());
 
         List<Element<GADetailsRespondentSol>> gaDetailsRespondentSolList2 =
             Lists.newArrayList(element(respondentSolTwoGA1));

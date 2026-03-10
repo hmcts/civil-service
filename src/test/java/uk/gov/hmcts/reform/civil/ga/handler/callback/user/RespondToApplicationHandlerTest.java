@@ -318,7 +318,7 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
         when(gaForLipService.isLipResp(any())).thenReturn(true);
         GeneralApplicationCaseData caseData =
             new GeneralApplicationCaseData().ccdState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION).generalAppUrgencyRequirement(
-                    GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).generalAppType(
+                    new GAUrgencyRequirement().setGeneralAppUrgency(YES)).generalAppType(
                     GAApplicationType
                         .builder()
                         .types(List.of(
@@ -1334,25 +1334,19 @@ public class RespondToApplicationHandlerTest extends GeneralApplicationBaseCallb
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableNullDateList() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(null)
-            .unavailableTrialDateTo(null)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates().setUnavailableTrialDateFrom(null).setUnavailableTrialDateTo(null);
         return wrapElements(invalidDates);
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableDateList() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
-            .unavailableTrialDateTo(UNAVAILABILITY_DATE_TO_INVALID)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates()
+            .setUnavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
+            .setUnavailableTrialDateTo(UNAVAILABILITY_DATE_TO_INVALID);
         return wrapElements(invalidDates);
     }
 
     private List<Element<GAUnavailabilityDates>> getUnavailableDateBeforeToday() {
-        GAUnavailabilityDates invalidDates = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID)
-            .build();
+        GAUnavailabilityDates invalidDates = new GAUnavailabilityDates().setUnavailableTrialDateFrom(UNAVAILABILITY_DATE_FROM_INVALID);
         return wrapElements(invalidDates);
     }
 

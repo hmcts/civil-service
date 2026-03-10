@@ -314,12 +314,12 @@ public class ParentCaseUpdateHelper {
                 if (masterCollection.isEmpty()) {
                     gaMasterDetails.add(
                         element(
-                            GeneralApplicationsDetails.builder()
-                                .generalApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
-                                .generalAppSubmittedDateGAspec(generalApplicationsDetailsElement.getValue()
-                                                                   .getGeneralAppSubmittedDateGAspec())
-                                .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                                    generalAppCaseData.getCcdCaseReference())).build()).build()));
+                            new GeneralApplicationsDetails()
+                                .setGeneralApplicationType(
+                                    generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
+                                .setGeneralAppSubmittedDateGAspec(
+                                    generalApplicationsDetailsElement.getValue().getGeneralAppSubmittedDateGAspec())
+                                .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))));
                 }
             });
         } else {
@@ -509,15 +509,13 @@ public class ParentCaseUpdateHelper {
             .stream().filter(claimantApp -> applicationFilterCriteria(claimantApp, applicationId)).findAny();
         claimantCollection.ifPresent(generalApplicationsDetailsElement -> gaTranslationDetails.add(
             element(
-                GeneralApplicationsDetails.builder()
-                    .generalApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
-                    .generalAppSubmittedDateGAspec(generalApplicationsDetailsElement.getValue()
-                                                       .getGeneralAppSubmittedDateGAspec())
-                    .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                        generalAppCaseData.getCcdCaseReference())).build())
-                    .parentClaimantIsApplicant(generalApplicationsDetailsElement.getValue()
-                                                   .getParentClaimantIsApplicant())
-                    .build())));
+                new GeneralApplicationsDetails()
+                    .setGeneralApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
+                    .setGeneralAppSubmittedDateGAspec(
+                        generalApplicationsDetailsElement.getValue().getGeneralAppSubmittedDateGAspec())
+                    .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+                    .setParentClaimantIsApplicant(
+                        generalApplicationsDetailsElement.getValue().getParentClaimantIsApplicant()))));
     }
 
     private void removeApplicationFromTranslationCollection(GeneralApplicationCaseData parentCaseData, Map<String, Object> updateMap,
@@ -552,14 +550,13 @@ public class ParentCaseUpdateHelper {
         if (!gaToBeAdded.isPresent()) {
             respCollection.ifPresent(generalApplicationsDetailsElement -> gaDetailsRespondentSol.add(
                 element(
-                    GADetailsRespondentSol.builder()
-                        .generalApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
-                        .generalAppSubmittedDateGAspec(generalApplicationsDetailsElement.getValue()
-                                                           .getGeneralAppSubmittedDateGAspec())
-                        .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                            generalAppCaseData.getCcdCaseReference())).build())
-                        .parentClaimantIsApplicant(generalApplicationsDetailsElement.getValue().getParentClaimantIsApplicant())
-                        .build())));
+                    new GADetailsRespondentSol()
+                        .setGeneralApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
+                        .setGeneralAppSubmittedDateGAspec(
+                            generalApplicationsDetailsElement.getValue().getGeneralAppSubmittedDateGAspec())
+                        .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+                        .setParentClaimantIsApplicant(
+                            generalApplicationsDetailsElement.getValue().getParentClaimantIsApplicant()))));
         }
     }
 
@@ -571,14 +568,13 @@ public class ParentCaseUpdateHelper {
             .stream().filter(claimantApp -> applicationFilterCriteria(claimantApp, applicationId)).findAny();
         claimantCollection.ifPresent(generalApplicationsDetailsElement -> gaDetailsRespondentSol.add(
             element(
-                GADetailsRespondentSol.builder()
-                    .generalApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
-                    .generalAppSubmittedDateGAspec(generalApplicationsDetailsElement.getValue()
-                                                       .getGeneralAppSubmittedDateGAspec())
-                    .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                        generalAppCaseData.getCcdCaseReference())).build())
-                    .parentClaimantIsApplicant(generalApplicationsDetailsElement.getValue().getParentClaimantIsApplicant())
-                    .build())));
+                new GADetailsRespondentSol()
+                    .setGeneralApplicationType(generalApplicationsDetailsElement.getValue().getGeneralApplicationType())
+                    .setGeneralAppSubmittedDateGAspec(
+                        generalApplicationsDetailsElement.getValue().getGeneralAppSubmittedDateGAspec())
+                    .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+                    .setParentClaimantIsApplicant(
+                        generalApplicationsDetailsElement.getValue().getParentClaimantIsApplicant()))));
 
     }
 
@@ -600,14 +596,13 @@ public class ParentCaseUpdateHelper {
                 log.info("Application with Case ID {} is added to respondent solicitor collection", generalAppCaseData.getCcdCaseReference());
                 respondentSolCollection.ifPresent(respondentSolElement -> gaMasterDetails.add(
                     element(
-                        GeneralApplicationsDetails.builder()
-                            .generalApplicationType(respondentSolElement.getValue().getGeneralApplicationType())
-                            .generalAppSubmittedDateGAspec(respondentSolElement.getValue()
-                                                               .getGeneralAppSubmittedDateGAspec())
-                            .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                                generalAppCaseData.getCcdCaseReference())).build())
-                            .parentClaimantIsApplicant(respondentSolElement.getValue().getParentClaimantIsApplicant())
-                            .build())));
+                        new GeneralApplicationsDetails()
+                            .setGeneralApplicationType(respondentSolElement.getValue().getGeneralApplicationType())
+                            .setGeneralAppSubmittedDateGAspec(
+                                respondentSolElement.getValue().getGeneralAppSubmittedDateGAspec())
+                            .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+                            .setParentClaimantIsApplicant(
+                                respondentSolElement.getValue().getParentClaimantIsApplicant()))));
             }
         }
     }
@@ -649,17 +644,12 @@ public class ParentCaseUpdateHelper {
                 log.info("Adding application to Respondent One Solicitor collection.");
                 gaDetailsRespondentSol.add(
                         element(
-                                GADetailsRespondentSol.builder()
-                                        .generalApplicationType(generalApplicationsDetails
-                                                .get().getValue().getGeneralApplicationType())
-                                        .generalAppSubmittedDateGAspec(generalApplicationsDetails
+                                new GADetailsRespondentSol().setGeneralApplicationType(generalApplicationsDetails
+                                                .get().getValue().getGeneralApplicationType()).setGeneralAppSubmittedDateGAspec(generalApplicationsDetails
                                                 .get().getValue()
-                                                .getGeneralAppSubmittedDateGAspec())
-                                        .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                                                generalAppCaseData.getCcdCaseReference())).build())
-                                        .caseState(newState)
-                                        .parentClaimantIsApplicant(generalApplicationsDetails.get()
-                                                                       .getValue().getParentClaimantIsApplicant()).build()));
+                                                .getGeneralAppSubmittedDateGAspec()).setCaseLink(new CaseLink(String.valueOf(
+                                                generalAppCaseData.getCcdCaseReference()))).setCaseState(newState).setParentClaimantIsApplicant(generalApplicationsDetails.get()
+                                                                       .getValue().getParentClaimantIsApplicant())));
             } else {
                 /*
                 * Update the ga with new state in respondent one solicitor collection
@@ -680,17 +670,12 @@ public class ParentCaseUpdateHelper {
             if (!isGaDetailsRespondentSolTwoPresent) {
                 gaDetailsRespondentSolTwo.add(
                     element(
-                        GADetailsRespondentSol.builder()
-                            .generalApplicationType(generalApplicationsDetails
-                                                        .get().getValue().getGeneralApplicationType())
-                            .generalAppSubmittedDateGAspec(generalApplicationsDetails
+                        new GADetailsRespondentSol().setGeneralApplicationType(generalApplicationsDetails
+                                                        .get().getValue().getGeneralApplicationType()).setGeneralAppSubmittedDateGAspec(generalApplicationsDetails
                                                                .get().getValue()
-                                                               .getGeneralAppSubmittedDateGAspec())
-                            .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                                generalAppCaseData.getCcdCaseReference())).build())
-                            .caseState(newState)
-                            .parentClaimantIsApplicant(generalApplicationsDetails
-                                                           .get().getValue().getParentClaimantIsApplicant()).build()));
+                                                               .getGeneralAppSubmittedDateGAspec()).setCaseLink(new CaseLink(String.valueOf(
+                                generalAppCaseData.getCcdCaseReference()))).setCaseState(newState).setParentClaimantIsApplicant(generalApplicationsDetails
+                                                           .get().getValue().getParentClaimantIsApplicant())));
             } else {
                 /*
                  * Update the ga with new state in respondent one solicitor collection
@@ -710,17 +695,15 @@ public class ParentCaseUpdateHelper {
             if (!isGaDetailsClaimantPresent) {
                 gaDetailsClaimant.add(
                     element(
-                        GeneralApplicationsDetails.builder()
-                            .generalApplicationType(generalApplicationsDetails
-                                                        .get().getValue().getGeneralApplicationType())
-                            .generalAppSubmittedDateGAspec(generalApplicationsDetails
-                                                               .get().getValue()
-                                                               .getGeneralAppSubmittedDateGAspec())
-                            .caseLink(CaseLink.builder().caseReference(String.valueOf(
-                                generalAppCaseData.getCcdCaseReference())).build())
-                            .caseState(newState)
-                            .parentClaimantIsApplicant(generalApplicationsDetails.get().getValue().getParentClaimantIsApplicant())
-                            .build()));
+                        new GeneralApplicationsDetails()
+                            .setGeneralApplicationType(
+                                generalApplicationsDetails.get().getValue().getGeneralApplicationType())
+                            .setGeneralAppSubmittedDateGAspec(
+                                generalApplicationsDetails.get().getValue().getGeneralAppSubmittedDateGAspec())
+                            .setCaseLink(new CaseLink(String.valueOf(generalAppCaseData.getCcdCaseReference())))
+                            .setCaseState(newState)
+                            .setParentClaimantIsApplicant(
+                                generalApplicationsDetails.get().getValue().getParentClaimantIsApplicant())));
             } else {
                 /*
                  * Update the ga with new state in respondent one solicitor collection
@@ -910,12 +893,12 @@ public class ParentCaseUpdateHelper {
         GeneralApplication.GeneralApplicationBuilder applicationBuilder = generalApplication.toBuilder();
 
         applicationBuilder.generalAppRespondentAgreement(GARespondentOrderAgreement.builder().build())
-            .generalAppPBADetails(GAPbaDetails.builder().build())
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppDetailsOfOrder(EMPTY)
             .generalAppReasonsOfOrder(EMPTY)
             .generalAppInformOtherParty(GAInformOtherParty.builder().build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement())
+            .generalAppStatementOfTruth(new GAStatementOfTruth())
             .generalAppHearingDate(new GAHearingDateGAspec())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())

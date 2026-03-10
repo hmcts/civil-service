@@ -45,8 +45,7 @@ public class LocationRefSampleDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO)
                                                .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppEvidenceDocument(wrapElements(new Document()
                                                          .setDocumentUrl(STRING_CONSTANT)
                                                          .setDocumentBinaryUrl(STRING_CONSTANT)
@@ -57,12 +56,8 @@ public class LocationRefSampleDataBuilder {
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(NO)
                                             .reasonsForWithoutNotice(STRING_CONSTANT).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().name(STRING_CONSTANT).role(STRING_CONSTANT).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES).setReasonsForUrgency(STRING_CONSTANT).setUrgentAppConsiderationDate(APP_DATE_EPOCH))
+            .generalAppStatementOfTruth(new GAStatementOfTruth().setName(STRING_CONSTANT).setRole(STRING_CONSTANT))
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .judgeName(STRING_CONSTANT)
                                           .hearingDate(APP_DATE_EPOCH)
@@ -79,12 +74,9 @@ public class LocationRefSampleDataBuilder {
                                           .hearingDetailsEmailID(STRING_CONSTANT)
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
-                                                                                           APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH)
-                                                                                       .build()))
+                                          .generalAppUnavailableDates(wrapElements(new GAUnavailabilityDates().setUnavailableTrialDateFrom(
+                                                                                           APP_DATE_EPOCH).setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                           .reasonForPreferredHearingType(STRING_CONSTANT)
                                           .telephoneHearingPreferredType(STRING_CONSTANT)
@@ -98,15 +90,14 @@ public class LocationRefSampleDataBuilder {
 
     protected CaseData getTestCaseDataForUrgencyCheckMidEvent(CaseData caseData, boolean isApplicationUrgent,
                                                               LocalDate urgencyConsiderationDate) {
-        GAUrgencyRequirement.GAUrgencyRequirementBuilder urBuilder = GAUrgencyRequirement.builder();
+        GAUrgencyRequirement gaUrgencyRequirement = new GAUrgencyRequirement()
+            .setUrgentAppConsiderationDate(urgencyConsiderationDate);
         if (isApplicationUrgent) {
-            urBuilder.generalAppUrgency(YES)
-                .reasonsForUrgency(STRING_CONSTANT);
+            gaUrgencyRequirement.setGeneralAppUrgency(YES)
+                .setReasonsForUrgency(STRING_CONSTANT);
         } else {
-            urBuilder.generalAppUrgency(NO);
+            gaUrgencyRequirement.setGeneralAppUrgency(NO);
         }
-        urBuilder.urgentAppConsiderationDate(urgencyConsiderationDate);
-        GAUrgencyRequirement gaUrgencyRequirement = urBuilder.build();
         return caseData.toBuilder()
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
@@ -114,15 +105,14 @@ public class LocationRefSampleDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO)
                                                .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(NO)
                                             .reasonsForWithoutNotice(STRING_CONSTANT).build())
             .generalAppUrgencyRequirement(gaUrgencyRequirement)
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().name(STRING_CONSTANT).role(STRING_CONSTANT).build())
+            .generalAppStatementOfTruth(new GAStatementOfTruth().setName(STRING_CONSTANT).setRole(STRING_CONSTANT))
             .generalAppEvidenceDocument(wrapElements(new Document()
                                                          .setDocumentUrl(STRING_CONSTANT)
                                                          .setDocumentBinaryUrl(STRING_CONSTANT)
@@ -142,11 +132,9 @@ public class LocationRefSampleDataBuilder {
                                           .judgeRequiredYesOrNo(YES)
                                           .trialRequiredYesOrNo(YES)
                                           .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
-                                                                                           APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH).build()))
+                                          .generalAppUnavailableDates(wrapElements(new GAUnavailabilityDates().setUnavailableTrialDateFrom(
+                                                                                           APP_DATE_EPOCH).setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
@@ -188,14 +176,8 @@ public class LocationRefSampleDataBuilder {
     }
 
     protected List<Element<GAUnavailabilityDates>> getValidUnavailableDateList() {
-        GAUnavailabilityDates range1 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now())
-            .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-            .build();
-        GAUnavailabilityDates range2 = GAUnavailabilityDates.builder()
-            .unavailableTrialDateFrom(LocalDate.now().plusDays(2))
-            .unavailableTrialDateTo(LocalDate.now().plusDays(2))
-            .build();
+        GAUnavailabilityDates range1 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now()).setUnavailableTrialDateTo(LocalDate.now().plusDays(2));
+        GAUnavailabilityDates range2 = new GAUnavailabilityDates().setUnavailableTrialDateFrom(LocalDate.now().plusDays(2)).setUnavailableTrialDateTo(LocalDate.now().plusDays(2));
         return wrapElements(range1, range2);
     }
 
@@ -207,19 +189,14 @@ public class LocationRefSampleDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO)
                                                .build())
-            .generalAppPBADetails(GAPbaDetails.builder()
-                                      .build())
+            .generalAppPBADetails(new GAPbaDetails())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
             .generalAppInformOtherParty(GAInformOtherParty.builder()
                                             .isWithNotice(NO)
                                             .reasonsForWithoutNotice(STRING_CONSTANT).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                              .generalAppUrgency(YES)
-                                              .reasonsForUrgency(STRING_CONSTANT)
-                                              .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                              .build())
-            .generalAppStatementOfTruth(GAStatementOfTruth.builder().name(STRING_CONSTANT).role(STRING_CONSTANT).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES).setReasonsForUrgency(STRING_CONSTANT).setUrgentAppConsiderationDate(APP_DATE_EPOCH))
+            .generalAppStatementOfTruth(new GAStatementOfTruth().setName(STRING_CONSTANT).setRole(STRING_CONSTANT))
             .generalAppEvidenceDocument(wrapElements(new Document()
                                                          .setDocumentUrl(STRING_CONSTANT)
                                                          .setDocumentBinaryUrl(STRING_CONSTANT)
@@ -239,11 +216,9 @@ public class LocationRefSampleDataBuilder {
                                           .judgeRequiredYesOrNo(YES)
                                           .trialRequiredYesOrNo(YES)
                                           .hearingDetailsEmailID(STRING_CONSTANT)
-                                          .generalAppUnavailableDates(wrapElements(GAUnavailabilityDates.builder()
-                                                                                       .unavailableTrialDateFrom(
-                                                                                           APP_DATE_EPOCH)
-                                                                                       .unavailableTrialDateTo(
-                                                                                           APP_DATE_EPOCH).build()))
+                                          .generalAppUnavailableDates(wrapElements(new GAUnavailabilityDates().setUnavailableTrialDateFrom(
+                                                                                           APP_DATE_EPOCH).setUnavailableTrialDateTo(
+                                                                                           APP_DATE_EPOCH)))
                                           .supportRequirementOther(STRING_CONSTANT)
                                           .hearingPreferredLocation(DynamicList.builder().build())
                                           .hearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)

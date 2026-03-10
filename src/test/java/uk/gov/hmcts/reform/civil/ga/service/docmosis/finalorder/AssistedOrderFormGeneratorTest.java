@@ -137,10 +137,7 @@ class AssistedOrderFormGeneratorTest {
     @Test
     void shouldThrowExceptionWhenNoLocationMatch() {
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("9")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("9").setPostcode("BA 117"))
             .claimant2PartyName(null).build();
 
         doThrow(new IllegalArgumentException("Court Name is not found in location data"))
@@ -167,10 +164,7 @@ class AssistedOrderFormGeneratorTest {
             .thenReturn(new DocmosisDocument(ASSISTED_ORDER_FORM.getDocumentTitle(), bytes));
 
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("1")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
             .judgeTitle("John Doe")
             .claimant2PartyName(null).build();
 
@@ -216,10 +210,7 @@ class AssistedOrderFormGeneratorTest {
                     .setExternalShortName("London")
             );
         GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(YES).copy()
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .baseLocation("2")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("2").setPostcode("BA 117"))
             .judgeTitle("John Doe")
             .claimant2PartyName(null).build();
         generator.generate(caseData, BEARER_TOKEN);
@@ -267,9 +258,7 @@ class AssistedOrderFormGeneratorTest {
             .defendant2PartyName("Test Defendant2 Name")
             .isMultiParty(isMultiparty)
             .locationName("ccmcc")
-            .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                        .address("london court")
-                                        .postcode("BA 117").build())
+            .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setPostcode("BA 117"))
             .assistedOrderMadeSelection(YES)
             .assistedOrderMadeDateHeardDetails(new AssistedOrderMadeDateHeardDetails().setSingleDateSelection(
                 new AssistedOrderDateHeard().setSingleDate(LocalDate.now())))
@@ -2379,10 +2368,7 @@ class AssistedOrderFormGeneratorTest {
 
             GeneralApplicationCaseData caseData = getSampleGeneralApplicationGeneralApplicationCaseData(NO).copy()
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
-                                            .address("london court")
-                                            .baseLocation("1")
-                                            .postcode("BA 117").build())
+                .caseManagementLocation(new CaseLocationCivil().setSiteName("testing").setAddress("london court").setBaseLocation("1").setPostcode("BA 117"))
                 .judgeTitle("John Doe")
                 .claimant2PartyName(null).build();
 

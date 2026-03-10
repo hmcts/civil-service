@@ -776,7 +776,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             String expectedJudicialSupportReqText = "Applicant requires no support";
 
-            GAUrgencyRequirement urgentApp = GAUrgencyRequirement.builder().generalAppUrgency(YES).build();
+            GAUrgencyRequirement urgentApp = new GAUrgencyRequirement().setGeneralAppUrgency(YES);
 
             CallbackParams params = callbackParamsOf(getCaseDateWithNoSupportReq(
                 null,
@@ -798,7 +798,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             String expectedJudicialSupportReqText = "Applicant requires no support. "
                 + "Respondent requires Other support, Hearing loop.";
 
-            GAUrgencyRequirement urgentApp = GAUrgencyRequirement.builder().generalAppUrgency(YES).build();
+            GAUrgencyRequirement urgentApp = new GAUrgencyRequirement().setGeneralAppUrgency(YES);
 
             List<Element<GARespondentResponse>> respondentResponse = getRespodentResponses(hasRespondentResponseVul);
 
@@ -1489,7 +1489,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
             return new GeneralApplicationCaseData()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                         .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -2104,7 +2104,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
             return new GeneralApplicationCaseData()
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .judicialListForHearing(new GAJudgesHearingListGAspec()
                                             .setHearingPreferredLocation(getLocationDynamicList())
                                             .setJudicialSupportRequirement(judgeSupportReqChoices)
@@ -2861,7 +2861,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
             return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YES)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder())

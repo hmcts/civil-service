@@ -183,7 +183,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
         void shouldSetTheEaFlagToTriggerTheWATask_TakeCaseOffline() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
+                    .caseLink(new CaseLink("54326781"))
                     .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
                     .build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()
@@ -215,7 +215,7 @@ class TriggerGenAppLocationUpdateCallbackHandlerTest extends BaseCallbackHandler
         void shouldNotSetTheEaFlagToTriggerTheWATask_TakeCaseOffline() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("54326781").build())
+                    .caseLink(new CaseLink("54326781"))
                     .generalAppType(GAApplicationType.builder().types(singletonList(SUMMARY_JUDGEMENT)).build())
                     .build());
             CaseData caseData = CaseDataBuilder.builder().atStateClaimSubmittedSmallClaim()

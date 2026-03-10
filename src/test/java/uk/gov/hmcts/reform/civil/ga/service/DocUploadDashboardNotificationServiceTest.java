@@ -132,7 +132,7 @@ public class DocUploadDashboardNotificationServiceTest {
                 .defendant1PartyName("Mr. Sole Trader")
                 .generalAppConsentOrder(YES)
                 .isGaRespondentOneLip(NO)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
+                .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES))
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename(
                         "GAApplnSolicitor")
                                               .email(DUMMY_EMAIL).organisationIdentifier("1").build())

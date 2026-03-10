@@ -41,7 +41,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     void shouldRecordNonUrgentScenarioWhenWithNotice() {
         GeneralApplicationCaseData caseData = baseCase()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario());
@@ -51,7 +51,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     void shouldRecordUrgentScenarioWhenWithNoticeAndUrgent() {
         GeneralApplicationCaseData caseData = baseCase()
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_RESPONDENT.getScenario());
@@ -61,7 +61,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     void shouldRecordNonUrgentScenarioWhenWithConsent() {
         GeneralApplicationCaseData caseData = baseCase()
             .generalAppConsentOrder(YesOrNo.YES)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.NO).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.NO))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_NONURGENT_RESPONDENT.getScenario());
@@ -71,7 +71,7 @@ class ApplicationSubmittedRespondentDashboardServiceTest {
     void shouldRecordUrgentScenarioWhenWithConsentAndUrgent() {
         GeneralApplicationCaseData caseData = baseCase()
             .generalAppConsentOrder(YesOrNo.YES)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YesOrNo.YES).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YesOrNo.YES))
             .build();
 
         assertScenarioRecorded(caseData, SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_URGENT_RESPONDENT.getScenario());

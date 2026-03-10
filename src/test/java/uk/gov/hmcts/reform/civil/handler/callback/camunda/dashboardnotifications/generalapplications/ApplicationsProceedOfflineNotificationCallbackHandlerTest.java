@@ -166,7 +166,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenEventIsLrClaimant() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -189,7 +189,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenEventIsLrDefendant() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -212,7 +212,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsForClaimantNull() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -241,7 +241,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsForClaimantEmpty() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -270,14 +270,11 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldReturnResponse_whenGeneralApplicationsForClaimantExist() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
 
             List<Element<GeneralApplicationsDetails>> gaApplicationsClaimant = wrapElements(
-                GeneralApplicationsDetails.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .caseState("Awaiting Respondent Response")
-                    .build());
+                new GeneralApplicationsDetails().setCaseLink(new CaseLink("12345678")).setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()
@@ -307,7 +304,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsForDefendantNull() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -336,7 +333,7 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldEmptyResponse_whenGeneralApplicationsForDefendantEmpty() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
@@ -365,14 +362,11 @@ class ApplicationsProceedOfflineNotificationCallbackHandlerTest extends BaseCall
         void shouldReturnResponse_whenGeneralApplicationsForDefendantExist() {
             List<Element<GeneralApplication>> gaApplications = wrapElements(
                 GeneralApplication.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
+                    .caseLink(new CaseLink("12345678"))
                     .build());
 
             List<Element<GADetailsRespondentSol>> respondentSolGaAppDetails = wrapElements(
-                GADetailsRespondentSol.builder()
-                    .caseLink(CaseLink.builder().caseReference("12345678").build())
-                    .caseState("Awaiting Respondent Response")
-                    .build());
+                new GADetailsRespondentSol().setCaseLink(new CaseLink("12345678")).setCaseState("Awaiting Respondent Response"));
             // GIVEN
             CaseData caseData = CaseDataBuilder.builder()
                 .build().toBuilder()

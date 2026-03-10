@@ -2496,7 +2496,7 @@ class JudicialApplicantNotificationServiceTest {
 
     private GeneralApplicationCaseData getCaseData(YesOrNo isUrgent, YesOrNo informOtherParty, String recipient) {
         return new GeneralApplicationCaseData()
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(isUrgent).build())
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(isUrgent))
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(informOtherParty).build())
             .generalAppRespondentSolicitors(wrapElements(GASolicitorDetailsGAspec.builder()
                                                              .email(recipient).build()))

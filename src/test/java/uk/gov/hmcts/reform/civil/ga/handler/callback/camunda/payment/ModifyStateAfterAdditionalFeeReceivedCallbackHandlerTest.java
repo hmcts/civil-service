@@ -223,16 +223,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
-                                                         .build())
+                                              .value(new GeneralApplicationsDetails()
+                                                  .setParentClaimantIsApplicant(YES)
+                                                  .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))
                                               .build()))
             .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                              .build())
+                                                   .value(new GADetailsRespondentSol()
+                                                       .setParentClaimantIsApplicant(YES)
+                                                       .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
                                                    .build()))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
@@ -269,16 +267,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                         .build())
+                                              .value(new GeneralApplicationsDetails()
+                                                  .setParentClaimantIsApplicant(YES)
+                                                  .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
                                               .build()))
             .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                              .build())
+                                                   .value(new GADetailsRespondentSol()
+                                                       .setParentClaimantIsApplicant(YES)
+                                                       .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
                                                    .build()))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
@@ -315,16 +311,10 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(YES)
-                                                         .caseState(APPLICATION_CLOSED.getDisplayedValue())
-                                                         .build())
+                                              .value(new GeneralApplicationsDetails().setParentClaimantIsApplicant(YES).setCaseState(APPLICATION_CLOSED.getDisplayedValue()))
                                               .build()))
             .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(YES)
-                                                              .caseState(APPLICATION_CLOSED.getDisplayedValue())
-                                                              .build())
+                                                   .value(new GADetailsRespondentSol().setParentClaimantIsApplicant(YES).setCaseState(APPLICATION_CLOSED.getDisplayedValue()))
                                                    .build()))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
@@ -361,16 +351,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(NO)
-                                                         .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                         .build())
+                                              .value(new GeneralApplicationsDetails()
+                                                  .setParentClaimantIsApplicant(NO)
+                                                  .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
                                               .build()))
             .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(NO)
-                                                              .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())
-                                                              .build())
+                                                   .value(new GADetailsRespondentSol()
+                                                       .setParentClaimantIsApplicant(NO)
+                                                       .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))
                                                    .build()))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
@@ -403,16 +391,14 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         caseData = caseData.copy()
             .parentCaseReference("1234")
             .claimantGaAppDetails(List.of(Element.<GeneralApplicationsDetails>builder()
-                                              .value(GeneralApplicationsDetails.builder()
-                                                         .parentClaimantIsApplicant(NO)
-                                                         .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue())
-                                                         .build())
+                                              .value(new GeneralApplicationsDetails()
+                                                  .setParentClaimantIsApplicant(NO)
+                                                  .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()))
                                               .build()))
             .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                   .value(GADetailsRespondentSol.builder()
-                                                              .parentClaimantIsApplicant(NO)
-                                                              .caseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())
-                                                              .build())
+                                                   .value(new GADetailsRespondentSol()
+                                                       .setParentClaimantIsApplicant(NO)
+                                                       .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))
                                                    .build()))
             .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
@@ -692,7 +678,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build()).build();
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(NO)).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -724,7 +710,7 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
                                                      GAJudgeRequestMoreInfoOption.SEND_APP_TO_OTHER_PARTY))
             .ccdCaseReference(CCD_CASE_REFERENCE).build().copy()
             .parentCaseReference(PARENT_CASE_REFERENCE)
-            .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build()).build();
+            .generalAppUrgencyRequirement(new GAUrgencyRequirement().setGeneralAppUrgency(YES)).build();
 
         HashMap<String, Object> scenarioParams = new HashMap<>();
 
@@ -818,15 +804,15 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest extends GeneralAp
         parentCaseData = parentCaseData.copy()
             .claimantGaAppDetails(List.of(
                 Element.<GeneralApplicationsDetails>builder().value(
-                    GeneralApplicationsDetails.builder()
-                        .parentClaimantIsApplicant(YES)
-                        .caseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()) // Action needed
-                        .build()).build(),
+                    new GeneralApplicationsDetails()
+                        .setParentClaimantIsApplicant(YES)
+                        .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()) // Action needed
+                ).build(),
                 Element.<GeneralApplicationsDetails>builder().value(
-                    GeneralApplicationsDetails.builder()
-                        .parentClaimantIsApplicant(YES)
-                        .caseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()) // In progress
-                        .build()).build()
+                    new GeneralApplicationsDetails()
+                        .setParentClaimantIsApplicant(YES)
+                        .setCaseState(APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION.getDisplayedValue()) // In progress
+                ).build()
             ))
             .respondentSolGaAppDetails(null)
             .build();
