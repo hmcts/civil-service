@@ -69,7 +69,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
     @BeforeEach
     public void setup() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
     }
 
     private GeneralApplicationPbaDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
