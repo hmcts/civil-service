@@ -672,8 +672,9 @@ class GeneralAppFeesServiceTest {
                 GAInformOtherParty.builder().isWithNotice(isWithNotice).build());
         }
         if (Objects.nonNull(hearingScheduledDate)) {
-            builder.generalAppHearingDate(GAHearingDateGAspec.builder()
-                                              .hearingScheduledDate(hearingScheduledDate).build());
+            GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+            hearingDate.setHearingScheduledDate(hearingScheduledDate);
+            builder.generalAppHearingDate(hearingDate);
         }
         return builder.build();
     }

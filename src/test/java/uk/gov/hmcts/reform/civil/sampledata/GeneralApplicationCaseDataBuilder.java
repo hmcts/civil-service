@@ -1323,9 +1323,8 @@ public class GeneralApplicationCaseDataBuilder {
 
     public GeneralApplicationCaseData adjournOrVacateHearingApplication(
         YesOrNo isRespondentAgreed, LocalDate gaHearingDate) {
-        GAHearingDateGAspec generalAppHearingDate = GAHearingDateGAspec.builder()
-            .hearingScheduledDate(gaHearingDate)
-            .build();
+        GAHearingDateGAspec generalAppHearingDate = new GAHearingDateGAspec();
+        generalAppHearingDate.setHearingScheduledDate(gaHearingDate);
         return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")

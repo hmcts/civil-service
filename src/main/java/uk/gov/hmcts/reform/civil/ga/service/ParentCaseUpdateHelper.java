@@ -916,7 +916,7 @@ public class ParentCaseUpdateHelper {
             .generalAppInformOtherParty(GAInformOtherParty.builder().build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().build())
             .generalAppStatementOfTruth(GAStatementOfTruth.builder().build())
-            .generalAppHearingDate(GAHearingDateGAspec.builder().build())
+            .generalAppHearingDate(new GAHearingDateGAspec())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .gaApplicantDisplayName(EMPTY)
@@ -932,9 +932,9 @@ public class ParentCaseUpdateHelper {
             .caseAccessCategory(null)
             .defendant2PartyName(EMPTY)
             .generalAppSuperClaimType(EMPTY)
-            .caseManagementCategory(GACaseManagementCategory.builder().build())
+            .caseManagementCategory(new GACaseManagementCategory())
             .locationName(EMPTY)
-            .generalAppHearingDate(GAHearingDateGAspec.builder().build())
+            .generalAppHearingDate(new GAHearingDateGAspec())
             .certOfSC(new CertOfSC())
             .applicantPartyName(EMPTY).build();
 

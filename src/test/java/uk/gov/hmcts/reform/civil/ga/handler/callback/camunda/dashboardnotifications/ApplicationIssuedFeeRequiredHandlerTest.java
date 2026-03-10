@@ -100,13 +100,15 @@ public class ApplicationIssuedFeeRequiredHandlerTest extends GeneralApplicationB
 
         @Test
         void shouldRecordApplicationSubmittedScenarioWhenInvokedForFreeApplication() {
+            GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+            hearingDate.setHearingScheduledDate(LocalDate.now().minusDays(20));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.YES).build())
                 .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.ADJOURN_HEARING)).build())
                 .isGaApplicantLip(YesOrNo.YES)
-                .generalAppHearingDate(GAHearingDateGAspec.builder().hearingScheduledDate(LocalDate.now().minusDays(20)).build())
+                .generalAppHearingDate(hearingDate)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .generalAppPBADetails(new GeneralApplicationPbaDetails()
                                           .setFee(new Fee()

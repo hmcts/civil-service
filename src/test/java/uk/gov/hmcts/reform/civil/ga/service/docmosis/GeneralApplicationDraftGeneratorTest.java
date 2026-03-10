@@ -349,9 +349,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF)
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+            .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .generalAppRespondentSolicitors(respondentSols)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
             .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
@@ -398,9 +396,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 getGeneralApplication(isConsented, isTobeNotified))
             .copy()
             .claimant1PartyName("Test Claimant1 Name")
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+            .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF).build();
     }
@@ -410,9 +406,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 getGeneralApplicationWithDeadlineReached(isConsented, isTobeNotified))
             .copy()
             .claimant1PartyName("Test Claimant1 Name")
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+            .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .defendant1PartyName("Test Defendant1 Name")
             .ccdCaseReference(CHILD_CCD_REF).build();
     }
@@ -473,9 +467,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             .generalAppType(GAApplicationType.builder().types(List.of(RELIEF_FROM_SANCTIONS)).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(isConsented).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isTobeNotified).build())
-            .generalAppHearingDate(
-                GAHearingDateGAspec.builder()
-                    .hearingScheduledPreferenceYesNo(YES).hearingScheduledDate(LocalDate.now()).build())
+            .generalAppHearingDate(buildHearingDateGAspec(YES, LocalDate.now()))
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
@@ -560,6 +552,13 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
 
         assertThat(generalApplicationDraftGenerator.getReference(caseDetails, "applicantSolicitor1Reference")).isEqualTo("app1ref");
         assertThat(generalApplicationDraftGenerator.getReference(caseDetails, "notExist")).isNull();
+    }
+
+    private GAHearingDateGAspec buildHearingDateGAspec(YesOrNo hearingScheduledPreferenceYesNo, LocalDate hearingScheduledDate) {
+        GAHearingDateGAspec hearingDate = new GAHearingDateGAspec();
+        hearingDate.setHearingScheduledPreferenceYesNo(hearingScheduledPreferenceYesNo);
+        hearingDate.setHearingScheduledDate(hearingScheduledDate);
+        return hearingDate;
     }
 
     private String getClaimants(GeneralApplicationCaseData caseData) {
