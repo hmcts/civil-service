@@ -283,6 +283,7 @@ class IncidentRetryEventHandlerTest {
         inc.setProcessInstanceId(processInstanceId);
         inc.setConfiguration(jobId);
         inc.setActivityId("activity1");
+        inc.setIncidentMessage("some error");
         return inc;
     }
 }
