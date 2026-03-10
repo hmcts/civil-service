@@ -204,6 +204,8 @@ public class CaseDataCaseProgression extends CivilCaseData implements MappableOb
     private OrderMadeOnTypes orderMadeOnDetailsList;
     private OrderMadeOnDetails orderMadeOnDetailsOrderCourt;
     private OrderMadeOnDetailsOrderWithoutNotice orderMadeOnDetailsOrderWithoutNotice;
+    private List<FinalOrderToggle> assistedOrderPenalNoticeToggle;
+    private String assistedOrderPenalNoticeContent;
     private YesOrNo finalOrderGiveReasonsYesNo;
     private AssistedOrderReasons finalOrderGiveReasonsComplex;
     private YesOrNo finalOrderAllocateToTrack;

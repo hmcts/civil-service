@@ -109,6 +109,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private static final String WITHOUT_NOTICE_SELECTION_TEXT = "If you were not notified of the application before "
         + "this order was made, you may apply to set aside, vary or stay the order. Any such application must be made "
         + "by 4pm on";
+    public static final String DEFAULT_PENAL_NOTICE = """
+        WARNING
+
+        [DEFENDANT] IF YOU DO NOT COMPLY WITH THIS ORDER YOU MAY BE HELD IN CONTEMPT OF COURT AND PUNISHED BY A FINE, \
+        IMPRISONMENT, CONFISCATION OF ASSETS OR OTHER PUNISHMENT UNDER THE LAW.
+
+        A penal notice against the Defendant is attached to paragraph X below.""";
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
     public static final String BODY_1_V_1 = """
     The order has been sent to:
@@ -151,6 +158,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public static final String FUTURE_DATE_FROM_ERROR = "The date in Order made 'Date from' may not be later than the established date";
     public static final String FUTURE_DATE_TO_ERROR = "The date in Order made 'Date to' may not be later than the established date";
     public static final String DATE_FROM_AFTER_DATE_TO_ERROR = "The date in Order made 'Date from' may not be later than the 'Date to'";
+    public static final String PENAL_NOTICE_CONTENT_REQUIRED = "Field is required";
     private String defendantTwoPartyName;
     private String claimantTwoPartyName;
     public static final String APPEAL_NOTICE_DATE = "Appeal notice date";
@@ -234,6 +242,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setAssistedOrderCostsReserved(null);
         caseData.setAssistedOrderMakeAnOrderForCosts(null);
         caseData.setAssistedOrderCostsBespoke(null);
+        caseData.setAssistedOrderPenalNoticeToggle(null);
+        caseData.setAssistedOrderPenalNoticeContent(null);
         caseData.setFinalOrderAppealToggle(null);
         caseData.setFinalOrderAppealComplex(null);
         caseData.setOrderMadeOnDetailsList(null);
@@ -332,6 +342,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             checkFieldDate(caseData, errors);
             checkFurtherHearingOther(caseData, errors);
             checkFurtherHearingOtherAlternateLocation(caseData, errors);
+            checkPenalNoticeContent(caseData, errors);
         }
 
         CaseDocument finalDocument = judgeFinalOrderGenerator.generate(
@@ -353,6 +364,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             && isNull(caseData.getFinalOrderFurtherHearingComplex()
                 .getLengthListOther())) {
             errors.add(FURTHER_HEARING_OTHER_EMPTY);
+        }
+    }
+
+    private void checkPenalNoticeContent(final CaseData caseData, final List<String> errors) {
+        if (nonNull(caseData.getAssistedOrderPenalNoticeToggle())
+            && !caseData.getAssistedOrderPenalNoticeToggle().isEmpty()
+            && caseData.getAssistedOrderPenalNoticeToggle().get(0).equals(SHOW)
+            && (caseData.getAssistedOrderPenalNoticeContent() == null
+                || caseData.getAssistedOrderPenalNoticeContent().isBlank())) {
+            errors.add(PENAL_NOTICE_CONTENT_REQUIRED);
         }
     }
 
@@ -520,6 +541,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
 
         caseData.setFinalOrderGiveReasonsYesNo(NO);
+
+        caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
