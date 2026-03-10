@@ -450,8 +450,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                    .respondent1(PartyBuilder.builder().build())
-                    .respondent2(PartyBuilder.builder().build())
+                    .respondent1(new PartyBuilder().build())
+                    .respondent2(new PartyBuilder().build())
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
@@ -490,8 +490,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                    .respondent1(PartyBuilder.builder().build())
-                    .respondent2(PartyBuilder.builder().build())
+                    .respondent1(new PartyBuilder().build())
+                    .respondent2(new PartyBuilder().build())
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
@@ -516,8 +516,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
-                    .respondent1(PartyBuilder.builder().build())
-                    .respondent2(PartyBuilder.builder().build())
+                    .respondent1(new PartyBuilder().build())
+                    .respondent2(new PartyBuilder().build())
                     .addRespondent2(YesOrNo.YES)
                     .applicant1Represented(YesOrNo.NO)
                     .queries(query)
@@ -571,8 +571,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
                 .applicantSolicitor1UserDetails(new IdamUserDetails()
                                                     .setEmail("applicant@email.com")
                                                     )
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .respondentSolicitor1EmailAddress("respondent1@email.com")
@@ -590,8 +590,8 @@ class NotifyOtherPartyQueryRaisedNotificationHandlerTest extends BaseCallbackHan
         private CaseData createCaseData1v2DifferentSolCaseWithQueries() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicantSolicitor1UserDetails(new IdamUserDetails()

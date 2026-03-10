@@ -741,8 +741,7 @@ public class GeneralApplicationCaseDataBuilder {
         GAInformOtherParty gaInformOtherParty = null;
         if (!isConsented) {
             gaInformOtherParty = GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
-                .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
-                .build();
+                .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT).build();
         }
         return new GeneralApplicationCaseData()
             .ccdCaseReference(1644495739087775L)
