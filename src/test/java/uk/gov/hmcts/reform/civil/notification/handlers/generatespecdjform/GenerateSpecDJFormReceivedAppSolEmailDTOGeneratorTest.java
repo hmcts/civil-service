@@ -110,7 +110,7 @@ class GenerateSpecDJFormReceivedAppSolEmailDTOGeneratorTest {
     @Test
     void shouldReturnTrueWhenBothDefendantsSelected() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder().label("Both Defendants").build())
@@ -123,7 +123,7 @@ class GenerateSpecDJFormReceivedAppSolEmailDTOGeneratorTest {
     @Test
     void shouldReturnFalseWhenOnlyOneDefendantSelectedFromTwo() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder().label("First Defendant").build())

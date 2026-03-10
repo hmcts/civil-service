@@ -115,7 +115,7 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
     void shouldNotifyWhenBothDefendantsSelected() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder().label("Both Defendants").build())
@@ -129,7 +129,7 @@ class GenerateSpecDJFormReceivedRespSolOneEmailDTOGeneratorTest {
     void shouldNotNotifyWhenOnlyOneOfTwoDefendantsSelected() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
             .defendantDetailsSpec(DynamicList.builder()
                 .value(DynamicListElement.builder().label("Second Defendant").build())
