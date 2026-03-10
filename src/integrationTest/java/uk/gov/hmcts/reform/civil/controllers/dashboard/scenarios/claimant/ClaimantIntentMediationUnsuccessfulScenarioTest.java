@@ -35,13 +35,13 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
 
         String caseId = "323491";
         Party respondent1 = new Party();
-        respondent1.toBuilder().partyName("John Doe").build();
+        respondent1.setPartyName("John Doe");
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v1LiP().build()
             .toBuilder()
             .ccdCaseReference(Long.valueOf(323491))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                             .setType(Party.Type.INDIVIDUAL))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -173,8 +173,8 @@ public class ClaimantIntentMediationUnsuccessfulScenarioTest extends DashboardBa
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                             .setType(Party.Type.INDIVIDUAL))
             .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(List.of(reason)))
             .build();
         return caseData;

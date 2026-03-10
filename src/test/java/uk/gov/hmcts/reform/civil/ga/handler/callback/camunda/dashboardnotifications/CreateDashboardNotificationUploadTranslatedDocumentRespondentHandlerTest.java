@@ -56,7 +56,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
@@ -77,7 +77,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldNotRecordTranslatedDocUploadedScenario_ifNotWithNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData().build();
             caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
