@@ -236,24 +236,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .parentCaseReference("1234")
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         AWAITING_APPLICATION_PAYMENT
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .respondentSolGaAppDetails(
                                 List.of(
-                                        Element.<GADetailsRespondentSol>builder()
-                                                .value(
+                                        new Element<GADetailsRespondentSol>().setValue(
                                                         new GADetailsRespondentSol()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         AWAITING_RESPONDENT_RESPONSE
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -293,24 +289,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .parentCaseReference("1234")
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .respondentSolGaAppDetails(
                                 List.of(
-                                        Element.<GADetailsRespondentSol>builder()
-                                                .value(
+                                        new Element<GADetailsRespondentSol>().setValue(
                                                         new GADetailsRespondentSol()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -350,24 +342,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .parentCaseReference("1234")
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         APPLICATION_CLOSED
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .respondentSolGaAppDetails(
                                 List.of(
-                                        Element.<GADetailsRespondentSol>builder()
-                                                .value(
+                                        new Element<GADetailsRespondentSol>().setValue(
                                                         new GADetailsRespondentSol()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         APPLICATION_CLOSED
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -407,24 +395,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .parentCaseReference("1234")
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(NO)
                                                                 .setCaseState(
                                                                         AWAITING_RESPONDENT_RESPONSE
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .respondentSolGaAppDetails(
                                 List.of(
-                                        Element.<GADetailsRespondentSol>builder()
-                                                .value(
+                                        new Element<GADetailsRespondentSol>().setValue(
                                                         new GADetailsRespondentSol()
                                                                 .setParentClaimantIsApplicant(NO)
                                                                 .setCaseState(
                                                                         AWAITING_APPLICATION_PAYMENT
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -461,24 +445,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .parentCaseReference("1234")
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(NO)
                                                                 .setCaseState(
                                                                         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .respondentSolGaAppDetails(
                                 List.of(
-                                        Element.<GADetailsRespondentSol>builder()
-                                                .value(
+                                        new Element<GADetailsRespondentSol>().setValue(
                                                         new GADetailsRespondentSol()
                                                                 .setParentClaimantIsApplicant(NO)
                                                                 .setCaseState(
                                                                         AWAITING_RESPONDENT_RESPONSE
-                                                                                .getDisplayedValue()))
-                                                .build()))
+                                                                                .getDisplayedValue()))))
                         .build();
         when(stateGeneratorService.getCaseStateForEndJudgeBusinessProcess(any()))
                 .thenReturn(AWAITING_RESPONDENT_RESPONSE);
@@ -967,24 +947,20 @@ class ModifyStateAfterAdditionalFeeReceivedCallbackHandlerTest
                         .copy()
                         .claimantGaAppDetails(
                                 List.of(
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         AWAITING_APPLICATION_PAYMENT
                                                                                 .getDisplayedValue()) // Action needed
-                                                        )
-                                                .build(),
-                                        Element.<GeneralApplicationsDetails>builder()
-                                                .value(
+                                                        ),
+                                        new Element<GeneralApplicationsDetails>().setValue(
                                                         new GeneralApplicationsDetails()
                                                                 .setParentClaimantIsApplicant(YES)
                                                                 .setCaseState(
                                                                         APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION
                                                                                 .getDisplayedValue()) // In progress
-                                                        )
-                                                .build()))
+                                                        )))
                         .respondentSolGaAppDetails(null)
                         .build();
 

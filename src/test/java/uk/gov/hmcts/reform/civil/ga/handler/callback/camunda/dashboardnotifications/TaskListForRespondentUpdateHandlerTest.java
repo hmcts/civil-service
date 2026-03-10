@@ -79,10 +79,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                  .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                       .setParentClaimantIsApplicant(YesOrNo.YES)
-                                                      .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue())).build()))
+                                                      .setCaseState(AWAITING_RESPONDENT_RESPONSE.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -114,10 +113,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                            .setParentClaimantIsApplicant(YesOrNo.YES)
-                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue())).build()))
+                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -149,10 +147,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                            .setParentClaimantIsApplicant(YesOrNo.YES)
-                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue())).build()))
+                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -184,10 +181,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                            .setParentClaimantIsApplicant(YesOrNo.NO)
-                                                           .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())).build()))
+                                                           .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -219,10 +215,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                            .setParentClaimantIsApplicant(YesOrNo.NO)
-                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue())).build()))
+                                                           .setCaseState(HEARING_SCHEDULED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -254,10 +249,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
                 .parentClaimantIsApplicant(YesOrNo.NO)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                       .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                            .setParentClaimantIsApplicant(YesOrNo.NO)
-                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue())).build()))
+                                                           .setCaseState(APPLICATION_DISMISSED.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);
@@ -289,10 +283,9 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .respondentSolGaAppDetails(List.of(Element.<GADetailsRespondentSol>builder()
-                                                  .value(new GADetailsRespondentSol()
+                .respondentSolGaAppDetails(List.of(new Element<GADetailsRespondentSol>().setValue(new GADetailsRespondentSol()
                                                       .setParentClaimantIsApplicant(YesOrNo.YES)
-                                                      .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue())).build()))
+                                                      .setCaseState(AWAITING_APPLICATION_PAYMENT.getDisplayedValue()))))
                 .build();
             when(coreCaseDataService.getCase(any())).thenReturn(caseDetails);
             when(caseDetailsConverter.toGeneralApplicationCaseData(caseDetails)).thenReturn(caseData);

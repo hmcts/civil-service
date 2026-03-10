@@ -1308,10 +1308,7 @@ public class ParentCaseUpdateHelper {
         Element<GeneralApplication> elementToAdd;
         if (newApplicationElement.isPresent()) {
             elementToAdd =
-                    Element.<GeneralApplication>builder()
-                            .id(newApplicationElement.get().getId())
-                            .value(application)
-                            .build();
+                    new Element<GeneralApplication>().setId(newApplicationElement.get().getId()).setValue(application);
         } else {
             elementToAdd = element(application);
         }

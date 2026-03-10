@@ -194,9 +194,7 @@ public class DocUploadUtilsTest {
         UUID sameId = from.get(1).getId();
         List<Element<CaseDocument>> to = new ArrayList<>();
         to.add(
-                Element.<CaseDocument>builder()
-                        .id(sameId)
-                        .value(
+                new Element<CaseDocument>().setId(sameId).setValue(
                                 new CaseDocument()
                                         .setCreatedBy("civil")
                                         .setDocumentLink(
@@ -206,8 +204,7 @@ public class DocUploadUtilsTest {
                                                         .setDocumentBinaryUrl(
                                                                 "http://dm-store:8080/documents"))
                                         .setDocumentName("witness_document.docx")
-                                        .setCreatedDatetime(LocalDateTime.now()))
-                        .build());
+                                        .setCreatedDatetime(LocalDateTime.now())));
         assertThat(DocUploadUtils.addDocuments(from, to).size()).isEqualTo(2);
     }
 

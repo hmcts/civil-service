@@ -101,10 +101,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
     @Autowired GeneralApplicationDraftGenerator generalApplicationDraftGenerator;
     List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
     DynamicListElement location1 =
-            DynamicListElement.builder()
-                    .code(String.valueOf(UUID.randomUUID()))
-                    .label("Site Name 2 - Address2 - 28000")
-                    .build();
+            new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
 
     @Test
     void shouldNotGenerateApplicationDraftDocument() {
@@ -357,11 +354,8 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                         resp1UnavailabilityDates)
                                                 .setHearingPreferredLocation(
                                                         hasResp1PreferLocation == YES
-                                                                ? DynamicList.builder()
-                                                                        .listItems(
-                                                                                List.of(location1))
-                                                                        .value(location1)
-                                                                        .build()
+                                                                ? new DynamicList().setListItems(
+                                                                                List.of(location1)).setValue(location1)
                                                                 : null))
                                 .setGaRespondentDetails("1L")));
         if (addRespondent == YES) {
@@ -381,12 +375,9 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                                                             resp2UnavailabilityDates)
                                                     .setHearingPreferredLocation(
                                                             hasResp2PreferLocation == YES
-                                                                    ? DynamicList.builder()
-                                                                            .listItems(
+                                                                    ? new DynamicList().setListItems(
                                                                                     List.of(
-                                                                                            location1))
-                                                                            .value(location1)
-                                                                            .build()
+                                                                                            location1)).setValue(location1)
                                                                     : null))
                                     .setGaRespondentDetails("2L")));
         }
@@ -397,10 +388,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
             List<Element<GASolicitorDetailsGAspec>> respondentSols, YesOrNo addRespondent) {
         List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.SUMMARY_JUDGEMENT));
         DynamicListElement location2 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("Site Name 2 - Address2 - 28000")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
         return new GeneralApplicationCaseData()
                 .claimant1PartyName("Test Claimant1 Name")
                 .defendant1PartyName("Test Defendant1 Name")
@@ -414,10 +402,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 .generalAppHearingDetails(
                         new GAHearingDetails()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .listItems(List.of(location2))
-                                                .value(location1)
-                                                .build())
+                                        new DynamicList().setListItems(List.of(location2)).setValue(location1))
                                 .setVulnerabilityQuestionsYesOrNo(YES)
                                 .setVulnerabilityQuestion("dummy2")
                                 .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -427,10 +412,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 .hearingDetailsResp(
                         new GAHearingDetails()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .listItems(List.of(location1))
-                                                .value(location1)
-                                                .build())
+                                        new DynamicList().setListItems(List.of(location1)).setValue(location1))
                                 .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                 .setHearingDuration(GAHearingDuration.MINUTES_30)
                                 .setHearingDetailsEmailID(DUMMY_EMAIL)
@@ -476,10 +458,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
 
     private GeneralApplication getGeneralApplication(YesOrNo isConsented, YesOrNo isTobeNotified) {
         DynamicListElement location2 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("Site Name 2 - Address2 - 28000")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
         List<Element<GAUnavailabilityDates>> appUnavailabilityDates = new ArrayList<>();
         appUnavailabilityDates.add(
                 element(
@@ -510,10 +489,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 .setGeneralAppHearingDetails(
                         new GAHearingDetails()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .listItems(List.of(location2))
-                                                .value(location2)
-                                                .build())
+                                        new DynamicList().setListItems(List.of(location2)).setValue(location2))
                                 .setVulnerabilityQuestionsYesOrNo(YES)
                                 .setVulnerabilityQuestion("dummy2")
                                 .setGeneralAppUnavailableDates(appUnavailabilityDates)
@@ -563,10 +539,7 @@ class GeneralApplicationDraftGeneratorTest extends GeneralApplicationBaseCallbac
                 .setGeneralAppHearingDetails(
                         new GAHearingDetails()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .listItems(List.of(location1))
-                                                .value(location1)
-                                                .build())
+                                        new DynamicList().setListItems(List.of(location1)).setValue(location1))
                                 .setVulnerabilityQuestionsYesOrNo(YES)
                                 .setVulnerabilityQuestion("dummy2")
                                 .setGeneralAppUnavailableDates(appUnavailabilityDates)

@@ -20,30 +20,22 @@ class DynamicListUtilsTest {
         void shouldCreateListFromDynamicList() {
             List<String> stringList = List.of("item 1", "item 2");
 
-            DynamicList dynamicList = DynamicList.builder()
-                .listItems(List.of(DynamicListElement.builder()
-                                       .label("item 1")
-                                       .build(),
-                                   DynamicListElement.builder()
-                                       .label("item 2")
-                                       .build()))
-                .build();
+            DynamicList dynamicList = new DynamicList().setListItems(List.of(new DynamicListElement().setLabel("item 1"),
+                                   new DynamicListElement().setLabel("item 2")));
 
             assertThat(listFromDynamicList(dynamicList)).isEqualTo(stringList);
         }
 
         @Test
         void shouldReturnNull_whenNullDynamicListItems() {
-            DynamicList dynamicList = DynamicList.builder()
-                .listItems(null)
-                .build();
+            DynamicList dynamicList = new DynamicList().setListItems(null);
 
             assertThat(listFromDynamicList(dynamicList)).isNull();
         }
 
         @Test
         void shouldReturnNull_whenNullDynamicList() {
-            DynamicList dynamicList = DynamicList.builder().build();
+            DynamicList dynamicList = new DynamicList();
 
             assertThat(listFromDynamicList(dynamicList)).isNull();
         }
@@ -53,33 +45,18 @@ class DynamicListUtilsTest {
     class ValueFromDynamicList {
         void shouldReturnString_whenDynamicListHasValue() {
             String expected = "item 1";
-            DynamicList dynamicList = DynamicList.builder()
-                .listItems(List.of(
-                    DynamicListElement.builder()
-                        .label("item 1")
-                        .build(),
-                    DynamicListElement.builder()
-                        .label("item 2")
-                        .build()))
-                .value(DynamicListElement.builder()
-                           .label("item 1")
-                           .build())
-                .build();
+            DynamicList dynamicList = new DynamicList().setListItems(List.of(
+                    new DynamicListElement().setLabel("item 1"),
+                    new DynamicListElement().setLabel("item 2"))).setValue(new DynamicListElement().setLabel("item 1"));
 
             assertThat(getDynamicListValue(dynamicList)).isEqualTo(expected);
         }
     }
 
     void shouldReturnNull_whenDynamicListHasNoValue() {
-        DynamicList dynamicList = DynamicList.builder()
-            .listItems(List.of(
-                DynamicListElement.builder()
-                    .label("item 1")
-                    .build(),
-                DynamicListElement.builder()
-                    .label("item 2")
-                    .build()))
-            .build();
+        DynamicList dynamicList = new DynamicList().setListItems(List.of(
+                new DynamicListElement().setLabel("item 1"),
+                new DynamicListElement().setLabel("item 2")));
 
         assertThat(getDynamicListValue(dynamicList)).isNull();
     }
@@ -88,21 +65,12 @@ class DynamicListUtilsTest {
     class TrimDynamicList {
         @Test
         void shouldTrimListItemsToSelectedValue() {
-            DynamicListElement selected = DynamicListElement.builder()
-                .code("CODE")
-                .label("Label")
-                .build();
+            DynamicListElement selected = new DynamicListElement().setCode("CODE").setLabel("Label");
 
-            DynamicList dynamicList = DynamicList.builder()
-                .listItems(List.of(
+            DynamicList dynamicList = new DynamicList().setListItems(List.of(
                     selected,
-                    DynamicListElement.builder()
-                        .code("OTHER")
-                        .label("Other")
-                        .build()
-                ))
-                .value(selected)
-                .build();
+                    new DynamicListElement().setCode("OTHER").setLabel("Other")
+                )).setValue(selected);
 
             DynamicList trimmed = trimToSelectedValue(dynamicList);
 

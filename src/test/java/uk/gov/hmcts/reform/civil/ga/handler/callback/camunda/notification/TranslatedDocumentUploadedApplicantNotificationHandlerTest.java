@@ -92,12 +92,10 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest
                             .defendant1PartyName("respondent1")
                             .generalAppRespondentSolicitors(
                                     List.of(
-                                            Element.<GASolicitorDetailsGAspec>builder()
-                                                    .value(
+                                            new Element<GASolicitorDetailsGAspec>().setValue(
                                                             new GASolicitorDetailsGAspec()
                                                                     .setEmail(
-                                                                            "respondent@gmail.com"))
-                                                    .build()))
+                                                                            "respondent@gmail.com"))))
                             .generalAppParentCaseLink(
                                     new GeneralAppParentCaseLink().setCaseReference("1234567"))
                             .generalAppConsentOrder(YES)
@@ -146,12 +144,10 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest
                             .defendant1PartyName("respondent1")
                             .generalAppRespondentSolicitors(
                                     List.of(
-                                            Element.<GASolicitorDetailsGAspec>builder()
-                                                    .value(
+                                            new Element<GASolicitorDetailsGAspec>().setValue(
                                                             new GASolicitorDetailsGAspec()
                                                                     .setEmail(
-                                                                            "respondent@gmail.com"))
-                                                    .build()))
+                                                                            "respondent@gmail.com"))))
                             .generalAppParentCaseLink(
                                     new GeneralAppParentCaseLink().setCaseReference("1234567"))
                             .generalAppConsentOrder(YES)
@@ -203,12 +199,10 @@ public class TranslatedDocumentUploadedApplicantNotificationHandlerTest
                             .defendant1PartyName("respondent1")
                             .generalAppRespondentSolicitors(
                                     List.of(
-                                            Element.<GASolicitorDetailsGAspec>builder()
-                                                    .value(
+                                            new Element<GASolicitorDetailsGAspec>().setValue(
                                                             new GASolicitorDetailsGAspec()
                                                                     .setEmail(
-                                                                            "respondent@gmail.com"))
-                                                    .build()))
+                                                                            "respondent@gmail.com"))))
                             .generalAppParentCaseLink(
                                     new GeneralAppParentCaseLink().setCaseReference("1234567"))
                             .generalAppConsentOrder(YES)
