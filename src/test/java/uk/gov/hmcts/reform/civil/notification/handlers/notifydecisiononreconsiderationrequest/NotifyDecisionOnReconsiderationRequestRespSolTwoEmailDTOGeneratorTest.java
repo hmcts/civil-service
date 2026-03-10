@@ -57,7 +57,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual("Alex").build())
+            .respondent2(new PartyBuilder().individual("Alex").build())
             .addRespondent2(YesOrNo.YES)
             .build();
         Map<String, String> properties = new HashMap<>();
@@ -72,7 +72,7 @@ class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGeneratorTest {
     @Test
     void shouldNotifyWhenSecondDefendantExistsEvenWithSameSolicitor() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual("Alex").build())
+            .respondent2(new PartyBuilder().individual("Alex").build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .respondentSolicitor1EmailAddress("solicitor@example.com")

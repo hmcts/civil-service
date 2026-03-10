@@ -66,7 +66,7 @@ class NotifyDecisionOnReconsiderationRequestDefendantEmailDTOGeneratorTest {
     void shouldNotifyForRespondentLipWithEmail() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
-            .respondent1(PartyBuilder.builder().individual().partyEmail("defendant@example.com").build())
+            .respondent1(new PartyBuilder().individual().partyEmail("defendant@example.com").build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
@@ -76,7 +76,7 @@ class NotifyDecisionOnReconsiderationRequestDefendantEmailDTOGeneratorTest {
     void shouldNotNotifyWhenEmailMissing() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
-            .respondent1(PartyBuilder.builder().individual().partyEmail(null).build())
+            .respondent1(new PartyBuilder().individual().partyEmail(null).build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
@@ -86,7 +86,7 @@ class NotifyDecisionOnReconsiderationRequestDefendantEmailDTOGeneratorTest {
     void shouldNotNotifyWhenRespondentRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
-            .respondent1(PartyBuilder.builder().individual().partyEmail("defendant@example.com").build())
+            .respondent1(new PartyBuilder().individual().partyEmail("defendant@example.com").build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
