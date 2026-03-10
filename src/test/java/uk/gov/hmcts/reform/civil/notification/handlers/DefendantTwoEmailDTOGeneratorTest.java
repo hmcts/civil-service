@@ -42,7 +42,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
     void shouldReturnCorrectEmailAddress() {
         String email = "test@example.com";
         CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().partyEmail(email).build())
+            .respondent2(new Party().setPartyEmail(email))
             .build();
 
         String outputEmail = emailDTOGenerator.getEmailAddress(caseData);
@@ -51,7 +51,7 @@ public class DefendantTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         CaseData caseData = CaseData.builder().respondent2(party).build();
         MockedStatic<PartyUtils> partyUtilsMockedStatic = Mockito.mockStatic(PartyUtils.class);
 

@@ -30,11 +30,10 @@ class PartyDetailsCaseReferenceTest {
 
     @Test
     void shouldMapApplicant1PartyCorrectly() throws Exception {
-        Party party = Party.builder()
-            .individualFirstName("Alice")
-            .individualLastName("Smith")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setIndividualFirstName("Alice")
+            .setIndividualLastName("Smith")
+            .setType(Party.Type.INDIVIDUAL);
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("applicant1", party);
@@ -51,11 +50,10 @@ class PartyDetailsCaseReferenceTest {
 
     @Test
     void shouldMapApplicant2PartyCorrectly() throws Exception {
-        Party party = Party.builder()
-            .individualFirstName("Bob")
-            .individualLastName("Johnson")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setIndividualFirstName("Bob")
+            .setIndividualLastName("Johnson")
+            .setType(Party.Type.INDIVIDUAL);
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("applicant2", party);
@@ -72,11 +70,10 @@ class PartyDetailsCaseReferenceTest {
 
     @Test
     void shouldMapRespondent1PartyCorrectly() throws Exception {
-        Party party = Party.builder()
-            .individualFirstName("Charlie")
-            .individualLastName("Brown")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setIndividualFirstName("Charlie")
+            .setIndividualLastName("Brown")
+            .setType(Party.Type.INDIVIDUAL);
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("respondent1", party);
@@ -94,11 +91,10 @@ class PartyDetailsCaseReferenceTest {
 
     @Test
     void shouldMapRespondent2PartyCorrectly() throws Exception {
-        Party party = Party.builder()
-            .individualFirstName("Diana")
-            .individualLastName("Prince")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party party = new Party()
+            .setIndividualFirstName("Diana")
+            .setIndividualLastName("Prince")
+            .setType(Party.Type.INDIVIDUAL);
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("respondent2", party);
