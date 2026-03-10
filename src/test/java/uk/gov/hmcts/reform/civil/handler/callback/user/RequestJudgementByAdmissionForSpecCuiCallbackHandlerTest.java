@@ -637,7 +637,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             DynamicList dynamicList = new DynamicList();
             dynamicList.setValue(dynamicListElement);
             caseData.setDefendantDetailsSpec(dynamicList);
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
             caseData.setActiveJudgment(activeJudgment);
 
@@ -676,7 +676,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             dynamicList.setValue(dynamicListElement);
             caseData.setDefendantDetailsSpec(dynamicList);
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
             caseData.setActiveJudgment(activeJudgment);
 
@@ -715,9 +715,9 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(300));
             ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1(PartyBuilder.builder().individual().build());
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setApplicant1(new PartyBuilder().individual().build());
+            caseData.setRespondent1(new PartyBuilder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YesOrNo.YES);
             caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
             caseData.setSpecRespondent1Represented(YES);
@@ -760,8 +760,8 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             ccjPaymentDetails.setCcjJudgmentLipInterest(BigDecimal.valueOf(300));
             ccjPaymentDetails.setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1(PartyBuilder.builder().individual().build());
-            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setApplicant1(new PartyBuilder().individual().build());
+            caseData.setApplicant2(new PartyBuilder().individual().build());
             caseData.setAddApplicant2(YesOrNo.YES);
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
             DynamicListElement dynamicListElement = new DynamicListElement();
@@ -770,7 +770,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             dynamicList.setValue(dynamicListElement);
             caseData.setDefendantDetailsSpec(dynamicList);
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
@@ -845,7 +845,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
             caseData.setApplicant1Represented(YES);
             caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY);
             caseData.setCcjPaymentDetails(ccjPaymentDetails);
-            caseData.setRespondent1(PartyBuilder.builder().individual().build());
+            caseData.setRespondent1(new PartyBuilder().individual().build());
             caseData.setCaseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"));
             caseData.setActiveJudgment(activeJudgment);
 
@@ -880,7 +880,7 @@ public class RequestJudgementByAdmissionForSpecCuiCallbackHandlerTest extends Ba
                 .applicant1Represented(YesOrNo.NO)
                 .totalClaimAmount(BigDecimal.valueOf(1000))
                 .ccjPaymentDetails(ccjPaymentDetails)
-                .respondent1(PartyBuilder.builder().individual().build()).build();
+                .respondent1(new PartyBuilder().individual().build()).build();
             caseData.setActiveJudgment(activeJudgment);
             caseData.setClaimFee(new Fee()
                               .setCalculatedAmountInPence(BigDecimal.valueOf(0)));

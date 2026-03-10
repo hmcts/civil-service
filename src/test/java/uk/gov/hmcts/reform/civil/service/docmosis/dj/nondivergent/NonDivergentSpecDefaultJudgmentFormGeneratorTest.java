@@ -121,7 +121,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .totalClaimAmount(new BigDecimal(2000))
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .addApplicant2(YesOrNo.YES)
-            .applicant2(PartyBuilder.builder().individual().build())
+            .applicant2(new PartyBuilder().individual().build())
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)
             .repaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH)
             .repaymentDate(LocalDate.now().plusMonths(4))
@@ -236,7 +236,7 @@ class NonDivergentSpecDefaultJudgmentFormGeneratorTest {
             .thenReturn(new BigDecimal(10));
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued1v2Respondent2LiP()
-            .respondent2(PartyBuilder.builder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .totalClaimAmount(new BigDecimal(2000))
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN)

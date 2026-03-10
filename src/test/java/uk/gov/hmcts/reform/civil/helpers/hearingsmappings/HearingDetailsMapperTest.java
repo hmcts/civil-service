@@ -347,27 +347,25 @@ public class HearingDetailsMapperTest {
         void shouldReturnList_whenInvokedWithOneEvidenceFlag() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Audio/Video Evidence")
                                            .setFlagCode("PF0014")
                                            .setFlagComment("flag comment for evidence")
                                            .setStatus("Active")
-                                   ))))
-                        .build())
+                                   )))))
                 .respondent1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("other flag")
                                            .setFlagCode("PF0010")
                                            .setFlagComment("flag comment")
                                            .setStatus("Active")
-                                   ))))
-                        .build()).build();
+                                   ))))).build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
                 "Audio/Video Evidence: flag comment for evidence");
@@ -377,8 +375,8 @@ public class HearingDetailsMapperTest {
         void shouldReturnList_whenInvokedWithMultipleEvidenceFlags() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Audio/Video Evidence")
@@ -386,20 +384,17 @@ public class HearingDetailsMapperTest {
                                            .setFlagComment("flag comment one")
                                            .setStatus("Active")
                                    )))
-                        )
-                        .build())
+                        ))
                 .respondent1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Audio/Video Evidence")
                                            .setFlagCode("PF0014")
                                            .setFlagComment("flag comment two")
                                            .setStatus("Active")
-                                   ))))
-                        .build()
-                )
+                                   )))))
                 .build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
@@ -410,27 +405,24 @@ public class HearingDetailsMapperTest {
         void shouldReturnList_whenInvokedWithMultipleEvidenceFlagsMissingComments() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Audio/Video Evidence")
                                            .setFlagCode("PF0014")
                                            .setFlagComment("flag comment one")
                                            .setStatus("Active")
-                                   ))))
-                        .build())
+                                   )))))
                 .respondent1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Audio/Video Evidence")
                                            .setFlagCode("PF0014")
                                            .setStatus("Active")
-                                   ))))
-                        .build()
-                )
+                                   )))))
                 .build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isEqualTo(
@@ -441,28 +433,25 @@ public class HearingDetailsMapperTest {
         void shouldReturnNull_whenInvokedWithNoEvidenceFlags() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Other 1")
                                            .setFlagCode("PF0012")
                                            .setFlagComment("flag comment one")
                                            .setStatus("Active")
-                                   ))))
-                        .build())
+                                   )))))
                 .respondent1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Other 2")
                                            .setFlagCode("PF0010")
                                            .setStatus("Active")
                                            .setFlagComment("flag comment two")
-                                   ))))
-                        .build()
-                )
+                                   )))))
                 .build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).isNull();
@@ -472,8 +461,8 @@ public class HearingDetailsMapperTest {
         void shouldReturnTruncatedComment_whenTheResultingListingCommentsAreOver200CharactersLong() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Other 1")
@@ -483,11 +472,10 @@ public class HearingDetailsMapperTest {
                                                    "flag comment one flag comment one flag comment one")
                                            .setStatus("Active")
                                    )))
-                        )
-                        .build())
+                        ))
                 .respondent1(
-                    Party.builder()
-                        .flags(new Flags()
+                    new Party()
+                        .setFlags(new Flags()
                                    .setDetails(wrapElements(List.of(
                                        new FlagDetail()
                                            .setName("Other 2")
@@ -496,9 +484,7 @@ public class HearingDetailsMapperTest {
                                            .setFlagComment(
                                                "flag comment two flag comment two flag comment two flag comment two " +
                                                    "flag comment two flag comment two flag comment two")
-                                   ))))
-                        .build()
-                )
+                                   )))))
                 .build();
 
             assertThat(HearingDetailsMapper.getListingComments(caseData)).hasSize(200);

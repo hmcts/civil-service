@@ -190,8 +190,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         caseData.setClaimType(null);
         caseData.setTotalClaimAmount(BigDecimal.valueOf(12500));
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(YES);
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
         // When
@@ -211,7 +211,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
             EvidenceUploadHandlerBase.OPTION_DEF_BOTH);
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(YES);
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
         CallbackParams params = callbackParamsOf(caseData, MID, "createShowCondition");
@@ -231,7 +231,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
@@ -249,7 +249,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
         caseData.setAddRespondent2(YES);
         caseData.setCaseAccessCategory(SPEC_CLAIM);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
         given(coreCaseUserService.userHasCaseRole(any(), any(), eq(RESPONDENTSOLICITORTWO))).willReturn(true);
@@ -751,13 +751,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -785,13 +785,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -823,13 +823,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -858,13 +858,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -892,13 +892,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -932,13 +932,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -972,13 +972,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -1004,13 +1004,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -1037,14 +1037,14 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
 
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -1082,13 +1082,13 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseData, collectionField, date);
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setRespondent2SameLegalRepresentative(NO);
         caseData.setCaseTypeFlag("RespondentTwoFields");
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         invoke(caseDataBefore, collectionField, List.of());
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         caseDataBefore.setRespondent2SameLegalRepresentative(NO);
         caseDataBefore.setCaseTypeFlag("RespondentTwoFields");
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, MID, null,
@@ -1526,8 +1526,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setAddRespondent2(YES);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(Integer.parseInt(selected)), false));
         caseData.setDocumentWitnessSummaryRes(
                 createWitnessDocs(witnessName, createdDate, witnessDate));
@@ -1548,8 +1548,8 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         caseData.setDocumentCostsRes(createEvidenceDocs(null, null, null));
         CaseData caseDataBefore = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseDataBefore.setAddRespondent2(YES);
-        caseDataBefore.setRespondent1(PartyBuilder.builder().individual().build());
-        caseDataBefore.setRespondent2(PartyBuilder.builder().individual().build());
+        caseDataBefore.setRespondent1(new PartyBuilder().individual().build());
+        caseDataBefore.setRespondent2(new PartyBuilder().individual().build());
         CallbackParams params = callbackParamsOf(caseData, caseDataBefore, ABOUT_TO_SUBMIT);
         given(userService.getUserInfo(anyString())).willReturn(UserInfo.builder().uid("uid").build());
 
@@ -1734,7 +1734,7 @@ class EvidenceUploadRespondentHandlerTest extends BaseCallbackHandlerTest {
         LocalDate witnessDate = LocalDate.of(2023, 2, 10);
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
         caseData.setNotificationText("Documentation that has been uploaded: \n\n Defendant 1 - Joint Statement of Experts / Single Joint Expert Report \n");
-        caseData.setApplicant1(PartyBuilder.builder().individual().build());
+        caseData.setApplicant1(new PartyBuilder().individual().build());
         caseData.setEvidenceUploadOptions(DynamicList.fromList(options, Object::toString, options.get(0), false));
         caseData.setDocumentJointStatementRes(createExpertDocs("expertsName", witnessDate, null, "expertises", null, null, null));
         CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);

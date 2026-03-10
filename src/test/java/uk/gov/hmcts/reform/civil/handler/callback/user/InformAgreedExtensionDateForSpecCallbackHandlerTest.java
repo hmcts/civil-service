@@ -227,7 +227,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
-            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2(new Party());
             caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_START);
@@ -246,7 +246,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
-            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2(new Party());
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent1TimeExtensionDate(LocalDateTime.now());
 
@@ -280,7 +280,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
-            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2(new Party());
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
@@ -303,7 +303,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
-            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2(new Party());
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now().plusDays(99));
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());
@@ -331,7 +331,7 @@ class InformAgreedExtensionDateForSpecCallbackHandlerTest extends BaseCallbackHa
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             caseData.setAddRespondent2(NO);
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(now());
-            caseData.setRespondent2(Party.builder().build());
+            caseData.setRespondent2(new Party());
             caseData.setRespondent2SameLegalRepresentative(NO);
             caseData.setRespondent2ResponseDeadline(LocalDateTime.now());
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(LocalDate.now());

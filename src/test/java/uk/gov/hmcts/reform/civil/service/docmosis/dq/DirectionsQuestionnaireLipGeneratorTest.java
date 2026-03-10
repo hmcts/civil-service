@@ -85,20 +85,18 @@ class DirectionsQuestionnaireLipGeneratorTest {
     void shouldSuccessfullyGenerateRespondentList() {
         //Given
         CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefence().build().toBuilder()
-            .applicant1(Party.builder()
-                .partyEmail("email")
-                .companyName("company")
-                .type(Party.Type.COMPANY)
-                .partyID("0808")
-                .primaryAddress(new Address())
-                .build())
-            .respondent1(Party.builder()
-                .partyEmail("email")
-                .companyName("company")
-                .type(Party.Type.COMPANY)
-                .partyPhone("0808")
-                .primaryAddress(new Address())
-                .build())
+            .applicant1(new Party()
+                .setPartyEmail("email")
+                .setCompanyName("company")
+                .setType(Party.Type.COMPANY)
+                .setPartyID("0808")
+                .setPrimaryAddress(new Address()))
+            .respondent1(new Party()
+                .setPartyEmail("email")
+                .setCompanyName("company")
+                .setType(Party.Type.COMPANY)
+                .setPartyPhone("0808")
+                .setPrimaryAddress(new Address()))
             .build();
         //When
         DirectionsQuestionnaireForm form = generator.getTemplateData(caseData, BEARER_TOKEN);

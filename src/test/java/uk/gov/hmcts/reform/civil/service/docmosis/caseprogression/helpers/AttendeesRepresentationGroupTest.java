@@ -33,8 +33,8 @@ public class AttendeesRepresentationGroupTest {
 
     @Test
     void shouldPopulateAttendeesDetails_WhenAllAttendeesPresent() {
-        Party applicant2 = PartyBuilder.builder().company().build();
-        Party respondent2 = PartyBuilder.builder().company().build();
+        Party applicant2 = new PartyBuilder().company().build();
+        Party respondent2 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder().applicant2(applicant2).respondent2(respondent2).build();
 
         when(claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, false)).thenReturn("Claimant 1 attends");
@@ -53,7 +53,7 @@ public class AttendeesRepresentationGroupTest {
 
     @Test
     void shouldPopulateAttendeesDetails_WhenOnlyOneClaimantPresent() {
-        Party applicant1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).build();
 
         JudgeFinalOrderForm form = new JudgeFinalOrderForm();
@@ -63,7 +63,7 @@ public class AttendeesRepresentationGroupTest {
 
     @Test
     void shouldReturnCorrectClaimantText_ForFirstClaimant() {
-        CaseData caseData = CaseDataBuilder.builder().applicant1(PartyBuilder.builder().company().build()).build();
+        CaseData caseData = CaseDataBuilder.builder().applicant1(new PartyBuilder().company().build()).build();
 
         when(claimantAttendsOrRepresentedTextBuilder.claimantBuilder(caseData, false)).thenReturn("Claimant 1 attends");
 

@@ -3994,7 +3994,7 @@ class EventHistoryMapperTest {
                             .respondent2DQ()
                             .respondent1DQ()
                             .respondent1(
-                                    PartyBuilder.builder()
+                                    new PartyBuilder()
                                             .individual()
                                             .individualDateOfBirth(LocalDate.now().plusDays(1))
                                             .build())
@@ -4085,7 +4085,7 @@ class EventHistoryMapperTest {
                             .respondent2DQ()
                             .respondent1DQ()
                             .respondent1(
-                                    PartyBuilder.builder()
+                                    new PartyBuilder()
                                             .individual()
                                             .individualDateOfBirth(LocalDate.now().plusDays(1))
                                             .build())
@@ -10247,7 +10247,7 @@ class EventHistoryMapperTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
@@ -10268,7 +10268,7 @@ class EventHistoryMapperTest {
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setHearingSupportRequirementsDJ(new HearingSupportRequirementsDJ());
@@ -10297,7 +10297,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10337,7 +10337,7 @@ class EventHistoryMapperTest {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setCcdState(CaseState.JUDICIAL_REFERRAL);
             caseData.setTotalClaimAmount(new BigDecimal(1000));
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10385,7 +10385,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setRepaymentSummaryObject(
@@ -10443,7 +10443,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
@@ -10501,7 +10501,7 @@ class EventHistoryMapperTest {
             caseData.setTotalClaimAmount(new BigDecimal(1000));
             caseData.setRepaymentSuggestion("100");
             caseData.setRepaymentFrequency(RepaymentFrequencyDJ.ONCE_ONE_MONTH);
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setPaymentTypeSelection(DJPaymentTypeSelection.REPAYMENT_PLAN);
             caseData.setJoDJCreatedDate(LocalDateTime.now());
@@ -11008,7 +11008,7 @@ class EventHistoryMapperTest {
                             .setClaimTypeToSpecClaim()
                             .specClaim1v1LrVsLip()
                             .atStateSpec1v1ClaimSubmitted()
-                            .respondent1(PartyBuilder.builder().company().build())
+                            .respondent1(new PartyBuilder().company().build())
                             .atStateRespondent1v1FullAdmissionSpec()
                             .build();
             caseData.setResponseClaimMediationSpecRequired(YES);

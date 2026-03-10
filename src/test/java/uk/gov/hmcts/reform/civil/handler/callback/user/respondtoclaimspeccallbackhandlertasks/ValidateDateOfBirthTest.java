@@ -63,7 +63,7 @@ class ValidateDateOfBirthTest {
 
     @Test
     void shouldReturnErrorsWhenDateOfBirthIsInvalid() {
-        Party respondent = PartyBuilder.builder().build();
+        Party respondent = new PartyBuilder().build();
         when(dateOfBirthValidator.validate(respondent)).thenReturn(Collections.singletonList("Invalid date of birth"));
         when(callbackParams.getCaseData()).thenReturn(caseData.setRespondent1(respondent));
 
@@ -74,7 +74,7 @@ class ValidateDateOfBirthTest {
 
     @Test
     void shouldReturnNoErrorsWhenDateOfBirthIsValid() {
-        Party respondent = PartyBuilder.builder().build();
+        Party respondent = new PartyBuilder().build();
         when(dateOfBirthValidator.validate(respondent)).thenReturn(Collections.emptyList());
         when(callbackParams.getCaseData()).thenReturn(caseData.setRespondent1(respondent));
 
@@ -106,7 +106,7 @@ class ValidateDateOfBirthTest {
 
     @Test
     void shouldReturnErrorsWhenRespondent1IsNullAndRespondent2IsNotNull() {
-        Party respondent2 = PartyBuilder.builder().build();
+        Party respondent2 = new PartyBuilder().build();
         when(dateOfBirthValidator.validate(respondent2)).thenReturn(Collections.singletonList("Invalid date of birth"));
         when(callbackParams.getCaseData()).thenReturn(caseData.setRespondent2(respondent2));
 
@@ -117,7 +117,7 @@ class ValidateDateOfBirthTest {
 
     @Test
     void shouldReturnNoErrorsWhenRespondent1IsNotNullAndRespondent2IsNull() {
-        Party respondent1 = PartyBuilder.builder().build();
+        Party respondent1 = new PartyBuilder().build();
         when(dateOfBirthValidator.validate(respondent1)).thenReturn(Collections.emptyList());
         when(callbackParams.getCaseData()).thenReturn(caseData.setRespondent1(respondent1));
 

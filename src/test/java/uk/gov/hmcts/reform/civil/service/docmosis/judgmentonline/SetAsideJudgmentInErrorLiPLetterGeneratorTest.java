@@ -61,8 +61,8 @@ class SetAsideJudgmentInErrorLiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1(applicant)

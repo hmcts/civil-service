@@ -132,10 +132,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2SameSolicitor() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .submittedDate(LocalDateTime.now().minusDays(30))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
@@ -162,10 +161,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2DifferentSolicitor() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL)))
@@ -190,10 +188,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2Respondent1LIP() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .specRespondent1Represented(YesOrNo.NO)
             .build();
 
@@ -219,10 +216,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2Respondent2LIP() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .specRespondent2Represented(YesOrNo.NO)
             .build();
 
@@ -248,10 +244,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm2v1() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .applicant2(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .partyName("name")
-                            .build())
+            .applicant2(new Party()
+                            .setType(Party.Type.COMPANY)
+                            .setPartyName("name"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1)))
