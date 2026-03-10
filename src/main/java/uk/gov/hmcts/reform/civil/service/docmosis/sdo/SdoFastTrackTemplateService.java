@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.FastTrackVariable;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackDirectionsService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoFastTrackTemplateFieldService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,6 +49,10 @@ public class SdoFastTrackTemplateService {
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setApplicant1(caseData.getApplicant1())
+            .setApplicant1PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
+            .setApplicant2PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
+            .setRespondent1PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
+            .setRespondent2PartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())
             .setRespondent1(caseData.getRespondent1())

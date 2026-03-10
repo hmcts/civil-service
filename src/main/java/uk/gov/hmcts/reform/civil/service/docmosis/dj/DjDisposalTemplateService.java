@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.utils.DocumentUtils.getDisposalHearingTimeEstimateDJ;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getSdoDjOrderLitigiousPartyName;
 
 @Service
 @RequiredArgsConstructor
@@ -69,8 +70,9 @@ public class DjDisposalTemplateService {
             .setDisposalHearingCostsAddSection(
                 directionsToggleService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
             .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
-                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .setRespondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
+                           ? getSdoDjOrderLitigiousPartyName(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend(), true) : null)
+
+            .setRespondent(partyFieldService.resolveRespondent(caseData))
             .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         template
