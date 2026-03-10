@@ -3,16 +3,16 @@ package uk.gov.hmcts.reform.civil.service.robotics.strategy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.PROCEEDS_IN_HERITAGE;
 import static uk.gov.hmcts.reform.civil.service.robotics.utils.RoboticsDataUtil.RESPONDENT_ID;
 
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -24,6 +24,9 @@ import uk.gov.hmcts.reform.civil.service.flowstate.IStateFlowEngine;
 import uk.gov.hmcts.reform.civil.service.robotics.support.RoboticsSequenceGenerator;
 import uk.gov.hmcts.reform.civil.stateflow.StateFlow;
 import uk.gov.hmcts.reform.civil.stateflow.model.State;
+
+import java.util.List;
+import java.util.UUID;
 
 class GeneralApplicationStrikeOutStrategyTest {
 
@@ -122,15 +125,15 @@ class GeneralApplicationStrikeOutStrategyTest {
                         .build();
         Element<GeneralApplication> first = caseData.getGeneralApplications().getFirst();
         GeneralApplication secondValue =
-                GeneralApplication.builder()
-                        .applicantPartyName(first.getValue().getApplicantPartyName())
-                        .litigiousPartyID("004")
-                        .generalAppDateDeadline(first.getValue().getGeneralAppDateDeadline())
-                        .generalAppSubmittedDateGAspec(first.getValue().getGeneralAppSubmittedDateGAspec())
-                        .generalAppType(first.getValue().getGeneralAppType())
-                        .caseLink(first.getValue().getCaseLink())
-                        .businessProcess(first.getValue().getBusinessProcess())
-                        .build();
+                new GeneralApplication()
+                        .setApplicantPartyName(first.getValue().getApplicantPartyName())
+                        .setLitigiousPartyID("004")
+                        .setGeneralAppDateDeadline(first.getValue().getGeneralAppDateDeadline())
+                        .setGeneralAppSubmittedDateGAspec(
+                                first.getValue().getGeneralAppSubmittedDateGAspec())
+                        .setGeneralAppType(first.getValue().getGeneralAppType())
+                        .setCaseLink(first.getValue().getCaseLink())
+                        .setBusinessProcess(first.getValue().getBusinessProcess());
         Element<GeneralApplication> second = new Element<>(UUID.randomUUID(), secondValue);
         caseData.setGeneralApplications(List.of(first, second));
 

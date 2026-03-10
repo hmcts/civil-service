@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import lombok.experimental.Accessors;
+
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -83,74 +82,85 @@ public class GeneralApplication implements MappableObject {
     private YesOrNo isGaRespondentTwoLip;
     private HelpWithFees generalAppHelpWithFees;
     private CertOfSC certOfSC;
-    //caseName
+    // caseName
     private String caseNameGaInternal;
-    //WA claim track description
+    // WA claim track description
     private String gaWaTrackLabel;
     private String emailPartyReference;
-    //dates
+    // dates
     private LocalDateTime mainCaseSubmittedDate;
 
     @JsonCreator
-    GeneralApplication(@JsonProperty("generalApplicationState") String generalApplicationState,
-                       @JsonProperty("generalAppType") GAApplicationType generalAppType,
-                       @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
-                       @JsonProperty("generalAppRespondentAgreement")
-                           GARespondentOrderAgreement generalAppRespondentAgreement,
-                       @JsonProperty("businessProcess") BusinessProcess businessProcess,
-                       @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
-                       @JsonProperty("generalAppAskForCosts") YesOrNo generalAppAskForCosts,
-                       @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
-                       @JsonProperty("generalAppDetailsOfOrderColl") List<Element<String>> generalAppDetailsOfOrderColl,
-                       @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
-                       @JsonProperty("generalAppReasonsOfOrderColl") List<Element<String>> generalAppReasonsOfOrderColl,
-                       @JsonProperty("generalAppInformOtherParty") GAInformOtherParty generalAppInformOtherParty,
-                       @JsonProperty("generalAppConsentOrder") YesOrNo generalAppConsentOrder,
-                       @JsonProperty("generalAppUrgencyRequirement") GAUrgencyRequirement generalAppUrgencyRequirement,
-                       @JsonProperty("generalAppStatementOfTruth") GAStatementOfTruth generalAppStatementOfTruth,
-                       @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
-                       @JsonProperty("generalAppApplnSolicitor") GASolicitorDetailsGAspec generalAppApplnSolicitor,
-                       @JsonProperty("generalAppRespondentSolicitors") List<Element<GASolicitorDetailsGAspec>>
-                           generalAppRespondentSolicitors,
-                       @JsonProperty("generalAppApplicantAddlSolicitors") List<Element<GASolicitorDetailsGAspec>>
-                           generalAppApplicantAddlSolicitors,
-                       @JsonProperty("generalAppEvidenceDocument") List<Element<Document>> generalAppEvidenceDocument,
-                       @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
-                       @JsonProperty("isMultiParty") YesOrNo isMultiParty,
-                       @JsonProperty("isDocumentVisibleGA") YesOrNo isDocumentVisibleGA,
-                       @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
-                       @JsonProperty("gaApplicantDisplayName") String gaApplicantDisplayName,
-                       @JsonProperty("caseLink") CaseLink caseLink,
-                       @JsonProperty("generalAppSubmittedDateGAspec") LocalDateTime generalAppSubmittedDateGAspec,
-                       @JsonProperty("civilServiceUserRoles") IdamUserDetails civilServiceUserRoles,
-                       @JsonProperty("applicantPartyName") String applicantPartyName,
-                       @JsonProperty("claimant1PartyName") String claimant1PartyName,
-                       @JsonProperty("claimant2PartyName") String claimant2PartyName,
-                       @JsonProperty("defendant1PartyName") String defendant1PartyName,
-                       @JsonProperty("defendant2PartyName") String defendant2PartyName,
-                       @JsonProperty("litigiousPartyID") String litigiousPartyID,
-                       @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
-                       @JsonProperty("caseManagementLocation") CaseLocationCivil caseManagementLocation,
-                       @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
-                       @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
-                       @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
-                       @JsonProperty("locationName") String locationName,
-                       @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
-                       @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
-                       @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
-                       @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
-                       @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
-                       @JsonProperty("generalAppParentCaseLink") GeneralAppParentCaseLink generalAppParentCaseLink,
-                       @JsonProperty("respondentsResponses") List<Element<GARespondentResponse>> respondentsResponses,
-                       @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
-                       @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
-                       @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
-                       @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees,
-                       @JsonProperty("certOfSC") CertOfSC certOfSC,
-                       @JsonProperty("caseNameGaInternal") String caseNameGaInternal,
-                       @JsonProperty("gaWaTrackLabel") String gaWaTrackLabel,
-                       @JsonProperty("emailPartyReference") String emailPartyReference,
-                       @JsonProperty("mainCaseSubmittedDate") LocalDateTime mainCaseSubmittedDate) {
+    GeneralApplication(
+            @JsonProperty("generalApplicationState") String generalApplicationState,
+            @JsonProperty("generalAppType") GAApplicationType generalAppType,
+            @JsonProperty("generalAppTypeLR") GAApplicationTypeLR generalAppTypeLR,
+            @JsonProperty("generalAppRespondentAgreement")
+                    GARespondentOrderAgreement generalAppRespondentAgreement,
+            @JsonProperty("businessProcess") BusinessProcess businessProcess,
+            @JsonProperty("generalAppPBADetails") GAPbaDetails generalAppPBADetails,
+            @JsonProperty("generalAppAskForCosts") YesOrNo generalAppAskForCosts,
+            @JsonProperty("generalAppDetailsOfOrder") String generalAppDetailsOfOrder,
+            @JsonProperty("generalAppDetailsOfOrderColl")
+                    List<Element<String>> generalAppDetailsOfOrderColl,
+            @JsonProperty("generalAppReasonsOfOrder") String generalAppReasonsOfOrder,
+            @JsonProperty("generalAppReasonsOfOrderColl")
+                    List<Element<String>> generalAppReasonsOfOrderColl,
+            @JsonProperty("generalAppInformOtherParty")
+                    GAInformOtherParty generalAppInformOtherParty,
+            @JsonProperty("generalAppConsentOrder") YesOrNo generalAppConsentOrder,
+            @JsonProperty("generalAppUrgencyRequirement")
+                    GAUrgencyRequirement generalAppUrgencyRequirement,
+            @JsonProperty("generalAppStatementOfTruth")
+                    GAStatementOfTruth generalAppStatementOfTruth,
+            @JsonProperty("generalAppHearingDetails") GAHearingDetails generalAppHearingDetails,
+            @JsonProperty("generalAppApplnSolicitor")
+                    GASolicitorDetailsGAspec generalAppApplnSolicitor,
+            @JsonProperty("generalAppRespondentSolicitors")
+                    List<Element<GASolicitorDetailsGAspec>> generalAppRespondentSolicitors,
+            @JsonProperty("generalAppApplicantAddlSolicitors")
+                    List<Element<GASolicitorDetailsGAspec>> generalAppApplicantAddlSolicitors,
+            @JsonProperty("generalAppEvidenceDocument")
+                    List<Element<Document>> generalAppEvidenceDocument,
+            @JsonProperty("generalAppDateDeadline") LocalDateTime generalAppDateDeadline,
+            @JsonProperty("isMultiParty") YesOrNo isMultiParty,
+            @JsonProperty("isDocumentVisibleGA") YesOrNo isDocumentVisibleGA,
+            @JsonProperty("parentClaimantIsApplicant") YesOrNo parentClaimantIsApplicant,
+            @JsonProperty("gaApplicantDisplayName") String gaApplicantDisplayName,
+            @JsonProperty("caseLink") CaseLink caseLink,
+            @JsonProperty("generalAppSubmittedDateGAspec")
+                    LocalDateTime generalAppSubmittedDateGAspec,
+            @JsonProperty("civilServiceUserRoles") IdamUserDetails civilServiceUserRoles,
+            @JsonProperty("applicantPartyName") String applicantPartyName,
+            @JsonProperty("claimant1PartyName") String claimant1PartyName,
+            @JsonProperty("claimant2PartyName") String claimant2PartyName,
+            @JsonProperty("defendant1PartyName") String defendant1PartyName,
+            @JsonProperty("defendant2PartyName") String defendant2PartyName,
+            @JsonProperty("litigiousPartyID") String litigiousPartyID,
+            @JsonProperty("generalAppSuperClaimType") String generalAppSuperClaimType,
+            @JsonProperty("caseManagementLocation") CaseLocationCivil caseManagementLocation,
+            @JsonProperty("isCcmccLocation") YesOrNo isCcmccLocation,
+            @JsonProperty("caseManagementCategory") GACaseManagementCategory caseManagementCategory,
+            @JsonProperty("CaseAccessCategory") CaseCategory caseAccessCategory,
+            @JsonProperty("locationName") String locationName,
+            @JsonProperty("applicationClosedDate") LocalDateTime applicationClosedDate,
+            @JsonProperty("applicationTakenOfflineDate") LocalDateTime applicationTakenOfflineDate,
+            @JsonProperty("generalAppVaryJudgementType") YesOrNo generalAppVaryJudgementType,
+            @JsonProperty("generalAppN245FormUpload") Document generalAppN245FormUpload,
+            @JsonProperty("generalAppHearingDate") GAHearingDateGAspec generalAppHearingDate,
+            @JsonProperty("generalAppParentCaseLink")
+                    GeneralAppParentCaseLink generalAppParentCaseLink,
+            @JsonProperty("respondentsResponses")
+                    List<Element<GARespondentResponse>> respondentsResponses,
+            @JsonProperty("isGaApplicantLip") YesOrNo isGaApplicantLip,
+            @JsonProperty("isGaRespondentOneLip") YesOrNo isGaRespondentOneLip,
+            @JsonProperty("isGaRespondentTwoLip") YesOrNo isGaRespondentTwoLip,
+            @JsonProperty("generalAppHelpWithFees") HelpWithFees generalAppHelpWithFees,
+            @JsonProperty("certOfSC") CertOfSC certOfSC,
+            @JsonProperty("caseNameGaInternal") String caseNameGaInternal,
+            @JsonProperty("gaWaTrackLabel") String gaWaTrackLabel,
+            @JsonProperty("emailPartyReference") String emailPartyReference,
+            @JsonProperty("mainCaseSubmittedDate") LocalDateTime mainCaseSubmittedDate) {
 
         this.generalApplicationState = generalApplicationState;
         this.generalAppType = generalAppType;
@@ -208,5 +218,65 @@ public class GeneralApplication implements MappableObject {
         this.gaWaTrackLabel = gaWaTrackLabel;
         this.emailPartyReference = emailPartyReference;
         this.mainCaseSubmittedDate = mainCaseSubmittedDate;
+    }
+
+    public GeneralApplication copy() {
+        return new GeneralApplication()
+                .setGeneralApplicationState(generalApplicationState)
+                .setGeneralAppType(generalAppType)
+                .setGeneralAppTypeLR(generalAppTypeLR)
+                .setGeneralAppRespondentAgreement(generalAppRespondentAgreement)
+                .setBusinessProcess(businessProcess)
+                .setGeneralAppPBADetails(generalAppPBADetails)
+                .setGeneralAppAskForCosts(generalAppAskForCosts)
+                .setGeneralAppDetailsOfOrder(generalAppDetailsOfOrder)
+                .setGeneralAppDetailsOfOrderColl(generalAppDetailsOfOrderColl)
+                .setGeneralAppReasonsOfOrder(generalAppReasonsOfOrder)
+                .setGeneralAppReasonsOfOrderColl(generalAppReasonsOfOrderColl)
+                .setGeneralAppInformOtherParty(generalAppInformOtherParty)
+                .setGeneralAppConsentOrder(generalAppConsentOrder)
+                .setGeneralAppUrgencyRequirement(generalAppUrgencyRequirement)
+                .setGeneralAppStatementOfTruth(generalAppStatementOfTruth)
+                .setGeneralAppHearingDetails(generalAppHearingDetails)
+                .setGeneralAppApplnSolicitor(generalAppApplnSolicitor)
+                .setGeneralAppRespondentSolicitors(generalAppRespondentSolicitors)
+                .setGeneralAppApplicantAddlSolicitors(generalAppApplicantAddlSolicitors)
+                .setGeneralAppEvidenceDocument(generalAppEvidenceDocument)
+                .setGeneralAppDateDeadline(generalAppDateDeadline)
+                .setIsMultiParty(isMultiParty)
+                .setIsDocumentVisibleGA(isDocumentVisibleGA)
+                .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                .setGaApplicantDisplayName(gaApplicantDisplayName)
+                .setCaseLink(caseLink)
+                .setGeneralAppSubmittedDateGAspec(generalAppSubmittedDateGAspec)
+                .setCivilServiceUserRoles(civilServiceUserRoles)
+                .setApplicantPartyName(applicantPartyName)
+                .setClaimant1PartyName(claimant1PartyName)
+                .setClaimant2PartyName(claimant2PartyName)
+                .setDefendant1PartyName(defendant1PartyName)
+                .setDefendant2PartyName(defendant2PartyName)
+                .setLitigiousPartyID(litigiousPartyID)
+                .setGeneralAppSuperClaimType(generalAppSuperClaimType)
+                .setCaseManagementLocation(caseManagementLocation)
+                .setIsCcmccLocation(isCcmccLocation)
+                .setCaseManagementCategory(caseManagementCategory)
+                .setCaseAccessCategory(caseAccessCategory)
+                .setLocationName(locationName)
+                .setApplicationClosedDate(applicationClosedDate)
+                .setApplicationTakenOfflineDate(applicationTakenOfflineDate)
+                .setGeneralAppVaryJudgementType(generalAppVaryJudgementType)
+                .setGeneralAppN245FormUpload(generalAppN245FormUpload)
+                .setGeneralAppHearingDate(generalAppHearingDate)
+                .setGeneralAppParentCaseLink(generalAppParentCaseLink)
+                .setRespondentsResponses(respondentsResponses)
+                .setIsGaApplicantLip(isGaApplicantLip)
+                .setIsGaRespondentOneLip(isGaRespondentOneLip)
+                .setIsGaRespondentTwoLip(isGaRespondentTwoLip)
+                .setGeneralAppHelpWithFees(generalAppHelpWithFees)
+                .setCertOfSC(certOfSC)
+                .setCaseNameGaInternal(caseNameGaInternal)
+                .setGaWaTrackLabel(gaWaTrackLabel)
+                .setEmailPartyReference(emailPartyReference)
+                .setMainCaseSubmittedDate(mainCaseSubmittedDate);
     }
 }
