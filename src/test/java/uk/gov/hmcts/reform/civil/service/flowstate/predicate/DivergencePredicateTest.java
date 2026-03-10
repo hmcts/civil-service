@@ -32,7 +32,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOffline_when_1v2_one_rep_responses_differ_and_one_is_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
@@ -41,7 +41,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOffline_when_1v2_one_rep_responses_differ_and_two_is_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
@@ -50,7 +50,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondWithDQAndGoOffline_when_1v2_one_rep_responses_are_same() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
@@ -59,7 +59,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOffline_when_1v2_two_reps_responses_differ_and_one_full_defence_is_second() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now());
@@ -69,7 +69,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOffline_when_1v2_two_reps_responses_differ_and_two_full_defence_is_second() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent1ResponseDate()).thenReturn(LocalDateTime.now().minusDays(1));
@@ -79,7 +79,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondWithDQAndGoOffline_when_1v2_two_reps_responses_differ_and_full_defence_is_first_but_responded_first() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
@@ -90,7 +90,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondWithDQAndGoOffline_when_1v2_two_reps_responses_are_same() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
             assertFalse(DivergencePredicate.divergentRespondWithDQAndGoOffline.test(caseData));
@@ -138,7 +138,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOffline_when_1v2_two_reps_responses_differ_and_full_defence_is_first() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
@@ -158,7 +158,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondGoOffline_when_1v2_two_reps_responses_differ_and_no_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
@@ -167,7 +167,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondGoOffline_when_1v2_one_rep_responses_differ_and_no_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
@@ -176,7 +176,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondGoOffline_when_1v2_one_rep_responses_same_and_no_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(PART_ADMISSION);
@@ -185,7 +185,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondGoOffline_when_1v2_one_rep_responses_differ_and_one_is_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
@@ -194,7 +194,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_false_for_divergentRespondGoOffline_when_1v2_one_rep_responses_differ_and_two_is_full_defence() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(FULL_DEFENCE);
@@ -227,7 +227,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondGoOffline_when_1v2_two_reps_responses_differ_and_respondent2_responded_first() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
@@ -238,7 +238,7 @@ class DivergencePredicateTest {
 
         @Test
         void should_return_true_for_divergentRespondGoOffline_when_1v2_two_reps_responses_differ_and_respondent1_responded_first() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseType()).thenReturn(PART_ADMISSION);
             when(caseData.getRespondent2ClaimResponseType()).thenReturn(COUNTER_CLAIM);
@@ -261,7 +261,7 @@ class DivergencePredicateTest {
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOfflineSpec_when_spec_1v2_one_rep_responses_differ_and_one_is_full_defence() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondentResponseIsSame()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
@@ -272,7 +272,7 @@ class DivergencePredicateTest {
         @Test
         void should_return_true_for_divergentRespondWithDQAndGoOfflineSpec_when_spec_1v2_two_reps_responses_differ() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
             when(caseData.getRespondent2ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
@@ -303,7 +303,7 @@ class DivergencePredicateTest {
         @Test
         void should_return_true_for_divergentRespondGoOfflineSpec_when_spec_1v2_one_rep_responses_differ_and_no_full_defence() {
             when(caseData.getCaseAccessCategory()).thenReturn(SPEC_CLAIM);
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YES);
             when(caseData.getRespondentResponseIsSame()).thenReturn(NO);
             when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
