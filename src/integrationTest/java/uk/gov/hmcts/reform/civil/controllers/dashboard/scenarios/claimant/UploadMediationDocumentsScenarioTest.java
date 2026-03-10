@@ -39,8 +39,8 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                             .setType(Party.Type.INDIVIDUAL))
             .build();
 
         handler.handle(callbackParams(caseData));
@@ -75,8 +75,8 @@ public class UploadMediationDocumentsScenarioTest extends DashboardBaseIntegrati
             .toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                             .type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                             .setType(Party.Type.INDIVIDUAL))
             .build();
 
         handler.handle(callbackParams(caseData));
