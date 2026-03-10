@@ -143,7 +143,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT_1V2);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
@@ -196,7 +196,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(NO)
             .build();
@@ -248,7 +248,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(null)
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
@@ -302,7 +302,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .applicant2(PartyBuilder.builder().individual().build())
+            .applicant2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(null)
             .addApplicant2(YES)
             .respondent1ClaimResponseIntentionTypeApplicant2(CONTEST_JURISDICTION)
@@ -352,7 +352,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)
@@ -380,7 +380,7 @@ class AcknowledgementOfClaimGeneratorTest {
             .thenReturn(CASE_DOCUMENT);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .respondent1AcknowledgeNotificationDate(LocalDateTime.now().plusDays(1))
             .respondent2AcknowledgeNotificationDate(LocalDateTime.now())
             .respondent2ClaimResponseIntentionType(FULL_DEFENCE)

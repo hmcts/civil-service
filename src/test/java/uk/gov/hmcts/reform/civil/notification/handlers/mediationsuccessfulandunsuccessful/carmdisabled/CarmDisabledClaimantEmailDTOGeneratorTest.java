@@ -36,8 +36,8 @@ class CarmDisabledClaimantEmailDTOGeneratorTest {
     void setUp() {
         caseData = CaseData.builder()
             .legacyCaseReference("000LR001")
-            .applicant1(Party.builder().individualFirstName("Alice").individualLastName("Smith").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Bob").individualLastName("Jones").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("Alice").setIndividualLastName("Smith").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Bob").setIndividualLastName("Jones").setType(Party.Type.INDIVIDUAL))
             .build();
     }
 

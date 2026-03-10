@@ -76,7 +76,7 @@ class RespSolTwoEmailGeneratorTest {
     @Test
     void shouldReturnNotifyAsTrue_WhenTwoLRsAreNotInvolved() {
         CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();
         Boolean shouldNotify = emailGenerator.getShouldNotify(caseData);

@@ -105,8 +105,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1L)
             .respondent1Represented(YesOrNo.NO)
@@ -168,8 +168,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.NO)
