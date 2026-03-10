@@ -38,7 +38,7 @@ public class RecordJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsAddedPayDate() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().build();
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
@@ -63,7 +63,7 @@ public class RecordJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsAddedPayInstallments() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment().build();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
@@ -94,7 +94,7 @@ public class RecordJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsAddedPayImmediately() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately().build();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
@@ -121,7 +121,7 @@ public class RecordJudgmentsOnlineMapperTest {
     @Test
     void testIfActiveJudgmentIsAddedPayImmediately_Multi_party() {
 
-        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party().build();
+        CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate_Multi_party();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
 
         assertNotNull(activeJudgment);
@@ -145,7 +145,7 @@ public class RecordJudgmentsOnlineMapperTest {
 
     @Test
     void testIfActiveJudgmentHasPartyNameInLimit() {
-        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress().build();
+        CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediatelyWithOldAddress();
         JudgmentDetails activeJudgment = judgmentOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
         assertThat(activeJudgment.getDefendant1Name().length()).isLessThanOrEqualTo(70);
