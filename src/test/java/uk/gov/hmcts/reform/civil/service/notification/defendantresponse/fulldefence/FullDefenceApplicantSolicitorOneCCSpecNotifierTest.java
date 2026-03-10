@@ -133,10 +133,9 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .respondent1ResponseDate(null)
             .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
                 .setName("statementOfTruthName"))
-            .respondent2(Party.builder()
-                             .type(Party.Type.ORGANISATION)
-                             .organisationName("org-name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.ORGANISATION)
+                             .setOrganisationName("org-name"))
             .respondent2OrganisationPolicy(
                 new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
             .build();
