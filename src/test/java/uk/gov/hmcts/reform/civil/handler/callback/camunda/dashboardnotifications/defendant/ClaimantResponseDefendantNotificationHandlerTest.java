@@ -972,7 +972,7 @@ class ClaimantResponseDefendantNotificationHandlerTest extends BaseCallbackHandl
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
-        Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).build();
+        Party respondent1 = new Party().setType(Party.Type.INDIVIDUAL);
 
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setRespondent1(respondent1);

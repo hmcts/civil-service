@@ -33,9 +33,9 @@ class SpecDefRespRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomPropertiesWithLegalOrgNameAndRespondent2Name() {
-        Party respondent2 = Party.builder().type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Joe")
-            .individualLastName("Brown").build();
+        Party respondent2 = new Party().setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Joe")
+            .setIndividualLastName("Brown");
         CaseData caseData = CaseData.builder()
             .respondent2(respondent2)
             .build();

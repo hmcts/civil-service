@@ -101,14 +101,12 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
             .setComplexityBandingAgreed(YesOrNo.YES)
             .setBand(ComplexityBand.BAND_1)
             .setReasons("reasons");
-        given(caseData.getApplicant1()).willReturn(Party.builder()
-                                                       .partyName("app1")
-                                                       .type(Party.Type.COMPANY)
-                                                       .build());
-        given(caseData.getRespondent1()).willReturn(Party.builder()
-                                                        .partyName("res1")
-                                                        .type(Party.Type.COMPANY)
-                                                        .build());
+        given(caseData.getApplicant1()).willReturn(new Party()
+                                                       .setPartyName("app1")
+                                                       .setType(Party.Type.COMPANY));
+        given(caseData.getRespondent1()).willReturn(new Party()
+                                                        .setPartyName("res1")
+                                                        .setType(Party.Type.COMPANY));
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.INTERMEDIATE_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
                                                          .setRespondent1DQFixedRecoverableCostsIntermediate(
@@ -148,14 +146,12 @@ class DirectionQuestionnaireLipResponseGeneratorTest {
 
     @Test
     void shouldGenerateTemplateDataForMultiTrack() {
-        given(caseData.getApplicant1()).willReturn(Party.builder()
-                                                       .partyName("app1")
-                                                       .type(Party.Type.COMPANY)
-                                                       .build());
-        given(caseData.getRespondent1()).willReturn(Party.builder()
-                                                        .partyName("res1")
-                                                        .type(Party.Type.COMPANY)
-                                                        .build());
+        given(caseData.getApplicant1()).willReturn(new Party()
+                                                       .setPartyName("app1")
+                                                       .setType(Party.Type.COMPANY));
+        given(caseData.getRespondent1()).willReturn(new Party()
+                                                        .setPartyName("res1")
+                                                        .setType(Party.Type.COMPANY));
         given(caseData.getResponseClaimTrack()).willReturn(AllocatedTrack.MULTI_CLAIM.name());
         given(caseData.getRespondent1DQ()).willReturn(new Respondent1DQ()
                                                           .setSpecRespondent1DQDisclosureOfElectronicDocuments(

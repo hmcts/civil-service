@@ -216,7 +216,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnDateOfBirth_whenPartyTypeIsIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).contains(DATE_OF_BIRTH);
         }
@@ -224,7 +224,7 @@ class PartyUtilsTest {
         @ParameterizedTest
         @EnumSource(value = Party.Type.class, mode = EnumSource.Mode.EXCLUDE, names = {"SOLE_TRADER", "INDIVIDUAL"})
         void shouldReturnEmpty_whenPartyTypeIsNotIndividualOrSoleTrader(Party.Type type) {
-            Party party = PartyBuilder.builder().ofType(type).build();
+            Party party = new PartyBuilder().ofType(type).build();
 
             assertThat(PartyUtils.getDateOfBirth(party)).isEmpty();
         }
@@ -523,7 +523,7 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder().individual().build())
+                .respondent1(new PartyBuilder().individual().build())
                 .respondent1TimeExtensionDate(datetime)
                 .respondentSolicitor1AgreedDeadlineExtension(date)
                 .build();
@@ -544,7 +544,7 @@ class PartyUtilsTest {
             LocalDateTime datetime = LocalDateTime.now();
             LocalDate date = LocalDate.now();
             CaseData caseData = CaseDataBuilder.builder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2TimeExtensionDate(datetime)
                 .respondentSolicitor2AgreedDeadlineExtension(date)
                 .build();

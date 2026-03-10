@@ -60,7 +60,7 @@ class DjNotificationRecipientServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1EmailAddress("sharedsolicitor@example.com")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .build();
 
         assertThat(service.getRespondent2Email(caseData)).isEqualTo("sharedsolicitor@example.com");
@@ -71,7 +71,7 @@ class DjNotificationRecipientServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent2Represented(YesOrNo.YES)
             .respondentSolicitor2EmailAddress("respondentsolicitor2@example.com")
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .build();
 
         assertThat(service.getRespondent2Email(caseData)).isEqualTo("respondentsolicitor2@example.com");
@@ -79,7 +79,7 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldRequireSelectionForRespondent1Notification() {
-        var respondent1 = PartyBuilder.builder().individual().build();
+        var respondent1 = new PartyBuilder().individual().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
@@ -92,12 +92,12 @@ class DjNotificationRecipientServiceTest {
 
     @Test
     void shouldRespectBothDefendantsSelection() {
-        var respondent1 = PartyBuilder.builder().individual().build();
+        var respondent1 = new PartyBuilder().individual().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.YES)
             .respondent1(respondent1)
             .respondentSolicitor1EmailAddress("respondentsolicitor@example.com")
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .defendantDetails(dynamicSelection("Both Defendants"))
             .addRespondent2(YesOrNo.YES)
             .build();
@@ -109,7 +109,7 @@ class DjNotificationRecipientServiceTest {
     @Test
     void shouldRequireRespondent2FlagBeforeNotifyingSecondRespondent() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .defendantDetails(dynamicSelection("Mr. John Rambo"))
             .addRespondent2(YesOrNo.NO)
             .build();
