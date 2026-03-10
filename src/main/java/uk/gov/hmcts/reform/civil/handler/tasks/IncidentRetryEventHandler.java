@@ -265,7 +265,8 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                             .toList();
                     } else {
                         callbackErrors = Collections.emptyList();
-                    }for (String error : callbackErrors) {
+                    }
+                    for (String error : callbackErrors) {
                         if (ALREADY_PROCESSED_PATTERN.matcher(error).find()) {
                             alreadyProcessed = true;
                             break;
