@@ -172,7 +172,7 @@ public class SpringEncoder implements Encoder {
         }
         MappingJackson2HttpMessageConverter adapted = new MappingJackson2HttpMessageConverter();
         ObjectMapper mapper = jacksonConverter.getObjectMapper().copy();
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         adapted.setObjectMapper(mapper);
         return adapted;
     }
