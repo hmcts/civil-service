@@ -111,10 +111,10 @@ public class GeneralApplicationCaseDataBuilder {
 
     private static final String JUDGES_DECISION = "MAKE_DECISION";
     List<DynamicListElement> listItems =
-            singletonList(DynamicListElement.builder().code("code").label("label").build());
+            singletonList(new DynamicListElement().setCode("code").setLabel("label"));
 
     DynamicListElement selectedLocation =
-            DynamicListElement.builder().label("sitename - location name - D12 8997").build();
+            new DynamicListElement().setLabel("sitename - location name - D12 8997");
 
     private static final String HEARING_SCHEDULED = "HEARING_SCHEDULED_GA";
     private static final Fee FEE108 =
@@ -629,15 +629,9 @@ public class GeneralApplicationCaseDataBuilder {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid1))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
         draftDocs.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument));
         return build().copy()
                 .ccdCaseReference(1644495739087775L)
                 .ccdCaseReference(1644495739087775L)
@@ -1086,10 +1080,7 @@ public class GeneralApplicationCaseDataBuilder {
                 .judicialListForHearing(
                         new GAJudgesHearingListGAspec()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .value(selectedLocation)
-                                                .listItems(listItems)
-                                                .build())
+                                        new DynamicList().setValue(selectedLocation).setListItems(listItems))
                                 .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                 .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
                 .judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_1)
@@ -1150,10 +1141,7 @@ public class GeneralApplicationCaseDataBuilder {
                 .judicialListForHearing(
                         new GAJudgesHearingListGAspec()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .value(selectedLocation)
-                                                .listItems(listItems)
-                                                .build())
+                                        new DynamicList().setValue(selectedLocation).setListItems(listItems))
                                 .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
                                 .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
                 .claimant1PartyName("Test Claimant1 Name")
@@ -1510,30 +1498,15 @@ public class GeneralApplicationCaseDataBuilder {
 
     public DynamicList getLocationDynamicList() {
         DynamicListElement location1 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("ABCD - RG0 0AL")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("ABCD - RG0 0AL");
         DynamicListElement location2 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("PQRS - GU0 0EE")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("PQRS - GU0 0EE");
         DynamicListElement location3 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("WXYZ - EW0 0HE")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("WXYZ - EW0 0HE");
         DynamicListElement location4 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("LMNO - NE0 0BH")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("LMNO - NE0 0BH");
 
-        return DynamicList.builder()
-                .listItems(List.of(location1, location2, location3, location4))
-                .value(location1)
-                .build();
+        return new DynamicList().setListItems(List.of(location1, location2, location3, location4)).setValue(location1);
     }
 
     public GeneralApplicationCaseData buildJudicialDecisionRequestMoreInfo() {

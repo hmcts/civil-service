@@ -810,9 +810,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     .forEach(
                             response ->
                                     respondentResponses.add(
-                                            Element.<GARespondentResponse>builder()
-                                                    .id(response.getId())
-                                                    .value(
+                                            new Element<GARespondentResponse>().setId(response.getId()).setValue(
                                                             new GARespondentResponse()
                                                                     .setGaHearingDetails(
                                                                             response.getValue()
@@ -828,8 +826,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                                                     .getGaRespondentDetails())
                                                                     .setGaRespondentResponseReason(
                                                                             response.getValue()
-                                                                                    .getGaRespondentResponseReason()))
-                                                    .build()));
+                                                                                    .getGaRespondentResponseReason()))));
             caseData =
                     caseData.copy()
                             .generalAppHearingDetails(
@@ -1017,9 +1014,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     .forEach(
                             response ->
                                     respondentResponses.add(
-                                            Element.<GARespondentResponse>builder()
-                                                    .id(response.getId())
-                                                    .value(
+                                            new Element<GARespondentResponse>().setId(response.getId()).setValue(
                                                             new GARespondentResponse()
                                                                     .setGaHearingDetails(
                                                                             response.getValue()
@@ -1035,8 +1030,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                                                     .getGaRespondentDetails())
                                                                     .setGaRespondentResponseReason(
                                                                             response.getValue()
-                                                                                    .getGaRespondentResponseReason()))
-                                                    .build()));
+                                                                                    .getGaRespondentResponseReason()))));
             caseData =
                     caseData.copy()
                             .generalAppHearingDetails(
@@ -4544,30 +4538,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
     public DynamicList getLocationDynamicList() {
         DynamicListElement location1 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("ABCD - RG0 0AL")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("ABCD - RG0 0AL");
         DynamicListElement location2 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("PQRS - GU0 0EE")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("PQRS - GU0 0EE");
         DynamicListElement location3 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("WXYZ - EW0 0HE")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("WXYZ - EW0 0HE");
         DynamicListElement location4 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("LMNO - NE0 0BH")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("LMNO - NE0 0BH");
 
-        return DynamicList.builder()
-                .listItems(List.of(location1, location2, location3, location4))
-                .value(location1)
-                .build();
+        return new DynamicList().setListItems(List.of(location1, location2, location3, location4)).setValue(location1);
     }
 
     public List<Element<GASolicitorDetailsGAspec>> getRespondentSolicitors() {

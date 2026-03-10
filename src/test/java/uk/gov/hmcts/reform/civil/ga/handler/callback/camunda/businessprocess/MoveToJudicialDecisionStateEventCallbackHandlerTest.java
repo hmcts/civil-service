@@ -174,10 +174,7 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest
     private GeneralApplication getGeneralApplication(
             YesOrNo isConsented, YesOrNo isTobeNotified, YesOrNo isUrgent) {
         DynamicListElement location1 =
-                DynamicListElement.builder()
-                        .code(String.valueOf(UUID.randomUUID()))
-                        .label("Site Name 2 - Address2 - 28000")
-                        .build();
+                new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel("Site Name 2 - Address2 - 28000");
         return new GeneralApplication()
                 .setGeneralAppType(new GAApplicationType().setTypes(List.of(RELIEF_FROM_SANCTIONS)))
                 .setGeneralAppRespondentAgreement(
@@ -201,10 +198,7 @@ class MoveToJudicialDecisionStateEventCallbackHandlerTest
                 .setGeneralAppHearingDetails(
                         new GAHearingDetails()
                                 .setHearingPreferredLocation(
-                                        DynamicList.builder()
-                                                .listItems(List.of(location1))
-                                                .value(location1)
-                                                .build())
+                                        new DynamicList().setListItems(List.of(location1)).setValue(location1))
                                 .setVulnerabilityQuestionsYesOrNo(YES)
                                 .setVulnerabilityQuestion("dummy2")
                                 .setHearingPreferencesPreferredType(GAHearingType.IN_PERSON)

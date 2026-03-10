@@ -307,8 +307,7 @@ class JudgeFinalOrderGeneratorTest {
             .applicant2(new PartyBuilder().soleTrader().build()
                             .setPartyID("res-2-party-id")
                             .setPartyName("Respondent2"))
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.dynamicElement("hearing-location")).build())
+            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("hearing-location")))
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
 
@@ -442,11 +441,8 @@ class JudgeFinalOrderGeneratorTest {
         when(appealInitiativePopulator.populateInitiativeOrWithoutNoticeDetails(any(), any())).thenReturn(
             new JudgeFinalOrderForm().setInitiativeDate(appealDate));
 
-        DynamicListElement dynamicListElement = DynamicListElement.builder().label("test_label").build();
-        DynamicList dynamicList = DynamicList.builder()
-            .listItems(Collections.singletonList(dynamicListElement))
-            .value(dynamicListElement)
-            .build();
+        DynamicListElement dynamicListElement = new DynamicListElement().setLabel("test_label");
+        DynamicList dynamicList = new DynamicList().setListItems(Collections.singletonList(dynamicListElement)).setValue(dynamicListElement);
         List<FinalOrdersJudgePapers> finalOrdersJudgePapersList =
             new ArrayList<>(Arrays.asList(FinalOrdersJudgePapers.CONSIDERED));
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
@@ -501,8 +497,7 @@ class JudgeFinalOrderGeneratorTest {
             .orderMadeOnDetailsOrderWithoutNotice(new OrderMadeOnDetailsOrderWithoutNotice()
                                                       .setWithOutNoticeText("without notice test")
                                                       .setWithOutNoticeDate(LocalDate.now()))
-            .hearingLocation(DynamicList.builder()
-                                 .value(DynamicListElement.dynamicElement("hearing-location")).build())
+            .hearingLocation(new DynamicList().setValue(DynamicListElement.dynamicElement("hearing-location")))
             .build();
         //When: Assisted order document generation called
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);

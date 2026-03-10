@@ -177,12 +177,9 @@ class ParentCaseUpdateHelperTest {
     @Test
     void checkIfDocumentExists() {
         Element<?> same =
-                Element.<CaseDocument>builder()
-                        .id(UUID.randomUUID())
-                        .value(
+                new Element<CaseDocument>().setId(UUID.randomUUID()).setValue(
                                 new CaseDocument()
-                                        .setDocumentLink(new Document().setDocumentUrl("string")))
-                        .build();
+                                        .setDocumentLink(new Document().setDocumentUrl("string")));
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(same);
@@ -200,10 +197,7 @@ class ParentCaseUpdateHelperTest {
     @Test
     void checkIfDocumentExists_whenDocumentTypeIsDocumentClass() {
         Element<Document> documentElement =
-                Element.<Document>builder()
-                        .id(UUID.randomUUID())
-                        .value(new Document().setDocumentUrl("string"))
-                        .build();
+                new Element<Document>().setId(UUID.randomUUID()).setValue(new Document().setDocumentUrl("string"));
         List<Element<?>> gaDocumentList = new ArrayList<>();
         List<Element<?>> civilCaseDocumentList = new ArrayList<>();
         gaDocumentList.add(documentElement);
@@ -669,15 +663,13 @@ class ParentCaseUpdateHelperTest {
         civilCase
                 .getClaimantGaAppDetails()
                 .add(
-                        Element.<GeneralApplicationsDetails>builder()
-                                .value(
+                        new Element<GeneralApplicationsDetails>().setValue(
                                         new GeneralApplicationsDetails()
                                                 .setCaseLink(
                                                         new CaseLink(
                                                                 GeneralApplicationCaseDataBuilder
                                                                         .CASE_ID
-                                                                        .toString())))
-                                .build());
+                                                                        .toString()))));
 
         when(coreCaseDataService.startUpdate(any(), any()))
                 .thenReturn(getStartEventResponse(YES, NO));
@@ -700,15 +692,13 @@ class ParentCaseUpdateHelperTest {
         civilCase
                 .getRespondentSolGaAppDetails()
                 .add(
-                        Element.<GADetailsRespondentSol>builder()
-                                .value(
+                        new Element<GADetailsRespondentSol>().setValue(
                                         new GADetailsRespondentSol()
                                                 .setCaseLink(
                                                         new CaseLink(
                                                                 GeneralApplicationCaseDataBuilder
                                                                         .CASE_ID
-                                                                        .toString())))
-                                .build());
+                                                                        .toString()))));
         when(coreCaseDataService.startUpdate(any(), any()))
                 .thenReturn(getStartEventResponse(YES, NO));
         when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(civilCase);
@@ -728,14 +718,12 @@ class ParentCaseUpdateHelperTest {
                 getVaryMainCaseDataForCollectionAfterPayment("Claimant");
         List<Element<GeneralApplicationsDetails>> translationList = new ArrayList<>();
         translationList.add(
-                Element.<GeneralApplicationsDetails>builder()
-                        .value(
+                new Element<GeneralApplicationsDetails>().setValue(
                                 new GeneralApplicationsDetails()
                                         .setCaseLink(
                                                 new CaseLink(
                                                         GeneralApplicationCaseDataBuilder.CASE_ID
-                                                                .toString())))
-                        .build());
+                                                                .toString()))));
         GeneralApplicationCaseData updatedCaseData =
                 civilCase.copy().gaDetailsTranslationCollection(translationList).build();
         when(coreCaseDataService.startUpdate(any(), any()))
@@ -761,14 +749,12 @@ class ParentCaseUpdateHelperTest {
                 getVaryMainCaseDataForCollectionAfterPayment("RespondentSol");
         List<Element<GeneralApplicationsDetails>> translationList = new ArrayList<>();
         translationList.add(
-                Element.<GeneralApplicationsDetails>builder()
-                        .value(
+                new Element<GeneralApplicationsDetails>().setValue(
                                 new GeneralApplicationsDetails()
                                         .setCaseLink(
                                                 new CaseLink(
                                                         GeneralApplicationCaseDataBuilder.CASE_ID
-                                                                .toString())))
-                        .build());
+                                                                .toString()))));
         GeneralApplicationCaseData updatedCaseData =
                 civilCase.copy().gaDetailsTranslationCollection(translationList).build();
 
@@ -890,10 +876,7 @@ class ParentCaseUpdateHelperTest {
                 .ccdState(PENDING_APPLICATION_ISSUED)
                 .directionOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -920,10 +903,7 @@ class ParentCaseUpdateHelperTest {
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(
                 singletonList(
-                        Element.<Document>builder()
-                                .id(UUID.fromString(uid))
-                                .value(pdfDocument)
-                                .build()));
+                        new Element<Document>().setId(UUID.fromString(uid)).setValue(pdfDocument)));
         switch (role) {
             case "Claimant":
                 builder.parentClaimantIsApplicant(YES)
@@ -990,10 +970,7 @@ class ParentCaseUpdateHelperTest {
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.gaAddlDoc(
                 singletonList(
-                        Element.<CaseDocument>builder()
-                                .id(UUID.fromString(uid))
-                                .value(pdfDocument)
-                                .build()));
+                        new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)));
         switch (role) {
             case "Claimant":
                 builder.parentClaimantIsApplicant(YES)
@@ -1058,10 +1035,7 @@ class ParentCaseUpdateHelperTest {
         String uid = "f000aa01-0451-4000-b000-000000000000";
         builder.generalAppEvidenceDocument(
                 singletonList(
-                        Element.<Document>builder()
-                                .id(UUID.fromString(uid))
-                                .value(pdfDocument)
-                                .build()));
+                        new Element<Document>().setId(UUID.fromString(uid)).setValue(pdfDocument)));
         switch (role) {
             case "Claimant":
                 builder.parentClaimantIsApplicant(YES)
