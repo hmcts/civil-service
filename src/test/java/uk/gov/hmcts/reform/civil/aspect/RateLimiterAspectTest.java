@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.RateLimiterService;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
-import java.util.Collections;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -74,9 +73,6 @@ class RateLimiterAspectTest {
         when(rateLimiterService.allowRequest("127.0.0.1", 5, 60))
             .thenReturn(true);
         when(joinPoint.proceed()).thenReturn("success");
-        //remove later
-        when(request.getHeaderNames())
-            .thenReturn(Collections.enumeration(Collections.emptyList()));
 
         RequestContextHolder.setRequestAttributes(
             new ServletRequestAttributes(request, response)
@@ -106,9 +102,6 @@ class RateLimiterAspectTest {
         when(request.getRequestURI()).thenReturn("/test");
         when(rateLimiterService.allowRequest("192.168.0.1", 5, 60))
             .thenReturn(false);
-        //remove later
-        when(request.getHeaderNames())
-            .thenReturn(Collections.enumeration(Collections.emptyList()));
 
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
@@ -139,8 +132,6 @@ class RateLimiterAspectTest {
         when(request.getRequestURI()).thenReturn("/no-response");
         when(rateLimiterService.allowRequest("10.10.10.10", 5, 60))
             .thenReturn(false);
-        when(request.getHeaderNames())
-            .thenReturn(Collections.enumeration(Collections.emptyList()));
 
         RequestContextHolder.setRequestAttributes(
             new ServletRequestAttributes(request)
@@ -166,9 +157,6 @@ class RateLimiterAspectTest {
         when(rateLimiterService.allowRequest("10.0.0.1", 3, 30))
             .thenReturn(true);
         when(joinPoint.proceed()).thenReturn("ok");
-        //remove later
-        when(request.getHeaderNames())
-            .thenReturn(Collections.enumeration(Collections.emptyList()));
 
         RequestContextHolder.setRequestAttributes(
             new ServletRequestAttributes(request, response)

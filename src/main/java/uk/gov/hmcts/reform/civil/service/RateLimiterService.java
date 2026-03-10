@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@SuppressWarnings("all")
 public class RateLimiterService {
 
     private final CacheManager cacheManager;

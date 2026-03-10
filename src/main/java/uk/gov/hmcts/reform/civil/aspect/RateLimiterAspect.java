@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.aspect;
 import uk.gov.hmcts.reform.civil.service.RateLimiterService;
 
 import java.lang.reflect.Method;
-import java.util.Enumeration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,7 +21,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 @Aspect
 @Component
-@SuppressWarnings("all")
 public class RateLimiterAspect {
 
     private final RateLimiterService rateLimiterService;
@@ -92,15 +90,6 @@ public class RateLimiterAspect {
             "True-Client-IP",
             "Forwarded"
         };
-
-        //remove later
-        Enumeration<String> headerNames = request.getHeaderNames();
-
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            String headerValue = request.getHeader(headerName);
-            System.out.println(headerName + " All headers : " + headerValue);
-        }
 
         for (String header : headers) {
             String value = request.getHeader(header);
