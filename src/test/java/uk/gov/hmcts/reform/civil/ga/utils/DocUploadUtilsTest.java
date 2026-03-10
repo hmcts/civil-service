@@ -197,7 +197,7 @@ public class DocUploadUtilsTest {
     @Test
     public void shouldNotVisible_whenWithoutNotice() {
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
-            .buildFeeValidationCaseData(null, false, false);
+            .buildFeeValidationCaseData(null, false, false).build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.NO);
     }
 
@@ -217,7 +217,7 @@ public class DocUploadUtilsTest {
 
     @Test
     public void shouldVisible_whenWithNotice() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withNoticeCaseData().build();
         assertThat(DocUploadUtils.isDocumentVisible(caseData)).isEqualTo(YesOrNo.YES);
     }
 

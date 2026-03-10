@@ -61,10 +61,9 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(YES);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(fixedDate)
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(fixedDate)
+            .setUnavailableDateType(SINGLE_DATE);
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
         when(mediationLiPCarm.getUnavailableDatesForMediation()).thenReturn(List.of(elementUnavailableDate));
 
