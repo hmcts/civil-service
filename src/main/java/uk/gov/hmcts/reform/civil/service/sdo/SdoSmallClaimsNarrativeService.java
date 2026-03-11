@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -55,8 +55,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
 
-    @Value("${other_remedy.enabled:false}")
-    private boolean otherRemedyEnabled;
+    private final FeatureToggleService featureToggleService;
     private final SdoDeadlineService sdoDeadlineService;
 
     public void applyJudgesRecital(CaseData caseData) {
@@ -145,7 +144,7 @@ public class SdoSmallClaimsNarrativeService {
     }
 
     public void applyHousingDisrepair(CaseData caseData) {
-        if (otherRemedyEnabled) {
+        if (featureToggleService.isOtherRemedyEnabled()) {
             HousingDisrepair housingDisrepair = new HousingDisrepair();
             housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
             housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
@@ -48,23 +49,18 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO;
 
 @Service
+@RequiredArgsConstructor
 public class SdoFastTrackSpecialistDirectionsService {
 
     private final SdoDeadlineService deadlineService;
-    private final boolean otherRemedyEnabled;
-
-    public SdoFastTrackSpecialistDirectionsService(SdoDeadlineService deadlineService,
-                                                   @Value("${other_remedy.enabled:false}") boolean otherRemedyEnabled) {
-        this.deadlineService = deadlineService;
-        this.otherRemedyEnabled = otherRemedyEnabled;
-    }
+    private final FeatureToggleService featureToggleService;
 
     public void populateSpecialistDirections(CaseData caseData) {
         caseData.setFastTrackBuildingDispute(buildBuildingDispute());
         caseData.setFastTrackClinicalNegligence(buildClinicalNegligence());
         caseData.setSdoR2FastTrackCreditHire(buildCreditHire());
         caseData.setFastTrackCreditHire(buildFastTrackCreditHire());
-        if (otherRemedyEnabled) {
+        if (featureToggleService.isOtherRemedyEnabled()) {
             caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
         } else {
             caseData.setFastTrackHousingDisrepair(buildFastTrackHousingDisrepair());

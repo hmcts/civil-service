@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.sdo.IncludeInOrderToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2FastTrackAltDisputeResolution;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 
@@ -27,6 +28,8 @@ class SdoTrackDefaultsServiceTest {
     private SdoDeadlineService deadlineService;
     @Mock
     private SdoFeatureToggleService featureToggleService;
+    @Mock
+    private FeatureToggleService mainFeatureToggleService;
 
     private SdoTrackDefaultsService service;
 
@@ -39,14 +42,14 @@ class SdoTrackDefaultsServiceTest {
                 new SdoDisposalNarrativeService(deadlineService)
         );
         SdoFastTrackSpecialistDirectionsService specialistDirectionsService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, mainFeatureToggleService);
         SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService = new SdoFastTrackOrderDefaultsService(
                 fastTrackNarrativeService,
                 specialistDirectionsService
         );
         SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService = new SdoSmallClaimsOrderDefaultsService(
-                new SdoSmallClaimsNarrativeService(deadlineService),
+                new SdoSmallClaimsNarrativeService(mainFeatureToggleService, deadlineService),
                 journeyToggleService
         );
         SdoExpertEvidenceFieldsService expertEvidenceFieldsService = new SdoExpertEvidenceFieldsService(deadlineService);
@@ -59,7 +62,8 @@ class SdoTrackDefaultsServiceTest {
                 smallClaimsOrderDefaultsService,
                 expertEvidenceFieldsService,
                 disclosureOfDocumentsFieldsService,
-                judgementDeductionService
+                judgementDeductionService,
+                mainFeatureToggleService
         );
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
