@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.FastTrack;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle.ADD;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackTemplateService {
@@ -35,6 +37,10 @@ public class SdoFastTrackTemplateService {
     public SdoDocumentFormFast buildTemplate(CaseData caseData, String judgeName, boolean isJudge, String authorisation) {
         boolean showBundleInfo = hasVariable(caseData, FastTrackVariable.TRIAL_BUNDLE_TOGGLE);
         boolean hasPpi = hasDirection(caseData, FastTrack.fastClaimPPI);
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+
+        log.info("Building Fast Track SDO template for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
 
         SdoDocumentFormFast template = new SdoDocumentFormFast()
             .setWrittenByJudge(isJudge)
@@ -74,7 +80,7 @@ public class SdoFastTrackTemplateService {
             .setFastTrackBuildingDispute(caseData.getFastTrackBuildingDispute())
             .setFastTrackClinicalNegligence(caseData.getFastTrackClinicalNegligence())
             .setFastTrackHousingDisrepair(caseData.getFastTrackHousingDisrepair())
-            .setOtherRemedyEnabled(featureToggleService.isOtherRemedyEnabled())
+            .setOtherRemedyEnabled(otherRemedyEnabled)
             .setFastTrackPersonalInjury(caseData.getFastTrackPersonalInjury())
             .setFastTrackRoadTrafficAccident(caseData.getFastTrackRoadTrafficAccident())
             .setHasNewDirections(hasVariable(caseData, FastTrackVariable.ADD_NEW_DIRECTIONS))

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.sdo.AddOrRemoveToggle;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.PERSONAL_INJURY_UPLOAD;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.ROAD_TRAFFIC_ACCIDENT_UPLOAD_SDO;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoFastTrackSpecialistDirectionsService {
@@ -56,15 +58,25 @@ public class SdoFastTrackSpecialistDirectionsService {
     private final FeatureToggleService featureToggleService;
 
     public void populateSpecialistDirections(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating Specialist Directions for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
         caseData.setFastTrackBuildingDispute(buildBuildingDispute());
         caseData.setFastTrackClinicalNegligence(buildClinicalNegligence());
         caseData.setSdoR2FastTrackCreditHire(buildCreditHire());
         caseData.setFastTrackCreditHire(buildFastTrackCreditHire());
-        if (featureToggleService.isOtherRemedyEnabled()) {
+
+        if (otherRemedyEnabled) {
             caseData.setFastTrackHousingDisrepair(buildHousingDisrepair());
+            log.debug("Setting Housing Disrepair case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
         } else {
             caseData.setFastTrackHousingDisrepair(buildFastTrackHousingDisrepair());
+            log.debug("Setting Fast Track Housing Disrepair case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
         }
+
         caseData.setFastTrackPersonalInjury(buildPersonalInjury());
         caseData.setFastTrackRoadTrafficAccident(buildRoadTrafficAccident());
     }

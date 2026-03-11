@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoTrackDefaultsService {
@@ -55,24 +57,35 @@ public class SdoTrackDefaultsService {
     }
 
     private void populatePenalNoticeFields(CaseData caseData) {
-        if (featureToggleService.isOtherRemedyEnabled()) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating Penal Notice fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
+        if (otherRemedyEnabled) {
             caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
             caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
             caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
             caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+            log.debug("Penal Notice fields populated for case: {}", caseData.getCcdCaseReference());
         }
     }
 
     private void populatePpiFields(CaseData caseData) {
-        if (featureToggleService.isOtherRemedyEnabled()) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating PPI fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
+        if (otherRemedyEnabled) {
             PPI ppi = new PPI();
             ppi.setPpiDate(LocalDate.now().plusDays(28));
             ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
             caseData.setSmallClaimsPPI(ppi);
             caseData.setFastTrackPPI(ppi);
+            log.debug("PPI fields populated for case: {}", caseData.getCcdCaseReference());
         } else {
             caseData.setSmallClaimsPPI(null);
             caseData.setFastTrackPPI(null);
+            log.debug("PPI fields set to null for case: {}", caseData.getCcdCaseReference());
         }
     }
 

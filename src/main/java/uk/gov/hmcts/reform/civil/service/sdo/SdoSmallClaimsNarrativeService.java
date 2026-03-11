@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
@@ -51,6 +52,7 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_FEE_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
@@ -144,7 +146,10 @@ public class SdoSmallClaimsNarrativeService {
     }
 
     public void applyHousingDisrepair(CaseData caseData) {
-        if (featureToggleService.isOtherRemedyEnabled()) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Applying Housing Disrepair for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+        if (otherRemedyEnabled) {
             HousingDisrepair housingDisrepair = new HousingDisrepair();
             housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
             housingDisrepair.setClauseB(HOUSING_DISREPAIR_CLAUSE_B);
