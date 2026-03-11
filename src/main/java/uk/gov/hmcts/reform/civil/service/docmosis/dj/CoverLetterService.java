@@ -103,6 +103,6 @@ public class CoverLetterService {
         return new JudgementCoverLetter()
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setAddress(party.getPrimaryAddress())
-            .setPartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(party, caseData.getApplicant1LitigationFriend()));
+            .setPartyName(PartyUtils.getPartyNameWithLitigiousFriend(party, caseData.getApplicant1LitigationFriend()));
     }
 }

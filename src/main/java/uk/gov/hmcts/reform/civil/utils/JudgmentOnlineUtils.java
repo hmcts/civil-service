@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getSdoDjOrderLitigiousPartyName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 public class JudgmentOnlineUtils {
 
@@ -73,11 +73,11 @@ public class JudgmentOnlineUtils {
 
         List<Party> applicants = new ArrayList<>();
         applicants.add(new Party()
-                           .setName(getSdoDjOrderLitigiousPartyName(applicant1, caseData.getRespondent1LitigationFriend()))
+                           .setName(getPartyNameWithLitigiousFriend(applicant1, caseData.getRespondent1LitigationFriend()))
                            .setPrimaryAddress(applicant1.getPrimaryAddress()));
         if (applicant2 != null) {
             applicants.add(new Party()
-                               .setName(" and " + getSdoDjOrderLitigiousPartyName(applicant2, caseData.getRespondent2LitigationFriend()))
+                               .setName(" and " + getPartyNameWithLitigiousFriend(applicant2, caseData.getRespondent2LitigationFriend()))
                                .setPrimaryAddress(applicant2.getPrimaryAddress()));
         }
         return applicants;
