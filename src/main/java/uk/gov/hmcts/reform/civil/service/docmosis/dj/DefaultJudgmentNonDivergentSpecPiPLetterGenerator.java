@@ -29,7 +29,7 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.OTHER;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.SET_ASIDE_JUDGEMENT;
 import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.VARY_ORDER;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.DEFAULT_JUDGMENT_NON_DIVERGENT_SPEC_PIN_LIP_DEFENDANT_LETTER;
-import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getSdoDjOrderLitigiousPartyName;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,7 +97,7 @@ public class DefaultJudgmentNonDivergentSpecPiPLetterGenerator {
     public DefaultJudgmentNonDivergentSpecLipDefendantLetter getTemplateData(CaseData caseData) {
         return new DefaultJudgmentNonDivergentSpecLipDefendantLetter()
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
-            .setClaimantName(getSdoDjOrderLitigiousPartyName(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
+            .setClaimantName(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
             .setDefendant(caseData.getRespondent1())
             .setLetterIssueDate(LocalDate.now())
             .setCaseSubmittedDate(caseData.getSubmittedDate().toLocalDate())

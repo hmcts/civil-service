@@ -93,11 +93,11 @@ public class PartyUtils {
         };
     }
 
-    public static String getSdoDjOrderLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
-        return getSdoDjOrderLitigiousPartyName(party, litigationFriend, false);
+    public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
+        return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }
 
-    public static String getSdoDjOrderLitigiousPartyName(Party party, LitigationFriend litigationFriend, boolean upperCase) {
+    public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend, boolean upperCase) {
         String partyName = ofNullable(party).map(Party::getPartyName).map(name -> upperCase ? name.toUpperCase() : name).orElse(null);
         if (partyName != null) {
             return ofNullable(litigationFriend)
