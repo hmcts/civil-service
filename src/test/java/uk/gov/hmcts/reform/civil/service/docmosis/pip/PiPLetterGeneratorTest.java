@@ -77,13 +77,12 @@ class PiPLetterGeneratorTest {
     private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
     private static final String CLAIMANT_FULL_NAME = "Mr. John Smith";
     private static final String CLAIM_REFERENCE = "ABC";
-    private static final Party DEFENDANT = Party.builder()
-        .primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Smith")
-        .individualLastName("John")
-        .build();
+    private static final Party DEFENDANT = new Party()
+        .setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Smith")
+        .setIndividualLastName("John");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -161,11 +160,11 @@ class PiPLetterGeneratorTest {
         return CaseData.builder()
             .legacyCaseReference(CLAIM_REFERENCE)
             .ccdCaseReference(1234123412341234L)
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr.")
-                            .individualFirstName("John")
-                            .individualLastName("Smith").build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualTitle("Mr.")
+                            .setIndividualFirstName("John")
+                            .setIndividualLastName("Smith"))
             .respondent1(DEFENDANT)
             .respondent1Represented(YesOrNo.NO)
             .respondent1ResponseDeadline(RESPONSE_DEADLINE)
