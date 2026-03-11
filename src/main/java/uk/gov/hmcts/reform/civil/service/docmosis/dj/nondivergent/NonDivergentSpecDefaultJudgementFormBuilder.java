@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent1SolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getRespondent2SolicitorRef;
@@ -42,7 +42,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
         defaultJudgmentForm
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setFormText("No response,")
-            .setApplicant(getApplicant(caseData))
+            .setApplicant(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
             .setDebt(debtAmount.toString())
             .setCosts(cost.toString())
