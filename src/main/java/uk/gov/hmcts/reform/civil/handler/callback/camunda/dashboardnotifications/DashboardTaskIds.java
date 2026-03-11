@@ -53,4 +53,6 @@ public final class DashboardTaskIds {
     public static final String GA_HWF_OUTCOME = "GenerateDashboardNotificationsGaHwfOutcome";
     public static final String GA_MAKE_DECISION = "GenerateDashboardNotificationsGaMakeDecision";
     public static final String GA_TRANSLATED_DOCUMENT = "GenerateDashboardNotificationsGaTranslatedDocument";
+    public static final String INITIATE_COSC = "GenerateDashboardNotificationsInitiateCOSC";
+    public static final String PROCESS_COSC = "GenerateDashboardNotificationsProcessCOSC";
 }
