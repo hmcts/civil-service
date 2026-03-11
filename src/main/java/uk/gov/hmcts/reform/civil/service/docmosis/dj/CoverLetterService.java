@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.model.documents.DocumentMetaData;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService;
 import uk.gov.hmcts.reform.civil.service.documentmanagement.DocumentDownloadService;
 import uk.gov.hmcts.reform.civil.stitch.service.CivilStitchService;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -102,6 +103,6 @@ public class CoverLetterService {
         return new JudgementCoverLetter()
             .setClaimNumber(caseData.getLegacyCaseReference())
             .setAddress(party.getPrimaryAddress())
-            .setPartyName(party.getPartyName());
+            .setPartyName(PartyUtils.getSdoDjOrderLitigiousPartyName(party, caseData.getApplicant1LitigationFriend()));
     }
 }
