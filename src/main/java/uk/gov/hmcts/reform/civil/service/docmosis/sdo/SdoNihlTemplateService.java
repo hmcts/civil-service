@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoCaseClassificationService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoNihlTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoR2TrialTemplateFieldService;
-import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
