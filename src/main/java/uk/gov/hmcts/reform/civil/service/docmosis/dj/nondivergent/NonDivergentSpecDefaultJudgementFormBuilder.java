@@ -42,7 +42,7 @@ public class NonDivergentSpecDefaultJudgementFormBuilder extends DefaultJudgment
         defaultJudgmentForm
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setFormText("No response,")
-            .setApplicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicant(getApplicant(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
             .setDebt(debtAmount.toString())
             .setCosts(cost.toString())

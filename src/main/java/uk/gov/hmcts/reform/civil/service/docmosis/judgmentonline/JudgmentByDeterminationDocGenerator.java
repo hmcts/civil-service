@@ -119,7 +119,7 @@ public class JudgmentByDeterminationDocGenerator {
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setDebt(orderAmount.toString())
             .setFormText("No response,")
-            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicants(getApplicant(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
             .setTotalCost(orderAmount.add(costs).setScale(2).toString())
             .setApplicantReference(getApplicantSolicitorRef(caseData))

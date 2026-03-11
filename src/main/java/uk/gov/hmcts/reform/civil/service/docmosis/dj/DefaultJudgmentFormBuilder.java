@@ -47,7 +47,7 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
         return new DefaultJudgmentForm()
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setFormText("No response,")
-            .setApplicant(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicant(getApplicant(caseData))
             .setRespondent(getPartyDetails(respondent))
             .setClaimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
             )

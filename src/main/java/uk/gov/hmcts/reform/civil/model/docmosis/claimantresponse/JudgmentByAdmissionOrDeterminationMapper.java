@@ -262,7 +262,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
             .setApplicantReference(getApplicantSolicitorRef(caseData))
             .setApplicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicants(getApplicant(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData))
             .setTotalClaimAmount(totalClaimAmount)
             .setTotalInterestAmount(totalInterest)
