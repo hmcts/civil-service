@@ -39,10 +39,9 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldBuildOrganisation() {
-        Organisation organisation = Organisation.builder()
-            .name("Test Org")
-            .contactInformation(Collections.emptyList())
-            .build();
+        Organisation organisation = new Organisation()
+            .setName("Test Org")
+            .setContactInformation(Collections.emptyList());
 
         Solicitor.SolicitorBuilder<?, ?> solicitorBuilder = Solicitor.builder();
 
@@ -55,10 +54,9 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldGetContactDXWhenDxAddressExists() {
-        DxAddress dxAddress = DxAddress.builder().dxNumber("DX123").build();
-        ContactInformation contact = ContactInformation.builder()
-            .dxAddress(List.of(dxAddress))
-            .build();
+        DxAddress dxAddress = new DxAddress().setDxNumber("DX123");
+        ContactInformation contact = new ContactInformation()
+            .setDxAddress(List.of(dxAddress));
 
         String result = mapper.getContactDX(List.of(contact));
 
@@ -67,9 +65,8 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldReturnNullWhenDxAddressMissing() {
-        ContactInformation contact = ContactInformation.builder()
-            .dxAddress(Collections.emptyList())
-            .build();
+        ContactInformation contact = new ContactInformation()
+            .setDxAddress(Collections.emptyList());
 
         String result = mapper.getContactDX(List.of(contact));
 
@@ -98,7 +95,7 @@ class BaseRoboticsDataMapperTest {
 
     @Test
     void shouldUseContactInformationWhenProvidedAddressNotPresent() {
-        ContactInformation contact = ContactInformation.builder().build();
+        ContactInformation contact = new ContactInformation();
         RoboticsAddresses roboticsAddresses = new RoboticsAddresses();
 
         when(addressMapper.toRoboticsAddresses(List.of(contact))).thenReturn(roboticsAddresses);
@@ -112,7 +109,7 @@ class BaseRoboticsDataMapperTest {
     @Test
     void shouldReturnOrganisationId() {
         uk.gov.hmcts.reform.ccd.model.Organisation org =
-            uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("ORG123").build();
+            new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG123");
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(org);
 

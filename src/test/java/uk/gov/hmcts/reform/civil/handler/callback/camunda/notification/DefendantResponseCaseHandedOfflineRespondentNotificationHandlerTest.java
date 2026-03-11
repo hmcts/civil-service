@@ -140,7 +140,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -173,7 +173,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
                     .thenReturn("template-id-multiparty");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -211,7 +211,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -233,7 +233,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -275,7 +275,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .thenReturn("template-id-multiparty");
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -302,7 +302,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -331,7 +331,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -362,7 +362,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -392,7 +392,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -421,7 +421,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -450,7 +450,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -472,7 +472,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 CallbackParams params = CallbackParamsBuilder.builder()
                     .of(ABOUT_TO_SUBMIT, caseData)
@@ -502,9 +502,8 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
                 when(notificationsProperties.getRespondentSolicitorDefendantResponseForSpec())
                     .thenReturn("template-id-multiparty");
-                Organisation r2Org = Organisation.builder()
-                    .name("org name")
-                    .build();
+                Organisation r2Org = new Organisation()
+                    .setName("org name");
                 when(organisationService.findOrganisationById(
                     caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID()
                 )).thenReturn(Optional.of(r2Org));
@@ -551,7 +550,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                     .build();
 
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 handler.handle(params);
 
@@ -573,7 +572,7 @@ class DefendantResponseCaseHandedOfflineRespondentNotificationHandlerTest extend
                 when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline())
                     .thenReturn("template-id");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("org name")));
 
                 CaseData caseData = CaseDataBuilder.builder()
                     .multiPartyClaimTwoApplicants()

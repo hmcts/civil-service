@@ -12,11 +12,11 @@ class FeeTest {
 
     @Test
     void shouldConvertCalculateAmountInPenceToPounds_whenFeeIsConvertedToFeeDto() {
-        Fee fee = Fee.builder()
-            .calculatedAmountInPence(BigDecimal.valueOf(100))
-            .version("1")
-            .code("1")
-            .build();
+        Fee fee = new Fee()
+            .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+            .setVersion("1")
+            .setCode("1")
+            ;
 
         assertThat(fee.toFeeDto()).isEqualTo(
             FeeDto.builder()

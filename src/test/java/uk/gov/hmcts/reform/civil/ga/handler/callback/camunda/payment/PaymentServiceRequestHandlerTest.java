@@ -6,22 +6,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDetails;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.model.citizenui.HelpWithFees;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.GeneralAppFeesService;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
@@ -38,44 +39,37 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAKE_PAYMENT_SERVICE_REQ_GASPEC;
 import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 
-@SpringBootTest(classes = {
-    PaymentServiceRequestHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class
-})
+@ExtendWith(MockitoExtension.class)
 class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
     private static final String SUCCESSFUL_PAYMENT_REFERENCE = "2022-1655915218557";
     private static final String FREE_PAYMENT_REFERENCE = "FREE";
 
-    @MockBean
+    @Mock
     private PaymentsService paymentsService;
 
-    @MockBean
+    @Mock
     private PaymentServiceResponse paymentServiceResponse;
 
-    @MockBean
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @Autowired
+    @InjectMocks
     private PaymentServiceRequestHandler handler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+    @Mock
     private GeneralAppFeesService generalAppFeesService;
     private GeneralApplicationCaseData caseData;
     private CallbackParams params;
 
     @BeforeEach
     public void setup() {
-        caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
-
-        when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
+        caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
     }
 
     private GeneralApplicationPbaDetails extractPaymentDetailsFromResponse(AboutToStartOrSubmitCallbackResponse response) {
@@ -93,6 +87,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldMakePaymentServiceRequest_whenInvoked() {
+            when(gaForLipService.isGaForLip(any())).thenReturn(false);
             when(paymentsService.createServiceRequestGa(any(), any()))
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(SUCCESSFUL_PAYMENT_REFERENCE).build());
@@ -106,9 +101,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldNotMakePaymentServiceRequest_shouldAddFreePaymentDetails_whenInvoked() {
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
-                                .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
+            when(gaForLipService.isGaForLip(any())).thenReturn(false);
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -126,10 +120,8 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldNotMakePaymentServiceRequest_shouldAddFreePaymentDetails_for_Lip_whenInvoked() {
+            when(time.now()).thenReturn(LocalDateTime.of(2020, 1, 1, 12, 0, 0));
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(paymentsService.createServiceRequestGa(any(), any()))
-                .thenReturn(PaymentServiceResponse.builder()
-                                .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(true);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -163,7 +155,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
                 .thenReturn(PaymentServiceResponse.builder()
                                 .serviceRequestReference(FREE_PAYMENT_REFERENCE).build());
             when(generalAppFeesService.isFreeApplication(any())).thenReturn(false);
-            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+            caseData = caseData.copy().generalAppHelpWithFees(new HelpWithFees()
                                                                        .setHelpWithFee(YesOrNo.YES)).build();
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -176,7 +168,7 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnCorrectActivityId_whenRequested() {
-            assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("GeneralApplicationPaymentServiceReq");
+            assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("GeneralApplicationPaymentServiceReq");
         }
 
         @Test
@@ -186,14 +178,14 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
 
         @Test
         void shouldReturnHwf_True() {
-            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+            caseData = caseData.copy().generalAppHelpWithFees(new HelpWithFees()
                                                                        .setHelpWithFee(YesOrNo.YES)).build();
             assertThat(handler.isHelpWithFees(caseData)).isTrue();
         }
 
         @Test
         void shouldReturnHwf_False() {
-            caseData = caseData.toBuilder().generalAppHelpWithFees(new HelpWithFees()
+            caseData = caseData.copy().generalAppHelpWithFees(new HelpWithFees()
                                                                        .setHelpWithFee(YesOrNo.NO)).build();
             assertThat(handler.isHelpWithFees(caseData)).isFalse();
         }
@@ -201,31 +193,31 @@ class PaymentServiceRequestHandlerTest extends GeneralApplicationBaseCallbackHan
         @Test
         void shouldReturnFreeLipGa_True() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(Fee.builder().code("FREE").build()).build()).build();
+            caseData = caseData.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                     .setFee(new Fee().setCode("FREE"))).build();
             assertThat(handler.isFreeGaLip(caseData)).isTrue();
         }
 
         @Test
         void shouldReturnFreeLipGa_whenPbaDetailsAreNull_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().build();
+            caseData = caseData.copy().build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }
 
         @Test
         void shouldReturnFreeLipGa_whenFeeDetailsAreNull_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                  .build()).build();
+            caseData = caseData.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                  ).build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }
 
         @Test
         void shouldReturnFreeLipGa_whenFeeCodeIsNotFree_false() {
             when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            caseData = caseData.toBuilder().generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                                                     .fee(Fee.builder().code("1").build()).build())
+            caseData = caseData.copy().generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                                                     .setFee(new Fee().setCode("1")))
                                                                      .build();
             assertThat(handler.isFreeGaLip(caseData)).isFalse();
         }

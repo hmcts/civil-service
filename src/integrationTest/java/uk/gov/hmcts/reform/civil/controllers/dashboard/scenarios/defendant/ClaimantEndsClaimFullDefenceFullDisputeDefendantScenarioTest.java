@@ -28,8 +28,8 @@ public class ClaimantEndsClaimFullDefenceFullDisputeDefendantScenarioTest extend
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build()
             .toBuilder()
-            .applicant1(Party.builder().companyName("Test Company").type(Party.Type.COMPANY).build())
-            .respondent1(Party.builder().companyName("Respondent Company").type(Party.Type.COMPANY).build())
+            .applicant1(new Party().setCompanyName("Test Company").setType(Party.Type.COMPANY))
+            .respondent1(new Party().setCompanyName("Respondent Company").setType(Party.Type.COMPANY))
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .respondent1Represented(NO)

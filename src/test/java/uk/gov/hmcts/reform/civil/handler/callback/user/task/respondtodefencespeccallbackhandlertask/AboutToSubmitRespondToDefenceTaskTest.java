@@ -281,10 +281,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
             .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .specRespondent1Represented(NO)
             .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .caseManagementLocation(caseLocationCivil)
             .build();
 
@@ -310,10 +310,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .specRespondent1Represented(NO)
             .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .caseManagementLocation(caseLocationCivil)
             .applicant1ResponseDate(LocalDateTime.now())
             .build();
@@ -357,10 +357,10 @@ class AboutToSubmitRespondToDefenceTaskTest {
             .applicant1DQWithExperts()
             .applicant1DQWithWitnesses()
             .respondent1Represented(NO)
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .specRespondent1Represented(NO)
             .applicant1Represented(YES)
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .caseManagementLocation(caseLocationCivil)
             .applicant1AcceptPartAdmitPaymentPlanSpec(YES)
             .applicant1ResponseDate(LocalDateTime.now())
@@ -377,15 +377,12 @@ class AboutToSubmitRespondToDefenceTaskTest {
     @Test
     void shouldSetApplicant1DefenceResponseDocumentCategory() {
         // Given
-        Document document = Document.builder()
-            .documentUrl("http://dm-store/documents/123")
-            .documentBinaryUrl("http://dm-store/documents/123/binary")
-            .documentFileName("defence-response.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://dm-store/documents/123")
+            .setDocumentBinaryUrl("http://dm-store/documents/123/binary")
+            .setDocumentFileName("defence-response.pdf");
 
-        ResponseDocument responseDocument = ResponseDocument.builder()
-            .file(document)
-            .build();
+        ResponseDocument responseDocument = new ResponseDocument(document);
 
         CaseData caseData = CaseData.builder()
             .applicant1DefenceResponseDocumentSpec(responseDocument)
@@ -418,12 +415,11 @@ class AboutToSubmitRespondToDefenceTaskTest {
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .caseDetailsBefore(caseDetails)
                          .build())
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }

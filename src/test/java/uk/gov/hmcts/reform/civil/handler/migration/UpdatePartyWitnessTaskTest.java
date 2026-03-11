@@ -36,14 +36,14 @@ class UpdatePartyWitnessTaskTest {
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseRef = CaseReference.builder().caseReference(null).build();
+        CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
 
     @Test
     void shouldUpdateApplicantWitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
-        PartyFlagStructure witness2 = PartyFlagStructure.builder().firstName("Alice").lastName(null).build();
+        PartyFlagStructure witness1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
+        PartyFlagStructure witness2 = new PartyFlagStructure().setFirstName("Alice").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .applicantWitnesses(List.of(
@@ -52,7 +52,7 @@ class UpdatePartyWitnessTaskTest {
             ))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         List<Element<PartyFlagStructure>> updatedList = updated.getApplicantWitnesses();
@@ -66,13 +66,13 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateRespondent1WitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness = PartyFlagStructure.builder().firstName(null).lastName("Smith").build();
+        PartyFlagStructure witness = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         PartyFlagStructure updatedWitness = updated.getRespondent1Witnesses().get(0).getValue();
@@ -82,13 +82,13 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldUpdateRespondent2WitnessesWithTBCWhenNamesAreNull() {
-        PartyFlagStructure witness = PartyFlagStructure.builder().firstName("Bob").lastName(null).build();
+        PartyFlagStructure witness = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .respondent2Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         PartyFlagStructure updatedWitness = updated.getRespondent2Witnesses().get(0).getValue();
@@ -117,7 +117,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent2DQ(new Respondent2DQ().setRespondent2DQWitnesses(dqWitnesses))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("CASE123").build();
+        CaseReference ref = caseReference("CASE123");
         CaseData updated = task.migrateCaseData(caseData, ref);
 
         List<Element<Witness>> updatedApp1 = updated.getApplicant1DQ().getApplicant1DQWitnesses().getDetails();
@@ -133,17 +133,17 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldAssignNewPartyIdWhenMissing() {
-        PartyFlagStructure witness = PartyFlagStructure.builder()
-            .firstName("Jane")
-            .lastName("Doe")
-            .partyID(null)
-            .build();
+        PartyFlagStructure witness = new PartyFlagStructure()
+            .setFirstName("Jane")
+            .setLastName("Doe")
+            .setPartyID(null)
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantWitnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-1").build();
+        CaseReference ref = caseReference("REF-1");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         String newPartyId = updated.getApplicantWitnesses().get(0).getValue().getPartyID();
@@ -156,17 +156,17 @@ class UpdatePartyWitnessTaskTest {
 
     @Test
     void shouldNotChangeExistingPartyId() {
-        PartyFlagStructure witness = PartyFlagStructure.builder()
-            .firstName("Alex")
-            .lastName("Mason")
-            .partyID("existing-id-001")
-            .build();
+        PartyFlagStructure witness = new PartyFlagStructure()
+            .setFirstName("Alex")
+            .setLastName("Mason")
+            .setPartyID("existing-id-001")
+            ;
 
         CaseData caseData = CaseData.builder()
             .respondent1Witnesses(List.of(Element.<PartyFlagStructure>builder().value(witness).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-2").build();
+        CaseReference ref = caseReference("REF-2");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         assertThat(updated.getRespondent1Witnesses().get(0).getValue().getPartyID())
@@ -187,7 +187,7 @@ class UpdatePartyWitnessTaskTest {
             .respondent2DQ(null)
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("REF-3").build();
+        CaseReference ref = caseReference("REF-3");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
         assertThat(updated.getApplicantWitnesses()).isEmpty();
@@ -202,5 +202,11 @@ class UpdatePartyWitnessTaskTest {
         assertThat(task.getTaskName()).isEqualTo("UpdatePartyWitnessTask");
         assertThat(task.getEventSummary()).contains("Update case party witness via migration task");
         assertThat(task.getEventDescription()).contains("UpdatePartyWitnessTask updates witness");
+    }
+
+    private CaseReference caseReference(String value) {
+        CaseReference caseReference = new CaseReference();
+        caseReference.setCaseReference(value);
+        return caseReference;
     }
 }

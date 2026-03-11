@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.civil.service.robotics.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.civil.model.robotics.EventHistory;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Builder
+@Accessors(chain = true)
 public class RoboticsCaseDataDTO {
 
     byte [] jsonRawData;

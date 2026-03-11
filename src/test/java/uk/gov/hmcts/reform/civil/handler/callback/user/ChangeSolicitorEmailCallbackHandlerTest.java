@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
+import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
@@ -186,7 +187,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateNotificationAcknowledged()
-                .applicantSolicitor1UserDetails(IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()
+                .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")
                 ).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -435,11 +436,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy applicantPolicy =
+                copyOrganisationPolicy(caseData.getApplicant1OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isApplicant1(YesOrNo.YES)
-                .applicant1OrganisationPolicy(caseData.getApplicant1OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .applicant1OrganisationPolicy(applicantPolicy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -460,11 +462,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy respondent1Policy =
+                copyOrganisationPolicy(caseData.getRespondent1OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isRespondent1(YesOrNo.YES)
-                .respondent1OrganisationPolicy(caseData.getRespondent1OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .respondent1OrganisationPolicy(respondent1Policy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -485,11 +488,12 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(coreCaseUserService.getUserCaseRoles(anyString(), anyString())).thenReturn(caseRoles);
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
+            OrganisationPolicy respondent2Policy =
+                copyOrganisationPolicy(caseData.getRespondent2OrganisationPolicy())
+                    .setOrgPolicyReference("new reference");
             caseData = caseData.toBuilder()
                 .isRespondent2(YesOrNo.YES)
-                .respondent2OrganisationPolicy(caseData.getRespondent2OrganisationPolicy().toBuilder()
-                                                  .orgPolicyReference("new reference")
-                                                  .build())
+                .respondent2OrganisationPolicy(respondent2Policy)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
 
@@ -517,7 +521,7 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
         void validateApplicant1SolicitorEmail_shouldInvokeEmailValidationServiceAndReturnOutput() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicantSolicitor1UserDetails(
-                    IdamUserDetails.builder().email("applicant1solicitor@gmail.com").build()).build();
+                    new IdamUserDetails().setEmail("applicant1solicitor@gmail.com")).build();
             CallbackParams params = callbackParamsOf(caseData, MID, "validate-applicant1-solicitor-email");
 
             when(validateEmailService.validate(anyString())).thenReturn(mockErrors);
@@ -648,5 +652,18 @@ class ChangeSolicitorEmailCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertEquals("<br />",
                          response.getConfirmationBody(), "confirmationBody");
         }
+    }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
     }
 }

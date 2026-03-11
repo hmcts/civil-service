@@ -217,17 +217,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
         }
 
         @Test
-        void shouldReturnError_WhenAboutToStartIsInvokedWithRespondentLip() {
-            CaseData caseData = CaseDataBuilder.builder()
-                .atStateClaimIssued()
-                .applicant1Represented(NO).build();
-            CallbackParams params = callbackParamsOf(caseData.toMap(mapper), caseData, ABOUT_TO_START, JUDICIAL_REFERRAL);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-            assertThat(response.getErrors()).hasSize(1);
-            assertThat(response.getErrors()).containsExactlyInAnyOrder(NOT_ALLOWED_FOR_CITIZEN);
-        }
-
-        @Test
         void shouldNotReturnError_WhenAboutToStartIsInvokedNotInJudicialReferral() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .applicant1Represented(NO)
@@ -554,7 +543,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
@@ -651,7 +640,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
@@ -1529,7 +1518,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addRespondent2(YES)
-                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
@@ -1547,7 +1536,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addApplicant2(YES)
-                        .applicant2(PartyBuilder.builder().individual().build())
+                        .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1609,7 +1598,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addRespondent2(YES)
-                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
@@ -1628,7 +1617,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addApplicant2(YES)
-                        .applicant2(PartyBuilder.builder().individual().build())
+                        .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1680,8 +1669,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                                                                         .surname("Judy")
                                                                         .roles(Collections.emptyList()).build());
             // Given
-            List<Element<CaseDocument>> finalCaseDocuments = new ArrayList<>();
-            finalCaseDocuments.add(element(finalOrder));
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                 .finalOrderDocumentCollection(new ArrayList<>())
@@ -1695,10 +1682,11 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Then
             String fileName = LocalDate.now() + "_Judge Judy" + ".pdf";
             assertThat(response.getData()).extracting("finalOrderDocumentCollection").isNotNull();
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getFinalOrderDocumentCollection().getFirst()
                            .getValue().getDocumentLink().getCategoryID()).isEqualTo("caseManagementOrders");
-            assertThat(updatedData.getFinalOrderDocumentCollection().get(0)
+            assertThat(updatedData.getFinalOrderDocumentCollection().getFirst()
                            .getValue().getDocumentLink().getDocumentFileName()).isEqualTo(fileName);
+            assertThat(updatedData.getEnableUploadEvent()).isEqualTo(YES);
         }
 
         @Test

@@ -78,12 +78,12 @@ class CaseDismissDefendantNotificationHandlerTest {
 
     private CaseDataBuilder commonCaseData() {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .partyEmail("defendant@hmcts.net")
-                             .type(Party.Type.INDIVIDUAL).build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setPartyEmail("defendant@hmcts.net")
+                             .setType(Party.Type.INDIVIDUAL))
             .respondentSolicitor1EmailAddress("solicitor@example.com");
     }
 
@@ -97,9 +97,9 @@ class CaseDismissDefendantNotificationHandlerTest {
             .build().toBuilder()
             .caseDataLiP(new CaseDataLiP()
                              .setRespondent1LiPResponse(respondentLip))
-            .respondent2(!isRespondent1 ? Party.builder().individualFirstName("John").individualLastName("Johnson")
-                             .partyEmail("defendant2@hmcts.net")
-                             .type(Party.Type.INDIVIDUAL).build() : null)
+            .respondent2(!isRespondent1 ? new Party().setIndividualFirstName("John").setIndividualLastName("Johnson")
+                             .setPartyEmail("defendant2@hmcts.net")
+                             .setType(Party.Type.INDIVIDUAL) : null)
             .respondentSolicitor2EmailAddress(!isRespondent1 ? "solicitor2@example.com" : null)
             .addRespondent2(!isRespondent1 ? YesOrNo.YES : YesOrNo.NO)
             .respondent2SameLegalRepresentative(!isRespondent1 ? YesOrNo.NO : null)
@@ -126,11 +126,10 @@ class CaseDismissDefendantNotificationHandlerTest {
                          ? CaseEvent.NOTIFY_DEFENDANT_DISMISS_CASE.name()
                          : CaseEvent.NOTIFY_DEFENDANT_TWO_DISMISS_CASE.name())
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .request(callbackRequest)
             .caseData(caseData)
-            .type(ABOUT_TO_SUBMIT)
-            .build();
+            .type(ABOUT_TO_SUBMIT);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

@@ -48,7 +48,7 @@ class FullDefenceRespondentSolicitorTwoCCSpecNotifierTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
         when(notificationsProperties.getClaimantSolicitorDefendantResponseFullDefence()).thenReturn("template-id");
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -66,7 +66,7 @@ class FullDefenceRespondentSolicitorTwoCCSpecNotifierTest {
     void shouldNotifyRespondentSolicitor2In1v2ScenarioSecondSol_whenV1CallbackInvoked() {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateRespondentFullDefence()
-            .respondent2(PartyBuilder.builder().soleTrader().build().toBuilder().partyID("res-2-party-id").build())
+            .respondent2(new PartyBuilder().soleTrader().build().setPartyID("res-2-party-id"))
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .build();
 

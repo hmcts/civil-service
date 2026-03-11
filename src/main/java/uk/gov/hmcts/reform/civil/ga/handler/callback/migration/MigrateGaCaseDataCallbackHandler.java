@@ -41,7 +41,7 @@ public class MigrateGaCaseDataCallbackHandler extends CallbackHandler implements
 
         GeneralApplicationCaseData oldCaseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Migrating data for case: {}", oldCaseData.getCcdCaseReference());
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = oldCaseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = oldCaseData.copy();
         caseDataBuilder.migrationId(MIGRATION_ID_VALUE);
 
         return AboutToStartOrSubmitCallbackResponse.builder()

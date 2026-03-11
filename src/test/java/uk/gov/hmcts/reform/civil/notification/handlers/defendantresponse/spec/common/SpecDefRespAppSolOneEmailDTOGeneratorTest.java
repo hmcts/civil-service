@@ -36,9 +36,9 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
         CaseData caseData = CaseData.builder()
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(LocalDate.of(2025, Month.MAY, 10))
-                                               .build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(LocalDate.of(2025, Month.MAY, 10))
+            )
             .build();
 
         String expectedOrgName = "OrgName Ltd";
@@ -61,10 +61,10 @@ class SpecDefRespAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddClaimantNameWhenNotImmediatePayment() {
-        Party applicant = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Jane")
-            .individualLastName("Doe").build();
+        Party applicant = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Jane")
+            .setIndividualLastName("Doe");
         CaseData caseData = CaseData.builder()
             .applicant1(applicant)
             .defenceAdmitPartPaymentTimeRouteRequired(null)

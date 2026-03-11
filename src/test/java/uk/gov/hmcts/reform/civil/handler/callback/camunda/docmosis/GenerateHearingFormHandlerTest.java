@@ -78,7 +78,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         when(hearingFormGenerator.generate(any(CaseData.class), anyString())).thenReturn(documents);
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2SameLegalRepresentative(YES);
         BusinessProcess businessProcess =  new BusinessProcess();
@@ -157,7 +157,7 @@ class GenerateHearingFormHandlerTest extends BaseCallbackHandlerTest {
         List<Element<CaseDocument>> systemGeneratedCaseDocuments = new ArrayList<>();
         systemGeneratedCaseDocuments.add(element(document));
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        caseData.setRespondent2(PartyBuilder.builder().individual().build());
+        caseData.setRespondent2(new PartyBuilder().individual().build());
         caseData.setAddRespondent2(YES);
         caseData.setRespondent2SameLegalRepresentative(YES);
         caseData.setHearingDocuments(systemGeneratedCaseDocuments);

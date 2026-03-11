@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks.variables;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -9,7 +8,6 @@ import uk.gov.hmcts.reform.civil.model.common.MappableObject;
 
 import java.util.List;
 
-@Builder(toBuilder = true)
 @Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor

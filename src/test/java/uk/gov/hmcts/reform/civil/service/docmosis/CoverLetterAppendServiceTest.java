@@ -64,21 +64,19 @@ class CoverLetterAppendServiceTest {
     private static final Address APPLICANT_ADDRESS = address("123 road", "London", "SW1 1NT");
     private static final Address RESPONDENT_ADDRESS = address("456 Avenue", "London", "EX12RT");
 
-    private static final Party CLAIMANT = Party.builder()
-        .primaryAddress(APPLICANT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Mint")
-        .individualLastName("Clay")
-        .build();
+    private static final Party CLAIMANT = new Party()
+        .setPrimaryAddress(APPLICANT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Mint")
+        .setIndividualLastName("Clay");
 
-    private static final Party DEFENDANT = Party.builder()
-        .primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Indent")
-        .individualLastName("Dave")
-        .build();
+    private static final Party DEFENDANT = new Party()
+        .setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Indent")
+        .setIndividualLastName("Dave");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -93,14 +91,13 @@ class CoverLetterAppendServiceTest {
     private static final CoverLetter DEFENDANT_LETTER_TEMPLATE_DATA = new CoverLetter()
         .setParty(DEFENDANT);
 
-    private static final CaseDocument caseDocument = CaseDocument.builder()
-        .documentType(DocumentType.HEARING_FORM)
-        .documentSize(5L)
-        .documentName("DocumentName.pdf")
-        .createdBy("CIVIL")
-        .createdDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
-        .documentLink(Document.builder().documentFileName("DocumentName.pdf").documentBinaryUrl("Binary/url").documentUrl("url").build())
-        .build();
+    private static final CaseDocument caseDocument = new CaseDocument()
+        .setDocumentType(DocumentType.HEARING_FORM)
+        .setDocumentSize(5L)
+        .setDocumentName("DocumentName.pdf")
+        .setCreatedBy("CIVIL")
+        .setCreatedDatetime(LocalDateTime.of(2024,  1, 2,  3,  4))
+        .setDocumentLink(new Document().setDocumentFileName("DocumentName.pdf").setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
     private static final byte[] STITCHED_DOC_BYTES = new byte[]{1, 2, 3, 4};
 
     private List<DocumentMetaData> specClaimTimelineDocuments;
@@ -172,17 +169,15 @@ class CoverLetterAppendServiceTest {
     }
 
     private CaseDocument buildStitchedDocument() {
-        return CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SEALED_CLAIM)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        return new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SEALED_CLAIM)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
     }
 }

@@ -129,10 +129,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2SameSolicitor() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .submittedDate(LocalDateTime.now().minusDays(30))
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
@@ -159,10 +158,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2DifferentSolicitor() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_1V2_DIFFERENT_SOL)))
@@ -187,10 +185,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2Respondent1LIP() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .specRespondent1Represented(YesOrNo.NO)
             .build();
 
@@ -216,10 +213,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm1v2Respondent2LIP() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .partyName("name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setPartyName("name"))
             .specRespondent2Represented(YesOrNo.NO)
             .build();
 
@@ -245,10 +241,9 @@ class  SealedClaimFormGeneratorForSpecTest {
     void generateSealedClaimForm2v1() {
         CaseData.CaseDataBuilder caseBuilder = getBaseCaseDataBuilder();
         CaseData caseData = caseBuilder
-            .applicant2(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .partyName("name")
-                            .build())
+            .applicant2(new Party()
+                            .setType(Party.Type.COMPANY)
+                            .setPartyName("name"))
             .build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(N2_2V1)))
@@ -269,32 +264,33 @@ class  SealedClaimFormGeneratorForSpecTest {
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder()
             .totalClaimAmount(BigDecimal.valueOf(850_00))
-            .claimFee(Fee.builder()
-                          .calculatedAmountInPence(BigDecimal.valueOf(70_00))
-                          .build());
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(BigDecimal.valueOf(70_00))
+                          );
     }
 
     private CaseData.CaseDataBuilder getCaseDataBuilderWithAllDetails() {
         List<TimelineOfEvents> timelines = new ArrayList<>();
-        timelines.add(TimelineOfEvents.builder()
-                          .value(TimelineOfEventDetails.builder()
-                                     .timelineDate(LocalDate.now()).timelineDescription("test timeline").build()).build());
+        timelines.add(new TimelineOfEvents(
+            new TimelineOfEventDetails(LocalDate.now(), "test timeline"),
+            null
+        ));
 
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
             .toBuilder()
             .totalClaimAmount(BigDecimal.valueOf(850_00))
-            .claimFee(Fee.builder()
-                          .calculatedAmountInPence(BigDecimal.valueOf(70_00))
-                          .build())
+            .claimFee(new Fee()
+                          .setCalculatedAmountInPence(BigDecimal.valueOf(70_00))
+                          )
             .timelineOfEvents(timelines)
             .interestClaimOptions(InterestClaimOptions.SAME_RATE_INTEREST)
             .sameRateInterestSelection(buildSameRateSelection(new BigDecimal(100), "test"))
             .interestFromSpecificDate(LocalDate.now())
             .interestClaimFrom(InterestClaimFromType.FROM_CLAIM_SUBMIT_DATE)
-            .fixedCosts(FixedCosts.builder()
-                            .claimFixedCosts(YesOrNo.YES)
-                            .fixedCostAmount("2000")
-                            .build())
+            .fixedCosts(new FixedCosts()
+                            .setClaimFixedCosts(YesOrNo.YES)
+                            .setFixedCostAmount("2000")
+                            )
             .breakDownInterestDescription("test breakdown desc");
     }
 

@@ -90,18 +90,18 @@ class ExpenditureCalculatorTest {
     }
 
     private Respondent1DebtLRspec createDebtsWithoutCreditCard() {
-        return Respondent1DebtLRspec.builder()
-            .debtDetails(createDebts())
-            .hasLoanCardDebt(YesOrNo.NO)
-            .build();
+        return new Respondent1DebtLRspec()
+            .setDebtDetails(createDebts())
+            .setHasLoanCardDebt(YesOrNo.NO)
+            ;
     }
 
     private Respondent1DebtLRspec createDebtWithCreditCard() {
-        return Respondent1DebtLRspec.builder()
-            .debtDetails(createDebts())
-            .hasLoanCardDebt(YesOrNo.YES)
-            .loanCardDebtDetails(createLoanCardDents())
-            .build();
+        return new Respondent1DebtLRspec()
+            .setDebtDetails(createDebts())
+            .setHasLoanCardDebt(YesOrNo.YES)
+            .setLoanCardDebtDetails(createLoanCardDents())
+            ;
     }
 
     private List<Element<DebtLRspec>> createDebts() {
@@ -112,14 +112,13 @@ class ExpenditureCalculatorTest {
     }
 
     private List<Element<LoanCardDebtLRspec>> createLoanCardDents() {
-        return wrapElements(LoanCardDebtLRspec.builder()
-                                .monthlyPayment(new BigDecimal(30000))
-                                .build());
+        return wrapElements(new LoanCardDebtLRspec().setMonthlyPayment(new BigDecimal(30000))
+                                );
     }
 
     private List<Element<Respondent1CourtOrderDetails>> createCourtOrders() {
-        return wrapElements(Respondent1CourtOrderDetails.builder()
-                                .monthlyInstalmentAmount(new BigDecimal(30000))
-                                .build());
+        return wrapElements(new Respondent1CourtOrderDetails()
+                                .setMonthlyInstalmentAmount(new BigDecimal(30000))
+                                );
     }
 }

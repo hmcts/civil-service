@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.CaseManagementCategory;
 import uk.gov.hmcts.reform.civil.model.CaseManagementCategoryElement;
 import uk.gov.hmcts.reform.civil.model.CorrectEmail;
 import uk.gov.hmcts.reform.civil.model.CourtLocation;
+import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.PaymentDetails;
@@ -193,12 +194,11 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         Optional<Organisation> organisation = organisationService.findOrganisation(authToken);
         organisation.ifPresent(value -> caseData.setApplicant1OrganisationPolicy(
-            OrganisationPolicy.builder()
-                 .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                 .organisationID(value.getOrganisationIdentifier()).build())
-                 .orgPolicyReference(null)
-                 .orgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())
-                 .build()));
+            new OrganisationPolicy().setOrganisation(
+                new uk.gov.hmcts.reform.ccd.model.Organisation()
+                    .setOrganisationID(value.getOrganisationIdentifier()))
+                    .setOrgPolicyReference(null)
+                    .setOrgPolicyCaseAssignedRole(APPLICANTSOLICITORONE.getFormattedName())));
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper)).build();
     }
@@ -304,6 +304,10 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         updatedDetails.setCustomerReference(customerReference);
         caseData.setClaimIssuedPaymentDetails(updatedDetails);
         caseData.setClaimFee(feesService.getFeeDataByClaimValue(caseData.getClaimValue()));
+        if (YesOrNo.YES.equals(caseData.getIsClaimDeclarationAdded())) {
+            Fee otherRemedyFee = feesService.getFeeDataForOtherRemedy(caseData.getClaimValue());
+            caseData.setOtherRemedyFee(otherRemedyFee);
+        }
         caseData.setPaymentTypePBA("PBAv3");
         List<String> pbaNumbers = getPbaAccounts(callbackParams.getParams().get(BEARER_TOKEN).toString());
         caseData.setApplicantSolicitor1PbaAccounts(DynamicList.fromList(pbaNumbers));
@@ -380,12 +384,9 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
 
-            caseData.setRespondent1OrganisationPolicy(
-                caseData.getRespondent1OrganisationPolicy()
-                    .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
-                    .build()
-            );
+            OrganisationPolicy respondent1Policy = copyOrganisationPolicy(caseData.getRespondent1OrganisationPolicy());
+            respondent1Policy.setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation());
+            caseData.setRespondent1OrganisationPolicy(respondent1Policy);
         }
 
         if (NO.equals(caseData.getRespondent2SameLegalRepresentative()) && YES.equals(caseData.getRespondent2Represented())) {
@@ -399,37 +400,46 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
                 }
             }
 
-            caseData.setRespondent2OrganisationPolicy(
-                caseData.getRespondent2OrganisationPolicy()
-                    .toBuilder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
-                    .build()
-            );
+            OrganisationPolicy respondent2Policy = copyOrganisationPolicy(caseData.getRespondent2OrganisationPolicy());
+            respondent2Policy.setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation());
+            caseData.setRespondent2OrganisationPolicy(respondent2Policy);
         }
     }
 
     private void addOrgPolicy2ForSameLegalRepresentative(CaseData caseData) {
         if (YES.equals(caseData.getRespondent2SameLegalRepresentative())) {
-            OrganisationPolicy.OrganisationPolicyBuilder organisationPolicy2Builder = OrganisationPolicy.builder();
-
+            OrganisationPolicy respondent2OrganisationPolicy = new OrganisationPolicy();
             OrganisationPolicy respondent1OrganisationPolicy = caseData.getRespondent1OrganisationPolicy();
-            organisationPolicy2Builder.organisation(respondent1OrganisationPolicy.getOrganisation())
-                .orgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference())
-                .build();
 
-            organisationPolicy2Builder.orgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName());
+            if (respondent1OrganisationPolicy != null) {
+                respondent2OrganisationPolicy
+                    .setOrgPolicyReference(respondent1OrganisationPolicy.getOrgPolicyReference());
+            }
 
-            caseData.setRespondent2OrganisationPolicy(
-                organisationPolicy2Builder
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().build())
-                    .build()
-            );
+            respondent2OrganisationPolicy
+                .setOrgPolicyCaseAssignedRole(RESPONDENTSOLICITORTWO.getFormattedName())
+                .setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation());
+
+            caseData.setRespondent2OrganisationPolicy(respondent2OrganisationPolicy);
 
             // Use the respondent1OrganisationIDCopy which was already set by clearOrganisationPolicyId
             caseData.setRespondent2OrganisationIDCopy(
                 caseData.getRespondent1OrganisationIDCopy()
             );
         }
+    }
+
+    private OrganisationPolicy copyOrganisationPolicy(OrganisationPolicy sourcePolicy) {
+        OrganisationPolicy copy = new OrganisationPolicy();
+        if (sourcePolicy == null) {
+            return copy;
+        }
+
+        return copy
+            .setOrganisation(sourcePolicy.getOrganisation())
+            .setOrgPolicyReference(sourcePolicy.getOrgPolicyReference())
+            .setOrgPolicyCaseAssignedRole(sourcePolicy.getOrgPolicyCaseAssignedRole())
+            .setPreviousOrganisations(sourcePolicy.getPreviousOrganisations());
     }
 
     private CallbackResponse submitClaim(CallbackParams callbackParams) {

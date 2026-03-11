@@ -5,14 +5,12 @@ import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder;
 import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import uk.gov.hmcts.reform.civil.event.DispatchBusinessProcessEvent;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
@@ -27,7 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {JacksonAutoConfiguration.class, CaseDetailsConverter.class})
+@ExtendWith(MockitoExtension.class)
 class GaEventEmitterServiceTest {
 
     @Mock
@@ -36,10 +34,10 @@ class GaEventEmitterServiceTest {
     @Mock
     private RemoteProcessEngineException mockedRemoteProcessEngineException;
 
-    @MockBean
+    @Mock
     private RuntimeService runtimeService;
 
-    @MockBean
+    @Mock
     private MessageCorrelationBuilder messageCorrelationBuilder;
 
     private GaEventEmitterService eventEmitterService;
@@ -50,7 +48,6 @@ class GaEventEmitterServiceTest {
         when(runtimeService.createMessageCorrelation(any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.setVariable(any(), any())).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.tenantId(any())).thenReturn(messageCorrelationBuilder);
-        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
     }
 
     @Test
@@ -61,7 +58,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -78,6 +75,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerEvent_whenInvoked_withoutTenantId() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
@@ -87,7 +85,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -105,7 +103,7 @@ class GaEventEmitterServiceTest {
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withTenantId() {
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -121,11 +119,12 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldSendMessageAndTriggerGAEvent_whenInvoked_withoutTenantId() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException)
             .thenReturn(null);
 
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -148,7 +147,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -166,7 +165,7 @@ class GaEventEmitterServiceTest {
     void shouldSendMessageAndNotTriggerGAEvent_whenNotTrue() {
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(new RuntimeException());
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();
@@ -181,6 +180,7 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldHandleException_whenInvoked() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
         GeneralApplication generalApplication = GeneralApplication.builder()
@@ -188,7 +188,7 @@ class GaEventEmitterServiceTest {
             .build();
         List<Element<GeneralApplication>> newApplication = newArrayList();
         newApplication.add(element(generalApplication));
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalApplications(newApplication)
             .ccdCaseReference(1L)
             .build();
@@ -203,10 +203,11 @@ class GaEventEmitterServiceTest {
 
     @Test
     void shouldHandleException_whenInvokedGA() {
+        when(messageCorrelationBuilder.withoutTenantId()).thenReturn(messageCorrelationBuilder);
         when(messageCorrelationBuilder.correlateStartMessage()).thenThrow(mockedRemoteProcessEngineException);
         var businessProcess = new BusinessProcess().setCamundaEvent("TEST_EVENT");
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdCaseReference(1L)
             .build();

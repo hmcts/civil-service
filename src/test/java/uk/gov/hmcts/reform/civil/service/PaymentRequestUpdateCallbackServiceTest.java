@@ -109,13 +109,12 @@ class PaymentRequestUpdateCallbackServiceTest {
     }
 
     private ServiceRequestUpdateDto buildServiceDto(String status) {
-        return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CASE_ID.toString())
-            .serviceRequestStatus(status)
-            .payment(PaymentDto.builder()
-                         .customerReference("CUST-REF")
-                         .paymentReference("123")
-                         .build())
-            .build();
+        return new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(CASE_ID.toString())
+            .setServiceRequestStatus(status)
+            .setPayment(PaymentDto.builder()
+                .customerReference("CUST-REF")
+                .paymentReference("123")
+                .build());
     }
 }

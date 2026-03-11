@@ -18,11 +18,10 @@ class SystemGeneratedDocMapperTest {
     @Test
     void testMapSystemGeneratedCaseDocument() {
         SystemGeneratedDocMapper mapper = new SystemGeneratedDocMapper();
-        CaseDocument doc = CaseDocument.builder()
-            .documentType(DocumentType.SDO_ORDER)
-            .documentLink(Document.builder().documentUrl("url").documentFileName("f.pdf").build())
-            .createdDatetime(LocalDateTime.now())
-            .build();
+        CaseDocument doc = new CaseDocument()
+            .setDocumentType(DocumentType.SDO_ORDER)
+            .setDocumentLink(new Document().setDocumentUrl("url").setDocumentFileName("f.pdf"))
+            .setCreatedDatetime(LocalDateTime.now());
 
         List<Element<CaseDocument>> input = List.of(ElementUtils.element(doc));
 

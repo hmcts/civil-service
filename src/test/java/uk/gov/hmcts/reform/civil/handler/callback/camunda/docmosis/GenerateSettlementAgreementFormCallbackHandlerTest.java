@@ -83,10 +83,9 @@ class GenerateSettlementAgreementFormCallbackHandlerTest extends BaseCallbackHan
     void shouldGenerateForm_whenAboutToSubmitCalled() {
         given(formGenerator.generate(any(CaseData.class), anyString())).willReturn(caseDocument);
         CaseData caseData = CaseDataBuilder.builder()
-                .respondent1(PartyBuilder.builder()
-                        .soleTrader().build().toBuilder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .build())
+                .respondent1(new PartyBuilder()
+                        .soleTrader().build()
+                        .setType(Party.Type.INDIVIDUAL))
                 .build();
 
         handler.handle(callbackParamsOf(caseData, ABOUT_TO_SUBMIT));

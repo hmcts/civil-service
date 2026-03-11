@@ -38,10 +38,10 @@ public class LocationRefDataUtilTest {
             .courtLocation()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10").courtLocationCode("121")
-                               .epimmsId("000000").build());
+        courtLocations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+                               .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+                               .setCourtTypeId("10").setCourtLocationCode("121")
+                               .setEpimmsId("000000"));
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
                                                                               BEARER_TOKEN, true);
@@ -54,10 +54,10 @@ public class LocationRefDataUtilTest {
             .courtLocation_old()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10").courtLocationCode("127")
-                               .epimmsId("000000").build());
+        courtLocations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+                               .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+                               .setCourtTypeId("10").setCourtLocationCode("127")
+                               .setEpimmsId("000000"));
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
                                                                               BEARER_TOKEN, true);
@@ -70,10 +70,10 @@ public class LocationRefDataUtilTest {
             .courtLocation()
             .build();
         List<LocationRefData> courtLocations = new ArrayList<>();
-        courtLocations.add(LocationRefData.builder().siteName("SiteName").courtAddress("1").postcode("1")
-                               .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-                               .courtTypeId("10")
-                               .epimmsId("121212").build());
+        courtLocations.add(new LocationRefData().setSiteName("SiteName").setCourtAddress("1").setPostcode("1")
+                               .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+                               .setCourtTypeId("10")
+                               .setEpimmsId("121212"));
         when(locationRefDataService.getCourtLocationsByEpimmsIdAndCourtType(any(), any())).thenReturn(courtLocations);
         String preferredCourtCode = locationRefDataUtil.getPreferredCourtData(caseData,
                                                                               BEARER_TOKEN, true);

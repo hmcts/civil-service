@@ -94,24 +94,24 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
         @Test
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
-            caseData = caseData.toBuilder().applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                                                            .id("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
-                                                                                            .email("applicantsolicitor@example.com")
-                                                                                            .build())
+            caseData = caseData.toBuilder().applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                                                            .setId("f5e5cc53-e065-43dd-8cec-2ad005a6b9a9")
+                                                                                            .setEmail("applicantsolicitor@example.com")
+                                                                                            )
                 .addApplicant2(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.NO)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
-                .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                            .organisationID(ORG_NAME).build()).build()).build();
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
+                .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
+                    new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME))).build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             when(notificationsProperties.getNotifyLrRecordJudgmentDeterminationMeansTemplate()).thenReturn("template-id");
-            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(Organisation.builder().name(ORG_NAME).build()));
+            when(organisationService.findOrganisationById(any())).thenReturn(Optional.of(new Organisation().setName(ORG_NAME)));
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
             handler.handle(params);
 
@@ -130,11 +130,11 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
-                .applicant1(Party.builder()
-                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
-                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
-                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
