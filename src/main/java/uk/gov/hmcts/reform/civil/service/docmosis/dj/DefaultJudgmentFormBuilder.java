@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GENERATE_DJ_FORM_SPEC;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 
 @Component
 public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase implements StandardDefaultJudgmentBuilder {
@@ -47,7 +47,7 @@ public class DefaultJudgmentFormBuilder extends DefaultJudgmentFormBuilderBase i
         return new DefaultJudgmentForm()
             .setCaseNumber(caseData.getLegacyCaseReference())
             .setFormText("No response,")
-            .setApplicant(getApplicant(caseData))
+            .setApplicant(getApplicants(caseData))
             .setRespondent(getPartyDetails(respondent))
             .setClaimantLR(getApplicantOrgDetails(caseData.getApplicant1OrganisationPolicy())
             )

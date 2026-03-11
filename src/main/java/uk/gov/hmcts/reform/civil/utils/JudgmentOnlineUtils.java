@@ -66,7 +66,7 @@ public class JudgmentOnlineUtils {
         return null;
     }
 
-    public static List<Party> getApplicant(CaseData caseData) {
+    public static List<Party> getApplicants(CaseData caseData) {
         uk.gov.hmcts.reform.civil.model.Party applicant1 = caseData.getApplicant1();
         uk.gov.hmcts.reform.civil.model.Party applicant2 = caseData.getApplicant2();
 
