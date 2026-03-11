@@ -84,7 +84,7 @@ class JudgmentByAdmissionMapperTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
             .totalInterest(BigDecimal.valueOf(10))
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -125,7 +125,7 @@ class JudgmentByAdmissionMapperTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
             .totalInterest(BigDecimal.valueOf(10))
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -152,7 +152,7 @@ class JudgmentByAdmissionMapperTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
             .totalInterest(BigDecimal.valueOf(10))
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -179,7 +179,7 @@ class JudgmentByAdmissionMapperTest {
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
             .totalInterest(BigDecimal.valueOf(10))
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -213,7 +213,7 @@ class JudgmentByAdmissionMapperTest {
                                           .setRepaymentFrequency(paymentFrequencyLRspec)
                                           )
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .ccjPaymentDetails(buildCCJPaymentDetails())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
@@ -262,7 +262,7 @@ class JudgmentByAdmissionMapperTest {
                                                .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5)))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -304,9 +304,9 @@ class JudgmentByAdmissionMapperTest {
                                                .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5)))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .addRespondent2(YES)
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -353,7 +353,7 @@ class JudgmentByAdmissionMapperTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
 
@@ -406,7 +406,7 @@ class JudgmentByAdmissionMapperTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
@@ -454,7 +454,7 @@ class JudgmentByAdmissionMapperTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
@@ -480,7 +480,7 @@ class JudgmentByAdmissionMapperTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
             .ccjPaymentDetails(buildCCJPaymentDetails())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionOnlineMapper.addUpdateActiveJudgment(caseData);
         assertNotNull(activeJudgment);
@@ -501,7 +501,7 @@ class JudgmentByAdmissionMapperTest {
     @Test
     void testGetInstalmentDetails_ClaimantInFavour_NullAmount() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(null)
             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(PaymentFrequencyClaimantResponseLRspec.ONCE_ONE_WEEK)
@@ -526,7 +526,7 @@ class JudgmentByAdmissionMapperTest {
     void testGetInstalmentDetails_ClaimantInFavour_Frequencies(
         PaymentFrequencyClaimantResponseLRspec repFreq, PaymentFrequency expectedFreq) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .applicant1RepaymentOptionForDefendantSpec(PaymentType.REPAYMENT_PLAN)
             .applicant1SuggestInstalmentsPaymentAmountForDefendantSpec(new BigDecimal("100"))
             .applicant1SuggestInstalmentsRepaymentFrequencyForDefendantSpec(repFreq)
@@ -546,7 +546,7 @@ class JudgmentByAdmissionMapperTest {
     @Test
     void testGetInstalmentDetails_Respondent1Plan() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(new RepaymentPlanLRspec()
@@ -566,7 +566,7 @@ class JudgmentByAdmissionMapperTest {
     @Test
     void testGetInstalmentDetails_Respondent2Plan() {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(null)
@@ -593,7 +593,7 @@ class JudgmentByAdmissionMapperTest {
     void testGetInstalmentDetails_RespondentPlan_Frequencies(
         PaymentFrequencyLRspec repFreq, PaymentFrequency expectedFreq) {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .respondent1ClaimResponseTypeForSpec(FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.SUGGESTION_OF_REPAYMENT_PLAN)
             .respondent1RepaymentPlan(new RepaymentPlanLRspec()

@@ -102,12 +102,11 @@ class ClaimantConfirmProceedDefendantEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         String legacyCaseReference = "000MC001";
 
-        Party respondent = Party.builder()
-            .individualTitle("Ms")
-            .individualFirstName("Jane")
-            .individualLastName("Smith")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party respondent = new Party()
+            .setIndividualTitle("Ms")
+            .setIndividualFirstName("Jane")
+            .setIndividualLastName("Smith")
+            .setType(Party.Type.INDIVIDUAL);
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference(legacyCaseReference)

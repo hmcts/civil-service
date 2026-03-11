@@ -120,10 +120,9 @@ public class RepresentedLitigantPopulatorTest {
             .setOrganisation(organisation);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(fixedDate)
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(fixedDate)
+            .setUnavailableDateType(SINGLE_DATE);
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
 
         MediationAvailability mediationAvailability = new MediationAvailability();
