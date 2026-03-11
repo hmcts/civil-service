@@ -20,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim.PPI_DESCRIPTION;
 
 @ExtendWith(MockitoExtension.class)
 class SdoTrackDefaultsServiceTest {
@@ -103,5 +104,59 @@ class SdoTrackDefaultsServiceTest {
         assertThat(disputeResolution.getIncludeInOrderToggle()).containsExactly(IncludeInOrderToggle.INCLUDE);
         assertThat(caseData.getSdoR2FastTrackUseOfWelshLanguage()).isNotNull();
         assertThat(caseData.getSdoR2DisposalHearingUseOfWelshLanguage()).isNotNull();
+    }
+
+    @Test
+    void shouldPopulatePenalNoticeFieldsWhenOtherRemedyEnabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
+        when(mainFeatureToggleService.isOtherRemedyEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        service.applyBaseTrackDefaults(caseData);
+
+        assertThat(caseData.getSmallClaimsPenalNotice()).isNotNull();
+        assertThat(caseData.getFastTrackPenalNotice()).isNotNull();
+        assertThat(caseData.getSmallClaimsPenalNoticeToggle()).isNotNull().isEmpty();
+        assertThat(caseData.getFastTrackPenalNoticeToggle()).isNotNull().isEmpty();
+    }
+
+    @Test
+    void shouldNotPopulatePenalNoticeFieldsWhenOtherRemedyDisabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
+        when(mainFeatureToggleService.isOtherRemedyEnabled()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        service.applyBaseTrackDefaults(caseData);
+
+        assertThat(caseData.getSmallClaimsPenalNotice()).isNull();
+        assertThat(caseData.getFastTrackPenalNotice()).isNull();
+    }
+
+    @Test
+    void shouldPopulatePpiFieldsWhenOtherRemedyEnabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
+        when(mainFeatureToggleService.isOtherRemedyEnabled()).thenReturn(true);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        service.applyBaseTrackDefaults(caseData);
+
+        assertThat(caseData.getSmallClaimsPPI()).isNotNull();
+        assertThat(caseData.getSmallClaimsPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(28));
+        assertThat(caseData.getSmallClaimsPPI().getText()).isEqualTo(PPI_DESCRIPTION);
+        assertThat(caseData.getFastTrackPPI()).isNotNull();
+        assertThat(caseData.getFastTrackPPI().getPpiDate()).isEqualTo(LocalDate.now().plusDays(28));
+        assertThat(caseData.getFastTrackPPI().getText()).isEqualTo(PPI_DESCRIPTION);
+    }
+
+    @Test
+    void shouldSetPpiFieldsToNullWhenOtherRemedyDisabled() {
+        when(featureToggleService.isCarmEnabled(any(CaseData.class))).thenReturn(true);
+        when(mainFeatureToggleService.isOtherRemedyEnabled()).thenReturn(false);
+
+        CaseData caseData = CaseDataBuilder.builder().build();
+        service.applyBaseTrackDefaults(caseData);
+
+        assertThat(caseData.getSmallClaimsPPI()).isNull();
+        assertThat(caseData.getFastTrackPPI()).isNull();
     }
 }
