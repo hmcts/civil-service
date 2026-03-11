@@ -28,21 +28,21 @@ public class UnAssignCaseReference extends CaseReference implements ExcelMappabl
 
     @Override
     public void fromExcelRow(Map<String, Object> rowValues) throws Exception {
+        if (rowValues.containsKey("caseRole")) {
+            Object value = rowValues.get("caseRole");
+            setCaseRole(value != null ? value.toString() : null);
+        }
         if (rowValues.containsKey("caseReference")) {
             Object value = rowValues.get("caseReference");
             setCaseReference(value != null ? value.toString() : null);
-        }
-        if (rowValues.containsKey("userId")) {
-            Object value = rowValues.get("userId");
-            setUserId(value != null ? value.toString() : null);
         }
         if (rowValues.containsKey("organisationId")) {
             Object value = rowValues.get("organisationId");
             setOrganisationId(value != null ? value.toString() : null);
         }
-        if (rowValues.containsKey("caseRole")) {
-            Object value = rowValues.get("caseRole");
-            setCaseRole(value != null ? value.toString() : null);
+        if (rowValues.containsKey("userId")) {
+            Object value = rowValues.get("userId");
+            setUserId(value != null ? value.toString() : null);
         }
     }
 }

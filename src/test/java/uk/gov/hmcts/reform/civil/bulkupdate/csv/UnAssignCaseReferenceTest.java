@@ -11,6 +11,20 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class UnAssignCaseReferenceTest {
 
     @Test
+    void shouldIgnoreMissingFields() throws Exception {
+        Map<String, Object> rowValues = new HashMap<>();
+        rowValues.put("caseReference", "99999");
+
+        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        assignCaseReference.fromExcelRow(rowValues);
+
+        assertEquals("99999", assignCaseReference.getCaseReference());
+        assertNull(assignCaseReference.getUserId());
+        assertNull(assignCaseReference.getOrganisationId());
+        assertNull(assignCaseReference.getCaseRole());
+    }
+
+    @Test
     void shouldPopulateFieldsFromExcelRow() throws Exception {
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", "12345");
@@ -42,19 +56,5 @@ class UnAssignCaseReferenceTest {
         assertNull(unassignCaseReference.getUserId());
         assertNull(unassignCaseReference.getOrganisationId());
         assertNull(unassignCaseReference.getCaseRole());
-    }
-
-    @Test
-    void shouldIgnoreMissingFields() throws Exception {
-        Map<String, Object> rowValues = new HashMap<>();
-        rowValues.put("caseReference", "99999");
-
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
-        assignCaseReference.fromExcelRow(rowValues);
-
-        assertEquals("99999", assignCaseReference.getCaseReference());
-        assertNull(assignCaseReference.getUserId());
-        assertNull(assignCaseReference.getOrganisationId());
-        assertNull(assignCaseReference.getCaseRole());
     }
 }

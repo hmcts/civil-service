@@ -16,11 +16,6 @@ public class UnAssignUserWithACaseRole extends MigrationTask<UnAssignCaseReferen
         this.coreCaseUserService = coreCaseUserService1;
     }
 
-    @Override
-    protected String getEventSummary() {
-        return "UnAssign a case role to a case";
-    }
-
     protected CaseData migrateCaseData(CaseData caseData, UnAssignCaseReference unassignCaseReference) {
         if (caseData == null || unassignCaseReference.getCaseReference() == null) {
             throw new IllegalArgumentException("CaseData and CaseReference must not be null");
@@ -29,9 +24,14 @@ public class UnAssignUserWithACaseRole extends MigrationTask<UnAssignCaseReferen
         coreCaseUserService.unassignCase(unassignCaseReference.getCaseReference(),
                                          unassignCaseReference.getUserId(),
                                          unassignCaseReference.getOrganisationId(),
-                                       CaseRole.valueOf(unassignCaseReference.getCaseRole())
+                                         CaseRole.valueOf(unassignCaseReference.getCaseRole())
         );
         return caseData;
+    }
+
+    @Override
+    protected String getEventSummary() {
+        return "UnAssign a case role to a case";
     }
 
     @Override

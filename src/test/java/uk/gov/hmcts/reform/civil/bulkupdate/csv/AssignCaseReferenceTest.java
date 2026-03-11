@@ -11,23 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class AssignCaseReferenceTest {
 
     @Test
-    void shouldPopulateFieldsFromExcelRow() throws Exception {
-        Map<String, Object> rowValues = new HashMap<>();
-        rowValues.put("caseReference", "12345");
-        rowValues.put("userId", "user1");
-        rowValues.put("organisationId", "org1");
-        rowValues.put("caseRole", "CREATOR");
-
-        AssignCaseReference assignCaseReference = new AssignCaseReference();
-        assignCaseReference.fromExcelRow(rowValues);
-
-        assertEquals("12345", assignCaseReference.getCaseReference());
-        assertEquals("user1", assignCaseReference.getUserId());
-        assertEquals("org1", assignCaseReference.getOrganisationId());
-        assertEquals("CREATOR", assignCaseReference.getCaseRole());
-    }
-
-    @Test
     void shouldHandleNullValues() throws Exception {
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("caseReference", null);
@@ -42,6 +25,23 @@ class AssignCaseReferenceTest {
         assertNull(assignCaseReference.getUserId());
         assertNull(assignCaseReference.getOrganisationId());
         assertNull(assignCaseReference.getCaseRole());
+    }
+
+    @Test
+    void shouldPopulateFieldsFromExcelRow() throws Exception {
+        Map<String, Object> rowValues = new HashMap<>();
+        rowValues.put("caseReference", "12345");
+        rowValues.put("userId", "user1");
+        rowValues.put("organisationId", "org1");
+        rowValues.put("caseRole", "CREATOR");
+
+        AssignCaseReference assignCaseReference = new AssignCaseReference();
+        assignCaseReference.fromExcelRow(rowValues);
+
+        assertEquals("12345", assignCaseReference.getCaseReference());
+        assertEquals("user1", assignCaseReference.getUserId());
+        assertEquals("org1", assignCaseReference.getOrganisationId());
+        assertEquals("CREATOR", assignCaseReference.getCaseRole());
     }
 
     @Test
