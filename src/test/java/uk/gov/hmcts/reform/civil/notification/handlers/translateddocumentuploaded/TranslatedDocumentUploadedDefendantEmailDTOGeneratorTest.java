@@ -68,14 +68,12 @@ public class TranslatedDocumentUploadedDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party applicant = Party.builder()
-            .type(Party.Type.COMPANY)
-            .companyName("Applicant Company")
-            .build();
-        Party respondent = Party.builder()
-            .type(Party.Type.COMPANY)
-            .companyName("Respondent Company")
-            .build();
+        Party applicant = new Party()
+            .setType(Party.Type.COMPANY)
+            .setCompanyName("Applicant Company");
+        Party respondent = new Party()
+            .setType(Party.Type.COMPANY)
+            .setCompanyName("Respondent Company");
         CaseData caseData = CaseData.builder()
             .applicant1(applicant)
             .respondent1(respondent)
