@@ -674,6 +674,40 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
         }
 
+        @Test
+        void shouldPreserveEditedPenalNoticeContent_whenPopulateFormValuesCalledAgain() {
+            // AC4: Edited content persists on navigation - when user navigates back, populate-form-values
+            // may run again but should not overwrite user's edited penal notice content
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(locationRefDataWithCourtNameRegion());
+            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
+                .thenReturn(LocalDate.now())
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21));
+
+            String customPenalNotice = "Custom edited penal notice with defendant name and paragraph X";
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CASE_PROGRESSION)
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .assistedOrderPenalNoticeContent(customPenalNotice)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
+                .isEqualTo(customPenalNotice);
+        }
+
     }
 
     @Nested

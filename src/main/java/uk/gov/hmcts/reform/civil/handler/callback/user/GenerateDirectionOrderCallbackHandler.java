@@ -542,7 +542,11 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
         caseData.setFinalOrderGiveReasonsYesNo(NO);
 
-        caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
+        // Only set default penal notice when empty - preserves user edits when navigating back (AC4)
+        if (caseData.getAssistedOrderPenalNoticeContent() == null
+            || caseData.getAssistedOrderPenalNoticeContent().isBlank()) {
+            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
+        }
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
