@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -172,11 +173,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
+    @Value("${other_remedy.enabled:false}")
+    private static boolean otherRemedyEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
-            callbackKey(ABOUT_TO_START), this::nullPreviousSelections,
+            callbackKey(ABOUT_TO_START), this::populateAndResetPreviousSelections,
             callbackKey(MID, "assign-track-toggle"), this::assignTrackToggle,
             callbackKey(MID, "populate-form-values"), this::populateFormValues,
             callbackKey(MID, "create-download-template-document"), this::generateTemplate,
@@ -195,8 +198,10 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     // so we remove previously selected options from both Free form orders and assisted orders.
     // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
 
-    private CallbackResponse nullPreviousSelections(CallbackParams callbackParams) {
+    private CallbackResponse populateAndResetPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
+
+        populatePenalNotice(caseData);
         if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -218,10 +223,16 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         }
 
         caseData.setFinalOrderFurtherHearingToggle(null);
-        return nullPreviousSelections(caseData);
+        return populateAndResetPreviousSelections(caseData);
     }
 
-    private CallbackResponse nullPreviousSelections(CaseData caseData) {
+    private static void populatePenalNotice(final CaseData caseData) {
+        if (otherRemedyEnabled) {
+            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
+        }
+    }
+
+    private CallbackResponse populateAndResetPreviousSelections(CaseData caseData) {
         caseData.setFinalOrderSelection(null);
         // Free form orders
         caseData.setFreeFormRecordedTextArea(null);
@@ -242,8 +253,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setAssistedOrderCostsReserved(null);
         caseData.setAssistedOrderMakeAnOrderForCosts(null);
         caseData.setAssistedOrderCostsBespoke(null);
-        caseData.setAssistedOrderPenalNoticeToggle(null);
-        caseData.setAssistedOrderPenalNoticeContent(null);
         caseData.setFinalOrderAppealToggle(null);
         caseData.setFinalOrderAppealComplex(null);
         caseData.setOrderMadeOnDetailsList(null);
@@ -420,6 +429,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         orderWithoutNotice.setWithoutNoticeSelectionDate(workingDayIndicator
             .getNextWorkingDay(LocalDate.now().plusDays(7)));
         caseData.setOrderWithoutNotice(orderWithoutNotice);
+        caseData.setAssistedOrderPenalNoticeContent(null);
     }
 
     private void populateDownloadTemplateOptions(CaseData caseData) {
@@ -541,12 +551,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
 
         caseData.setFinalOrderGiveReasonsYesNo(NO);
-
-        // Only set default penal notice when empty - preserves user edits when navigating back (AC4)
-        if (caseData.getAssistedOrderPenalNoticeContent() == null
-            || caseData.getAssistedOrderPenalNoticeContent().isBlank()) {
-            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
-        }
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
@@ -727,7 +731,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
 
             caseData.setFinalOrderFurtherHearingToggle(null);
 
-            nullPreviousSelections(caseData);
+            populateAndResetPreviousSelections(caseData);
             return AboutToStartOrSubmitCallbackResponse.builder()
                 .data(caseData.toMap(objectMapper))
                 .build();
@@ -744,7 +748,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
             caseData.setFinalOrderFurtherHearingToggle(null);
         }
 
-        nullPreviousSelections(caseData);
+        populateAndResetPreviousSelections(caseData);
 
         AboutToStartOrSubmitCallbackResponse.AboutToStartOrSubmitCallbackResponseBuilder responseBuilder =
             AboutToStartOrSubmitCallbackResponse.builder()
