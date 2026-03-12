@@ -132,17 +132,49 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenOnlyOneDefendantSelectedFromTwo() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .respondent2(new PartyBuilder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder().label("First Defendant").build())
-                .build())
-            .build();
+    void shouldNotifyWhenOnlyFirstDefendantSelectedFromTwo() {
+        CaseData baseCaseData = multiPartyCaseData();
+        String firstDefendantName = baseCaseData.getRespondent1().getPartyName();
+
+        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
+            .label(firstDefendantName)
+            .code("first")
+            .build());
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
+    @Test
+    void shouldNotNotifyWhenSecondDefendantSelectedInstead() {
+        CaseData baseCaseData = multiPartyCaseData();
+        Party respondent2 = baseCaseData.getRespondent2();
+
+        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
+            .label(respondent2.getPartyName())
+            .code("second")
+            .build());
+
+        assertThat(caseData.getDefendantDetailsSpec().getValue().getLabel())
+            .isEqualTo(respondent2.getPartyName());
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    private CaseData multiPartyCaseData() {
+        return multiPartyCaseData(null);
+    }
+
+    private CaseData multiPartyCaseData(DynamicListElement selectedDefendant) {
+        Party respondent1 = new PartyBuilder().individual().build();
+        Party respondent2 = new PartyBuilder().individual("Second").build();
+        DynamicListElement value = selectedDefendant != null ? selectedDefendant : DynamicListElement.builder().label(respondent1.getPartyName()).code("first").build();
+        return CaseData.builder()
+            .respondent1(respondent1)
+            .respondent2(respondent2)
+            .respondent1Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .defendantDetailsSpec(DynamicList.builder().value(value).build())
+            .build();
     }
 
     @Test

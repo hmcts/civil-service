@@ -61,7 +61,12 @@ public class GenerateSpecDJFormRequestedRespSolTwoEmailDTOGenerator extends Resp
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
-            && notificationHelper.hasSingleDefendantSelection(caseData);
+        if (!Boolean.TRUE.equals(super.getShouldNotify(caseData))) {
+            return false;
+        }
+        if (!notificationHelper.hasSingleDefendantSelection(caseData)) {
+            return false;
+        }
+        return notificationHelper.isSecondDefendantSelected(caseData);
     }
 }

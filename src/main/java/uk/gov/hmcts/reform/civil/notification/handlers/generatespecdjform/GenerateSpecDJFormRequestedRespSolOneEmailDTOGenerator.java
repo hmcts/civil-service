@@ -59,7 +59,10 @@ public class GenerateSpecDJFormRequestedRespSolOneEmailDTOGenerator extends Resp
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
-            && notificationHelper.hasSingleDefendantSelection(caseData);
+        if (!Boolean.TRUE.equals(super.getShouldNotify(caseData))) {
+            return false;
+        }
+        return notificationHelper.hasSingleDefendantSelection(caseData)
+            && notificationHelper.isFirstDefendantSelected(caseData);
     }
 }

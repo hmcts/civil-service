@@ -132,31 +132,37 @@ class GenerateSpecDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyWhenOnlyOneDefendantSelectedAndTwoSolicitors() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .respondent2(new PartyBuilder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Second Defendant").build())
-                .build())
-            .build();
+    void shouldNotifyWhenOnlySecondDefendantSelectedAndTwoSolicitors() {
+        CaseData baseCaseData = multiPartyCaseData();
+        Party respondent2 = baseCaseData.getRespondent2();
+
+        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
+            .label(respondent2.getPartyName())
+            .code("second")
+            .build());
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
+    void shouldNotNotifyWhenFirstDefendantSelectedInstead() {
+        CaseData baseCaseData = multiPartyCaseData();
+        String firstDefendantName = baseCaseData.getRespondent1().getPartyName();
+
+        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
+            .label(firstDefendantName)
+            .code("first")
+            .build());
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
     void shouldNotNotifyWhenBothDefendantsSelected() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .respondent1Represented(YesOrNo.YES)
-            .respondent2(new PartyBuilder().individual().build())
-            .addRespondent2(YesOrNo.YES)
-            .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both Defendants").build())
-                .build())
-            .build();
+        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
+            .label("Both Defendants")
+            .code("both")
+            .build());
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
@@ -166,5 +172,26 @@ class GenerateSpecDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    private CaseData multiPartyCaseData() {
+        return multiPartyCaseData(null);
+    }
+
+    private CaseData multiPartyCaseData(DynamicListElement selectedDefendant) {
+        Party respondent1 = new PartyBuilder().individual().build();
+        Party respondent2 = new PartyBuilder().individual("Second").build();
+        DynamicListElement value = selectedDefendant != null ? selectedDefendant : DynamicListElement.builder()
+            .label(respondent2.getPartyName())
+            .code("second")
+            .build();
+        return CaseData.builder()
+            .respondent1(respondent1)
+            .respondent2(respondent2)
+            .respondent1Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .defendantDetailsSpec(DynamicList.builder().value(value).build())
+            .build();
     }
 }
