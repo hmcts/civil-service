@@ -708,6 +708,38 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo(customPenalNotice);
         }
 
+        @Test
+        void shouldSetDefaultPenalNotice_whenContentIsBlank() {
+            // When content is null or blank, populate-form-values should set default
+            List<LocationRefData> locations = new ArrayList<>();
+            locations.add(locationRefDataWithCourtNameRegion());
+            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
+            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
+            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
+                .thenReturn(LocalDate.now())
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(7))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(14))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21))
+                .thenReturn(LocalDate.now().plusDays(21));
+
+            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
+                .ccdState(CASE_PROGRESSION)
+                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
+                .assistedOrderPenalNoticeContent("   ")
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
+
+            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+            assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
+                .isEqualTo(DEFAULT_PENAL_NOTICE);
+        }
+
     }
 
     @Nested
