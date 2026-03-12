@@ -148,6 +148,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             log.info("Setting max allowed extension date base on notification date {} and respondent1 for caseID {}",
                      notificationDate, ccdCaseReference
             );
+            if (caseData.getCaseStayDate() != null) {
+                notificationDate = LocalDate.from(caseData.getRespondent1ResponseDeadline());
+            }
             caseData.setRespondentSolicitor1AgreedDeadlineExtension(validator.getMaxDate(
                 notificationDate,
                 caseData.getRespondent1AcknowledgeNotificationDate()
@@ -158,6 +161,9 @@ public class InformAgreedExtensionDateCallbackHandler extends CallbackHandler {
             log.info("Setting max allowed extension date base on notification date {} and respondent2 for caseID {}",
                      notificationDate, ccdCaseReference
             );
+            if (caseData.getCaseStayDate() != null) {
+                notificationDate = LocalDate.from(caseData.getRespondent2ResponseDeadline());
+            }
             caseData.setRespondentSolicitor2AgreedDeadlineExtension(validator.getMaxDate(
                 notificationDate,
                 caseData.getRespondent2AcknowledgeNotificationDate()
