@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.model.genapplication.CaseLink;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -42,8 +41,6 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
     private DashboardNotificationService dashboardNotificationService;
     @Mock(lenient = true)
     private DashboardNotificationsParamsMapper mapper;
-    @Mock
-    private FeatureToggleService featureToggleService;
 
     @InjectMocks
     private ApplicationsProceedOfflineClaimantDashboardService service;
@@ -51,29 +48,21 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
     @BeforeEach
     void setup() {
         when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
     }
 
     @Test
     void shouldRecordScenariosWhenEligible() {
-        CaseLink caseLink = CaseLink.builder().caseReference("123").build();
-        GeneralApplication application = GeneralApplication.builder()
-            .caseLink(caseLink)
-            .build();
+        List<Element<GeneralApplication>> applications = wrapElements(
+            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
+        );
+        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
+            GeneralApplicationsDetails.builder().caseState("Awaiting Respondent Response").build()
+        );
 
-        GeneralApplicationsDetails claimantDetail = GeneralApplicationsDetails.builder()
-            .caseState("Awaiting Respondent Response")
-            .build();
-
-        List<Element<GeneralApplication>> applications = wrapElements(application);
-        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(claimantDetail);
-
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(applications)
             .claimantGaAppDetails(claimantDetails)
             .build();
@@ -97,24 +86,17 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldOnlyRecordInitiateScenarioWhenNoLiveApplications() {
-        CaseLink caseLink = CaseLink.builder().caseReference("123").build();
-        GeneralApplication application = GeneralApplication.builder()
-            .caseLink(caseLink)
-            .build();
+        List<Element<GeneralApplication>> applications = wrapElements(
+            GeneralApplication.builder().caseLink(CaseLink.builder().caseReference("123").build()).build()
+        );
+        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(
+            GeneralApplicationsDetails.builder().caseState("Application Closed").build()
+        );
 
-        GeneralApplicationsDetails claimantDetail = GeneralApplicationsDetails.builder()
-            .caseState("Application Closed")
-            .build();
-
-        List<Element<GeneralApplication>> applications = wrapElements(application);
-        List<Element<GeneralApplicationsDetails>> claimantDetails = wrapElements(claimantDetail);
-
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .generalApplications(applications)
             .claimantGaAppDetails(claimantDetails)
             .build();
@@ -131,30 +113,11 @@ class ApplicationsProceedOfflineClaimantDashboardServiceTest {
 
     @Test
     void shouldNotRecordWhenNotLip() {
-        CaseData caseData = CaseDataBuilder.builder()
+        CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
+            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .ccdCaseReference(1234L)
             .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.YES)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
             .build();
-
-        service.notify(caseData, AUTH_TOKEN);
-
-        verify(dashboardNotificationService, never()).deleteByReferenceAndCitizenRole(any(), any());
-        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
-    }
-
-    @Test
-    void shouldNotRecordWhenFeatureDisabled() {
-        CaseData caseData = CaseDataBuilder.builder()
-            .ccdCaseReference(1234L)
-            .applicant1Represented(uk.gov.hmcts.reform.civil.enums.YesOrNo.NO)
-            .build()
-            .toBuilder()
-            .ccdState(CaseState.PROCEEDS_IN_HERITAGE_SYSTEM)
-            .build();
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         service.notify(caseData, AUTH_TOKEN);
 

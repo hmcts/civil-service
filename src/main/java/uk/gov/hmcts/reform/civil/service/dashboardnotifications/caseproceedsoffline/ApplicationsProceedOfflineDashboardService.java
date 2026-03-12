@@ -4,7 +4,6 @@ import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.data.ScenarioRequestParams;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
@@ -17,7 +16,6 @@ abstract class ApplicationsProceedOfflineDashboardService {
     private final DashboardScenariosService dashboardScenariosService;
     private final DashboardNotificationService dashboardNotificationService;
     private final DashboardNotificationsParamsMapper mapper;
-    private final FeatureToggleService featureToggleService;
 
     private static final List<String> NON_LIVE_STATES = List.of(
         "Application Closed",
@@ -30,18 +28,13 @@ abstract class ApplicationsProceedOfflineDashboardService {
 
     ApplicationsProceedOfflineDashboardService(DashboardScenariosService dashboardScenariosService,
                                                DashboardNotificationService dashboardNotificationService,
-                                               DashboardNotificationsParamsMapper mapper,
-                                               FeatureToggleService featureToggleService) {
+                                               DashboardNotificationsParamsMapper mapper) {
         this.dashboardScenariosService = dashboardScenariosService;
         this.dashboardNotificationService = dashboardNotificationService;
         this.mapper = mapper;
-        this.featureToggleService = featureToggleService;
     }
 
     public void notify(CaseData caseData, String authToken) {
-        if (!featureToggleService.isLipVLipEnabled()) {
-            return;
-        }
         if (!CaseState.PROCEEDS_IN_HERITAGE_SYSTEM.equals(caseData.getCcdState())) {
             return;
         }

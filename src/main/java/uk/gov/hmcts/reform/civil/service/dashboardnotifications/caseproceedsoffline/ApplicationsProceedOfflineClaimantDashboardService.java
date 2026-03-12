@@ -5,7 +5,6 @@ import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplicationsDetails;
-import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardScenariosService;
@@ -17,9 +16,8 @@ public class ApplicationsProceedOfflineClaimantDashboardService extends Applicat
 
     public ApplicationsProceedOfflineClaimantDashboardService(DashboardScenariosService dashboardScenariosService,
                                                               DashboardNotificationService dashboardNotificationService,
-                                                              DashboardNotificationsParamsMapper mapper,
-                                                              FeatureToggleService featureToggleService) {
-        super(dashboardScenariosService, dashboardNotificationService, mapper, featureToggleService);
+                                                              DashboardNotificationsParamsMapper mapper) {
+        super(dashboardScenariosService, dashboardNotificationService, mapper);
     }
 
     @Override
