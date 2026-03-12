@@ -108,7 +108,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionO
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_DATE_TO_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.FUTURE_SINGLE_DATE_ERROR;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.HEADER;
-import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.DEFAULT_PENAL_NOTICE;
 import static uk.gov.hmcts.reform.civil.handler.callback.user.GenerateDirectionOrderCallbackHandler.PENAL_NOTICE_CONTENT_REQUIRED;
 import static uk.gov.hmcts.reform.civil.model.common.DynamicList.fromList;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
@@ -638,8 +637,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 .isEqualTo(LocalDate.now().plusDays(21).toString());
             assertThat(response.getData()).extracting("publicFundingCostsProtection")
                 .isEqualTo("No");
-            assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
-                .isEqualTo(DEFAULT_PENAL_NOTICE);
         }
 
         @Test
@@ -706,38 +703,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
             assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
                 .isEqualTo(customPenalNotice);
-        }
-
-        @Test
-        void shouldSetDefaultPenalNotice_whenContentIsBlank() {
-            // When content is null or blank, populate-form-values should set default
-            List<LocationRefData> locations = new ArrayList<>();
-            locations.add(locationRefDataWithCourtNameRegion());
-            when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
-            when(locationHelper.getHearingLocation(any(), any(), any())).thenReturn(locationRefDataAfterSdo);
-            when(workingDayIndicator.getNextWorkingDay(any(LocalDate.class)))
-                .thenReturn(LocalDate.now())
-                .thenReturn(LocalDate.now().plusDays(7))
-                .thenReturn(LocalDate.now().plusDays(7))
-                .thenReturn(LocalDate.now().plusDays(7))
-                .thenReturn(LocalDate.now().plusDays(14))
-                .thenReturn(LocalDate.now().plusDays(14))
-                .thenReturn(LocalDate.now().plusDays(21))
-                .thenReturn(LocalDate.now().plusDays(21))
-                .thenReturn(LocalDate.now().plusDays(21))
-                .thenReturn(LocalDate.now().plusDays(21));
-
-            CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .ccdState(CASE_PROGRESSION)
-                .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
-                .assistedOrderPenalNoticeContent("   ")
-                .build();
-            CallbackParams params = callbackParamsOf(caseData, MID, PAGE_ID);
-
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
-            assertThat(response.getData()).extracting("assistedOrderPenalNoticeContent")
-                .isEqualTo(DEFAULT_PENAL_NOTICE);
         }
 
     }

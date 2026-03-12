@@ -194,6 +194,13 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     public List<CaseEvent> handledEvents() {
         return EVENTS;
     }
+
+    private static void populatePenalNotice(final CaseData caseData) {
+        if (otherRemedyEnabled) {
+            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
+        }
+    }
+
     // Final orders can be submitted multiple times, we want each one to be a "clean slate"
     // so we remove previously selected options from both Free form orders and assisted orders.
     // Exception is fields which we specifically prepopulate e.g. date fields, or specific text.
@@ -201,7 +208,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateAndResetPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
-        populatePenalNotice(caseData);
         if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -226,12 +232,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return populateAndResetPreviousSelections(caseData);
     }
 
-    private static void populatePenalNotice(final CaseData caseData) {
-        if (otherRemedyEnabled) {
-            caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
-        }
-    }
-
     private CallbackResponse populateAndResetPreviousSelections(CaseData caseData) {
         caseData.setFinalOrderSelection(null);
         // Free form orders
@@ -253,6 +253,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setAssistedOrderCostsReserved(null);
         caseData.setAssistedOrderMakeAnOrderForCosts(null);
         caseData.setAssistedOrderCostsBespoke(null);
+        caseData.setAssistedOrderPenalNoticeToggle(null);
+        caseData.setAssistedOrderPenalNoticeContent(null);
         caseData.setFinalOrderAppealToggle(null);
         caseData.setFinalOrderAppealComplex(null);
         caseData.setOrderMadeOnDetailsList(null);
@@ -264,6 +266,8 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderDownloadTemplateOptions(null);
         caseData.setOrderAfterHearingDate(null);
         caseData.setShowOrderAfterHearingDatePage(null);
+
+        populatePenalNotice(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
