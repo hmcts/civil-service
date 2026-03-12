@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,8 @@ import uk.gov.hmcts.reform.civil.service.search.CasesStuckCheckSearchService;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -255,17 +256,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 if (ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find()) {
                     alreadyProcessed = true;
                 } else {
-                    Map<String, Object> response = camundaRuntimeApi.fetchErrorDetails(incident.getId(), serviceAuthorization);
-                    Object errorsObj = response.getOrDefault("callbackErrors", Collections.emptyList());
-                    List<String> callbackErrors;
-                    if (errorsObj instanceof List<?> list) {
-                        callbackErrors = list.stream()
-                            .filter(Objects::nonNull)
-                            .map(Object::toString) // safely convert to String
-                            .toList();
-                    } else {
-                        callbackErrors = Collections.emptyList();
-                    }
+                    List<String> callbackErrors = fetchCallbackErrors(incident.getId(), serviceAuthorization);
                     for (String error : callbackErrors) {
                         if (ALREADY_PROCESSED_PATTERN.matcher(error).find()) {
                             alreadyProcessed = true;
@@ -297,6 +288,27 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 e
             );
             return false;
+        }
+    }
+
+    private List<String> fetchCallbackErrors(String incidentId, String serviceAuthorization) {
+        try {
+            Map<String, Object> response = camundaRuntimeApi.fetchErrorDetails(incidentId, serviceAuthorization);
+            Object errorsObj = response.getOrDefault("callbackErrors", Collections.emptyList());
+            if (errorsObj instanceof List<?> list) {
+                return list.stream()
+                    .filter(Objects::nonNull)
+                    .map(Object::toString)
+                    .toList();
+            }
+            return Collections.emptyList();
+        } catch (FeignException.NotFound notFound) {
+            log.warn(
+                "No historic external task log found for incident {}. Treating callback errors as empty.",
+                incidentId,
+                notFound
+            );
+            return Collections.emptyList();
         }
     }
 

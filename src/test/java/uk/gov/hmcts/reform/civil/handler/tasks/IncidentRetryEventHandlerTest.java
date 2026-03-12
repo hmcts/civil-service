@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
+import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
@@ -27,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +59,20 @@ class IncidentRetryEventHandlerTest {
         return instructions.size() == 1
             && "startAfterActivity".equals(instructions.get(0).get("type"))
             && "activity1".equals(instructions.get(0).get("activityId"));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static boolean matchesRetryInstructions(Map<String, Object> req) {
+        List<Map<String, Object>> instructions = (List<Map<String, Object>>) req.get("instructions");
+        if (instructions.size() != 2) {
+            return false;
+        }
+        Map<String, Object> cancelInstruction = instructions.get(0);
+        Map<String, Object> startBeforeInstruction = instructions.get(1);
+        return "cancel".equals(cancelInstruction.get("type"))
+            && "activity1".equals(cancelInstruction.get("activityId"))
+            && "startBeforeActivity".equals(startBeforeInstruction.get("type"))
+            && "activity1".equals(startBeforeInstruction.get("activityId"));
     }
 
     @Test
@@ -323,6 +339,41 @@ class IncidentRetryEventHandlerTest {
             eq("serviceAuth"),
             eq("proc1"),
             argThat(IncidentRetryEventHandlerTest::matches)
+        );
+    }
+
+    @Test
+    void shouldContinueRetrying_whenErrorDetailsNotFound() {
+        ProcessInstanceDto pi = newProcessInstance("proc1");
+
+        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
+        incident.setIncidentMessage("some other error");
+
+        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
+
+        when(camundaRuntimeApi.queryProcessInstances(
+            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
+        )).thenReturn(List.of(pi));
+
+        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
+            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
+        )).thenReturn(List.of(incident));
+
+        HashMap<String, VariableValueDto> vars = new HashMap<>();
+        VariableValueDto var = new VariableValueDto();
+        var.setValue("case-proc1");
+        vars.put("caseId", var);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
+
+        FeignException.NotFound notFound = mock(FeignException.NotFound.class);
+        when(camundaRuntimeApi.fetchErrorDetails(anyString(), anyString())).thenThrow(notFound);
+
+        handler.handleTask(externalTask);
+
+        verify(camundaRuntimeApi).modifyProcessInstance(
+            eq("serviceAuth"),
+            eq("proc1"),
+            argThat(IncidentRetryEventHandlerTest::matchesRetryInstructions)
         );
     }
 
