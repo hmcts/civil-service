@@ -208,7 +208,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
 
-            assertThat(response.getErrors()).containsExactly("No user found with email: " + DEFENDANT_EMAIL);
+            assertThat(response.getErrors()).containsExactly("No user found with the provided email address");
         }
     }
 }

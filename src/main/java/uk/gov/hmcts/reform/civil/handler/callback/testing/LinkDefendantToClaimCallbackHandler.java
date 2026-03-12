@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.testing;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.LINK_DEFENDANT_TO_CLAIM;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
@@ -65,11 +67,16 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
         CaseData caseData = callbackParams.getCaseData();
         String defendantEmail = caseData.getDefendantEmailAddress();
 
+        log.info("Linking defendant to claim for case reference: {}", caseData.getCcdCaseReference());
+
         return getDefendantUserId(defendantEmail)
             .map(defendantUserId -> linkDefendantToClaim(caseData, defendantUserId, defendantEmail))
-            .orElseGet(() -> AboutToStartOrSubmitCallbackResponse.builder()
-                .errors(List.of("No user found with email: " + defendantEmail))
-                .build());
+            .orElseGet(() -> {
+                log.error("No user found with the provided email address for case reference: {}", caseData.getCcdCaseReference());
+                return AboutToStartOrSubmitCallbackResponse.builder()
+                    .errors(List.of("No user found with the provided email address"))
+                    .build();
+            });
     }
 
     private Optional<String> getDefendantUserId(String defendantEmailAddress) {
@@ -89,8 +96,10 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse linkDefendantToClaim(CaseData caseData, String defendantUserId, String defendantEmail) {
+        String caseId = caseData.getCcdCaseReference().toString();
+        log.info("Assigning case {} to defendant user ID: {}", caseId, defendantUserId);
         coreCaseUserService.assignCase(
-            caseData.getCcdCaseReference().toString(),
+            caseId,
             defendantUserId,
             null,
             CaseRole.DEFENDANT
@@ -104,11 +113,11 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
             .ifPresent(party -> party.setPartyEmail(defendantEmail));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
-            .data(removeRedundantFieldsFrom(caseData.toMap(objectMapper)))
+            .data(removeTemporaryFields(caseData.toMap(objectMapper)))
             .build();
     }
 
-    private Map<String, Object> removeRedundantFieldsFrom(Map<String, Object> dataMap) {
+    private Map<String, Object> removeTemporaryFields(Map<String, Object> dataMap) {
         if (dataMap.get("respondent1PinToPostLRspec") instanceof Map<?, ?> map) {
             map.remove("accessCode");
         }
