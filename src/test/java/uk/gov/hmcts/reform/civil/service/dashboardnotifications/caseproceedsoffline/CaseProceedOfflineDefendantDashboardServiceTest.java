@@ -67,14 +67,11 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             taskListService,
             scenarioService
         );
+        when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
     }
 
     @Nested
     class NotifyCaseProceedOffline {
-        @BeforeEach
-        void stubMapper() {
-            when(mapper.mapCaseDataToParams(any())).thenReturn(new HashMap<>());
-        }
 
         @Test
         void shouldRecordScenario_whenInvokedWithoutCaseProgression() {
