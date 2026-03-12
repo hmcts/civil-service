@@ -251,6 +251,8 @@ public class ManageStayCallbackHandlerTest {
 
         assertThat(updated.getRespondent1ResponseDeadline()).isNotNull();
         assertThat(updated.getRespondent2ResponseDeadline()).isNotNull();
+        assertThat(updated.getNextDeadline())
+            .isEqualTo(updated.getRespondent1ResponseDeadline().toLocalDate());
     }
 
     @Test

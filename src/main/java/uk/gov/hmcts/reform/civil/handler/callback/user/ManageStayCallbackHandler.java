@@ -133,6 +133,7 @@ public class ManageStayCallbackHandler extends CallbackHandler {
                         caseData.setRespondent1ResponseDeadline(
                             deadlinesCalculator.plusDaysSetAt4PMDeadline(caseData.getRespondent1ResponseDeadline(), daysSinceCaseStay)
                         );
+                        caseData.setNextDeadline(LocalDate.from(caseData.getRespondent1ResponseDeadline()));
                     }
                     if (nonNull(caseData.getRespondent2ResponseDeadline())) {
                         caseData.setRespondent2ResponseDeadline(
