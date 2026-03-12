@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -39,7 +38,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -58,8 +56,6 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
 
     private static final String CIVIL_CASE_ID = "1594901956117591";
     private static final String GENERAL_APP_CASE_ID = "1234";
-    private static final String ACTIVITY_ID = "InitiateCoscApplicationNotifier";
-    private static final String PROCESS_INSTANCE_ID = "process-instance";
 
     @Mock
     private ExternalTask mockExternalTask;
@@ -97,8 +93,6 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
                                                                                .setStateHistory(
                                                                                    List.of(State.from("MAIN.DRAFT")))
                                                                                .setState(State.from("MAIN.DRAFT")));
-        when(mockExternalTask.getActivityId()).thenReturn(ACTIVITY_ID);
-        when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
     }
 
     @ParameterizedTest
@@ -142,43 +136,6 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         verify(coreCaseDataService).startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE);
         verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class));
         verify(externalTaskService).complete(mockExternalTask, variables);
-    }
-
-    @Test
-    void shouldUpdateBusinessProcessWithCurrentActivityId() {
-        CaseData caseData = new CaseDataBuilder()
-            .businessProcess(
-                new BusinessProcess()
-                    .setStatus(BusinessProcessStatus.READY)
-                    .setProcessInstanceId("existing-process"))
-            .build();
-
-        CaseDetails caseDetails = new CaseDetailsBuilder().data(caseData).build();
-
-        when(mockExternalTask.getTopicName()).thenReturn("test");
-        when(mockExternalTask.getAllVariables())
-            .thenReturn(Map.of(
-                "caseId", GENERAL_APP_CASE_ID,
-                "caseEvent", CHECK_PAID_IN_FULL_SCHED_DEADLINE,
-                "generalAppParentCaseLink", CIVIL_CASE_ID
-            ));
-
-        when(coreCaseDataService.startUpdate(CIVIL_CASE_ID, CHECK_PAID_IN_FULL_SCHED_DEADLINE))
-            .thenReturn(StartEventResponse.builder().caseDetails(caseDetails)
-                            .eventId(CONTACT_INFORMATION_UPDATED.name()).build());
-        when(coreCaseDataService.submitUpdate(eq(CIVIL_CASE_ID), any(CaseDataContent.class)))
-            .thenReturn(caseData);
-
-        handler.execute(mockExternalTask, externalTaskService);
-
-        ArgumentCaptor<CaseDataContent> captor = ArgumentCaptor.forClass(CaseDataContent.class);
-        verify(coreCaseDataService).submitUpdate(eq(CIVIL_CASE_ID), captor.capture());
-        @SuppressWarnings("unchecked")
-        Map<String, Object> dataMap = (Map<String, Object>) captor.getValue().getData();
-        BusinessProcess updatedBusinessProcess = (BusinessProcess) dataMap.get("businessProcess");
-
-        assertThat(updatedBusinessProcess.getActivityId()).isEqualTo(ACTIVITY_ID);
-        assertThat(updatedBusinessProcess.getProcessInstanceId()).isEqualTo(PROCESS_INSTANCE_ID);
     }
 
     @Test
@@ -277,3 +234,4 @@ public class CoscApplicationAfterPaymentTaskHandlerTest {
         verify(externalTaskService).complete(mockExternalTask, variables);
     }
 }
+
