@@ -74,8 +74,7 @@ public class SolicitorEmailValidation {
                         generalAppSolicitor))) {
 
             log.info(
-                    "Update GA Solicitor Email ID as same as Civil Claim Respondent Solicitor one"
-                        + " Email");
+                    "Update GA Solicitor Email ID as same as Civil Claim Respondent Solicitor one Email");
             return updateSolDetails(
                     civilCaseData.getRespondentSolicitor1EmailAddress(), generalAppSolicitor);
         }
@@ -90,8 +89,7 @@ public class SolicitorEmailValidation {
                                 generalAppSolicitor)))) {
 
             log.info(
-                    "Update GA Solicitor Email ID as same as Civil Claim Respondent Solicitor Two"
-                        + " Email");
+                    "Update GA Solicitor Email ID as same as Civil Claim Respondent Solicitor Two Email");
             return updateSolDetails(
                     civilCaseData.getRespondentSolicitor2EmailAddress(), generalAppSolicitor);
         }
