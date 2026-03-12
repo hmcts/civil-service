@@ -236,7 +236,7 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
         }
     }
 
-    private boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization, Set<String> caseIds) {
+    boolean retryIncidentSafely(IncidentDto incident, String serviceAuthorization, Set<String> caseIds) {
         try {
             String processInstanceId = incident.getProcessInstanceId();
             String failedActivityId = incident.getActivityId();
@@ -250,8 +250,30 @@ public class IncidentRetryEventHandler extends BaseExternalTaskHandler {
                 incident.getId(), processInstanceId, jobId, incidentCaseId, failedActivityId
             );
 
-            boolean alreadyProcessed = incident.getIncidentMessage() != null
-                && ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find();
+            boolean alreadyProcessed = false;
+            if (incident.getIncidentMessage() != null) {
+                if (ALREADY_PROCESSED_PATTERN.matcher(incident.getIncidentMessage()).find()) {
+                    alreadyProcessed = true;
+                } else {
+                    Map<String, Object> response = camundaRuntimeApi.fetchErrorDetails(incident.getId(), serviceAuthorization);
+                    Object errorsObj = response.getOrDefault("callbackErrors", Collections.emptyList());
+                    List<String> callbackErrors;
+                    if (errorsObj instanceof List<?> list) {
+                        callbackErrors = list.stream()
+                            .filter(Objects::nonNull)
+                            .map(Object::toString) // safely convert to String
+                            .toList();
+                    } else {
+                        callbackErrors = Collections.emptyList();
+                    }
+                    for (String error : callbackErrors) {
+                        if (ALREADY_PROCESSED_PATTERN.matcher(error).find()) {
+                            alreadyProcessed = true;
+                            break;
+                        }
+                    }
+                }
+            }
             if (alreadyProcessed) {
                 completeAlreadyProcessedIncident(incident.getProcessInstanceId(), serviceAuthorization, failedActivityId);
             } else {
