@@ -54,7 +54,7 @@ public class StateFlowEngineTest {
 
     @Test
     void shouldReturnApplicationSubmittedWhenPBAPaymentIsFailed() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentFailureCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildPaymentFailureCaseData().build();
         GaStateFlow stateFlow = stateFlowEngine.evaluate(caseData);
 
         assertThat(stateFlow.getState()).extracting(State::getName).isNotNull()
