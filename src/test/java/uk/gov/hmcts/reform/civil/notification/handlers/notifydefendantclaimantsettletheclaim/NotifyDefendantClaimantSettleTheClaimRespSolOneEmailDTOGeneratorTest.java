@@ -74,7 +74,7 @@ public class NotifyDefendantClaimantSettleTheClaimRespSolOneEmailDTOGeneratorTes
         solicitorReferences.setRespondentSolicitor1Reference(defendantReference);
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(claimantName).build())
+            .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(claimantName))
             .ccdCaseReference(ccdCaseReference)
             .solicitorReferences(solicitorReferences)
             .respondent1OrganisationPolicy(organisationPolicy)
@@ -104,7 +104,7 @@ public class NotifyDefendantClaimantSettleTheClaimRespSolOneEmailDTOGeneratorTes
         OrganisationPolicy organisationPolicy = new OrganisationPolicy();
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(claimantName).build())
+            .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(claimantName))
             .ccdCaseReference(ccdCaseReference)
             .respondent1OrganisationPolicy(organisationPolicy)
             .build();

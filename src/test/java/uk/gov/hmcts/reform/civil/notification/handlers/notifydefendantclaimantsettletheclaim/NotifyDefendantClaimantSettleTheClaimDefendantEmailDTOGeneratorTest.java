@@ -53,8 +53,8 @@ public class NotifyDefendantClaimantSettleTheClaimDefendantEmailDTOGeneratorTest
         String claimantName = "Claimant Company Ltd";
         String respondentName = "Defendant Company Ltd";
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(claimantName).build())
-            .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(respondentName).build())
+            .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(claimantName))
+            .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(respondentName))
             .build();
 
         Map<String, String> properties = new HashMap<>();

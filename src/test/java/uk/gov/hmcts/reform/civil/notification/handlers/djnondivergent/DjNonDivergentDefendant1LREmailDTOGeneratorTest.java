@@ -57,11 +57,10 @@ class DjNonDivergentDefendant1LREmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party applicant = Party.builder()
-            .individualFirstName("Claimant")
-            .individualLastName("Name")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party applicant = new Party()
+            .setIndividualFirstName("Claimant")
+            .setIndividualLastName("Name")
+            .setType(Party.Type.INDIVIDUAL);
         CaseData caseData = CaseData.builder()
             .applicant1(applicant)
             .build();
