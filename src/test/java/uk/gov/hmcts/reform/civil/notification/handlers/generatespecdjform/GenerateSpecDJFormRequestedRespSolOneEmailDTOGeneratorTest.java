@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,9 +87,8 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
         Map<String, String> properties = new HashMap<>();
         CaseData caseData = mock(CaseData.class);
         Party applicant1 = mock(Party.class);
-        DynamicList list = DynamicList.builder()
-            .value(DynamicListElement.builder().code("code").label("Both Defendants").build())
-            .build();
+        DynamicListElement selectedElement = DynamicListElement.dynamicElementFromCode("code", "Both Defendants");
+        DynamicList list = new DynamicList(selectedElement, List.of(selectedElement));
 
         when(caseData.getApplicant1()).thenReturn(applicant1);
         when(caseData.getCcdCaseReference()).thenReturn(1234567890123456L);
@@ -136,10 +136,7 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
         CaseData baseCaseData = multiPartyCaseData();
         String firstDefendantName = baseCaseData.getRespondent1().getPartyName();
 
-        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
-            .label(firstDefendantName)
-            .code("first")
-            .build());
+        CaseData caseData = multiPartyCaseData(DynamicListElement.dynamicElementFromCode("first", firstDefendantName));
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
@@ -149,10 +146,7 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
         CaseData baseCaseData = multiPartyCaseData();
         Party respondent2 = baseCaseData.getRespondent2();
 
-        CaseData caseData = multiPartyCaseData(DynamicListElement.builder()
-            .label(respondent2.getPartyName())
-            .code("second")
-            .build());
+        CaseData caseData = multiPartyCaseData(DynamicListElement.dynamicElementFromCode("second", respondent2.getPartyName()));
 
         assertThat(caseData.getDefendantDetailsSpec().getValue().getLabel())
             .isEqualTo(respondent2.getPartyName());
@@ -166,26 +160,34 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
     private CaseData multiPartyCaseData(DynamicListElement selectedDefendant) {
         Party respondent1 = new PartyBuilder().individual().build();
         Party respondent2 = new PartyBuilder().individual("Second").build();
-        DynamicListElement value = selectedDefendant != null ? selectedDefendant : DynamicListElement.builder().label(respondent1.getPartyName()).code("first").build();
-        return CaseData.builder()
+        DynamicListElement value = selectedDefendant != null
+            ? selectedDefendant
+            : DynamicListElement.dynamicElementFromCode("first", respondent1.getPartyName());
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
             .respondent1(respondent1)
             .respondent2(respondent2)
             .respondent1Represented(YesOrNo.YES)
             .respondent2Represented(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .defendantDetailsSpec(DynamicList.builder().value(value).build())
+            .addRespondent2(YesOrNo.YES)
+            .build();
+
+        return baseCaseData.toBuilder()
+            .defendantDetailsSpec(new DynamicList(value, List.of(value)))
             .build();
     }
 
     @Test
     void shouldNotNotifyWhenBothDefendantsSelected() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
+        DynamicListElement bothDefendants = DynamicListElement.dynamicElement("Both Defendants");
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
             .respondent1Represented(YesOrNo.YES)
             .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YesOrNo.YES)
-            .defendantDetailsSpec(DynamicList.builder()
-                .value(DynamicListElement.builder().label("Both Defendants").build())
-                .build())
+            .build()
+            .toBuilder()
+            .defendantDetailsSpec(new DynamicList(bothDefendants, List.of(bothDefendants)))
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
