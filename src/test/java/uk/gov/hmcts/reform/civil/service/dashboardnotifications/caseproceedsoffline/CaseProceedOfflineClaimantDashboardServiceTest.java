@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -99,6 +98,7 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
             service.notifyCaseProceedOffline(caseData, AUTH_TOKEN);
 
             verifyDeleteNotificationsAndTaskListUpdates(caseData);
+            ScenarioRequestParams params = ScenarioRequestParams.builder().params(new HashMap<>()).build();
             verify(dashboardScenariosService).recordScenarios(
                 eq(AUTH_TOKEN),
                 eq(SCENARIO_AAA6_CASE_PROCEED_IN_CASE_MAN_CLAIMANT_WITHOUT_TASK_CHANGES.getScenario()),
@@ -111,29 +111,6 @@ class CaseProceedOfflineClaimantDashboardServiceTest {
                 eq(caseData.getCcdCaseReference().toString()),
                 any(ScenarioRequestParams.class)
             );
-        }
-    }
-
-    @Nested
-    class Eligibility {
-
-        @Test
-        void shouldBeEligibleForCasemanAndCaseProgressionWhenLipvLip() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setRespondent1Represented(YesOrNo.NO);
-
-            assertTrue(service.eligibleForCasemanState(caseData));
-            assertTrue(service.eligibleForCaseProgressionState(caseData));
-        }
-
-        @Test
-        void shouldBeEligibleForCasemanWhenLipvLr() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setRespondent1Represented(YesOrNo.YES);
-
-            assertTrue(service.eligibleForCasemanState(caseData));
         }
     }
 

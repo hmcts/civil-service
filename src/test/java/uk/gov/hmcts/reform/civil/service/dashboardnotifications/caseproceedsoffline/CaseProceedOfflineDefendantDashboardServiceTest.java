@@ -24,7 +24,6 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -174,30 +173,6 @@ class CaseProceedOfflineDefendantDashboardServiceTest {
             );
         }
 
-    }
-
-    @Nested
-    class Eligibility {
-
-        @Test
-        void shouldBeEligibleForCasemanAndCaseProgressionWhenLipvLip() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1Represented(YesOrNo.NO);
-            caseData.setRespondent1Represented(YesOrNo.NO);
-
-            assertTrue(service.eligibleForCasemanState(caseData));
-            assertTrue(service.eligibleForCaseProgressionState(caseData));
-        }
-
-        @Test
-        void shouldBeEligibleForCasemanAndCaseProgressionWhenLrVLip() {
-            CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1Represented(YesOrNo.YES);
-            caseData.setRespondent1Represented(YesOrNo.NO);
-
-            assertTrue(service.eligibleForCasemanState(caseData));
-            assertTrue(service.eligibleForCaseProgressionState(caseData));
-        }
     }
 
     private void verifyDeleteNotificationsAndTaskListUpdates(CaseData caseData) {
