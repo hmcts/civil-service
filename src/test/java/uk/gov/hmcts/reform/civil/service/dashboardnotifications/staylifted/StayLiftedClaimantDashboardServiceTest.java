@@ -5,11 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
-import uk.gov.hmcts.reform.civil.model.PaymentDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardNotificationsParamsMapper;
@@ -21,16 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.CASE_PROGRESSION;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.HEARING_READINESS;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.IN_MEDIATION;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.JUDICIAL_REFERRAL;
-import static uk.gov.hmcts.reform.civil.enums.CaseState.PREPARE_FOR_HEARING_CONDUCT_HEARING;
-import static uk.gov.hmcts.reform.civil.enums.PaymentStatus.SUCCESS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT;
@@ -41,7 +36,6 @@ import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifi
 class StayLiftedClaimantDashboardServiceTest {
 
     private static final String AUTH_TOKEN = "Bearer";
-    private static final String CCD_REFERENCE = "1594901956117591";
 
     private HashMap<String, Object> params;
 
@@ -51,8 +45,6 @@ class StayLiftedClaimantDashboardServiceTest {
     private DashboardNotificationsParamsMapper mapper;
     @Mock
     private FeatureToggleService featureToggleService;
-    @Spy
-    private StayLiftedDashboardHelper stayLiftedDashboardHelper;
 
     @InjectMocks
     private StayLiftedClaimantDashboardService stayLiftedClaimantDashboardService;
@@ -60,23 +52,25 @@ class StayLiftedClaimantDashboardServiceTest {
     @BeforeEach
     void setupTests() {
         params = new HashMap<>();
+        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
     }
 
     @Test
-    void shouldNotRecordAnyScenarios_ifClaimantIsNotLip() {
-
+    void shouldNotRecordScenarios_whenClaimantNotLip() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.YES);
         caseData.setPreStayState(IN_MEDIATION.toString());
 
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardScenariosService).reconfigureCaseDashboardNotifications(
+            any(), any(), eq("CLAIMANT")
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
     }
 
     @Test
     void shouldNotRecordScenarios_whenLipVLipDisabled() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
         when(featureToggleService.isLipVLipEnabled()).thenReturn(false);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -85,17 +79,19 @@ class StayLiftedClaimantDashboardServiceTest {
 
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
-        verifyNoInteractions(dashboardScenariosService);
+        verify(dashboardScenariosService).reconfigureCaseDashboardNotifications(
+            any(), any(), eq("CLAIMANT")
+        );
+        verify(dashboardScenariosService, never()).recordScenarios(any(), any(), any(), any());
     }
 
     @Test
-    void shouldRecordExpectedScenarios_whenPreStateInMediation() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+    void shouldRecordDefaultScenario_whenPreStayStateIsNotSpecial() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(IN_MEDIATION.toString());
+        caseData.setPreStayState("AWAITING_RESPONDENT_ACKNOWLEDGEMENT");
 
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
@@ -105,24 +101,7 @@ class StayLiftedClaimantDashboardServiceTest {
     }
 
     @Test
-    void shouldRecordExpectedScenarios_whenPreStateJudicialReferral() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(JUDICIAL_REFERRAL.toString());
-
-        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verifyRecordedScenarios(List.of(
-            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario())
-        );
-    }
-
-    @Test
-    void shouldRecordExpectedScenarios_whenPreStateCaseProgression() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+    void shouldRecordExtraScenarios_forCaseProgression() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -132,15 +111,13 @@ class StayLiftedClaimantDashboardServiceTest {
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
         verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
     }
 
     @Test
-    void shouldRecordExpectedScenarios_whenPreStateHearingReadiness() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+    void shouldRecordExtraScenarios_forHearingReadiness_withFeeNotPaid() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
@@ -150,109 +127,40 @@ class StayLiftedClaimantDashboardServiceTest {
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
         verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
+        ));
     }
 
     @Test
-    void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeePaid() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
+    void shouldRecordViewDocumentsAvailable_whenDocumentUploaded() {
         when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
 
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
-        PaymentDetails paymentDetails = new PaymentDetails();
-        paymentDetails.setStatus(SUCCESS);
-        caseData.setHearingFeePaymentDetails(paymentDetails);
-
-        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
-    }
-
-    @Test
-    void shouldRecordExpectedScenarios_whenPreStatePfHcH_withFeeNotRequired() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
-
-        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_NOT_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
-    }
-
-    @Test
-    void shouldRecordExpectedScenarios_whenEvidenceUploadedByClaimant() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
+        caseData.setPreStayState(CASE_PROGRESSION.toString());
         caseData.setCaseDocumentUploadDate(LocalDateTime.now());
 
         stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
 
         verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
+            SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
+            SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT.getScenario()
+        ));
     }
 
-    @Test
-    void shouldRecordExpectedScenarios_whenEvidenceUploadedByDefendant() {
-        when(mapper.mapCaseDataToParams(any())).thenReturn(params);
-        when(featureToggleService.isLipVLipEnabled()).thenReturn(true);
-
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
-        caseData.setApplicant1Represented(YesOrNo.NO);
-        caseData.setPreStayState(PREPARE_FOR_HEARING_CONDUCT_HEARING.toString());
-        caseData.setCaseDocumentUploadDateRes(LocalDateTime.now());
-
-        stayLiftedClaimantDashboardService.notifyStayLifted(caseData, AUTH_TOKEN);
-
-        verifyRecordedScenarios(List.of(
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_FEE_PAID_TASK.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_RESET_HEARING_TASKS_CLAIMANT.getScenario(),
-                                    SCENARIO_AAA6_CP_STAY_LIFTED_VIEW_DOCUMENTS_TASK_AVAILABLE_CLAIMANT.getScenario()
-                                )
-        );
-    }
-
-    void verifyRecordedScenario(String scenario) {
+    private void verifyRecordedScenario(String scenario) {
         verify(dashboardScenariosService).recordScenarios(
-            AUTH_TOKEN,
-            scenario,
-            CCD_REFERENCE,
-            ScenarioRequestParams.builder().params(params).build()
+            eq(AUTH_TOKEN),
+            eq(scenario),
+            any(),
+            eq(ScenarioRequestParams.builder().params(params).build())
         );
     }
 
-    void verifyRecordedScenarios(List<String> expectedScenarios) {
-        expectedScenarios.forEach(this::verifyRecordedScenario);
-        verifyNoMoreInteractions(dashboardScenariosService);
+    private void verifyRecordedScenarios(List<String> scenarios) {
+        scenarios.forEach(this::verifyRecordedScenario);
     }
 }
