@@ -353,7 +353,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
   implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
@@ -438,8 +438,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.5'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.7'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.7'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok

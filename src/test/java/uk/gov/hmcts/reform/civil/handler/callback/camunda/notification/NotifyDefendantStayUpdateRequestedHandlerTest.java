@@ -77,9 +77,9 @@ class NotifyDefendantStayUpdateRequestedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                             .type(Party.Type.INDIVIDUAL).partyEmail("lipEmail@email.com").build())
-            .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                             .setType(Party.Type.INDIVIDUAL).setPartyEmail("lipEmail@email.com"))
+            .respondent2(new Party().setIndividualFirstName("Jim").setIndividualLastName("Jameson").setType(Party.Type.INDIVIDUAL))
             .build();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));

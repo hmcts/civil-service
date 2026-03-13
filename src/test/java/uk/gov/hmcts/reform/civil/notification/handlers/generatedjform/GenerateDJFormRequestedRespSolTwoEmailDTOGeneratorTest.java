@@ -94,8 +94,7 @@ class GenerateDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTrue_whenIsOneVTwoLegalRepIsTrue() {
-        Party respondent2Party = Party.builder()
-            .build();
+        Party respondent2Party = new Party();
         CaseData caseData = CaseData.builder().respondent2(respondent2Party)
             .respondent2Copy(respondent2Party)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
@@ -108,8 +107,7 @@ class GenerateDJFormRequestedRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnTrue_whenIsOneVTwoTwoLegalRepIsTrue() {
-        Party respondent2Party = Party.builder()
-            .build();
+        Party respondent2Party = new Party();
         CaseData caseData = CaseData.builder().respondent2(respondent2Party)
             .respondent2Copy(respondent2Party)
             .build();

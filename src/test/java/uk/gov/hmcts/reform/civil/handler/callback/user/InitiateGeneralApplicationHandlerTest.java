@@ -1527,8 +1527,7 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
     private CaseData getReadyTestCaseData(CaseData caseData, boolean multipleGenAppTypes) {
         GAInformOtherParty withOrWithoutNotice = GAInformOtherParty.builder()
             .isWithNotice(YES)
-            .reasonsForWithoutNotice(STRING_CONSTANT)
-            .build();
+            .reasonsForWithoutNotice(STRING_CONSTANT).build();
         GARespondentOrderAgreement withOrWithoutConsent = GARespondentOrderAgreement.builder()
             .hasAgreed(NO).build();
 

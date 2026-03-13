@@ -32,6 +32,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.MID;
@@ -231,14 +232,17 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
         String body = "";
 
         if (isConfirmationForLip(caseData)) {
-            String formattedDeadline = formatLocalDate(caseData.getClaimDetailsNotificationDeadline().toLocalDate(),
-                                                       DATE);
+            String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+                .map(LocalDateTime::toLocalDate)
+                .map(date -> formatLocalDate(date, DATE))
+                .orElse("N/A");
             header = String.format(CONFIRMATION_COS_HEADER, caseData.getLegacyCaseReference());
             body = format(CONFIRMATION_SUMMARY_COS, formattedDeadline) + exitSurveyContentService.applicantSurvey();
 
         } else {
-            String formattedDeadline = formatLocalDateTime(caseData
-                                                               .getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+            String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+                .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+                .orElse("N/A");
             header = String.format("# Notification of claim sent%n## Claim number: %s",
                                    caseData.getLegacyCaseReference());
             body = format(CONFIRMATION_SUMMARY, formattedDeadline) + exitSurveyContentService.applicantSurvey();
@@ -257,7 +261,9 @@ public class NotifyClaimCallbackHandler extends CallbackHandler {
             return buildConfirmation(callbackParams);
         }
 
-        String formattedDeadline = formatLocalDateTime(caseData.getClaimDetailsNotificationDeadline(), DATE_TIME_AT);
+        String formattedDeadline = ofNullable(caseData.getClaimDetailsNotificationDeadline())
+            .map(rd -> formatLocalDateTime(rd, DATE_TIME_AT))
+            .orElse("N/A");
 
         String confirmationText = (ONE_V_ONE.equals(MultiPartyScenario.getMultiPartyScenario(caseData))
             || notifyBothRespondentSolicitors(caseData))
