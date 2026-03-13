@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
+
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsDrhTemplateService {
@@ -39,6 +41,10 @@ public class SdoSmallClaimsDrhTemplateService {
             .setCurrentDate(LocalDate.now())
             .setJudgeName(judgeName)
             .setCaseNumber(caseData.getLegacyCaseReference())
+            .setApplicant1PartyName(getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend()))
+            .setApplicant2PartyName(getPartyNameWithLitigiousFriend(caseData.getApplicant2(), caseData.getApplicant2LitigationFriend()))
+            .setRespondent1PartyName(getPartyNameWithLitigiousFriend(caseData.getRespondent1(), caseData.getRespondent1LitigationFriend()))
+            .setRespondent2PartyName(getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend()))
             .setApplicant1(caseData.getApplicant1())
             .setHasApplicant2(caseClassificationService.hasApplicant2(caseData))
             .setApplicant2(caseData.getApplicant2())

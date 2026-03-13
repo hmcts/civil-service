@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
+import static uk.gov.hmcts.reform.civil.utils.PartyUtils.getPartyNameWithLitigiousFriend;
 
 public class JudgmentOnlineUtils {
 
@@ -66,16 +67,17 @@ public class JudgmentOnlineUtils {
         return null;
     }
 
-    public static List<Party> getApplicant(uk.gov.hmcts.reform.civil.model.Party applicant1,
-                                           uk.gov.hmcts.reform.civil.model.Party applicant2) {
+    public static List<Party> getApplicants(CaseData caseData) {
+        uk.gov.hmcts.reform.civil.model.Party applicant1 = caseData.getApplicant1();
+        uk.gov.hmcts.reform.civil.model.Party applicant2 = caseData.getApplicant2();
 
         List<Party> applicants = new ArrayList<>();
         applicants.add(new Party()
-                           .setName(applicant1.getPartyName())
+                           .setName(getPartyNameWithLitigiousFriend(applicant1, caseData.getRespondent1LitigationFriend()))
                            .setPrimaryAddress(applicant1.getPrimaryAddress()));
         if (applicant2 != null) {
             applicants.add(new Party()
-                               .setName(" and " + applicant2.getPartyName())
+                               .setName(" and " + getPartyNameWithLitigiousFriend(applicant2, caseData.getRespondent2LitigationFriend()))
                                .setPrimaryAddress(applicant2.getPrimaryAddress()));
         }
         return applicants;

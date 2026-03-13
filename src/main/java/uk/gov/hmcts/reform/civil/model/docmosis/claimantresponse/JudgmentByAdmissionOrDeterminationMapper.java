@@ -34,7 +34,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.enums.RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY;
 import static uk.gov.hmcts.reform.civil.utils.DateUtils.formatDateInWelsh;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
@@ -262,7 +262,7 @@ public class JudgmentByAdmissionOrDeterminationMapper {
             .setRespondent2Ref(getRespondent2SolicitorRef(caseData))
             .setApplicantReference(getApplicantSolicitorRef(caseData))
             .setApplicant(getClaimantLipOrLRDetailsForPaymentAddress(caseData))
-            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicants(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData))
             .setTotalClaimAmount(totalClaimAmount)
             .setTotalInterestAmount(totalInterest)

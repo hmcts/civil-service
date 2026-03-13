@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.docmosis.dj.DefaultJudgmentSDOOrderForm;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.docmosis.DocumentHearingLocationHelper;
+import uk.gov.hmcts.reform.civil.utils.PartyUtils;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.Objects.nonNull;
@@ -69,8 +70,9 @@ public class DjDisposalTemplateService {
             .setDisposalHearingCostsAddSection(
                 directionsToggleService.isToggleEnabled(caseData.getDisposalHearingCostsDJToggle()))
             .setApplicant(partyFieldService.hasApplicantPartyName(caseData)
-                           ? caseData.getApplicant1().getPartyName().toUpperCase() : null)
-            .setRespondent(partyFieldService.resolveRespondent(caseData).toUpperCase())
+                           ? PartyUtils.getPartyNameWithLitigiousFriend(caseData.getApplicant1(), caseData.getApplicant1LitigationFriend(), true) : null)
+
+            .setRespondent(partyFieldService.resolveRespondent(caseData))
             .setCaseManagementLocation(locationHelper.getHearingLocation(null, caseData, authorisation));
 
         template

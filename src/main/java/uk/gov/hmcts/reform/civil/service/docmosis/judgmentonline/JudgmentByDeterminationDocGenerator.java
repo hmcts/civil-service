@@ -29,7 +29,7 @@ import java.util.Objects;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_CLAIMANT;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.JUDGMENT_BY_DETERMINATION_DEFENDANT;
-import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicant;
+import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicants;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getApplicantSolicitorRef;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getOrgDetails;
 import static uk.gov.hmcts.reform.civil.utils.JudgmentOnlineUtils.getPartyDetails;
@@ -119,7 +119,7 @@ public class JudgmentByDeterminationDocGenerator {
             .setClaimReferenceNumber(caseData.getLegacyCaseReference())
             .setDebt(orderAmount.toString())
             .setFormText("No response,")
-            .setApplicants(getApplicant(caseData.getApplicant1(), caseData.getApplicant2()))
+            .setApplicants(getApplicants(caseData))
             .setRespondent(getRespondentLROrLipDetails(caseData, partyType))
             .setTotalCost(orderAmount.add(costs).setScale(2).toString())
             .setApplicantReference(getApplicantSolicitorRef(caseData))
