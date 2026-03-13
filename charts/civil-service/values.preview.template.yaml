@@ -61,7 +61,6 @@ java:
     SENDGRID_HOST: ${SERVICE_NAME}-wiremock
     RTL_API_URL: http://${SERVICE_NAME}-wiremock
     SENDGRID_TEST: true
-    OTHER_REMEDY_ENABLED: true
   keyVaults:
     civil:
       resourceGroup: civil
