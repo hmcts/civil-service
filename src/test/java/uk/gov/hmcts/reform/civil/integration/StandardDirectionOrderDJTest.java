@@ -471,7 +471,6 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                          - Item\s
                          - \
                         Alleged Defect \
-
                          - Claimant's costing
                          - Defendant's\
                          response
