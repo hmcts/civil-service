@@ -78,8 +78,8 @@ class NotifyDefendantStayLiftedHandlerTest {
         @BeforeEach
         void setUp() {
             caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
-                .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
+                .respondent2(new Party().setIndividualFirstName("Jim").setIndividualLastName("Jameson").setType(Party.Type.INDIVIDUAL))
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -152,11 +152,11 @@ class NotifyDefendantStayLiftedHandlerTest {
         private CaseDataBuilder commonCaseData() {
             return CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
-                .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe")
-                                .type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson")
-                                 .partyEmail("defendant@hmcts.net")
-                                 .type(Party.Type.INDIVIDUAL).build())
+                .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe")
+                                .setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson")
+                                 .setPartyEmail("defendant@hmcts.net")
+                                 .setType(Party.Type.INDIVIDUAL))
                 .respondentSolicitor1EmailAddress("solicitor@example.com");
         }
 
@@ -249,8 +249,8 @@ class NotifyDefendantStayLiftedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
-            .respondent2(Party.builder().individualFirstName("Jim").individualLastName("Jameson").type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
+            .respondent2(new Party().setIndividualFirstName("Jim").setIndividualLastName("Jameson").setType(Party.Type.INDIVIDUAL))
             .build();
     }
 

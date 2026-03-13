@@ -1,0 +1,26 @@
+[
+  {
+    "submitterId": "600e1660-0000-0000-0000-000000000001",
+    "defendantId": "600e1660-0000-0000-0000-000000000002",
+    "externalId": "a]ocmc-ext-id-wiremock-001",
+    "referenceNumber": "000MC001",
+    "totalAmountTillToday": 1500.00,
+    "claim": {
+      "claimants": [
+        {
+          "name": "OCMC Claimant WireMock"
+        }
+      ],
+      "defendants": [
+        {
+          "name": "OCMC Defendant WireMock"
+        }
+      ]
+    },
+    "responseDeadline": "2026-04-01",
+    "moreTimeRequested": false,
+    "submitterEmail": "ocmc-claimant@wiremock.hmcts.net",
+    "createdAt": "2026-02-01T10:00:00",
+    "state": "OPEN"
+  }
+]

@@ -45,11 +45,10 @@ class SpecCaseOfflineClaimantEmailDTOGeneratorTest {
     void shouldAddClaimantNameToProperties() {
         String expectedName = "Jane Doe";
 
-        Party applicant1 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Jane")
-            .individualLastName("Doe")
-            .build();
+        Party applicant1 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Jane")
+            .setIndividualLastName("Doe");
 
         CaseData caseData = CaseData.builder()
             .applicant1(applicant1)

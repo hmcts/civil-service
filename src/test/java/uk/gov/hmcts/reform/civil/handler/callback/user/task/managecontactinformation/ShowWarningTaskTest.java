@@ -71,8 +71,8 @@ class ShowWarningTaskTest {
         dynamicList.setValue(dynamicListElement);
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
-        Party applicant1 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
@@ -104,8 +104,8 @@ class ShowWarningTaskTest {
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
 
-        Party applicant1 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
@@ -142,7 +142,7 @@ class ShowWarningTaskTest {
         UpdatePartyDetailsForm updatePartyDetailsForm = new UpdatePartyDetailsForm();
         updatePartyDetailsForm.setPartyId("123");
         updateDetailsForm.setUpdateExpertsDetailsForm(wrapElements(updatePartyDetailsForm));
-        Party applicant1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .updateDetailsForm(updateDetailsForm)
@@ -169,7 +169,7 @@ class ShowWarningTaskTest {
         dynamicList.setValue(dynamicListElement);
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
-        Party applicant1 = PartyBuilder.builder().individual().build();
+        Party applicant1 = new PartyBuilder().individual().build();
         applicant1.setPartyName("seventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyoneseventyone");
         Address address = new Address();
         address.setPostCode("1234");
@@ -204,7 +204,7 @@ class ShowWarningTaskTest {
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
 
-        Party applicant1 = PartyBuilder.builder().individual().build();
+        Party applicant1 = new PartyBuilder().individual().build();
         applicant1.setBulkClaimPartyName("bulk claim party name");
         Address address = new Address();
         address.setAddressLine1("Line 1 test again for more than 35 characters test test test test test");
@@ -246,8 +246,8 @@ class ShowWarningTaskTest {
         dynamicList.setValue(dynamicListElement);
         UpdateDetailsForm updateDetailsForm = new UpdateDetailsForm();
         updateDetailsForm.setPartyChosen(dynamicList);
-        Party applicant1 = PartyBuilder.builder().company().build();
-        Party applicant2 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
+        Party applicant2 = new PartyBuilder().company().build();
         LitigationFriend litigationFriend = new LitigationFriend();
         CaseData oldCaseData = CaseDataBuilder.builder()
             .applicant1(applicant1)

@@ -1,0 +1,15 @@
+{
+  "name": "CMC Claim Store - Defendant Link Status (linked - 000MC001)",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/claims/000MC001/defendant-link-status"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"linked\": true}"
+  }
+}
