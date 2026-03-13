@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.finalorders.AssistedCostTypesList;
 import uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -24,11 +21,9 @@ import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.COSTS;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.DEFENDANT;
 import static uk.gov.hmcts.reform.civil.enums.finalorders.CostEnums.INDEMNITY_BASIS;
 
-@ExtendWith(SpringExtension.class)
 public class CostsDetailsGroupTest {
 
-    @InjectMocks
-    private CostDetailsPopulator costsDetailsGroup;
+    private final CostDetailsPopulator costsDetailsGroup = new CostDetailsPopulator();
 
     @Test
     void shouldPopulateCostsDetails_WhenAllFieldsArePresent() {

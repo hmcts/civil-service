@@ -8,9 +8,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -61,7 +61,7 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.DI
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     GenerateDiscontinueClaimCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     AssignCategoryId.class
 })
 class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
@@ -70,14 +70,14 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     private GenerateDiscontinueClaimCallbackHandler handler;
-    @MockBean
+    @MockitoBean
     private NoticeOfDiscontinuanceFormGenerator formGenerator;
-    @MockBean
+    @MockitoBean
     private RuntimeService runTimeService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
 

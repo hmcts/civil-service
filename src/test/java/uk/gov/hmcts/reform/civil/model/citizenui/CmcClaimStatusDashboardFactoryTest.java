@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.civil.model.citizenui;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.enums.RespondentResponseType;
 import uk.gov.hmcts.reform.cmc.model.ClaimState;
 import uk.gov.hmcts.reform.cmc.model.ClaimantResponse;
@@ -29,11 +26,9 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 
-@ExtendWith(SpringExtension.class)
 public class CmcClaimStatusDashboardFactoryTest {
 
-    @InjectMocks
-    private DashboardClaimStatusFactory cmcClaimStatusDashboardFactory;
+    private final DashboardClaimStatusFactory cmcClaimStatusDashboardFactory = new DashboardClaimStatusFactory();
 
     @Test
     void given_hasResponsePending_whenGetStatus_thenReturnNoResponse() {

@@ -2,22 +2,17 @@ package uk.gov.hmcts.reform.civil.service.docmosis.caseprogression.helpers;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.Party.Type;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 import uk.gov.hmcts.reform.civil.model.docmosis.casepogression.JudgeFinalOrderForm;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ExtendWith(SpringExtension.class)
 public class CaseInfoGroupTest {
 
-    @InjectMocks
-    private CaseInfoPopulator caseInfoPopulator;
+    private final CaseInfoPopulator caseInfoPopulator = new CaseInfoPopulator();
 
     @Test
     void shouldPopulateCaseInfo_WhenAllFieldsPresent() {

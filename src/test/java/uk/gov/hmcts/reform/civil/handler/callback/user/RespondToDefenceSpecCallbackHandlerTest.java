@@ -9,10 +9,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -124,7 +124,7 @@ import java.util.stream.Stream;
 import static java.time.LocalDateTime.now;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -176,7 +176,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
     DetermineNextState.class,
     BuildConfirmationTask.class,
     PopulateCaseDataTask.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     ValidationAutoConfiguration.class,
     UnavailableDateValidator.class,
     CaseDetailsConverter.class,
@@ -214,49 +214,49 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Autowired
     private FrcDocumentsUtils frcDocumentsUtils;
 
-    @MockBean
+    @MockitoBean
     private UnavailableDateValidator unavailableDateValidator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private CourtLocationUtils courtLocationUtils;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private LocationReferenceDataService locationRefDataService;
 
-    @MockBean
+    @MockitoBean
     private DQResponseDocumentUtils dqResponseDocumentUtils;
 
     @Autowired
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagsInitialiser;
-    @MockBean
+    @MockitoBean
     private RespondentMediationService respondentMediationService;
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
-    @MockBean
+    @MockitoBean
     private DeadlineExtensionCalculatorService deadlineCalculatorService;
-    @MockBean
+    @MockitoBean
     private IStateFlowEngine stateFlowEngine;
-    @MockBean
+    @MockitoBean
     private DirectionsQuestionnairePreparer directionsQuestionnairePreparer;
     @Autowired
     private RoboticsAddressMapper addressMapper;
     @Autowired
     private AddressLinesMapper linesMapper;
-    @MockBean
+    @MockitoBean
     private UpdateWaCourtLocationsService updateWaCourtLocationsService;
     @Autowired
     private InterestCalculator interestCalculator;
@@ -2388,11 +2388,11 @@ class RespondToDefenceSpecCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Nested
         class ConfTextLRBulkAdmission {
 
-            @MockBean
+            @MockitoBean
             private ClaimUrlsConfiguration claimUrlsConfiguration;
-            @MockBean
+            @MockitoBean
             private AboutToSubmitRespondToDefenceTask aboutToSubmitRespondToDefenceTask;
-            @MockBean
+            @MockitoBean
             private PopulateCaseDataTask populateCaseDataTask;
 
             private BuildConfirmationTask buildConfirmationTask;

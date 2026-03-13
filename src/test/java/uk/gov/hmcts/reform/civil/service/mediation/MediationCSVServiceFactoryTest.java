@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.civil.service.mediation;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @SpringBootTest(classes = {
     MediationCSVLrvLipService.class,
@@ -20,13 +20,12 @@ import static org.mockito.BDDMockito.given;
 })
 public class MediationCSVServiceFactoryTest {
 
-    @Mock
-    private CaseData caseData;
+    private final CaseData caseData = mock(CaseData.class);
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
     @Autowired
@@ -63,4 +62,3 @@ public class MediationCSVServiceFactoryTest {
         assertThat(mediationCSVService).isInstanceOf(MediationCSVLipVLipService.class);
     }
 }
-

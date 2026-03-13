@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.sdo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -33,7 +33,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.RECON
 @ContextConfiguration(classes = {
     RequestReconsiderationGeneratorService.class,
     SdoCaseClassificationService.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class RequestReconsiderationGeneratorServiceTest {
 
@@ -50,13 +50,13 @@ class RequestReconsiderationGeneratorServiceTest {
     @Autowired
     private RequestReconsiderationGeneratorService requestReconsiderationGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @MockitoBean
     protected UserService userService;
 
     @Test

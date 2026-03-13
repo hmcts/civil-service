@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,9 @@ class PostcodeLookupServiceTest {
     private static final String LOOKUP_URL = "https://api.ordnancesurvey.co.uk/opennames/v1/find";
     private static final String ACCESS_KEY = "dummy-key";
 
-    @MockBean
+    @MockitoBean
     private RestTemplate restTemplate;
-    @MockBean
+    @MockitoBean
     private PostcodeLookupConfiguration postcodeLookupConfiguration;
 
     @Autowired
@@ -46,6 +46,16 @@ class PostcodeLookupServiceTest {
         mockExchangeResponse(new ResponseEntity<>(response, HttpStatus.OK));
 
         assertThat(postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
+            .isTrue();
+    }
+
+    @Test
+    void shouldReturnTrueWhenCountryIsWales() {
+        mockConfiguration();
+        String response = "{\"results\":[{\"GAZETTEER_ENTRY\":{\"NAME1\":\"CF10 1EP\",\"COUNTRY\":\"Wales\"}}]}";
+        mockExchangeResponse(new ResponseEntity<>(response, HttpStatus.OK));
+
+        assertThat(postcodeLookupService.validatePostCodeForDefendant("CF10 1EP"))
             .isTrue();
     }
 
@@ -77,6 +87,15 @@ class PostcodeLookupServiceTest {
         org.junit.jupiter.api.Assertions.assertThrows(
             RuntimeException.class, () -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL")
         );
+    }
+
+    @Test
+    void shouldReturnExceptionWhenApiKeyIsEmpty() {
+        when(postcodeLookupConfiguration.getUrl()).thenReturn(LOOKUP_URL);
+        when(postcodeLookupConfiguration.getAccessKey()).thenReturn("");
+
+        assertThatThrownBy(() -> postcodeLookupService.validatePostCodeForDefendant("IG11 7YL"))
+            .isInstanceOf(RuntimeException.class);
     }
 
     private void mockConfiguration() {

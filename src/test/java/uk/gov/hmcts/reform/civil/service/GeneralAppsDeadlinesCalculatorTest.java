@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
 import uk.gov.hmcts.reform.civil.helpers.ResourceReader;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidays;
@@ -23,7 +23,7 @@ import static uk.gov.hmcts.reform.civil.assertion.DayAssert.assertThat;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSINESS_DAY;
 import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_DAY;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class GeneralAppsDeadlinesCalculatorTest {
 
     @Mock

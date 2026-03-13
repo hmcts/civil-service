@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.hearingnotice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.camunda.bpm.engine.RuntimeService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -86,5 +88,22 @@ public class HearingNoticeCamundaServiceTest {
         hearingNoticeCamundaService.setProcessVariables(PROCESS_INSTANCE_ID, variables);
 
         verify(runtimeService).setVariables(PROCESS_INSTANCE_ID, variables.toMap(mapper));
+    }
+
+    @Test
+    void shouldIgnoreUnknownCamundaVariablesWhenDeserializing() {
+        ObjectMapper realMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        HearingNoticeCamundaService service = new HearingNoticeCamundaService(runtimeService, runtimeClient, realMapper);
+        when(runtimeClient.getProcessVariables(PROCESS_INSTANCE_ID)).thenReturn(Map.of(
+            "flowState", "MAIN.SOME_STATE",
+            "caseId", 123L,
+            "hearingId", "hearing-id"
+        ));
+
+        HearingNoticeVariables variables = assertDoesNotThrow(() -> service.getProcessVariables(PROCESS_INSTANCE_ID));
+
+        assertEquals(123L, variables.getCaseId());
+        assertEquals("hearing-id", variables.getHearingId());
     }
 }

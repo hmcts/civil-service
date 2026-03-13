@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -58,7 +58,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.POST_
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     GaHearingFormGenerator.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class GaHearingFormGeneratorTest {
 
@@ -79,20 +79,20 @@ class GaHearingFormGeneratorTest {
             .documentType(HEARING_NOTICE)
             .build();
 
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
-    @MockBean
+    @MockitoBean
     private GaCoreCaseDataService coreCaseDataService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
     @Autowired
     private GaHearingFormGenerator generator;
-    @MockBean
+    @MockitoBean
     private DocmosisService docmosisService;
 
     @Test

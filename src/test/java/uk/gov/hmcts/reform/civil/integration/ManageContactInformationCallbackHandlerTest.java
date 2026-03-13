@@ -12,9 +12,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
@@ -114,7 +114,7 @@ import static uk.gov.hmcts.reform.civil.utils.ManageContactInformationUtils.DEFE
 
 @SpringBootTest(classes = {
     ManageContactInformationCallbackHandler.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     PostcodeValidator.class,
     PartyValidator.class,
@@ -132,25 +132,25 @@ class ManageContactInformationCallbackHandlerTest extends BaseCallbackHandlerTes
 
     @Autowired
     private ObjectMapper mapper;
-    @MockBean
+    @MockitoBean
     private PartyDetailsChangedUtil partyDetailsChangedUtil;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsInitialiser caseFlagInitialiser;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
+    @MockitoBean
     private PostcodeValidator postcodeValidator;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseDataService coreCaseDataService;
 
     private static final UserInfo ADMIN_USER = UserInfo.builder()

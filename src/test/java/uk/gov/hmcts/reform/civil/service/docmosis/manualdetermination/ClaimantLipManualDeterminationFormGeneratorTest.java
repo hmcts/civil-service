@@ -4,8 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.DocumentManagementService;
@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.CLAIM
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
     ClaimantLipManualDeterminationFormGenerator.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class ClaimantLipManualDeterminationFormGeneratorTest {
 
@@ -49,13 +49,13 @@ class ClaimantLipManualDeterminationFormGeneratorTest {
             .documentName(fileName_application)
             .documentType(LIP_MANUAL_DETERMINATION)
             .build();
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
     @Autowired
     private ClaimantLipManualDeterminationFormGenerator generator;
-    @MockBean
+    @MockitoBean
     private ClaimantResponseUtils claimantResponseUtils;
 
     @BeforeEach

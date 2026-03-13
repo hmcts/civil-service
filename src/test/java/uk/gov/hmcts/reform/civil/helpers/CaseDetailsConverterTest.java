@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.helpers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
@@ -59,5 +60,20 @@ class CaseDetailsConverterTest {
         assertEquals("Details of Claim", civilCaseData.getDetailsOfClaim());
         assertEquals(CASE_REFERENCE, civilCaseData.getCcdCaseReference());
         assertEquals(CASE_ISSUED, civilCaseData.getCcdState());
+    }
+
+    @Test
+    void shouldNotMutateSharedObjectMapperInclusionPolicy() {
+        ObjectMapper sharedMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        JsonInclude.Include inclusionBefore = sharedMapper.getSerializationConfig()
+            .getDefaultPropertyInclusion()
+            .getValueInclusion();
+
+        new CaseDetailsConverter(sharedMapper);
+
+        JsonInclude.Include inclusionAfter = sharedMapper.getSerializationConfig()
+            .getDefaultPropertyInclusion()
+            .getValueInclusion();
+        assertEquals(inclusionBefore, inclusionAfter);
     }
 }

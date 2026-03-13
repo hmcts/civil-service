@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.civil.model.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageState;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,7 +17,7 @@ public class CcdServiceBusMessage implements Serializable {
     private String caseId;
     private LocalDateTime eventTimestamp;
     private Boolean fromDlq;
-    private MessageState state;
+    private String state;
     private JsonNode messageProperties;
     private String messageContent;
     private LocalDateTime received;
@@ -32,7 +31,7 @@ public class CcdServiceBusMessage implements Serializable {
                                 @JsonProperty("CaseId") String caseId,
                                 @JsonProperty("EventTimestamp") LocalDateTime eventTimestamp,
                                 @JsonProperty("FromDlq") Boolean fromDlq,
-                                @JsonProperty("State")MessageState state,
+                                @JsonProperty("State") String state,
                                 @JsonProperty("MessageProperties") JsonNode messageProperties,
                                 @JsonProperty("MessageContent") String messageContent,
                                 @JsonProperty("Received") LocalDateTime received,
@@ -73,7 +72,7 @@ public class CcdServiceBusMessage implements Serializable {
         return fromDlq;
     }
 
-    public MessageState getState() {
+    public String getState() {
         return state;
     }
 

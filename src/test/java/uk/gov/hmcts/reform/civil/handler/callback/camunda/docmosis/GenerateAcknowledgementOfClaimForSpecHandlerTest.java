@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.docmosis;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
@@ -30,7 +30,7 @@ import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
 @SpringBootTest(classes = {
     GenerateAcknowledgementOfClaimForSpecCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandlerTest {
 
@@ -55,7 +55,7 @@ class GenerateAcknowledgementOfClaimForSpecHandlerTest extends BaseCallbackHandl
     @Autowired
     private GenerateAcknowledgementOfClaimForSpecCallbackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private AcknowledgementOfClaimGeneratorForSpec acknowledgementOfClaimGenerator;
     @Autowired
     private final ObjectMapper mapper = new ObjectMapper();

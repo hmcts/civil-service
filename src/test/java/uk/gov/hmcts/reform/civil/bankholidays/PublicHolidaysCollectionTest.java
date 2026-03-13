@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.civil.bankholidays;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidays;
 import uk.gov.hmcts.reform.civil.bankholidays.BankHolidaysApi;
 import uk.gov.hmcts.reform.civil.bankholidays.PublicHolidaysCollection;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class PublicHolidaysCollectionTest {
 
     private static final LocalDate BANK_HOLIDAY_1 = LocalDate.of(2020, 12, 24);

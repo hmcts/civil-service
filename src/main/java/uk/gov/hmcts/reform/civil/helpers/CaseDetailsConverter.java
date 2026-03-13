@@ -21,7 +21,7 @@ public class CaseDetailsConverter {
     private final ObjectMapper objectMapper;
 
     public CaseDetailsConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.copy();
         this.objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
     }
 

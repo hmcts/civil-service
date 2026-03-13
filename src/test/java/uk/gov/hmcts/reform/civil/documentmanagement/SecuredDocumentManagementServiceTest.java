@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -51,26 +50,25 @@ import static uk.gov.hmcts.reform.civil.documentmanagement.model.DocumentType.SE
 
 @SpringBootTest(classes = {
     SecuredDocumentManagementService.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     DocumentManagementConfiguration.class, Tika.class})
 class SecuredDocumentManagementServiceTest {
 
     private static final String USER_ROLES_JOINED = "caseworker-civil,caseworker-civil-solicitor";
     public static final String BEARER_TOKEN = "Bearer Token";
 
-    @MockBean
+    @MockitoBean
     private CaseDocumentClientApi caseDocumentClientApi;
-    @MockBean
+    @MockitoBean
     private DocumentDownloadClientApi documentDownloadClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private UserService userService;
     @Autowired
     private ObjectMapper mapper;
     @Autowired
     private SecuredDocumentManagementService documentManagementService;
-    @Mock
     private ResponseEntity<Resource> responseEntity;
 
     private static final String PNG_MIME_TYPE = "application/png";
@@ -85,6 +83,7 @@ class SecuredDocumentManagementServiceTest {
 
     @BeforeEach
     public void setUp() {
+        responseEntity = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
         when(authTokenGenerator.generate()).thenReturn(BEARER_TOKEN);
         when(userService.getUserInfo(anyString())).thenReturn(userInfo);
     }
@@ -215,9 +214,6 @@ class SecuredDocumentManagementServiceTest {
                      eq(documentId)
                  )
             ).thenReturn(document);
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             when(documentDownloadClient.downloadBinary(
                      anyString(),
                      anyString(),
@@ -247,9 +243,6 @@ class SecuredDocumentManagementServiceTest {
             );
             String documentPath = URI.create(document.links.self.href).getPath();
             UUID documentId = getDocumentIdFromSelfHref(documentPath);
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             when(caseDocumentClientApi.getDocumentBinary(
                      anyString(),
                      anyString(),
@@ -320,9 +313,6 @@ class SecuredDocumentManagementServiceTest {
                      eq(documentId)
                  )
             ).thenReturn(responseEntity);
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             //When
             DownloadedDocumentResponse expectedResult =
                 new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
@@ -356,9 +346,6 @@ class SecuredDocumentManagementServiceTest {
                      eq(documentId)
                  )
             ).thenReturn(responseEntity);
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             //When
             DownloadedDocumentResponse expectedResult =
                 new DownloadedDocumentResponse(new ByteArrayResource("test".getBytes()), "TEST_DOCUMENT_1.pdf",
@@ -385,9 +372,6 @@ class SecuredDocumentManagementServiceTest {
                      eq(documentId)
                  )
             ).thenReturn(document);
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             when(documentDownloadClient.downloadBinary(
                      anyString(),
                      anyString(),
@@ -451,9 +435,6 @@ class SecuredDocumentManagementServiceTest {
             ).thenReturn(mapper.readValue(
                 ResourceReader.readString("document-management/metadata.success.json"), Document.class)
             );
-
-            when(responseEntity.getBody()).thenReturn(new ByteArrayResource("test".getBytes()));
-
             Document documentMetaData
                 = documentManagementService.getDocumentMetaData(BEARER_TOKEN, documentPath);
 

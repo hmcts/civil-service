@@ -4,9 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.bankholidays.WorkingDayIndicator;
@@ -62,7 +62,7 @@ import static uk.gov.hmcts.reform.civil.service.DeadlinesCalculator.END_OF_BUSIN
     ExitSurveyConfiguration.class,
     ExitSurveyContentService.class,
     DeadlineExtensionValidator.class,
-    JacksonAutoConfiguration.class,
+    TestJacksonAutoConfiguration.class,
     CaseDetailsConverter.class,
     DeadlinesCalculator.class,
     SimpleStateFlowEngine.class,
@@ -77,22 +77,22 @@ class InformAgreedExtensionDateCallbackHandlerTest extends BaseCallbackHandlerTe
     @Autowired
     private ExitSurveyContentService exitSurveyContentService;
 
-    @MockBean
+    @MockitoBean
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @MockitoBean
     private WorkingDayIndicator workingDayIndicator;
 
-    @MockBean
+    @MockitoBean
     private Time time;
 
-    @MockBean
+    @MockitoBean
     private CoreCaseUserService coreCaseUserService;
 
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService toggleService;
 
     @Nested

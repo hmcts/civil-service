@@ -3,9 +3,9 @@ package uk.gov.hmcts.reform.civil.handler.callback.camunda.caseevents;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -33,14 +33,14 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.TRIGGER_APPLICATION_C
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
     TriggerApplicationClosureCallbackHandler.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class TriggerApplicationClosureCallbackHandlerTest extends BaseCallbackHandlerTest {
 
     @Autowired
     TriggerApplicationClosureCallbackHandler handler;
 
-    @MockBean
+    @MockitoBean
     private GenAppStateHelperService helperService;
 
     @Test

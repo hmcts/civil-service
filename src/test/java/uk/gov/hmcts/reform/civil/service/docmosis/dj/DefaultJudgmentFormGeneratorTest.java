@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import uk.gov.hmcts.reform.civil.config.TestJacksonAutoConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.documentmanagement.SecuredDocumentManagementService;
@@ -49,7 +49,7 @@ import static uk.gov.hmcts.reform.civil.service.docmosis.DocmosisTemplates.N121_
     JudgmentAmountsCalculator.class,
     DefaultJudgmentFormBuilder.class,
     DjWelshTextService.class,
-    JacksonAutoConfiguration.class
+    TestJacksonAutoConfiguration.class
 })
 class DefaultJudgmentFormGeneratorTest {
 
@@ -61,22 +61,22 @@ class DefaultJudgmentFormGeneratorTest {
         .documentName(fileName)
         .documentType(DEFAULT_JUDGMENT)
         .build();
-    @MockBean
+    @MockitoBean
     private SecuredDocumentManagementService documentManagementService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGeneratorService documentGeneratorService;
 
     @Autowired
     private DefaultJudgmentFormGenerator generator;
 
-    @MockBean
+    @MockitoBean
     private AssignCategoryId assignCategoryId;
 
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
-    @MockBean
+    @MockitoBean
     private InterestCalculator interestCalculator;
 
     @Test
