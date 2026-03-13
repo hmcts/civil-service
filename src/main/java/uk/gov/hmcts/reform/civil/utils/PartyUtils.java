@@ -40,6 +40,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
 public class PartyUtils {
 
+    private static final String SPACE = " ";
     private PartyUtils() {
         //NO-OP
     }
@@ -101,7 +102,7 @@ public class PartyUtils {
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
-        final String SPACE = " ";
+
         final String titlePrefix = omitTitle ? "" : getTitle(party.getSoleTraderTitle());
         final String firstName = ofNullable(party.getSoleTraderFirstName()).orElse(SPACE);
         final String lastName = ofNullable(party.getSoleTraderLastName()).orElse(SPACE);

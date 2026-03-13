@@ -112,7 +112,7 @@ class ClaimantLipRequestJudgementByAdmissionRespondentNotificationHandlerTest ex
         private Map<String, String> getNotificationDataMap() {
             Map<String, String> properties = new HashMap<>(addCommonProperties());
             properties.putAll(Map.of(
-                RESPONDENT_NAME, "Mr. Sole Trader",
+                RESPONDENT_NAME, "Mr. Sole Trader T/A Sole Trader co",
                 CLAIMANT_NAME, "Mr. John Rambo",
                 CLAIM_REFERENCE_NUMBER, LEGACY_CASE_REFERENCE,
                 FRONTEND_URL, "dummy_cui_front_end_url"
