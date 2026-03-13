@@ -85,6 +85,18 @@ class OtherPartyQueryResponseRespSolTwoEmailDTOGeneratorTest {
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 
+    @Test
+    void shouldNotifyWhenContextIsRespondentSolicitorOne() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateClaimIssued()
+            .build();
+        when(respondToQueryHelper.getResponseQueryContext(caseData))
+            .thenReturn(Optional.of(context(CaseRole.RESPONDENTSOLICITORONE)));
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
     private Party createParty(String name) {
         Party party = new Party();
         party.setType(Party.Type.INDIVIDUAL);

@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -19,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -85,6 +88,49 @@ class RespondToQueryHelperTest {
         helper.addQueryDateProperty(properties, caseData);
 
         assertThat(properties).containsEntry(QUERY_DATE, formatLocalDate(now.minusDays(1).toLocalDate(), DATE));
+    }
+
+    @Test
+    void shouldReturnResponseQueryContextWhenProcessVariablesAvailable() {
+        OffsetDateTime now = OffsetDateTime.now();
+        CaseData caseData = createCaseData(now);
+        QueryManagementVariables queryManagementVariables = new QueryManagementVariables();
+        queryManagementVariables.setQueryId("response-id");
+        when(runtimeService.getProcessVariables("process-id"))
+            .thenReturn(queryManagementVariables);
+        when(coreCaseUserService.getUserCaseRoles(caseData.getCcdCaseReference().toString(), "LR"))
+            .thenReturn(List.of(CaseRole.APPLICANTSOLICITORONE.toString()));
+
+        Optional<RespondToQueryHelper.ResponseQueryContext> context = helper.getResponseQueryContext(caseData);
+
+        assertThat(context).isPresent();
+        assertThat(context.get().getParentQuery().getId()).isEqualTo("parent-id");
+        assertThat(context.get().getResponseQuery().getId()).isEqualTo("response-id");
+        assertThat(context.get().getRoles()).containsExactly(CaseRole.APPLICANTSOLICITORONE.toString());
+    }
+
+    @Test
+    void shouldReturnEmptyResponseQueryContextWhenProcessInstanceMissing() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+
+        assertThat(helper.getResponseQueryContext(caseData)).isEmpty();
+    }
+
+    @Test
+    void shouldIdentifyUnspecClaimNotReadyForNotification() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setCaseAccessCategory(CaseCategory.UNSPEC_CLAIM);
+        caseData.setCcdState(CaseState.CASE_ISSUED);
+
+        assertThat(helper.isUnspecClaimNotReadyForNotification(
+            caseData,
+            List.of(CaseRole.APPLICANTSOLICITORONE.getFormattedName())
+        )).isTrue();
+
+        assertThat(helper.isUnspecClaimNotReadyForNotification(
+            caseData,
+            List.of(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())
+        )).isFalse();
     }
 
     @Test
