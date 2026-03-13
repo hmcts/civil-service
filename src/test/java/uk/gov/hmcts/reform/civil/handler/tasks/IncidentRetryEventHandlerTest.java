@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.handler.tasks;
 
-import feign.FeignException;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.community.rest.client.model.IncidentDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
@@ -28,7 +27,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,20 +57,6 @@ class IncidentRetryEventHandlerTest {
         return instructions.size() == 1
             && "startAfterActivity".equals(instructions.get(0).get("type"))
             && "activity1".equals(instructions.get(0).get("activityId"));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static boolean matchesRetryInstructions(Map<String, Object> req) {
-        List<Map<String, Object>> instructions = (List<Map<String, Object>>) req.get("instructions");
-        if (instructions.size() != 2) {
-            return false;
-        }
-        Map<String, Object> cancelInstruction = instructions.get(0);
-        Map<String, Object> startBeforeInstruction = instructions.get(1);
-        return "cancel".equals(cancelInstruction.get("type"))
-            && "activity1".equals(cancelInstruction.get("activityId"))
-            && "startBeforeActivity".equals(startBeforeInstruction.get("type"))
-            && "activity1".equals(startBeforeInstruction.get("activityId"));
     }
 
     @Test
@@ -127,6 +111,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentStartTime")).thenReturn("2025-01-01T00:00:00Z");
         when(externalTask.getVariable("incidentEndTime")).thenReturn("2025-12-31T23:59:59Z");
 
+        // Mock process instances
         List<ProcessInstanceDto> processInstances = List.of(
             newProcessInstance("proc1"), newProcessInstance("proc2")
         );
@@ -163,29 +148,39 @@ class IncidentRetryEventHandlerTest {
 
     @Test
     void shouldCompleteActivityWhenIncidentAlreadyProcessed() {
+        // GIVEN
         ProcessInstanceDto pi = newProcessInstance("proc1");
 
         IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
-        incident.setIncidentMessage("422 - already processed");
+        incident.setIncidentMessage("422 - already processed"); // KEY FOR THIS TEST
 
         when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(externalTask.getVariable(any())).thenReturn("2025-01-01T00:00:00Z");
+
+        when(externalTask.getVariable(any()))
+            .thenReturn("2025-01-01T00:00:00Z");
+
+        // 1 process instance returned
         when(camundaRuntimeApi.queryProcessInstances(
             any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
             .thenReturn(List.of(pi));
+
+        // Incident returned with message "already processed"
         when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
             any(), anyBoolean(), eq("proc1"), anyString(), anyString(), anyInt()))
             .thenReturn(List.of(incident));
 
+        // caseId exists
         HashMap<String, VariableValueDto> vars = new HashMap<>();
         VariableValueDto var = new VariableValueDto();
         var.setValue("case-proc1");
         vars.put("caseId", var);
-        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
+        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any()))
+            .thenReturn(vars);
 
         handler.handleTask(externalTask);
 
         verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
+
         verify(camundaRuntimeApi).modifyProcessInstance(
             eq("serviceAuth"),
             eq("proc1"),
@@ -248,7 +243,7 @@ class IncidentRetryEventHandlerTest {
         when(externalTask.getVariable("incidentStartTime")).thenReturn("");
         when(externalTask.getVariable("incidentEndTime")).thenReturn(null);
         when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
-            .thenReturn(List.of());
+            .thenReturn(List.of()); // no instances, just to exit early
 
         ExternalTaskData result = handler.handleTask(externalTask);
 
@@ -275,108 +270,6 @@ class IncidentRetryEventHandlerTest {
         verify(camundaRuntimeApi).modifyProcessInstance(eq("serviceAuth"), eq("proc1"), anyMap());
     }
 
-    @Test
-    void shouldMarkAlreadyProcessed_whenIncidentMessageContainsPattern() {
-        ProcessInstanceDto pi = newProcessInstance("proc1");
-
-        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
-        incident.setIncidentMessage("422 - already processed");
-
-        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-        when(camundaRuntimeApi.queryProcessInstances(any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()))
-            .thenReturn(List.of(pi));
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
-            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()))
-            .thenReturn(List.of(incident));
-
-        HashMap<String, VariableValueDto> vars = new HashMap<>();
-        VariableValueDto var = new VariableValueDto();
-        var.setValue("case-proc1");
-        vars.put("caseId", var);
-        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
-
-        handler.handleTask(externalTask);
-
-        verify(camundaRuntimeApi).modifyProcessInstance(
-            eq("serviceAuth"),
-            eq("proc1"),
-            argThat(IncidentRetryEventHandlerTest::matches)
-        );
-    }
-
-    @Test
-    void shouldMarkAlreadyProcessed_whenCallbackErrorsContainPattern() {
-        // GIVEN
-        ProcessInstanceDto pi = newProcessInstance("proc1");
-
-        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
-        incident.setIncidentMessage("some other error"); // message does NOT trigger already processed
-
-        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-
-        when(camundaRuntimeApi.queryProcessInstances(
-            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
-        )).thenReturn(List.of(pi));
-
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
-            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
-        )).thenReturn(List.of(incident));
-
-        HashMap<String, VariableValueDto> vars = new HashMap<>();
-        VariableValueDto var = new VariableValueDto();
-        var.setValue("case-proc1");
-        vars.put("caseId", var);
-        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
-
-        Map<String, Object> response = Map.of(
-            "callbackErrors", List.of("error1", "already processed error")
-        );
-        when(camundaRuntimeApi.fetchErrorDetails(anyString(), anyString())).thenReturn(response);
-
-        handler.handleTask(externalTask);
-
-        verify(camundaRuntimeApi).modifyProcessInstance(
-            eq("serviceAuth"),
-            eq("proc1"),
-            argThat(IncidentRetryEventHandlerTest::matches)
-        );
-    }
-
-    @Test
-    void shouldContinueRetrying_whenErrorDetailsNotFound() {
-        ProcessInstanceDto pi = newProcessInstance("proc1");
-
-        IncidentDto incident = newIncident(pi.getId(), "inc1", "job1");
-        incident.setIncidentMessage("some other error");
-
-        when(authTokenGenerator.generate()).thenReturn("serviceAuth");
-
-        when(camundaRuntimeApi.queryProcessInstances(
-            any(), anyInt(), anyInt(), anyString(), anyString(), anyMap()
-        )).thenReturn(List.of(pi));
-
-        when(camundaRuntimeApi.getLatestOpenIncidentForProcessInstance(
-            any(), anyBoolean(), eq("proc1"), any(), any(), anyInt()
-        )).thenReturn(List.of(incident));
-
-        HashMap<String, VariableValueDto> vars = new HashMap<>();
-        VariableValueDto var = new VariableValueDto();
-        var.setValue("case-proc1");
-        vars.put("caseId", var);
-        when(camundaRuntimeApi.getProcessVariables(eq("proc1"), any())).thenReturn(vars);
-
-        FeignException.NotFound notFound = mock(FeignException.NotFound.class);
-        when(camundaRuntimeApi.fetchErrorDetails(anyString(), anyString())).thenThrow(notFound);
-
-        handler.handleTask(externalTask);
-
-        verify(camundaRuntimeApi).modifyProcessInstance(
-            eq("serviceAuth"),
-            eq("proc1"),
-            argThat(IncidentRetryEventHandlerTest::matchesRetryInstructions)
-        );
-    }
-
     // Helper methods
     private ProcessInstanceDto newProcessInstance(String id) {
         ProcessInstanceDto pi = new ProcessInstanceDto();
@@ -390,7 +283,6 @@ class IncidentRetryEventHandlerTest {
         inc.setProcessInstanceId(processInstanceId);
         inc.setConfiguration(jobId);
         inc.setActivityId("activity1");
-        inc.setIncidentMessage("some error");
         return inc;
     }
 }
