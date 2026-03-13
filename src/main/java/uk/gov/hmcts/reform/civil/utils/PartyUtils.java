@@ -80,29 +80,39 @@ public class PartyUtils {
     }
 
     public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
-        switch (party.getType()) {
-            case COMPANY:
-                return party.getCompanyName();
-            case ORGANISATION:
-                return party.getOrganisationName();
-            case INDIVIDUAL:
-                return ofNullable(litigationFriend)
-                    .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
-                    .orElse(getIndividualName(party));
-            case SOLE_TRADER:
-                return ofNullable(party.getSoleTraderTradingAs())
-                    .map(ta -> getSoleTraderName(party) + " T/A " + ta)
-                    .orElse(getSoleTraderName(party));
-            default:
-                throw new IllegalArgumentException("Invalid Party type in " + party);
+        return switch (party.getType()) {
+            case COMPANY -> party.getCompanyName();
+            case ORGANISATION -> party.getOrganisationName();
+            case INDIVIDUAL -> ofNullable(litigationFriend)
+                .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
+                .orElse(getIndividualName(party));
+            case SOLE_TRADER -> ofNullable(party.getSoleTraderTradingAs())
+                .map(ta -> getSoleTraderName(party) + " T/A " + ta)
+                .orElse(getSoleTraderName(party));
+            default -> throw new IllegalArgumentException("Invalid Party type in " + party);
+        };
+    }
+
+    public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
+        return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
+    }
+
+    public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend, boolean upperCase) {
+        String partyName = ofNullable(party).map(Party::getPartyName).map(name -> upperCase ? name.toUpperCase() : name).orElse(null);
+        if (partyName != null) {
+            return ofNullable(litigationFriend)
+                .map(lf ->  partyName + " (by his litigation friend " + lf.getFirstName() + " " + lf.getLastName() + ")")
+                .orElse(partyName);
         }
+        return null;
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
         return (omitTitle ? "" : getTitle(party.getSoleTraderTitle()))
             + party.getSoleTraderFirstName()
             + " "
-            + party.getSoleTraderLastName();
+            + party.getSoleTraderLastName()
+            ;
     }
 
     private static String getSoleTraderName(Party party) {
