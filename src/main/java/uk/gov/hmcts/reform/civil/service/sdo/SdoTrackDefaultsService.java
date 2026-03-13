@@ -61,6 +61,12 @@ public class SdoTrackDefaultsService {
             caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
             caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
             caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+        } else {
+            caseData.setSmallClaimsPenalNotice(null);
+            caseData.setFastTrackPenalNotice(null);
+            caseData.setSmallClaimsPenalNoticeToggle(null);
+            caseData.setFastTrackPenalNoticeToggle(null);
+            caseData.setSmallClaimsHousingDisrepair(null);
         }
     }
 
