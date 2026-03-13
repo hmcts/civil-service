@@ -45,18 +45,15 @@ public class PartyUtils {
     }
 
     public static String getPartyNameBasedOnType(Party party, boolean omitTitle) {
-        switch (party.getType()) {
-            case COMPANY:
-                return party.getCompanyName();
-            case INDIVIDUAL:
-                return getIndividualName(party, omitTitle);
-            case SOLE_TRADER:
-                return getSoleTraderName(party, omitTitle);
-            case ORGANISATION:
-                return party.getOrganisationName();
-            default:
-                throw new IllegalArgumentException("Invalid Party type in " + party);
-        }
+        return switch (party.getType()) {
+            case COMPANY -> party.getCompanyName();
+            case INDIVIDUAL -> getIndividualName(party, omitTitle);
+            case SOLE_TRADER -> ofNullable(party.getSoleTraderTradingAs())
+                .map(ta -> getSoleTraderName(party, omitTitle) + " T/A " + ta)
+                .orElse(getSoleTraderName(party, omitTitle));
+            case ORGANISATION -> party.getOrganisationName();
+            default -> throw new IllegalArgumentException("Invalid Party type in " + party);
+        };
     }
 
     public static String getPartyNameBasedOnType(Party party) {
