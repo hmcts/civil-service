@@ -99,7 +99,7 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
         void shouldNotifyApplicantOnlyOneSolicitor_whenInvoked() {
             when(notificationsProperties.getNotifySetAsideJudgmentTemplate()).thenReturn(TEMPLATE_ID);
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("Test Org Name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("Test Org Name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
 
@@ -108,13 +108,12 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
                 .build();
             caseData.setJoSetAsideJudgmentErrorText("test error");
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 
@@ -134,26 +133,25 @@ public class ClaimSetAsideJudgmentClaimantNotificationHandlerTest extends BaseCa
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate().toBuilder()
-                .applicant1(Party.builder()
-                                .individualFirstName("Applicant1")
-                                .individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("applicantLip@example.com").build())
-                .respondent1(Party.builder().partyName("Respondent1")
-                                 .individualFirstName("Respondent1").individualLastName("RespondentLastName")
-                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1")
+                                .setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("applicantLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1")
+                                 .setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)
                 .ccdState(CaseState.All_FINAL_ORDERS_ISSUED)
                 .build();
 
-            CallbackParams params = CallbackParams.builder()
+            CallbackParams params = new CallbackParams()
                 .caseData(caseData)
                 .type(ABOUT_TO_SUBMIT)
                 .request(CallbackRequest.builder()
                              .eventId(CaseEvent.SET_ASIDE_JUDGMENT.name())
-                             .build())
-                .build();
+                             .build());
 
             handler.handle(params);
 

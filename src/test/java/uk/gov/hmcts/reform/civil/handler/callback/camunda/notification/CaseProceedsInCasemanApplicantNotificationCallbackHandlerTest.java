@@ -93,7 +93,7 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
         void shouldNotifyApplicantSolicitor_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
@@ -130,8 +130,8 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
         void shouldNotNotifyApplicantLipVSLR_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
-                                .partyEmail("aabc@gmail.com").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("A").setIndividualLastName("B")
+                                .setPartyEmail("aabc@gmail.com"))
                 .ccdCaseReference(Long.valueOf("1234"))
                 .legacyCaseReference("000DC001")
                 .applicant1Represented(YesOrNo.NO)
@@ -156,8 +156,8 @@ class CaseProceedsInCasemanApplicantNotificationCallbackHandlerTest extends Base
         void shouldNotNotifyApplicantLipVSLrForBilingualLip_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder()
                 .respondent1Represented(YesOrNo.YES)
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("A").individualLastName("B")
-                                .partyEmail("aabc@gmail.com").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("A").setIndividualLastName("B")
+                                .setPartyEmail("aabc@gmail.com"))
                 .ccdCaseReference(Long.valueOf("1234"))
                 .legacyCaseReference("000DC001")
                 .applicant1Represented(YesOrNo.NO)

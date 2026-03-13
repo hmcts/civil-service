@@ -38,11 +38,11 @@ public class FullAdmitPayImmediatelyNoPaymentFromDefendantScenarioTest extends D
         CaseData caseData = new CaseDataBuilder().atStateClaimDraft().build().toBuilder()
             .ccdCaseReference(Long.valueOf(caseId))
             .totalClaimAmount(BigDecimal.valueOf(124.67))
-            .applicant1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Dave").individualLastName("Indent").type(Party.Type.INDIVIDUAL).build())
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                                               .whenWillThisAmountBePaid(whenWillThisAmountBePaid)
-                                               .build())
+            .applicant1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Dave").setIndividualLastName("Indent").setType(Party.Type.INDIVIDUAL))
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                                               .setWhenWillThisAmountBePaid(whenWillThisAmountBePaid)
+                                               )
             .build();
 
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).id(Long.valueOf(caseId)).build();

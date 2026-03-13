@@ -80,8 +80,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123456")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123456"));
         CaseMessage applicantMessage = new CaseMessage();
         applicantMessage.setId("123456");
         applicantMessage.setCreatedBy("applicant");
@@ -139,8 +138,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage defendantMessage = new CaseMessage();
         defendantMessage.setId("123457");
         defendantMessage.setCreatedBy("defendant");
@@ -198,8 +196,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(DEFENDANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage defendantMessage = new CaseMessage();
         defendantMessage.setId("123457");
         defendantMessage.setCreatedBy("defendant");
@@ -255,8 +252,7 @@ public class UpdateDashboardNotificationsForRaisedQueryTest extends BaseCallback
 
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of(CLAIMANT.getFormattedName()));
-        when(runtimeService.getProcessVariables(any())).thenReturn(QueryManagementVariables.builder().queryId("123457")
-                                                                       .build());
+        when(runtimeService.getProcessVariables(any())).thenReturn(new QueryManagementVariables().setQueryId("123457"));
         CaseMessage claimantMessage = new CaseMessage();
         claimantMessage.setId("123457");
         claimantMessage.setCreatedBy("claimant");

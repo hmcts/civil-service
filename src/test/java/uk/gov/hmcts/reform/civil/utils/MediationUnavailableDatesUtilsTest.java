@@ -53,10 +53,9 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldAddToErrors_whenSingleDatesListIsMoreThan3MonthsInTheFuture() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                  .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                  .date(LocalDate.of(2024, 5, 1))
-                                                  .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                  .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                  .setDate(LocalDate.of(2024, 5, 1)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo("Unavailability Date must not be more than three months in the future.");
@@ -64,10 +63,9 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldAddToErrors_whenSingleDatesListIsInThePast() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                                           .date(LocalDate.of(2023, 12, 31))
-                                                                           .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                                           .setDate(LocalDate.of(2023, 12, 31)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo("Unavailability Date must not be before today.");
@@ -75,11 +73,10 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldAddToErrors_whenDateRangeFromIsInThePast() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                                           .fromDate(LocalDate.of(2023, 12, 31))
-                                                                           .toDate(LocalDate.of(2024, 12, 31))
-                                                                           .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                                           .setFromDate(LocalDate.of(2023, 12, 31))
+                                                                           .setToDate(LocalDate.of(2024, 12, 31)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo("Unavailability Date From must not be before today.");
@@ -87,11 +84,10 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldAddToErrors_whenDateRangeToIsInThePast() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                                           .fromDate(LocalDate.of(2024, 2, 20))
-                                                                           .toDate(LocalDate.of(2023, 12, 31))
-                                                                           .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                                           .setFromDate(LocalDate.of(2024, 2, 20))
+                                                                           .setToDate(LocalDate.of(2023, 12, 31)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo("Unavailability Date From cannot be after Unavailability Date To. Please enter valid range.");
@@ -99,11 +95,10 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldAddToErrors_whenDateRangeToIsMoreThan3MonthsInTheFuture() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                                           .fromDate(LocalDate.of(2024, 6, 2))
-                                                                           .toDate(LocalDate.of(2024, 6, 3))
-                                                                           .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                                           .setFromDate(LocalDate.of(2024, 6, 2))
+                                                                           .setToDate(LocalDate.of(2024, 6, 3)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(1);
         assertThat(errors.get(0)).isEqualTo("Unavailability Date To must not be more than three months in the future.");
@@ -111,15 +106,13 @@ class MediationUnavailableDatesUtilsTest {
 
     @Test
     void shouldNotAddToErrors_whenDateRangeAndSingleDateAreBothValid() {
-        List<Element<UnavailableDate>> unavailableDates = wrapElements(UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                                                           .fromDate(LocalDate.of(2024, 2, 2))
-                                                                           .toDate(LocalDate.of(2024, 2, 5))
-                                                                           .build(),
-                                                                       UnavailableDate.builder()
-                                                                           .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                                           .date(LocalDate.of(2024, 1, 31))
-                                                                           .build());
+        List<Element<UnavailableDate>> unavailableDates = wrapElements(new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                                                           .setFromDate(LocalDate.of(2024, 2, 2))
+                                                                           .setToDate(LocalDate.of(2024, 2, 5)),
+                                                                       new UnavailableDate()
+                                                                           .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                                                           .setDate(LocalDate.of(2024, 1, 31)));
         checkUnavailable(errors, unavailableDates);
         assertThat(errors.size()).isEqualTo(0);
     }

@@ -4,18 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
-import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.CaseDocument;
 import uk.gov.hmcts.reform.civil.documentmanagement.model.Document;
@@ -26,6 +27,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.UploadDocumentByType;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.utils.AssignCategoryId;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserInfo;
@@ -50,43 +52,31 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 import static uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder.STRING_CONSTANT;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SuppressWarnings({"checkstyle:EmptyLineSeparator", "checkstyle:Indentation"})
-@SpringBootTest(classes = {
-    UploadAdditionalDocumentsCallbackHandler.class,
-    JacksonAutoConfiguration.class})
+@ExtendWith(MockitoExtension.class)
 class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    UploadAdditionalDocumentsCallbackHandler handler;
-    @Autowired
-    ObjectMapper objectMapper;
-    @MockBean
-    IdamClient idamClient;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @MockBean
-    CaseDetailsConverter caseDetailsConverter;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
-    AssignCategoryId assignCategoryId;
-    @MockBean
-    DocUploadDashboardNotificationService docUploadDashboardNotificationService;
-    @MockBean
-    GaForLipService gaForLipService;
+    @InjectMocks
+    private UploadAdditionalDocumentsCallbackHandler handler;
 
-    List<Element<CaseDocument>> documents = new ArrayList<>();
+    @Mock
+    private IdamClient idamClient;
+
+    @Mock
+    private AssignCategoryId assignCategoryId;
+
+    @Mock
+    private DocUploadDashboardNotificationService docUploadDashboardNotificationService;
+
+    @Mock
+    private GaForLipService gaForLipService;
 
     private static final String DUMMY_EMAIL = "test@gmail.com";
-
-    @BeforeEach
-    public void setUp() throws IOException {
-        when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
-
-        when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
-                                                                 .sub(DUMMY_EMAIL)
-                                                                 .uid(STRING_CONSTANT)
-                                                                 .build());
-
-    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -96,21 +86,29 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
     @Nested
     class AboutToSubmit {
 
+        @BeforeEach
+        public void setUp() throws IOException {
+            when(idamClient.getUserInfo(anyString())).thenReturn(UserInfo.builder()
+                                                                     .sub(DUMMY_EMAIL)
+                                                                     .uid(STRING_CONSTANT)
+                                                                     .build());
+        }
+
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeUncloaked() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("Witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("Witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicationIsUncloakedOnce(YES)
                 .parentClaimantIsApplicant(YES)
@@ -132,19 +130,19 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeCloakedApplication() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness bundle")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicationIsCloaked(NO)
                 .parentClaimantIsApplicant(YES)
@@ -166,19 +164,19 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenJudgeIsNotUncloakedAndInformOtherPartyIsYes() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness bundle")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .parentClaimantIsApplicant(YES)
@@ -201,13 +199,12 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
         void shouldSetUpReadyBusinessProcessWhenApplicationIsUrgent() {
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaApplAddlSolicitors = new ArrayList<>();
             gaApplAddlSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                                  .id("id1")
@@ -216,7 +213,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .parentClaimantIsApplicant(YES)
@@ -238,15 +235,15 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsUrgentAddedToApplicantAddlUser() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaApplAddlSolicitors = new ArrayList<>();
             gaApplAddlSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                                  .id(STRING_CONSTANT)
@@ -255,7 +252,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .parentClaimantIsApplicant(YES)
@@ -280,13 +277,12 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
             when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(true);
             List<Element<UploadDocumentByType>> uploadDocumentByRespondent = new ArrayList<>();
-            uploadDocumentByRespondent.add(element(UploadDocumentByType.builder()
-                                                       .documentType("witness")
-                                                       .additionalDocument(Document.builder()
-                                                                               .documentFileName("witness_document.pdf")
-                                                                               .documentUrl("http://dm-store:8080")
-                                                                               .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                               .build()).build()));
+            uploadDocumentByRespondent.add(element(new UploadDocumentByType()
+                                                       .setDocumentType("witness")
+                                                       .setAdditionalDocument(new Document()
+                                                                               .setDocumentFileName("witness_document.pdf")
+                                                                               .setDocumentUrl("http://dm-store:8080")
+                                                                               .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
                                              .id(STRING_CONSTANT)
@@ -295,7 +291,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .isMultiParty(NO)
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(NO).build())
@@ -320,15 +316,15 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp1Collection1v2() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
@@ -350,7 +346,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppConsentOrder(YES)
                 .generalAppRespondentSolicitors(gaRespSolicitors)
@@ -374,15 +370,15 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp2Collection1v2() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
@@ -408,7 +404,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppConsentOrder(YES)
                 .generalAppRespondentSolicitors(gaRespSolicitors)
@@ -432,24 +428,23 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsConsentOrderAndAddedToResp2Collection1v2MultipleCollection() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             List<Element<CaseDocument>> documentsCollection = new ArrayList<>();
-            documentsCollection.add(element(CaseDocument.builder().createdBy("civil")
-                                                .documentLink(Document.builder()
-                                                                  .documentFileName("witness_document.pdf")
-                                                                  .documentUrl("http://dm-store:8080")
-                                                                  .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                  .build())
-                                                .documentName("witness_document.docx")
-                                                .createdDatetime(LocalDateTime.now()).build()));
+            documentsCollection.add(element(new CaseDocument().setCreatedBy("civil")
+                                                .setDocumentLink(new Document()
+                                                                  .setDocumentFileName("witness_document.pdf")
+                                                                  .setDocumentUrl("http://dm-store:8080")
+                                                                  .setDocumentBinaryUrl("http://dm-store:8080/documents"))
+                                                .setDocumentName("witness_document.docx")
+                                                .setCreatedDatetime(LocalDateTime.now())));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
@@ -463,7 +458,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppConsentOrder(YES)
                 .generalAppRespondentSolicitors(gaRespSolicitors)
@@ -490,19 +485,19 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldSetUpReadyBusinessProcessWhenApplicationIsNotConsentOrder() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("witness")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("witness")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .parentClaimantIsApplicant(YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id(STRING_CONSTANT).forename("GAApplnSolicitor")
@@ -522,15 +517,15 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
 
         @Test
         void shouldPutBundleInBundleCollection() {
+            when(gaForLipService.isGaForLip(any(GeneralApplicationCaseData.class))).thenReturn(false);
 
             List<Element<UploadDocumentByType>> uploadDocumentByApplicant = new ArrayList<>();
-            uploadDocumentByApplicant.add(element(UploadDocumentByType.builder()
-                                                      .documentType("bundle")
-                                                      .additionalDocument(Document.builder()
-                                                                              .documentFileName("witness_document.pdf")
-                                                                              .documentUrl("http://dm-store:8080")
-                                                                              .documentBinaryUrl("http://dm-store:8080/documents")
-                                                                              .build()).build()));
+            uploadDocumentByApplicant.add(element(new UploadDocumentByType()
+                                                      .setDocumentType("bundle")
+                                                      .setAdditionalDocument(new Document()
+                                                                              .setDocumentFileName("witness_document.pdf")
+                                                                              .setDocumentUrl("http://dm-store:8080")
+                                                                              .setDocumentBinaryUrl("http://dm-store:8080/documents"))));
 
             List<Element<GASolicitorDetailsGAspec>> gaRespSolicitors = new ArrayList<>();
             gaRespSolicitors.add(element(GASolicitorDetailsGAspec.builder()
@@ -544,7 +539,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .generalAppConsentOrder(YES)
                 .generalAppRespondentSolicitors(gaRespSolicitors)
@@ -577,7 +572,7 @@ class UploadAdditionalDocumentsCallbackHandlerTest extends GeneralApplicationBas
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
                 .ccdCaseReference(1678356749555475L)
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")

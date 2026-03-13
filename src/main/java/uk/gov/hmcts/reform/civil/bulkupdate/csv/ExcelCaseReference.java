@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@SuperBuilder
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonPropertyOrder({"caseReference"})

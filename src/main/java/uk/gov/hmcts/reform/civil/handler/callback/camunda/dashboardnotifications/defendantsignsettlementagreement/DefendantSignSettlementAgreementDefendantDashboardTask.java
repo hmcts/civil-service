@@ -1,0 +1,21 @@
+package uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.defendantsignsettlementagreement;
+
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardServiceTask;
+import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.dashboardnotifications.defendantsignsettlementagreement.DefendantSignSettlementAgreementDefendantDashboardService;
+
+@Component
+public class DefendantSignSettlementAgreementDefendantDashboardTask extends DashboardServiceTask {
+
+    private final DefendantSignSettlementAgreementDefendantDashboardService dashboardService;
+
+    public DefendantSignSettlementAgreementDefendantDashboardTask(DefendantSignSettlementAgreementDefendantDashboardService dashboardService) {
+        this.dashboardService = dashboardService;
+    }
+
+    @Override
+    protected void notifyDashboard(CaseData caseData, String authToken) {
+        dashboardService.notifyDefendantSignSettlementAgreement(caseData, authToken);
+    }
+}

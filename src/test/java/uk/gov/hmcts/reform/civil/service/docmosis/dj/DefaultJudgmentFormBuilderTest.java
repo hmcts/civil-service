@@ -63,10 +63,10 @@ class DefaultJudgmentFormBuilderTest {
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
             .totalClaimAmount(new BigDecimal("1000.00"))
             .legacyCaseReference("12345")
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
@@ -84,10 +84,10 @@ class DefaultJudgmentFormBuilderTest {
             .totalClaimAmount(new BigDecimal("1000.00"))
             .legacyCaseReference("12345")
             .partialPaymentAmount("200000")
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(1000)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("-45.00"));
 
@@ -119,7 +119,7 @@ class DefaultJudgmentFormBuilderTest {
             .applicant2(applicant2)
             .respondent1(respondent1)
             .respondent2(respondent2)
-            .claimFee(Fee.builder().calculatedAmountInPence(new BigDecimal(10)).build())
+            .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(10)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
 

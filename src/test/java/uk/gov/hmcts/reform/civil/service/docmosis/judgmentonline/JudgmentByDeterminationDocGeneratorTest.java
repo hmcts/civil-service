@@ -91,9 +91,9 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_CLAIMANT);
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .activeJudgment(new JudgmentDetails()
                                 .setState(ISSUED)
                                 .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IN_INSTALMENTS))
@@ -124,9 +124,9 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_CLAIMANT);
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentImmediately()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .activeJudgment(new JudgmentDetails()
                                 .setState(ISSUED)
                                 .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_IN_INSTALMENTS))
@@ -157,9 +157,9 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_CLAIMANT);
 
         CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithPaymentByDate()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .activeJudgment(new JudgmentDetails()
                                 .setState(ISSUED)
                                 .setPaymentPlan(new JudgmentPaymentPlan().setType(PAY_BY_DATE).setPaymentDeadlineDate(LocalDate.now()))
@@ -187,11 +187,10 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_CLAIMANT);
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN, GEN_JUDGMENT_BY_DETERMINATION_DOC_CLAIMANT.name());
 
@@ -216,9 +215,9 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .build();
 
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,
@@ -246,18 +245,18 @@ class JudgmentByDeterminationDocGeneratorTest {
             .thenReturn(CASE_DOCUMENT_DEFENDANT);
 
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder().name("test solicitor")
-                                        .contactInformation(List.of(ContactInformation.builder().addressLine1("Test").country(
-                                            "Test").build()))
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation().setName("test solicitor")
+                                        .setContactInformation(List.of(new ContactInformation()
+                                                                        .setAddressLine1("Test")
+                                                                        .setCountry("Test")))
+                                        ));
 
         CaseData caseData = CaseDataBuilder.builder().buildJudmentOnlineCaseDataWithPaymentByInstalment()
-            .toBuilder().applicant1(PartyBuilder.builder().soleTrader().build())
-            .respondent1(PartyBuilder.builder().soleTrader().build())
-            .respondent2(PartyBuilder.builder().soleTrader().build())
+            .toBuilder().applicant1(new PartyBuilder().soleTrader().build())
+            .respondent1(new PartyBuilder().soleTrader().build())
+            .respondent2(new PartyBuilder().soleTrader().build())
             .respondent1Represented(YesOrNo.NO)
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder().organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-                                                                                        .organisationID("ORG_NAME").build()).build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("ORG_NAME")))
             .build();
 
         List<CaseDocument> caseDocuments = generator.generateDocs(caseData, BEARER_TOKEN,

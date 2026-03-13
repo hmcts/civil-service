@@ -113,12 +113,12 @@ public class GeneralApplicationCaseDataBuilder {
         .builder().label("sitename - location name - D12 8997").build();
 
     private static final String HEARING_SCHEDULED = "HEARING_SCHEDULED_GA";
-    private static final Fee FEE108 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(10800)).code("FEE0443").version("1").build();
-    private static final Fee FEE14 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(1400)).code("FEE0458").version("2").build();
-    private static final Fee FEE275 = Fee.builder().calculatedAmountInPence(
-        BigDecimal.valueOf(27500)).code("FEE0442").version("1").build();
+    private static final Fee FEE108 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(10800)).setCode("FEE0443").setVersion("1");
+    private static final Fee FEE14 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(1400)).setCode("FEE0458").setVersion("2");
+    private static final Fee FEE275 = new Fee().setCalculatedAmountInPence(
+        BigDecimal.valueOf(27500)).setCode("FEE0442").setVersion("1");
     public static final String STRING_CONSTANT = "this is a string";
     private static final String DUMMY_EMAIL = "hmcts.civil@gmail.com";
 
@@ -401,7 +401,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData build() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .businessProcess(businessProcess)
             .ccdState(ccdState)
             .applicant1(applicant1)
@@ -450,35 +450,33 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildMakePaymentsCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .generalAppSuperClaimType("UNSPEC_CLAIM")
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData buildPaymentFailureCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -488,30 +486,29 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(YES).build())
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.FAILED)
-                                        .reference("RC-1658-4258-2679-9795")
-                                        .customerReference(CUSTOMER_REFERENCE)
-                                        .build())
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                new GeneralApplicationPbaDetails()
+                    .setPaymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.FAILED)
+                                        .setReference("RC-1658-4258-2679-9795")
+                                        .setCustomerReference(CUSTOMER_REFERENCE)
+                                        )
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .parentClaimantIsApplicant(YES)
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData withNoticeCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         List<GeneralApplicationTypes> types = Arrays.asList(VARY_PAYMENT_TERMS_OF_JUDGMENT);
-        return build().toBuilder()
+        return build().copy()
             .generalAppType(GAApplicationType.builder().types(types).build())
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -521,31 +518,30 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                new GeneralApplicationPbaDetails()
+                    .setPaymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .reference("RC-1658-4258-2679-9795")
-                                        .customerReference(CUSTOMER_REFERENCE)
-                                        .build())
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                    .setPaymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        .setReference("RC-1658-4258-2679-9795")
+                                        .setCustomerReference(CUSTOMER_REFERENCE)
+                                        )
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData withoutNoticeCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -555,42 +551,39 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(NO).build())
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                new GeneralApplicationPbaDetails()
+                    .setPaymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .reference("RC-1658-4258-2679-9795")
-                                        .customerReference(CUSTOMER_REFERENCE)
-                                        .build())
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                    .setPaymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        .setReference("RC-1658-4258-2679-9795")
+                                        .setCustomerReference(CUSTOMER_REFERENCE)
+                                        )
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
-    public final CaseDocument pdfDocument = CaseDocument.builder()
-        .createdBy("John")
-        .documentName("documentName")
-        .documentSize(0L)
-        .documentType(DocumentType.GENERAL_APPLICATION_DRAFT)
-        .createdDatetime(LocalDateTime.now())
-        .documentLink(Document.builder()
-                          .documentUrl("fake-url")
-                          .documentFileName("file-name")
-                          .documentBinaryUrl("binary-url")
-                          .build())
-        .build();
+    public final CaseDocument pdfDocument = new CaseDocument()
+        .setCreatedBy("John")
+        .setDocumentName("documentName")
+        .setDocumentSize(0L)
+        .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT)
+        .setCreatedDatetime(LocalDateTime.now())
+        .setDocumentLink(new Document()
+                          .setDocumentUrl("fake-url")
+                          .setDocumentFileName("file-name")
+                          .setDocumentBinaryUrl("binary-url"));
 
     public GeneralApplicationCaseData withNoticeDraftAppCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         String uid = "f000aa01-0451-4000-b000-000000000111";
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
@@ -598,7 +591,7 @@ public class GeneralApplicationCaseDataBuilder {
                           .value(pdfDocument).build());
         draftDocs.add(Element.<CaseDocument>builder().id(UUID.fromString(uid))
                           .value(pdfDocument).build());
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -608,58 +601,57 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
                                                .hasAgreed(YES).build())
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                new GeneralApplicationPbaDetails()
+                    .setPaymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .reference("RC-1658-4258-2679-9795")
-                                        .customerReference(CUSTOMER_REFERENCE)
-                                        .build())
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                    .setPaymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        .setReference("RC-1658-4258-2679-9795")
+                                        .setCustomerReference(CUSTOMER_REFERENCE)
+                                        )
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData buildPaymentSuccessfulCaseData() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
-        return build().toBuilder()
+        return build().copy()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .paymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
+                new GeneralApplicationPbaDetails()
+                    .setPaymentSuccessfulDate(LocalDateTime.of(LocalDate.of(2020, 1, 1),
                                                             LocalTime.of(12, 0, 0)))
-                    .paymentDetails(PaymentDetails.builder()
-                                        .status(PaymentStatus.SUCCESS)
-                                        .reference("RC-1658-4258-2679-9795")
-                                        .customerReference(CUSTOMER_REFERENCE)
-                                        .build())
-                    .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                    .setPaymentDetails(new PaymentDetails()
+                                        .setStatus(PaymentStatus.SUCCESS)
+                                        .setReference("RC-1658-4258-2679-9795")
+                                        .setCustomerReference(CUSTOMER_REFERENCE)
+                                        )
+                    .setFee(
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGeneralApplication(GeneralApplication application) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(PENDING_APPLICATION_ISSUED)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -684,7 +676,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGeneralApplicationByState(GeneralApplication application, CaseState state) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(state)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -708,7 +700,7 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildCaseDateBaseOnGaForCollection(GeneralApplication application) {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(AWAITING_APPLICATION_PAYMENT)
             .generalAppType(application.getGeneralAppType())
             .caseLink(application.getCaseLink())
@@ -744,16 +736,14 @@ public class GeneralApplicationCaseDataBuilder {
 
     public GeneralApplicationCaseData buildFeeValidationCaseData(Fee fee, boolean isConsented, boolean isWithNotice) {
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         GAInformOtherParty gaInformOtherParty = null;
         if (!isConsented) {
             gaInformOtherParty = GAInformOtherParty.builder().isWithNotice(isWithNotice ? YES : NO)
-                .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT)
-                .build();
+                .reasonsForWithoutNotice(isWithNotice ? null : STRING_CONSTANT).build();
         }
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(1644495739087775L)
             .ccdCaseReference(1644495739087775L)
             .legacyCaseReference("000DC001")
@@ -762,18 +752,18 @@ public class GeneralApplicationCaseDataBuilder {
                                                .hasAgreed(isConsented ? YES : NO).build())
             .generalAppInformOtherParty(gaInformOtherParty)
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(fee)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder().organisation(orgId).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(fee)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(orgId))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> consentOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData consentOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -788,25 +778,24 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .approveConsentOrder(GAApproveConsentOrder.builder().consentOrderDescription("testing purpose")
-                                     .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .orderText("Test Order")
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .reasonForDecisionText("Test Reason")
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                           .judgeRecitalText("Test Judge's recital")
-                                           .build())
+            .approveConsentOrder(new GAApproveConsentOrder().setConsentOrderDescription("testing purpose")
+                                     )
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setOrderText("Test Order")
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
+                                           .setJudgeRecitalText("Test Judge's recital"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> finalOrderFreeForm() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData finalOrderFreeForm() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -842,19 +831,19 @@ public class GeneralApplicationCaseDataBuilder {
         respondentAddress.setAddressLine2("respondent1address2");
         respondentAddress.setAddressLine3("respondent1address3");
 
-        return GeneralApplicationCaseData.builder()
-            .applicant1(GeneralApplicationParty.builder()
-                            .primaryAddress(applicantAddress)
-                            .partyName("applicant1partyname").build())
-            .respondent1(GeneralApplicationParty.builder()
-                             .primaryAddress(respondentAddress)
-                             .partyName("respondent1partyname").build()).build();
+        return new GeneralApplicationCaseData()
+            .applicant1(new GeneralApplicationParty()
+                            .setPrimaryAddress(applicantAddress)
+                            .setPartyName("applicant1partyname"))
+            .respondent1(new GeneralApplicationParty()
+                             .setPrimaryAddress(respondentAddress)
+                             .setPartyName("respondent1partyname")).build();
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> generalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData generalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -870,22 +859,21 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .orderText("Test Order")
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .reasonForDecisionText("Test Reason")
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                           .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                           .judgeRecitalText("Test Judge's recital")
-                                           .build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setOrderText("Test Order")
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
+                                           .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                           .setJudgeRecitalText("Test Judge's recital"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> generalOrderFreeFormApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData generalOrderFreeFormApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -901,22 +889,21 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(FREE_FORM_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .orderText("Test Order")
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .reasonForDecisionText("Test Reason")
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                           .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                           .judgeRecitalText("Test Judge's recital")
-                                           .build())
+            .judicialDecision(new GAJudicialDecision().setDecision(FREE_FORM_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setOrderText("Test Order")
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
+                                           .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                           .setJudgeRecitalText("Test Judge's recital"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judgeFinalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData judgeFinalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -932,23 +919,22 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .orderText("Test Order")
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .reasonForDecisionText("Test Reason")
-                                           .makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
-                                           .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                           .judgeRecitalText("Test Judge's recital")
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setOrderText("Test Order")
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)
+                                           .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                           .setJudgeRecitalText("Test Judge's recital"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> directionOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData directionOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -956,7 +942,7 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("1")
@@ -965,25 +951,24 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .directionsText("Test Direction")
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .reasonForDecisionText("Test Reason")
-                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                                           .directionsResponseByDate(now())
-                                           .showJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
-                                           .judgeRecitalText("Test Judge's recital")
-                                           .build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setDirectionsText("Test Direction")
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                                           .setDirectionsResponseByDate(now())
+                                           .setShowJudgeRecitalText(List.of(FinalOrderShowToggle.SHOW))
+                                           .setJudgeRecitalText("Test Judge's recital"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> dismissalOrderApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData dismissalOrderApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -998,42 +983,36 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .dismissalOrderText("Test Dismissal")
-                                           .reasonForDecisionText("Test Reason")
-                                           .orderCourtOwnInitiative("abcd")
-                                           .orderCourtOwnInitiativeDate(now())
-                                           .judicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
-                                           .makeAnOrder(DISMISS_THE_APPLICATION)
-                                           .build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setDismissalOrderText("Test Dismissal")
+                                           .setReasonForDecisionText("Test Reason")
+                                           .setOrderCourtOwnInitiative("abcd")
+                                           .setOrderCourtOwnInitiativeDate(now())
+                                           .setJudicialByCourtsInitiative(GAByCourtsInitiativeGAspec.OPTION_1)
+                                           .setMakeAnOrder(DISMISS_THE_APPLICATION))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> hearingOrderApplication(YesOrNo isAgreed, YesOrNo isWithNotice) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData hearingOrderApplication(YesOrNo isAgreed, YesOrNo isWithNotice) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(DynamicList.builder()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(DynamicList.builder()
                                                                       .value(selectedLocation).listItems(listItems)
                                                                       .build())
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .judicialTimeEstimate(GAHearingDuration.MINUTES_15)
-                                        .build())
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
+                                        .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
             .judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_1)
-            .orderCourtOwnInitiativeListForHearing(GAOrderCourtOwnInitiativeGAspec
-                                                       .builder()
-                                                       .orderCourtOwnInitiative("abcd")
-                                                       .orderCourtOwnInitiativeDate(now()).build())
+            .orderCourtOwnInitiativeListForHearing(new GAOrderCourtOwnInitiativeGAspec()
+                                                       .setOrderCourtOwnInitiative("abcd")
+                                                       .setOrderCourtOwnInitiativeDate(now()))
             .defendant1PartyName("Test Defendant1 Name")
             .locationName("Nottingham County Court and Family Court (and Crown)")
             .defendant2PartyName("Test Defendant2 Name")
@@ -1050,12 +1029,12 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(LIST_FOR_A_HEARING))
             .judicialHearingGOHearingReqText("test")
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> hearingScheduledApplication(YesOrNo isCloak) {
+    public GeneralApplicationCaseData hearingScheduledApplication(YesOrNo isCloak) {
         List<Element<GASolicitorDetailsGAspec>> respondentSols = new ArrayList<>();
 
         GASolicitorDetailsGAspec respondent1 = GASolicitorDetailsGAspec.builder().id("id")
@@ -1075,49 +1054,39 @@ public class GeneralApplicationCaseDataBuilder {
             .build();
         respondentSols.add(element(respondent1));
         respondentSols.add(element(respondent2));
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
-            .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                        .hearingPreferredLocation(DynamicList.builder()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
+            .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                        .setHearingPreferredLocation(DynamicList.builder()
                                                                       .value(selectedLocation).listItems(listItems)
                                                                       .build())
-                                        .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                        .judicialTimeEstimate(GAHearingDuration.MINUTES_15)
-                                        .build())
+                                        .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
+                                        .setJudicialTimeEstimate(GAHearingDuration.MINUTES_15))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .judgeTitle("John Doe")
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(HEARING_SCHEDULED))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE108)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE108)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
             .generalAppApplnSolicitor(
                 GASolicitorDetailsGAspec.builder().email(DUMMY_EMAIL).build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder().organisationID("1").build())
-                                              .build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("2").build())
-                                               .build())
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder().organisationID("3").build())
-                                               .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(LIST_FOR_A_HEARING).build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("1")))
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("2")))
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("3")))
+            .judicialDecision(new GAJudicialDecision().setDecision(LIST_FOR_A_HEARING))
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
                                         .address("london court")
                                         .baseLocation("1")
@@ -1137,23 +1106,23 @@ public class GeneralApplicationCaseDataBuilder {
                 ))
             .respondentSolGaAppDetails(wrapElements(gaDetailsRespondentSol))
             .respondentSolTwoGaAppDetails(wrapElements(gaDetailsRespondentSol))
-            .gaHearingNoticeDetail(GAHearingNoticeDetail.builder()
-                                       .channel(GAJudicialHearingType.IN_PERSON)
-                                       .hearingDuration(GAHearingDuration.HOUR_1)
-                                       .hearingTimeHourMinute("1530")
-                                       .hearingDate(now().plusDays(10))
-                                       .hearingLocation(getLocationDynamicList()).build())
-            .gaHearingNoticeApplication(GAHearingNoticeApplication.builder()
-                                            .hearingNoticeApplicationDate(now())
-                                            .hearingNoticeApplicationDetail(HearingApplicationDetails.CLAIMANT_AND_DEFENDANT)
-                                            .hearingNoticeApplicationType("type").build())
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail()
+                                       .setChannel(GAJudicialHearingType.IN_PERSON)
+                                       .setHearingDuration(GAHearingDuration.HOUR_1)
+                                       .setHearingTimeHourMinute("1530")
+                                       .setHearingDate(now().plusDays(10))
+                                       .setHearingLocation(getLocationDynamicList()))
+            .gaHearingNoticeApplication(new GAHearingNoticeApplication()
+                                            .setHearingNoticeApplicationDate(now())
+                                            .setHearingNoticeApplicationDetail(HearingApplicationDetails.CLAIMANT_AND_DEFENDANT)
+                                            .setHearingNoticeApplicationType("type"))
             .gaHearingNoticeInformation("testing");
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationSequentialApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData writtenRepresentationSequentialApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1166,27 +1135,27 @@ public class GeneralApplicationCaseDataBuilder {
                                         .postcode("BA 117").build())
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
-                GAOrderCourtOwnInitiativeGAspec.builder()
-                    .orderCourtOwnInitiative("abcd")
-                    .orderCourtOwnInitiativeDate(now()).build())
+                new GAOrderCourtOwnInitiativeGAspec()
+                    .setOrderCourtOwnInitiative("abcd")
+                    .setOrderCourtOwnInitiativeDate(now()))
             .judgeRecitalText("Test Judge's recital")
             .directionInRelationToHearingText("Test written order")
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
-                GAJudicialWrittenRepresentations.builder()
-                    .writtenOption(SEQUENTIAL_REPRESENTATIONS)
-                    .writtenSequentailRepresentationsBy(now())
-                    .sequentialApplicantMustRespondWithin(now()
-                                                              .plusDays(5)).build())
+                new GAJudicialWrittenRepresentations()
+                    .setWrittenOption(SEQUENTIAL_REPRESENTATIONS)
+                    .setWrittenSequentailRepresentationsBy(now())
+                    .setSequentialApplicantMustRespondWithin(now()
+                                                              .plusDays(5)))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> approveApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData approveApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1198,24 +1167,24 @@ public class GeneralApplicationCaseDataBuilder {
                                         .postcode("BA 117").build())
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
-                GAOrderCourtOwnInitiativeGAspec.builder()
-                    .orderCourtOwnInitiative("abcd")
-                    .orderCourtOwnInitiativeDate(LocalDate.now()).build())
+                new GAOrderCourtOwnInitiativeGAspec()
+                    .setOrderCourtOwnInitiative("abcd")
+                    .setOrderCourtOwnInitiativeDate(LocalDate.now()))
             .judgeRecitalText("Test Judge's recital")
             .directionInRelationToHearingText("Test written order")
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().makeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> writtenRepresentationConcurrentApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData writtenRepresentationConcurrentApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
             .defendant1PartyName("Test Defendant1 Name")
@@ -1226,9 +1195,9 @@ public class GeneralApplicationCaseDataBuilder {
                                         .postcode("BA 117").build())
             .judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
             .orderCourtOwnInitiativeForWrittenRep(
-                GAOrderCourtOwnInitiativeGAspec.builder()
-                    .orderCourtOwnInitiative("abcd")
-                    .orderCourtOwnInitiativeDate(now()).build())
+                new GAOrderCourtOwnInitiativeGAspec()
+                    .setOrderCourtOwnInitiative("abcd")
+                    .setOrderCourtOwnInitiativeDate(now()))
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .createdDate(LocalDateTime.now())
@@ -1237,19 +1206,19 @@ public class GeneralApplicationCaseDataBuilder {
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS))
             .judicialDecisionMakeAnOrderForWrittenRepresentations(
-                GAJudicialWrittenRepresentations.builder()
-                    .writtenOption(CONCURRENT_REPRESENTATIONS)
-                    .writtenConcurrentRepresentationsBy(now())
-                    .build())
+                new GAJudicialWrittenRepresentations()
+                    .setWrittenOption(CONCURRENT_REPRESENTATIONS)
+                    .setWrittenConcurrentRepresentationsBy(now())
+                    )
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> requestForInformationApplication() {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData requestForInformationApplication() {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference(PARENT_CASE_ID).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference(PARENT_CASE_ID))
             .claimant1PartyName("Test Claimant1 Name")
             .locationName("Nottingham County Court and Family Court (and Crown)")
             .caseManagementLocation(CaseLocationCivil.builder().siteName("testing")
@@ -1262,28 +1231,28 @@ public class GeneralApplicationCaseDataBuilder {
             .applicantPartyName("Test Applicant Name")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE275)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE275)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .judgeRecitalText(JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT)
-                                                 .requestMoreInfoOption(REQUEST_MORE_INFORMATION)
-                                                 .judgeRequestMoreInfoByDate(now())
-                                                 .judgeRequestMoreInfoText("test").build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setJudgeRecitalText(JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT)
+                                                 .setRequestMoreInfoOption(REQUEST_MORE_INFORMATION)
+                                                 .setJudgeRequestMoreInfoByDate(now())
+                                                 .setJudgeRequestMoreInfoText("test"))
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judicialDecisionWithUncloakRequestForInformationApplication(
+    public GeneralApplicationCaseData judicialDecisionWithUncloakRequestForInformationApplication(
         GAJudgeRequestMoreInfoOption requestMoreInfoOption, YesOrNo isWithNotice, YesOrNo isCloak) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1293,28 +1262,28 @@ public class GeneralApplicationCaseDataBuilder {
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(JUDGES_DECISION))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE108)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE108)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                 .requestMoreInfoOption(requestMoreInfoOption)
-                                                 .judgeRequestMoreInfoByDate(LocalDate.now())
-                                                 .judgeRequestMoreInfoText("test").build())
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                 .setRequestMoreInfoOption(requestMoreInfoOption)
+                                                 .setJudgeRequestMoreInfoByDate(LocalDate.now())
+                                                 .setJudgeRequestMoreInfoText("test"))
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
             .applicationIsCloaked(isCloak)
             .isMultiParty(NO)
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> judicialOrderMadeWithUncloakApplication(YesOrNo isCloak) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData judicialOrderMadeWithUncloakApplication(YesOrNo isCloak) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .claimant2PartyName("Test Claimant2 Name")
@@ -1322,22 +1291,19 @@ public class GeneralApplicationCaseDataBuilder {
             .defendant2PartyName("Test Defendant2 Name")
             .applicantPartyName("Test Applicant Name")
             .isGaRespondentOneLip(NO)
-            .generalAppParentCaseLink(
-                GeneralAppParentCaseLink
-                    .builder()
-                    .caseReference(CASE_REFERENCE.toString())
-                    .build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(CASE_REFERENCE.toString()))
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY)
                                  .setCamundaEvent(JUDGES_DECISION))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE108)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE108)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(EXTEND_TIME))
                                 .build())
-            .judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build())
+            .judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
             .businessProcess(new BusinessProcess().setCamundaEvent(JUDGES_DECISION))
@@ -1355,20 +1321,20 @@ public class GeneralApplicationCaseDataBuilder {
                                                    .build()));
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> adjournOrVacateHearingApplication(
+    public GeneralApplicationCaseData adjournOrVacateHearingApplication(
         YesOrNo isRespondentAgreed, LocalDate gaHearingDate) {
         GAHearingDateGAspec generalAppHearingDate = GAHearingDateGAspec.builder()
             .hearingScheduledDate(gaHearingDate)
             .build();
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE108)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE108)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(singletonList(ADJOURN_HEARING))
@@ -1380,16 +1346,16 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> varyApplication(List<GeneralApplicationTypes> types) {
-        return GeneralApplicationCaseData.builder()
+    public GeneralApplicationCaseData varyApplication(List<GeneralApplicationTypes> types) {
+        return new GeneralApplicationCaseData()
             .ccdCaseReference(CASE_ID)
             .claimant1PartyName("Test Claimant1 Name")
             .defendant1PartyName("Test Defendant1 Name")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppPBADetails(
-                GeneralApplicationPbaDetails.builder()
-                    .fee(FEE14)
-                    .serviceReqReference(CUSTOMER_REFERENCE).build())
+                new GeneralApplicationPbaDetails()
+                    .setFee(FEE14)
+                    .setServiceReqReference(CUSTOMER_REFERENCE))
             .createdDate(LocalDateTime.now())
             .generalAppType(GAApplicationType.builder()
                                 .types(types)
@@ -1400,13 +1366,13 @@ public class GeneralApplicationCaseDataBuilder {
             .submittedOn(APPLICATION_SUBMITTED_DATE);
     }
 
-    public GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> getMainCaseDataWithDetails(
+    public GeneralApplicationCaseData getMainCaseDataWithDetails(
         boolean withGADetails,
         boolean withGADetailsResp,
         boolean withGADetailsResp2,
         boolean withGADetailsMaster) {
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = build().toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = build().copy();
         caseDataBuilder.ccdCaseReference(1L);
         GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
             .caseState(LISTING_FOR_A_HEARING.getDisplayedValue())
@@ -1457,16 +1423,16 @@ public class GeneralApplicationCaseDataBuilder {
     }
 
     public GeneralApplicationCaseData buildJudicialDecisionRequestMoreInfo() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-            .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().requestMoreInfoOption(
-                REQUEST_MORE_INFORMATION).judgeRequestMoreInfoByDate(LocalDate.of(2024, 9, 4)).build()).build();
+            .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setRequestMoreInfoOption(
+                REQUEST_MORE_INFORMATION).setJudgeRequestMoreInfoByDate(LocalDate.of(2024, 9, 4))).build();
     }
 
     public GeneralApplicationCaseData buildCaseWorkerHearingScheduledInfo() {
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .ccdState(LISTING_FOR_A_HEARING)
-            .gaHearingNoticeDetail(GAHearingNoticeDetail.builder().hearingDate(
-                (LocalDate.of(2024, 9, 4))).build()).build();
+            .gaHearingNoticeDetail(new GAHearingNoticeDetail().setHearingDate(
+                (LocalDate.of(2024, 9, 4)))).build();
     }
 }

@@ -62,19 +62,17 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final String FILE_NAME = JUDGMENT_BY_ADMISSION_PIN_IN_POST_LIP_DEFENDANT_LETTER.getDocumentTitle();
     private static final String PIN = "1234789";
     private static final String JUDGMENT_BY_ADMISSION_LETTER = "judgment-by-admission-letter";
-    private static final CaseDocument CASE_DOCUMENT_TRIAL = CaseDocument.builder()
-        .documentName("PinAndPost.pdf")
-        .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
-        .documentLink(Document.builder().documentFileName(FILE_NAME).documentBinaryUrl("Binary/url").documentUrl("url").build())
-        .build();
+    private static final CaseDocument CASE_DOCUMENT_TRIAL = new CaseDocument()
+        .setDocumentName("PinAndPost.pdf")
+        .setDocumentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
+        .setDocumentLink(new Document().setDocumentFileName(FILE_NAME).setDocumentBinaryUrl("Binary/url").setDocumentUrl("url"));
 
     private static final Address RESPONDENT_ADDRESS = address("123 road", "London", "EX12RT");
-    private static final Party DEFENDANT = Party.builder().primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Smith")
-        .individualLastName("John")
-        .build();
+    private static final Party DEFENDANT = new Party().setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Smith")
+        .setIndividualLastName("John");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();
@@ -87,22 +85,22 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private static final CaseData CASE_DATA = CaseData.builder()
         .legacyCaseReference(CLAIM_REFERENCE)
         .ccdCaseReference(16543480L)
-        .applicant1(Party.builder()
-                        .type(Party.Type.INDIVIDUAL)
-                        .individualTitle("Mr.")
-                        .individualFirstName("John")
-                        .individualLastName("Smith").build())
+        .applicant1(new Party()
+                        .setType(Party.Type.INDIVIDUAL)
+                        .setIndividualTitle("Mr.")
+                        .setIndividualFirstName("John")
+                        .setIndividualLastName("Smith"))
         .respondent1(DEFENDANT)
         .respondent1Represented(YesOrNo.NO)
         .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode(PIN))
         .submittedDate(LocalDateTime.now())
         .systemGeneratedCaseDocuments(List.of(
             Element.<CaseDocument>builder()
-                .value(CaseDocument.builder().documentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
-                           .documentName("DefendantJBA.pdf")
-                           .documentLink(Document.builder().documentFileName("DefendantJBA.pdf").documentBinaryUrl(
-                               "Binary/url").documentUrl("url").build())
-                           .createdDatetime(LocalDateTime.now()).build()).build()))
+                .value(new CaseDocument().setDocumentType(DocumentType.JUDGMENT_BY_ADMISSION_DEFENDANT)
+                           .setDocumentName("DefendantJBA.pdf")
+                           .setDocumentLink(new Document().setDocumentFileName("DefendantJBA.pdf").setDocumentBinaryUrl(
+                               "Binary/url").setDocumentUrl("url"))
+                           .setCreatedDatetime(LocalDateTime.now())).build()))
         .build();
     private static final byte[] LETTER_CONTENT = new byte[]{37, 80, 68, 70, 45, 49, 46, 53, 10, 37, -61, -92};
 
@@ -134,17 +132,16 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     private GeneralAppFeesService generalAppFeesService;
 
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("James")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name.pdf")
-                              .documentBinaryUrl("binary-url")
-                              .build()).build();
+        new CaseDocument()
+            .setCreatedBy("James")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name.pdf")
+                              .setDocumentBinaryUrl("binary-url"));
 
     @Test
     void shouldDefaultJudgmentSpecPiPLetterGenerator_whenValidDataIsProvided() {
@@ -157,8 +154,8 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
         given(documentDownloadService.downloadDocument(any(), any()))
             .willReturn(new DownloadedDocumentResponse(new ByteArrayResource(LETTER_CONTENT), "test", "test"));
         when(pipInPostConfiguration.getRespondToClaimUrl()).thenReturn("Response URL");
-        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(Fee.builder().calculatedAmountInPence(
-            BigDecimal.valueOf(1000)).build());
+        when(generalAppFeesService.getFeeForJOWithApplicationType(any())).thenReturn(new Fee().setCalculatedAmountInPence(
+            BigDecimal.valueOf(1000)));
         when(civilStitchService.generateStitchedCaseDocument(
             anyList(), anyString(), anyLong(), eq(DocumentType.JUDGMENT_BY_ADMISSION_NON_DIVERGENT_SPEC_PIP_LETTER),
             anyString())).thenReturn(STITCHED_DOC);
@@ -183,9 +180,9 @@ class JudgmentByAdmissionPiPLetterGeneratorTest {
     void shouldGetTemplateFeesCorrectly() {
         //Given
         when(generalAppFeesService.getFeeForJOWithApplicationType(VARY_ORDER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1500)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1500)));
         when(generalAppFeesService.getFeeForJOWithApplicationType(OTHER))
-            .thenReturn(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(1400)).build());
+            .thenReturn(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(1400)));
         //When
         JudgmentByAdmissionLiPDefendantLetter judgmentByAdmissionLiPDefendantLetter
             = generator.getTemplateData(CASE_DATA);

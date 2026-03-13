@@ -106,7 +106,7 @@ class HearingScheduledClaimantNotificationHandlerTest extends BaseCallbackHandle
     @Test
     void createDashboardNotifications() {
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().siteName("Name").courtAddress("Loc").postcode("1").build());
+        locations.add(new LocationRefData().setSiteName("Name").setCourtAddress("Loc").setPostcode("1"));
         when(dashboardNotificationsParamsMapper.mapCaseDataToParams(any())).thenReturn(params);
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
 

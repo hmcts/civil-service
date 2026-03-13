@@ -11,8 +11,8 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsSignatureConfiguration;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
@@ -63,10 +63,8 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .applicant1(PartyBuilder.builder().individual().build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .applicant1(new PartyBuilder().individual().build())
+            .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation applicantOrganisation = new Organisation();
         applicantOrganisation.setName("Applicant Org");
@@ -87,7 +85,7 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
 
         Map<String, String> properties = service.buildDefendant1Properties(caseData);
@@ -102,10 +100,8 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation respondentOrganisation = new Organisation();
         respondentOrganisation.setName("Def Two Org");
@@ -125,11 +121,9 @@ class DjNotificationPropertiesServiceTest {
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                .organisation(ccdOrganisation)
-                .build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
 
         Organisation sharedOrganisation = new Organisation();

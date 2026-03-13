@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.civil.ga.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAJudgeWrittenRepresentationsOptions;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudicialWrittenRepresentations;
 
@@ -13,22 +13,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionWrittenRepService.WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST;
 
-@SpringBootTest(classes = {
-    JudicialDecisionWrittenRepService.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class JudicialDecisionWrittenRepServiceTest {
 
-    @Autowired
+    @InjectMocks
     private JudicialDecisionWrittenRepService service;
 
     @Test
     void shouldReturnErrors_whenWrittenRepresentationSequentialRepresentationsDateIsInPast() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-            .writtenSequentailRepresentationsBy(LocalDate.now().minusDays(1))
-            .sequentialApplicantMustRespondWithin(LocalDate.now())
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+            .setWrittenSequentailRepresentationsBy(LocalDate.now().minusDays(1))
+            .setSequentialApplicantMustRespondWithin(LocalDate.now())
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 
@@ -38,11 +35,11 @@ public class JudicialDecisionWrittenRepServiceTest {
 
     @Test
     void shouldReturnErrors_whenApplicantWrittenRepresentationSequentialRepresentationsDateIsInPast() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-            .writtenSequentailRepresentationsBy(LocalDate.now())
-            .sequentialApplicantMustRespondWithin(LocalDate.now().minusDays(1))
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+            .setWrittenSequentailRepresentationsBy(LocalDate.now())
+            .setSequentialApplicantMustRespondWithin(LocalDate.now().minusDays(1))
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 
@@ -52,11 +49,11 @@ public class JudicialDecisionWrittenRepServiceTest {
 
     @Test
     void shouldReturnErrors_whenBothWrittenRepresentationSequentialRepresentationsDateIsInPast() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-            .writtenSequentailRepresentationsBy(LocalDate.now().minusDays(1))
-            .sequentialApplicantMustRespondWithin(LocalDate.now().minusDays(1))
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+            .setWrittenSequentailRepresentationsBy(LocalDate.now().minusDays(1))
+            .setSequentialApplicantMustRespondWithin(LocalDate.now().minusDays(1))
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 
@@ -66,10 +63,10 @@ public class JudicialDecisionWrittenRepServiceTest {
 
     @Test
     void shouldReturnErrors_whenWrittenRepresentationConcurentRepresentationsDateIsInPast() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
-            .writtenConcurrentRepresentationsBy(LocalDate.now().minusDays(1))
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
+            .setWrittenConcurrentRepresentationsBy(LocalDate.now().minusDays(1))
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 
@@ -79,11 +76,11 @@ public class JudicialDecisionWrittenRepServiceTest {
 
     @Test
     void shouldNotReturnErrors_whenBothWrittenRepresentationSequentialRepresentationsDateIsInFuture() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-            .sequentialApplicantMustRespondWithin(LocalDate.now())
-            .writtenSequentailRepresentationsBy(LocalDate.now())
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+            .setSequentialApplicantMustRespondWithin(LocalDate.now())
+            .setWrittenSequentailRepresentationsBy(LocalDate.now())
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 
@@ -92,10 +89,10 @@ public class JudicialDecisionWrittenRepServiceTest {
 
     @Test
     void shouldNotReturnErrors_whenWrittenRepresentationConcurentRepresentationsDateIsInFuture() {
-        GAJudicialWrittenRepresentations writtenRepresentations = GAJudicialWrittenRepresentations.builder()
-            .writtenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
-            .writtenConcurrentRepresentationsBy(LocalDate.now())
-            .build();
+        GAJudicialWrittenRepresentations writtenRepresentations = new GAJudicialWrittenRepresentations()
+            .setWrittenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
+            .setWrittenConcurrentRepresentationsBy(LocalDate.now())
+            ;
 
         List<String> errors = service.validateWrittenRepresentationsDates(writtenRepresentations);
 

@@ -57,10 +57,9 @@ class PaymentsServiceTest {
         .paymentReference("RC-1234-1234-1234-1234").build();
     private static final PaymentServiceResponse PAYMENT_SERVICE_RESPONSE = PaymentServiceResponse.builder()
         .serviceRequestReference("RC-1234-1234-1234-1234").build();
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .name("test org")
-        .contactInformation(List.of(ContactInformation.builder().build()))
-        .build();
+    private static final Organisation ORGANISATION = new Organisation()
+        .setName("test org")
+        .setContactInformation(List.of(new ContactInformation()));
     private static final String CUSTOMER_REFERENCE = "12345";
     private static final String FEE_NOT_SET_CORRECTLY_ERROR = "Fees are not set correctly.";
 
@@ -110,8 +109,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
         OrganisationPolicy policy = new OrganisationPolicy();
@@ -127,8 +125,7 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestShouldThrowAnError_whenFeeDetailsNotProvided_withSpecAllocatedTrack() {
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResponseClaimTrack(FAST_CLAIM.name());
         caseData.setClaimIssuedPBADetails(new SRPbaDetails());
@@ -153,8 +150,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -177,8 +173,7 @@ class PaymentsServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setClaimIssuedPBADetails(claimIssuedPBADetails);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -201,8 +196,7 @@ class PaymentsServiceTest {
         hfPbaDetails.setServiceReqReference("request-reference");
         hfPbaDetails.setApplicantsPbaAccounts(applicantsPbaAccounts);
 
-        uk.gov.hmcts.reform.ccd.model.Organisation orgId = uk.gov.hmcts.reform.ccd.model.Organisation.builder()
-            .organisationID("OrgId").build();
+        uk.gov.hmcts.reform.ccd.model.Organisation orgId = new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("OrgId");
 
         OrganisationPolicy policy = new OrganisationPolicy();
         policy.setOrganisation(orgId);
@@ -223,14 +217,14 @@ class PaymentsServiceTest {
     //General Application Tests
     @Test
     void validateRequestGaShouldNotThrowAnError_whenValidCaseDataIsProvided() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         paymentsService.validateRequestGa(caseData);
         assertThat(caseData).isNotNull();
     }
 
     @Test
     void validateRequestGaShouldThrowAnError_whenPBADetailsNotProvided() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -243,8 +237,8 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsNotProvided() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails())
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -257,13 +251,13 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeCode() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .version("1")
-                                               .build())
-                                      .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setVersion("1")
+                                               )
+                                      )
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -276,13 +270,13 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeVersion() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.valueOf(10800))
-                                               .code("FEE0442")
-                                               .build())
-                                      .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.valueOf(10800))
+                                               .setCode("FEE0442")
+                                               )
+                                      )
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -295,13 +289,13 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenFeeDetailsDoNotHaveFeeAmount() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .code("FEE0442")
-                                               .version("1")
-                                               .build())
-                                      .build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee()
+                                               .setCode("FEE0442")
+                                               .setVersion("1")
+                                               )
+                                      )
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().organisationIdentifier("OrgId").build())
             .build();
 
@@ -314,8 +308,8 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorDetailsAreNotSet() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()))
             .build();
 
         Exception exception = assertThrows(
@@ -327,8 +321,8 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSet() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder().build()).build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+            .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 
@@ -341,13 +335,13 @@ class PaymentsServiceTest {
 
     @Test
     void validateRequestGaShouldNotThrowAnError_whenApplicantSolicitorOrgDetailsAreNotSetForLiPApplicant() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .isGaApplicantLip(YesOrNo.YES)
-            .generalAppPBADetails(GeneralApplicationPbaDetails.builder()
-                                      .fee(Fee.builder()
-                                               .calculatedAmountInPence(BigDecimal.TEN)
-                                               .version("version")
-                                               .code("code").build()).build())
+            .generalAppPBADetails(new GeneralApplicationPbaDetails()
+                                      .setFee(new Fee()
+                                               .setCalculatedAmountInPence(BigDecimal.TEN)
+                                               .setVersion("version")
+                                               .setCode("code")))
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .build();
 
@@ -359,7 +353,7 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequestGa_whenValidCaseDetails() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequestGa(caseData, AUTH_TOKEN);
         assertThat(caseData.getGeneralAppSuperClaimType()).isEqualTo("UNSPEC_CLAIM");
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);
@@ -369,8 +363,8 @@ class PaymentsServiceTest {
     @Test
     void shouldCreatePaymentServiceRequestGa_whenGaTypeIsSpecClaim() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
-        caseData = caseData.toBuilder().generalAppSuperClaimType("SPEC_CLAIM").build();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
+        caseData = caseData.copy().generalAppSuperClaimType("SPEC_CLAIM").build();
         PaymentServiceResponse serviceRequestResponse = paymentsService.createServiceRequestGa(caseData, AUTH_TOKEN);
         assertThat(caseData.getGeneralAppSuperClaimType()).isEqualTo("SPEC_CLAIM");
         assertThat(serviceRequestResponse).isEqualTo(PAYMENT_SERVICE_RESPONSE);

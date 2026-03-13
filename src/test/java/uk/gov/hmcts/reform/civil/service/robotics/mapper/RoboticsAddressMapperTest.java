@@ -114,12 +114,11 @@ class RoboticsAddressMapperTest {
 
         @Test
         void shouldMapToRoboticsAddresses_whenContactInformationIsProvided() {
-            List<ContactInformation> contactInformationList = List.of(ContactInformation.builder()
-                                                                          .addressLine1("line 1")
-                                                                          .addressLine2("line 2")
-                                                                          .postCode("AB1 2XY")
-                                                                          .county("My county")
-                                                                          .build());
+            List<ContactInformation> contactInformationList = List.of(new ContactInformation()
+                                                                          .setAddressLine1("line 1")
+                                                                          .setAddressLine2("line 2")
+                                                                          .setPostCode("AB1 2XY")
+                                                                          .setCounty("My county"));
 
             RoboticsAddresses roboticsAddresses = mapper.toRoboticsAddresses(contactInformationList);
 

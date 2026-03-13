@@ -135,11 +135,11 @@ public class UpdateWaCourtLocationsService {
 
         // CNBC will not be returned by ref data call, so populate details manually
         if (cnbcEpimmId.equals(court) || ccmccEpimmId.equals(court)) {
-            return LocationRefData.builder()
-                .region("Midlands")
-                .regionId("2")
-                .epimmsId(cnbcEpimmId)
-                .siteName("Civil National Business Centre").build();
+            return new LocationRefData()
+                .setRegion("Midlands")
+                .setRegionId("2")
+                .setEpimmsId(cnbcEpimmId)
+                .setSiteName("Civil National Business Centre");
         }
 
         LocationRefData courtTypeLocationDetails;

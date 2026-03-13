@@ -112,16 +112,15 @@ class ServiceRequestUpdateClaimIssuedCallbackControllerTest extends BaseIntegrat
     }
 
     private ServiceRequestUpdateDto buildServiceDto() {
-        return ServiceRequestUpdateDto.builder()
-            .ccdCaseNumber(CCD_CASE_NUMBER)
-            .serviceRequestStatus(PAID)
-            .payment(PaymentDto.builder()
-                         .amount(new BigDecimal(167))
-                         .paymentReference(REFERENCE)
-                         .caseReference(REFERENCE)
-                         .accountNumber(ACCOUNT_NUMBER)
-                         .build())
-            .build();
+        return new ServiceRequestUpdateDto()
+            .setCcdCaseNumber(CCD_CASE_NUMBER)
+            .setServiceRequestStatus(PAID)
+            .setPayment(PaymentDto.builder()
+                .amount(new BigDecimal(167))
+                .paymentReference(REFERENCE)
+                .caseReference(REFERENCE)
+                .accountNumber(ACCOUNT_NUMBER)
+                .build());
     }
 
     @SneakyThrows

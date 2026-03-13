@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.civil.ga.service.docmosis;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.CaseCategory;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.ga.enums.dq.GAByCourtsInitiativeGAspec;
@@ -24,29 +26,34 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.civil.service.docmosis.DocumentGeneratorService.DATE_FORMATTER;
 
-@SpringBootTest(classes = {
-    DocmosisService.class})
+@ExtendWith(MockitoExtension.class)
 public class DocmosisServiceTest {
 
     private static final List<LocationRefData> locationRefData = Arrays
         .asList(
-            LocationRefData.builder().epimmsId("1").venueName("Reading").build(),
-            LocationRefData.builder().epimmsId("2").venueName("London").build(),
-            LocationRefData.builder().epimmsId("3").venueName("Manchester").build(),
-            LocationRefData.builder().epimmsId("420219").venueName("CNBC").build()
+            new LocationRefData().setEpimmsId("1").setVenueName("Reading"),
+            new LocationRefData().setEpimmsId("2").setVenueName("London"),
+            new LocationRefData().setEpimmsId("3").setVenueName("Manchester"),
+            new LocationRefData().setEpimmsId("420219").setVenueName("CNBC")
         );
-    @Autowired
+    @InjectMocks
     private DocmosisService docmosisService;
-    @MockBean
+    @Mock
     private GeneralAppLocationRefDataService generalAppLocationRefDataService;
+
+    @BeforeEach
+    void setUp() {
+        setField(docmosisService, "cnbcEpimmId", "420219");
+    }
 
     @Test
     void shouldReturnLocationRefData() {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("2").build()).build();
         LocationRefData locationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
         assertThat(locationRefData.getVenueName())
@@ -57,7 +64,7 @@ public class DocmosisServiceTest {
     void shouldReturnLocationRefData_whenSpecAndCnbc() {
         when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.SPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
@@ -69,7 +76,7 @@ public class DocmosisServiceTest {
     void shouldReturnLocationRefData_whenUspecAndCnbc() {
         when(generalAppLocationRefDataService.getCnbcLocation(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseAccessCategory(CaseCategory.UNSPEC_CLAIM)
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("420219").build()).build();
         LocationRefData cnbcLocationRefData = docmosisService.getCaseManagementLocationVenueName(caseData, "auth");
@@ -81,7 +88,7 @@ public class DocmosisServiceTest {
     void shouldThrowExceptionWhenNoLocationMatch() {
         when(generalAppLocationRefDataService.getCourtLocations(any())).thenReturn(locationRefData);
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build()).build();
 
         Exception exception =
@@ -99,10 +106,10 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .reasonForDecisionText("Test Reason")
-                                                      .showReasonForDecision(YesOrNo.YES).build()).build();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setReasonForDecisionText("Test Reason")
+                                                      .setShowReasonForDecision(YesOrNo.YES)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudgeReason(updateData)).isEqualTo("Test Reason");
@@ -113,10 +120,10 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .reasonForDecisionText("Test Reason")
-                                                      .showReasonForDecision(YesOrNo.NO).build()).build();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setReasonForDecisionText("Test Reason")
+                                                      .setShowReasonForDecision(YesOrNo.NO)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudgeReason(updateData)).isEqualTo(StringUtils.EMPTY);
@@ -127,10 +134,10 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_3).build()).build();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_3)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData)).isEqualTo(StringUtils.EMPTY);
@@ -141,13 +148,12 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .orderWithoutNotice("abcdef")
-                                                      .orderWithoutNoticeDate(LocalDate.now())
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_2)
-                                                      .build()).build();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setOrderWithoutNotice("abcdef")
+                                                      .setOrderWithoutNoticeDate(LocalDate.now())
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_2)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData))
@@ -159,13 +165,12 @@ public class DocmosisServiceTest {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-        caseDataBuilder.judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                                      .orderCourtOwnInitiative("abcdef")
-                                                      .orderCourtOwnInitiativeDate(LocalDate.now())
-                                                      .judicialByCourtsInitiative(
-                                                          GAByCourtsInitiativeGAspec.OPTION_1)
-                                                      .build()).build();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+        caseDataBuilder.judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                                      .setOrderCourtOwnInitiative("abcdef")
+                                                      .setOrderCourtOwnInitiativeDate(LocalDate.now())
+                                                      .setJudicialByCourtsInitiative(
+                                                          GAByCourtsInitiativeGAspec.OPTION_1)).build();
         GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
         assertThat(docmosisService.populateJudicialByCourtsInitiative(updateData))

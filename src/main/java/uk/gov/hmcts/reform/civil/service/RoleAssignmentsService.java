@@ -40,6 +40,10 @@ public class RoleAssignmentsService {
             log.debug(actorId, "Getting Role assignments for actorId {0}");
         }
 
+        QueryRequest queryRequest = new QueryRequest()
+            .setActorId(List.of(actorId))
+            .setRoleName(roleNames);
+
         return roleAssignmentApi.getRoleAssignments(
             authorization,
             authTokenGenerator.generate(),
@@ -48,10 +52,7 @@ public class RoleAssignmentsService {
             100,
             null,
             null,
-            QueryRequest.builder()
-                .actorId(actorId)
-                .roleName(roleNames)
-                .build(),
+            queryRequest,
             true
         );
     }
@@ -62,11 +63,10 @@ public class RoleAssignmentsService {
             log.debug(caseId, "Getting Role assignments for case ID {0}");
         }
 
-        QueryRequest queryRequest = QueryRequest.builder()
-            .roleType(roleType)
-            .roleName(roleName)
-            .attributes(Map.of("caseId", List.of(caseId)))
-            .build();
+        QueryRequest queryRequest = new QueryRequest()
+            .setRoleType(roleType)
+            .setRoleName(roleName)
+            .setAttributes(Map.of("caseId", List.of(caseId)));
 
         return this.roleAssignmentApi.getRoleAssignments(authorization,
                                                          this.authTokenGenerator.generate(),

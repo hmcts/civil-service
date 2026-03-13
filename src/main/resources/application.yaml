@@ -110,6 +110,12 @@ fees:
       fastTrackHrg: FastTrackHrg
       multiTrackHrg: MultiTrackHrg
       smallClaimHrg: HearingSmallClaims
+      anyOtherRemedy: AnyOtherRemedy
+
+otherRemediesFees:
+  api:
+    service: other
+    jurisdiction2: civil
 
 location:
   api:
@@ -567,6 +573,8 @@ notifications:
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY:false}
+  host: ${SENDGRID_HOST:}
+  test: ${SENDGRID_TEST:false}
 
 os-postcode-lookup:
   url: https://api.os.uk/search/names/v1/find
@@ -905,6 +913,10 @@ caseFlags:
 
 court_location_dmn:
   enabled: ${COURT_LOCATION_WA_DMN_ENABLED:true}
+
+other_remedy:
+  enabled: ${OTHER_REMEDY_ENABLED:false}
+
 
 stitch-bundle:
   wait-time-in-milliseconds: ${WAIT_TIME_IN_MILLISECONDS:3000}

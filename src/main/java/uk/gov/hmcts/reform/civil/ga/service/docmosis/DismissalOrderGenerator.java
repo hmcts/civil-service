@@ -71,46 +71,44 @@ public class DismissalOrderGenerator implements TemplateDataGenerator<JudgeDecis
     @Override
     public JudgeDecisionPdfDocument getTemplateData(GeneralApplicationCaseData civilCaseData, GeneralApplicationCaseData caseData, String authorisation, FlowFlag userType) {
 
-        JudgeDecisionPdfDocument.JudgeDecisionPdfDocumentBuilder judgeDecisionPdfDocumentBuilder =
-            JudgeDecisionPdfDocument.builder()
-                .judgeNameTitle(caseData.getJudgeTitle())
-                .claimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
-                .isMultiParty(caseData.getIsMultiParty())
-                .claimant1Name(caseData.getClaimant1PartyName())
-                .claimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
-                .defendant1Name(caseData.getDefendant1PartyName())
-                .defendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
-                .courtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
-                .siteName(caseData.getCaseManagementLocation().getSiteName())
-                .address(caseData.getCaseManagementLocation().getAddress())
-                .postcode(caseData.getCaseManagementLocation().getPostcode())
-                .judgeRecital(showRecital(caseData) ? caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText() : null)
-                .dismissalOrder(caseData.getJudicialDecisionMakeOrder().getDismissalOrderText())
-                .submittedOn(LocalDate.now())
-                .reasonAvailable(docmosisService.reasonAvailable(caseData))
-                .reasonForDecision(docmosisService.populateJudgeReason(caseData))
-                .judicialByCourtsInitiative(docmosisService.populateJudicialByCourtsInitiative(caseData));
+        JudgeDecisionPdfDocument judgeDecisionPdfDocument = new JudgeDecisionPdfDocument()
+            .setJudgeNameTitle(caseData.getJudgeTitle())
+            .setClaimNumber(caseData.getGeneralAppParentCaseLink().getCaseReference())
+            .setIsMultiParty(caseData.getIsMultiParty())
+            .setClaimant1Name(caseData.getClaimant1PartyName())
+            .setClaimant2Name(caseData.getClaimant2PartyName() != null ? caseData.getClaimant2PartyName() : null)
+            .setDefendant1Name(caseData.getDefendant1PartyName())
+            .setDefendant2Name(caseData.getDefendant2PartyName() != null ? caseData.getDefendant2PartyName() : null)
+            .setCourtName(docmosisService.getCaseManagementLocationVenueName(caseData, authorisation).getExternalShortName())
+            .setSiteName(caseData.getCaseManagementLocation().getSiteName())
+            .setAddress(caseData.getCaseManagementLocation().getAddress())
+            .setPostcode(caseData.getCaseManagementLocation().getPostcode())
+            .setJudgeRecital(showRecital(caseData) ? caseData.getJudicialDecisionMakeOrder().getJudgeRecitalText() : null)
+            .setDismissalOrder(caseData.getJudicialDecisionMakeOrder().getDismissalOrderText())
+            .setSubmittedOn(LocalDate.now())
+            .setReasonAvailable(docmosisService.reasonAvailable(caseData))
+            .setReasonForDecision(docmosisService.populateJudgeReason(caseData))
+            .setJudicialByCourtsInitiative(docmosisService.populateJudicialByCourtsInitiative(caseData));
 
         if (List.of(FlowFlag.POST_JUDGE_ORDER_LIP_APPLICANT, FlowFlag.POST_JUDGE_ORDER_LIP_RESPONDENT)
             .contains(userType)) {
             boolean parentClaimantIsApplicant = caseData.identifyParentClaimantIsApplicant(caseData);
 
-            judgeDecisionPdfDocumentBuilder
-                .partyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine1(caseData
-                                              .partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine2(caseData
-                                              .partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressAddressLine3(caseData
-                                              .partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostCode(caseData
-                                          .partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
-                .partyAddressPostTown(caseData
-                                          .partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData))
-                .build();
+            judgeDecisionPdfDocument
+                .setPartyName(caseData.getPartyName(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine1(caseData
+                                                 .partyAddressAddressLine1(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine2(caseData
+                                                 .partyAddressAddressLine2(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressAddressLine3(caseData
+                                                 .partyAddressAddressLine3(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostCode(caseData
+                                             .partyAddressPostCode(parentClaimantIsApplicant, userType, civilCaseData))
+                .setPartyAddressPostTown(caseData
+                                             .partyAddressPostTown(parentClaimantIsApplicant, userType, civilCaseData));
         }
 
-        return judgeDecisionPdfDocumentBuilder.build();
+        return judgeDecisionPdfDocument;
     }
 
     private DocmosisTemplates getDocmosisTemplate(FlowFlag userType) {

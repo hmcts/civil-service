@@ -3,10 +3,9 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.camunda.businessprocess;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
@@ -22,17 +21,13 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.CHANGE_STATE_TO_ADDITIONAL_RESPONSE_TIME_EXPIRED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.ADDITIONAL_RESPONSE_TIME_EXPIRED;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    MoveToAdditionalResponseTimeExpiredCallbackHandler.class,
-    ParentCaseUpdateHelper.class
-})
+@ExtendWith(MockitoExtension.class)
 public class MoveToAdditionalResponseTimeExpiredCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Mock
     private ParentCaseUpdateHelper parentCaseUpdateHelper;
 
-    @Autowired
+    @InjectMocks
     private MoveToAdditionalResponseTimeExpiredCallbackHandler handler;
 
     @Nested

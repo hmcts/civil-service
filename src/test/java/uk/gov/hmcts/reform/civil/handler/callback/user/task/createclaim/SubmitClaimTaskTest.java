@@ -211,8 +211,8 @@ class SubmitClaimTaskTest {
     @Test
     void shouldSetTheCourtLocationName() {
         List<LocationRefData> locations = new ArrayList<>();
-        locations.add(LocationRefData.builder().courtName("Court Name").regionId("2").epimmsId("420219")
-                          .siteName("Civil National Business Centre").build());
+        locations.add(new LocationRefData().setCourtName("Court Name").setRegionId("2").setEpimmsId("420219")
+                          .setSiteName("Civil National Business Centre"));
         when(locationRefDataService.getCourtLocationsByEpimmsId(any(), any())).thenReturn(locations);
         Party party = new Party();
         party.setIndividualFirstName("Clay");

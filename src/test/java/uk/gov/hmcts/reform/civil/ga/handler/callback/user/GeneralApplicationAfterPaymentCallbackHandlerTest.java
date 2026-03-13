@@ -2,10 +2,11 @@ package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.PaymentStatus;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
 import uk.gov.hmcts.reform.civil.model.genapplication.GeneralApplication;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,17 +46,16 @@ import static uk.gov.hmcts.reform.civil.enums.dq.GeneralApplicationTypes.RELIEF_
 import static uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder.CUSTOMER_REFERENCE;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.wrapElements;
 
-@SpringBootTest(classes = {
-    GeneralApplicationAfterPaymentCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-})
+@ExtendWith(MockitoExtension.class)
 public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @InjectMocks
     private GeneralApplicationAfterPaymentCallbackHandler handler;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @MockBean
+
+    @Mock
     private GaForLipService gaForLipService;
 
     private static final String STRING_CONSTANT = "STRING_CONSTANT";
@@ -115,7 +116,7 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
     private GeneralApplicationCaseData getSampleGeneralApplicationCaseData(YesOrNo isConsented, YesOrNo isTobeNotified) {
         return GeneralApplicationCaseDataBuilder.builder().buildCaseDateBaseOnGeneralApplication(
                 getGeneralApplicationBeforePayment(isConsented, isTobeNotified))
-            .toBuilder().ccdCaseReference(CHILD_CCD_REF).build();
+            .copy().ccdCaseReference(CHILD_CCD_REF).build();
     }
 
     private GeneralApplication getGeneralApplicationBeforePayment(YesOrNo isConsented, YesOrNo isTobeNotified) {
@@ -126,11 +127,11 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
             .generalAppPBADetails(
                 GAPbaDetails.builder()
                     .fee(
-                        Fee.builder()
-                            .code("FE203")
-                            .calculatedAmountInPence(BigDecimal.valueOf(27500))
-                            .version("1")
-                            .build())
+                        new Fee()
+                            .setCode("FE203")
+                            .setCalculatedAmountInPence(BigDecimal.valueOf(27500))
+                            .setVersion("1")
+                            )
                     .serviceReqReference(CUSTOMER_REFERENCE).build())
             .generalAppDetailsOfOrder(STRING_CONSTANT)
             .generalAppReasonsOfOrder(STRING_CONSTANT)
@@ -141,30 +142,30 @@ public class GeneralApplicationAfterPaymentCallbackHandlerTest extends GeneralAp
                                                              .email("abc@gmail.com").build()))
             .isMultiParty(NO)
             .parentClaimantIsApplicant(YES)
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder()
-                                          .caseReference(PARENT_CCD_REF.toString()).build())
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink()
+                                          .setCaseReference(PARENT_CCD_REF.toString()))
             .build();
     }
 
     private GeneralApplicationCaseData addPaymentStatusToGAPbaDetails(GeneralApplicationCaseData caseData, PaymentStatus status) {
         GeneralApplicationPbaDetails pbaDetails = caseData.getGeneralAppPBADetails();
-        GeneralApplicationPbaDetails.GeneralApplicationPbaDetailsBuilder pbaDetailsBuilder;
-        pbaDetailsBuilder = pbaDetails == null ? GeneralApplicationPbaDetails.builder() : pbaDetails.toBuilder();
+        GeneralApplicationPbaDetails updatedPbaDetails = pbaDetails == null
+            ? new GeneralApplicationPbaDetails()
+            : pbaDetails.copy();
 
-        PaymentDetails paymentDetails = PaymentDetails.builder()
-            .status(status)
-            .build();
-        pbaDetails = pbaDetailsBuilder.paymentDetails(paymentDetails).build();
-        return caseData.toBuilder()
-            .generalAppPBADetails(pbaDetails)
+        PaymentDetails paymentDetails = new PaymentDetails()
+            .setStatus(status)
+            ;
+        updatedPbaDetails.setPaymentDetails(paymentDetails);
+        return caseData.copy()
+            .generalAppPBADetails(updatedPbaDetails)
             .build();
     }
 
     private GeneralApplicationCaseData addGeneralAppType(GeneralApplicationCaseData caseData, GeneralApplicationTypes generalApplicationTypes) {
-        return caseData.toBuilder().generalAppType(
+        return caseData.copy().generalAppType(
                 GAApplicationType.builder().types(List.of(generalApplicationTypes))
                     .build())
             .build();
     }
 }
-

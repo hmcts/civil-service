@@ -91,9 +91,8 @@ class PopulateCaseDataTaskTest {
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(true);
         when(paymentDateService.getFormattedPaymentDate(any())).thenReturn(LocalDate.EPOCH.toString());
 
-        CallbackParams params = callbackParams(caseData).toBuilder()
-            .version(CallbackVersion.V_2)
-            .build();
+        CallbackParams params = callbackParams(caseData).copy()
+            .version(CallbackVersion.V_2);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(params);
@@ -118,9 +117,8 @@ class PopulateCaseDataTaskTest {
 
         when(featureToggleService.isCarmEnabledForCase(any(CaseData.class))).thenReturn(false);
 
-        CallbackParams params = callbackParams(caseData).toBuilder()
-            .version(CallbackVersion.V_1)
-            .build();
+        CallbackParams params = callbackParams(caseData).copy()
+            .version(CallbackVersion.V_1);
 
         AboutToStartOrSubmitCallbackResponse response =
             (AboutToStartOrSubmitCallbackResponse) task.execute(params);
@@ -136,9 +134,8 @@ class PopulateCaseDataTaskTest {
 
     private CallbackParams callbackParams(CaseData caseData) {
 
-        return CallbackParams.builder()
+        return new CallbackParams()
             .caseData(caseData)
-            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN))
-            .build();
+            .params(Map.of(BEARER_TOKEN, BEARER_TOKEN));
     }
 }

@@ -156,12 +156,12 @@ class JudgeFinalOrderGeneratorTest {
     @MockBean
     private OrderDetailsPopulator orderDetailsPopulator;
 
-    private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
-        .courtAddress("1").postcode("1")
-        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-        .externalShortName("ExternalShortName")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("000000").build();
+    private static LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
+        .setCourtAddress("1").setPostcode("1")
+        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+        .setExternalShortName("ExternalShortName")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("000000");
 
     @BeforeEach
     public void setUp() throws JsonProcessingException {
@@ -271,14 +271,12 @@ class JudgeFinalOrderGeneratorTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
                                 .setWithoutNoticeSelectionDate(LocalDate.now()))
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                             .partyID("app-2-party-id")
-                             .partyName("Applicant2")
-                             .build())
-            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .partyID("res-2-party-id")
-                            .partyName("Respondent2")
-                            .build())
+            .respondent2(new PartyBuilder().individual().build()
+                             .setPartyID("app-2-party-id")
+                             .setPartyName("Applicant2"))
+            .applicant2(new PartyBuilder().soleTrader().build()
+                            .setPartyID("res-2-party-id")
+                            .setPartyName("Respondent2"))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, BEARER_TOKEN);
@@ -303,14 +301,12 @@ class JudgeFinalOrderGeneratorTest {
             .ccdState(CaseState.CASE_PROGRESSION)
             .orderWithoutNotice(new FreeFormOrderValues().setWithoutNoticeSelectionTextArea("test without notice")
                                 .setWithoutNoticeSelectionDate(LocalDate.now()))
-            .respondent2(PartyBuilder.builder().individual().build().toBuilder()
-                             .partyID("app-2-party-id")
-                             .partyName("Applicant2")
-                             .build())
-            .applicant2(PartyBuilder.builder().soleTrader().build().toBuilder()
-                            .partyID("res-2-party-id")
-                            .partyName("Respondent2")
-                            .build())
+            .respondent2(new PartyBuilder().individual().build()
+                             .setPartyID("app-2-party-id")
+                             .setPartyName("Applicant2"))
+            .applicant2(new PartyBuilder().soleTrader().build()
+                            .setPartyID("res-2-party-id")
+                            .setPartyName("Respondent2"))
             .hearingLocation(DynamicList.builder()
                                  .value(DynamicListElement.dynamicElement("hearing-location")).build())
             .build();
@@ -463,10 +459,10 @@ class JudgeFinalOrderGeneratorTest {
             .finalOrderJudgePapers(
                 finalOrdersJudgePapersList)
             // judge heard from section
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
-            .applicant2(PartyBuilder.builder().individual().build())
+            .applicant2(new PartyBuilder().individual().build())
             .addApplicant2(YES)
             .finalOrderRepresentation(new FinalOrderRepresentation()
                                           .setTypeRepresentationList(FinalOrderRepresentationList.CLAIMANT_AND_DEFENDANT)
