@@ -45,16 +45,19 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     private final ObjectMapper objectMapper;
     private final FeatureToggleService featureToggleService;
 
+    @Override
     protected Map<String, Callback> callbacks() {
-        return featureToggleService.isLinkDefendantTestingEnabled()
-            ? Map.of(
+        return Map.of(
             callbackKey(MID, "confirm-defendant-email"), this::confirmDefendantEmail,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit
-        )
-            : Map.of(
-            callbackKey(MID, "confirm-defendant-email"), this::emptyCallbackResponse,
-            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
         );
+    }
+
+    @Override
+    public CallbackResponse handle(CallbackParams callbackParams) {
+        return featureToggleService.isLinkDefendantTestingEnabled()
+            ? super.handle(callbackParams)
+            : emptyCallbackResponse(callbackParams);
     }
 
     @Override
