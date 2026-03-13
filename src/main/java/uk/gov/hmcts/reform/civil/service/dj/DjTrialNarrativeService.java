@@ -98,7 +98,7 @@ public class DjTrialNarrativeService {
     public TrialHearingTrial buildTrialHearingTrial() {
         return new TrialHearingTrial()
             .setInput1(FAST_TRACK_TRIAL_TIME_ALLOWED_DJ)
-            .setDate1(deadlineService.weeksFromNow(22))
+            .setDate1(deadlineService.weeksFromNow(20))
             .setDate2(deadlineService.weeksFromNow(34))
             .setInput2(FAST_TRACK_TRIAL_TIME_WARNING_DJ)
             .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ");
@@ -110,7 +110,7 @@ public class DjTrialNarrativeService {
             .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .setDateToToggle(DATE_TO_SHOW)
             .setDate1(deadlineService.weeksFromNow(22))
-            .setDate2(deadlineService.weeksFromNow(30));
+            .setDate2(deadlineService.weeksFromNow(29));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {
