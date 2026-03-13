@@ -302,4 +302,11 @@ class FeatureToggleServiceTest {
 
         assertThat(featureToggleService.isCuiGaNroEnabled()).isEqualTo(toggleStat);
     }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldCallBoolVariation_whenLinkDefendantTestingEnabled(Boolean toggleStat) {
+        givenToggle("link-defendant-testing-enabled", toggleStat);
+        assertThat(featureToggleService.isLinkDefendantTestingEnabled()).isEqualTo(toggleStat);
+    }
 }
