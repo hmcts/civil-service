@@ -1,0 +1,19 @@
+{
+  "name": "Bundle API - Stitch CCD Bundles",
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/stitch-ccd-bundles",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "bundleStitchResponse.json"
+  }
+}
