@@ -65,15 +65,11 @@ public class PartyUtils {
     }
 
     public static Optional<LocalDate> getDateOfBirth(Party party) {
-        switch (party.getType()) {
-            case INDIVIDUAL:
-                return ofNullable(party.getIndividualDateOfBirth());
-            case SOLE_TRADER:
-                return ofNullable(party.getSoleTraderDateOfBirth());
-            case COMPANY, ORGANISATION:
-            default:
-                return Optional.empty();
-        }
+        return switch (party.getType()) {
+            case INDIVIDUAL -> ofNullable(party.getIndividualDateOfBirth());
+            case SOLE_TRADER -> ofNullable(party.getSoleTraderDateOfBirth());
+            default -> Optional.empty();
+        };
     }
 
     public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
