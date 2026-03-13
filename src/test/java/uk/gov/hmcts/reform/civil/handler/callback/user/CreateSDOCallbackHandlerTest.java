@@ -462,11 +462,11 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
                 .atStateClaimIssuedDisposalHearingSDOInPersonHearing()
                 .reasonForTransfer("Court Closed")
-                .transferCourtLocationList(DynamicList.builder()
-                                               .value(DynamicListElement.builder()
-                                                          .code("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
-                                                          .label("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
-                                                          .build()).build())
+                .transferCourtLocationList(new DynamicList().setValue(
+                    new DynamicListElement()
+                        .setCode("97c6385d-dc61-4a46-b58f-2992e5ecb4f4")
+                        .setLabel("Central London County Court - Thomas More Building, Royal Courts of Justice, Strand, London - WC2A 2LL")
+                ))
                 .caseManagementLocation(civil)
                 .caseAccessCategory(UNSPEC_CLAIM)
                 .build();

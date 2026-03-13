@@ -79,9 +79,9 @@ public class GeneralApplicationDetailsBuilder {
     public static final String STRING_NUM_CONSTANT = "123456789";
     public static final String APPLICANT_EMAIL_ID_CONSTANT = "testUser@gmail.com";
     public static final String RESPONDENT_EMAIL_ID_CONSTANT = "respondent@gmail.com";
-    public static final DynamicList PBA_ACCOUNTS = DynamicList.builder().build();
+    public static final DynamicList PBA_ACCOUNTS = new DynamicList();
     public static final LocalDate APP_DATE_EPOCH = EPOCH;
-    public static final DynamicList PBALIST = DynamicList.builder().build();
+    public static final DynamicList PBALIST = new DynamicList();
 
     private final ObjectMapper mapper =
             new ObjectMapper()
@@ -1005,7 +1005,7 @@ public class GeneralApplicationDetailsBuilder {
                                                         .setUnavailableTrialDateFrom(APP_DATE_EPOCH)
                                                         .setUnavailableTrialDateTo(APP_DATE_EPOCH)))
                                 .setSupportRequirementOther(STRING_CONSTANT)
-                                .setHearingPreferredLocation(DynamicList.builder().build())
+                                .setHearingPreferredLocation(new DynamicList())
                                 .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                 .setReasonForPreferredHearingType(STRING_CONSTANT)
                                 .setTelephoneHearingPreferredType(STRING_CONSTANT)
@@ -1128,7 +1128,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                 .setUnavailableTrialDateTo(
                                                                         APP_DATE_EPOCH)))
                                         .setSupportRequirementOther(STRING_CONSTANT)
-                                        .setHearingPreferredLocation(DynamicList.builder().build())
+                                        .setHearingPreferredLocation(new DynamicList())
                                         .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                         .setReasonForPreferredHearingType(STRING_CONSTANT)
                                         .setTelephoneHearingPreferredType(STRING_CONSTANT)
@@ -1242,7 +1242,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                 .setUnavailableTrialDateTo(
                                                                         APP_DATE_EPOCH)))
                                         .setSupportRequirementOther(STRING_CONSTANT)
-                                        .setHearingPreferredLocation(DynamicList.builder().build())
+                                        .setHearingPreferredLocation(new DynamicList())
                                         .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                         .setReasonForPreferredHearingType(STRING_CONSTANT)
                                         .setTelephoneHearingPreferredType(STRING_CONSTANT)
@@ -1392,7 +1392,7 @@ public class GeneralApplicationDetailsBuilder {
                                                                 .setUnavailableTrialDateTo(
                                                                         APP_DATE_EPOCH)))
                                         .setSupportRequirementOther(STRING_CONSTANT)
-                                        .setHearingPreferredLocation(DynamicList.builder().build())
+                                        .setHearingPreferredLocation(new DynamicList())
                                         .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                         .setReasonForPreferredHearingType(STRING_CONSTANT)
                                         .setTelephoneHearingPreferredType(STRING_CONSTANT)
@@ -1606,10 +1606,7 @@ public class GeneralApplicationDetailsBuilder {
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .generalOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1622,10 +1619,7 @@ public class GeneralApplicationDetailsBuilder {
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .generalOrderDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1636,7 +1630,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppEvidenceDocument(
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .dismissalOrderDocument(
-                        singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+                        singletonList(new Element<CaseDocument>().setValue(pdfDocument)))
                 .build();
     }
 
@@ -1647,7 +1641,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppEvidenceDocument(
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .dismissalOrderDocStaff(
-                        singletonList(Element.<CaseDocument>builder().value(pdfDocument).build()))
+                        singletonList(new Element<CaseDocument>().setValue(pdfDocument)))
                 .build();
     }
 
@@ -1661,16 +1655,10 @@ public class GeneralApplicationDetailsBuilder {
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .generalOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .directionOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1684,16 +1672,10 @@ public class GeneralApplicationDetailsBuilder {
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .generalOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .gaRespDocument(
                         singletonList(
-                                Element.<Document>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument1)
-                                        .build()))
+                                new Element<Document>().setId(UUID.fromString(uid1)).setValue(pdfDocument1)))
                 .build();
     }
 
@@ -1705,10 +1687,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .consentOrderDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1717,15 +1696,9 @@ public class GeneralApplicationDetailsBuilder {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid1))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
         draftDocs.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument));
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
@@ -1738,10 +1711,7 @@ public class GeneralApplicationDetailsBuilder {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> draftDocs = newArrayList();
         draftDocs.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid1))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
@@ -1757,10 +1727,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .gaAddlDoc(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1769,10 +1736,7 @@ public class GeneralApplicationDetailsBuilder {
         String uid1 = "f000aa01-0451-4000-b000-000000000000";
         List<Element<CaseDocument>> directionOrderDocStaff = new ArrayList<>();
         directionOrderDocStaff.add(
-                Element.<CaseDocument>builder()
-                        .id(UUID.fromString(uid1))
-                        .value(pdfDocument)
-                        .build());
+                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument));
 
         return caseData.toBuilder()
                 .ccdCaseReference(1234L)
@@ -1781,10 +1745,7 @@ public class GeneralApplicationDetailsBuilder {
                         wrapElements(new Document().setDocumentUrl(STRING_CONSTANT)))
                 .generalOrderDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid)).setValue(pdfDocument)))
                 .directionOrderDocStaff(directionOrderDocStaff)
                 .build();
     }
@@ -1797,10 +1758,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .consentOrderDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1812,10 +1770,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .gaDraftDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1827,10 +1782,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .gaAddlDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1841,10 +1793,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .hearingNoticeDocument(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 
@@ -1855,10 +1804,7 @@ public class GeneralApplicationDetailsBuilder {
                 .generalAppType(new GAApplicationType().setTypes(singletonList(EXTEND_TIME)))
                 .hearingNoticeDocStaff(
                         singletonList(
-                                Element.<CaseDocument>builder()
-                                        .id(UUID.fromString(uid1))
-                                        .value(pdfDocument)
-                                        .build()))
+                                new Element<CaseDocument>().setId(UUID.fromString(uid1)).setValue(pdfDocument)))
                 .build();
     }
 

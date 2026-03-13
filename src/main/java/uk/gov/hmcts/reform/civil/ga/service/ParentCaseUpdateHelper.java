@@ -237,9 +237,7 @@ public class ParentCaseUpdateHelper {
                             .orElseThrow(
                                     () ->
                                             new IllegalArgumentException(
-                                                    "Civil general application not found for parent"
-                                                        + " case id: "
-                                                            + parentCaseId))
+                                                    "Civil general application not found for parent case id: " + parentCaseId))
                             .getValue();
 
             civilGeneralApplications =
@@ -267,8 +265,7 @@ public class ParentCaseUpdateHelper {
             updateEvidence(updateMap, caseData, generalAppCaseData, docVisibilityRoles);
         }
         log.info(
-                "updateParentWithGAState() Civil General Applications about to submit for case ID:"
-                    + " {}",
+                "updateParentWithGAState() Civil General Applications about to submit for case ID: {}",
                 parentCaseId);
         coreCaseDataService.submitUpdate(
                 parentCaseId,
@@ -854,8 +851,7 @@ public class ParentCaseUpdateHelper {
         String applicationId = generalAppCaseData.getCcdCaseReference().toString();
         String parentCaseId = generalAppCaseData.getGeneralAppParentCaseLink().getCaseReference();
         log.info(
-                "Starting updateParentApplicationVisibilityWithNewState. New state: {}, Application"
-                    + " ID: {}, Parent Case ID: {}",
+                "Starting updateParentApplicationVisibilityWithNewState. New state: {}, Application ID: {}, Parent Case ID: {}",
                 newState,
                 applicationId,
                 parentCaseId);
@@ -927,8 +923,7 @@ public class ParentCaseUpdateHelper {
                  * Update the ga with new state in respondent one solicitor collection
                  * */
                 log.info(
-                        "Updating existing application state in Respondent One Solicitor collection"
-                            + " to: {}",
+                        "Updating existing application state in Respondent One Solicitor collection to: {}",
                         newState);
                 gaDetailsRespondentSol =
                         updateGaDetailsRespondentOne(caseData, newState, applicationId);
@@ -1308,10 +1303,7 @@ public class ParentCaseUpdateHelper {
         Element<GeneralApplication> elementToAdd;
         if (newApplicationElement.isPresent()) {
             elementToAdd =
-                    Element.<GeneralApplication>builder()
-                            .id(newApplicationElement.get().getId())
-                            .value(application)
-                            .build();
+                    new Element<GeneralApplication>().setId(newApplicationElement.get().getId()).setValue(application);
         } else {
             elementToAdd = element(application);
         }

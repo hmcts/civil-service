@@ -25,15 +25,15 @@ class DocumentUtilsTest {
 
         @Test
         void shouldReturnNull_whenGivenDynamicListValueIsNull() {
-            assertNull(DocumentUtils.getDynamicListValueLabel(DynamicList.builder().build()));
+            assertNull(DocumentUtils.getDynamicListValueLabel(new DynamicList()));
         }
 
         @Test
         void shouldReturnExpectedValueLabel_whenValidDynamicListIsGiven() {
             var expected = "expected";
-            var dynamicList =  DynamicList.builder().value(
-                DynamicListElement.builder().label(expected).build()
-            ).build();
+            var dynamicList =  new DynamicList().setValue(
+                new DynamicListElement().setLabel(expected)
+            );
 
             var actual = DocumentUtils.getDynamicListValueLabel(dynamicList);
             assertEquals(expected, actual);

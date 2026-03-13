@@ -284,11 +284,11 @@ class AssistedOrderFormGeneratorTest {
                                                                               .setLengthListOtherHours(5)
                                                                               .setLengthListOtherMinutes(30))
                                                     .setDatesToAvoid(NO)
-                                                    .setHearingLocationList(DynamicList.builder().value(
-                                                        DynamicListElement.builder().label("Other location").build()).build())
-                                                    .setAlternativeHearingLocation(DynamicList.builder().value(
-                                                        DynamicListElement.builder().label(
-                                                            "Site Name 2 - Address2 - 28000").build()).build())
+                                                    .setHearingLocationList(new DynamicList().setValue(
+                                                        new DynamicListElement().setLabel("Other location")))
+                                                    .setAlternativeHearingLocation(new DynamicList().setValue(
+                                                        new DynamicListElement().setLabel(
+                                                            "Site Name 2 - Address2 - 28000")))
                                                     .setHearingMethods(GAJudicialHearingType.TELEPHONE))
             .assistedOrderAppealToggle(appealShowOption)
             .assistedOrderAppealDetails(new AssistedOrderAppealDetails()
@@ -1072,11 +1072,11 @@ class AssistedOrderFormGeneratorTest {
                                                                                   .setLengthListOtherHours(5)
                                                                                   .setLengthListOtherMinutes(30))
                                                         .setDatesToAvoid(YesOrNo.NO)
-                                                        .setHearingLocationList(DynamicList.builder().value(
-                                                            DynamicListElement.builder().label("Other location").build()).build())
-                                                        .setAlternativeHearingLocation(DynamicList.builder().value(
-                                                            DynamicListElement.builder().label(
-                                                                "Site Name 2 - Address2 - 28000").build()).build())
+                                                        .setHearingLocationList(new DynamicList().setValue(
+                                                            new DynamicListElement().setLabel("Other location")))
+                                                        .setAlternativeHearingLocation(new DynamicList().setValue(
+                                                            new DynamicListElement().setLabel(
+                                                                "Site Name 2 - Address2 - 28000")))
                                                         .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingLocation = generator.getFurtherHearingLocation(caseData);
@@ -1095,8 +1095,8 @@ class AssistedOrderFormGeneratorTest {
                                                                                   .setLengthListOtherHours(5)
                                                                                   .setLengthListOtherMinutes(30))
                                                         .setDatesToAvoid(YesOrNo.NO)
-                                                        .setHearingLocationList(DynamicList.builder().value(
-                                                            DynamicListElement.builder().label("ccmcc location").build()).build())
+                                                        .setHearingLocationList(new DynamicList().setValue(
+                                                            new DynamicListElement().setLabel("ccmcc location")))
                                                         .setHearingMethods(GAJudicialHearingType.TELEPHONE))
                 .build();
             String hearingLocation = generator.getFurtherHearingLocation(caseData);

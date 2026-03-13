@@ -111,7 +111,7 @@ class BundleCreationServiceTest {
             .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
             .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .hearingDate(LocalDate.now())
-            .hearingLocation(DynamicList.builder().value(DynamicListElement.builder().label("County Court").build()).build())
+            .hearingLocation(new DynamicList().setValue(new DynamicListElement().setLabel("County Court")))
             .build();
     }
 

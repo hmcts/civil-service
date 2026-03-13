@@ -343,10 +343,7 @@ public class JudicialDecisionHelperTest {
         }
 
         private DynamicListElement getDynamicLocation(String label) {
-            return DynamicListElement.builder()
-                    .code(String.valueOf(UUID.randomUUID()))
-                    .label(label)
-                    .build();
+            return new DynamicListElement().setCode(String.valueOf(UUID.randomUUID())).setLabel(label);
         }
 
         private DynamicList getDynamicLocationsList(
@@ -355,10 +352,9 @@ public class JudicialDecisionHelperTest {
                     Arrays.stream(elements)
                             .filter(e -> e.getLabel().equals(chosenValue))
                             .findFirst();
-            DynamicList.DynamicListBuilder dynamicListBuilder =
-                    DynamicList.builder().listItems(List.of(elements));
-            first.ifPresent(dynamicListBuilder::value);
-            return dynamicListBuilder.build();
+            DynamicList dynamicList = new DynamicList().setListItems(List.of(elements));
+            first.ifPresent(dynamicList::setValue);
+            return dynamicList;
         }
     }
 

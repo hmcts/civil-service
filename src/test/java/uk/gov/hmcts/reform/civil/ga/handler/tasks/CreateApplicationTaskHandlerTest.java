@@ -937,10 +937,7 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolList = Lists.newArrayList();
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
         Element<Document> same =
-                Element.<Document>builder()
-                        .id(DOC_ID)
-                        .value(new Document().setDocumentUrl("string"))
-                        .build();
+                new Element<Document>().setId(DOC_ID).setValue(new Document().setDocumentUrl("string"));
         List<Element<Document>> generalAppEvidenceDocument =
                 addEvidenceDoc
                         ? (new ArrayList<>() {

@@ -433,7 +433,7 @@ public class RespondToApplicationHandler extends CallbackHandler
                             .copy()
                             .setRespondentResponsePartyName(
                                     getRespondentResponsePartyName(caseData, userInfo))
-                            .setHearingPreferredLocation(DynamicList.builder().build());
+                            .setHearingPreferredLocation(new DynamicList());
         }
         return gaHearingDetailsResp;
     }

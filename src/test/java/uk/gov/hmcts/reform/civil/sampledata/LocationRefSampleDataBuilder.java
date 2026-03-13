@@ -79,7 +79,7 @@ public class LocationRefSampleDataBuilder {
                                 .setTrialRequiredYesOrNo(YES)
                                 .setHearingDetailsEmailID(STRING_CONSTANT)
                                 .setSupportRequirementOther(STRING_CONSTANT)
-                                .setHearingPreferredLocation(DynamicList.builder().build())
+                                .setHearingPreferredLocation(new DynamicList())
                                 .setGeneralAppUnavailableDates(
                                         wrapElements(
                                                 new GAUnavailabilityDates()
@@ -145,7 +145,7 @@ public class LocationRefSampleDataBuilder {
                                                         .setUnavailableTrialDateFrom(APP_DATE_EPOCH)
                                                         .setUnavailableTrialDateTo(APP_DATE_EPOCH)))
                                 .setSupportRequirementOther(STRING_CONSTANT)
-                                .setHearingPreferredLocation(DynamicList.builder().build())
+                                .setHearingPreferredLocation(new DynamicList())
                                 .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                 .setReasonForPreferredHearingType(STRING_CONSTANT)
                                 .setTelephoneHearingPreferredType(STRING_CONSTANT)
@@ -251,7 +251,7 @@ public class LocationRefSampleDataBuilder {
                                                                 .setUnavailableTrialDateTo(
                                                                         APP_DATE_EPOCH)))
                                         .setSupportRequirementOther(STRING_CONSTANT)
-                                        .setHearingPreferredLocation(DynamicList.builder().build())
+                                        .setHearingPreferredLocation(new DynamicList())
                                         .setHearingDetailsTelephoneNumber(STRING_NUM_CONSTANT)
                                         .setReasonForPreferredHearingType(STRING_CONSTANT)
                                         .setTelephoneHearingPreferredType(STRING_CONSTANT)
