@@ -101,11 +101,12 @@ public class PartyUtils {
     }
 
     private static String getSoleTraderName(Party party, boolean omitTitle) {
-        return (omitTitle ? "" : getTitle(party.getSoleTraderTitle()))
-            + party.getSoleTraderFirstName()
-            + " "
-            + party.getSoleTraderLastName()
-            ;
+        final String SPACE = " ";
+        final String titlePrefix = omitTitle ? "" : getTitle(party.getSoleTraderTitle());
+        final String firstName = ofNullable(party.getSoleTraderFirstName()).orElse(SPACE);
+        final String lastName = ofNullable(party.getSoleTraderLastName()).orElse(SPACE);
+        return titlePrefix + firstName + SPACE + lastName;
+
     }
 
     private static String getSoleTraderName(Party party) {
@@ -134,7 +135,7 @@ public class PartyUtils {
 
         stringBuilder.append(buildClaimantReference(caseData));
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
             .ifPresent(ref -> {
                 if (!stringBuilder.isEmpty()) {
                     stringBuilder.append("\n");
@@ -157,7 +158,7 @@ public class PartyUtils {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
             .ifPresent(ref -> {
                 stringBuilder.append("Claimant reference: ");
                 stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference());
@@ -179,7 +180,7 @@ public class PartyUtils {
         SolicitorReferences solicitorReferences = caseData.getSolicitorReferences();
         StringBuilder stringBuilder = new StringBuilder();
 
-        Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
+        ofNullable(solicitorReferences).map(SolicitorReferences::getApplicantSolicitor1Reference)
             .ifPresent(ref -> stringBuilder.append(solicitorReferences.getApplicantSolicitor1Reference()));
 
         return stringBuilder.toString();
@@ -190,12 +191,12 @@ public class PartyUtils {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (!isRespondentSolicitorNumber2) {
-            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
+            ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor1Reference)
                 .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor1Reference()));
         }
 
         if (isRespondentSolicitorNumber2) {
-            Optional.ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
+            ofNullable(solicitorReferences).map(SolicitorReferences::getRespondentSolicitor2Reference)
                 .ifPresent(ref -> stringBuilder.append(solicitorReferences.getRespondentSolicitor2Reference()));
         }
         return stringBuilder.toString();
@@ -223,10 +224,10 @@ public class PartyUtils {
     public static RespondentResponseType getResponseTypeForRespondent(CaseData caseData, Party respondent) {
         if (SPEC_CLAIM.equals(caseData.getCaseAccessCategory())) {
             if (caseData.getRespondent1().equals(respondent)) {
-                return Optional.ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
+                return ofNullable(caseData.getRespondent1ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
             } else {
-                return Optional.ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
+                return ofNullable(caseData.getRespondent2ClaimResponseTypeForSpec())
                     .map(RespondentResponseTypeSpec::translate).orElse(null);
             }
         } else {
