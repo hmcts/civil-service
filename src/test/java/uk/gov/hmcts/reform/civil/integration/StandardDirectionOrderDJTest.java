@@ -445,7 +445,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input1")
                 .isEqualTo("The time provisionally allowed for the trial is");
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(20).toString());
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("date2")
                 .isEqualTo(LocalDate.now().plusWeeks(34).toString());
             assertThat(response.getData()).extracting("trialHearingTrialDJ").extracting("input2")
@@ -471,7 +471,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                          - Item\s
                          - \
                         Alleged Defect \
-                        
+
                          - Claimant's costing
                          - Defendant's\
                          response
@@ -541,7 +541,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                         The columns should be headed:\s
                          - Item\s
                          - Alleged disrepair \
-                        
+
                          - Defendant's Response\s
                          - Reserved for Judge's Use""");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")
