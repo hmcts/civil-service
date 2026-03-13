@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.LitigationFriend;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.SolicitorReferences;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +24,7 @@ import static uk.gov.hmcts.reform.civil.utils.DocmosisTemplateDataUtils.toCaseNa
 class DocmosisTemplateDataUtilsTest {
 
     @Test
-    void shouldReturnNull_whenBothApplicant1NotFount() throws IOException {
+    void shouldReturnNull_whenBothApplicant1NotFount() {
         CaseData caseData = CaseData.builder()
             .respondent1(new Party()
                              .setType(Party.Type.INDIVIDUAL)
@@ -486,5 +485,55 @@ class DocmosisTemplateDataUtilsTest {
         String formattedCaseReference = formatCcdCaseReference(caseData);
         assertThat(formattedCaseReference).isNotEmpty();
         assertThat(formattedCaseReference).isEqualTo(expectedCaseReference);
+    }
+
+    @Nested
+    class SoleTrader {
+        @Test
+        void shouldReturnCaseName_whenBothPartiesAreSoleTrader() {
+            CaseData caseData = CaseData.builder()
+                .applicant1(new Party()
+                                .setType(Party.Type.SOLE_TRADER)
+                                .setSoleTraderTitle("Mr.")
+                                .setSoleTraderFirstName("Sam")
+                                .setSoleTraderLastName("Clark")
+                                .setSoleTraderTradingAs("Sole Trader"))
+                .respondent1(new Party()
+                                 .setType(Party.Type.SOLE_TRADER)
+                                 .setSoleTraderTradingAs("Sole Trader")
+                                 .setSoleTraderTitle("Mr.")
+                                 .setSoleTraderFirstName("Alex")
+                                 .setSoleTraderLastName("Trader"))
+                .build();
+            String caseName = toCaseName.apply(caseData);
+            assertThat(caseName).isEqualTo("Mr. Sam Clark T/A Sole Trader \n" +
+                                               "vs Mr. Alex Trader T/A Sole Trader");
+        }
+
+        @Test
+        void shouldReturnCaseName_whenMultiApplicant() {
+            CaseData caseData = CaseData.builder()
+                .applicant1(new Party()
+                                .setType(Party.Type.SOLE_TRADER)
+                                .setSoleTraderTitle("Mr.")
+                                .setSoleTraderFirstName("Sam")
+                                .setSoleTraderLastName("Clark")
+                                .setSoleTraderTradingAs("Sole Trader"))
+                .applicant2(new Party()
+                                .setType(Party.Type.INDIVIDUAL)
+                                .setIndividualTitle("Mr.")
+                                .setIndividualFirstName("White")
+                                .setIndividualLastName("Clark"))
+                .respondent1(new Party()
+                                 .setType(Party.Type.INDIVIDUAL)
+                                 .setIndividualTitle("Mr.")
+                                 .setIndividualFirstName("Alex")
+                                 .setIndividualLastName("Richards"))
+                .build();
+
+            String caseName = toCaseName.apply(caseData);
+            assertThat(caseName).isEqualTo("1 Mr. Sam Clark T/A Sole Trader & 2 Mr. White Clark \n" +
+                                               "vs Mr. Alex Richards");
+        }
     }
 }

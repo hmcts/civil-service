@@ -27,8 +27,6 @@ public class DocmosisTemplateDataUtils {
     //TODO Need to confirm the case name logic
     public static final Function<CaseData, String> toCaseName = caseData -> {
         String caseName = fetchApplicantName(caseData) + " vs " + fetchRespondentName(caseData);
-
-
         return caseName.length() > CASE_NAME_LENGTH_TO_FIT_IN_DOCS
             ? caseName.replace(" vs ", " \nvs ")
             : caseName;
@@ -52,7 +50,6 @@ public class DocmosisTemplateDataUtils {
             litigationFriend(caseData.getRespondent2LitigationFriend(), respondentNameBuilder);
         } else {
             respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
-            soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
             litigationFriend(caseData.getRespondent1LitigationFriend(), respondentNameBuilder);
         }
 
@@ -65,7 +62,6 @@ public class DocmosisTemplateDataUtils {
         if (caseData.getApplicant1() != null && caseData.getApplicant2() != null) {
             applicantNameBuilder.append("1 ");
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
-            soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
             applicantNameBuilder.append(" & 2 ");
             applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
@@ -73,7 +69,6 @@ public class DocmosisTemplateDataUtils {
             litigationFriend(caseData.getApplicant2LitigationFriend(), applicantNameBuilder);
         } else if (caseData.getApplicant1() != null) {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
-            soleTraderCompany(caseData.getApplicant1(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
         } else {
             String errorMsg = String.format("Applicant1 not found for claim number: %s",
