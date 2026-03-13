@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
 import uk.gov.hmcts.reform.civil.enums.CaseRole;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
@@ -70,6 +71,7 @@ class OtherPartyQueryResponseRespSolOneEmailDTOGeneratorTest {
     @Test
     void getShouldNotifyShouldRespectUnspecGatingAndRoles() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.YES);
         when(respondToQueryHelper.getResponseQueryContext(caseData))
             .thenReturn(Optional.of(context(CaseRole.APPLICANTSOLICITORONE)));
         when(respondToQueryHelper.isUnspecClaimNotReadyForNotification(caseData, List.of(
@@ -81,6 +83,16 @@ class OtherPartyQueryResponseRespSolOneEmailDTOGeneratorTest {
             CaseRole.APPLICANTSOLICITORONE.getFormattedName()))).thenReturn(true);
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
+    @Test
+    void shouldNotifyWhenContextIsRespondentSolicitorTwo() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        caseData.setRespondent1Represented(YesOrNo.YES);
+        when(respondToQueryHelper.getResponseQueryContext(caseData))
+            .thenReturn(Optional.of(context(CaseRole.RESPONDENTSOLICITORTWO)));
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
 
     private Party createParty(String name) {
