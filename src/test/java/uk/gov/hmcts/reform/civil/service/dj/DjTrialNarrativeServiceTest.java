@@ -62,8 +62,8 @@ class DjTrialNarrativeServiceTest {
     void shouldBuildTrialHearingTimeWithToggleDefaults() {
         LocalDate twentyTwoWeeks = LocalDate.of(2025, 6, 1);
         LocalDate thirtyWeeks = LocalDate.of(2025, 7, 27);
-        when(deadlineService.weeksFromNow(20)).thenReturn(twentyTwoWeeks);
-        when(deadlineService.weeksFromNow(29)).thenReturn(thirtyWeeks);
+        when(deadlineService.weeksFromNow(22)).thenReturn(twentyTwoWeeks);
+        when(deadlineService.weeksFromNow(30)).thenReturn(thirtyWeeks);
 
         TrialHearingTimeDJ result = service.buildTrialHearingTime();
 

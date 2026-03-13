@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.dj;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.enums.sdo.DateToShowToggle;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialHearingDisclosureOfDocuments;
@@ -35,7 +34,6 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_PREFIX;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.WITNESS_PAGE_LIMIT_SUFFIX_DJ;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DjTrialNarrativeService {
@@ -98,23 +96,21 @@ public class DjTrialNarrativeService {
     }
 
     public TrialHearingTrial buildTrialHearingTrial() {
-        log.info("setting00 trial from and to Date");
         return new TrialHearingTrial()
             .setInput1(FAST_TRACK_TRIAL_TIME_ALLOWED_DJ)
-            .setDate1(deadlineService.weeksFromNow(20))
+            .setDate1(deadlineService.weeksFromNow(22))
             .setDate2(deadlineService.weeksFromNow(34))
             .setInput2(FAST_TRACK_TRIAL_TIME_WARNING_DJ)
             .setInput3(FAST_TRACK_TRIAL_BUNDLE_NOTICE + " ");
     }
 
     public TrialHearingTimeDJ buildTrialHearingTime() {
-        log.info("setting11 trial from and to Date");
         return new TrialHearingTimeDJ()
             .setHelpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
             .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .setDateToToggle(DATE_TO_SHOW)
-            .setDate1(deadlineService.weeksFromNow(20))
-            .setDate2(deadlineService.weeksFromNow(29));
+            .setDate1(deadlineService.weeksFromNow(22))
+            .setDate2(deadlineService.weeksFromNow(30));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {

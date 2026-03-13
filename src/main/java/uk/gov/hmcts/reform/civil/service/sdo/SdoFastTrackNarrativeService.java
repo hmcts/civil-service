@@ -55,8 +55,8 @@ public class SdoFastTrackNarrativeService {
     private static final List<DateToShowToggle> DATE_TO_SHOW_TRUE = List.of(DateToShowToggle.SHOW);
     private static final DateTimeFormatter ORDER_DATE_FORMAT =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-    private static final int TRIAL_WINDOW_START_WEEKS = 22;
-    private static final int TRIAL_WINDOW_END_WEEKS = 30;
+    private static final int TRIAL_WINDOW_START_WEEKS = 20;
+    private static final int TRIAL_WINDOW_END_WEEKS = 29;
 
     private final SdoDeadlineService sdoDeadlineService;
 
