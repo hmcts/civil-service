@@ -7,14 +7,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQueryHelper;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,6 +66,25 @@ class OtherPartyQueryResponseRespSolTwoEmailDTOGeneratorTest {
         verify(respondToQueryHelper).addCustomProperties(properties, caseData, "Respondent 2 Org", false);
     }
 
+    @Test
+    void getShouldNotifyShouldRespectUnspecGatingAndRoles() {
+        CaseData caseData = CaseDataBuilder.builder()
+            .multiPartyClaimTwoDefendantSolicitors()
+            .atStateClaimIssued()
+            .build();
+        when(respondToQueryHelper.getResponseQueryContext(caseData))
+            .thenReturn(Optional.of(context(CaseRole.APPLICANTSOLICITORONE)));
+        when(respondToQueryHelper.isUnspecClaimNotReadyForNotification(caseData, List.of(
+            CaseRole.APPLICANTSOLICITORONE.getFormattedName()))).thenReturn(false);
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+
+        when(respondToQueryHelper.isUnspecClaimNotReadyForNotification(caseData, List.of(
+            CaseRole.APPLICANTSOLICITORONE.getFormattedName()))).thenReturn(true);
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
     private Party createParty(String name) {
         Party party = new Party();
         party.setType(Party.Type.INDIVIDUAL);
@@ -70,5 +92,13 @@ class OtherPartyQueryResponseRespSolTwoEmailDTOGeneratorTest {
         party.setIndividualLastName("Test");
         party.setPartyName(name);
         return party;
+    }
+
+    private RespondToQueryHelper.ResponseQueryContext context(CaseRole role) {
+        CaseMessage parent = new CaseMessage();
+        parent.setId("parent");
+        CaseMessage response = new CaseMessage();
+        response.setParentId("parent");
+        return new RespondToQueryHelper.ResponseQueryContext(parent, response, List.of(role.getFormattedName()));
     }
 }

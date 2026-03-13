@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
+
 @Component
 public class RespondToQueryDefendantEmailDTOGenerator extends DefendantEmailDTOGenerator {
 
@@ -38,5 +40,13 @@ public class RespondToQueryDefendantEmailDTOGenerator extends DefendantEmailDTOG
         respondToQueryHelper.addLipOtherPartyProperties(properties, caseData, caseData.getRespondent1().getPartyName());
         respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && respondToQueryHelper.getResponseQueryContext(caseData)
+            .map(context -> isLIPDefendant(context.getRoles()))
+            .orElse(false);
     }
 }

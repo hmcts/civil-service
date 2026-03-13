@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.model.querymanagement.CaseQueriesCollection;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static uk.gov.hmcts.reform.civil.enums.CaseCategory.UNSPEC_CLAIM;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIM_LEGAL_ORG_NAME_SPEC;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.QUERY_DATE;
@@ -23,6 +27,7 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getQueryById;
 import static uk.gov.hmcts.reform.civil.utils.CaseQueriesUtil.getUserRoleForQuery;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.unwrapElements;
+import static uk.gov.hmcts.reform.civil.utils.QueryNotificationUtils.isOtherPartyApplicant;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
@@ -61,7 +66,7 @@ public class RespondToQueryHelper {
         return addCustomProperties(properties, caseData, partyName, true);
     }
 
-    private Optional<LocalDate> getOriginalQueryCreatedDate(CaseData caseData) {
+    public Optional<ResponseQueryContext> getResponseQueryContext(CaseData caseData) {
         if (caseData.getBusinessProcess() == null
             || caseData.getBusinessProcess().getProcessInstanceId() == null) {
             return Optional.empty();
@@ -74,11 +79,20 @@ public class RespondToQueryHelper {
         }
 
         CaseMessage responseQuery = getQueryById(caseData, processVariables.getQueryId());
-        String parentQueryId = responseQuery.getParentId();
-        CaseMessage parentQuery = getQueryById(caseData, parentQueryId);
-        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQueryId);
+        CaseMessage parentQuery = getQueryById(caseData, responseQuery.getParentId());
+        List<String> roles = getUserRoleForQuery(caseData, coreCaseUserService, parentQuery.getId());
 
-        return Optional.ofNullable(getOriginalQueryCreatedDate(caseData, responseQuery, roles, parentQuery));
+        return Optional.of(new ResponseQueryContext(parentQuery, responseQuery, roles));
+    }
+
+    private Optional<LocalDate> getOriginalQueryCreatedDate(CaseData caseData) {
+        return getResponseQueryContext(caseData)
+            .flatMap(context -> Optional.ofNullable(
+                getOriginalQueryCreatedDate(caseData,
+                                            context.getResponseQuery(),
+                                            context.getRoles(),
+                                            context.getParentQuery())
+            ));
     }
 
     private LocalDate getOriginalQueryCreatedDate(CaseData caseData, CaseMessage responseQuery, List<String> roles,
@@ -125,5 +139,20 @@ public class RespondToQueryHelper {
         } else {
             throw new IllegalArgumentException(QUERY_NOT_FOUND);
         }
+    }
+
+    public boolean isUnspecClaimNotReadyForNotification(CaseData caseData, List<String> roles) {
+        return UNSPEC_CLAIM.equals(caseData.getCaseAccessCategory())
+            && !isOtherPartyApplicant(roles)
+            && (CaseState.CASE_ISSUED == caseData.getCcdState()
+            || CaseState.AWAITING_CASE_DETAILS_NOTIFICATION == caseData.getCcdState());
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ResponseQueryContext {
+        private final CaseMessage parentQuery;
+        private final CaseMessage responseQuery;
+        private final List<String> roles;
     }
 }

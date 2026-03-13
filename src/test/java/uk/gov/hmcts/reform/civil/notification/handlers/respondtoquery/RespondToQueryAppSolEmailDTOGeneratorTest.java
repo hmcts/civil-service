@@ -7,14 +7,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.model.Organisation;
 import uk.gov.hmcts.reform.ccd.model.OrganisationPolicy;
+import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.StatementOfTruth;
+import uk.gov.hmcts.reform.civil.model.querymanagement.CaseMessage;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,6 +71,20 @@ class RespondToQueryAppSolEmailDTOGeneratorTest {
         verify(respondToQueryHelper).addQueryDateProperty(properties, caseData);
     }
 
+    @Test
+    void shouldNotifyOnlyWhenApplicantSolicitorRaisedQuery() {
+        CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
+        when(respondToQueryHelper.getResponseQueryContext(caseData))
+            .thenReturn(Optional.of(context(CaseRole.APPLICANTSOLICITORONE)));
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+
+        when(respondToQueryHelper.getResponseQueryContext(caseData))
+            .thenReturn(Optional.of(context(CaseRole.DEFENDANT)));
+
+        assertThat(generator.getShouldNotify(caseData)).isFalse();
+    }
+
     private CaseData createBaseCaseData() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build();
         StatementOfTruth statementOfTruth = new StatementOfTruth();
@@ -90,5 +107,13 @@ class RespondToQueryAppSolEmailDTOGeneratorTest {
     private OrganisationPolicy organisationPolicy(String organisationId) {
         Organisation organisation = new Organisation().setOrganisationID(organisationId);
         return new OrganisationPolicy().setOrganisation(organisation);
+    }
+
+    private RespondToQueryHelper.ResponseQueryContext context(CaseRole role) {
+        CaseMessage parent = new CaseMessage();
+        parent.setId("parent");
+        CaseMessage response = new CaseMessage();
+        response.setParentId("parent");
+        return new RespondToQueryHelper.ResponseQueryContext(parent, response, List.of(role.getFormattedName()));
     }
 }
