@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
 
 @Component
 public class RespondToQueryAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -41,5 +42,13 @@ public class RespondToQueryAppSolEmailDTOGenerator extends AppSolOneEmailDTOGene
         properties.put(CLAIM_LEGAL_ORG_NAME_SPEC, getApplicantLegalOrganizationName(caseData, organisationService));
         respondToQueryHelper.addQueryDateProperty(properties, caseData);
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && respondToQueryHelper.getResponseQueryContext(caseData)
+            .map(context -> isApplicantSolicitor(context.getRoles()))
+            .orElse(false);
     }
 }

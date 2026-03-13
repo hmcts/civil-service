@@ -8,6 +8,10 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
+
 @Component
 public class OtherPartyQueryResponseClaimantEmailDTOGenerator extends ClaimantEmailDTOGenerator {
 
@@ -41,5 +45,15 @@ public class OtherPartyQueryResponseClaimantEmailDTOGenerator extends ClaimantEm
             caseData,
             caseData.getApplicant1().getPartyName()
         );
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && respondToQueryHelper.getResponseQueryContext(caseData)
+            .map(context -> isRespondentSolicitorOne(context.getRoles())
+                || isRespondentSolicitorTwo(context.getRoles())
+                || isLIPDefendant(context.getRoles()))
+            .orElse(false);
     }
 }

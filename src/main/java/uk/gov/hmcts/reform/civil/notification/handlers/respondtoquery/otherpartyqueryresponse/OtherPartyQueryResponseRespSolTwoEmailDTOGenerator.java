@@ -7,9 +7,13 @@ import uk.gov.hmcts.reform.civil.notification.handlers.respondtoquery.RespondToQ
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
+import java.util.List;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getLegalOrganizationNameForRespondent;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isApplicantSolicitor;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPClaimant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
 
 @Component
 public class OtherPartyQueryResponseRespSolTwoEmailDTOGenerator extends RespSolTwoEmailDTOGenerator {
@@ -42,5 +46,26 @@ public class OtherPartyQueryResponseRespSolTwoEmailDTOGenerator extends RespSolT
         String orgName = getLegalOrganizationNameForRespondent(caseData, false, organisationService);
         respondToQueryHelper.addCustomProperties(properties, caseData, orgName, false);
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        if (!Boolean.TRUE.equals(super.getShouldNotify(caseData))) {
+            return false;
+        }
+
+        return respondToQueryHelper.getResponseQueryContext(caseData)
+            .map(context -> shouldNotifyForRoles(caseData, context.getRoles()))
+            .orElse(false);
+    }
+
+    private boolean shouldNotifyForRoles(CaseData caseData, List<String> roles) {
+        if (isApplicantSolicitor(roles) || isLIPClaimant(roles)) {
+            return !respondToQueryHelper.isUnspecClaimNotReadyForNotification(caseData, roles);
+        }
+        if (isRespondentSolicitorOne(roles)) {
+            return true;
+        }
+        return false;
     }
 }

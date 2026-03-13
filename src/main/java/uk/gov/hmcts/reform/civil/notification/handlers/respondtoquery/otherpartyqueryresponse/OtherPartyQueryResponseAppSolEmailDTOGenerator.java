@@ -10,6 +10,9 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 import java.util.Map;
 
 import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.getApplicantLegalOrganizationName;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isLIPDefendant;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorOne;
+import static uk.gov.hmcts.reform.civil.utils.UserRoleUtils.isRespondentSolicitorTwo;
 
 @Component
 public class OtherPartyQueryResponseAppSolEmailDTOGenerator extends AppSolOneEmailDTOGenerator {
@@ -42,5 +45,15 @@ public class OtherPartyQueryResponseAppSolEmailDTOGenerator extends AppSolOneEma
         String orgName = getApplicantLegalOrganizationName(caseData, organisationService);
         respondToQueryHelper.addCustomProperties(properties, caseData, orgName, false);
         return properties;
+    }
+
+    @Override
+    public Boolean getShouldNotify(CaseData caseData) {
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && respondToQueryHelper.getResponseQueryContext(caseData)
+            .map(context -> isRespondentSolicitorOne(context.getRoles())
+                || isRespondentSolicitorTwo(context.getRoles())
+                || isLIPDefendant(context.getRoles()))
+            .orElse(false);
     }
 }
