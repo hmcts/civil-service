@@ -208,6 +208,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private CallbackResponse populateAndResetPreviousSelections(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
 
+        populatePenalNotice(caseData);
         if (isJudicialReferral(callbackParams)
             && caseData.isLipCase()) {
             return AboutToStartOrSubmitCallbackResponse.builder()
@@ -253,8 +254,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setAssistedOrderCostsReserved(null);
         caseData.setAssistedOrderMakeAnOrderForCosts(null);
         caseData.setAssistedOrderCostsBespoke(null);
-        caseData.setAssistedOrderPenalNoticeToggle(null);
-        caseData.setAssistedOrderPenalNoticeContent(null);
         caseData.setFinalOrderAppealToggle(null);
         caseData.setFinalOrderAppealComplex(null);
         caseData.setOrderMadeOnDetailsList(null);
@@ -266,8 +265,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderDownloadTemplateOptions(null);
         caseData.setOrderAfterHearingDate(null);
         caseData.setShowOrderAfterHearingDatePage(null);
-
-        populatePenalNotice(caseData);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))

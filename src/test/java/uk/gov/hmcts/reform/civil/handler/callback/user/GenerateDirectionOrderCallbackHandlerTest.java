@@ -414,8 +414,6 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             assertThat(response.getData().get("assistedOrderCostsReserved")).isNull();
             assertThat(response.getData().get("assistedOrderMakeAnOrderForCosts")).isNull();
             assertThat(response.getData().get("assistedOrderCostsBespoke")).isNull();
-            assertThat(response.getData().get("assistedOrderPenalNoticeToggle")).isNull();
-            assertThat(response.getData().get("assistedOrderPenalNoticeContent")).isNull();
             assertThat(response.getData().get("finalOrderAppealToggle")).isNull();
             assertThat(response.getData().get("finalOrderAppealComplex")).isNull();
             assertThat(response.getData().get("orderMadeOnDetailsList")).isNull();
