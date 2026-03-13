@@ -46,7 +46,7 @@ public class DeleteApplicationPaymentDashboardNotificationHandlerTest extends Ge
 
         @Test
         void shouldRemoveNotification_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             when(gaForLipService.isGaForLip(caseData)).thenReturn(true);
             when(gaForLipService.isLipApp(caseData)).thenReturn(true);
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(true);
@@ -66,7 +66,7 @@ public class DeleteApplicationPaymentDashboardNotificationHandlerTest extends Ge
 
         @Test
         void shouldNotRemoveNotification_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             when(featureToggleService.isGaForWelshEnabled()).thenReturn(false);
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
                 CallbackRequest.builder().eventId(DELETE_APPLICATION_PAYMENT_DASHBOARD_NOTIFICATION.name()).build()

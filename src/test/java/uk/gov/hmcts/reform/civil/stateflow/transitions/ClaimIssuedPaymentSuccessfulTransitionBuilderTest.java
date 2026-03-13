@@ -110,7 +110,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(YES)
             .build();
@@ -125,7 +125,7 @@ public class ClaimIssuedPaymentSuccessfulTransitionBuilderTest {
             .issueDate(LocalDate.now())
             .respondent1Represented(YES)
             .respondent1OrgRegistered(YES)
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2Represented(YES)
             .respondent2SameLegalRepresentative(NO)
             .respondent2OrgRegistered(YES)

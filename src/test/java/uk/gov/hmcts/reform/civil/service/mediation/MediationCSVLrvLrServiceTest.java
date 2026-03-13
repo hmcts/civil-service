@@ -65,22 +65,20 @@ class MediationCSVLrvLrServiceTest {
     }
 
     private Party buildParty(Party.Type type, String firstName, String lastName, String phoneNumber, String emailAddress) {
-        return Party.builder()
-            .type(type)
-            .individualFirstName(firstName)
-            .individualLastName(lastName)
-            .partyPhone(phoneNumber)
-            .partyEmail(emailAddress)
-            .build();
+        return new Party()
+            .setType(type)
+            .setIndividualFirstName(firstName)
+            .setIndividualLastName(lastName)
+            .setPartyPhone(phoneNumber)
+            .setPartyEmail(emailAddress);
     }
 
     private Party buildCompanyParty(String companyName, String phoneNumber, String emailAddress) {
-        return Party.builder()
-            .type(Party.Type.COMPANY)
-            .companyName(companyName)
-            .partyPhone(phoneNumber)
-            .partyEmail(emailAddress)
-            .build();
+        return new Party()
+            .setType(Party.Type.COMPANY)
+            .setCompanyName(companyName)
+            .setPartyPhone(phoneNumber)
+            .setPartyEmail(emailAddress);
     }
 
     private CaseData getCaseData(Party.Type partyType) {

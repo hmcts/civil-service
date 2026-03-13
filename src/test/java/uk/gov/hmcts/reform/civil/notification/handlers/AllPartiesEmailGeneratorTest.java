@@ -59,7 +59,7 @@ class AllPartiesEmailGeneratorTest {
     @Test
     void shouldNotifyAllParties_whenTwoRespondentRepresentativesFlagIsSet() {
         CaseData caseData = CaseData.builder()
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();
         EmailDTO appSolEmail = mock(EmailDTO.class);

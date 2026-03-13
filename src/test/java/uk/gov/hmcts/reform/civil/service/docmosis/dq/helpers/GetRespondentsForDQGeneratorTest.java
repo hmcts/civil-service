@@ -61,8 +61,8 @@ class GetRespondentsForDQGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondentResponseIsSame(YES)
             .respondent2SameLegalRepresentative(YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .build();
 
         List<Party> respondents = getRespondentsForDQGenerator.getRespondents(caseData, "ONE");
@@ -76,7 +76,7 @@ class GetRespondentsForDQGeneratorTest {
         CaseData caseData = CaseDataBuilder.builder()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(YES)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .build();
 
         List<Party> respondents = getRespondentsForDQGenerator.getRespondents(caseData, "TWO");
