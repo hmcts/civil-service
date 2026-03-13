@@ -73,31 +73,27 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
-            .respondent1(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
+            .respondent1(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setCompanyName("company name"))
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent1OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent1OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -132,31 +128,27 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setCompanyName("company name"))
             .respondentSolicitor2EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -191,33 +183,28 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setCompanyName("company name"))
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.YES)
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -252,33 +239,29 @@ class BreathingSpaceEnterNotificationHandlerTest {
         String organisationId = "organisationId";
         String organisationName = "organisation name";
         Mockito.when(organisationService.findOrganisationById(organisationId))
-            .thenReturn(Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                                        .name(organisationName)
-                                        .build()));
+            .thenReturn(Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                                        .setName(organisationName)
+                                        ));
 
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
-            .respondent2(Party.builder()
-                             .type(Party.Type.COMPANY)
-                             .companyName("company name")
-                             .build())
+            .respondent2(new Party()
+                             .setType(Party.Type.COMPANY)
+                             .setCompanyName("company name"))
             .respondentSolicitor2EmailAddress(null)
             .respondentSolicitor1EmailAddress(recipient)
-            .respondent2OrganisationPolicy(OrganisationPolicy.builder()
-                                               .organisation(Organisation.builder()
-                                                                 .organisationID(organisationId)
-                                                                 .build())
-                                               .build())
+            .respondent2OrganisationPolicy(new OrganisationPolicy()
+                                               .setOrganisation(new Organisation()
+                                                                    .setOrganisationID(organisationId)))
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 
@@ -316,29 +299,24 @@ class BreathingSpaceEnterNotificationHandlerTest {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("legacy ref")
             .ccdCaseReference(CASE_ID)
-            .applicant1(Party.builder()
-                            .type(Party.Type.COMPANY)
-                            .companyName("company name")
-                            .build())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder()
-                                                .email(recipient)
-                                                .build())
-            .applicant1OrganisationPolicy(OrganisationPolicy.builder()
-                                              .organisation(Organisation.builder()
-                                                                .organisationID(organisationId)
-                                                                .build())
-                                              .build())
-            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
-                                                          .name(solicitorName)
-                                                          .build())
+            .applicant1(new Party()
+                            .setType(Party.Type.COMPANY)
+                            .setCompanyName("company name"))
+            .applicantSolicitor1UserDetails(new IdamUserDetails()
+                                                .setEmail(recipient))
+            .applicant1OrganisationPolicy(new OrganisationPolicy()
+                                              .setOrganisation(new Organisation()
+                                                                   .setOrganisationID(organisationId)))
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
+                                                          .setName(solicitorName)
+                                                          )
             .build();
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .type(CallbackType.ABOUT_TO_SUBMIT)
             .caseData(caseData)
             .request(CallbackRequest.builder()
                          .eventId(CaseEvent.NOTIFY_APPLICANT_SOLICITOR1_BREATHING_SPACE_ENTER.name())
-                         .build())
-            .build();
+                         .build());
 
         handler.handle(params);
 

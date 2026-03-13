@@ -920,7 +920,7 @@ public class ParentCaseUpdateHelper {
             .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().build())
             .generalAppHearingDetails(GAHearingDetails.builder().build())
             .gaApplicantDisplayName(EMPTY)
-            .civilServiceUserRoles(IdamUserDetails.builder().build())
+            .civilServiceUserRoles(new IdamUserDetails())
             .generalAppRespondentSolicitors(Collections.emptyList())
             .generalAppEvidenceDocument(Collections.emptyList())
             .applicantPartyName(EMPTY)

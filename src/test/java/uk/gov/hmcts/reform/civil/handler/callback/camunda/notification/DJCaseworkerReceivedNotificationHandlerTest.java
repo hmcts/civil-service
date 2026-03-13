@@ -79,14 +79,12 @@ class DJCaseworkerReceivedNotificationHandlerTest {
             when(defaultJudgmentSpecEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
             when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
+                .thenReturn(BigDecimal.valueOf(100));
             when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                .thenReturn(new Fee()
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+                                .setVersion("1")
+                                .setCode("CODE"));
 
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -119,14 +117,12 @@ class DJCaseworkerReceivedNotificationHandlerTest {
             when(defaultJudgmentSpecEmailConfiguration.getReceiver())
                 .thenReturn("caseworker@hmcts.net");
             when(interestCalculator.calculateInterest(any()))
-                .thenReturn(BigDecimal.valueOf(100)
-                );
+                .thenReturn(BigDecimal.valueOf(100));
             when(feesService.getFeeDataByTotalClaimAmount(any()))
-                .thenReturn(Fee.builder()
-                                .calculatedAmountInPence(BigDecimal.valueOf(100))
-                                .version("1")
-                                .code("CODE")
-                                .build());
+                .thenReturn(new Fee()
+                                .setCalculatedAmountInPence(BigDecimal.valueOf(100))
+                                .setVersion("1")
+                                .setCode("CODE"));
             //send Received email
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
                 .build().toBuilder()

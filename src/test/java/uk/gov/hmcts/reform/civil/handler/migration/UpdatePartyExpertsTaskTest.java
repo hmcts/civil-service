@@ -36,14 +36,14 @@ class UpdatePartyExpertsTaskTest {
     @Test
     void shouldThrowExceptionWhenCaseReferenceValueIsNull() {
         CaseData caseData = CaseData.builder().build();
-        CaseReference caseRef = CaseReference.builder().caseReference(null).build();
+        CaseReference caseRef = caseReference(null);
         assertThrows(IllegalArgumentException.class, () -> task.migrateCaseData(caseData, caseRef));
     }
 
     @Test
     void shouldUpdateApplicantExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert1 = PartyFlagStructure.builder().firstName(null).lastName(null).build();
-        PartyFlagStructure expert2 = PartyFlagStructure.builder().firstName("John").lastName(null).build();
+        PartyFlagStructure expert1 = new PartyFlagStructure().setFirstName(null).setLastName(null);
+        PartyFlagStructure expert2 = new PartyFlagStructure().setFirstName("John").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(
@@ -52,7 +52,7 @@ class UpdatePartyExpertsTaskTest {
             ))
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference caseRef = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, caseRef);
 
@@ -66,13 +66,13 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateRespondent1ExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert = PartyFlagStructure.builder().firstName(null).lastName("Smith").build();
+        PartyFlagStructure expert = new PartyFlagStructure().setFirstName(null).setLastName("Smith");
 
         CaseData caseData = CaseData.builder()
             .respondent1Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -83,13 +83,13 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldUpdateRespondent2ExpertsWithTBCWhenNamesAreNull() {
-        PartyFlagStructure expert = PartyFlagStructure.builder().firstName("Bob").lastName(null).build();
+        PartyFlagStructure expert = new PartyFlagStructure().setFirstName("Bob").setLastName(null);
 
         CaseData caseData = CaseData.builder()
             .respondent2Experts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("123").build();
+        CaseReference ref = caseReference("123");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -116,7 +116,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent2DQ(new Respondent2DQ().setRespondent2DQExperts(dqExperts))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("999").build();
+        CaseReference ref = caseReference("999");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -133,17 +133,17 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldAssignNewPartyIdWhenMissing() {
-        PartyFlagStructure expert = PartyFlagStructure.builder()
-            .firstName("Test")
-            .lastName("User")
-            .partyID(null)
-            .build();
+        PartyFlagStructure expert = new PartyFlagStructure()
+            .setFirstName("Test")
+            .setLastName("User")
+            .setPartyID(null)
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("111").build();
+        CaseReference ref = caseReference("111");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -153,17 +153,17 @@ class UpdatePartyExpertsTaskTest {
 
     @Test
     void shouldNotChangePartyIdIfAlreadyPresent() {
-        PartyFlagStructure expert = PartyFlagStructure.builder()
-            .firstName("John")
-            .lastName("Doe")
-            .partyID("existing-id-123")
-            .build();
+        PartyFlagStructure expert = new PartyFlagStructure()
+            .setFirstName("John")
+            .setLastName("Doe")
+            .setPartyID("existing-id-123")
+            ;
 
         CaseData caseData = CaseData.builder()
             .applicantExperts(List.of(Element.<PartyFlagStructure>builder().value(expert).build()))
             .build();
 
-        CaseReference ref = CaseReference.builder().caseReference("12345").build();
+        CaseReference ref = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, ref);
 
@@ -183,7 +183,7 @@ class UpdatePartyExpertsTaskTest {
             .respondent2DQ(null)
             .build();
 
-        CaseReference caseRef = CaseReference.builder().caseReference("12345").build();
+        CaseReference caseRef = caseReference("12345");
 
         CaseData updated = task.migrateCaseData(caseData, caseRef);
 
@@ -199,5 +199,11 @@ class UpdatePartyExpertsTaskTest {
         assertThat(task.getTaskName()).isEqualTo("UpdatePartyExpertsTask");
         assertThat(task.getEventSummary()).contains("Update case party experts");
         assertThat(task.getEventDescription()).contains("UpdatePartyExpertsTask updates experts");
+    }
+
+    private CaseReference caseReference(String value) {
+        CaseReference caseReference = new CaseReference();
+        caseReference.setCaseReference(value);
+        return caseReference;
     }
 }

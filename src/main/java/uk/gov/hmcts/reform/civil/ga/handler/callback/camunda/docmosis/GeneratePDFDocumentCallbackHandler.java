@@ -120,7 +120,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
         GeneralApplicationCaseData caseData = callbackParams.getGeneralApplicationCaseData();
         log.info("Create PDF document for case: {}", caseData.getCcdCaseReference());
 
-        GeneralApplicationCaseData civilCaseData = GeneralApplicationCaseData.builder().build();
+        GeneralApplicationCaseData civilCaseData = new GeneralApplicationCaseData().build();
         if (gaForLipService.isGaForLip(caseData)) {
             civilCaseData = caseDetailsConverter
                 .toGeneralApplicationCaseData(coreCaseDataService
@@ -128,7 +128,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
 
         }
 
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         CaseDocument decision = null;
         CaseDocument postJudgeOrderToLipApplicant = null;
         CaseDocument postJudgeOrderToLipRespondent = null;
@@ -659,7 +659,7 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
             .build();
     }
 
-    private void setPreTranslationDocument(GeneralApplicationCaseData caseData, GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder,
+    private void setPreTranslationDocument(GeneralApplicationCaseData caseData, GeneralApplicationCaseData caseDataBuilder,
                                            CaseDocument decision, PreTranslationGaDocumentType doctype) {
         List<Element<CaseDocument>> preTranslatedDocuments =
             Optional.ofNullable(caseData.getPreTranslationGaDocuments())

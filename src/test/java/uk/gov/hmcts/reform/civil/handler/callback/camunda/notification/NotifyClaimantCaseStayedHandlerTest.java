@@ -64,9 +64,9 @@ class NotifyClaimantCaseStayedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
             .build();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -94,9 +94,9 @@ class NotifyClaimantCaseStayedHandlerTest {
         caseData = caseData.toBuilder()
             .applicant1Represented(isApplicantLiP ? YesOrNo.NO : YesOrNo.YES)
             .claimantBilingualLanguagePreference(isClaimantBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())
-            .applicantSolicitor1UserDetails(IdamUserDetails.builder().email(email).build())
+            .applicantSolicitor1UserDetails(new IdamUserDetails().setEmail(email))
             .build();
-        final CallbackParams params = CallbackParams.builder().caseData(caseData).build();
+        final CallbackParams params = new CallbackParams().caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isApplicantLiP && isClaimantBilingual) {

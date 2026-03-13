@@ -34,15 +34,13 @@ class RdClientServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        court1 = LocationRefData.builder()
-            .epimmsId("111")
-            .courtName("London Court")
-            .build();
+        court1 = new LocationRefData()
+            .setEpimmsId("111")
+            .setCourtName("London Court");
 
-        court2 = LocationRefData.builder()
-            .epimmsId("222")
-            .courtName("Bristol Court")
-            .build();
+        court2 = new LocationRefData()
+            .setEpimmsId("222")
+            .setCourtName("Bristol Court");
 
         when(locationRefDataApiClient.getAllCivilCourtVenues(any(), any(), any(), any()))
             .thenReturn(List.of(court1, court2));

@@ -5,12 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GAApplicationType;
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAApproveConsentOrder;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAInformOtherParty;
 import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.consentorder.ConsentOrderGenerator;
 
@@ -45,26 +44,25 @@ import static uk.gov.hmcts.reform.civil.callback.CaseEvent.APPROVE_CONSENT_ORDER
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    ApproveConsentOrderCallbackHandler.class,
-    JacksonAutoConfiguration.class,
-    ValidationAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
+@ExtendWith(MockitoExtension.class)
  class ApproveConsentOrderCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Spy
+    private ObjectMapper mapper = ObjectMapperFactory.instance();
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(mapper);
+
     private static final String CAMUNDA_EVENT = "APPROVE_CONSENT_ORDER";
     private static final String BUSINESS_PROCESS_INSTANCE_ID = "11111";
     private static final String ACTIVITY_ID = "anyActivity";
     public static final String ORDER_DATE_IN_PAST = "The date, by which the order to end"
         + " should be given, cannot be in past.";
-    @Autowired
+
+    @InjectMocks
     private ApproveConsentOrderCallbackHandler handler;
 
-    @MockBean
+    @Mock
     private ConsentOrderGenerator consentOrderGenerator;
 
     @Test
@@ -217,7 +215,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
     public GeneralApplicationCaseData getGeneralAppCaseData(List<GeneralApplicationTypes> types) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppDetailsOfOrder("Testing prepopulated text")
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
@@ -225,9 +223,9 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()
@@ -244,21 +242,21 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
     public GeneralApplicationCaseData getGeneralAppCaseDataForGeneratingDocument(List<GeneralApplicationTypes> types, LocalDate orderDate,
                                                                YesOrNo showConsent) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppDetailsOfOrder("Testing prepopulated text")
-            .approveConsentOrder(GAApproveConsentOrder.builder().consentOrderDescription("Testing prepopulated text")
-                                     .showConsentOrderDate(showConsent)
-                                     .consentOrderDateToEnd(orderDate)
-                                    .build())
+            .approveConsentOrder(new GAApproveConsentOrder().setConsentOrderDescription("Testing prepopulated text")
+                                     .setShowConsentOrderDate(showConsent)
+                                     .setConsentOrderDateToEnd(orderDate)
+                                    )
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()
@@ -274,16 +272,16 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 
     public GeneralApplicationCaseData getGeneralAppCaseDataWithoutOrderDetails(List<GeneralApplicationTypes> types) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YES).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

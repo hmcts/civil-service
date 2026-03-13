@@ -97,12 +97,12 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .willReturn(Optional.of(requestedCourt));
 
             given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+                .willReturn(Optional.of(new LocationRefData().setCourtLocationCode("123")));
 
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(new PartyBuilder().individual().build().setPartyID("res-1-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -122,12 +122,12 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
                 .willReturn(Optional.of(requestedCourt));
 
             given(helper.getMatching(any(), any()))
-                .willReturn(Optional.of(LocationRefData.builder().courtLocationCode("123").build()));
+                .willReturn(Optional.of(new LocationRefData().setCourtLocationCode("123")));
 
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmittedSmallClaim()
                 .setClaimTypeToUnspecClaim()
-                .respondent2(PartyBuilder.builder().individual().build().toBuilder().partyID("res-2-party-id").build())
+                .respondent2(new PartyBuilder().individual().build().setPartyID("res-2-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -144,7 +144,7 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
             CaseData localCaseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
                 .atStateClaimSubmitted()
                 .setClaimTypeToSpecClaim()
-                .respondent1(PartyBuilder.builder().individual().build().toBuilder().partyID("res-1-party-id").build())
+                .respondent1(new PartyBuilder().individual().build().setPartyID("res-1-party-id"))
                 .build();
 
             CallbackParams localParams = callbackParamsOf(localCaseData, ABOUT_TO_SUBMIT);
@@ -160,8 +160,8 @@ public class CreateReferToJudgeCallbackHandlerTest extends BaseCallbackHandlerTe
         void thereIsAMatchingLocation() {
             CaseData updatedData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
 
-            LocationHelper.updateWithLocation(updatedData, LocationRefData.builder()
-                .courtLocationCode("123").regionId("regionId").region("region name").epimmsId("epimms").build());
+            LocationHelper.updateWithLocation(updatedData, new LocationRefData()
+                .setCourtLocationCode("123").setRegionId("regionId").setRegion("region name").setEpimmsId("epimms"));
 
             CaseLocationCivil caseLocationCivil = new CaseLocationCivil();
             caseLocationCivil.setRegion("regionId");

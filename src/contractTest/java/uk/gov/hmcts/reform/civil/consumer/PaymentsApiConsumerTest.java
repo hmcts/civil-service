@@ -46,10 +46,9 @@ public class PaymentsApiConsumerTest extends BaseContractTest {
     private static final String SERVICE = "CIVIL";
     private static final String SITE_ID = "site_id";
     private static final String SPEC_SITE_ID = "spec_site_id";
-    private static final Organisation ORGANISATION = Organisation.builder()
-        .name("test org")
-        .contactInformation(List.of(ContactInformation.builder().build()))
-        .build();
+    private static final Organisation ORGANISATION = new Organisation()
+        .setName("test org")
+        .setContactInformation(List.of(new ContactInformation()));
     protected static final String ACCOUNT_NUMBER = "PBA0077597";
 
     @Autowired

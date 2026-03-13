@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.civil.model.citizenui.DtoFieldFormat.DATE_FORM
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Accessors(chain = true)
 public class Offer {
 
     private PaymentIntention paymentIntention;

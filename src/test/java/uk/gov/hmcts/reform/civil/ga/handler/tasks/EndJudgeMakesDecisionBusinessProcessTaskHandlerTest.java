@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.civil.ga.handler.tasks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
@@ -22,6 +20,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDetailsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.data.ExternalTaskInput;
 
 import java.util.Map;
 
@@ -31,34 +30,32 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_JUDGE_BUSINESS_PROCESS_GASPEC;
 
-@SpringBootTest(classes = {
-    EndJudgeMakesDecisionBusinessProcessTaskHandler.class,
-    JacksonAutoConfiguration.class,
-    CaseDetailsConverter.class,
-})
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class EndJudgeMakesDecisionBusinessProcessTaskHandlerTest {
 
-    private static final String CASE_ID = "1234";
     public static final String PROCESS_INSTANCE_ID = "processInstanceId";
-
+    private static final String CASE_ID = "1234";
     @Mock
     private ExternalTask mockExternalTask;
 
     @Mock
     private ExternalTaskService externalTaskService;
 
-    @MockBean
+    @Mock
     private GaCoreCaseDataService coreCaseDataService;
 
-    @Autowired
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
+
+    @Mock
+    private ObjectMapper mapper;
+
+    @InjectMocks
     private EndJudgeMakesDecisionBusinessProcessTaskHandler handler;
 
     @BeforeEach
     void init() {
         when(mockExternalTask.getTopicName()).thenReturn("test");
-        when(mockExternalTask.getWorkerId()).thenReturn("worker");
-        when(mockExternalTask.getActivityId()).thenReturn("activityId");
         when(mockExternalTask.getProcessInstanceId()).thenReturn(PROCESS_INSTANCE_ID);
 
         when(mockExternalTask.getAllVariables())
@@ -77,10 +74,14 @@ class EndJudgeMakesDecisionBusinessProcessTaskHandlerTest {
         CaseDetails caseDetails = CaseDetailsBuilder.builder().data(caseData).build();
         StartEventResponse startEventResponse = startEventResponse(caseDetails);
 
+        ExternalTaskInput externalTaskInput = new ExternalTaskInput()
+            .setCaseId(CASE_ID);
+
+        when(mapper.convertValue(any(), eq(ExternalTaskInput.class))).thenReturn(externalTaskInput);
         when(coreCaseDataService.startGaUpdate(CASE_ID, END_JUDGE_BUSINESS_PROCESS_GASPEC))
             .thenReturn(startEventResponse);
-
         when(coreCaseDataService.submitGaUpdate(eq(CASE_ID), any(CaseDataContent.class))).thenReturn(caseData);
+        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(caseData);
 
         CaseDataContent caseDataContentWithFinishedStatus = getCaseDataContent(caseDetails, startEventResponse);
 

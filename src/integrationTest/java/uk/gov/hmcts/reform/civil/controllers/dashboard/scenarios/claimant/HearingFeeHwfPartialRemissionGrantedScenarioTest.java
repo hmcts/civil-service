@@ -34,7 +34,7 @@ public class HearingFeeHwfPartialRemissionGrantedScenarioTest extends DashboardB
             .legacyCaseReference("reference")
             .applicant1Represented(YesOrNo.NO)
             .ccdCaseReference(Long.valueOf(caseId))
-            .hearingFee(Fee.builder().calculatedAmountInPence(BigDecimal.valueOf(45500)).build())
+            .hearingFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(45500)))
             .hearingHwfDetails(new HelpWithFeesDetails()
                                    .setHwfCaseEvent(CaseEvent.PARTIAL_REMISSION_HWF_GRANTED)
                                    .setRemissionAmount(new BigDecimal(10000))

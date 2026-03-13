@@ -33,13 +33,12 @@ class ResetPinDefendantLipEmailGeneratorTest {
 
     @Test
     void shouldGenerateEmailDTOForPartiesToNotify() {
+        EmailDTO emailDTO = new EmailDTO();
+        emailDTO.setTargetEmail("respondent@example.com");
+        emailDTO.setEmailTemplate("template-id");
+        emailDTO.setParameters(Map.of("key", "value"));
+        emailDTO.setReference("reset-pin-notification");
         CaseData caseData = mock(CaseData.class);
-        EmailDTO emailDTO = EmailDTO.builder()
-            .targetEmail("respondent@example.com")
-            .emailTemplate("template-id")
-            .parameters(Map.of("key", "value"))
-            .reference("reset-pin-notification")
-            .build();
 
         when(resetPinDefendantLipEmailDTOGenerator.getShouldNotify(caseData)).thenReturn(true);
         when(resetPinDefendantLipEmailDTOGenerator.buildEmailDTO(caseData, null)).thenReturn(emailDTO);

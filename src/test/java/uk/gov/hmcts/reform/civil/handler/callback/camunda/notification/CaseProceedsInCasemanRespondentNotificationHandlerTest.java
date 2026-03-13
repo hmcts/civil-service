@@ -128,7 +128,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
         void shouldNotifyRespondentSolicitor_whenFlowStateHasTransitionedToClaimNotified() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).build();
@@ -151,7 +151,7 @@ class CaseProceedsInCasemanRespondentNotificationHandlerTest extends BaseCallbac
         void shouldNotifyRespondentSolicitor2_whenFlowStateHasTransitionedToClaimNotified() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build()
                 .toBuilder()

@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.civil.referencedata.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
-@Builder(toBuilder = true)
+@Accessors(chain = true)
 public class JudgeRefData {
 
     private String title;
@@ -19,6 +19,10 @@ public class JudgeRefData {
     private String isJudge;
     private String isPanelMember;
     private String isMagistrate;
+
+    public JudgeRefData() {
+        // default constructor for frameworks/tests
+    }
 
     @JsonCreator
     public JudgeRefData(@JsonProperty("post_nominals") String title,

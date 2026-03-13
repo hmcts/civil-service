@@ -18,18 +18,16 @@ class CaseDataContentConverterTest {
 
     @Test
     void shouldConvertToUpdatedCaseWithoutDeletingNestedData() {
-        Address app1Address = Address.builder()
-            .addressLine1("123 Street")
-            .postTown("City")
-            .postCode("12345")
-            .country("Country")
-            .build();
-        Address resp1Address = Address.builder()
-            .addressLine1("456 Street")
-            .postTown("City")
-            .postCode("54321")
-            .country("Country")
-            .build();
+        Address app1Address = new Address()
+            .setAddressLine1("123 Street")
+            .setPostTown("City")
+            .setPostCode("12345")
+            .setCountry("Country");
+        Address resp1Address = new Address()
+            .setAddressLine1("456 Street")
+            .setPostTown("City")
+            .setPostCode("54321")
+            .setCountry("Country");
         Map<String, Object> applicant1 =
             new HashMap<>(Map.of("firstName", "app1firstname", "lastName", "app1lastname", "email", "app1@test.com", "address", app1Address));
         Map<String, Object> respondent1 =

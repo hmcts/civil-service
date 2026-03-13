@@ -124,7 +124,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
             @Test
             void shouldNotifyApplicantSolicitor_whenInvoked() {
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
                 when(notificationsProperties.getClaimantSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id");
                 Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -188,7 +188,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
             @Test
             void shouldNotifyRespondentSolicitor1_whenInvoked() {
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -208,7 +208,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
             @Test
             void shouldNotifyRespondentSolicitor2_whenInvoked() {
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -242,7 +242,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 invokeAboutToSubmitWithEvent("NOTIFY_APPLICANT_RESPONDENT2_FOR_AGREED_EXTENSION_DATE_FOR_SPEC_CC");
 
@@ -259,7 +259,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -285,7 +285,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -311,14 +311,14 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
-                    .respondent1(PartyBuilder.builder().individual().build())
+                    .respondent1(new PartyBuilder().individual().build())
                     .addRespondent2(YES)
                     .respondent2SameLegalRepresentative(NO)
-                    .respondent2(PartyBuilder.builder().soleTrader().build())
+                    .respondent2(new PartyBuilder().soleTrader().build())
                     .respondent1TimeExtensionDate(LocalDateTime.now().minusDays(1))
                     .build();
 
@@ -337,7 +337,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -364,12 +364,12 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent1TimeExtension()
                     .addRespondent2(YES)
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .build();
 
@@ -392,7 +392,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -436,7 +436,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()
@@ -461,7 +461,7 @@ class AgreedExtensionDateApplicantForSpecHandlerTest extends BaseCallbackHandler
                 when(notificationsProperties.getRespondentSolicitorAgreedExtensionDateForSpec())
                     .thenReturn("template-id-respondent");
                 when(organisationService.findOrganisationById(anyString()))
-                    .thenReturn(Optional.of(Organisation.builder().name("Signer Name").build()));
+                    .thenReturn(Optional.of(new Organisation().setName("Signer Name")));
 
                 caseData = CaseDataBuilder.builder()
                     .atStateNotificationAcknowledgedRespondent2TimeExtension()

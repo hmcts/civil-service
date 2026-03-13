@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocument;
 import uk.gov.hmcts.reform.civil.model.citizenui.ManageDocumentType;
 import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,12 +34,14 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
 
     private ManageDocumentsHandler handler;
     private ObjectMapper objectMapper;
+    @Mock
+    private TaskListService taskListService;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        handler = new ManageDocumentsHandler(objectMapper);
+        handler = new ManageDocumentsHandler(objectMapper, taskListService);
     }
 
     @Nested
@@ -80,7 +84,7 @@ class ManageDocumentsHandlerTest extends BaseCallbackHandlerTest {
                 UUID.fromString("5fc03087-d265-11e7-b8c6-83e29cd24f45"),
                 manageDocument1
             );
-            CaseData caseData = CaseDataBuilder.builder().build();
+            CaseData caseData = CaseDataBuilder.builder().ccdCaseReference(1L).build();
             caseData.setManageDocuments(List.of(document, document2));
 
             CallbackParams params = callbackParamsOf(caseData, caseDataBefore, CallbackType.ABOUT_TO_SUBMIT);

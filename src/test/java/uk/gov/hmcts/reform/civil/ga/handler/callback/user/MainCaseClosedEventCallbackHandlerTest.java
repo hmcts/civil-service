@@ -1,22 +1,23 @@
 package uk.gov.hmcts.reform.civil.ga.handler.callback.user;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
+import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.CaseState;
 import uk.gov.hmcts.reform.civil.ga.handler.GeneralApplicationBaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.service.Time;
 
 import java.time.LocalDateTime;
@@ -29,32 +30,33 @@ import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.MAIN_CASE_CLOSED;
 import static uk.gov.hmcts.reform.civil.enums.CaseState.APPLICATION_CLOSED;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {
-    MainCaseClosedEventCallbackHandler.class, JacksonAutoConfiguration.class, Time.class
-})
+@ExtendWith(MockitoExtension.class)
 class MainCaseClosedEventCallbackHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @MockBean
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
+
+    @Spy
+    private CaseDetailsConverter caseDetailsConverter = new CaseDetailsConverter(objectMapper);
+
+    @Mock
     private Time time;
 
-    @Autowired
+    @InjectMocks
     private MainCaseClosedEventCallbackHandler handler;
 
     @Nested
     class AboutToSubmitCallback {
 
-        private LocalDateTime localDateTime;
-
-        @BeforeEach
-        void setup() {
-            localDateTime = LocalDateTime.now();
-            when(time.now()).thenReturn(localDateTime);
-        }
+        private final LocalDateTime localDateTime = LocalDateTime.now();
 
         @ParameterizedTest(name = "The application is in {0} state")
         @EnumSource(value = CaseState.class)
         void shouldRespondWithStateChangedWhenApplicationIsLive(CaseState state) {
+            if (!NON_LIVE_STATES.contains(state)) {
+                when(time.now()).thenReturn(localDateTime);
+            }
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .ccdCaseReference(1234L)
                 .ccdState(state).build();

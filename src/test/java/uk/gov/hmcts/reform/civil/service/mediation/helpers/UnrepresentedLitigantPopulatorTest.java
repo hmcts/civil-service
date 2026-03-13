@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.civil.service.mediation.helpers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.NO;
 import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
@@ -39,19 +39,18 @@ class UnrepresentedLitigantPopulatorTest {
         party.setPartyEmail("party@email.com");
         party.setPartyPhone("123456789");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             null
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
         assertThat(litigant.getDateRangeToAvoid()).hasSize(1);
-        assertNull(litigant.getDateRangeToAvoid().get(0).getDateFrom());
-        assertNull(litigant.getDateRangeToAvoid().get(0).getDateTo());
+        Assertions.assertNull(litigant.getDateRangeToAvoid().get(0).getDateFrom());
+        Assertions.assertNull(litigant.getDateRangeToAvoid().get(0).getDateTo());
     }
 
     @Test
@@ -62,10 +61,9 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(YES);
 
         LocalDate fixedDate = LocalDate.of(2024, 6, 10);
-        UnavailableDate unavailableDate = UnavailableDate.builder()
-            .date(fixedDate)
-            .unavailableDateType(SINGLE_DATE)
-            .build();
+        UnavailableDate unavailableDate = new UnavailableDate()
+            .setDate(fixedDate)
+            .setUnavailableDateType(SINGLE_DATE);
         Element<UnavailableDate> elementUnavailableDate = ElementUtils.element(unavailableDate);
         when(mediationLiPCarm.getUnavailableDatesForMediation()).thenReturn(List.of(elementUnavailableDate));
 
@@ -75,13 +73,12 @@ class UnrepresentedLitigantPopulatorTest {
         party.setPartyEmail("party@email.com");
         party.setPartyPhone("123456789");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
@@ -104,13 +101,12 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getAlternativeMediationTelephone()).thenReturn("987654321");
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("alt@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("987654321");
@@ -132,13 +128,12 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Contact Person",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactEmail()).isEqualTo("party@email.com");
         assertThat(litigant.getMediationContactNumber()).isEqualTo("123456789");
@@ -159,13 +154,12 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getIsMediationPhoneCorrect()).thenReturn(YES);
         when(mediationLiPCarm.getHasUnavailabilityNextThreeMonths()).thenReturn(NO);
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Jane Doe",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactName()).isEqualTo("Jane Doe");
         assertThat(litigant.getMediationContactEmail()).isEqualTo("corp@email.com");
@@ -184,13 +178,12 @@ class UnrepresentedLitigantPopulatorTest {
         when(mediationLiPCarm.getIsMediationContactNameCorrect()).thenReturn(NO);
         when(mediationLiPCarm.getAlternativeMediationContactPerson()).thenReturn("Alternative Contact");
 
-        MediationLitigant.MediationLitigantBuilder builder = MediationLitigant.builder();
         MediationLitigant litigant = unrepresentedLitigantPopulator.populator(
-            builder,
+            new MediationLitigant(),
             party,
             "Original Contact",
             mediationLiPCarm
-        ).build();
+        );
 
         assertThat(litigant.getMediationContactName()).isEqualTo("Alternative Contact");
     }

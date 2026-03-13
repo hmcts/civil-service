@@ -52,12 +52,12 @@ class CourtOfficerOrderGeneratorTest {
         .documentName(courtOrderFileName)
         .documentType(COURT_OFFICER_ORDER)
         .build();
-    private static LocationRefData locationRefData = LocationRefData.builder().siteName("SiteName")
-        .courtAddress("12").postcode("34")
-        .courtName("Court Name").region("Region").regionId("4").courtVenueId("000")
-        .externalShortName("Court Name Short")
-        .courtTypeId("10").courtLocationCode("121")
-        .epimmsId("123456").build();
+    private static LocationRefData locationRefData = new LocationRefData().setSiteName("SiteName")
+        .setCourtAddress("12").setPostcode("34")
+        .setCourtName("Court Name").setRegion("Region").setRegionId("4").setCourtVenueId("000")
+        .setExternalShortName("Court Name Short")
+        .setCourtTypeId("10").setCourtLocationCode("121")
+        .setEpimmsId("123456");
     private static final CaseLocationCivil caseManagementLocation = new CaseLocationCivil().setBaseLocation("123456");
 
     @MockBean
@@ -111,7 +111,7 @@ class CourtOfficerOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
-            .applicant2(Party.builder().partyName("applicant2").type(Party.Type.INDIVIDUAL).build())
+            .applicant2(new Party().setPartyName("applicant2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, "BEARER_TOKEN");
@@ -131,7 +131,7 @@ class CourtOfficerOrderGeneratorTest {
 
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
             .courtOfficerOrdered("apples and bananas")
-            .respondent2(Party.builder().partyName("respondent2").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(new Party().setPartyName("respondent2").setType(Party.Type.INDIVIDUAL))
             .caseManagementLocation(caseManagementLocation)
             .build();
         CaseDocument caseDocument = generator.generate(caseData, "BEARER_TOKEN");

@@ -53,7 +53,7 @@ class RaisingClaimAgainstLitigantInPersonForSpecNotificationHandlerTest {
             .build();
 
         when(organisationService.findOrganisationById(anyString()))
-            .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("org name")));
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
         when(configuration.getPhoneContact()).thenReturn((String) configMap.get("phoneContact"));

@@ -20,16 +20,16 @@ public class HwFFeeTypeUtilTest {
     @Test
     void updateFeeType_shouldSetAdditionalFeeType_whenCaseStateIsApplicationAddPayment() {
         // Arrange
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
-                                                                     .calculatedAmountInPence(BigDecimal.valueOf(180))
-                                                                     .code("FEE123").build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()
+                                                                     .setCalculatedAmountInPence(BigDecimal.valueOf(180))
+                                                                     .setCode("FEE123")))
                 .build();
 
         // Act
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
+        GeneralApplicationCaseData updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
 
         // Assert
         assertThat(updatedCaseDataBuilder.build().getHwfFeeType()).isEqualTo(FeeType.ADDITIONAL);
@@ -39,17 +39,17 @@ public class HwFFeeTypeUtilTest {
     @Test
     void updateFeeType_shouldSetApplicationFeeType_whenCaseStateIsNotApplicationAddPayment() {
         // Arrange
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .generalAppHelpWithFees(new HelpWithFees())
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(Fee.builder()
-                                                                 .calculatedAmountInPence(BigDecimal.valueOf(180))
-                                                                 .code("FEE123").build()).build())
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee()
+                                                                 .setCalculatedAmountInPence(BigDecimal.valueOf(180))
+                                                                 .setCode("FEE123")))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFeesReferenceNumber("HWF-111-222"))
             .build();
 
         // Act
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
+        GeneralApplicationCaseData updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
 
         // Assert
         assertThat(updatedCaseDataBuilder.build().getHwfFeeType()).isEqualTo(FeeType.APPLICATION);
@@ -59,12 +59,12 @@ public class HwFFeeTypeUtilTest {
     @Test
     void updateFeeType_shouldNotChangeFeeType_whenGeneralAppHelpWithFeesIsNull() {
         // Arrange
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .ccdState(CaseState.APPLICATION_ADD_PAYMENT)
                 .build();
 
         // Act
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
+        GeneralApplicationCaseData updatedCaseDataBuilder = HwFFeeTypeUtil.updateHwfDetails(caseData);
 
         // Assert
         assertThat(updatedCaseDataBuilder.build().getHwfFeeType()).isNull();
@@ -73,13 +73,13 @@ public class HwFFeeTypeUtilTest {
     @Test
     void getCalculatedFeeInPence_shouldReturnFee_whenFeesIsNotNull() {
         // Arrange
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
-                .generalAppPBADetails(GeneralApplicationPbaDetails.builder().fee(
-                                Fee.builder()
-                                        .calculatedAmountInPence(BigDecimal.valueOf(30000))
-                                        .code("OOOCM002").build())
-                        .build())
-                .additionalHwfDetails(HelpWithFeesDetails.builder().build())
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
+                .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(
+                                new Fee()
+                                        .setCalculatedAmountInPence(BigDecimal.valueOf(30000))
+                                        .setCode("OOOCM002"))
+                        )
+                .additionalHwfDetails(new HelpWithFeesDetails())
                 .hwfFeeType(FeeType.ADDITIONAL)
                 .build();
 
@@ -93,7 +93,7 @@ public class HwFFeeTypeUtilTest {
     @Test
     void getCalculatedFeeInPence_shouldReturnZero_whenFeesIsNull() {
         // Arrange
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .build();
 
         // Act
@@ -105,7 +105,7 @@ public class HwFFeeTypeUtilTest {
 
     @Test
     void should_updateHwfReferenceNumber() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseData.builder()
+        GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
                 .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
                         .setHwfNumberAvailable(YesOrNo.YES)
                         .setHwfNumberForFeePaymentOutcome("hwf"))

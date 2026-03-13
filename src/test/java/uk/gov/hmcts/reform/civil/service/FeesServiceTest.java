@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.civil.config.FeesConfiguration;
+import uk.gov.hmcts.reform.civil.config.OtherRemedyFeesConfiguration;
 import uk.gov.hmcts.reform.civil.model.ClaimValue;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.Fee2Dto;
@@ -38,22 +39,28 @@ class FeesServiceTest {
     @Mock
     private FeesConfiguration feesConfiguration;
 
+    @Mock
+    private OtherRemedyFeesConfiguration otherRemedyFeesConfiguration;
+
     @InjectMocks
     private FeesService feesService;
 
     @BeforeEach
     void setUp() {
-        FeeLookupResponseDto feeLookupResponse = FeeLookupResponseDto.builder()
-            .feeAmount(TEST_FEE_AMOUNT_POUNDS)
-            .code("test_fee_code")
-            .version(1)
-            .build();
+        FeeLookupResponseDto feeLookupResponse = new FeeLookupResponseDto()
+            .setFeeAmount(TEST_FEE_AMOUNT_POUNDS)
+            .setCode("test_fee_code")
+            .setVersion(1)
+            ;
         given(feesClient.lookupFee(any(), any(), any()))
             .willReturn(feeLookupResponse);
         given(feesClient.findRangeGroup(any(), any())).willReturn(buildFeeRangeResponse());
         given(feesConfiguration.getChannel()).willReturn(CHANNEL);
         given(feesConfiguration.getEvent()).willReturn(EVENT);
         given(feesConfiguration.getHearingEvent()).willReturn(HEARING_EVENT);
+
+        given(feesClient.lookupOtherRemedyFees(any(OtherRemedyFeesConfiguration.class), any()))
+            .willReturn(feeLookupResponse);
     }
 
     @Test
@@ -69,6 +76,22 @@ class FeesServiceTest {
         Fee feeDto = feesService.getFeeDataByClaimValue(claimValue);
 
         verify(feesClient).lookupFee(CHANNEL, EVENT, new BigDecimal("50.00"));
+        assertThat(feeDto).isEqualTo(expectedFeeDto);
+    }
+
+    @Test
+    void shouldReturnFeeDataForOtherRemedy_whenValidClaimValue() {
+        ClaimValue claimValue = new ClaimValue();
+        claimValue.setStatementOfValueInPennies(BigDecimal.valueOf(5000));
+
+        Fee expectedFeeDto = new Fee();
+        expectedFeeDto.setCalculatedAmountInPence(TEST_FEE_AMOUNT_PENCE);
+        expectedFeeDto.setCode("test_fee_code");
+        expectedFeeDto.setVersion("1");
+
+        Fee feeDto = feesService.getFeeDataForOtherRemedy(claimValue);
+
+        verify(feesClient).lookupOtherRemedyFees(otherRemedyFeesConfiguration, new BigDecimal("50.00"));
         assertThat(feeDto).isEqualTo(expectedFeeDto);
     }
 
@@ -109,13 +132,13 @@ class FeesServiceTest {
 
     private Fee2Dto[] buildFeeRangeResponse() {
         return new Fee2Dto[]{
-            Fee2Dto.builder()
-                .minRange(MIN_RANGE)
-                .maxRange(MAX_RANGE)
-                .currentVersion(FeeVersionDto.builder()
-                    .flatAmount(FlatAmountDto.builder().amount(TEST_FEE_AMOUNT_POUNDS).build())
-                    .build())
-                .build()
+            new Fee2Dto()
+                .setMinRange(MIN_RANGE)
+                .setMaxRange(MAX_RANGE)
+                .setCurrentVersion(new FeeVersionDto()
+                    .setFlatAmount(new FlatAmountDto().setAmount(TEST_FEE_AMOUNT_POUNDS))
+                    )
+                
         };
     }
 }

@@ -33,9 +33,8 @@ class DjPrePopulateTaskTest {
         CaseData caseData = CaseDataBuilder.builder().build();
         when(participantService.buildApplicantVRespondentText(any())).thenReturn("Applicant v Respondent");
 
-        CallbackParams params = CallbackParams.builder()
-            .params(Collections.emptyMap())
-            .build();
+        CallbackParams params = new CallbackParams()
+            .params(Collections.emptyMap());
         DirectionsOrderTaskContext context =
             new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.PRE_POPULATE);
 

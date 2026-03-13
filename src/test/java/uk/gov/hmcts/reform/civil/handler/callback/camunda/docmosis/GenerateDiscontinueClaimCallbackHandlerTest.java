@@ -462,24 +462,21 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private Party getRespondent1PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("John")
-                .individualLastName("Doe")
-                .build();
+        return new PartyBuilder().individual().build()
+                .setIndividualFirstName("John")
+                .setIndividualLastName("Doe");
     }
 
     private Party getRespondent2PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Jane")
-                .individualLastName("Doe")
-                .build();
+        return new PartyBuilder().individual().build()
+                .setIndividualFirstName("Jane")
+                .setIndividualLastName("Doe");
     }
 
     private Party getApplicant1PartyDetails() {
-        return PartyBuilder.builder().individual().build().toBuilder()
-                .individualFirstName("Carl")
-                .individualLastName("Foster")
-                .build();
+        return new PartyBuilder().individual().build()
+                .setIndividualFirstName("Carl")
+                .setIndividualLastName("Foster");
     }
 
     private CaseDocument getCaseDocument() {
@@ -498,21 +495,19 @@ class GenerateDiscontinueClaimCallbackHandlerTest extends BaseCallbackHandlerTes
     }
 
     private Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> getOrganisation() {
-        return Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                               .name("Organisation name")
-                               .contactInformation(List.of(ContactInformation.builder()
-                                                               .addressLine1("Address 1")
-                                                               .postCode("Post Code")
-                                                               .build()))
-                               .build());
+        return Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                               .setName("Organisation name")
+                               .setContactInformation(List.of(new ContactInformation()
+                                                               .setAddressLine1("Address 1")
+                                                               .setPostCode("Post Code")))
+                               );
     }
 
     private Optional<uk.gov.hmcts.reform.civil.prd.model.Organisation> getOrganisationWithoutName() {
-        return Optional.of(uk.gov.hmcts.reform.civil.prd.model.Organisation.builder()
-                               .contactInformation(List.of(ContactInformation.builder()
-                                                               .addressLine1("Address 1")
-                                                               .postCode("Post Code")
-                                                               .build()))
-                               .build());
+        return Optional.of(new uk.gov.hmcts.reform.civil.prd.model.Organisation()
+                               .setContactInformation(List.of(new ContactInformation()
+                                                               .setAddressLine1("Address 1")
+                                                               .setPostCode("Post Code")))
+                               );
     }
 }

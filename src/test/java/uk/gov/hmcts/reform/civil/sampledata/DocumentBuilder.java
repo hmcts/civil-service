@@ -15,12 +15,15 @@ public class DocumentBuilder {
         return this;
     }
 
+    public DocumentBuilder setDocumentName(String documentName) {
+        return documentName(documentName);
+    }
+
     public Document build() {
-        return Document.builder()
-            .documentFileName(documentName)
-            .documentBinaryUrl(
+        return new Document()
+            .setDocumentFileName(documentName)
+            .setDocumentBinaryUrl(
                 "http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f/binary")
-            .documentUrl("http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f")
-            .build();
+            .setDocumentUrl("http://dm-store:4506/documents/73526424-8434-4b1f-acca-bd33a3f8338f");
     }
 }

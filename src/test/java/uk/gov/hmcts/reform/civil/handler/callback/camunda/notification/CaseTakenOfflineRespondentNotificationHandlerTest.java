@@ -92,7 +92,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyRespondentSolicitorOne_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build();
             CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
@@ -113,7 +113,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyRespondentSolicitorTwo_whenInvoked() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors().build();
@@ -135,7 +135,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithSameSol() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()
@@ -159,7 +159,7 @@ class CaseTakenOfflineRespondentNotificationHandlerTest extends BaseCallbackHand
         void shouldNotifyRespondentSolicitorTwo_whenInvokedWithDiffSol() {
             when(notificationsProperties.getSolicitorCaseTakenOffline()).thenReturn("template-id");
             when(organisationService.findOrganisationById(anyString()))
-                .thenReturn(Optional.of(Organisation.builder().name("org name").build()));
+                .thenReturn(Optional.of(new Organisation().setName("org name")));
 
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified_1v2_andNotifyBothSolicitors()

@@ -91,11 +91,10 @@ public class GenerateCsvAndTransferTaskHandler extends GenerateMediationFileAndT
     private Optional<EmailData> prepareEmail(String generateCsvData) {
         InputStreamSource inputSource = new ByteArrayResource(generateCsvData.getBytes(StandardCharsets.UTF_8));
 
-        return Optional.of(EmailData.builder()
-                               .to(mediationCSVEmailConfiguration.getRecipient())
-                               .subject(SUBJECT)
-                               .attachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME)))
-                               .build());
+        return Optional.of(new EmailData()
+                               .setTo(mediationCSVEmailConfiguration.getRecipient())
+                               .setSubject(SUBJECT)
+                               .setAttachments(List.of(new EmailAttachment(inputSource, "text/csv", FILENAME))));
     }
 
     private String generateCsvContent(CaseData caseData) {
