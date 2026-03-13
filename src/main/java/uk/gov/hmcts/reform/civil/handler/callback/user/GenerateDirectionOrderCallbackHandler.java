@@ -174,7 +174,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
     @Value("${other_remedy.enabled:false}")
-    private static boolean otherRemedyEnabled;
+    private boolean otherRemedyEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -195,7 +195,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         return EVENTS;
     }
 
-    private static void populatePenalNotice(final CaseData caseData) {
+    private void populatePenalNotice(final CaseData caseData) {
         if (otherRemedyEnabled) {
             caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
         }
