@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.model.DefendantPinToPostLRspec;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
@@ -59,6 +60,9 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     @Mock
     private CrossAccessUserConfiguration crossAccessUserConfiguration;
 
+    @Mock
+    private FeatureToggleService featureToggleService;
+
     @Spy
     private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
@@ -66,14 +70,50 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
     private LinkDefendantToClaimCallbackHandler handler;
 
     @Test
-    void shouldReturnCorrectEvents() {
+    void shouldReturnCorrectEvents_WhenHandledEventsCalledAndEnabled() {
+        when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
         assertThat(handler.handledEvents()).containsOnly(LINK_DEFENDANT_TO_CLAIM);
+    }
+
+    @Test
+    void shouldReturnEmptyList_WhenHandledEventsCalledAndDisabled() {
+        when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(false);
+        assertThat(handler.handledEvents()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyResponse_WhenHandlerCalledAndDisabled_ForAboutToSubmit() {
+        when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(false);
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(ABOUT_TO_SUBMIT, CaseDataBuilder.builder().build()).build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getData()).isNull();
+        assertThat(response.getErrors()).isNull();
+    }
+
+    @Test
+    void shouldReturnEmptyResponse_WhenHandlerCalledAndDisabled_ForMidEvent() {
+        when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(false);
+        CallbackParams params = CallbackParamsBuilder.builder()
+            .of(MID, CaseDataBuilder.builder().build()).pageId("confirm-defendant-email").build();
+
+        AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
+
+        assertThat(response.getData()).isNull();
+        assertThat(response.getErrors()).isNull();
     }
 
     @Nested
     class MidEventTests {
 
         public static final String PAGE_ID = "confirm-defendant-email";
+
+        @BeforeEach
+        void setUp() {
+            when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
+        }
 
         @Test
         void shouldValidateDefendantEmail_AndReturnNoErrorForValidEmail() {
@@ -133,6 +173,7 @@ class LinkDefendantToClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(crossAccessUserConfiguration.getUserName()).thenReturn(USER);
             when(crossAccessUserConfiguration.getPassword()).thenReturn(PASSWORD);
             when(userService.getAccessToken(USER, PASSWORD)).thenReturn(BEARER_TOKEN);
+            when(featureToggleService.isLinkDefendantTestingEnabled()).thenReturn(true);
         }
 
         @Test

@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.validation.ValidateEmailService;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -42,17 +43,23 @@ public class LinkDefendantToClaimCallbackHandler extends CallbackHandler {
     private final UserService userService;
     private final CrossAccessUserConfiguration crossAccessUserConfiguration;
     private final ObjectMapper objectMapper;
+    private final FeatureToggleService featureToggleService;
 
     protected Map<String, Callback> callbacks() {
-        return Map.of(
+        return featureToggleService.isLinkDefendantTestingEnabled()
+            ? Map.of(
             callbackKey(MID, "confirm-defendant-email"), this::confirmDefendantEmail,
             callbackKey(ABOUT_TO_SUBMIT), this::aboutToSubmit
+        )
+            : Map.of(
+            callbackKey(MID, "confirm-defendant-email"), this::emptyCallbackResponse,
+            callbackKey(ABOUT_TO_SUBMIT), this::emptyCallbackResponse
         );
     }
 
     @Override
     public List<CaseEvent> handledEvents() {
-        return EVENTS;
+        return featureToggleService.isLinkDefendantTestingEnabled() ? EVENTS : List.of();
     }
 
     private CallbackResponse confirmDefendantEmail(CallbackParams callbackParams) {
