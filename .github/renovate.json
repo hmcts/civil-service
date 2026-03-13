@@ -46,7 +46,7 @@
       "groupSlug": "all-non-major",
       "automerge": true,
       "automergeType": "pr",
-      "automergeSchedule": ["before 2pm every weekday"]
+      "automergeSchedule": ["before 4pm every weekday"]
     },
     {
       "matchManagers": ["helmv3"],
