@@ -1,0 +1,27 @@
+{
+  "documentTaskId": 12345,
+  "data": {
+    "caseBundles": [
+      {
+        "value": {
+          "id": "bundle-id-wiremock-001",
+          "title": "Trial Bundle",
+          "description": "Civil Trial Bundle",
+          "stitchStatus": "DONE",
+          "fileName": "trial-bundle.pdf",
+          "createdOn": "2026-03-10T10:00:00.000000",
+          "bundleHearingDate": "2026-04-15",
+          "stitchedDocument": {
+            "document_url": "http://dm-store/documents/stitched-doc-001",
+            "document_binary_url": "http://dm-store/documents/stitched-doc-001/binary",
+            "document_filename": "trial-bundle.pdf",
+            "document_hash": "abc123hash",
+            "category_id": "bundles"
+          }
+        }
+      }
+    ]
+  },
+  "errors": null,
+  "warnings": null
+}
