@@ -131,16 +131,13 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
             .legacyCaseReference("12345")
             .ccdCaseReference(CASE_ID)
             .respondent1ResponseDate(null)
-            .applicantSolicitor1ClaimStatementOfTruth(StatementOfTruth.builder()
-                                                          .name("statementOfTruthName").build())
-            .respondent2(Party.builder()
-                             .type(Party.Type.ORGANISATION)
-                             .organisationName("org-name")
-                             .build())
+            .applicantSolicitor1ClaimStatementOfTruth(new StatementOfTruth()
+                .setName("statementOfTruthName"))
+            .respondent2(new Party()
+                             .setType(Party.Type.ORGANISATION)
+                             .setOrganisationName("org-name"))
             .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
-                    .build())
+                new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
             .build();
         // When
         notifier.sendNotificationToSolicitor(caseData, "solicitor1@example.com");
@@ -160,13 +157,11 @@ class FullDefenceApplicantSolicitorOneCCSpecNotifierTest {
         CaseData caseData = CaseData.builder()
             .respondent1DQ(null)
             .respondent2OrganisationPolicy(
-                OrganisationPolicy.builder()
-                    .organisation(uk.gov.hmcts.reform.ccd.model.Organisation.builder().organisationID("org-id").build())
-                    .build())
+                new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("org-id")))
             .build();
 
         when(organisationService.findOrganisationById("org-id"))
-            .thenReturn(Optional.of(Organisation.builder().name("Org Name").build()));
+            .thenReturn(Optional.of(new Organisation().setName("Org Name")));
 
         // When
         String organisationName = notifier.getLegalOrganisationName(caseData);

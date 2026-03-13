@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.enums.BusinessProcessStatus;
@@ -56,10 +56,11 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GARespondentOrderAgreement
 import uk.gov.hmcts.reform.civil.ga.model.genapplication.GARespondentResponse;
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAUrgencyRequirement;
+import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
+import uk.gov.hmcts.reform.civil.testutils.ObjectMapperFactory;
 import uk.gov.hmcts.reform.civil.sampledata.PDFBuilder;
 import uk.gov.hmcts.reform.civil.ga.service.AssignCaseToRespondentSolHelper;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
-import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.GeneralAppLocationRefDataService;
@@ -91,7 +92,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -119,74 +119,74 @@ import static uk.gov.hmcts.reform.civil.helpers.DateFormatHelper.formatLocalDate
 import static uk.gov.hmcts.reform.civil.ga.service.JudicialDecisionWrittenRepService.WRITTEN_REPRESENTATION_DATE_CANNOT_BE_IN_PAST;
 import static uk.gov.hmcts.reform.civil.utils.ElementUtils.element;
 
-@SpringBootTest(classes = {
-    JudicialDecisionHandler.class,
-    AssignCaseToRespondentSolHelper.class,
-    GaForLipService.class,
-    DeadlinesCalculator.class,
-    JacksonAutoConfiguration.class},
-    properties = {"reference.database.enabled=false"})
+@ExtendWith(MockitoExtension.class)
 public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackHandlerTest {
 
-    @Autowired
-    JudicialDecisionHandler handler;
+    @Mock
+    private CaseDetailsConverter caseDetailsConverter;
 
-    @MockBean
-    JudicialDecisionWrittenRepService service;
+    @InjectMocks
+    private JudicialDecisionHandler handler;
 
-    @MockBean
-    JudicialDecisionHelper helper;
+    @Mock
+    private JudicialDecisionWrittenRepService service;
 
-    @MockBean
-    GeneralAppLocationRefDataService locationRefDataService;
+    @Mock
+    private JudicialDecisionHelper helper;
 
-    @MockBean
+    @Mock
+    private GeneralAppLocationRefDataService locationRefDataService;
+
+    @Mock
     private Time time;
 
-    @MockBean
+    @Mock
     private DeadlinesCalculator deadlinesCalculator;
 
-    @MockBean
+    @Mock
     private GaForLipService gaForLipService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper = ObjectMapperFactory.instance();
 
-    @MockBean
+    @Mock
     private CoreCaseUserService coreCaseUserService;
 
-    @MockBean
+    @Mock
     private GeneralOrderGenerator generalOrderGenerator;
 
-    @MockBean
+    @Mock
     private RequestForInformationGenerator requestForInformationGenerator;
 
-    @MockBean
+    @Mock
     private DirectionOrderGenerator directionOrderGenerator;
 
-    @MockBean
+    @Mock
     private DismissalOrderGenerator dismissalOrderGenerator;
 
-    @MockBean
+    @Mock
     private HearingOrderGenerator hearingOrderGenerator;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationConcurrentOrderGenerator writtenRepresentationConcurrentOrderGenerator;
 
-    @MockBean
+    @Mock
     private WrittenRepresentationSequentialOrderGenerator writtenRepresentationSequentialOrderGenerator;
 
-    @MockBean
+    @Mock
     private FreeFormOrderGenerator gaFreeFormOrderGenerator;
 
-    @MockBean
+    @Mock
     private IdamClient idamClient;
-    @MockBean
-    private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+
+    @Mock
     private CoreCaseDataService coreCaseDataService;
-    @MockBean
+
+    @Mock
     private JudicialTimeEstimateHelper timeEstimateHelper;
+
+    @Mock
+    private AssignCaseToRespondentSolHelper assignCaseToResopondentSolHelper;
 
     private static final String CAMUNDA_EVENT = "INITIATE_GENERAL_APPLICATION";
     private static final String BUSINESS_PROCESS_INSTANCE_ID = "11111";
@@ -209,13 +209,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         + " Any such application must be made by 4pm on";
 
     private static final LocalDate localDatePlus7days = LocalDate.now().plusDays(7);
-
-    @BeforeEach
-    void setUp() {
-        when(coreCaseDataService.getCase(any())).thenReturn(CaseDetails.builder().build());
-        when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(GeneralApplicationCaseData.builder().build());
-        when(gaForLipService.isGaForLip(any())).thenReturn(false);
-    }
 
     @Test
     void handleEventsReturnsTheExpectedCallbackEvent() {
@@ -317,7 +310,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .isEqualTo(String.format(expectedJudicialPreferenceLocationApplicantRespondent1Text,
                                          caseDataApplicantRespondent1.getGeneralAppHearingDetails()
                                              .getHearingPreferredLocation().getValue().getLabel(),
-                                         caseDataApplicantRespondent1.getRespondentsResponses().get(0).getValue()
+                                         caseDataApplicantRespondent1.getRespondentsResponses().getFirst().getValue()
                                              .getGaHearingDetails().getHearingPreferredLocation().getValue()
                                              .getLabel()));
 
@@ -381,7 +374,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getJudgeHearingCourtLocationText1())
                 .isEqualTo(String.format(expectedOnlyRespondent1LocationText,
-                                         caseData.getRespondentsResponses().get(0).getValue().getGaHearingDetails()
+                                         caseData.getRespondentsResponses().getFirst().getValue().getGaHearingDetails()
                                              .getHearingPreferredLocation().getValue().getLabel()));
         }
 
@@ -433,31 +426,31 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy1")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                        .hearingDuration(GAHearingDuration.HOUR_1)
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .build())
-                                 .gaRespondentDetails("1L").build()));
+                                 .setGaRespondentDetails("1L")));
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy2")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                        .hearingDuration(GAHearingDuration.MINUTES_30)
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .build())
-                                 .gaRespondentDetails("2L").build()));
+                                 .setGaRespondentDetails("2L")));
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            GeneralApplicationCaseData builder = caseData.copy();
             builder.respondentsResponses(respondentsResponses);
             builder.generalAppHearingDetails(GAHearingDetails.builder()
                                                   .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -484,8 +477,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy1")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -493,17 +486,17 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .supportRequirement(getApplicant1Responses())
                                                        .build())
-                                 .gaRespondentDetails("1L").build()));
+                                 .setGaRespondentDetails("1L")));
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy2")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                        .hearingDuration(GAHearingDuration.MINUTES_30)
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .build())
-                                 .gaRespondentDetails("2L").build()));
+                                 .setGaRespondentDetails("2L")));
 
             String expecetedJudicialSupportText =
                 "Applicant requires Hearing loop. Respondent 1 requires Hearing loop. "
@@ -513,7 +506,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            GeneralApplicationCaseData builder = caseData.copy();
             builder.respondentsResponses(respondentsResponses);
 
             CallbackParams params = callbackParamsOf(builder.build(), ABOUT_TO_START);
@@ -533,18 +526,18 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy1")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                        .hearingDuration(GAHearingDuration.HOUR_1)
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .build())
-                                 .gaRespondentDetails("1L").build()));
+                                 .setGaRespondentDetails("1L")));
             respondentsResponses
-                .add(element(GARespondentResponse.builder()
-                                 .gaHearingDetails(GAHearingDetails.builder()
+                .add(element(new GARespondentResponse()
+                                 .setGaHearingDetails(GAHearingDetails.builder()
                                                        .vulnerabilityQuestionsYesOrNo(YES)
                                                        .vulnerabilityQuestion("dummy2")
                                                        .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -552,13 +545,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                        .hearingPreferredLocation(getLocationDynamicList())
                                                        .supportRequirement(getApplicant1Responses())
                                                        .build())
-                                 .gaRespondentDetails("2L").build()));
+                                 .setGaRespondentDetails("2L")));
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.STAY_THE_CLAIM), (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp1and2(types, NO, YES, YES);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = caseData.toBuilder();
+            GeneralApplicationCaseData builder = caseData.copy();
             builder.respondentsResponses(respondentsResponses);
             builder.generalAppHearingDetails(GAHearingDetails.builder()
                                                  .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -650,15 +643,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     expectedJudicialSupportText,
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getGeneralAppHearingDetails()
-                        .getSupportRequirement().get(0).getDisplayedValue(),
+                        .getSupportRequirement().getFirst().getDisplayedValue(),
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getRespondentsResponses().get(0).getValue()
                         .getGaHearingDetails().getSupportRequirement()
-                        .get(0).getDisplayedValue(),
+                        .getFirst().getDisplayedValue(),
                     getHearingOrderApplnAndResp1and2(types, NO, YES, YES)
                         .getRespondentsResponses().get(1).getValue()
                         .getGaHearingDetails().getSupportRequirement()
-                        .get(0).getDisplayedValue()
+                        .getFirst().getDisplayedValue()
                 ));
 
         }
@@ -673,12 +666,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             caseData.getRespondentsResponses().forEach(
                 response -> respondentResponses.add(Element.<GARespondentResponse>builder()
                     .id(response.getId())
-                    .value(response.getValue().toBuilder()
-                         .gaHearingDetails(response.getValue().getGaHearingDetails().toBuilder()
-                             .hearingDuration(null).build())
-                         .build())
+                    .value(new GARespondentResponse()
+                               .setGaHearingDetails(response.getValue().getGaHearingDetails().toBuilder()
+                                                        .hearingDuration(null).build())
+                               .setGeneralAppRespondent1Representative(
+                                   response.getValue().getGeneralAppRespondent1Representative())
+                               .setGaRespondentDetails(response.getValue().getGaRespondentDetails())
+                               .setGaRespondentResponseReason(response.getValue().getGaRespondentResponseReason()))
                     .build()));
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppHearingDetails(
                     caseData.getGeneralAppHearingDetails().toBuilder()
                         .hearingDuration(null)
@@ -759,7 +755,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             String expectedJudicialTimeEstimateText = "Applicant and respondent have not provided estimates";
 
             GeneralApplicationCaseData caseData = getCaseDateForUrgentApp();
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppHearingDetails(
                     caseData.getGeneralAppHearingDetails().toBuilder()
                         .hearingDuration(null)
@@ -858,12 +854,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             caseData.getRespondentsResponses().forEach(
                 response -> respondentResponses.add(Element.<GARespondentResponse>builder()
                     .id(response.getId())
-                    .value(response.getValue().toBuilder()
-                        .gaHearingDetails(response.getValue().getGaHearingDetails().toBuilder()
-                            .hearingDuration(null).build())
-                        .build())
+                    .value(new GARespondentResponse()
+                               .setGaHearingDetails(response.getValue().getGaHearingDetails().toBuilder()
+                                                        .hearingDuration(null).build())
+                               .setGeneralAppRespondent1Representative(
+                                   response.getValue().getGeneralAppRespondent1Representative())
+                               .setGaRespondentDetails(response.getValue().getGaRespondentDetails())
+                               .setGaRespondentResponseReason(response.getValue().getGaRespondentResponseReason()))
                     .build()));
-            caseData = caseData.toBuilder()
+            caseData = caseData.copy()
                 .generalAppHearingDetails(
                     caseData.getGeneralAppHearingDetails().toBuilder()
                         .hearingDuration(null)
@@ -1456,8 +1455,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void shouldPrepopulateLocationIfApplicantAndRespondentHaveSameLocationPref() {
 
             List<LocationRefData> locations = new ArrayList<>();
-            locations.add(LocationRefData.builder().siteName("siteName").courtAddress("court Address")
-                              .postcode("post code").courtName("Court Name").region("Region").build());
+            locations.add(new LocationRefData().setSiteName("siteName").setCourtAddress("court Address")
+                              .setPostcode("post code").setCourtName("Court Name").setRegion("Region"));
             when(locationRefDataService.getCourtLocations(any())).thenReturn(locations);
 
             when(helper.isApplicantAndRespondentLocationPrefSame(any())).thenReturn(true);
@@ -1473,7 +1472,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             assertThat(responseCaseData.getHearingPreferredLocation()).isNotNull();
             assertThat(responseCaseData.getHearingPreferredLocation().getValue()).isNotNull();
-            assertThat(responseCaseData.getHearingPreferredLocation().getListItems().get(0).getLabel())
+            assertThat(responseCaseData.getHearingPreferredLocation().getListItems().getFirst().getLabel())
                 .isEqualTo("siteName - court Address - post code");
 
         }
@@ -1489,7 +1488,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppHearingDetails(GAHearingDetails.builder()
@@ -1501,9 +1500,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                               .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                               .hearingDuration(GAHearingDuration.HOUR_1)
@@ -1530,7 +1529,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             hasRespondentResponseVul = NO;
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppUrgencyRequirement(urgentApp)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .respondentsResponses(respondentResponse)
@@ -1538,9 +1537,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                               .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                               .hearingDuration(GAHearingDuration.HOUR_1)
@@ -1566,7 +1565,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             hasRespondentResponseVul = NO;
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppUrgencyRequirement(urgentApp)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .respondentsResponses(respondentResponse)
@@ -1574,9 +1573,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                               .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                               .hearingDuration(GAHearingDuration.HOUR_1)
@@ -1597,16 +1596,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         public GeneralApplicationCaseData getCaseDateWithHearingScreeen1V1(List<GeneralApplicationTypes> types, YesOrNo vulQuestion,
                                                          YesOrNo hasRespondentResponseVul) {
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .respondentsResponses(getRespodentResponses(hasRespondentResponseVul))
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                               .vulnerabilityQuestionsYesOrNo(vulQuestion)
                                               .vulnerabilityQuestion("dummy")
@@ -1645,7 +1644,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             hasRespondentResponseVul = NO;
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(parentClaimantIsApplicant)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .respondentsResponses(getRespodentResponses(hasRespondentResponseVul))
@@ -1655,13 +1654,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                               .supportRequirement(getApplicantResponses())
                                               .build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder())
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -1682,15 +1681,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             hasRespondentResponseVul = NO;
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(NO)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder())
                 .generalAppDetailsOfOrder("Draft order text entered by applicant.")
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .respondentsResponses(getRespodentResponses(hasRespondentResponseVul))
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder().isWithNotice(YES).build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo().setIsWithNotice(YES))
                 .generalAppInformOtherParty(GAInformOtherParty.builder()
                                                 .isWithNotice(YES).build())
                 .generalAppHearingDetails(GAHearingDetails.builder()
@@ -1699,9 +1698,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                               .supportRequirement(getApplicantResponses())
                                               .build())
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -1723,23 +1722,10 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         private static final String VALIDATE_WRITTEN_REPRESENTATION_PAGE = "ga-validate-written-representation-date";
         private static final String VALIDATE_HEARING_ORDER_SCREEN = "validate-hearing-order-screen";
 
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
-
-            when(hearingOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
-
-            when(writtenRepresentationConcurrentOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
-
-        }
-
         @Test
         void shouldGenerateListingForHearingDocument() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-hearing-order-doc");
@@ -1756,14 +1742,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorForListingForHearingCourtOwnInitiative() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeListForHearing(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now().minusDays(4)).build()).build();
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now().minusDays(4))).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -1771,38 +1758,41 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
         void shouldThrowErrorForListingForHearingCourtOrderWithOutNotice() {
+            when(hearingOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.HEARING_ORDER_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().hearingOrderApplication(YesOrNo.NO, YesOrNo.NO)
                 .build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeListForHearing(GAByCourtsInitiativeGAspec.OPTION_1)
                 .orderCourtOwnInitiativeListForHearing(
-                    GAOrderCourtOwnInitiativeGAspec.builder().orderCourtOwnInitiative("abcde")
-                        .orderCourtOwnInitiativeDate(LocalDate.now().minusDays(3)).build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec().setOrderCourtOwnInitiative("abcde")
+                        .setOrderCourtOwnInitiativeDate(LocalDate.now().minusDays(3))).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
             CallbackParams params = callbackParamsOf(updateData, MID, "populate-hearing-order-doc");
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
         void shouldGenerateConcurrentApplicationDocument() {
+            when(writtenRepresentationConcurrentOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_CONCURRENT_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationConcurrentApplication().build()
-                .toBuilder().build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+                .copy().build();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now()).build()).build();
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now())).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -1821,14 +1811,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateSequentialApplicationDocument() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder().build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+                .copy().build();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now()).build()).build();
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now())).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -1847,14 +1839,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldThrowErrorCourtOwnInitiativeForWrittenRepIsPastDate() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder().build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+                .copy().build();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_1)
                 .orderCourtOwnInitiativeForWrittenRep(
-                    GAOrderCourtOwnInitiativeGAspec.builder().orderCourtOwnInitiative("abcde")
-                        .orderCourtOwnInitiativeDate(LocalDate.now().minusDays(2)).build()).build();
+                    new GAOrderCourtOwnInitiativeGAspec().setOrderCourtOwnInitiative("abcde")
+                        .setOrderCourtOwnInitiativeDate(LocalDate.now().minusDays(2))).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -1863,20 +1857,22 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
 
         }
 
         @Test
         void shouldThrowErrorOrderWithoutNoticeForWrittenRepIsPastDate() {
+            when(writtenRepresentationSequentialOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.WRITTEN_REPRESENTATION_SEQUENTIAL_DOCUMENT);
 
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().writtenRepresentationSequentialApplication().build()
-                .toBuilder().build();
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+                .copy().build();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.judicialByCourtsInitiativeForWrittenRep(GAByCourtsInitiativeGAspec.OPTION_2)
                 .orderWithoutNoticeForWrittenRep(
-                    GAOrderWithoutNoticeGAspec.builder().orderWithoutNotice("abcde")
-                        .orderWithoutNoticeDate(LocalDate.now().minusDays(2)).build()).build();
+                    new GAOrderWithoutNoticeGAspec().setOrderWithoutNotice("abcde")
+                        .setOrderWithoutNoticeDate(LocalDate.now().minusDays(2))).build();
 
             GeneralApplicationCaseData updateData = caseDataBuilder.build();
 
@@ -1885,7 +1881,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
 
         }
 
@@ -1921,6 +1917,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotReturnErrors_whenSequentialWrittenRepresentationDateIsInFuture() {
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
 
             String expectedSequentialText = "The defendant should upload any written responses or evidence by 4pm on %s";
             String expectedApplicantSequentialText =
@@ -1983,6 +1980,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             String expectedJudicialHearingTypeText = "The hearing will be %s.";
             String expeceedJudicialTimeEstimateText = "Estimated length of hearing is %s";
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
             when(timeEstimateHelper.getEstimatedHearingLength(any())).thenReturn("2 hours");
 
             List<SupportRequirements> judgeSupportReqChoices = new ArrayList<>();
@@ -2070,6 +2068,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnNullForJudgeGOSupportRequirement() {
 
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
+
             List<SupportRequirements> judgeSupportReqChoices = null;
 
             CallbackParams params = callbackParamsOf(getHearingOrderApplnAndResp(judgeSupportReqChoices),
@@ -2086,10 +2086,10 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         private GeneralApplicationCaseData getJudicialListHearingData() {
 
-            return GeneralApplicationCaseData.builder()
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                            .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                            .judicialTimeEstimate(GAHearingDuration.HOURS_2).build())
+            return new GeneralApplicationCaseData()
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                            .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
+                                            .setJudicialTimeEstimate(GAHearingDuration.HOURS_2))
                 .businessProcess(new BusinessProcess()
                                      .setCamundaEvent(CAMUNDA_EVENT)
                                      .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
@@ -2103,13 +2103,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                            .hearingPreferredLocation(getLocationDynamicList())
-                                            .judicialSupportRequirement(judgeSupportReqChoices)
-                                            .hearingPreferencesPreferredType(GAJudicialHearingType.VIDEO)
-                                            .judicialTimeEstimate(GAHearingDuration.HOURS_2).build())
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                            .setHearingPreferredLocation(getLocationDynamicList())
+                                            .setJudicialSupportRequirement(judgeSupportReqChoices)
+                                            .setHearingPreferencesPreferredType(GAJudicialHearingType.VIDEO)
+                                            .setJudicialTimeEstimate(GAHearingDuration.HOURS_2))
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppHearingDetails(GAHearingDetails.builder()
                                         .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -2128,9 +2128,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                               .supportRequirement(getApplicantResponses())
                                               .build())
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -2146,27 +2146,21 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         public GeneralApplicationCaseData getSequentialWrittenRepresentationDecision(LocalDate writtenRepresentationDate) {
 
-            GAJudicialWrittenRepresentations.GAJudicialWrittenRepresentationsBuilder
-                    writtenRepresentationBuilder = GAJudicialWrittenRepresentations.builder();
-            writtenRepresentationBuilder.writtenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
-                    .writtenSequentailRepresentationsBy(writtenRepresentationDate)
-                    .sequentialApplicantMustRespondWithin(writtenRepresentationDate)
-                    .writtenConcurrentRepresentationsBy(null);
-
-            GAJudicialWrittenRepresentations gaJudicialWrittenRepresentations = writtenRepresentationBuilder.build();
-            return GeneralApplicationCaseData.builder()
+            GAJudicialWrittenRepresentations gaJudicialWrittenRepresentations = new GAJudicialWrittenRepresentations()
+                .setWrittenOption(GAJudgeWrittenRepresentationsOptions.SEQUENTIAL_REPRESENTATIONS)
+                .setWrittenSequentailRepresentationsBy(writtenRepresentationDate)
+                .setSequentialApplicantMustRespondWithin(writtenRepresentationDate)
+                .setWrittenConcurrentRepresentationsBy(null);
+            return new GeneralApplicationCaseData()
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(gaJudicialWrittenRepresentations).build();
         }
 
         public GeneralApplicationCaseData getConcurrentWrittenRepresentationDecision(LocalDate writtenRepresentationDate) {
-            GAJudicialWrittenRepresentations.GAJudicialWrittenRepresentationsBuilder
-                    writtenRepresentationBuilder = GAJudicialWrittenRepresentations.builder();
-            writtenRepresentationBuilder.writtenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
-                    .writtenConcurrentRepresentationsBy(writtenRepresentationDate)
-                    .writtenSequentailRepresentationsBy(null);
-
-            GAJudicialWrittenRepresentations gaJudicialWrittenRepresentations = writtenRepresentationBuilder.build();
-            return GeneralApplicationCaseData.builder()
+            GAJudicialWrittenRepresentations gaJudicialWrittenRepresentations = new GAJudicialWrittenRepresentations()
+                .setWrittenOption(GAJudgeWrittenRepresentationsOptions.CONCURRENT_REPRESENTATIONS)
+                .setWrittenConcurrentRepresentationsBy(writtenRepresentationDate)
+                .setWrittenSequentailRepresentationsBy(null);
+            return new GeneralApplicationCaseData()
                     .judicialDecisionMakeAnOrderForWrittenRepresentations(gaJudicialWrittenRepresentations).build();
         }
 
@@ -2175,25 +2169,20 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     @Nested
     class MidEventForMakeAnOrderOption {
 
-        @BeforeEach
-        void setUp() {
-            when(gaForLipService.isGaForLip(any())).thenReturn(false);
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-        }
-
         private static final String VALIDATE_MAKE_AN_ORDER = "validate-make-an-order";
 
         @Test
         void shouldPopulateFreeFormOrderValues_onMidEventCallback() {
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
+
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM));
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(NO);
 
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(FREE_FORM_ORDER).build())
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(FREE_FORM_ORDER))
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader");
 
@@ -2222,8 +2211,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateFinalOrderPreviewDocumentWhenPopulateFinalOrderPreviewDocIsCalled() {
-            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(CaseDocument
-                                                                               .builder().documentLink(Document.builder().build()).build());
+            when(gaFreeFormOrderGenerator.generate(any(), any())).thenReturn(new CaseDocument().setDocumentLink(new Document()));
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().build();
             CallbackParams params = callbackParamsOf(caseData, MID, "populate-final-order-preview-doc");
 
@@ -2239,53 +2227,49 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(NO)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
         void shouldReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
-            when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(NO)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
         @Test
         void shouldNotReturnErrorForWrittenRepresentationWithOutNoticeApplnForJudgeRevisitLipCase() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
-            when(gaForLipService.isGaForLip(any())).thenReturn(true);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
-            when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(YES)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2301,10 +2285,10 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(YES)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2318,13 +2302,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void shouldReturnNoErrorForHearingWhenJudgeRevisit_AfterUncloak() {
             List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STRIKE_OUT));
 
+            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
             caseDataBuilder.applicationIsUncloakedOnce(NO)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(LIST_FOR_A_HEARING).build());
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(LIST_FOR_A_HEARING));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2342,9 +2327,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder()
-                                                 .decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision()
+                                                 .setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2362,16 +2347,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder()
-                                                 .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision()
+                                                 .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2383,16 +2368,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder()
-                                                 .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision()
+                                                 .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertThat(response).isNotNull();
             assertThat(response.getErrors()).isNotNull();
-            assertThat(response.getErrors().get(0))
+            assertThat(response.getErrors().getFirst())
                 .isEqualTo("The application needs to be uncloaked before requesting written representations");
         }
 
@@ -2405,8 +2390,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2428,8 +2413,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2450,8 +2435,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2473,8 +2458,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2495,8 +2480,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2518,8 +2503,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2541,8 +2526,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2559,14 +2544,12 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void shouldReturnCorrectDirectionsText() {
 
-            List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM),
-                                                          (GeneralApplicationTypes.EXTEND_TIME));
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
 
             GeneralApplicationCaseData caseData = getDirectionsText(NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2579,16 +2562,12 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldAddCorrectDirectionsText() {
-
-            List<GeneralApplicationTypes> types = List.of((GeneralApplicationTypes.STAY_THE_CLAIM),
-                                                          (GeneralApplicationTypes.EXTEND_TIME));
-
             when(helper.isApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getMakeAnOrder(NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2609,8 +2588,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2632,8 +2611,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
 
             GeneralApplicationCaseData caseData = getHearingOrderApplnAndResp(types, NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -2652,8 +2631,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(YES);
             // isWithNotice = No
             GeneralApplicationCaseData caseData = getNotifiedApplication(NO, YES);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
@@ -2675,8 +2654,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             //isWithNotice = Yes
 
             GeneralApplicationCaseData caseData = getNotifiedApplication(YES, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             String expectedRecitalText = "The Judge considered the application of the defendant dated 15 January 2022\n\n";
@@ -2697,8 +2676,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             when(helper.isLipApplicationCreatedWithoutNoticeByApplicant(any())).thenReturn(NO);
             //isWithNotice = No
             GeneralApplicationCaseData caseData = getNotifiedApplication(NO, NO);
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
-            caseDataBuilder.judicialDecision(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build());
+            GeneralApplicationCaseData caseDataBuilder = caseData.copy();
+            caseDataBuilder.judicialDecision(new GAJudicialDecision().setDecision(MAKE_AN_ORDER));
             CallbackParams params = callbackParamsOf(caseDataBuilder.build(), MID, VALIDATE_MAKE_AN_ORDER);
 
             String expectedRecitalText = "The Judge considered the application of the defendant dated 15 January 2022\n\n";
@@ -2716,18 +2695,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
     @Nested
     class MidEventForRespondToDirectionsDateValidity {
-
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(generalOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
-            when(directionOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
-            when(dismissalOrderGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
-        }
 
         private static final String VALIDATE_MAKE_DECISION_SCREEN = "validate-make-decision-screen";
         public static final String RESPOND_TO_DIRECTIONS_DATE_IN_PAST = "The date, by which the response to direction"
@@ -2796,6 +2763,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnGenerateOrderDocument() {
+            when(generalOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.GENERAL_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_MAKE_DECISION_SCREEN);
@@ -2814,6 +2783,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateDirectionOrderDocument() {
+            when(directionOrderGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.DIRECTION_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().directionOrderApplication()
                 .build();
 
@@ -2831,6 +2803,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateDismissalOrderDocument() {
+            when(dismissalOrderGenerator.generate(any(), any())).thenReturn(PDFBuilder.DISMISSAL_ORDER_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().dismissalOrderApplication()
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_MAKE_DECISION_SCREEN);
@@ -2858,7 +2832,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         @Test
@@ -2874,7 +2848,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
 
             assertEquals(1, response.getErrors().size());
-            assertThat(response.getErrors().get(0)).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
+            assertThat(response.getErrors().getFirst()).isEqualTo(MAKE_DECISION_APPROVE_BY_DATE_IN_PAST);
         }
 
         private GeneralApplicationCaseData getApplication_MakeDecision_GiveDirections(GAJudgeMakeAnOrderOption orderOption,
@@ -2885,18 +2859,18 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                                     LocalDate orderWithoutNoticeDate) {
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .parentClaimantIsApplicant(YES)
                 .generalAppUrgencyRequirement(GAUrgencyRequirement.builder().generalAppUrgency(YES).build())
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(NO).build())
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder())
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -2907,13 +2881,13 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                      .setStatus(BusinessProcessStatus.STARTED)
                                      .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                               .makeAnOrder(orderOption)
-                                               .judicialByCourtsInitiative(gaByCourtsInitiativeGAspec)
-                                               .orderCourtOwnInitiativeDate(orderCourtOwnInitiativeDate)
-                                               .orderWithoutNoticeDate(orderWithoutNoticeDate)
-                                               .judgeApproveEditOptionDate(LocalDate.now().plusDays(1))
-                                               .directionsResponseByDate(directionsResponseByDate).build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                               .setMakeAnOrder(orderOption)
+                                               .setJudicialByCourtsInitiative(gaByCourtsInitiativeGAspec)
+                                               .setOrderCourtOwnInitiativeDate(orderCourtOwnInitiativeDate)
+                                               .setOrderWithoutNoticeDate(orderWithoutNoticeDate)
+                                               .setJudgeApproveEditOptionDate(LocalDate.now().plusDays(1))
+                                               .setDirectionsResponseByDate(directionsResponseByDate))
                 .build();
         }
     }
@@ -2924,18 +2898,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         LocalDateTime responseDate = LocalDateTime.now();
         LocalDateTime deadline = LocalDateTime.now().plusDays(5);
 
-        @BeforeEach
-        void setup() {
-            when(deadlinesCalculator.getJudicialOrderDeadlineDate(any(), anyInt())).thenReturn(localDatePlus7days);
-
-            when(time.now()).thenReturn(responseDate);
-            when(deadlinesCalculator.calculateApplicantResponseDeadline(
-                any(LocalDateTime.class), any(Integer.class))).thenReturn(deadline);
-
-            when(requestForInformationGenerator.generate(any(), any()))
-                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
-        }
-
         private static final String VALIDATE_REQUEST_MORE_INFO_SCREEN = "validate-request-more-info-screen";
         public static final String REQUESTED_MORE_INFO_BY_DATE_REQUIRED = "The date, by which the applicant must "
                 + "respond, is required.";
@@ -2944,6 +2906,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .applicationIsCloaked(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
@@ -2962,14 +2927,17 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void should_GenerateRequestMoreInfoDocument_JudgeRevisit_Without_Uncloaked() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .applicationIsUncloakedOnce(NO)
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText(JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT)
-                                                     .requestMoreInfoOption(REQUEST_MORE_INFORMATION)
-                                                     .judgeRequestMoreInfoByDate(LocalDate.now())
-                                                     .isWithNotice(NO)
-                                                     .judgeRequestMoreInfoText("test").build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText(JUDICIAL_REQUEST_MORE_INFO_RECITAL_TEXT)
+                                                     .setRequestMoreInfoOption(REQUEST_MORE_INFORMATION)
+                                                     .setJudgeRequestMoreInfoByDate(LocalDate.now())
+                                                     .setIsWithNotice(NO)
+                                                     .setJudgeRequestMoreInfoText("test"))
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
                 .build();
@@ -2995,11 +2963,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText(judgeRecitalText)
-                                                     .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
-                                                     .judgeRequestMoreInfoByDate(LocalDate.now())
-                                                     .judgeRequestMoreInfoText("test").build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText(judgeRecitalText)
+                                                     .setRequestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
+                                                     .setJudgeRequestMoreInfoByDate(LocalDate.now())
+                                                     .setJudgeRequestMoreInfoText("test"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN);
 
@@ -3023,11 +2991,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
                 .applicationIsCloaked(YES)
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText(judgeRecitalText)
-                                                     .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
-                                                     .judgeRequestMoreInfoByDate(LocalDate.now())
-                                                     .judgeRequestMoreInfoText("test").build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText(judgeRecitalText)
+                                                     .setRequestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
+                                                     .setJudgeRequestMoreInfoByDate(LocalDate.now())
+                                                     .setJudgeRequestMoreInfoText("test"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN);
 
@@ -3043,6 +3011,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldGenerateRequestMoreInfoDocumentWithNotice() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             String judgeRecitalText = "<Title><Name>\n"
                 + "Upon reviewing the application made and upon considering the information "
                 + "provided by the parties,the court requests more information from the applicant.";
@@ -3050,11 +3021,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().requestForInformationApplication()
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .judgeRecitalText(judgeRecitalText)
-                                                     .isWithNotice(YES)
-                                                     .judgeRequestMoreInfoByDate(LocalDate.now())
-                                                     .judgeRequestMoreInfoText("test").build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setJudgeRecitalText(judgeRecitalText)
+                                                     .setIsWithNotice(YES)
+                                                     .setJudgeRequestMoreInfoByDate(LocalDate.now())
+                                                     .setJudgeRequestMoreInfoText("test"))
                 .build();
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN);
 
@@ -3070,6 +3041,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotReturnErrors_whenRequestedMoreInfoAndTheDateIsInFuture() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation(REQUEST_MORE_INFORMATION,
                                                                       LocalDate.now().plusDays(1), YES);
 
@@ -3082,6 +3056,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnErrors_whenRequestedMoreInfoAndTheDateIsNull() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(REQUEST_MORE_INFORMATION, null, NO);
 
             CallbackParams params = callbackParamsOf(caseData, MID, VALIDATE_REQUEST_MORE_INFO_SCREEN);
@@ -3093,6 +3070,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldReturnErrors_whenRequestedMoreInfoAndTheDateIsInPast() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(REQUEST_MORE_INFORMATION,
                     LocalDate.now().minusDays(1), NO);
 
@@ -3106,6 +3086,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldNotCauseAnyErrors_whenApplicationIsNotUrgentAndConsiderationDateIsNotProvided() {
+            when(requestForInformationGenerator.generate(any(), any()))
+                .thenReturn(PDFBuilder.REQUEST_FOR_INFORMATION_DOCUMENT);
+
             GeneralApplicationCaseData caseData = getApplication_RequestMoreInformation2(null,
                     LocalDate.now(), YES);
 
@@ -3120,18 +3103,18 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                                 LocalDate judgeRequestMoreInfoByDate,
                                                                 YesOrNo hasAgree) {
 
-            return GeneralApplicationCaseData.builder()
-                .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+            return new GeneralApplicationCaseData()
+                .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(hasAgree).build())
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .requestMoreInfoOption(option)
-                                                     .judgeRequestMoreInfoByDate(judgeRequestMoreInfoByDate)
-                                                     .judgeRequestMoreInfoText("Test")
-                                                     .isWithNotice(YES)
-                                                     .deadlineForMoreInfoSubmission(LocalDateTime.now().plusDays(5))
-                                                     .build())
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setRequestMoreInfoOption(option)
+                                                     .setJudgeRequestMoreInfoByDate(judgeRequestMoreInfoByDate)
+                                                     .setJudgeRequestMoreInfoText("Test")
+                                                     .setIsWithNotice(YES)
+                                                     .setDeadlineForMoreInfoSubmission(LocalDateTime.now().plusDays(5))
+                                                     )
                 .build();
         }
 
@@ -3139,18 +3122,18 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                                LocalDate judgeRequestMoreInfoByDate, YesOrNo hasAgree) {
             List<GeneralApplicationTypes> types = List.of(
                 (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
-                .judicialDecision(GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build())
+                .judicialDecision(new GAJudicialDecision().setDecision(REQUEST_MORE_INFO))
                 .parentClaimantIsApplicant(YES)
                 .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(hasAgree).build())
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder().build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder())
                 .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                 .applicantPartyName("ApplicantPartyName")
                 .generalAppRespondent1Representative(
-                    GARespondentRepresentative.builder()
-                        .generalAppRespondent1Representative(YES)
-                        .build())
+                    new GARespondentRepresentative()
+                        .setGeneralAppRespondent1Representative(YES)
+                        )
                 .generalAppType(
                     GAApplicationType
                         .builder()
@@ -3161,15 +3144,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                      .setStatus(BusinessProcessStatus.STARTED)
                                      .setActivityId(ACTIVITY_ID))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
-                .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                               .makeAnOrder(APPROVE_OR_EDIT)
-                                               .build())
-                .judicialDecisionRequestMoreInfo(GAJudicialRequestMoreInfo.builder()
-                                                     .requestMoreInfoOption(option)
-                                                     .judgeRequestMoreInfoByDate(judgeRequestMoreInfoByDate)
-                                                     .judgeRequestMoreInfoText("Test")
-                                                     .deadlineForMoreInfoSubmission(LocalDateTime.now().plusDays(5))
-                                                     .build())
+                .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                               .setMakeAnOrder(APPROVE_OR_EDIT))
+                .judicialDecisionRequestMoreInfo(new GAJudicialRequestMoreInfo()
+                                                     .setRequestMoreInfoOption(option)
+                                                     .setJudgeRequestMoreInfoByDate(judgeRequestMoreInfoByDate)
+                                                     .setJudgeRequestMoreInfoText("Test")
+                                                     .setDeadlineForMoreInfoSubmission(LocalDateTime.now().plusDays(5))
+                                                     )
                 .build();
         }
     }
@@ -3180,7 +3162,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void oneVOne() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
                 .build();
@@ -3192,7 +3174,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void oneVTwoSameSol() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -3207,7 +3189,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void oneVTwo() {
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .atStateClaimDraft()
-                .build().toBuilder()
+                .build().copy()
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .claimant1PartyName("Mr. John Rambo")
                 .defendant1PartyName("Mr. Sole Trader")
@@ -3224,7 +3206,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldSetUpReadyBusinessProcess() {
-            GeneralApplicationCaseData caseData = getApplicationBusinessProcess().toBuilder().isMultiParty(NO)
+            GeneralApplicationCaseData caseData = getApplicationBusinessProcess().copy().isMultiParty(NO)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                               .email("test@gmail.com").organisationIdentifier("org1").build())
                 .isGaRespondentOneLip(NO)
@@ -3243,7 +3225,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldSetUpReadyWhenPreferredTypeNotInPerson() {
-            GeneralApplicationCaseData caseData = getApplicationWithPreferredTypeNotInPerson().toBuilder()
+            GeneralApplicationCaseData caseData = getApplicationWithPreferredTypeNotInPerson().copy()
                 .isMultiParty(NO)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                               .email("test@gmail.com").organisationIdentifier("org1").build())
@@ -3264,15 +3246,14 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         void shouldClearJudicialHearingLabelText() {
 
             GeneralApplicationCaseData caseData = getApplicationBusinessProcess()
-                .toBuilder().isMultiParty(YES)
+                .copy().isMultiParty(YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                               .email("test@gmail.com").organisationIdentifier("org1").build())
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                                        .judgeHearingCourtLocationText1("test")
-                                                        .judgeHearingTimeEstimateText1("test")
-                                                        .hearingPreferencesPreferredTypeLabel1("test")
-                                                        .judgeHearingSupportReqText1("test")
-                                                        .build())
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                                        .setJudgeHearingCourtLocationText1("test")
+                                                        .setJudgeHearingTimeEstimateText1("test")
+                                                        .setHearingPreferencesPreferredTypeLabel1("test")
+                                                        .setJudgeHearingSupportReqText1("test"))
                 .isGaRespondentOneLip(NO)
                 .isGaApplicantLip(NO)
                 .isGaRespondentTwoLip(NO).build();
@@ -3308,6 +3289,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldCallAssignCase_3Times() {
+            String caseId = GeneralApplicationCaseDataBuilder.CASE_ID.toString();
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(SEND_APP_TO_OTHER_PARTY, NO, YES)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
@@ -3323,12 +3305,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             GeneralApplicationCaseData responseCaseData = objectMapper.convertValue(response.getData(), GeneralApplicationCaseData.class);
             assertThat(responseCaseData.getApplicationIsCloaked()).isEqualTo(NO);
-            verify(coreCaseUserService, times(3)).assignCase(
-                any(),
-                any(),
-                any(),
-                any()
-            );
+            verify(assignCaseToResopondentSolHelper).assignCaseToRespondentSolicitor(caseData, caseId);
         }
 
         @Test
@@ -3362,7 +3339,6 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void shouldAssignToRespondent_WhenJudgeNotUncloaked_RequestMoreInformationApplicationLipRespondent() {
-            when(gaForLipService.isLipResp(any())).thenReturn(true);
             GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder()
                 .judicialDecisionWithUncloakRequestForInformationApplication(REQUEST_MORE_INFORMATION, NO, YES)
                 .isMultiParty(NO)
@@ -3400,8 +3376,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                 .isMultiParty(NO)
                 .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder().id("id")
                                               .email("test@gmail.com").organisationIdentifier("org1").build())
-                .makeAppVisibleToRespondents(GAMakeApplicationAvailableCheck.builder()
-                                                 .makeAppAvailableCheck(getMakeAppVisible()).build())
+                .makeAppVisibleToRespondents(new GAMakeApplicationAvailableCheck()
+                                                 .setMakeAppAvailableCheck(getMakeAppVisible()))
                 .isGaRespondentOneLip(NO)
                 .isGaApplicantLip(NO)
                 .isGaRespondentTwoLip(NO)
@@ -3416,16 +3392,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         public GeneralApplicationCaseData getApplicationBusinessProcess() {
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
                 .ccdCaseReference(123345689L)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(LIST_FOR_A_HEARING).build())
-                .makeAppVisibleToRespondents(GAMakeApplicationAvailableCheck.builder()
-                                                 .makeAppAvailableCheck(getMakeAppVisible()).build())
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                            .hearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
-                                            .hearingPreferredLocation(getLocationDynamicList()).build())
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(LIST_FOR_A_HEARING))
+                .makeAppVisibleToRespondents(new GAMakeApplicationAvailableCheck()
+                                                 .setMakeAppAvailableCheck(getMakeAppVisible()))
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                            .setHearingPreferencesPreferredType(GAJudicialHearingType.IN_PERSON)
+                                            .setHearingPreferredLocation(getLocationDynamicList()))
                 .businessProcess(new BusinessProcess()
                                      .setCamundaEvent(CAMUNDA_EVENT)
                                      .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
@@ -3436,16 +3412,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         private GeneralApplicationCaseData getApplicationWithPreferredTypeNotInPerson() {
 
-            return GeneralApplicationCaseData.builder()
+            return new GeneralApplicationCaseData()
                 .generalAppRespondentSolicitors(getRespondentSolicitors())
                 .ccdCaseReference(123345689L)
-                .judicialDecision(GAJudicialDecision.builder()
-                                      .decision(LIST_FOR_A_HEARING).build())
-                .makeAppVisibleToRespondents(GAMakeApplicationAvailableCheck.builder()
-                                                 .makeAppAvailableCheck(getMakeAppVisible()).build())
-                .judicialListForHearing(GAJudgesHearingListGAspec.builder()
-                                            .hearingPreferencesPreferredType(GAJudicialHearingType.TELEPHONE)
-                                            .build())
+                .judicialDecision(new GAJudicialDecision()
+                                      .setDecision(LIST_FOR_A_HEARING))
+                .makeAppVisibleToRespondents(new GAMakeApplicationAvailableCheck()
+                                                 .setMakeAppAvailableCheck(getMakeAppVisible()))
+                .judicialListForHearing(new GAJudgesHearingListGAspec()
+                                            .setHearingPreferencesPreferredType(GAJudicialHearingType.TELEPHONE))
                 .businessProcess(new BusinessProcess()
                                      .setCamundaEvent(CAMUNDA_EVENT)
                                      .setProcessInstanceId(BUSINESS_PROCESS_INSTANCE_ID)
@@ -3468,7 +3443,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void callbackHandlingForMakeAnOrder() {
-            GeneralApplicationCaseData caseData = getApplication(GAJudicialDecision.builder().decision(MAKE_AN_ORDER).build(), null);
+            GeneralApplicationCaseData caseData = getApplication(new GAJudicialDecision().setDecision(MAKE_AN_ORDER), null);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -3479,8 +3454,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void callbackHandlingForListForHearing() {
-            GeneralApplicationCaseData caseData = getApplication(GAJudicialDecision.builder()
-                    .decision(LIST_FOR_A_HEARING).build(), null);
+            GeneralApplicationCaseData caseData = getApplication(new GAJudicialDecision()
+                    .setDecision(LIST_FOR_A_HEARING), null);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -3491,8 +3466,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         @Test
         void callbackHandlingForWrittenRepresentaion() {
-            GeneralApplicationCaseData caseData = getApplication(GAJudicialDecision.builder()
-                    .decision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS).build(), null);
+            GeneralApplicationCaseData caseData = getApplication(new GAJudicialDecision()
+                    .setDecision(MAKE_ORDER_FOR_WRITTEN_REPRESENTATIONS), null);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
             var response = (SubmittedCallbackResponse) handler.handle(params);
@@ -3504,11 +3479,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void callbackHandlingForRequestInfoFromApplicant() {
             GeneralApplicationCaseData caseData = getApplication(
-                GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build(),
-                GAJudicialRequestMoreInfo.builder()
-                    .requestMoreInfoOption(REQUEST_MORE_INFORMATION)
-                    .judgeRequestMoreInfoText("Test")
-                    .judgeRequestMoreInfoByDate(LocalDate.now()).build()
+                new GAJudicialDecision().setDecision(REQUEST_MORE_INFO),
+                new GAJudicialRequestMoreInfo()
+                    .setRequestMoreInfoOption(REQUEST_MORE_INFORMATION)
+                    .setJudgeRequestMoreInfoText("Test")
+                    .setJudgeRequestMoreInfoByDate(LocalDate.now())
             );
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -3524,11 +3499,11 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void callbackHandlingForRequestHearingDetailsFromOtherParty() {
             GeneralApplicationCaseData caseData = getApplication(
-                    GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build(),
-                    GAJudicialRequestMoreInfo.builder()
-                            .requestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
-                            .deadlineForMoreInfoSubmission(LocalDateTime.now())
-                            .build());
+                    new GAJudicialDecision().setDecision(REQUEST_MORE_INFO),
+                    new GAJudicialRequestMoreInfo()
+                            .setRequestMoreInfoOption(SEND_APP_TO_OTHER_PARTY)
+                            .setDeadlineForMoreInfoSubmission(LocalDateTime.now())
+                            );
 
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -3541,7 +3516,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         @Test
         void callbackHandlingForRequestMoreInfoWithNullGAJudicialRequestMoreInfo() {
             GeneralApplicationCaseData caseData = getApplication(
-                    GAJudicialDecision.builder().decision(REQUEST_MORE_INFO).build(),
+                    new GAJudicialDecision().setDecision(REQUEST_MORE_INFO),
                     null);
             CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
 
@@ -3551,7 +3526,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         private GeneralApplicationCaseData getApplication(GAJudicialDecision decision, GAJudicialRequestMoreInfo moreInfo) {
             List<GeneralApplicationTypes> types = List.of(
                     (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-            GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> builder = GeneralApplicationCaseData.builder();
+            GeneralApplicationCaseData builder = new GeneralApplicationCaseData();
             if (decision != null && REQUEST_MORE_INFO.equals(decision.getDecision())) {
                 builder.judicialDecisionRequestMoreInfo(moreInfo);
             }
@@ -3562,9 +3537,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                     .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
                     .applicantPartyName("ApplicantPartyName")
                     .generalAppRespondent1Representative(
-                            GARespondentRepresentative.builder()
-                                    .generalAppRespondent1Representative(YES)
-                                    .build())
+                            new GARespondentRepresentative()
+                                    .setGeneralAppRespondent1Representative(YES)
+                                    )
                     .generalAppType(
                             GAApplicationType
                                     .builder()
@@ -3583,7 +3558,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     public GeneralApplicationCaseData getDirectionOrderApplnAndResp(List<GeneralApplicationTypes> types, YesOrNo vulQuestion,
                                                 YesOrNo hasRespondentResponseVul) {
 
-        return GeneralApplicationCaseData.builder()
+        return new GeneralApplicationCaseData()
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3596,9 +3571,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .vulnerabilityQuestionsYesOrNo(vulQuestion)
                                           .vulnerabilityQuestion("dummy")
@@ -3622,8 +3597,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
     public GeneralApplicationCaseData getDirectionsText(YesOrNo hasRespondentResponseVul) {
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3635,17 +3610,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                                           .directionsText("Test directionText")
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
+                                           .setDirectionsText("Test directionText"))
             .build();
     }
 
     public GeneralApplicationCaseData getMakeAnOrder(YesOrNo hasRespondentResponseVul) {
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3657,17 +3631,16 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YES).build())
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
-            .judicialDecisionMakeOrder(GAJudicialMakeAnOrder.builder()
-                                           .makeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING)
-                                           .build())
+            .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
+                                           .setMakeAnOrder(GIVE_DIRECTIONS_WITHOUT_HEARING))
             .build();
     }
 
     public GeneralApplicationCaseData getGaCaseAppln(List<GeneralApplicationTypes> types, YesOrNo isWithNotice,
                                                 YesOrNo hasAgreed) {
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(hasAgreed).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3679,9 +3652,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()
@@ -3698,8 +3671,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
     public GeneralApplicationCaseData getHearingOrderApplnAndResp(List<GeneralApplicationTypes> types, YesOrNo vulQuestion,
                                                  YesOrNo hasRespondentResponseVul) {
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3712,9 +3685,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .createdDate(LocalDateTime.of(2022, 1, 15, 0, 0, 0))
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .vulnerabilityQuestionsYesOrNo(vulQuestion)
                                           .vulnerabilityQuestion("dummy")
@@ -3744,8 +3717,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         respondentSolicitors
             .add(element(GASolicitorDetailsGAspec.builder().id("2L").build()));
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppHearingDetails(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3759,9 +3732,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondentSolicitors(respondentSolicitors)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .vulnerabilityQuestionsYesOrNo(vulQuestion)
                                           .vulnerabilityQuestion("dummy")
@@ -3793,8 +3766,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
         respondentSolicitors
             .add(element(GASolicitorDetailsGAspec.builder().id("2L").build()));
 
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .hearingDetailsResp(GAHearingDetails.builder()
                                     .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3807,9 +3780,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
             .applicantPartyName("ApplicantPartyName")
             .generalAppRespondentSolicitors(respondentSolicitors)
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppHearingDetails(GAHearingDetails.builder()
                                           .vulnerabilityQuestionsYesOrNo(YES)
                                           .vulnerabilityQuestion("dummy")
@@ -3842,15 +3815,15 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(vulQuestion)
                                                    .vulnerabilityQuestion("dummy")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
                                                    .hearingDuration(GAHearingDuration.HOUR_1)
                                                    .supportRequirement(respSupportReq)
                                                    .hearingPreferredLocation(getLocationDynamicList())
-                                                   .build()).build()
+                                                   .build())
             ));
 
         return respondentsResponses;
@@ -3870,8 +3843,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         List<Element<GARespondentResponse>> respondentsResponses = new ArrayList<>();
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(vulQuestion1)
                                                    .vulnerabilityQuestion("dummy1")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3880,10 +3853,10 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                    .hearingPreferredLocation(hasResp1PreferLocation == YES
                                                                                  ? getLocationDynamicList() : null)
                                                    .build())
-                             .gaRespondentDetails("1L").build()));
+                             .setGaRespondentDetails("1L")));
         respondentsResponses
-            .add(element(GARespondentResponse.builder()
-                             .gaHearingDetails(GAHearingDetails.builder()
+            .add(element(new GARespondentResponse()
+                             .setGaHearingDetails(GAHearingDetails.builder()
                                                    .vulnerabilityQuestionsYesOrNo(vulQuestion2)
                                                    .vulnerabilityQuestion("dummy2")
                                                    .hearingPreferencesPreferredType(GAHearingType.IN_PERSON)
@@ -3892,7 +3865,7 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                                    .hearingPreferredLocation(hasResp2PreferLocation == YES
                                                                                  ? getLocationDynamicList() : null)
                                                    .build())
-                             .gaRespondentDetails("2L").build()));
+                             .setGaRespondentDetails("2L")));
 
         return respondentsResponses;
     }
@@ -3926,8 +3899,8 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
 
         List<GeneralApplicationTypes> types = List.of(
             (GeneralApplicationTypes.SUMMARY_JUDGEMENT));
-        return GeneralApplicationCaseData.builder()
-            .generalAppParentCaseLink(GeneralAppParentCaseLink.builder().caseReference("1").build())
+        return new GeneralApplicationCaseData()
+            .generalAppParentCaseLink(new GeneralAppParentCaseLink().setCaseReference("1"))
             .parentClaimantIsApplicant(parentClaimantIsApplicant)
             .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
             .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(isWithNotice).build())
@@ -3941,9 +3914,9 @@ public class JudicialDecisionHandlerTest extends GeneralApplicationBaseCallbackH
                                           .supportRequirement(getApplicantResponses())
                                           .build())
             .generalAppRespondent1Representative(
-                GARespondentRepresentative.builder()
-                    .generalAppRespondent1Representative(YES)
-                    .build())
+                new GARespondentRepresentative()
+                    .setGeneralAppRespondent1Representative(YES)
+                    )
             .generalAppType(
                 GAApplicationType
                     .builder()

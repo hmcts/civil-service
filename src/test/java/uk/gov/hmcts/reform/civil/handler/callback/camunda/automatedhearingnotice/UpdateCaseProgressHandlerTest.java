@@ -34,9 +34,8 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitTrialHearing() {
         when(camundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingType("AAA7-TRI")
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingType("AAA7-TRI"));
         CaseData caseData = CaseDataBuilder.builder().build();
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setProcessInstanceId("PROCESS_ID");
@@ -58,9 +57,8 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     })
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmit(String hearingType) {
         when(camundaService.getProcessVariables(any()))
-            .thenReturn(HearingNoticeVariables.builder()
-                            .hearingType(hearingType)
-                            .build());
+            .thenReturn(new HearingNoticeVariables()
+                            .setHearingType(hearingType));
         CaseData caseData = CaseDataBuilder.builder().build();
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setProcessInstanceId("PROCESS_ID");
@@ -78,9 +76,8 @@ class UpdateCaseProgressHandlerTest extends BaseCallbackHandlerTest {
     @Test
     void shouldReturnCallbackResponseWithHearingReadinessCaseStateOnAboutToSubmitDisputeResolutionHearing() {
         when(camundaService.getProcessVariables(any()))
-                .thenReturn(HearingNoticeVariables.builder()
-                        .hearingType("AAA7-DRH")
-                        .build());
+                .thenReturn(new HearingNoticeVariables()
+                        .setHearingType("AAA7-DRH"));
         CaseData caseData = CaseDataBuilder.builder().build();
         BusinessProcess businessProcess = new BusinessProcess();
         businessProcess.setProcessInstanceId("PROCESS_ID");

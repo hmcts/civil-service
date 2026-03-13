@@ -56,7 +56,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
         if (locationDetails != null && !locationDetails.isEmpty()) {
             return locationDetails.get(0);
         } else {
-            return LocationRefData.builder().build();
+            return new LocationRefData();
         }
     }
 
@@ -70,7 +70,7 @@ public class UpdateGaLocationCallbackHandler extends CallbackHandler implements 
                             .getCase(Long.parseLong(parentCaseReference)));
         LocationRefData locationDetails = getWorkAllocationLocationDetails(civilCaseData.getCaseManagementLocation().getBaseLocation(),
                                                                            authToken);
-        GeneralApplicationCaseData.GeneralApplicationCaseDataBuilder<?, ?> caseDataBuilder = caseData.toBuilder();
+        GeneralApplicationCaseData caseDataBuilder = caseData.copy();
         caseDataBuilder
             .businessProcess(
                 new BusinessProcess()

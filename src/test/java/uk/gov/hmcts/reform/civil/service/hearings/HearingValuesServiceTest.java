@@ -161,20 +161,21 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-        Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-        Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-        Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-        CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+        Category inPerson = hearingChannel("INTER", "In Person");
+        Category video = hearingChannel("VID", "Video");
+        Category telephone = hearingChannel("TEL", "Telephone");
+        CategorySearchResult categorySearchResult = new CategorySearchResult();
+        categorySearchResult.setCategories(List.of(inPerson, video, telephone));
 
         when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
             Optional.of(categorySearchResult));
@@ -238,9 +239,9 @@ public class HearingValuesServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
@@ -256,13 +257,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -278,9 +279,9 @@ public class HearingValuesServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
                                         .setRegion(WELSH_REGION_ID))
@@ -292,13 +293,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -314,9 +315,9 @@ public class HearingValuesServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .multiPartyClaimTwoDefendantSolicitors()
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
@@ -329,13 +330,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -371,8 +372,8 @@ public class HearingValuesServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
             .caseReference(caseId)
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
                                         .setRegion(WELSH_REGION_ID))
@@ -386,13 +387,13 @@ public class HearingValuesServiceTest {
         when(caseDataService.getCase(caseId)).thenReturn(caseDetails);
         when(caseDetailsConverter.toCaseData(caseDetails.getData())).thenReturn(caseData);
         when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(APPLICANT_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(APPLICANT_LR_ORG_NAME)
+                                        ));
         when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-            .thenReturn(Optional.of(Organisation.builder()
-                                        .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                        .build()));
+            .thenReturn(Optional.of(new Organisation()
+                                        .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                        ));
         given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
         given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
@@ -413,9 +414,9 @@ public class HearingValuesServiceTest {
         respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued()
-            .applicant1(PartyBuilder.builder().individual().build())
-            .respondent1(PartyBuilder.builder().company().build())
-            .respondent2(PartyBuilder.builder().company().build())
+            .applicant1(new PartyBuilder().individual().build())
+            .respondent1(new PartyBuilder().company().build())
+            .respondent2(new PartyBuilder().company().build())
             .caseAccessCategory(UNSPEC_CLAIM)
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation(BASE_LOCATION_ID)
                                         .setRegion(WELSH_REGION_ID))
@@ -487,20 +488,21 @@ public class HearingValuesServiceTest {
             respondent1DQ = new Respondent1DQ();
             respondent1DQ.setRespondent1DQLanguage(respondent1WelshLang);
             when(organisationService.findOrganisationById(APPLICANT_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(APPLICANT_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(APPLICANT_LR_ORG_NAME)
+                                            ));
             when(organisationService.findOrganisationById(RESPONDENT_ONE_ORG_ID))
-                .thenReturn(Optional.of(Organisation.builder()
-                                            .name(RESPONDENT_ONE_LR_ORG_NAME)
-                                            .build()));
+                .thenReturn(Optional.of(new Organisation()
+                                            .setName(RESPONDENT_ONE_LR_ORG_NAME)
+                                            ));
             given(manageCaseBaseUrlConfiguration.getManageCaseBaseUrl()).willReturn("http://localhost:3333");
             given(paymentsConfiguration.getSiteId()).willReturn("AAA7");
 
-            Category inPerson = Category.builder().categoryKey("HearingChannel").key("INTER").valueEn("In Person").activeFlag("Y").build();
-            Category video = Category.builder().categoryKey("HearingChannel").key("VID").valueEn("Video").activeFlag("Y").build();
-            Category telephone = Category.builder().categoryKey("HearingChannel").key("TEL").valueEn("Telephone").activeFlag("Y").build();
-            CategorySearchResult categorySearchResult = CategorySearchResult.builder().categories(List.of(inPerson, video, telephone)).build();
+            Category inPerson = hearingChannel("INTER", "In Person");
+            Category video = hearingChannel("VID", "Video");
+            Category telephone = hearingChannel("TEL", "Telephone");
+            CategorySearchResult categorySearchResult = new CategorySearchResult();
+            categorySearchResult.setCategories(List.of(inPerson, video, telephone));
             when(categoryService.findCategoryByCategoryIdAndServiceId(anyString(), eq("HearingChannel"), anyString())).thenReturn(
                 Optional.of(categorySearchResult));
         }
@@ -817,5 +819,13 @@ public class HearingValuesServiceTest {
         partyDetails.setUnavailabilityRanges(null);
         partyDetails.setHearingSubChannel(null);
         return partyDetails;
+    }
+
+    private Category hearingChannel(String key, String valueEn) {
+        return new Category()
+            .setCategoryKey("HearingChannel")
+            .setKey(key)
+            .setValueEn(valueEn)
+            .setActiveFlag("Y");
     }
 }

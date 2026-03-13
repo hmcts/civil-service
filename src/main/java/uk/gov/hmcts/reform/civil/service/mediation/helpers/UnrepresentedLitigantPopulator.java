@@ -24,10 +24,10 @@ public class UnrepresentedLitigantPopulator {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    public MediationLitigant.MediationLitigantBuilder populator(MediationLitigant.MediationLitigantBuilder builder,
-                                                                Party party,
-                                                                String originalMediationContactPerson,
-                                                                MediationLiPCarm mediationLiPCarm) {
+    public MediationLitigant populator(MediationLitigant litigant,
+                                       Party party,
+                                       String originalMediationContactPerson,
+                                       MediationLiPCarm mediationLiPCarm) {
 
         List<MediationUnavailability> dateRangeToAvoid = getDateRangeToAvoid(mediationLiPCarm);
 
@@ -38,14 +38,14 @@ public class UnrepresentedLitigantPopulator {
 
         String mediationPhone = getMediationPhone(party, mediationLiPCarm);
 
-        return builder.represented(false)
-            .solicitorOrgName(null)
-            .litigantEmail(party.getPartyEmail())
-            .litigantTelephone(party.getPartyPhone())
-            .mediationContactName(mediationContactName)
-            .mediationContactNumber(mediationPhone)
-            .mediationContactEmail(mediationEmail)
-            .dateRangeToAvoid(dateRangeToAvoid);
+        return litigant.setRepresented(false)
+            .setSolicitorOrgName(null)
+            .setLitigantEmail(party.getPartyEmail())
+            .setLitigantTelephone(party.getPartyPhone())
+            .setMediationContactName(mediationContactName)
+            .setMediationContactNumber(mediationPhone)
+            .setMediationContactEmail(mediationEmail)
+            .setDateRangeToAvoid(dateRangeToAvoid);
     }
 
     private static String getMediationPhone(Party party, MediationLiPCarm mediationLiPCarm) {
@@ -68,7 +68,7 @@ public class UnrepresentedLitigantPopulator {
         if (mediationLiPCarm != null && YES.equals(mediationLiPCarm.getHasUnavailabilityNextThreeMonths())) {
             return toMediationUnavailableDates(mediationLiPCarm.getUnavailableDatesForMediation());
         }
-        return List.of(MediationUnavailability.builder().build());
+        return List.of(new MediationUnavailability());
     }
 
     private String getUnrepresentedLitigantMediationContactName(Party party,
@@ -84,16 +84,14 @@ public class UnrepresentedLitigantPopulator {
         List<MediationUnavailability> toMediationUnavailability = new ArrayList<>();
         for (UnavailableDate unavailableDate : unavailableDates) {
             if (SINGLE_DATE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getDate()))
-                                                  .dateTo(formatDate(unavailableDate.getDate()))
-                                                  .build());
+                toMediationUnavailability.add(new MediationUnavailability()
+                                                  .setDateFrom(formatDate(unavailableDate.getDate()))
+                                                  .setDateTo(formatDate(unavailableDate.getDate())));
             }
             if (DATE_RANGE.equals(unavailableDate.getUnavailableDateType())) {
-                toMediationUnavailability.add(MediationUnavailability.builder()
-                                                  .dateFrom(formatDate(unavailableDate.getFromDate()))
-                                                  .dateTo(formatDate(unavailableDate.getToDate()))
-                                                  .build());
+                toMediationUnavailability.add(new MediationUnavailability()
+                                                  .setDateFrom(formatDate(unavailableDate.getFromDate()))
+                                                  .setDateTo(formatDate(unavailableDate.getToDate())));
             }
         }
         return toMediationUnavailability;

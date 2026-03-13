@@ -30,11 +30,10 @@ class LitigationFriendCaseReferenceTest {
 
     @Test
     void shouldMapApplicant1LitigationFriendCorrectly() throws Exception {
-        LitigationFriend friend = LitigationFriend.builder()
-            .firstName("Alice")
-            .lastName("Smith")
-            .emailAddress("alice@example.com")
-            .build();
+        LitigationFriend friend = new LitigationFriend().setFirstName("Alice")
+            .setLastName("Smith")
+            .setEmailAddress("alice@example.com")
+            ;
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("applicant1LitigationFriend", friend);
@@ -51,11 +50,10 @@ class LitigationFriendCaseReferenceTest {
 
     @Test
     void shouldMapApplicant2LitigationFriendCorrectly() throws Exception {
-        LitigationFriend friend = LitigationFriend.builder()
-            .firstName("Bob")
-            .lastName("Johnson")
-            .emailAddress("bob@example.com")
-            .build();
+        LitigationFriend friend = new LitigationFriend().setFirstName("Bob")
+            .setLastName("Johnson")
+            .setEmailAddress("bob@example.com")
+            ;
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("applicant2LitigationFriend", friend);
@@ -72,11 +70,10 @@ class LitigationFriendCaseReferenceTest {
 
     @Test
     void shouldMapRespondent1LitigationFriendCorrectly() throws Exception {
-        LitigationFriend friend = LitigationFriend.builder()
-            .firstName("Charlie")
-            .lastName("Brown")
-            .emailAddress("charlie@example.com")
-            .build();
+        LitigationFriend friend = new LitigationFriend().setFirstName("Charlie")
+            .setLastName("Brown")
+            .setEmailAddress("charlie@example.com")
+            ;
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("respondent1LitigationFriend", friend);
@@ -93,11 +90,10 @@ class LitigationFriendCaseReferenceTest {
 
     @Test
     void shouldMapRespondent2LitigationFriendCorrectly() throws Exception {
-        LitigationFriend friend = LitigationFriend.builder()
-            .firstName("Diana")
-            .lastName("Prince")
-            .emailAddress("diana@example.com")
-            .build();
+        LitigationFriend friend = new LitigationFriend().setFirstName("Diana")
+            .setLastName("Prince")
+            .setEmailAddress("diana@example.com")
+            ;
 
         Map<String, Object> rowValues = new HashMap<>();
         rowValues.put("respondent2LitigationFriend", friend);

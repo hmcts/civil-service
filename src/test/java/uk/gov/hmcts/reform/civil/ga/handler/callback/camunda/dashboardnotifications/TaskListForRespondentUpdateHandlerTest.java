@@ -64,7 +64,7 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build())).isEqualTo("default");
+        assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo("default");
     }
 
     @Nested
@@ -73,8 +73,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioActionNeeded_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -108,8 +108,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioInProgress_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -143,8 +143,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioAvailable_whenInvoked_claimantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -178,8 +178,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioActionNeeded_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -213,8 +213,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioInProgress_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -248,8 +248,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldRecordDefendantScenarioAvailable_whenInvoked_defendantIsApplicant() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.NO)
@@ -283,8 +283,8 @@ public class TaskListForRespondentUpdateHandlerTest extends GeneralApplicationBa
         @Test
         void shouldNotRecordDefendantScenario_whenDefendantNotLiP() {
             CaseDetails caseDetails = CaseDetails.builder().build();
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder()
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .respondent1Represented(YesOrNo.YES)

@@ -84,7 +84,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmailWelsh"));
             when(configuration.getRaiseQueryLr()).thenReturn((String) configMap.get("raiseQueryLr"));
             //Given
-            Party party = PartyBuilder.builder()
+            Party party = new PartyBuilder()
                 .individual(defendantName)
                 .partyEmail(defendantEmail)
                 .build();
@@ -125,7 +125,7 @@ public class TranslatedDocumentUploadedDefendantNotificationHandlerTest {
             when(configuration.getLipContactEmail()).thenReturn((String) configMap.get("lipContactEmail"));
             when(configuration.getLipContactEmailWelsh()).thenReturn((String) configMap.get("lipContactEmail"));
             //Given
-            Party party = PartyBuilder.builder()
+            Party party = new PartyBuilder()
                 .individual(defendantName)
                 .partyEmail(defendantEmail)
                 .build();

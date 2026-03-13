@@ -25,11 +25,15 @@ import uk.gov.hmcts.reform.civil.enums.CaseRole;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.model.ChangeOfRepresentation;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
 import uk.gov.hmcts.reform.civil.model.common.DynamicListElement;
+import uk.gov.hmcts.reform.civil.model.IdamUserDetails;
 import uk.gov.hmcts.reform.civil.model.noc.ChangeOrganisationRequest;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
+
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -290,7 +294,7 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
         @Test
         void testGetChangedOrgReturnsOrganisationToRemoveId() {
             ChangeOrganisationRequest request = createRequest(CaseRole.APPLICANTSOLICITORONE.getFormattedName());
-            request.setOrganisationToRemove(Organisation.builder().organisationID(ORG_ID).build());
+            request.setOrganisationToRemove(new Organisation().setOrganisationID(ORG_ID));
 
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request))
                 .isEqualTo(ORG_ID);
@@ -333,12 +337,116 @@ class ApplyNoticeOfChangeDecisionCallbackHandlerTest extends BaseCallbackHandler
             assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
         }
 
+        @Test
+        void testGetChangedOrgReturnsNullForUnknownCaseRole() {
+            ChangeOrganisationRequest request = createRequest("[UNKNOWN-ROLE]");
+
+            assertThat(noticeOfChangeDecisionCallbackHandler.getChangedOrg(CaseData.builder().build(), request)).isNull();
+        }
+
         private ChangeOrganisationRequest createRequest(String caseRole) {
             ChangeOrganisationRequest request = new ChangeOrganisationRequest();
             request.setCaseRoleId(DynamicList.builder()
                 .value(DynamicListElement.builder().code(caseRole).build())
                 .build());
             return request;
+        }
+    }
+
+    @Nested
+    class PrivateMethodsCoverageTest {
+
+        @Test
+        void shouldUpdateOrgPoliciesForLipUsingOrgIdCopy_whenRespondent2OrganisationToRemoveIsNull() {
+            ChangeOrganisationRequest request = new ChangeOrganisationRequest();
+            request.setOrganisationToAdd(new Organisation().setOrganisationID("new-org-id"));
+            request.setCaseRoleId(DynamicList.builder()
+                .value(DynamicListElement.builder().code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build())
+                .build());
+            request.setOrganisationToRemove(null);
+
+            CaseDetails caseDetails = CaseDetails.builder().data(new HashMap<>()).build();
+            caseDetails.getData().put(CHANGE_ORGANISATION_REQUEST_FIELD, request);
+            caseDetails.getData().put("respondent2OrganisationIDCopy", "copy-org-id-2");
+
+            ReflectionTestUtils.invokeMethod(handler, "updateOrgPoliciesForLiP", caseDetails);
+
+            ChangeOrganisationRequest updatedRequest = mapper.convertValue(
+                caseDetails.getData().get(CHANGE_ORGANISATION_REQUEST_FIELD), ChangeOrganisationRequest.class);
+
+            assertThat(updatedRequest.getOrganisationToRemove().getOrganisationID()).isEqualTo("copy-org-id-2");
+        }
+
+        @Test
+        void shouldReturnNullFormerEmail_whenApplicantSolicitorDetailsAreMissing() {
+            String formerEmail = ReflectionTestUtils.invokeMethod(
+                handler,
+                "getFormerEmail",
+                CaseRole.APPLICANTSOLICITORONE.getFormattedName(),
+                CaseData.builder().build()
+            );
+
+            assertThat(formerEmail).isNull();
+        }
+
+        @Test
+        void shouldReturnRespondent2FormerEmail_whenCaseRoleIsRespondent2() {
+            String formerEmail = ReflectionTestUtils.invokeMethod(
+                handler,
+                "getFormerEmail",
+                CaseRole.RESPONDENTSOLICITORTWO.getFormattedName(),
+                CaseData.builder().respondentSolicitor2EmailAddress("res2@example.com").build()
+            );
+
+            assertThat(formerEmail).isEqualTo("res2@example.com");
+        }
+
+        @Test
+        void shouldReturnApplicantFormerEmail_whenApplicantSolicitorDetailsExist() {
+            IdamUserDetails userDetails = new IdamUserDetails().setEmail("applicant@example.com");
+
+            String formerEmail = ReflectionTestUtils.invokeMethod(
+                handler,
+                "getFormerEmail",
+                CaseRole.APPLICANTSOLICITORONE.getFormattedName(),
+                CaseData.builder().applicantSolicitor1UserDetails(userDetails).build()
+            );
+
+            assertThat(formerEmail).isEqualTo("applicant@example.com");
+        }
+
+        @Test
+        void shouldUseFallbackOrgFromCaseData_whenOrganisationToRemoveIsNull() {
+            ChangeOrganisationRequest request = new ChangeOrganisationRequest();
+            request.setCaseRoleId(DynamicList.builder()
+                .value(DynamicListElement.builder().code(CaseRole.RESPONDENTSOLICITORTWO.getFormattedName()).build())
+                .build());
+            request.setOrganisationToAdd(new Organisation().setOrganisationID("new-org-id"));
+            request.setOrganisationToRemove(null);
+
+            ChangeOfRepresentation changeOfRepresentation = ReflectionTestUtils.invokeMethod(
+                handler,
+                "getChangeOfRepresentation",
+                request,
+                CaseData.builder()
+                    .respondent2OrganisationIDCopy("copy-org-id-2")
+                    .respondentSolicitor2EmailAddress("res2@example.com")
+                    .build()
+            );
+
+            assertThat(changeOfRepresentation.getOrganisationToRemoveID()).isEqualTo("copy-org-id-2");
+        }
+
+        @Test
+        void shouldReturnNullFromOrgIdCopyLookup_whenCaseRoleIsNotRecognised() {
+            String orgIdCopy = ReflectionTestUtils.invokeMethod(
+                handler,
+                "getOrgIdCopyIfExists",
+                CaseDetails.builder().data(new HashMap<>()).build(),
+                "[UNKNOWN-ROLE]"
+            );
+
+            assertThat(orgIdCopy).isNull();
         }
     }
 

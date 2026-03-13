@@ -3,14 +3,14 @@ package uk.gov.hmcts.reform.civil.cas.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 @Data
-@Builder
+@Accessors(chain = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -21,6 +21,6 @@ public class DecisionRequest {
     private CaseDetails caseDetails;
 
     public static DecisionRequest decisionRequest(CaseDetails caseDetails) {
-        return DecisionRequest.builder().caseDetails(caseDetails).build();
+        return new DecisionRequest().setCaseDetails(caseDetails);
     }
 }

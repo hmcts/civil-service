@@ -68,9 +68,9 @@ class NotifyDefendantCaseStayedHandlerTest {
     @BeforeEach
     void setUp() {
         caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified()
-            .claimantUserDetails(IdamUserDetails.builder().email("claimant@hmcts.net").build())
-            .applicant1(Party.builder().individualFirstName("John").individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Jack").individualLastName("Jackson").type(Party.Type.INDIVIDUAL).build())
+            .claimantUserDetails(new IdamUserDetails().setEmail("claimant@hmcts.net"))
+            .applicant1(new Party().setIndividualFirstName("John").setIndividualLastName("Doe").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Jack").setIndividualLastName("Jackson").setType(Party.Type.INDIVIDUAL))
             .build();
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         when(configuration.getHmctsSignature()).thenReturn((String) configMap.get("hmctsSignature"));
@@ -101,8 +101,7 @@ class NotifyDefendantCaseStayedHandlerTest {
                 isRespondentBilingual ? Language.BOTH.toString() : Language.ENGLISH.toString())))
             .respondentSolicitor1EmailAddress(email)
             .respondent2(!isRespondent1
-                             ? Party.builder().individualFirstName("John").individualLastName("Johnson").type(Party.Type.INDIVIDUAL).build()
-                             : null)
+                             ? new Party().setIndividualFirstName("John").setIndividualLastName("Johnson").setType(Party.Type.INDIVIDUAL) : null)
             .addRespondent2(!isRespondent1
                                 ? YesOrNo.YES
                                 : null)
@@ -115,7 +114,7 @@ class NotifyDefendantCaseStayedHandlerTest {
             .build();
         CallbackRequest request = CallbackRequest.builder()
             .eventId(isRespondent1 ? CaseEvent.NOTIFY_DEFENDANT_STAY_CASE.name() : CaseEvent.NOTIFY_DEFENDANT_TWO_STAY_CASE.name()).build();
-        CallbackParams params = CallbackParams.builder().request(request).caseData(caseData).build();
+        CallbackParams params = new CallbackParams().request(request).caseData(caseData);
 
         Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
         if (isRespondentLiP && isRespondentBilingual) {

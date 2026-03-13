@@ -49,12 +49,12 @@ class RequestedCourtForClaimDetailsTabTest {
             .setCaseLocation(new CaseLocationCivil().setBaseLocation("00002"))
             .setReasonForHearingAtSpecificCourt("Close to home");
         locations = List.of(
-            LocationRefData.builder().epimmsId("00001").courtLocationCode("00001")
-                .siteName("court 1").courtAddress("1 address").postcode("Y01 7RB").build(),
-            LocationRefData.builder().epimmsId("00002").courtLocationCode("00002")
-                .siteName("court 2").courtAddress("2 address").postcode("Y02 7RB").build(),
-            LocationRefData.builder().epimmsId("00003").courtLocationCode("00003")
-                .siteName("court 3").courtAddress("3 address").postcode("Y03 7RB").build()
+            new LocationRefData().setEpimmsId("00001").setCourtLocationCode("00001")
+                .setSiteName("court 1").setCourtAddress("1 address").setPostcode("Y01 7RB"),
+            new LocationRefData().setEpimmsId("00002").setCourtLocationCode("00002")
+                .setSiteName("court 2").setCourtAddress("2 address").setPostcode("Y02 7RB"),
+            new LocationRefData().setEpimmsId("00003").setCourtLocationCode("00003")
+                .setSiteName("court 3").setCourtAddress("3 address").setPostcode("Y03 7RB")
         );
         when(locationRefDataService.getHearingCourtLocations(any())).thenReturn(locations);
     }
@@ -69,9 +69,8 @@ class RequestedCourtForClaimDetailsTabTest {
                 .setRespondent1DQRemoteHearingLRspec(null)
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(caseData, callbackParams);
@@ -98,9 +97,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                       .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicant(callbackParams, caseData);
@@ -127,9 +125,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                                         .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabApplicantSpec(callbackParams, caseData);
@@ -155,9 +152,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                                    .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1(callbackParams, caseData);
@@ -183,9 +179,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                                    .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2(callbackParams, caseData);
@@ -211,9 +206,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                                          .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent1Spec(caseData, callbackParams);
@@ -239,9 +233,8 @@ class RequestedCourtForClaimDetailsTabTest {
                                                          .setReasonForRemoteHearing("Outside scares me"))
         );
 
-        CallbackParams callbackParams = CallbackParams.builder()
-            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"))
-            .build();
+        CallbackParams callbackParams = new CallbackParams()
+            .params(Map.of(CallbackParams.Params.BEARER_TOKEN, "some-token"));
 
         // When
         requestedCourtForClaimDetailsTab.updateRequestCourtClaimTabRespondent2Spec(callbackParams, caseData);

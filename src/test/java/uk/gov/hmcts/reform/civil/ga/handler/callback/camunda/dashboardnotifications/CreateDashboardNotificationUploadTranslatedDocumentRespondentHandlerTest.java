@@ -47,7 +47,7 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -56,8 +56,8 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldRecordTranslatedDocUploadedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();
@@ -77,8 +77,8 @@ public class CreateDashboardNotificationUploadTranslatedDocumentRespondentHandle
 
         @Test
         void shouldNotRecordTranslatedDocUploadedScenario_ifNotWithNotice() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withoutNoticeCaseData().build();
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaRespondentOneLip(YesOrNo.YES)
                 .build();
             HashMap<String, Object> scenarioParams = new HashMap<>();

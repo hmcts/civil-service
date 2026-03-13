@@ -108,10 +108,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
             callbackParams);
@@ -135,10 +134,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy
             .execute(callbackParams);
@@ -161,10 +159,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params = new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy
             .execute(callbackParams);
@@ -188,10 +185,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
             callbackParams);
@@ -214,10 +210,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(
             callbackParams);
@@ -242,10 +237,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -273,10 +267,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 
@@ -305,10 +298,9 @@ class PopulateRespondent1CopyTest {
         Map<CallbackParams.Params, Object> params =  new EnumMap<>(CallbackParams.Params.class);
         params.put(BEARER_TOKEN, "testBearerToken");
 
-        CallbackParams callbackParams = CallbackParams.builder()
+        CallbackParams callbackParams = new CallbackParams()
             .caseData(caseData)
-            .params(params)
-            .build();
+            .params(params);
 
         AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) populateRespondent1Copy.execute(callbackParams);
 

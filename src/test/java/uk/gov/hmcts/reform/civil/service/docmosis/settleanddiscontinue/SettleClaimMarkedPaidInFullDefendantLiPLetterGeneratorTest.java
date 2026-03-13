@@ -63,18 +63,16 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
     private static final String BEARER_TOKEN = "BEARER_TOKEN";
 
     private static final CaseDocument STITCHED_DOC =
-        CaseDocument.builder()
-            .createdBy("John")
-            .documentName("Stitched document")
-            .documentSize(0L)
-            .documentType(SETTLE_CLAIM_PAID_IN_FULL_LETTER)
-            .createdDatetime(LocalDateTime.now())
-            .documentLink(Document.builder()
-                              .documentUrl("fake-url")
-                              .documentFileName("file-name")
-                              .documentBinaryUrl("binary-url")
-                              .build())
-            .build();
+        new CaseDocument()
+            .setCreatedBy("John")
+            .setDocumentName("Stitched document")
+            .setDocumentSize(0L)
+            .setDocumentType(SETTLE_CLAIM_PAID_IN_FULL_LETTER)
+            .setCreatedDatetime(LocalDateTime.now())
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("fake-url")
+                              .setDocumentFileName("file-name")
+                              .setDocumentBinaryUrl("binary-url"));
 
     private static final CaseDocument SETTLE_CLAIM = CaseDocumentBuilder.builder()
         .documentName("settle_claim_paid_in_full_letter.pdf")
@@ -107,8 +105,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(1L)
             .respondent1Represented(YesOrNo.NO)
@@ -170,8 +168,8 @@ class SettleClaimMarkedPaidInFullDefendantLiPLetterGeneratorTest {
             any(), any(), anyString(), anyString()
         )).willReturn(bytes);
 
-        Party applicant = PartyBuilder.builder().soleTrader().build();
-        Party defendant = PartyBuilder.builder().soleTrader().build();
+        Party applicant = new PartyBuilder().soleTrader().build();
+        Party defendant = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder()
             .ccdCaseReference(123L)
             .respondent1Represented(YesOrNo.NO)

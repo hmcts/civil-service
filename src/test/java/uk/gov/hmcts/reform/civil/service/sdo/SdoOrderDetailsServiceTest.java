@@ -34,11 +34,16 @@ class SdoOrderDetailsServiceTest {
     @Mock
     private SdoCaseClassificationService caseClassificationService;
 
+    @Mock
+    private SdoSmallClaimsDirectionsService smallClaimsDirectionsService;
+    @Mock
+    private SdoFastTrackDirectionsService fastTrackDirectionsService;
+
     private SdoOrderDetailsService service;
 
     @BeforeEach
     void setUp() {
-        service = new SdoOrderDetailsService(caseClassificationService);
+        service = new SdoOrderDetailsService(caseClassificationService, smallClaimsDirectionsService, fastTrackDirectionsService);
     }
 
     @Test
@@ -199,10 +204,9 @@ class SdoOrderDetailsServiceTest {
     }
 
     private DirectionsOrderTaskContext orderDetailsContext(CaseData caseData, CallbackVersion version) {
-        CallbackParams params = CallbackParams.builder()
+        CallbackParams params = new CallbackParams()
             .params(Collections.emptyMap())
-            .version(version)
-            .build();
+            .version(version);
 
         return new DirectionsOrderTaskContext(caseData, params, DirectionsOrderLifecycleStage.ORDER_DETAILS);
     }

@@ -63,7 +63,7 @@ class CoverLetterServiceTest {
         CaseDocument coverLetter = mock(CaseDocument.class);
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         DocumentMetaData metaData = new DocumentMetaData(mock(Document.class), "doc", LocalDate.now().toString());
         CaseDocument stitchedDoc = mock(CaseDocument.class);
@@ -96,13 +96,13 @@ class CoverLetterServiceTest {
     @Test
     void shouldGenerateBinaryDocument_whenStitchingEnabled() {
         byte[] expectedBytes = "pdf-content".getBytes();
-        CaseDocument stitchedDoc = CaseDocument.builder().documentLink(Document.builder().documentUrl(
-            "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
-        Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
+        CaseDocument stitchedDoc = new CaseDocument().setDocumentLink(new Document().setDocumentUrl(
+            "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
+        Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentManagementService.uploadDocument(anyString(), any(PDF.class))).thenReturn(stitchedDoc);
         when(documentGeneratorService.generateDocmosisDocument(any(), any())).thenReturn(new DocmosisDocument(
@@ -135,13 +135,13 @@ class CoverLetterServiceTest {
 
     @Test
     void shouldThrowException_whenDownloadFails() {
-        CaseDocument stitchedDoc = CaseDocument.builder().documentLink(Document.builder().documentUrl(
-            "http://docstore/documents/1234").documentFileName("file.pdf").build()).build();
-        Document document = Document.builder().documentUrl("http://docstore/documents/1234").documentFileName("file.pdf").build();
+        CaseDocument stitchedDoc = new CaseDocument().setDocumentLink(new Document().setDocumentUrl(
+            "http://docstore/documents/1234").setDocumentFileName("file.pdf"));
+        Document document = new Document().setDocumentUrl("http://docstore/documents/1234").setDocumentFileName("file.pdf");
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any())).thenReturn(new DocmosisDocument(
             "file",
@@ -173,7 +173,7 @@ class CoverLetterServiceTest {
     void shouldBuildTemplateDataCorrectly() {
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         JudgementCoverLetter result = coverLetterService.buildTemplateData(party, caseData);
 
@@ -187,22 +187,19 @@ class CoverLetterServiceTest {
     @Test
     void shouldThrowDocumentDownloadException_whenReadAllBytesFails() throws IOException {
         byte[] dummyBytes = "dummy".getBytes();
-        CaseDocument stitchedDoc = CaseDocument.builder()
-            .documentLink(Document.builder()
-                              .documentUrl("http://docstore/documents/1234")
-                              .documentFileName("file.pdf")
-                              .build())
-            .build();
+        CaseDocument stitchedDoc = new CaseDocument()
+            .setDocumentLink(new Document()
+                              .setDocumentUrl("http://docstore/documents/1234")
+                              .setDocumentFileName("file.pdf"));
 
-        Document document = Document.builder()
-            .documentUrl("http://docstore/documents/1234")
-            .documentFileName("file.pdf")
-            .build();
+        Document document = new Document()
+            .setDocumentUrl("http://docstore/documents/1234")
+            .setDocumentFileName("file.pdf");
 
         DocumentMetaData metaData = new DocumentMetaData(document, "doc", LocalDate.now().toString());
         CaseData caseData = CaseData.builder()
             .legacyCaseReference("001MC001").build();
-        Party party = PartyBuilder.builder().individual().build();
+        Party party = new PartyBuilder().individual().build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(), any()))
             .thenReturn(new DocmosisDocument("file", dummyBytes));

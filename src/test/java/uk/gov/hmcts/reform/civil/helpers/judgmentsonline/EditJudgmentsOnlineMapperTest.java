@@ -243,11 +243,11 @@ public class EditJudgmentsOnlineMapperTest {
                     .build())
                 .build())
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE)
-            .respondToClaimAdmitPartLRspec(RespondToClaimAdmitPartLRspec.builder()
-                .whenWillThisAmountBePaid(LocalDate.now().plusDays(5)).build())
+            .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec()
+                .setWhenWillThisAmountBePaid(LocalDate.now().plusDays(5)))
             .caseManagementLocation(new CaseLocationCivil().setBaseLocation("0123").setRegion("0321"))
             .ccjPaymentDetails(ccjPaymentDetails)
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .build();
         JudgmentDetails activeJudgment = judgmentByAdmissionMapper.addUpdateActiveJudgment(caseData);
 

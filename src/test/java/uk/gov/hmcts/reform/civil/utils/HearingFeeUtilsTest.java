@@ -73,10 +73,10 @@ class HearingFeeUtilsTest {
             .allocatedTrack(allocatedTrack)
             .build();
 
-        Fee expected = Fee.builder()
-            .calculatedAmountInPence(feeInPence)
-            .code("FEE0225").version("7")
-            .build();
+        Fee expected = new Fee()
+            .setCalculatedAmountInPence(feeInPence)
+            .setCode("FEE0225").setVersion("7")
+            ;
 
         when(hearingFeesService.getFeeForHearingSmallClaims(any())).thenReturn(expected);
         when(hearingFeesService.getFeeForHearingFastTrackClaims(any())).thenReturn(expected);

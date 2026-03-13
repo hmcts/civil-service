@@ -48,7 +48,7 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
 
     @Test
     void shouldReturnCorrectCamundaActivityId_whenInvoked() {
-        assertThat(handler.camundaActivityId(CallbackParams.builder().build()))
+        assertThat(handler.camundaActivityId(new CallbackParams()))
             .isEqualTo("default");
     }
 
@@ -57,8 +57,8 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
 
         @Test
         void shouldRecordApplicationSubmittedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();
@@ -79,8 +79,8 @@ class CreateDashboardNotificationWhenFinalOrderMadeRespondentHandlerTest extends
 
         @Test
         void shouldNotRecordApplicationSubmittedScenario_whenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withoutNoticeCaseData();
-            caseData = caseData.toBuilder().parentCaseReference(caseData.getCcdCaseReference().toString())
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().withoutNoticeCaseData().build();
+            caseData = caseData.copy().parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .build();

@@ -37,9 +37,8 @@ class MediationUtilsTest {
     @Test
     void shouldReturnFalse_whenMoreThanOneReasonMatch() {
         CaseData caseData = CaseDataBuilder.builder()
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT))
-                           .build())
+            .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT))
+                           )
             .build();
 
         assertThat(findMediationUnsuccessfulReason(caseData, List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))).isTrue();
@@ -48,9 +47,8 @@ class MediationUtilsTest {
     @Test
     void shouldReturnFalse_whenMediationUnsuccessfulReasonsMultiSelectIsNull() {
         CaseData caseData = CaseDataBuilder.builder()
-            .mediation(Mediation.builder()
-                           .mediationUnsuccessfulReasonsMultiSelect(null)
-                           .build())
+            .mediation(new Mediation().setMediationUnsuccessfulReasonsMultiSelect(null)
+                           )
             .build();
 
         assertThat(findMediationUnsuccessfulReason(caseData, List.of(PARTY_WITHDRAWS, APPOINTMENT_NO_AGREEMENT, APPOINTMENT_NOT_ASSIGNED))).isFalse();

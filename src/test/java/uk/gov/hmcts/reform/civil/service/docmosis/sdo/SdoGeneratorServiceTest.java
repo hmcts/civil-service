@@ -338,9 +338,9 @@ public class SdoGeneratorServiceTest {
             .smallClaimsMethod(SmallClaimsMethod.smallClaimsMethodInPerson)
             .smallClaimsMethodInPerson(formValue)
             .build().toBuilder()
-            .smallClaimsMediationSectionStatement(SmallClaimsMediation.builder()
-                                                      .input("mediation representation")
-                                                      .build())
+            .smallClaimsMediationSectionStatement(
+                new SmallClaimsMediation().setInput("mediation representation")
+            )
             .build();
         when(documentHearingLocationHelper.getHearingLocation(locationLabel, caseData, BEARER_TOKEN))
             .thenReturn(locationRefData);
@@ -437,7 +437,7 @@ public class SdoGeneratorServiceTest {
                 .plusWeeks(invocation.getArgument(0, Integer.class)));
 
         SdoFastTrackSpecialistDirectionsService specialistService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
 
         CaseData caseData = baseCase.toBuilder()
             .drawDirectionsOrderRequired(YesOrNo.NO)
