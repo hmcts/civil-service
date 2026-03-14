@@ -109,8 +109,8 @@ public class DjTrialNarrativeService {
             .setHelpText1(FAST_TRACK_TRIAL_HEARING_HELP_TEXT)
             .setHelpText2(FAST_TRACK_TRIAL_MANUAL_BUNDLE_GUIDANCE)
             .setDateToToggle(DATE_TO_SHOW)
-            .setDate1(deadlineService.weeksFromNow(22))
-            .setDate2(deadlineService.weeksFromNow(30));
+            .setDate1(deadlineService.weeksFromNow(20))
+            .setDate2(deadlineService.weeksFromNow(29));
     }
 
     public TrialHearingNotes buildTrialHearingNotes() {
