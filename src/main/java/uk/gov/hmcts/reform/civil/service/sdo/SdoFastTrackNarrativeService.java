@@ -113,8 +113,8 @@ public class SdoFastTrackNarrativeService {
     }
 
     private void applyHearingTime(CaseData caseData) {
-        LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
-        LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
+        LocalDate trialStart = calendarWeeksFromNow(20);
+        LocalDate trialEnd = calendarWeeksFromNow(29);
         caseData.setFastTrackHearingTime(new FastTrackHearingTime()
                                                  .setDateFrom(trialStart)
                                                  .setDateTo(trialEnd)

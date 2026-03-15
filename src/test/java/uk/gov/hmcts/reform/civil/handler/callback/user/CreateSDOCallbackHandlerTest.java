@@ -1929,9 +1929,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input1")
                 .isEqualTo("The time provisionally allowed for this trial is");
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date1")
-                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(20).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("date2")
-                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(29).toString());
             assertThat(response.getData()).extracting("fastTrackTrial").extracting("input2")
                 .isEqualTo("If either party considers that the time estimate is insufficient, they must inform the"
                                + " court within 7 days of the date stated on this order.");
@@ -2194,9 +2194,9 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                                + "they must inform the court within 7 days of the date of this order.");
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateToToggle").isNotNull();
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateFrom")
-                .isEqualTo(LocalDate.now().plusWeeks(22).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(20).toString());
             assertThat(response.getData()).extracting("fastTrackHearingTime").extracting("dateTo")
-                .isEqualTo(LocalDate.now().plusWeeks(30).toString());
+                .isEqualTo(LocalDate.now().plusWeeks(29).toString());
             assertThat(response.getData()).extracting("fastTrackOrderWithoutJudgement").extracting("input")
                 .isEqualTo(String.format(
                     "This order has been made without hearing. "

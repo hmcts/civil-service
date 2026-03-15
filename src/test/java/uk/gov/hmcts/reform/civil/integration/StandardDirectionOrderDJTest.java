@@ -471,7 +471,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                          - Item\s
                          - \
                         Alleged Defect \
-                        
+
                          - Claimant's costing
                          - Defendant's\
                          response
@@ -541,7 +541,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                         The columns should be headed:\s
                          - Item\s
                          - Alleged disrepair \
-                        
+
                          - Defendant's Response\s
                          - Reserved for Judge's Use""");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")

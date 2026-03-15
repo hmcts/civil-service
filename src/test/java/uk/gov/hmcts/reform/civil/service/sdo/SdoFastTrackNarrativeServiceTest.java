@@ -70,7 +70,7 @@ class SdoFastTrackNarrativeServiceTest {
             .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
         assertThat(caseData.getFastTrackHearingTime())
             .extracting(FastTrackHearingTime::getDateFrom, FastTrackHearingTime::getDateTo)
-            .containsExactly(calendarBase.plusDays(22 * 7), calendarBase.plusDays(30 * 7));
+            .containsExactly(calendarBase.plusDays(20 * 7), calendarBase.plusDays(29 * 7));
         assertThat(caseData.getFastTrackNotes().getDate())
             .isEqualTo(workingDayBase.plusWeeks(1));
     }
