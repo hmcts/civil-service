@@ -55,8 +55,8 @@ public class SdoFastTrackNarrativeService {
     private static final List<DateToShowToggle> DATE_TO_SHOW_TRUE = List.of(DateToShowToggle.SHOW);
     private static final DateTimeFormatter ORDER_DATE_FORMAT =
         DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH);
-    private static final int TRIAL_WINDOW_START_WEEKS = 20;
-    private static final int TRIAL_WINDOW_END_WEEKS = 29;
+    private static final int TRIAL_WINDOW_START_WEEKS = 22;
+    private static final int TRIAL_WINDOW_END_WEEKS = 30;
 
     private final SdoDeadlineService sdoDeadlineService;
 
@@ -113,8 +113,8 @@ public class SdoFastTrackNarrativeService {
     }
 
     private void applyHearingTime(CaseData caseData) {
-        LocalDate trialStart = calendarWeeksFromNow(TRIAL_WINDOW_START_WEEKS);
-        LocalDate trialEnd = calendarWeeksFromNow(TRIAL_WINDOW_END_WEEKS);
+        LocalDate trialStart = calendarWeeksFromNow(20);
+        LocalDate trialEnd = calendarWeeksFromNow(29);
         caseData.setFastTrackHearingTime(new FastTrackHearingTime()
                                                  .setDateFrom(trialStart)
                                                  .setDateTo(trialEnd)
