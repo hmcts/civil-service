@@ -1,0 +1,15 @@
+{
+  "name": "CMC Claim Store - Defendant Link Status (default - not linked)",
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/claims/.*/defendant-link-status"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "{\"linked\": false}"
+  }
+}

@@ -242,8 +242,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         private CaseData createCaseDataWithMultipleFollowUpQueries1v2SameSol() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.YES)
                 .applicantSolicitor1UserDetails(new IdamUserDetails()
@@ -301,8 +301,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
         private CaseData createCaseDataWithMultipleFollowUpQueries1v2DiffSol() {
             return CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build()
                 .toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .respondent2SameLegalRepresentative(YesOrNo.NO)
                 .applicantSolicitor1UserDetails(new IdamUserDetails()
@@ -548,8 +548,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateAwaitingResponseFullDefenceReceived().build().toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
                 .queries(query)
@@ -591,8 +591,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued().build().toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
                 .queries(query)
@@ -625,8 +625,8 @@ class NotifyOtherPartyQueryHasResponseNotificationHandlerTest extends BaseCallba
             when(coreCaseUserService.getUserCaseRoles(any(), any())).thenReturn(List.of("CLAIMANT"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified().build().toBuilder()
-                .respondent1(PartyBuilder.builder().build())
-                .respondent2(PartyBuilder.builder().build())
+                .respondent1(new PartyBuilder().build())
+                .respondent2(new PartyBuilder().build())
                 .addRespondent2(YesOrNo.YES)
                 .applicant1Represented(YesOrNo.NO)
                 .queries(query)

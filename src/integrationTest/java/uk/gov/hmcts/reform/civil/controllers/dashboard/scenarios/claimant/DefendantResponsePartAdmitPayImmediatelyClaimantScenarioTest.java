@@ -40,10 +40,9 @@ public class DefendantResponsePartAdmitPayImmediatelyClaimantScenarioTest extend
             .respondToClaimAdmitPartLRspec(new RespondToClaimAdmitPartLRspec().setWhenWillThisAmountBePaid(
                 LocalDate.of(2024, 3, 18)
             ))
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                    .individualFirstName("James")
-                    .individualLastName("John")
-                    .build())
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                    .setIndividualFirstName("James")
+                    .setIndividualLastName("John"))
             .claimFee(new Fee().setCalculatedAmountInPence(BigDecimal.valueOf(30000)))
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
