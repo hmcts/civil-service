@@ -644,6 +644,7 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         assertThat(categoriesCaptor.getValue())
             .containsExactlyInAnyOrder("Applications", "Hearing");
     }
+
     private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
