@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @lombok.Data
-@lombok.Builder(toBuilder = true)
 @lombok.NoArgsConstructor
 @lombok.AllArgsConstructor
 @Entity

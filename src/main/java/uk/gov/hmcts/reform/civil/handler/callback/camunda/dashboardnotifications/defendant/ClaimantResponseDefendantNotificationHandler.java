@@ -80,7 +80,7 @@ public class ClaimantResponseDefendantNotificationHandler extends DashboardCallb
             );
         }
         if (caseData.getCcdState() == CaseState.PROCEEDS_IN_HERITAGE_SYSTEM) {
-            ScenarioRequestParams notificationParams = ScenarioRequestParams.builder().params(mapper.mapCaseDataToParams(caseData)).build();
+            ScenarioRequestParams notificationParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
             dashboardScenariosService.recordScenarios(
                 authToken,
                 SCENARIO_AAA6_GENERAL_APPLICATION_INITIATE_APPLICATION_INACTIVE_DEFENDANT.getScenario(),

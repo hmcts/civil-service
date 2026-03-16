@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.dashboard.data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Data
-@Builder(toBuilder = true)
 public class ScenarioRequestParams {
 
     /**
@@ -18,9 +17,15 @@ public class ScenarioRequestParams {
      */
     HashMap<String, Object> params;
 
-    @SuppressWarnings("java:S1319")
     @JsonCreator
-    public ScenarioRequestParams(HashMap<String, Object> params) {
-        this.params = params;
+    @SuppressWarnings("unchecked")
+    public ScenarioRequestParams(Map<String, Object> params) {
+        if (params == null) {
+            this.params = null;
+        } else if (params instanceof HashMap<?, ?>) {
+            this.params = (HashMap<String, Object>) params;
+        } else {
+            this.params = new HashMap<>(params);
+        }
     }
 }

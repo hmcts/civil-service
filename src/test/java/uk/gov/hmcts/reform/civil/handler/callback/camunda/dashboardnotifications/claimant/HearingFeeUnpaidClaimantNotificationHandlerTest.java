@@ -96,7 +96,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
             verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
                 caseData.getCcdCaseReference().toString(), "CLAIMANT");
@@ -122,7 +122,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -150,7 +150,7 @@ class HearingFeeUnpaidClaimantNotificationHandlerTest {
                 "BEARER_TOKEN",
                 "Scenario.AAA6.CP.StrikeOut.HearingFeeUnpaid.TrialReady.Claimant",
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
     }

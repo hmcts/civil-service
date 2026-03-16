@@ -32,9 +32,7 @@ public abstract class GaDashboardScenarioService {
         String caseReference = resolveCaseReference(caseData);
         log.info("Evaluating dashboard scenarios for case {}", caseReference);
 
-        ScenarioRequestParams scenarioParams = ScenarioRequestParams.builder()
-            .params(mapper.mapCaseDataToParams(caseData))
-            .build();
+        ScenarioRequestParams scenarioParams = new ScenarioRequestParams(mapper.mapCaseDataToParams(caseData));
 
         String scenario = getScenario(caseData);
         if (!Strings.isNullOrEmpty(scenario) && shouldRecordScenario(caseData)) {
