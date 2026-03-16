@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -120,9 +122,7 @@ class TaskListServiceTest {
         //then
         assertThrows(
             RuntimeException.class,
-            () -> {
-                taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any());
-            }
+            () -> taskListRepository.findByReferenceAndTaskItemTemplateRole(any(), any())
         );
 
     }
@@ -133,8 +133,8 @@ class TaskListServiceTest {
         //given
         List<TaskListEntity> tasks = new ArrayList<>();
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
-                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
-                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .taskNameEn("<a>Link name</a>")
+                      .taskNameCy("<a>Link name Welsh</a>")
                       .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
                       .build());
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
@@ -439,6 +439,94 @@ class TaskListServiceTest {
     }
 
     @Test
+    void shouldFallbackToDefaultProgressQueryWhenCategoryTemplatesMissing() {
+        List<TaskListEntity> tasks = List.of(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.IN_PROGRESS.getPlaceValue())
+                      .build());
+
+        when(taskItemTemplateRepository.findByCategoryEnAndRole("CategoryEn", "Claimant")).thenReturn(List.of());
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
+        )).thenReturn(tasks);
+
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "123",
+            "Claimant",
+            "CategoryEn"
+        );
+
+        verify(taskItemTemplateRepository).findByCategoryEnAndRole("CategoryEn", "Claimant");
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
+        );
+        verify(taskListRepository, never()).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            any(),
+            any(),
+            any(),
+            any()
+        );
+        verify(taskListRepository, atLeast(1)).save(ArgumentMatchers.argThat(
+            a -> a.getCurrentStatus() == TaskStatus.INACTIVE.getPlaceValue()
+        ));
+    }
+
+    @Test
+    void shouldTreatEmptyExcludedCategoriesAsNoExclusions() {
+        List<TaskListEntity> tasks = List.of(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.ACTION_NEEDED.getPlaceValue())
+                      .build());
+
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
+        )).thenReturn(tasks);
+
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "123",
+            "Claimant",
+            null,
+            "   "
+        );
+
+        verify(taskItemTemplateRepository, never()).findByCategoryEnAndRole(any(), any());
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotIn(
+            "123",
+            "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(),
+                TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            )
+        );
+        verify(taskListRepository, never()).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            any(),
+            any(),
+            any(),
+            any()
+        );
+        verify(taskListRepository, atLeast(1)).save(ArgumentMatchers.argThat(
+            a -> a.getCurrentStatus() == TaskStatus.INACTIVE.getPlaceValue()
+        ));
+    }
+
+    @Test
     public void shouldDeleteWhenThereWereDuplicateEntriesInTheRepository() {
         TaskListEntity task = getTaskListEntity(UUID.randomUUID()).toBuilder()
             .currentStatus(TaskStatus.AVAILABLE.getPlaceValue())
@@ -534,6 +622,18 @@ class TaskListServiceTest {
             any(),
             any()
         );
+
+        ArgumentCaptor<TaskListEntity> captor = ArgumentCaptor.forClass(TaskListEntity.class);
+        verify(taskListRepository, times(2)).save(captor.capture());
+        List<TaskListEntity> savedTasks = captor.getAllValues();
+        savedTasks.forEach(saved -> {
+            assertThat(saved.getCurrentStatus()).isEqualTo(TaskStatus.AVAILABLE.getPlaceValue());
+            assertThat(saved.getNextStatus()).isEqualTo(TaskStatus.AVAILABLE.getPlaceValue());
+            assertThat(saved.getHintTextCy()).isEmpty();
+            assertThat(saved.getHintTextEn()).isEmpty();
+            assertThat(saved.getTaskNameEn()).isEqualTo("<a class=\"govuk-link\" href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\">Link name</a>");
+            assertThat(saved.getTaskNameCy()).isEqualTo("<a class=\"govuk-link\" href=\"{VIEW_EVIDENCE_UPLOAD_DOCUMENTS}\">Link name Welsh</a>");
+        });
     }
 
 }
