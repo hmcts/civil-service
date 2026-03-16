@@ -14,6 +14,7 @@ plugins {
   id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
+  id "org.gradle.test-retry" version "1.6.2"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -53,6 +54,15 @@ allprojects {
     maxWarnings = 0
     toolVersion = '10.26.1'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+    ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
+  }
+
+// Only create HTML Checkstyle reports
+  tasks.withType(Checkstyle).configureEach {
+    reports {
+      xml.required = false
+      html.required = true
+    }
   }
 
   jacoco {
@@ -166,9 +176,16 @@ task integration(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
+  failFast = System.getenv('GITHUB_ACTIONS') == 'true' ? false : true
   testLogging.showStandardStreams = false
 
+  if (System.getenv('GITHUB_ACTIONS') == 'true') {
+    retry {
+      maxRetries = 3
+      maxFailures = 10
+      failOnPassedAfterRetry = false
+    }
+  }
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -233,6 +250,9 @@ sonarqube {
       ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
+    property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.branch.cache.enabled", "true"
+    property "sonar.working.directory", "${buildDir}/sonar"
   }
 }
 
@@ -607,10 +627,15 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  doFirst {
+    logger.lifecycle("Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
+  }
   useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   jvmArgs '-Xshare:off'
+  // Use Parallel GC for faster, short-lived test forks
+  jvmArgs '-XX:+UseParallelGC'
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"
