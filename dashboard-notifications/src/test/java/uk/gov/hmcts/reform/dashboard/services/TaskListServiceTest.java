@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dashboard.services;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,6 +48,11 @@ class TaskListServiceTest {
 
     @InjectMocks
     private TaskListService taskListService;
+
+    @BeforeEach
+    void resetMocks() {
+        reset(taskListRepository, taskItemTemplateRepository);
+    }
 
     @Test
     void shouldReturnEmpty_whenTaskListIsNotPresent() {
@@ -133,8 +140,8 @@ class TaskListServiceTest {
         //given
         List<TaskListEntity> tasks = new ArrayList<>();
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
-                      .taskNameEn("<a>Link name</a>")
-                      .taskNameCy("<a>Link name Welsh</a>")
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
                       .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
                       .build());
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
@@ -574,8 +581,8 @@ class TaskListServiceTest {
         //given
         List<TaskListEntity> tasks = new ArrayList<>();
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
-                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
-                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .taskNameEn("<a>Link name</a>")
+                      .taskNameCy("<a>Link name Welsh</a>")
                       .currentStatus(TaskStatus.NOT_AVAILABLE_YET.getPlaceValue())
                       .build());
         tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
