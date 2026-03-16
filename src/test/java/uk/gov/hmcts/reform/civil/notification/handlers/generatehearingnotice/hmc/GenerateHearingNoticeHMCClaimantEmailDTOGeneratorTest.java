@@ -81,8 +81,8 @@ class GenerateHearingNoticeHMCClaimantEmailDTOGeneratorTest {
             .hearingDate(hearingDate)
             .businessProcess(new BusinessProcess()
                                  .setProcessInstanceId(processInstanceId))
-            .applicant1(Party.builder().individualFirstName("Claimant")
-                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("Claimant")
+                            .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
             .build();
 
         HearingNoticeVariables hearingNoticeVariables =  new HearingNoticeVariables();

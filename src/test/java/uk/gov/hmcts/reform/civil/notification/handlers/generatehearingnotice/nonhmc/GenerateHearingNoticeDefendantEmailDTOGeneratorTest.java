@@ -92,8 +92,8 @@ class GenerateHearingNoticeDefendantEmailDTOGeneratorTest {
                 .hearingDate(HEARING_DATE_VAL)
                 .hearingTimeHourMinute(TIME_ARG)
                 .businessProcess(new BusinessProcess().setProcessInstanceId(PROCESS_ID))
-                .respondent1(Party.builder().individualFirstName("Defendant")
-                            .individualLastName("Org").type(Party.Type.INDIVIDUAL).build())
+                .respondent1(new Party().setIndividualFirstName("Defendant")
+                            .setIndividualLastName("Org").setType(Party.Type.INDIVIDUAL))
                 .build();
 
         try (MockedStatic<NotificationUtils> utils = mockStatic(NotificationUtils.class)) {
