@@ -8,10 +8,10 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.exceptions.PaymentsApiException;
 import uk.gov.hmcts.reform.civil.exceptions.RetryablePaymentException;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.PaymentsClient;
+import uk.gov.hmcts.reform.civil.client.payments.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.client.payments.request.CardPaymentServiceRequestDTO;
+import uk.gov.hmcts.reform.civil.client.payments.response.CardPaymentServiceRequestResponse;
 
 @Slf4j
 @Service

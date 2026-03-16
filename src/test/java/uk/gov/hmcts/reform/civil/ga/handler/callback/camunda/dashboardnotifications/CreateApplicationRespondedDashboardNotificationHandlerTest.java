@@ -32,7 +32,7 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GAJudgesHearingListGAsp
 import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationService;
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.civil.client.idam.IdamClient;
 
 import java.util.ArrayList;
 import java.util.Arrays;

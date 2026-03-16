@@ -6,8 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
-import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
+import uk.gov.hmcts.reform.civil.client.sendletter.api.LetterWithPdfsRequest;
+import uk.gov.hmcts.reform.civil.client.sendletter.api.SendLetterApi;
 
 import java.util.Arrays;
 import java.util.Base64;

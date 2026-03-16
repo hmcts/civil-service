@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.model;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.payments.client.models.FeeDto;
+import uk.gov.hmcts.reform.civil.client.payments.models.FeeDto;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -76,8 +76,8 @@ import uk.gov.hmcts.reform.civil.ga.service.docmosis.HearingOrderGenerator;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.RequestForInformationGenerator;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.WrittenRepresentationConcurrentOrderGenerator;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.WrittenRepresentationSequentialOrderGenerator;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.IdamClient;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.ServiceRequestUpdateDto;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.client.payments.models.PaymentDto;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import static org.mockito.ArgumentMatchers.any;

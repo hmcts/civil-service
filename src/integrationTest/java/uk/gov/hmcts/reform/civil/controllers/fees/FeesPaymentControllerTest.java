@@ -18,11 +18,11 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.model.genapplication.GAPbaDetails;
 import uk.gov.hmcts.reform.civil.service.CoreCaseDataService;
 import uk.gov.hmcts.reform.civil.service.PaymentStatusRetryService;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.PaymentsClient;
+import uk.gov.hmcts.reform.civil.client.payments.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.client.payments.models.StatusHistoryDto;
+import uk.gov.hmcts.reform.civil.client.payments.request.CardPaymentServiceRequestDTO;
+import uk.gov.hmcts.reform.civil.client.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

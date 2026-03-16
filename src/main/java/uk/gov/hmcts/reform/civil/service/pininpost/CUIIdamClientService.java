@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.pininpost;
 
 import uk.gov.hmcts.reform.civil.config.CMCPinVerifyConfiguration;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
+import uk.gov.hmcts.reform.civil.client.idam.IdamApi;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

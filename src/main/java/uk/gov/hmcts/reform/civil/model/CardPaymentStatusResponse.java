@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

@@ -14,8 +14,8 @@ import uk.gov.hmcts.reform.civil.ga.model.GeneralApplicationCaseData;
 import uk.gov.hmcts.reform.civil.model.BusinessProcess;
 import uk.gov.hmcts.reform.civil.ga.service.UploadTranslatedDocumentService;
 import uk.gov.hmcts.reform.civil.ga.utils.IdamUserUtils;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.IdamClient;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.util.Collections;
 import java.util.List;

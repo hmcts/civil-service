@@ -87,7 +87,7 @@ import uk.gov.hmcts.reform.civil.service.sdo.SdoSmallClaimsTemplateFieldService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoMediationSectionService;
 import uk.gov.hmcts.reform.civil.service.sdo.SdoDeadlineService;
 import uk.gov.hmcts.reform.civil.utils.HearingMethodUtils;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

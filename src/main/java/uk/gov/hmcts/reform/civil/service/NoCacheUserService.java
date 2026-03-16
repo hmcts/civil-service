@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.civil.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.civil.client.idam.IdamClient;
 
 @Service
 @Slf4j

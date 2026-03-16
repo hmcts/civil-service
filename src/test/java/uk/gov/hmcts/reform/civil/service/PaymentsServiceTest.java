@@ -22,10 +22,10 @@ import uk.gov.hmcts.reform.civil.model.genapplication.GASolicitorDetailsGAspec;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.GeneralApplicationCaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.hearings.HearingFeesService;
-import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
-import uk.gov.hmcts.reform.payments.response.PaymentServiceResponse;
+import uk.gov.hmcts.reform.civil.client.payments.InvalidPaymentRequestException;
+import uk.gov.hmcts.reform.civil.client.payments.PaymentsClient;
+import uk.gov.hmcts.reform.civil.client.payments.response.PBAServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.response.PaymentServiceResponse;
 import uk.gov.hmcts.reform.civil.prd.model.ContactInformation;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 

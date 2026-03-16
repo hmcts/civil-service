@@ -4,25 +4,23 @@ import org.camunda.community.rest.EnableCamundaRestClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
-import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
-@EnableCamundaRestClient
-@ComponentScan(basePackages = {
+@SpringBootApplication(scanBasePackages = {
     "uk.gov.hmcts.reform.civil",
     "uk.gov.hmcts.reform.hmc",
     "uk.gov.hmcts.reform.dashboard"
 })
+@EnableCamundaRestClient
 @EnableFeignClients(basePackages = {
-    "uk.gov.hmcts.reform.idam.client",
+    "uk.gov.hmcts.reform.civil.client.idam",
     "uk.gov.hmcts.reform.civil",
     "uk.gov.hmcts.reform.civil.prd",
-    "uk.gov.hmcts.reform.ccd.document.am",
+    "uk.gov.hmcts.reform.civil.client.casedocument",
     "uk.gov.hmcts.reform.civil.ras",
     "uk.gov.hmcts.reform.cmc",
     "uk.gov.hmcts.reform.civil.crd",
     "uk.gov.hmcts.reform.hmc",
-    "uk.gov.hmcts.reform.payments.client"
+    "uk.gov.hmcts.reform.civil.client.payments"
 })
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class Application {

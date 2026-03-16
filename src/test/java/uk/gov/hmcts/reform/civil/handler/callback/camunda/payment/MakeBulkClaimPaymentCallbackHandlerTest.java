@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.PaymentsService;
 import uk.gov.hmcts.reform.civil.service.Time;
-import uk.gov.hmcts.reform.payments.client.InvalidPaymentRequestException;
-import uk.gov.hmcts.reform.payments.response.PBAServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.InvalidPaymentRequestException;
+import uk.gov.hmcts.reform.civil.client.payments.response.PBAServiceRequestResponse;
 
 import java.time.LocalDateTime;
 import java.util.Collections;

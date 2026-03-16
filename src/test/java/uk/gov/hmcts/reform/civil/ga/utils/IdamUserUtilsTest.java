@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.ga.utils;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

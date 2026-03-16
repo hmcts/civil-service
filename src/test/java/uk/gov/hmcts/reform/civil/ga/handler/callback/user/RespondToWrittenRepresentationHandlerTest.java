@@ -32,8 +32,8 @@ import uk.gov.hmcts.reform.civil.ga.service.DocUploadDashboardNotificationServic
 import uk.gov.hmcts.reform.civil.ga.service.GaForLipService;
 import uk.gov.hmcts.reform.civil.ga.service.docmosis.RespondToWrittenRepresentationGenerator;
 import uk.gov.hmcts.reform.civil.ga.utils.DocUploadUtils;
-import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.IdamClient;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.util.ArrayList;
 import java.util.List;

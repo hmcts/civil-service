@@ -37,8 +37,8 @@ import uk.gov.hmcts.reform.civil.service.UserService;
 import uk.gov.hmcts.reform.civil.service.referencedata.LocationReferenceDataService;
 import uk.gov.hmcts.reform.civil.service.validation.GeneralApplicationValidator;
 import uk.gov.hmcts.reform.civil.utils.UserRoleUtils;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserDetails;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

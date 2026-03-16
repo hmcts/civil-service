@@ -110,7 +110,6 @@ allprojects {
 
     }
     imports {
-      mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.3'
       mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.1'
       mavenBom "com.azure.spring:spring-cloud-azure-dependencies:7.0.0"
     }
@@ -331,9 +330,7 @@ dependencies {
     exclude group: 'junit', module: 'junit'
   }
   implementation project(':dashboard-notifications')
-  implementation group: 'org.springframework.data', name: 'spring-data-jpa'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-  implementation group: 'org.hibernate.orm', name: 'hibernate-core'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure-classic-modules'
   implementation group: 'org.springframework.boot', name: 'spring-boot-persistence'
@@ -343,7 +340,6 @@ dependencies {
   implementation group: 'org.springframework', name: 'spring-aspects'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-json'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-  implementation group: 'org.hibernate.validator', name: 'hibernate-validator'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
   implementation group: 'org.springframework.statemachine', name: 'spring-statemachine-core', version: versions.springStatemachine
@@ -371,18 +367,8 @@ dependencies {
 
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.2.0'
-  implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
-  implementation('com.github.hmcts:fees-java-client:0.1.0') {
-    exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
-  }
-  implementation('com.github.hmcts:payments-java-client:1.6.7') {
-    exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
-    exclude group: 'uk.gov.hmcts.reform', module: 'service-auth-provider-client'
-  }
   implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
-  implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
   implementation group: 'com.sendgrid', name: 'sendgrid-java', version: '4.10.3'
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -401,7 +387,6 @@ dependencies {
   implementation group: 'org.springframework.security', name: 'spring-security-oauth2-core'
   implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.8'
   implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.13.0'
-  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.2'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
   constraints {
@@ -440,7 +425,6 @@ dependencies {
   implementation group: 'org.apache.pdfbox', name: 'pdfbox-io', version: versions.pdfbox
 
   implementation group: 'com.github.hmcts', name: 'auth-checker-lib', version: '3.1.1'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-actuator'
 
   implementation 'org.apache.poi:poi:5.5.1'
   implementation 'org.apache.poi:poi-ooxml:5.5.1'
@@ -463,6 +447,7 @@ dependencies {
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test-classic'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-webmvc-test'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc-test'
+  testImplementation group: 'org.hibernate.validator', name: 'hibernate-validator'
   testImplementation group: 'org.springframework.security', name: 'spring-security-test'
 
   testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.4.0'

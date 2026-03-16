@@ -22,11 +22,11 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.model.Fee;
 import uk.gov.hmcts.reform.civil.model.SRPbaDetails;
-import uk.gov.hmcts.reform.payments.client.PaymentsClient;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.client.models.StatusHistoryDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.PaymentsClient;
+import uk.gov.hmcts.reform.civil.client.payments.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.client.payments.models.StatusHistoryDto;
+import uk.gov.hmcts.reform.civil.client.payments.request.CardPaymentServiceRequestDTO;
+import uk.gov.hmcts.reform.civil.client.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;

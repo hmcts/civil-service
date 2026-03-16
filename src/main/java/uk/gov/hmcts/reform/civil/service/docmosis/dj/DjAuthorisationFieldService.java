@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.docmosis.dj;
 
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserDetails;
 
 import java.util.Objects;
 

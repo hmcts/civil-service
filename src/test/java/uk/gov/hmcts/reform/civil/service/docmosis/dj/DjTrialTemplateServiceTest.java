@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.civil.service.dj.DjBuildingDisputeDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjClinicalDirectionsService;
 import uk.gov.hmcts.reform.civil.service.dj.DjDeadlineService;
 import uk.gov.hmcts.reform.civil.service.dj.DjTrialNarrativeService;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserDetails;
 
 import java.time.LocalDate;
 import java.util.Collections;

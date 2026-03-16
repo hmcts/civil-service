@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.civil.ga.utils;
 
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.util.StringJoiner;
 

@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.civil.handler.callback.user.task.evidenceupload.Appli
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.service.CoreCaseUserService;
 import uk.gov.hmcts.reform.civil.service.UserService;
-import uk.gov.hmcts.reform.idam.client.models.UserInfo;
+import uk.gov.hmcts.reform.civil.client.idam.models.UserInfo;
 
 import java.util.Collections;
 import java.util.Objects;

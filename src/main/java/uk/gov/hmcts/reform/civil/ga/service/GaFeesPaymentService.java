@@ -10,9 +10,9 @@ import uk.gov.hmcts.reform.civil.ga.model.genapplication.GeneralApplicationPbaDe
 import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CardPaymentStatusResponse;
 import uk.gov.hmcts.reform.civil.service.PaymentStatusService;
-import uk.gov.hmcts.reform.payments.client.models.PaymentDto;
-import uk.gov.hmcts.reform.payments.request.CardPaymentServiceRequestDTO;
-import uk.gov.hmcts.reform.payments.response.CardPaymentServiceRequestResponse;
+import uk.gov.hmcts.reform.civil.client.payments.models.PaymentDto;
+import uk.gov.hmcts.reform.civil.client.payments.request.CardPaymentServiceRequestDTO;
+import uk.gov.hmcts.reform.civil.client.payments.response.CardPaymentServiceRequestResponse;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
