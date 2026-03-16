@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -106,7 +107,7 @@ public class TaskListService {
                         category,
                         role
                     );
-                    return Objects.nonNull(templates) ? templates.stream() : List.<TaskItemTemplateEntity>of().stream();
+                    return Objects.nonNull(templates) ? templates.stream() : Stream.of();
                 })
                 .map(TaskItemTemplateEntity::getId)
                 .distinct()
@@ -208,6 +209,7 @@ public class TaskListService {
                 taskListRepository.save(task);
             });
     }
+
     private List<String> normaliseCategories(String... categories) {
         if (categories == null || categories.length == 0) {
             return List.of();
