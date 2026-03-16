@@ -41,6 +41,7 @@ public class NotifyDecisionOnReconsiderationRequestClaimantEmailDTOGenerator ext
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return caseData.isApplicantLiP()
+            && !caseData.isRespondent1LiP()
             && nonNull(caseData.getApplicant1())
             && nonNull(caseData.getApplicant1().getPartyEmail());
     }
