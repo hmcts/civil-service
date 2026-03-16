@@ -142,6 +142,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
         }
         if (isSDODrawnPreCPRelease(caseData)) {
+            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CLAIMANT_SDO_DRAWN_PRE_CASE_PROGRESSION.getScenario();
         }
         if (isFinalOrderIssued(callbackParams)) {
