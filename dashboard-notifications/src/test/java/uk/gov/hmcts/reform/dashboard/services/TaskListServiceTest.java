@@ -337,13 +337,13 @@ class TaskListServiceTest {
                 TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
                 TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
             ),
-            List.of(Long.valueOf(123))
+            List.of(123L)
         ))
             .thenReturn(tasks);
 
         List<TaskItemTemplateEntity> categories = new ArrayList<>();
         categories.add(TaskItemTemplateEntity.builder()
-                           .id(Long.valueOf(123)).taskNameCy("TaskNameCy")
+                           .id(123L).taskNameCy("TaskNameCy")
                            .taskNameEn("TaskNameEn")
                            .scenarioName("Scenario.hearing")
                            .templateName("Hearing.view")
@@ -372,7 +372,7 @@ class TaskListServiceTest {
                 TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
                 TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
             ),
-            List.of(Long.valueOf(123))
+            List.of(123L)
         );
 
         verify(taskListRepository, atLeast(5)).save(ArgumentMatchers.argThat(
@@ -392,6 +392,50 @@ class TaskListServiceTest {
                 return true;
             }
         ));
+    }
+
+    @Test
+    void shouldMakeProgressAbleTaskListInactiveForMultipleCategories_whenTaskListIsPresent() {
+
+        List<TaskListEntity> tasks = new ArrayList<>();
+        tasks.add(getTaskListEntity(UUID.randomUUID()).toBuilder()
+                      .currentStatus(TaskStatus.ACTION_NEEDED.getPlaceValue())
+                      .taskNameEn("<a href=\"somewhere\">Link name</A >")
+                      .taskNameCy("<A  href=\"somewhere\">Link name Welsh</A>")
+                      .build());
+
+        when(taskListRepository.findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            "123", "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
+            List.of(123L, 456L)
+        )).thenReturn(tasks);
+
+        List<TaskItemTemplateEntity> categoryA = List.of(TaskItemTemplateEntity.builder().id(123L).role("Claimant").build());
+        List<TaskItemTemplateEntity> categoryB = List.of(TaskItemTemplateEntity.builder().id(456L).role("Claimant").build());
+
+        when(taskItemTemplateRepository.findByCategoryEnAndRole("CategoryA", "Claimant")).thenReturn(categoryA);
+        when(taskItemTemplateRepository.findByCategoryEnAndRole("CategoryB", "Claimant")).thenReturn(categoryB);
+
+        taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            "123",
+            "Claimant",
+            "CategoryA",
+            "CategoryB"
+        );
+
+        verify(taskItemTemplateRepository).findByCategoryEnAndRole("CategoryA", "Claimant");
+        verify(taskItemTemplateRepository).findByCategoryEnAndRole("CategoryB", "Claimant");
+        verify(taskListRepository).findByReferenceAndTaskItemTemplateRoleAndCurrentStatusNotInAndTaskItemTemplate_IdNotIn(
+            "123", "Claimant",
+            List.of(
+                TaskStatus.AVAILABLE.getPlaceValue(), TaskStatus.DONE.getPlaceValue(),
+                TaskStatus.NOT_AVAILABLE_YET.getPlaceValue()
+            ),
+            List.of(123L, 456L)
+        );
     }
 
     @Test
