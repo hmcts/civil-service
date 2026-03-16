@@ -7,7 +7,6 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UploadResponse {
-
     private List<Document> documents;
 
     @JsonCreator

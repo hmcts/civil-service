@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.civil.client.payments.models.FeeDto;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateServiceRequestDTO {
-
     @JsonProperty("call_back_url")
     private String callBackUrl;
     @JsonProperty("case_payment_request")

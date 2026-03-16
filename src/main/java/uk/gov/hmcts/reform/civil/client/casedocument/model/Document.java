@@ -10,7 +10,6 @@ import java.util.Map;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Document {
-
     public Classification classification;
 
     public long size;

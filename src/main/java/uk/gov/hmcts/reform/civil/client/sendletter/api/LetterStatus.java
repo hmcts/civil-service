@@ -11,7 +11,6 @@ import java.util.UUID;
  * Letter status.
  */
 public class LetterStatus {
-
     public UUID id;
 
     public String status;

@@ -8,7 +8,6 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public class GeneratePinResponse {
-
     private String pin;
     private String userId;
 

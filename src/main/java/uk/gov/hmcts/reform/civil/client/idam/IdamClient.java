@@ -26,7 +26,6 @@ import java.util.List;
 
 @Service
 public class IdamClient {
-
     public static final String AUTH_TYPE = "code";
     public static final String GRANT_TYPE = "authorization_code";
     public static final String OPENID_GRANT_TYPE = "password";
@@ -79,8 +78,7 @@ public class IdamClient {
      * This method is no longer acceptable as idam now uses OpenID Connect and /oauth2/authorize endpoint is deprecated.
      *
      * @deprecated Use {@link IdamClient#getAccessToken(String, String)} or
-     * {@link IdamClient#getAccessTokenResponse(String, String)} instead.
-     *
+     *     {@link IdamClient#getAccessTokenResponse(String, String)} instead.
      */
     @Deprecated
     public String authenticateUser(String username, String password) {

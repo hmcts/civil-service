@@ -7,7 +7,6 @@ import java.util.Objects;
  * Document.
  */
 public class Document {
-
     public final String template;
 
     public final Map<String, Object> values;

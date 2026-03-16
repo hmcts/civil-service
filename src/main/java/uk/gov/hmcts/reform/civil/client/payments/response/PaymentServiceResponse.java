@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentServiceResponse {
-
     @JsonProperty("service_request_reference")
     private String serviceRequestReference;
 

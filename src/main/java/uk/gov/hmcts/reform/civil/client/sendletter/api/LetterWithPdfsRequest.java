@@ -9,7 +9,6 @@ import java.util.Map;
  * Letter with PDFs request.
  */
 public class LetterWithPdfsRequest {
-
     private final String type;
 
     private final List<String> documents;

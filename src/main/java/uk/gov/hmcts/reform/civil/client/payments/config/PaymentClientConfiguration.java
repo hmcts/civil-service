@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 
 public class PaymentClientConfiguration {
-
     @Bean
     @Primary
     public ErrorDecoder errorDecoder() {

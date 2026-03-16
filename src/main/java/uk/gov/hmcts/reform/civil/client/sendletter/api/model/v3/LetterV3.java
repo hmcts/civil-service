@@ -9,7 +9,6 @@ import java.util.Map;
  * Letter V3.
  */
 public class LetterV3 {
-
     @JsonProperty("documents")
     public final List<Document> documents;
 

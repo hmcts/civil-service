@@ -23,7 +23,6 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @FeignClient(name = "case-document-am-client-api", url = "${case_document_am.url}/cases/documents",
     configuration = FeignSupportConfig.class)
 public interface CaseDocumentClientApi {
-
     String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     String DOCUMENT_ID = "documentId";
 

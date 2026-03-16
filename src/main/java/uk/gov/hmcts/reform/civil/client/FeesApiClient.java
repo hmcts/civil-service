@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 
 @FeignClient(name = "fees-api", url = "${fees.api.url}")
 public interface FeesApiClient {
-
     String baseUrl = "/fees-register/fees";
 
     @GetMapping(baseUrl + "/lookup"

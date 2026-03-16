@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 
 @FeignClient(name = "wa", url = "${task-management.api.url}")
 public interface WaTaskManagementApiClient {
-
     @PostMapping(value = "/task", consumes = "application/json")
     GetTasksResponse searchWithCriteria(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,

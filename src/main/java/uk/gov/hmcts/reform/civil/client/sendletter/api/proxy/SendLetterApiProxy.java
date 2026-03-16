@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.civil.client.sendletter.api.model.v3.LetterV3;
 @FeignClient(name = "send-letter-api", url = "${send-letter.url}",
         configuration = SendLetterApiProxy.SendLetterConfiguration.class)
 public interface SendLetterApiProxy {
-
     /**
      * Send letter.
      * @param serviceAuthHeader The service auth header

@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PBAServiceRequestDTO {
-
     @JsonProperty("account_number")
     private String accountNumber;
     @JsonProperty("amount")

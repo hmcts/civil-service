@@ -17,7 +17,6 @@ import java.util.Collections;
 @Configuration
 @ConditionalOnProperty(prefix = "send-letter", name = "url")
 public class RetryConfig {
-
     /**
      * Retry template.
      * @return The RetryTemplate

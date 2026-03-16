@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.civil.client.sendletter.api.config;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.retry.policy.NeverRetryPolicy;
@@ -14,7 +13,6 @@ import java.util.Optional;
  * Retry policy.
  */
 public class RetryPolicy extends ExceptionClassifierRetryPolicy {
-
     /**
      * Constructor.
      * @param maxAttempts The max attempts

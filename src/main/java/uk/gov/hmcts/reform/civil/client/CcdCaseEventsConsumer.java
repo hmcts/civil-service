@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.civil.service.servicebus.CcdEventMessageReceiverServi
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @SuppressWarnings("PMD.DoNotUseThreads")
 public class CcdCaseEventsConsumer implements Runnable {
-
     private final CcdEventServiceBusConfiguration ccdEventServiceBusConfiguration;
     private final CcdEventMessageReceiverService eventMessageReceiverService;
     private volatile boolean keepRun = true;

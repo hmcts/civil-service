@@ -13,7 +13,6 @@ import java.util.Optional;
 @EqualsAndHashCode
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserDetails {
-
     private String id;
     private String email;
     private String forename;

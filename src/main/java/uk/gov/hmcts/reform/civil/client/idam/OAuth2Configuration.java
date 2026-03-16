@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 @Getter
 @Component
 public class OAuth2Configuration {
-
     private String clientId;
     private String redirectUri;
     private String clientSecret;

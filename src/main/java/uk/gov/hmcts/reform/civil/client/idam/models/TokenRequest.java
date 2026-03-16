@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class TokenRequest {
-
     @FormProperty("client_id")
     private String clientId;
     @FormProperty("client_secret")
@@ -24,7 +23,6 @@ public class TokenRequest {
     private String refreshToken;
     @FormProperty("code")
     private String code;
-
 
     public TokenRequest(
         String clientId,
@@ -47,7 +45,4 @@ public class TokenRequest {
         this.refreshToken = refreshToken;
         this.code = code;
     }
-
 }
-
-

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Document.
  */
 public class Document {
-
     @JsonProperty("content")
     public final String content;
 

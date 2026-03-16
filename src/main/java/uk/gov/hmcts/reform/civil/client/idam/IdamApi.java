@@ -25,7 +25,6 @@ import java.util.List;
 
 @FeignClient(name = "idam-api", url = "${idam.api.url}", configuration = CoreFeignConfiguration.class)
 public interface IdamApi {
-
     /**
      * Tactical get user details.
      * @deprecated This tactical endpoint is replaced by OpenID /o/userinfo.
@@ -53,12 +52,10 @@ public interface IdamApi {
         @RequestParam("state") final String state
     );
 
-
     /**
      * Tactical User Authenticate method.
      *
-     * @deprecated
-     * IDAM oauth2/authorize endpoint is deprecated
+     * @deprecated IDAM oauth2/authorize endpoint is deprecated
      */
     @Deprecated
     @PostMapping(

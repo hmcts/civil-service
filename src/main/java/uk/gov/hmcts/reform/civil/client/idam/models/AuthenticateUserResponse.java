@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthenticateUserResponse {
-
     private String code;
 
     @JsonCreator

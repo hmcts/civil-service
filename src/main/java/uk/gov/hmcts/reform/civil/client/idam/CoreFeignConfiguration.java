@@ -20,9 +20,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
 public class CoreFeignConfiguration {
-
     @Value("${idam.api.timeout:10000}")
-    private int REQUEST_TIMEOUT;
+    private int requestTimeout;
 
     @Value("${idam.api.loglevel:NONE}")
     private Logger.Level logLevel;
@@ -50,9 +49,9 @@ public class CoreFeignConfiguration {
 
     private CloseableHttpClient getHttpClient() {
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(REQUEST_TIMEOUT)
-            .setConnectionRequestTimeout(REQUEST_TIMEOUT)
-            .setSocketTimeout(REQUEST_TIMEOUT)
+            .setConnectTimeout(requestTimeout)
+            .setConnectionRequestTimeout(requestTimeout)
+            .setSocketTimeout(requestTimeout)
             .build();
 
         return HttpClientBuilder

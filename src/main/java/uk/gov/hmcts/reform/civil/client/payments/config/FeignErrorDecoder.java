@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class FeignErrorDecoder implements ErrorDecoder {
-
     public static final String DUPLICATE_PAYMENT = "Duplicate Payment";
 
     private final ErrorDecoder defaultErrorDecoder = new Default();

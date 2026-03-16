@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenResponse {
-
     public final String accessToken;
     public final String expiresIn;
     public final String idToken;

@@ -10,7 +10,6 @@ import java.util.List;
 
 @FeignClient(name = "location-ref-data-api", url = "${location.api.baseUrl}")
 public interface LocationReferenceDataApiClient {
-
     @GetMapping(value = "/refdata/location/court-venues")
     List<LocationRefData> getAllCivilCourtVenues(
         @RequestHeader("ServiceAuthorization") String serviceAuthorisation,

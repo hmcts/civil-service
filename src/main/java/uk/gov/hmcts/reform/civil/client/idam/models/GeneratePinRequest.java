@@ -11,7 +11,6 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class GeneratePinRequest {
-
     private final String firstName;
     @JsonInclude
     private final String lastName;

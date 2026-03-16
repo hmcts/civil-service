@@ -15,7 +15,6 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardPaymentServiceRequestResponse {
-
     @JsonProperty("external_reference")
     private String externalReference;
 

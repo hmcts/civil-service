@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardPaymentServiceRequestDTO {
-
     @JsonProperty("language")
     private String language;
     @JsonProperty("amount")

@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.civil.model.judgmentonline.cjes.JudgmentDetailsCJES;
 @FeignClient(name = "rtl", url = "${rtl.api.url}", configuration =
     FeignClientProperties.FeignClientConfiguration.class)
 public interface CjesApiClient {
-
     @PostMapping(path = "/judgment}", consumes = "application/json")
         ResponseEntity<Void> sendJudgmentDetailsCJES(
         @RequestBody JudgmentDetailsCJES judgmentDetailsCJES

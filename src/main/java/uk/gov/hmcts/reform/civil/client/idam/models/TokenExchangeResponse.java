@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenExchangeResponse {
-
     private final String accessToken;
 
     @JsonCreator

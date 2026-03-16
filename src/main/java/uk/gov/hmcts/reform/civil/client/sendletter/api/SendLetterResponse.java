@@ -8,7 +8,6 @@ import java.util.UUID;
  * Send letter response.
  */
 public class SendLetterResponse {
-
     public final UUID letterId;
 
     /**
