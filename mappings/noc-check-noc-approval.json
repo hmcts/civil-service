@@ -1,0 +1,17 @@
+{
+  "name": "NoC - Check NoC Approval",
+  "request": {
+    "method": "POST",
+    "urlPath": "/noc/check-noc-approval"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "confirmation_header": "# Notice of Change approved",
+      "confirmation_body": "<br/><p>The Notice of Change has been approved and the case has been updated.</p>"
+    }
+  }
+}
