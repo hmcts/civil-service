@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.civil.handler.callback.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
@@ -485,13 +486,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         finalOrderDateHeardComplex.setSingleDateSelection(singleDateSelection);
         caseData.setFinalOrderDateHeardComplex(finalOrderDateHeardComplex);
 
-        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
-        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
-        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
-        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
-        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
-        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
-        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        FinalOrderRepresentation finalOrderRepresentation = getFinalOrderRepresentation(caseData);
         caseData.setFinalOrderRepresentation(finalOrderRepresentation);
 
         DatesFinalOrders datesToAvoidDateDropdown = new DatesFinalOrders();
@@ -552,6 +547,17 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         caseData.setFinalOrderAppealComplex(finalOrderAppealComplex);
 
         caseData.setFinalOrderGiveReasonsYesNo(NO);
+    }
+
+    private @NonNull FinalOrderRepresentation getFinalOrderRepresentation(final CaseData caseData) {
+        ClaimantAndDefendantHeard typeRepresentationComplex = new ClaimantAndDefendantHeard();
+        typeRepresentationComplex.setTypeRepresentationClaimantOneDynamic(caseData.getApplicant1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantOneDynamic(caseData.getRespondent1().getPartyName());
+        typeRepresentationComplex.setTypeRepresentationDefendantTwoDynamic(defendantTwoPartyName);
+        typeRepresentationComplex.setTypeRepresentationClaimantTwoDynamic(claimantTwoPartyName);
+        FinalOrderRepresentation finalOrderRepresentation = new FinalOrderRepresentation();
+        finalOrderRepresentation.setTypeRepresentationComplex(typeRepresentationComplex);
+        return finalOrderRepresentation;
     }
 
     private void populateClaimant2Defendant2PartyNames(CaseData caseData) {
