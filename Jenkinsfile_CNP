@@ -139,6 +139,10 @@ withPipeline(type, product, component) {
   env.PACT_BROKER_PORT = "443"
   env.PACT_BROKER_SCHEME = "https"
   env.ENABLE_SECURE_URL = true
+  env.SONAR_SKIP_COMPILE = "true"
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
+  // Only run checkstyle on PR pipeline
+  env.CHECKSTYLE_SKIP = (env.CHANGE_ID != null) ? "false" : "true"
 
   onPR {
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
