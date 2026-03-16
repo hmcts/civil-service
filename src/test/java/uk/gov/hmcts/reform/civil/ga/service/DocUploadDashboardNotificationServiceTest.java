@@ -104,7 +104,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_OTHER_PARTY_UPLOADED_DOC_RESPONDENT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -157,7 +157,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_OTHER_PARTY_UPLOADED_DOC_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
 
             verify(dashboardApiClient)
                     .recordScenario(
@@ -165,7 +165,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -226,7 +226,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_OTHER_PARTY_UPLOADED_DOC_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -287,7 +287,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_OTHER_PARTY_UPLOADED_DOC_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -349,7 +349,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_RESPONDENT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -401,7 +401,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_RESPONDENT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -453,7 +453,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_APPLICANT_PROCEED_OFFLINE_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -515,7 +515,7 @@ public class DocUploadDashboardNotificationServiceTest {
                             SCENARIO_AAA6_GENERAL_APPLICATION_RESPONSE_SUBMITTED_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test

@@ -92,7 +92,7 @@ class TrialArrangementsClaimantNotificationHandlerTest extends BaseCallbackHandl
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_TRIAL_ARRANGEMENTS_REQUIRED_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(params).build()
+                new ScenarioRequestParams(params)
             );
         } else {
             verifyNoInteractions(dashboardScenariosService);

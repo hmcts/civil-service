@@ -59,7 +59,7 @@ public class GaRespondentResponseDeadlineCallbackHandler extends CallbackHandler
             callbackParams.getRequest().getCaseDetails().getId().toString(),
             DashboardScenarios.SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_DELETE_RESPONDENT.getScenario(),
             authToken,
-            ScenarioRequestParams.builder().params(paramsMap).build()
+            new ScenarioRequestParams(paramsMap)
 
         );
 

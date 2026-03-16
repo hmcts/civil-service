@@ -117,7 +117,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             SCENARIO_AAA6_GENERAL_APPLICATION_REQUEST_MORE_INFO_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @ParameterizedTest
@@ -166,7 +166,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             SCENARIO_AAA6_GENERAL_APPLICATION_ADDITIONAL_PAYMENT_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         private static Stream<Arguments> provideCcdState() {
@@ -217,7 +217,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -264,7 +264,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -311,7 +311,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -356,7 +356,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPLICATION_ORDER_MADE_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         private static Stream<Arguments> provideOrderType() {
@@ -415,7 +415,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             SCENARIO_AAA6_GENERAL_APPLICATION_HEARING_SCHEDULED_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
 
         @Test
@@ -462,7 +462,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest
                             SCENARIO_AAA6_GENERAL_APPLICATION_WRITTEN_REPRESENTATION_REQUIRED_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            ScenarioRequestParams.builder().params(scenarioParams).build());
+                            new ScenarioRequestParams(scenarioParams));
         }
     }
 }

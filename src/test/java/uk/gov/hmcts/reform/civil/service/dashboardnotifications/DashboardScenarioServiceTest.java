@@ -133,9 +133,7 @@ class DashboardScenarioServiceTest {
         private static ScenarioRequestParams getScenarioRequestParams() {
             HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("param1", "value1");
-            return ScenarioRequestParams.builder()
-                .params(parameters)
-                .build();
+            return new ScenarioRequestParams(parameters);
         }
     }
 

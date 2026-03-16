@@ -61,7 +61,7 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
@@ -86,7 +86,7 @@ class BundleUpdatedClaimantNotificationHandlerTest extends BaseCallbackHandlerTe
                 "BEARER_TOKEN",
                 SCENARIO_AAA6_CP_BUNDLE_UPDATED_TRIAL_READY_CLAIMANT.getScenario(),
                 caseData.getCcdCaseReference().toString(),
-                ScenarioRequestParams.builder().params(scenarioParams).build()
+                new ScenarioRequestParams(scenarioParams)
             );
         }
 
