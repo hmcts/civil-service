@@ -40,7 +40,7 @@ import uk.gov.hmcts.reform.civil.model.common.Element;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.prd.model.Organisation;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.ReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
 import uk.gov.hmcts.reform.civil.service.ExitSurveyContentService;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
@@ -120,7 +120,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
 
     private final ClaimUrlsConfiguration claimUrlsConfiguration;
     private final ExitSurveyContentService exitSurveyContentService;
-    private final CasemanReferenceNumberRepository casemanReferenceNumberRepository;
+    private final ReferenceNumberRepository referenceNumberRepository;
     private final DateOfBirthValidator dateOfBirthValidator;
     private final FeesService feesService;
     private final OrganisationService organisationService;
@@ -624,7 +624,7 @@ public class CreateClaimCallbackHandler extends CallbackHandler implements Parti
         }
 
         caseData.setBusinessProcess(BusinessProcess.ready(CREATE_SERVICE_REQUEST_CLAIM));
-        caseData.setLegacyCaseReference(casemanReferenceNumberRepository.next("unspec"));
+        caseData.setLegacyCaseReference(referenceNumberRepository.getReferenceNumber());
 
         ClaimType claimType = ClaimTypeHelper.getClaimTypeFromClaimTypeUnspec(caseData.getClaimTypeUnSpec());
         caseData.setClaimType(claimType);
