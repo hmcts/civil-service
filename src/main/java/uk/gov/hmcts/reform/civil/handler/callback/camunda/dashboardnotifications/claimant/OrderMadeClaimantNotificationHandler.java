@@ -51,6 +51,7 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     public static final String GA = "Applications";
+    public static final String HEARING = "Hearing";
     private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
@@ -202,12 +203,13 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT",
-                GA
+                GA, HEARING
             );
         } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT"
+                "CLAIMANT",
+                HEARING
             );
         }
     }

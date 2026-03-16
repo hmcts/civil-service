@@ -588,6 +588,23 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldExcludeOnlyHearingCategoryWhenCaseProgressionDisabled() {
+            CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
+            caseData.setApplicant1Represented(YesOrNo.NO);
+            when(toggleService.isCaseProgressionEnabledAndLocationWhiteListed(any())).thenReturn(false);
+            when(toggleService.isLocationWhiteListed(any())).thenReturn(false);
+            when(toggleService.isCuiGaNroEnabled()).thenReturn(false);
+
+            CallbackParams params = CallbackParamsBuilder.builder().of(ABOUT_TO_SUBMIT, caseData).request(
+                CallbackRequest.builder().eventId(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT.name())
+                    .caseDetails(CaseDetails.builder().state(All_FINAL_ORDERS_ISSUED.toString()).build()).build()).build();
+
+            handler.handle(params);
+
+            verifyDeleteNotificationsAndTaskListUpdatesNotInEa(caseData);
+        }
+
+        @Test
         void shouldRecordScenarioClaimantFinalOrderFastTrackTrialReady_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atAllFinalOrdersIssuedCheck().build();
             caseData.setApplicant1Represented(YesOrNo.NO);
@@ -618,21 +635,26 @@ class OrderMadeClaimantNotificationHandlerTest extends BaseCallbackHandlerTest {
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
+        ArgumentCaptor<String[]> categoriesCaptor = ArgumentCaptor.forClass(String[].class);
         verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT",
-            "Applications"
+            eq(caseData.getCcdCaseReference().toString()),
+            eq("CLAIMANT"),
+            categoriesCaptor.capture()
         );
+        assertThat(categoriesCaptor.getValue())
+            .containsExactlyInAnyOrder("Applications", "Hearing");
     }
-
     private void verifyDeleteNotificationsAndTaskListUpdatesNotInEa(CaseData caseData) {
         verify(dashboardNotificationService).deleteByReferenceAndCitizenRole(
             caseData.getCcdCaseReference().toString(),
             "CLAIMANT"
         );
-        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-            caseData.getCcdCaseReference().toString(),
-            "CLAIMANT"
+        ArgumentCaptor<String[]> categoriesCaptor = ArgumentCaptor.forClass(String[].class);
+        verify(taskListService).makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            eq(caseData.getCcdCaseReference().toString()),
+            eq("CLAIMANT"),
+            categoriesCaptor.capture()
         );
+        assertThat(categoriesCaptor.getValue()).containsExactly("Hearing");
     }
 }
