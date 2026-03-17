@@ -58,19 +58,19 @@ class NewApplicantSolEmailDTOGeneratorTest {
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder()
             .ccdCaseReference(1234567890123456L)
-            .applicant1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mr")
-                            .individualLastName("Doe")
-                            .individualFirstName("John")
-                            .partyName("John Doe").build())
+            .applicant1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualTitle("Mr")
+                            .setIndividualLastName("Doe")
+                            .setIndividualFirstName("John")
+                            .setPartyName("John Doe"))
 
-            .respondent1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .individualTitle("Mrs")
-                            .individualLastName("Dan")
-                            .individualFirstName("Jane")
-                            .partyName("Jane Dan").build())
+            .respondent1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setIndividualTitle("Mrs")
+                            .setIndividualLastName("Dan")
+                            .setIndividualFirstName("Jane")
+                            .setPartyName("Jane Dan"))
             .build();
 
         Map<String, String> initialProps = new HashMap<>();

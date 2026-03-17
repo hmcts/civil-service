@@ -183,8 +183,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             when(notificationsProperties.getQueryRaisedLip()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
                 createCaseDataWithQueries().toBuilder()
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
-                                    .individualLastName("b").partyEmail("applicant@email.com").build())
+                    .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
+                                    .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .applicant1Represented(YesOrNo.NO)
                     .qmLatestQuery(createLatestQuery("4"))
                     .build();
@@ -215,8 +215,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             when(notificationsProperties.getQueryRaisedLipBilingual()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
                 createCaseDataWithQueries().toBuilder()
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
-                                    .individualLastName("b").partyEmail("applicant@email.com").build())
+                    .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
+                                    .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .qmLatestQuery(createLatestQuery("4"))
                     .claimantBilingualLanguagePreference(Language.WELSH.toString())
                     .applicant1Represented(YesOrNo.NO)
@@ -248,8 +248,8 @@ class RaiseQuerySolicitorNotificationHandlerTest extends BaseCallbackHandlerTest
             when(notificationsProperties.getQueryRaisedLip()).thenReturn(TEMPLATE_ID);
             CaseData caseData =
                 createCaseDataWithQueries().toBuilder()
-                    .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("a")
-                                     .individualLastName("b").partyEmail("applicant@email.com").build())
+                    .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("a")
+                                     .setIndividualLastName("b").setPartyEmail("applicant@email.com"))
                     .qmLatestQuery(createLatestQuery("5"))
                     .defendantUserDetails(new IdamUserDetails().setEmail("applicant@email.com"))
                     .respondent1Represented(YesOrNo.NO)

@@ -362,13 +362,13 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isMultiParty_when_applicant2_present() {
-            when(caseData.getApplicant2()).thenReturn(Party.builder().build());
+            when(caseData.getApplicant2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
         }
 
         @Test
         void should_return_true_for_isMultiParty_when_respondent2_present() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Claim.isMultiParty.test(caseData));
         }
 
@@ -801,28 +801,28 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
         void should_return_false_for_isOneVTwoOneLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertFalse(CaseDataPredicate.MultiParty.isOneVTwoOneLegalRep.test(caseData));
         }
 
         @Test
         void should_return_true_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_no() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.NO);
             assertTrue(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
         }
 
         @Test
         void should_return_false_for_isOneVTwoTwoLegalRep_when_respondent2_present_and_same_legal_rep_yes() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getRespondent2SameLegalRepresentative()).thenReturn(YesOrNo.YES);
             assertFalse(CaseDataPredicate.MultiParty.isOneVTwoTwoLegalRep.test(caseData));
         }
@@ -1040,7 +1040,7 @@ class CaseDataPredicateTest {
 
         @Test
         void should_return_true_for_hasRespondent2_when_present() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             assertTrue(CaseDataPredicate.Respondent.hasRespondent2.test(caseData));
         }
 

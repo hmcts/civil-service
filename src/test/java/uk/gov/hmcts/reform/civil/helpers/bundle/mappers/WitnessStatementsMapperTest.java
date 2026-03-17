@@ -71,8 +71,8 @@ class WitnessStatementsMapperTest {
     @Test
     void testMapperWhenIncludesAllWitnessRelatedDocs() {
         when(bundleDocumentsRetrieval.getPartyByPartyType(eq(PartyType.CLAIMANT1), any()))
-            .thenReturn(Party.builder().individualFirstName("cl1Fname").partyName("applicant1")
-                            .type(Party.Type.INDIVIDUAL).build());
+            .thenReturn(new Party().setIndividualFirstName("cl1Fname").setPartyName("applicant1")
+                            .setType(Party.Type.INDIVIDUAL));
 
         when(bundleRequestDocsOrganizer.groupWitnessStatementsByName(any()))
             .thenReturn(Collections.emptyMap());

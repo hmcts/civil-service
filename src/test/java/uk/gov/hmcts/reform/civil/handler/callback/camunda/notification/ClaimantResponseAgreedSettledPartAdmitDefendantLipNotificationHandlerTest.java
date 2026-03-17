@@ -152,7 +152,7 @@ public class ClaimantResponseAgreedSettledPartAdmitDefendantLipNotificationHandl
             CaseData caseData = CaseDataBuilder.builder()
                 .atStateClaimDetailsNotified()
                 .specClaim1v1LrVsLip()
-                .respondent1(PartyBuilder.builder().soleTrader().partyEmail(null).build())
+                .respondent1(new PartyBuilder().soleTrader().partyEmail(null).build())
                 .build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
             when(configuration.getCnbcContact()).thenReturn((String) configMap.get("cnbcContact"));

@@ -66,7 +66,7 @@ class DefaultJudgmentFormBuilderTest {
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("1006.00"));
 
@@ -87,7 +87,7 @@ class DefaultJudgmentFormBuilderTest {
             .claimFee(new Fee().setCalculatedAmountInPence(new BigDecimal(1000)))
             .paymentTypeSelection(DJPaymentTypeSelection.IMMEDIATELY)
             .build();
-        uk.gov.hmcts.reform.civil.model.Party respondent = PartyBuilder.builder().individual().build();
+        uk.gov.hmcts.reform.civil.model.Party respondent = new PartyBuilder().individual().build();
         when(judgmentAmountsCalculator.getClaimFee(any())).thenReturn(new BigDecimal("50.00"));
         when(judgmentAmountsCalculator.getDebtAmount(any())).thenReturn(new BigDecimal("-45.00"));
 

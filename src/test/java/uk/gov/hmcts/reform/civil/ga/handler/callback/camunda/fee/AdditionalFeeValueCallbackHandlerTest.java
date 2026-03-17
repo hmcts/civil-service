@@ -68,14 +68,14 @@ class AdditionalFeeValueCallbackHandlerTest extends GeneralApplicationBaseCallba
 
     @Test
      void shouldReturnCorrectTaskId() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE167, false, false);
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE167, false, false).build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         assertThat(handler.camundaActivityId(new CallbackParams())).isEqualTo(TASK_ID);
     }
 
     @Test
     void shouldReturnCorrectEvent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE167, false, false);
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildFeeValidationCaseData(FEE167, false, false).build();
         params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
         assertThat(handler.handledEvents()).contains(OBTAIN_ADDITIONAL_FEE_VALUE);
     }

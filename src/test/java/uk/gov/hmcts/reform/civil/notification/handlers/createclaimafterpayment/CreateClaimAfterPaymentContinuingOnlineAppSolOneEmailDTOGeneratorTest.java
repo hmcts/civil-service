@@ -41,11 +41,10 @@ class CreateClaimAfterPaymentContinuingOnlineAppSolOneEmailDTOGeneratorTest {
         caseData = CaseData.builder()
                 .issueDate(LocalDate.of(2023, 10, 1))
                 .claimNotificationDeadline(LocalDate.of(2023, 10, 15).atStartOfDay())
-                .applicant1(Party.builder()
-                        .individualFirstName("John")
-                        .individualLastName("Doe")
-                        .type(Party.Type.INDIVIDUAL)
-                        .build())
+                .applicant1(new Party()
+                        .setIndividualFirstName("John")
+                        .setIndividualLastName("Doe")
+                        .setType(Party.Type.INDIVIDUAL))
                 .build();
     }
 

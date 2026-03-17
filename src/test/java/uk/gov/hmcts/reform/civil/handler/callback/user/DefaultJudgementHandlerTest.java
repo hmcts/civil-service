@@ -97,7 +97,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_WhenAboutToStartIsInvokedWithTwoDefendants() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -118,7 +118,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnBoth_whenHaveTwoDefendants() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -135,7 +135,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnOne_whenHaveOneDefendants() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -196,7 +196,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 hearingSupportRequirementsDJ.setHearingDates(wrapElements(hearingDates));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
                 caseData.setRespondent2SameLegalRepresentative(YES);
@@ -218,7 +218,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 hearingSupportRequirementsDJ.setHearingDates(wrapElements(hearingDates));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 caseData.setRespondent2SameLegalRepresentative(YES);
                 caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
@@ -240,7 +240,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 hearingSupportRequirementsDJ.setHearingDates(wrapElements(hearingDates));
 
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
                 caseData.setRespondent2SameLegalRepresentative(YES);
@@ -260,7 +260,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
                 hearingSupportRequirementsDJ.setHearingDates(wrapElements(hearingDates));
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 caseData.setHearingSupportRequirementsDJ(hearingSupportRequirementsDJ);
                 caseData.setRespondent2SameLegalRepresentative(YES);
@@ -273,7 +273,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldNotReturnError_whenNoDateRangeProvided() {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 HearingSupportRequirementsDJ hearingSupportRequirementsDJ = new HearingSupportRequirementsDJ();
                 hearingSupportRequirementsDJ.setHearingDates(null);
@@ -302,7 +302,7 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
                 hearingSupportRequirementsDJ.setHearingTemporaryLocation(hearingTemporaryLocation);
 
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
                 caseData.setRespondent2SameLegalRepresentative(YES);
                 caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -378,8 +378,8 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnJudgementGrantedResponse_whenInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
                 caseData.setLegacyCaseReference("111111");
-                caseData.setApplicant1(PartyBuilder.builder().build());
-                caseData.setRespondent1(PartyBuilder.builder().individual().build());
+                caseData.setApplicant1(new PartyBuilder().build());
+                caseData.setRespondent1(new PartyBuilder().individual().build());
 
                 CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
                 SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
@@ -400,11 +400,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnJudgementRequestedResponseOneDefendantSelected_whenInvokedAnd1v2() {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
                 caseData.setLegacyCaseReference("111111");
-                caseData.setRespondent1(PartyBuilder.builder().build());
-                caseData.setRespondent2(PartyBuilder.builder().build());
+                caseData.setRespondent1(new PartyBuilder().build());
+                caseData.setRespondent2(new PartyBuilder().build());
                 caseData.setAddRespondent2(YesOrNo.YES);
                 caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
-                caseData.setApplicant1(PartyBuilder.builder().build());
+                caseData.setApplicant1(new PartyBuilder().build());
                 DynamicListElement testUserElement = new DynamicListElement(null, "Test User");
                 DynamicList defendantDetails = new DynamicList();
                 defendantDetails.setValue(testUserElement);
@@ -426,11 +426,11 @@ public class DefaultJudgementHandlerTest extends BaseCallbackHandlerTest {
             void shouldReturnJudgementGrantedResponseBothDefendantSelected_whenInvokedAnd1v2() {
                 CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
                 caseData.setLegacyCaseReference("111111");
-                caseData.setRespondent1(PartyBuilder.builder().build());
-                caseData.setRespondent2(PartyBuilder.builder().build());
+                caseData.setRespondent1(new PartyBuilder().build());
+                caseData.setRespondent2(new PartyBuilder().build());
                 caseData.setAddRespondent2(YesOrNo.YES);
                 caseData.setRespondent2SameLegalRepresentative(YesOrNo.YES);
-                caseData.setApplicant1(PartyBuilder.builder().build());
+                caseData.setApplicant1(new PartyBuilder().build());
                 DynamicListElement bothElement = new DynamicListElement(null, "Both");
                 DynamicList defendantDetails = new DynamicList();
                 defendantDetails.setValue(bothElement);

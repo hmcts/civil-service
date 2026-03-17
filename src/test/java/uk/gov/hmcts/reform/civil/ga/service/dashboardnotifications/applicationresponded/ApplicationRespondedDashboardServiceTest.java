@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -139,15 +138,15 @@ class ApplicationRespondedDashboardServiceTest {
                                              boolean expectRespondent) {
         verify(dashboardNotificationService, times(expectApplicant ? 1 : 0))
             .createResponseDashboardNotification(
-                eq(caseData),
-                eq(DocUploadDashboardNotificationService.APPLICANT),
-                eq(AUTH_TOKEN)
+                caseData,
+                DocUploadDashboardNotificationService.APPLICANT,
+                AUTH_TOKEN
             );
         verify(dashboardNotificationService, times(expectRespondent ? 1 : 0))
             .createResponseDashboardNotification(
-                eq(caseData),
-                eq(DocUploadDashboardNotificationService.RESPONDENT),
-                eq(AUTH_TOKEN)
+                caseData,
+                DocUploadDashboardNotificationService.RESPONDENT,
+                AUTH_TOKEN
             );
         verify(dashboardNotificationService, never())
             .createOfflineResponseDashboardNotification(any(), any(), anyString());
@@ -159,15 +158,15 @@ class ApplicationRespondedDashboardServiceTest {
                                             boolean expectRespondent) {
         verify(dashboardNotificationService, times(expectApplicant ? 1 : 0))
             .createOfflineResponseDashboardNotification(
-                eq(caseData),
-                eq(DocUploadDashboardNotificationService.APPLICANT),
-                eq(AUTH_TOKEN)
+                caseData,
+                DocUploadDashboardNotificationService.APPLICANT,
+                AUTH_TOKEN
             );
         verify(dashboardNotificationService, times(expectRespondent ? 1 : 0))
             .createOfflineResponseDashboardNotification(
-                eq(caseData),
-                eq(DocUploadDashboardNotificationService.RESPONDENT),
-                eq(AUTH_TOKEN)
+                caseData,
+                DocUploadDashboardNotificationService.RESPONDENT,
+                AUTH_TOKEN
             );
         verify(dashboardNotificationService, never())
             .createResponseDashboardNotification(any(), any(), anyString());

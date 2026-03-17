@@ -107,7 +107,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapAllParameters_WhenIsRequested() {
+    void shouldMapAllParameters_WhenIsRequested() {
         when(claimantResponseUtils.getDefendantAdmittedAmount(any(), anyBoolean())).thenReturn(BigDecimal.valueOf(100));
 
         caseData.setHwfFeeType(FeeType.CLAIMISSUED);
@@ -291,15 +291,11 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
-
+    void shouldMapParameters_WhenGeneralApplicationsIsEnabled() {
         // caseData already initialized in setup
-
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
-
         assertThat(result).extracting("djDefendantNotificationMessage").isEqualTo(
             "<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to set aside (remove) or vary the judgment</a>");
-
         assertThat(result).extracting("djClaimantNotificationMessage")
             .isEqualTo("<a href=\"{GENERAL_APPLICATIONS_INITIATION_PAGE_URL}\" class=\"govuk-link\">make an application to vary the judgment</a>");
     }
@@ -666,8 +662,9 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, CaseEvent.ADD_CASE_NOTE);
-        assertThat(result).doesNotContainKey("orderDocument");
-        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+        assertThat(result)
+            .doesNotContainKey("orderDocument")
+            .doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -678,8 +675,9 @@ public class DashboardNotificationsParamsMapperTest {
 
         Map<String, Object> result =
             mapper.mapCaseDataToParams(caseData, null);
-        assertThat(result).doesNotContainKey("orderDocument");
-        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+        assertThat(result)
+            .doesNotContainKey("orderDocument")
+            .doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -710,8 +708,9 @@ public class DashboardNotificationsParamsMapperTest {
         caseData.setSystemGeneratedCaseDocuments(null);
         caseData.setPreTranslationDocuments(null);
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData, CaseEvent.CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
-        assertThat(result).doesNotContainKey("orderDocument");
-        assertThat(result).doesNotContainKey("hiddenOrderDocument");
+        assertThat(result)
+            .doesNotContainKey("orderDocument")
+            .doesNotContainKey("hiddenOrderDocument");
     }
 
     @Test
@@ -728,7 +727,7 @@ public class DashboardNotificationsParamsMapperTest {
     }
 
     @Test
-    public void shouldMapParameters_whenHearingFast() {
+    void shouldMapParameters_whenHearingFast() {
         caseData.setRespondent1ResponseDeadline(null);
         caseData.setRespondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_DEFENCE);
         caseData.setApplicant1ResponseDeadline(LocalDate.parse("2020-03-29").atStartOfDay());

@@ -947,6 +947,23 @@ class NotifyClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         }
 
         @Test
+        void shouldReturnExpectedResponse_whenInvokedWithNullDeadline() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimNotified_1v1().build();
+            caseData.setClaimDetailsNotificationDeadline(null);
+            CallbackParams params = callbackParamsOf(caseData, SUBMITTED);
+            SubmittedCallbackResponse response = (SubmittedCallbackResponse) handler.handle(params);
+
+            String confirmationBody = String.format(CONFIRMATION_BODY, "N/A")
+                + exitSurveyContentService.applicantSurvey();
+
+            assertThat(response).usingRecursiveComparison().isEqualTo(
+                SubmittedCallbackResponse.builder()
+                    .confirmationHeader(format("# Notification of claim sent%n## Claim number: 000DC001"))
+                    .confirmationBody(confirmationBody)
+                    .build());
+        }
+
+        @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenNotifyingBothParties_whenInvoked() {
 
             CaseData caseData = CaseDataBuilder.builder()

@@ -62,7 +62,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
         for (FinalOrdersClaimantDefendantNotAttending finalOrdersClaimantDefendantNotAttending : List.of(
             FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .finalOrderRecitals(null)
@@ -120,7 +120,7 @@ public class DefendantAttendsOrRepresentedTextBuilderTest {
         for (FinalOrdersDefendantRepresentationList finalOrdersDefendantRepresentationList : List.of(
             FinalOrdersDefendantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .addRespondent2(YES)
                 .respondent2SameLegalRepresentative(YES)
                 .finalOrderRecitals(null)

@@ -225,7 +225,7 @@ class SendSDOBulkPrintServiceTest {
     }
 
     private Party createSoleTraderParty() {
-        return PartyBuilder.builder().soleTrader().build();
+        return new PartyBuilder().soleTrader().build();
     }
 
     private CaseData createCaseDataWithSDOOrder(Party party) {

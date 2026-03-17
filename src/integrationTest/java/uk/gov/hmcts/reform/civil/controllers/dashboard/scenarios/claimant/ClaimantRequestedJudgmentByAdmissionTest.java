@@ -26,9 +26,9 @@ public class ClaimantRequestedJudgmentByAdmissionTest extends DashboardBaseInteg
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(YesOrNo.NO)
             .applicant1AcceptFullAdmitPaymentPlanSpec(YesOrNo.YES)
-            .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName("Claimant").build())
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).individualTitle("Mr").individualFirstName(
-                "Defendant").individualLastName("Guy").build())
+            .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualTitle("Mr").setIndividualFirstName("Claimant"))
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setIndividualTitle("Mr").setIndividualFirstName(
+                "Defendant").setIndividualLastName("Guy"))
             .build();
 
         handler.handle(callbackParams(caseData));

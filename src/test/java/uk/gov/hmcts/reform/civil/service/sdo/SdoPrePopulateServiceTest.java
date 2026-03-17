@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CategoryService;
 import uk.gov.hmcts.reform.civil.service.DeadlinesCalculator;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -54,6 +55,8 @@ class SdoPrePopulateServiceTest {
     private SdoFeatureToggleService featureToggleService;
     @Mock
     private CategoryService categoryService;
+    @Mock
+    private FeatureToggleService mainFeatureToggleService;
 
     private SdoPrePopulateService service;
 
@@ -67,13 +70,13 @@ class SdoPrePopulateServiceTest {
             new SdoDisposalNarrativeService(deadlineService)
         );
         SdoFastTrackSpecialistDirectionsService fastTrackSpecialistDirectionsService =
-            new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
+            new SdoFastTrackSpecialistDirectionsService(deadlineService, mainFeatureToggleService);
         SdoFastTrackNarrativeService fastTrackNarrativeService = new SdoFastTrackNarrativeService(deadlineService);
         SdoFastTrackOrderDefaultsService fastTrackOrderDefaultsService =
             new SdoFastTrackOrderDefaultsService(fastTrackNarrativeService, fastTrackSpecialistDirectionsService);
         SdoSmallClaimsOrderDefaultsService smallClaimsOrderDefaultsService =
             new SdoSmallClaimsOrderDefaultsService(
-                new SdoSmallClaimsNarrativeService(deadlineService),
+                new SdoSmallClaimsNarrativeService(mainFeatureToggleService, deadlineService),
                 journeyToggleService
             );
 
@@ -89,7 +92,8 @@ class SdoPrePopulateServiceTest {
                 smallClaimsOrderDefaultsService,
                 expertEvidenceFieldsService,
                 disclosureOfDocumentsFieldsService,
-                judgementDeductionService
+                judgementDeductionService,
+                mainFeatureToggleService
         );
         SdoHearingPreparationService hearingPreparationService = new SdoHearingPreparationService(
                 locationHelper,

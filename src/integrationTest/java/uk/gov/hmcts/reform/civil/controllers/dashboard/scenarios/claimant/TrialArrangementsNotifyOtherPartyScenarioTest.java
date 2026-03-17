@@ -47,7 +47,7 @@ public class TrialArrangementsNotifyOtherPartyScenarioTest extends DashboardBase
             .legacyCaseReference("reference")
             .ccdCaseReference(Long.valueOf(caseId))
             .applicant1Represented(applicant1Represented)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
             .build();
     }
 

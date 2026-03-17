@@ -63,7 +63,7 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantDefendantNotAttending.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
                     new ClaimantAndDefendantHeard().setTrialProcedClaimTwoComplex(new TrialNoticeProcedure().setListClaimTwo(
@@ -120,7 +120,7 @@ public class ClaimantAttendsOrRepresentedTextBuilderTest {
             FinalOrdersClaimantRepresentationList.values())) {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addApplicant2(YesOrNo.YES)
-                .applicant2(PartyBuilder.builder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
                 .finalOrderRecitals(null)
                 .finalOrderRepresentation(new FinalOrderRepresentation().setTypeRepresentationComplex(
                     new ClaimantAndDefendantHeard().setTypeRepresentationClaimantListTwo(

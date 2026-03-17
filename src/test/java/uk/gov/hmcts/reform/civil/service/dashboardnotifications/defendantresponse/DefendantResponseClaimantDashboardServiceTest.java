@@ -96,7 +96,7 @@ class DefendantResponseClaimantDashboardServiceTest {
             .applicant1Represented(YesOrNo.NO)
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.FULL_ADMISSION)
             .defenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.IMMEDIATELY)
-            .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).build())
+            .respondent1(new Party().setType(Party.Type.INDIVIDUAL))
             .build();
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
@@ -236,7 +236,7 @@ class DefendantResponseClaimantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(3001L);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.isPayByInstallment()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.COMPANY).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.COMPANY));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -253,7 +253,7 @@ class DefendantResponseClaimantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(3007L);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.isPayByInstallment()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.INDIVIDUAL));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -270,7 +270,7 @@ class DefendantResponseClaimantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(3002L);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_ADMISSION);
         when(caseData.isPayBySetDate()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.INDIVIDUAL));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 
@@ -287,7 +287,7 @@ class DefendantResponseClaimantDashboardServiceTest {
         CaseData caseData = mockBaseCaseData(3008L);
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.PART_ADMISSION);
         when(caseData.isPayBySetDate()).thenReturn(true);
-        when(caseData.getRespondent1()).thenReturn(Party.builder().type(Party.Type.COMPANY).build());
+        when(caseData.getRespondent1()).thenReturn(new Party().setType(Party.Type.COMPANY));
 
         service.notifyDefendantResponse(caseData, AUTH_TOKEN);
 

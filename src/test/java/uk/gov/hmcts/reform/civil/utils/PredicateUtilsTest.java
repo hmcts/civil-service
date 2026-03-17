@@ -144,7 +144,7 @@ public class PredicateUtilsTest {
         @Test
         public void when1v2differentSol_thenExists() {
             CaseData caseData = CaseData.builder()
-                .respondent2(Party.builder().build())
+                .respondent2(new Party())
                 .respondent2ResponseDate(LocalDateTime.now())
                 .build();
             Assertions.assertTrue(defendant2ResponseExists.test(caseData));
@@ -153,7 +153,7 @@ public class PredicateUtilsTest {
         @Test
         public void when1v2sameSol_thenExists() {
             CaseData caseData = CaseData.builder()
-                .respondent2(Party.builder().build())
+                .respondent2(new Party())
                 .respondent2SameLegalRepresentative(YES)
                 .respondentResponseIsSame(YES)
                 .respondent1ResponseDate(LocalDateTime.now())

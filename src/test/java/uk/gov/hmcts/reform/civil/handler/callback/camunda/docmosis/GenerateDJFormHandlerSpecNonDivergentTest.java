@@ -172,7 +172,7 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
                                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_DEFENDANT.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             DynamicListElement dynamicListElement = new DynamicListElement();
             dynamicListElement.setLabel("Both");
@@ -200,7 +200,7 @@ class GenerateDJFormHandlerSpecNonDivergentTest extends BaseCallbackHandlerTest 
                                                                        eq(GEN_DJ_FORM_NON_DIVERGENT_SPEC_CLAIMANT.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
-            caseData.setApplicant2(PartyBuilder.builder().individual().build());
+            caseData.setApplicant2(new PartyBuilder().individual().build());
             caseData.setAddApplicant2(YES);
             DynamicListElement dynamicListElement = new DynamicListElement();
             dynamicListElement.setLabel("Both");

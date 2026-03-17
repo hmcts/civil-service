@@ -16,17 +16,17 @@ class PersistDataUtilsTest {
         expectedAddress.setPostCode("E11 5BB");
 
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-            .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).build())
-            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).build())
-            .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).build())
+            .applicant1(new Party().setPartyName("name").setType(INDIVIDUAL))
+            .applicant2(new Party().setPartyName("name").setType(INDIVIDUAL))
+            .respondent1(new Party().setPartyName("name").setType(INDIVIDUAL))
+            .respondent2(new Party().setPartyName("name").setType(INDIVIDUAL))
             .build();
 
         CaseData oldCaseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(expectedAddress).build())
-            .applicant2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(expectedAddress).build())
-            .respondent1(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(expectedAddress).build())
-            .respondent2(Party.builder().partyName("name").type(INDIVIDUAL).primaryAddress(expectedAddress).build())
+            .applicant1(new Party().setPartyName("name").setType(INDIVIDUAL).setPrimaryAddress(expectedAddress))
+            .applicant2(new Party().setPartyName("name").setType(INDIVIDUAL).setPrimaryAddress(expectedAddress))
+            .respondent1(new Party().setPartyName("name").setType(INDIVIDUAL).setPrimaryAddress(expectedAddress))
+            .respondent2(new Party().setPartyName("name").setType(INDIVIDUAL).setPrimaryAddress(expectedAddress))
             .build();
 
         CaseData results = PersistDataUtils.persistPartyAddress(oldCaseData, caseData);

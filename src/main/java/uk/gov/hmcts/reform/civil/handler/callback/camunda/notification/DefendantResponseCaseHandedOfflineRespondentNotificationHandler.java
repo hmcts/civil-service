@@ -18,7 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.NOTIFY_RESPONDENT_SOLICITOR2_FOR_CASE_HANDED_OFFLINE;
-import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isRespondent1;
+import static uk.gov.hmcts.reform.civil.utils.NotificationUtils.isEvent;
 
 @Service
 @RequiredArgsConstructor
@@ -42,11 +42,10 @@ public class DefendantResponseCaseHandedOfflineRespondentNotificationHandler ext
 
     @Override
     public String camundaActivityId(CallbackParams callbackParams) {
-        return isRespondent1(
+        return isEvent(
             callbackParams,
             NOTIFY_RESPONDENT_SOLICITOR1_FOR_CASE_HANDED_OFFLINE
-        ) ? TASK_ID_RESPONDENT1
-            : TASK_ID_RESPONDENT2;
+        ) ? TASK_ID_RESPONDENT1 : TASK_ID_RESPONDENT2;
     }
 
     @Override

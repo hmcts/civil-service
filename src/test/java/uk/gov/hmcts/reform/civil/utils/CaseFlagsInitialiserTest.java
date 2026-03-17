@@ -59,26 +59,26 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldInitialiseCaseFlagsForCreateClaimEvent() {
-        var applicant1 = PartyBuilder.builder().individual().build();
-        var applicant2 = PartyBuilder.builder().company().build();
-        var respondent1 = PartyBuilder.builder().soleTrader().build();
-        var respondent2 = PartyBuilder.builder().organisation().build();
+        var applicant1 = new PartyBuilder().individual().build();
+        var applicant2 = new PartyBuilder().company().build();
+        var respondent1 = new PartyBuilder().soleTrader().build();
+        var respondent2 = new PartyBuilder().organisation().build();
         var applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         var applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
 
         var expected = CaseData.builder()
             .applicant1(
-                applicant1.toBuilder().flags(
+                applicant1.setFlags(
                     new Flags()
                         .setPartyName("Mr. John Rambo")
                         .setRoleOnCase("Claimant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant2(
-                applicant2.toBuilder().flags(
+                applicant2.setFlags(
                     new Flags()
                         .setPartyName("Company ltd")
                         .setRoleOnCase("Claimant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant1LitigationFriend(
                 applicant1LitFriend.copy().setFlags(
                     new Flags()
@@ -95,17 +95,17 @@ class CaseFlagsInitialiserTest {
                             .setDetails(List.of()))
                     )
             .respondent1(
-                respondent1.toBuilder().flags(
+                respondent1.setFlags(
                     new Flags()
                         .setPartyName("Mr. Sole Trader")
                         .setRoleOnCase("Defendant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .respondent2(
-                respondent2.toBuilder().flags(
+                respondent2.setFlags(
                     new Flags()
                         .setPartyName("The Organisation")
                         .setRoleOnCase("Defendant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .build();
 
         var caseData = CaseData.builder()
@@ -157,9 +157,8 @@ class CaseFlagsInitialiserTest {
     void shouldInitialiseCaseFlagsForManageContactInformationEvent() {
         CaseData caseData = CaseData.builder()
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID("id")))
-            .updateDetailsForm(UpdateDetailsForm.builder()
-                                   .partyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID)
-                                   .build())
+            .updateDetailsForm(new UpdateDetailsForm()
+                                   .setPartyChosenId(CLAIMANT_ONE_LEGAL_REP_INDIVIDUALS_ID))
             .build();
 
         caseFlagsInitialiser.initialiseCaseFlags(CaseEvent.MANAGE_CONTACT_INFORMATION, caseData);
@@ -169,9 +168,9 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldReinitialiseMissingCaseFlags() {
-        Party applicant1 = PartyBuilder.builder().individual().build();
-        Party applicant2 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        Party applicant1 = new PartyBuilder().individual().build();
+        Party applicant2 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
         LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
@@ -183,17 +182,17 @@ class CaseFlagsInitialiserTest {
 
         CaseData expected = CaseData.builder()
             .applicant1(
-                applicant1.toBuilder().flags(
+                applicant1.setFlags(
                     new Flags()
                         .setPartyName("Mr. John Rambo")
                         .setRoleOnCase("Claimant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant2(
-                applicant2.toBuilder().flags(
+                applicant2.setFlags(
                     new Flags()
                         .setPartyName("Company ltd")
                         .setRoleOnCase("Claimant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant1LitigationFriend(
                 applicant1LitFriend.copy().setFlags(
                         new Flags()
@@ -210,11 +209,11 @@ class CaseFlagsInitialiserTest {
                             .setDetails(List.of()))
                     )
             .respondent1(
-                respondent1.toBuilder().flags(
+                respondent1.setFlags(
                     new Flags()
                         .setPartyName("Mr. Sole Trader")
                         .setRoleOnCase("Defendant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicantWitnesses(wrapElements(List.of(
                 new PartyFlagStructure()
                     .setFirstName("First")
@@ -326,10 +325,10 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldNotReinitialiseCaseFlagsForRespondentDQ_whenRespondent1DQFlagsExist() {
-        Party applicant1 = PartyBuilder.builder().individual().build();
-        Party applicant2 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        Party respondent2 = PartyBuilder.builder().organisation().build();
+        Party applicant1 = new PartyBuilder().individual().build();
+        Party applicant2 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
+        Party respondent2 = new PartyBuilder().organisation().build();
         LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
@@ -341,17 +340,17 @@ class CaseFlagsInitialiserTest {
 
         CaseData expected = CaseData.builder()
             .applicant1(
-                applicant1.toBuilder().flags(
+                applicant1.setFlags(
                     new Flags()
                         .setPartyName("Mr. John Rambo")
                         .setRoleOnCase("Claimant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant2(
-                applicant2.toBuilder().flags(
+                applicant2.setFlags(
                     new Flags()
                         .setPartyName("Company ltd")
                         .setRoleOnCase("Claimant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant1LitigationFriend(
                 applicant1LitFriend.copy().setFlags(
                         new Flags()
@@ -368,17 +367,17 @@ class CaseFlagsInitialiserTest {
                             .setDetails(List.of()))
                     )
             .respondent1(
-                respondent1.toBuilder().flags(
+                respondent1.setFlags(
                     new Flags()
                         .setPartyName("Mr. Sole Trader")
                         .setRoleOnCase("Defendant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .respondent2(
-                respondent2.toBuilder().flags(
+                respondent2.setFlags(
                     new Flags()
                         .setPartyName("The Organisation")
                         .setRoleOnCase("Defendant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicantWitnesses(wrapElements(List.of(
                 new PartyFlagStructure()
                     .setFirstName("First")
@@ -571,10 +570,10 @@ class CaseFlagsInitialiserTest {
 
     @Test
     void shouldNotReinitialiseCaseFlagsForApplicantDQ_whenApplicantDQFlagsExist() {
-        Party applicant1 = PartyBuilder.builder().individual().build();
-        Party applicant2 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
-        Party respondent2 = PartyBuilder.builder().organisation().build();
+        Party applicant1 = new PartyBuilder().individual().build();
+        Party applicant2 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
+        Party respondent2 = new PartyBuilder().organisation().build();
         LitigationFriend applicant1LitFriend = new LitigationFriend().setFirstName("Jason").setLastName("Wilson");
         LitigationFriend applicant2LitFriend = new LitigationFriend().setFirstName("Jenny").setLastName("Carter");
         Witness witness1 = new Witness().setFirstName("First").setLastName("Name");
@@ -586,17 +585,17 @@ class CaseFlagsInitialiserTest {
 
         CaseData expected = CaseData.builder()
             .applicant1(
-                applicant1.toBuilder().flags(
+                applicant1.setFlags(
                     new Flags()
                         .setPartyName("Mr. John Rambo")
                         .setRoleOnCase("Claimant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant2(
-                applicant2.toBuilder().flags(
+                applicant2.setFlags(
                     new Flags()
                         .setPartyName("Company ltd")
                         .setRoleOnCase("Claimant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicant1LitigationFriend(
                 applicant1LitFriend.copy().setFlags(
                         new Flags()
@@ -613,17 +612,17 @@ class CaseFlagsInitialiserTest {
                             .setDetails(List.of()))
                     )
             .respondent1(
-                respondent1.toBuilder().flags(
+                respondent1.setFlags(
                     new Flags()
                         .setPartyName("Mr. Sole Trader")
                         .setRoleOnCase("Defendant 1")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .respondent2(
-                respondent2.toBuilder().flags(
+                respondent2.setFlags(
                     new Flags()
                         .setPartyName("The Organisation")
                         .setRoleOnCase("Defendant 2")
-                        .setDetails(List.of())).build())
+                        .setDetails(List.of())))
             .applicantWitnesses(wrapElements(List.of(
                 new PartyFlagStructure()
                     .setFirstName("First")

@@ -1,0 +1,14 @@
+{
+  "name": "CMC Claim Store - Claims for Claimant",
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/claims/claimant/.*"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "cmcClaimsResponse.json"
+  }
+}

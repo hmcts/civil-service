@@ -58,17 +58,16 @@ class MediationCSVLrvLipServiceTest {
     private Party buildParty(Party.Type partyType, String companyName, String phoneNumber, String emailAddress,
                              String individualFirstName, String individualLastName,
                              String soleTraderFirstName, String soleTraderLastName, String organisationName) {
-        return Party.builder()
-            .type(partyType)
-            .companyName(companyName)
-            .partyPhone(phoneNumber)
-            .partyEmail(emailAddress)
-            .individualFirstName(individualFirstName)
-            .individualLastName(individualLastName)
-            .soleTraderFirstName(soleTraderFirstName)
-            .soleTraderLastName(soleTraderLastName)
-            .organisationName(organisationName)
-            .build();
+        return new Party()
+            .setType(partyType)
+            .setCompanyName(companyName)
+            .setPartyPhone(phoneNumber)
+            .setPartyEmail(emailAddress)
+            .setIndividualFirstName(individualFirstName)
+            .setIndividualLastName(individualLastName)
+            .setSoleTraderFirstName(soleTraderFirstName)
+            .setSoleTraderLastName(soleTraderLastName)
+            .setOrganisationName(organisationName);
     }
 
     private CaseData getCaseData(Party.Type partyType) {

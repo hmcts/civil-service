@@ -218,7 +218,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(PartyBuilder.builder().individual()
+                .applicant1(new PartyBuilder().individual()
                     .individualDateOfBirth(now().plusDays(1))
                     .build())
                 .build();
@@ -232,7 +232,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(PartyBuilder.builder().individual()
+                .applicant1(new PartyBuilder().individual()
                     .soleTraderDateOfBirth(now().plusDays(1))
                     .build())
                 .build();
@@ -246,7 +246,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(PartyBuilder.builder().individual()
+                .applicant1(new PartyBuilder().individual()
                     .individualDateOfBirth(now().minusDays(1))
                     .build())
                 .build();
@@ -260,7 +260,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant1(PartyBuilder.builder().individual()
+                .applicant1(new PartyBuilder().individual()
                     .soleTraderDateOfBirth(now().minusDays(1))
                     .build())
                 .build();
@@ -353,7 +353,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenIndividualDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(PartyBuilder.builder().individual()
+                .applicant2(new PartyBuilder().individual()
                     .individualDateOfBirth(now().plusDays(1))
                     .build())
                 .build();
@@ -367,7 +367,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnError_whenSoleTraderDateOfBirthIsInTheFuture() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(PartyBuilder.builder().individual()
+                .applicant2(new PartyBuilder().individual()
                     .soleTraderDateOfBirth(now().plusDays(1))
                     .build())
                 .build();
@@ -381,7 +381,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenIndividualDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(PartyBuilder.builder().individual()
+                .applicant2(new PartyBuilder().individual()
                     .individualDateOfBirth(now().minusDays(1))
                     .build())
                 .build();
@@ -395,7 +395,7 @@ class CreateClaimCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnNoError_whenSoleTraderDateOfBirthIsInThePast() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimDraft()
-                .applicant2(PartyBuilder.builder().individual()
+                .applicant2(new PartyBuilder().individual()
                     .soleTraderDateOfBirth(now().minusDays(1))
                     .build())
                 .build();

@@ -164,12 +164,12 @@ public class NocNotificationUtilsTest {
 
     @Test
     void test1ApplicantV1Defendant() {
-        Party applicant1 = Party.builder()
-            .companyName(PARTY_1_NAME)
-            .type(Party.Type.COMPANY).build();
-        Party respondent1 = Party.builder()
-            .companyName(PARTY_2_NAME)
-            .type(Party.Type.COMPANY).build();
+        Party applicant1 = new Party()
+            .setCompanyName(PARTY_1_NAME)
+            .setType(Party.Type.COMPANY);
+        Party respondent1 = new Party()
+            .setCompanyName(PARTY_2_NAME)
+            .setType(Party.Type.COMPANY);
         caseData = CaseData.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
@@ -180,12 +180,12 @@ public class NocNotificationUtilsTest {
 
     @Test
     void test2ApplicantV1Defendant() {
-        Party applicant1 = Party.builder()
-            .companyName(PARTY_1_NAME)
-            .type(Party.Type.COMPANY).build();
-        Party respondent1 = Party.builder()
-            .companyName(PARTY_2_NAME)
-            .type(Party.Type.COMPANY).build();
+        Party applicant1 = new Party()
+            .setCompanyName(PARTY_1_NAME)
+            .setType(Party.Type.COMPANY);
+        Party respondent1 = new Party()
+            .setCompanyName(PARTY_2_NAME)
+            .setType(Party.Type.COMPANY);
         caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant2(applicant1)
@@ -198,12 +198,12 @@ public class NocNotificationUtilsTest {
 
     @Test
     void test1ApplicantV2Defendant() {
-        Party applicant1 = Party.builder()
-            .companyName(PARTY_1_NAME)
-            .type(Party.Type.COMPANY).build();
-        Party respondent1 = Party.builder()
-            .companyName(PARTY_2_NAME)
-            .type(Party.Type.COMPANY).build();
+        Party applicant1 = new Party()
+            .setCompanyName(PARTY_1_NAME)
+            .setType(Party.Type.COMPANY);
+        Party respondent1 = new Party()
+            .setCompanyName(PARTY_2_NAME)
+            .setType(Party.Type.COMPANY);
         caseData = CaseData.builder()
             .applicant1(applicant1)
             .respondent1(respondent1)
@@ -216,12 +216,12 @@ public class NocNotificationUtilsTest {
 
     @Test
     void test2ApplicantV2Defendant() {
-        Party applicant1 = Party.builder()
-            .companyName(PARTY_1_NAME)
-            .type(Party.Type.COMPANY).build();
-        Party respondent1 = Party.builder()
-            .companyName(PARTY_2_NAME)
-            .type(Party.Type.COMPANY).build();
+        Party applicant1 = new Party()
+            .setCompanyName(PARTY_1_NAME)
+            .setType(Party.Type.COMPANY);
+        Party respondent1 = new Party()
+            .setCompanyName(PARTY_2_NAME)
+            .setType(Party.Type.COMPANY);
         caseData = CaseData.builder()
             .applicant1(applicant1)
             .applicant2(applicant1)
@@ -270,7 +270,7 @@ public class NocNotificationUtilsTest {
         // Arrange
         CaseData caseData = CaseData.builder().applicant1Represented(YesOrNo.NO)
             .changeOfRepresentation(new ChangeOfRepresentation()
-                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).applicant1(Party.builder().partyEmail(TEST_EMAIL).build()).build();
+                                        .setCaseRole(CaseRole.RESPONDENTSOLICITORONE.getFormattedName())).applicant1(new Party().setPartyEmail(TEST_EMAIL)).build();
 
         assertEquals(TEST_EMAIL, getOtherSolicitor1Email(caseData));
     }

@@ -51,7 +51,7 @@ class ClaimantResponseCuiRejectPayRespLipEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectEmailTemplateId_whenClaimantGetTemplateIsInvokedAndBilingual() {
-        CaseData caseData = CaseData.builder().applicant1(Party.builder().build()).applicant1Represented(YesOrNo.NO)
+        CaseData caseData = CaseData.builder().applicant1(new Party()).applicant1Represented(YesOrNo.NO)
             .claimantBilingualLanguagePreference(Language.ENGLISH.getDisplayedValue()).build();
         String expectedTemplateId = "template-id";
         when(notificationsProperties.getNotifyDefendantLipTemplate()).thenReturn(expectedTemplateId);
@@ -64,8 +64,8 @@ class ClaimantResponseCuiRejectPayRespLipEmailDTOGeneratorTest {
     @Test
     void shouldAddCustomProperties() {
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("Claimant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
-            .respondent1(Party.builder().individualFirstName("Defendant").individualLastName("Name").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("Claimant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
+            .respondent1(new Party().setIndividualFirstName("Defendant").setIndividualLastName("Name").setType(Party.Type.INDIVIDUAL))
             .legacyCaseReference("12345")
             .build();
 

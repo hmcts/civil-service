@@ -42,10 +42,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenLessThanOneYearInTheFuture() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().plusMonths(4))
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().plusMonths(4));
             // When  // Then
             assertTrue(validator.isValid(date, constraintValidatorContext));
         }
@@ -53,10 +52,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenIsExactlyThanOneYearInTheFuture() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().plusYears(1))
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().plusYears(1));
             // When  // Then
             assertTrue(validator.isValid(date, constraintValidatorContext));
         }
@@ -64,10 +62,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenIsOneDayMoreThanOneYearInTheFuture() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().plusYears(1).plusDays(1))
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().plusYears(1).plusDays(1));
             // When  // Then
             assertFalse(validator.isValid(date, constraintValidatorContext));
         }
@@ -75,10 +72,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenIsMoreThanOneYearInTheFuture() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().plusYears(2))
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().plusYears(2));
             // When  // Then
             assertFalse(validator.isValid(date, constraintValidatorContext));
         }
@@ -86,10 +82,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeInvalidDate_whenInThePast() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().minusYears(1))
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().minusYears(1));
             // When  // Then
             assertFalse(validator.isValid(date, constraintValidatorContext));
         }
@@ -97,10 +92,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldBeValidDate_whenToday() {
             // Given
-            UnavailableDate date = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now())
-                .build();
+            UnavailableDate date = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now());
             // When  // Then
             assertTrue(validator.isValid(date, constraintValidatorContext));
         }
@@ -116,9 +110,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnNoError_whenToday() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now()).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now());
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -130,9 +124,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenMoreThanOneYearInFuture() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().plusYears(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().plusYears(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -145,10 +139,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenFromDateIsMoreThanOneYearInFutureForDateRange() {
             // Given: UnavailableDate From date is more than one year in Future
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().plusYears(5))
-                .toDate(LocalDate.now().plusMonths(2)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().plusYears(5))
+                .setToDate(LocalDate.now().plusMonths(2));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -162,10 +156,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenToDateIsMoreThanOneYearInFutureForDateRange() {
             // Given: UnavailableDate ToDate is more than one year in Future
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().plusMonths(5))
-                .toDate(LocalDate.now().plusYears(4)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().plusMonths(5))
+                .setToDate(LocalDate.now().plusYears(4));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -179,9 +173,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenInPast() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().minusDays(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().minusDays(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -194,10 +188,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenFromDateIsInPast() {
             // Given: UnavailableDate From date is in past
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().minusDays(5))
-                .toDate(LocalDate.now().plusDays(2)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().minusDays(5))
+                .setToDate(LocalDate.now().plusDays(2));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -211,10 +205,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenToDateIsInPast() {
             // Given: UnavailableDate From date is in past
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .toDate(LocalDate.now().minusDays(5))
-                .fromDate(LocalDate.now().plusMonths(2)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setToDate(LocalDate.now().minusDays(5))
+                .setFromDate(LocalDate.now().plusMonths(2));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -256,9 +250,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenHearingLRSpecValidatesDatesAndFastClaimIsNotNull() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().minusDays(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().minusDays(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             Hearing hearing = new Hearing()
                 .setUnavailableDatesRequired(YES)
@@ -311,9 +305,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndSmallClaimHearingIsNotNull() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                .date(LocalDate.now().minusDays(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                .setDate(LocalDate.now().minusDays(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -326,8 +320,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndDateInUnavaiableDateIsNull() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.SINGLE_DATE).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.SINGLE_DATE);
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -340,8 +334,8 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndDateRangeInUnavaiableDateIsNull() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE);
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -354,10 +348,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndDateRangeInUnavaiableDateIsNotValid() {
             // Given
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().plusDays(5))
-                .toDate(LocalDate.now().plusDays(4)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().plusDays(5))
+                .setToDate(LocalDate.now().plusDays(4));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -370,10 +364,10 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnNoError_whenSmallClaimHearingValidatesDatesAndFromDateIsLessThanToDate() {
             // Given: UnAvailableDate Where FromDate is less than ToDate
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().plusDays(4))
-                .toDate(LocalDate.now().plusDays(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().plusDays(4))
+                .setToDate(LocalDate.now().plusDays(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -387,9 +381,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingValidatesDatesAndDateRangeInUnavaiableToDateIsNull() {
             // Given: SmallClaimHearing object with ToDate is null
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .fromDate(LocalDate.now().plusDays(5)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setFromDate(LocalDate.now().plusDays(5));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)
@@ -403,9 +397,9 @@ class UnavailableDateValidatorTest {
         @Test
         void shouldReturnError_whenSmallClaimHearingFromDateIsNull() {
             // Given: SmallClaimHearing object with FromDate is null
-            UnavailableDate unavailableDate = UnavailableDate.builder()
-                .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                .toDate(LocalDate.now().plusDays(4)).build();
+            UnavailableDate unavailableDate = new UnavailableDate()
+                .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                .setToDate(LocalDate.now().plusDays(4));
             List<Element<UnavailableDate>> unavailableDates = wrapElements(unavailableDate);
             SmallClaimHearing hearing = new SmallClaimHearing()
                 .setUnavailableDatesRequired(YES)

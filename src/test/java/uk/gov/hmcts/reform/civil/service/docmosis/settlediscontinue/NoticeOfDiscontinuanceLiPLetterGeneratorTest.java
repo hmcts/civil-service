@@ -66,7 +66,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(false);
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()
@@ -93,7 +93,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenWelshParty() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()
@@ -120,7 +120,7 @@ class NoticeOfDiscontinuanceLiPLetterGeneratorTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfullyWhenMainCaseHasBilingualParty() {
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .respondent1Represented(YesOrNo.NO)
             .caseDataLiP(new CaseDataLiP()

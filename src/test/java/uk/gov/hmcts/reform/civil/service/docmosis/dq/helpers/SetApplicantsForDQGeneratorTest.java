@@ -33,7 +33,7 @@ class SetApplicantsForDQGeneratorTest {
     void shouldSetApplicantforDQFormBuilder() {
         CaseData caseData = CaseDataBuilder.builder()
             .multiPartyClaimTwoApplicants()
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .build();
 
         DirectionsQuestionnaireForm form = new DirectionsQuestionnaireForm();
@@ -48,7 +48,7 @@ class SetApplicantsForDQGeneratorTest {
     @Test
     void shouldSetSingleApplicantForDQFormBuilder() {
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaimAgainstRespondent1MultiParty1v2(YES)
             .build();
 
@@ -72,14 +72,12 @@ class SetApplicantsForDQGeneratorTest {
         addr2.setPostTown("Test City");
         addr2.setCountry("Test Country");
         CaseData caseData = CaseDataBuilder.builder()
-            .applicant1(Party.builder()
-                            .partyName("Party").type(Party.Type.INDIVIDUAL)
-                            .primaryAddress(addr1)
-                            .build())
-            .applicant2(Party.builder()
-                            .partyName("Party").type(Party.Type.INDIVIDUAL)
-                            .primaryAddress(addr2)
-                            .build())
+            .applicant1(new Party()
+                            .setPartyName("Party").setType(Party.Type.INDIVIDUAL)
+                            .setPrimaryAddress(addr1))
+            .applicant2(new Party()
+                            .setPartyName("Party").setType(Party.Type.INDIVIDUAL)
+                            .setPrimaryAddress(addr2))
             .addApplicant2(YES)
             .applicant1ProceedWithClaimMultiParty2v1(YES)
             .applicant2ProceedWithClaimMultiParty2v1(YES)

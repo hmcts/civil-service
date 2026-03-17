@@ -180,8 +180,8 @@ class HearingUtilsTest {
     void shouldReturnClaimantVDefendant_whenIs1v1Claim() {
         // Given
         CaseData caseData = CaseData.builder()
-                .applicant1(Party.builder().individualLastName("Doe").type(Party.Type.INDIVIDUAL).build())
-                .respondent1(Party.builder().companyName("Company").type(Party.Type.COMPANY).build())
+                .applicant1(new Party().setIndividualLastName("Doe").setType(Party.Type.INDIVIDUAL))
+                .respondent1(new Party().setCompanyName("Company").setType(Party.Type.COMPANY))
                 .build();
         // When
         String claimantVDefendant = HearingUtils.getClaimantVDefendant(caseData);

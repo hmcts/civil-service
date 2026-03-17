@@ -199,7 +199,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     public static CaseData buildAcceptPartAdmitAndPaidCaseData() {
         return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1(new PartyBuilder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.YES)
             .applicant1PartAdmitConfirmAmountPaidSpec(YesOrNo.YES)
@@ -210,7 +210,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     public static CaseData buildCaseDefendantWithOutMediationData() {
         CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1(new PartyBuilder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .applicant1ProceedWithClaim(null)
@@ -223,7 +223,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     public static CaseData buildCaseWithOutMediationFastTrackData() {
         return CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1(new PartyBuilder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO)
             .responseClaimTrack(FAST_CLAIM.name())
@@ -233,7 +233,7 @@ public class RespondToResponseConfirmationHeaderGeneratorTest implements CaseDat
     public static CaseData buildCaseClaimantWithOutMediationData() {
         CaseData caseData = CaseDataBuilder.builder()
             .caseAccessCategory(SPEC_CLAIM)
-            .respondent1(PartyBuilder.builder().company().build())
+            .respondent1(new PartyBuilder().company().build())
             .respondent1ClaimResponseTypeForSpec(RespondentResponseTypeSpec.PART_ADMISSION)
             .applicant1PartAdmitIntentionToSettleClaimSpec(YesOrNo.NO).build();
         caseData.setResponseClaimMediationSpecRequired(YesOrNo.YES);

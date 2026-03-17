@@ -76,6 +76,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static uk.gov.hmcts.reform.civil.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.END_BUSINESS_PROCESS_GASPEC;
 import static uk.gov.hmcts.reform.civil.callback.CaseEvent.UPDATE_CASE_WITH_GA_STATE;
@@ -396,6 +398,67 @@ public class EndGeneralAppBusinessProcessCallbackHandlerTest extends GeneralAppl
             List<?> gaDetailsMasterCollection = objectMapper.convertValue(map.get("gaDetailsMasterCollection"),
                                                                           new TypeReference<>(){});
             assertThat(gaDetailsMasterCollection).hasSize(1);
+        }
+
+        @Test
+        void isLipPaymentViaHelpWithFees_shouldReturnFalse_whenNoRemissionAndNoOutstandingPayment() {
+            // local handler with mocked ParentCaseUpdateHelper to isolate method evaluation
+            ParentCaseUpdateHelper mockHelper = mock(ParentCaseUpdateHelper.class);
+            EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
+                caseDetailsConverter, gaForLipService, mockHelper);
+
+            GeneralApplicationCaseData data = new GeneralApplicationCaseData()
+                .ccdCaseReference(1234L)
+                .ccdState(AWAITING_APPLICATION_PAYMENT)
+                .parentClaimantIsApplicant(YES)
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(new FeePaymentOutcomeDetails()
+                                              .setHwfFullRemissionGrantedForGa(NO)
+                                              .setHwfOutstandingFeePaymentDoneForGa(List.of("No")))
+                .generalAppPBADetails(new GeneralApplicationPbaDetails());
+
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            CallbackParams callbackParams = getCallbackParams(data);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(data);
+
+            localHandler.handle(callbackParams);
+
+            verify(mockHelper, never()).updateJudgeAndRespondentCollectionAfterPayment(any());
+        }
+
+        @Test
+        void isLipPaymentViaHelpWithFees_shouldReturnFalse_whenHwfYesButOutcomeDetailsNull_usesLocalMock() {
+            // local handler with mocked ParentCaseUpdateHelper to isolate method evaluation
+            ParentCaseUpdateHelper mockHelper = mock(ParentCaseUpdateHelper.class);
+            EndGeneralAppBusinessProcessCallbackHandler localHandler = new EndGeneralAppBusinessProcessCallbackHandler(
+                caseDetailsConverter, gaForLipService, mockHelper);
+
+            GeneralApplicationCaseData data = new GeneralApplicationCaseData()
+                .ccdCaseReference(1234L)
+                .ccdState(AWAITING_APPLICATION_PAYMENT)
+                .parentClaimantIsApplicant(YES)
+                .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YES))
+                .feePaymentOutcomeDetails(null)
+                .generalAppPBADetails(new GeneralApplicationPbaDetails());
+
+            when(gaForLipService.isGaForLip(any())).thenReturn(true);
+            CallbackParams callbackParams = getCallbackParams(data);
+            when(caseDetailsConverter.toGeneralApplicationCaseData(any())).thenReturn(data);
+
+            localHandler.handle(callbackParams);
+
+            verify(mockHelper, never()).updateJudgeAndRespondentCollectionAfterPayment(any());
+        }
+
+        private CallbackParams getCallbackParams(GeneralApplicationCaseData data) {
+            return new CallbackParams()
+                .type(ABOUT_TO_SUBMIT)
+                .request(CallbackRequest.builder()
+                             .caseDetails(CaseDetails.builder()
+                                              .data(new HashMap<>())
+                                              .build())
+                             .build())
+                .caseData(data);
         }
 
         @Test

@@ -82,7 +82,7 @@ class JudgmentOnlineUtilsTest {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment()
-            .respondent2(Party.builder().partyName("Respondent2 name").type(Party.Type.INDIVIDUAL).build())
+            .respondent2(new Party().setPartyName("Respondent2 name").setType(Party.Type.INDIVIDUAL))
             .respondent1OrganisationPolicy(organisation1Policy)
             .respondent2OrganisationPolicy(sameLegalOrgs ? organisation1Policy : organisation2Policy)
             .build();

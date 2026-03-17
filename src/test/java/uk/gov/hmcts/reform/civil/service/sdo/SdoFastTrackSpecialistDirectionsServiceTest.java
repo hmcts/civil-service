@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.model.CaseData;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackBuildingDispute;
 import uk.gov.hmcts.reform.civil.model.sdo.FastTrackClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.sdo.HousingDisrepair;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_COLUMNS_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.BUILDING_SCHEDULE_DEFENDANT_INSTRUCTION;
@@ -47,18 +49,21 @@ class SdoFastTrackSpecialistDirectionsServiceTest {
 
     @Mock
     private SdoDeadlineService deadlineService;
+    @Mock
+    private FeatureToggleService featureToggleService;
 
     private SdoFastTrackSpecialistDirectionsService service;
 
     @BeforeEach
     void setUp() {
-        service = new SdoFastTrackSpecialistDirectionsService(deadlineService, true);
+        service = new SdoFastTrackSpecialistDirectionsService(deadlineService, featureToggleService);
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))
             .thenAnswer(invocation -> LocalDate.now().plusWeeks(invocation.getArgument(0, Integer.class)));
     }
 
     @Test
     void shouldPopulateAllSpecialistSections() {
+        when(featureToggleService.isOtherRemedyEnabled()).thenReturn(true);
         CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateSpecialistDirections(caseData);
@@ -103,7 +108,7 @@ class SdoFastTrackSpecialistDirectionsServiceTest {
 
     @Test
     void shouldPopulateLegacyHousingDisrepairWhenFlagDisabled() {
-        service = new SdoFastTrackSpecialistDirectionsService(deadlineService, false);
+        when(featureToggleService.isOtherRemedyEnabled()).thenReturn(false);
         CaseData caseData = CaseDataBuilder.builder().build();
 
         service.populateSpecialistDirections(caseData);

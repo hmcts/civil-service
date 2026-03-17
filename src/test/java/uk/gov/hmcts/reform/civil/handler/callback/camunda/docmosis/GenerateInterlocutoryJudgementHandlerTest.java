@@ -91,7 +91,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL));
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setClaimantResponseOnCourtDecision(
             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
@@ -113,7 +113,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL));
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setClaimantResponseOnCourtDecision(
             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);
@@ -138,7 +138,7 @@ class GenerateInterlocutoryJudgementHandlerTest extends BaseCallbackHandlerTest 
             anyString()
         )).willReturn(FORM);
         CaseData caseData = CaseDataBuilder.builder().build();
-        caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).build());
+        caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL));
         ClaimantLiPResponse claimantLiPResponse = new ClaimantLiPResponse();
         claimantLiPResponse.setClaimantResponseOnCourtDecision(
             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE);

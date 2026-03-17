@@ -92,7 +92,7 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
             when(notificationsProperties.getNotifyApplicantLRMediationAgreementTemplate()).thenReturn("template-id");
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(false);
 
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 
@@ -119,7 +119,7 @@ class ClaimantDefendantAgreedMediationApplicantNotificationHandlerTest extends B
             when(notificationsProperties.getNotifyApplicantLRMediationTemplate()).thenReturn("mediation-template");
             when(featureToggleService.isCarmEnabledForCase(any())).thenReturn(true);
 
-            Party respondent1 = PartyBuilder.builder().soleTrader()
+            Party respondent1 = new PartyBuilder().soleTrader()
                 .partyEmail("respondent@example.com")
                 .build();
 

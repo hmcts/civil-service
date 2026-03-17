@@ -63,7 +63,7 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .applicant1(PartyBuilder.builder().individual().build())
+            .applicant1(new PartyBuilder().individual().build())
             .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation applicantOrganisation = new Organisation();
@@ -85,7 +85,7 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .respondent1(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
             .build();
 
         Map<String, String> properties = service.buildDefendant1Properties(caseData);
@@ -100,7 +100,7 @@ class DjNotificationPropertiesServiceTest {
         CaseData caseData = CaseDataBuilder.builder().build().toBuilder()
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .respondent2OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
         Organisation respondentOrganisation = new Organisation();
@@ -121,8 +121,8 @@ class DjNotificationPropertiesServiceTest {
             .ccdCaseReference(1594901956117591L)
             .legacyCaseReference("000DC001")
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .respondent1OrganisationPolicy(new OrganisationPolicy().setOrganisation(ccdOrganisation))
             .build();
 

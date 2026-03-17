@@ -237,7 +237,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedResponse_WhenCase1v2() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
 

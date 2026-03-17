@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.CaseLocationCivil;
 import uk.gov.hmcts.reform.civil.model.welshenhancements.PreferredLanguage;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.service.Time;
 import uk.gov.hmcts.reform.civil.service.citizenui.HelpWithFeesForTabService;
@@ -54,7 +54,7 @@ import static uk.gov.hmcts.reform.civil.utils.PartyUtils.populateWithPartyIds;
 @RequiredArgsConstructor
 public class CreateClaimLipCallBackHandler extends CallbackHandler {
 
-    private final SpecReferenceNumberRepository specReferenceNumberRepository;
+    private final CasemanReferenceNumberRepository casemanReferenceNumberRepository;
     private final Time time;
     private final ObjectMapper objectMapper;
     private final DefendantPinToPostLRspecService defendantPinToPostLRspecService;
@@ -98,7 +98,7 @@ public class CreateClaimLipCallBackHandler extends CallbackHandler {
         // Add back Pip in post to temporary pass the email event
         caseData.setRespondent1PinToPostLRspec(defendantPinToPostLRspecService.buildDefendantPinToPost());
         if (Optional.ofNullable(callbackParams.getRequest()).map(CallbackRequest::getEventId).isPresent()) {
-            caseData.setLegacyCaseReference(specReferenceNumberRepository.getSpecReferenceNumber());
+            caseData.setLegacyCaseReference(casemanReferenceNumberRepository.next("spec"));
             caseData.setBusinessProcess(BusinessProcess.ready(CREATE_LIP_CLAIM));
             Party respondent1Clone = objectMapper.convertValue(caseData.getRespondent1(), Party.class);
             respondent1Clone.setFlags(null);

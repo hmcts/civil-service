@@ -57,14 +57,14 @@ public class CaseDataMaxEdgeCasesBuilder extends CaseDataBuilder {
             .setApplicantSolicitor1Reference(Strings.repeat('A', 24))
             .setRespondentSolicitor1Reference(Strings.repeat('R', 24))
             ;
-        applicant1 = PartyBuilder.builder().companyWithMaxData().build();
+        applicant1 = new PartyBuilder().companyWithMaxData().build();
         applicant1LitigationFriendRequired = NO;
         applicantSolicitor1CheckEmail = new CorrectEmail()
             .setEmail("hmcts.civil@gmail.com")
             .setCorrect(YES);
         applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
         respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
-        respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
+        respondent1 = new PartyBuilder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
         claimValue = new ClaimValue()

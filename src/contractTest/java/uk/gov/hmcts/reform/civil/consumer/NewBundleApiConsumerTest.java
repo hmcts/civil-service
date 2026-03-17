@@ -125,42 +125,40 @@ public class NewBundleApiConsumerTest extends BaseContractTest {
     }
 
     private Party getParty(String applicant) {
-        return Party.builder()
-            .partyID("partyID")
-            .type(Party.Type.COMPANY)
-            .individualTitle("Mr")
-            .individualFirstName(applicant)
-            .individualLastName("Silvassauro")
-            .individualDateOfBirth(LocalDate.of(2019, 1, 1))
-            .companyName("company")
-            .organisationName("org")
-            .soleTraderTitle("soleTr")
-            .soleTraderFirstName("soleTrFN")
-            .soleTraderLastName("soleTrLN")
-                .soleTraderDateOfBirth(LocalDate.of(2019, 1, 1))
-            .primaryAddress(getTestAddress("rua1"))
-            .partyName(applicant)
-            .bulkClaimPartyName("bulk")
-            .partyTypeDisplayValue("typeDispl")
-            .partyEmail("is@is.is")
-            .partyPhone("07070006066")
-            .legalRepHeading("legalRep")
-            .unavailableDates(getUnavailableTestDates())
-            .flags(new Flags())
-            .build();
+        return new Party()
+            .setPartyID("partyID")
+            .setType(Party.Type.COMPANY)
+            .setIndividualTitle("Mr")
+            .setIndividualFirstName(applicant)
+            .setIndividualLastName("Silvassauro")
+            .setIndividualDateOfBirth(LocalDate.of(2019, 1, 1))
+            .setCompanyName("company")
+            .setOrganisationName("org")
+            .setSoleTraderTitle("soleTr")
+            .setSoleTraderFirstName("soleTrFN")
+            .setSoleTraderLastName("soleTrLN")
+                .setSoleTraderDateOfBirth(LocalDate.of(2019, 1, 1))
+            .setPrimaryAddress(getTestAddress("rua1"))
+            .setPartyName(applicant)
+            .setBulkClaimPartyName("bulk")
+            .setPartyTypeDisplayValue("typeDispl")
+            .setPartyEmail("is@is.is")
+            .setPartyPhone("07070006066")
+            .setLegalRepHeading("legalRep")
+            .setUnavailableDates(getUnavailableTestDates())
+            .setFlags(new Flags());
     }
 
     private List<Element<UnavailableDate>> getUnavailableTestDates() {
         return List.of(Element.<UnavailableDate>builder().id(UUID.fromString("00e5384f-03b3-4634-8b67-6acb665e83ba"))
-                           .value(UnavailableDate.builder()
-                                      .who("who")
-                                      .date(LocalDate.of(2020, 1, 1))
-                                      .fromDate(LocalDate.of(2020, 1, 1))
-                                      .toDate(LocalDate.of(2020, 1, 1))
-                                      .unavailableDateType(UnavailableDateType.DATE_RANGE)
-                                      .eventAdded("eventAdd")
-                                      .dateAdded(LocalDate.of(2020, 1, 1))
-                                      .build()).build());
+                           .value(new UnavailableDate()
+                                      .setWho("who")
+                                      .setDate(LocalDate.of(2020, 1, 1))
+                                      .setFromDate(LocalDate.of(2020, 1, 1))
+                                      .setToDate(LocalDate.of(2020, 1, 1))
+                                      .setUnavailableDateType(UnavailableDateType.DATE_RANGE)
+                                      .setEventAdded("eventAdd")
+                                      .setDateAdded(LocalDate.of(2020, 1, 1))).build());
     }
 
     private Address getTestAddress(String rua) {

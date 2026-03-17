@@ -126,8 +126,8 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(YES)
             .respondent2SameLegalRepresentative(YES)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
         Flags respondent1Flags = new Flags();
@@ -194,8 +194,8 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
         CallbackParams callbackParams = new CallbackParams()
@@ -229,8 +229,8 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
         Flags respondent1Flags = new Flags();
@@ -295,8 +295,8 @@ class SetApplicantResponseDeadlineTest {
             .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
             .respondentResponseIsSame(NO)
             .respondent2SameLegalRepresentative(NO)
-            .respondent1Copy(PartyBuilder.builder().individual().build())
-            .respondent2Copy(PartyBuilder.builder().individual().build())
+            .respondent1Copy(new PartyBuilder().individual().build())
+            .respondent2Copy(new PartyBuilder().individual().build())
             .build();
 
         CallbackParams callbackParams = new CallbackParams()

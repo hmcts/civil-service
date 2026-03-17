@@ -46,16 +46,14 @@ class DefendantResponseRespSolTwoEmailDTOGeneratorTest {
 
     @Test
     void shouldAddRespondentNamesAndTrackToProperties() {
-        Party respondent1 = Party.builder()
-            .individualFirstName("Alice")
-            .individualLastName("Smith")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party respondent1 = new Party()
+            .setIndividualFirstName("Alice")
+            .setIndividualLastName("Smith")
+            .setType(Party.Type.INDIVIDUAL);
 
-        Party respondent2 = Party.builder()
-            .companyName("Beta Corp")
-            .type(Party.Type.COMPANY)
-            .build();
+        Party respondent2 = new Party()
+            .setCompanyName("Beta Corp")
+            .setType(Party.Type.COMPANY);
 
         CaseData caseData = CaseData.builder()
             .respondent1(respondent1)

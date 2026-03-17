@@ -61,11 +61,11 @@ class SpecCaseOfflineHelperTest {
         when(caseData.getRespondent1ClaimResponseTypeForSpec()).thenReturn(RespondentResponseTypeSpec.FULL_DEFENCE);
         when(caseData.getRespondent2()).thenReturn(null);
         when(caseData.getRespondentResponseIsSame()).thenReturn(null);
-        when(caseData.getRespondent1()).thenReturn(Party.builder()
-                                                       .type(Party.Type.INDIVIDUAL)
-                                                       .individualFirstName("John")
-                                                       .individualLastName("Doe").build());
-        when(caseData.getApplicant1()).thenReturn(Party.builder().partyName("Claimant 1").build());
+        when(caseData.getRespondent1()).thenReturn(new Party()
+                                                       .setType(Party.Type.INDIVIDUAL)
+                                                       .setIndividualFirstName("John")
+                                                       .setIndividualLastName("Doe"));
+        when(caseData.getApplicant1()).thenReturn(new Party().setPartyName("Claimant 1"));
 
         when(notificationsProperties.getSolicitorDefendantResponseCaseTakenOffline()).thenReturn("offline-template");
 

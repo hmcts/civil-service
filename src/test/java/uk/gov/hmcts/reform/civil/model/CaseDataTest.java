@@ -271,9 +271,9 @@ class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1FullDefence_whenIsRespondentResponseFullDefence_thenFalse() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
         //When
@@ -286,9 +286,9 @@ class CaseDataTest {
     void givenOneVTwoTwoLegalRepCaseRespondent1And2FullDefence_whenIsRespondentResponseFullDefence_thenTrue() {
         //Given
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .respondent1ClaimResponseTypeForSpec(FULL_DEFENCE)
             .respondent2ClaimResponseTypeForSpec(FULL_DEFENCE)
             .build();
@@ -383,8 +383,8 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.YES)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
+            .respondent1(new Party())
+            .applicant1(new Party())
             .build();
         //Then
         assertTrue(caseData.isLRvLipOneVOne());
@@ -396,8 +396,8 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.YES)
             .applicant1Represented(YesOrNo.YES)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
+            .respondent1(new Party())
+            .applicant1(new Party())
             .build();
         //Then
         assertFalse(caseData.isLRvLipOneVOne());
@@ -409,8 +409,8 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
+            .respondent1(new Party())
+            .applicant1(new Party())
             .build();
         //Then
         assertFalse(caseData.isLRvLipOneVOne());
@@ -422,8 +422,8 @@ class CaseDataTest {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
             .applicant1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().build())
-            .applicant1(Party.builder().build())
+            .respondent1(new Party())
+            .applicant1(new Party())
             .build();
         //Then
         assertTrue(caseData.isLipvLipOneVOne());
@@ -434,7 +434,7 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.NO)
-            .applicant1(Party.builder().build())
+            .applicant1(new Party())
             .build();
         //Then
         assertTrue(caseData.isApplicant1NotRepresented());
@@ -445,7 +445,7 @@ class CaseDataTest {
         //Given
         CaseData caseData = CaseData.builder()
             .applicant1Represented(YesOrNo.YES)
-            .applicant1(Party.builder().build())
+            .applicant1(new Party())
             .build();
         //Then
         assertFalse(caseData.isApplicant1NotRepresented());
@@ -1548,8 +1548,7 @@ class CaseDataTest {
     @Test
     void shouldReturnRespondent1PartyEmail() {
         CaseData caseData = CaseData.builder().respondent1(
-            Party.builder().partyEmail("test@test.com").build()
-        ).build();
+            new Party().setPartyEmail("test@test.com")).build();
         assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
     }
 
@@ -1562,8 +1561,7 @@ class CaseDataTest {
     @Test
     void shouldReturnRespondent2PartyEmail() {
         CaseData caseData = CaseData.builder().respondent1(
-            Party.builder().partyEmail("test@test.com").build()
-        ).build();
+            new Party().setPartyEmail("test@test.com")).build();
         assertEquals("test@test.com", caseData.getRespondent1PartyEmail());
     }
 

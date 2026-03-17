@@ -366,7 +366,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YES)
             .build();
 
@@ -393,7 +393,7 @@ public class FullDefenceTransitionBuilderTest {
         CaseData caseData = CaseData.builder()
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(NO)
             .build();
 
@@ -803,7 +803,7 @@ public class FullDefenceTransitionBuilderTest {
             .caseAccessCategory(SPEC_CLAIM)
             .responseClaimTrack(SMALL_CLAIM.name())
             .responseClaimMediationSpecRequired(YesOrNo.YES)
-            .respondent2(Party.builder().build())
+            .respondent2(new Party())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
             .responseClaimMediationSpec2Required(YesOrNo.NO)
             .build();

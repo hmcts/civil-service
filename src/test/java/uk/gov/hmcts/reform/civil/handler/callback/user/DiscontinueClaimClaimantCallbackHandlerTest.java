@@ -240,10 +240,10 @@ class DiscontinueClaimClaimantCallbackHandlerTest extends BaseCallbackHandlerTes
         @BeforeEach
         void setup() {
             CaseData caseDataBefore = CaseDataBuilder.builder()
-                .applicant1(PartyBuilder.builder().individual().build())
-                .applicant2(PartyBuilder.builder().individual().build())
-                .respondent1(PartyBuilder.builder().individual().build())
-                .respondent2(PartyBuilder.builder().individual().build())
+                .applicant1(new PartyBuilder().individual().build())
+                .applicant2(new PartyBuilder().individual().build())
+                .respondent1(new PartyBuilder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .buildClaimIssuedPaymentCaseData();
             given(caseDetailsConverter.toCaseData(any(CaseDetails.class))).willReturn(caseDataBefore);
         }

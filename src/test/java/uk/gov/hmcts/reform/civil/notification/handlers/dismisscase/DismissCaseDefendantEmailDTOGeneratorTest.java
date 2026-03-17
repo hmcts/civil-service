@@ -70,7 +70,7 @@ public class DismissCaseDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
 
         String allPartyNames = "all party names";
         String respondentName = "respondent name";

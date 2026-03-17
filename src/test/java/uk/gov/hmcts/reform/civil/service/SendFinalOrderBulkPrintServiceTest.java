@@ -138,7 +138,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterSuccessfully() {
         // given
-        Party respondent1 = PartyBuilder.builder().soleTrader().build();
+        Party respondent1 = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(respondent1, JUDGE_FINAL_ORDER, true);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -153,7 +153,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPSuccessfully() {
         // given
-        Party claimant = PartyBuilder.builder().soleTrader().build();
+        Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, JUDGE_FINAL_ORDER, true);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -209,7 +209,7 @@ class SendFinalOrderBulkPrintServiceTest {
         // given
         CaseData caseData = CaseDataBuilder.builder()
             .systemGeneratedCaseDocuments(null)
-            .respondent1(PartyBuilder.builder().individual().build()) // Adding a respondent to differentiate
+            .respondent1(new PartyBuilder().individual().build()) // Adding a respondent to differentiate
             .build();
 
         // when
@@ -235,7 +235,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintTranslatedLetterToClaimantLiPSuccessfully() {
         // given
-        Party claimant = PartyBuilder.builder().individual().build();
+        Party claimant = new PartyBuilder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(claimant);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -250,7 +250,7 @@ class SendFinalOrderBulkPrintServiceTest {
     @Test
     void shouldDownloadDocumentAndPrintTranslatedLetterToDefendantLiPSuccessfully() {
         // given
-        Party defendant = PartyBuilder.builder().individual().build();
+        Party defendant = new PartyBuilder().individual().build();
         CaseData caseData = buildCaseDataForTranslatedOrder(defendant);
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
             .willReturn(new ByteArrayResource(LETTER_CONTENT).getByteArray());
@@ -303,7 +303,7 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInWelshSuccessfully() {
         // given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        Party claimant = PartyBuilder.builder().soleTrader().build();
+        Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant, FINAL_ORDER_TRANSLATED_DOCUMENT, true);
         caseData.setClaimantBilingualLanguagePreference("WELSH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))
@@ -324,7 +324,7 @@ class SendFinalOrderBulkPrintServiceTest {
     void shouldDownloadDocumentAndPrintLetterToClaimantLiPInBothLanguagesSuccessfully() {
         // given
         when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
-        Party claimant = PartyBuilder.builder().soleTrader().build();
+        Party claimant = new PartyBuilder().soleTrader().build();
         CaseData caseData = buildCaseData(claimant);
         caseData.setClaimantBilingualLanguagePreference("BOTH");
         given(coverLetterAppendService.makeDocumentMailable(any(), any(), any(), any(DocumentType.class), any()))

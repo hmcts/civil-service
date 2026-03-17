@@ -26,7 +26,7 @@ class DirectionsOrderParticipantServiceTest {
         CaseData caseData = CaseDataBuilder.builder()
             .atStateNotificationAcknowledged()
             .build().toBuilder()
-            .respondent2(PartyBuilder.builder().individual("Jane").build())
+            .respondent2(new PartyBuilder().individual("Jane").build())
             .addRespondent2(YES)
             .respondent2SameLegalRepresentative(YES)
             .build();

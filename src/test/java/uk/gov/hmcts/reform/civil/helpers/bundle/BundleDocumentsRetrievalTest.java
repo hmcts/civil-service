@@ -131,7 +131,7 @@ class BundleDocumentsRetrievalTest {
         );
 
         CaseData caseData = CaseData.builder()
-            .applicant1(Party.builder().individualFirstName("James").individualLastName("Gordon").type(Party.Type.INDIVIDUAL).build())
+            .applicant1(new Party().setIndividualFirstName("James").setIndividualLastName("Gordon").setType(Party.Type.INDIVIDUAL))
             .documentExpertReport(new ArrayList<>())
             .documentQuestionsRes2(listOfDocs)
             .build();

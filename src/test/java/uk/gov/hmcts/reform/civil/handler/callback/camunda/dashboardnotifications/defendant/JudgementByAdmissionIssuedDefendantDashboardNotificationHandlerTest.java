@@ -201,7 +201,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setDefendantDetailsSpec(defendantDetailsSpec);
-        caseData.setRespondent1(PartyBuilder.builder().individual().build());
+        caseData.setRespondent1(new PartyBuilder().individual().build());
         caseData.setActiveJudgment(activeJudgment);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()
@@ -242,7 +242,7 @@ class JudgementByAdmissionIssuedDefendantDashboardNotificationHandlerTest extend
         caseData.setDefenceAdmitPartPaymentTimeRouteRequired(RespondentResponsePartAdmissionPaymentTimeLRspec.BY_SET_DATE);
         caseData.setApplicant1AcceptPartAdmitPaymentPlanSpec(YesOrNo.YES);
         caseData.setDefendantDetailsSpec(defendantDetailsSpec);
-        caseData.setRespondent1(PartyBuilder.builder().organisation().build());
+        caseData.setRespondent1(new PartyBuilder().organisation().build());
         caseData.setActiveJudgment(activeJudgment);
 
         CallbackParams callbackParams = CallbackParamsBuilder.builder()

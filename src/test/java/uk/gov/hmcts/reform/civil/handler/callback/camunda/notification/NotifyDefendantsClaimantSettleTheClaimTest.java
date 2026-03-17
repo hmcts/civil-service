@@ -108,9 +108,9 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             //Given
             CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
-                    DEFENDANT_LIP_EMAIL_ADDRESS).build())
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
+                .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(DEFENDANT_PARTY_NAME).setPartyEmail(
+                    DEFENDANT_LIP_EMAIL_ADDRESS))
+                .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .addApplicant2(YesOrNo.NO)
                 .addRespondent2(YesOrNo.NO)
@@ -151,8 +151,8 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
 
             //Given
             CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Party.Type.COMPANY).build())
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
+                .respondent1(new Party().setType(Party.Type.COMPANY))
+                .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
@@ -193,13 +193,13 @@ public class NotifyDefendantsClaimantSettleTheClaimTest extends BaseCallbackHand
         void shouldOnlySendNotificationToDefendantLR_whenLiPvLRandDefendantHasEmail() {
             //Given
             CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().type(Party.Type.COMPANY).companyName(DEFENDANT_PARTY_NAME).partyEmail(
-                    DEFENDANT_LIP_EMAIL_ADDRESS).build())
+                .respondent1(new Party().setType(Party.Type.COMPANY).setCompanyName(DEFENDANT_PARTY_NAME).setPartyEmail(
+                    DEFENDANT_LIP_EMAIL_ADDRESS))
                 .respondent1Represented(YesOrNo.YES)
                 .respondent1OrganisationPolicy(organisationPolicy("ORG_ID", "[RESPONDENTSOLICITORONE]"))
                 .respondentSolicitor1EmailAddress(DEFENDANT_LR_EMAIL_ADDRESS)
                 .solicitorReferences(new SolicitorReferences().setRespondentSolicitor1Reference(null))
-                .applicant1(Party.builder().type(Party.Type.COMPANY).companyName(CLAIMANT_ORG_NAME).build())
+                .applicant1(new Party().setType(Party.Type.COMPANY).setCompanyName(CLAIMANT_ORG_NAME))
                 .legacyCaseReference(REFERENCE_NUMBER)
                 .ccdCaseReference(1234567891234567L)
                 .addApplicant2(YesOrNo.NO)

@@ -1,0 +1,14 @@
+{
+  "name": "NoC - Apply Decision",
+  "request": {
+    "method": "POST",
+    "urlPath": "/noc/apply-decision"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "nocApplyDecisionResponse.json"
+  }
+}

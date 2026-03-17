@@ -59,7 +59,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithNoticeNonUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
@@ -87,7 +87,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithNoticeUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
@@ -115,7 +115,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithConsentNonUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
@@ -143,7 +143,7 @@ public class CreateRespondentDashboardNotificationForApplicationSubmittedHandler
 
         @Test
         void shouldRecordApplicationSubmittedRespondentScenarioForWithConsentUrgentApplicationWhenInvoked() {
-            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData();
+            GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().atStateClaimDraft().withNoticeCaseData().build();
             caseData = caseData.copy()
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)

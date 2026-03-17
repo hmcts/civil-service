@@ -102,10 +102,10 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
                 .legacyCaseReference("000DC001")
                 .ccdCaseReference(12345L)
                 .addRespondent2(YesOrNo.NO)
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL)
-                                 .partyName("Test")
-                                 .individualLastName("Test Lastname")
-                                 .individualFirstName("Test Firstname").build())
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("Test")
+                                 .setIndividualLastName("Test Lastname")
+                                 .setIndividualFirstName("Test Firstname"))
                 .applicant1OrganisationPolicy(new OrganisationPolicy().setOrganisation(
                     new uk.gov.hmcts.reform.ccd.model.Organisation().setOrganisationID(ORG_NAME))).build();
             Map<String, Object> configMap = YamlNotificationTestUtil.loadNotificationsConfig();
@@ -130,11 +130,11 @@ class RecordJudgmentDeterminationMeansApplicantNotificationHandlerTest extends B
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
             CaseData caseData = CaseDataBuilder.builder().buildJudgmentOnlineCaseDataWithDeterminationMeans();
             caseData = caseData.toBuilder()
-                .applicant1(Party.builder()
-                                .individualFirstName("Applicant1").individualLastName("ApplicantLastName").partyName("Applicant1")
-                                .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
-                .respondent1(Party.builder().partyName("Respondent1").individualFirstName("Respondent1").individualLastName("RespondentLastName")
-                                 .type(Party.Type.INDIVIDUAL).partyEmail("respondentLip@example.com").build())
+                .applicant1(new Party()
+                                .setIndividualFirstName("Applicant1").setIndividualLastName("ApplicantLastName").setPartyName("Applicant1")
+                                .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
+                .respondent1(new Party().setPartyName("Respondent1").setIndividualFirstName("Respondent1").setIndividualLastName("RespondentLastName")
+                                 .setType(Party.Type.INDIVIDUAL).setPartyEmail("respondentLip@example.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .legacyCaseReference("000DC001")
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)

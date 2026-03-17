@@ -56,7 +56,7 @@ class ValidateClaimantDetailsTaskTest {
 
     @Test
     void shouldReturnNoErrors_whenClaimant1AddressValid() {
-        Party applicant1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
         Address address = new Address();
         address.setAddressLine1("Address line 1");
         applicant1.setPrimaryAddress(address);
@@ -85,7 +85,7 @@ class ValidateClaimantDetailsTaskTest {
         address.setCounty("County line test again for more than 35 characters");
         address.setPostCode("PostCode test more than 8 characters");
         address.setPostTown("Post town line test again for more than 35 characters");
-        Party applicant1 = PartyBuilder.builder().organisation().build();
+        Party applicant1 = new PartyBuilder().organisation().build();
         applicant1.setPrimaryAddress(address);
 
         validateClaimantDetailsTask.setGetApplicant(CaseData::getApplicant1);

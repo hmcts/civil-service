@@ -118,7 +118,7 @@ class TrialReadyApplicantNotificationHandlerTest {
             when(configuration.getSpecUnspecContact()).thenReturn((String) configMap.get("specUnspecContact"));
 
             CaseData caseData = CaseDataBuilder.builder().atStateTrialReadyCheck()
-                .applicant1(PartyBuilder.builder().company().partyEmail(null).build())
+                .applicant1(new PartyBuilder().company().partyEmail(null).build())
                 .claimantUserDetails(new IdamUserDetails().setEmail("email@email.com"))
                 .applicant1Represented(YesOrNo.NO)
                 .caseAccessCategory(CaseCategory.SPEC_CLAIM)

@@ -39,12 +39,11 @@ public class PartyDetailsPopulatorTest {
 
     @Test
     void shouldHandleNullFlags_whenFlagsAreNotProvided() {
-        Party party = Party.builder()
-            .partyID("P2")
-            .type(Type.COMPANY)
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .build();
+        Party party = new Party()
+            .setPartyID("P2")
+            .setType(Type.COMPANY)
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe");
 
         MediationLitigant litigant = partyDetailsPopulator.populator(new MediationLitigant(), party);
 

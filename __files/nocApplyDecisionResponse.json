@@ -1,0 +1,34 @@
+{
+  "data": {
+    "changeOrganisationRequestField": {
+      "createdBy": "requester.email@example.com",
+      "organisationToAdd": {
+        "OrganisationID": "Q1KOKP2"
+      }
+    },
+    "respondent1OrganisationPolicy": {
+      "Organisation": {
+        "OrganisationID": "Q1KOKP2",
+        "OrganisationName": "Civil - Organisation 1"
+      },
+      "OrgPolicyReference": null,
+      "OrgPolicyCaseAssignedRole": "[RESPONDENTSOLICITORONE]"
+    },
+    "respondent2OrganisationPolicy": {
+      "Organisation": {
+        "OrganisationID": "79ZRSOU",
+        "OrganisationName": "Civil - Organisation 2"
+      },
+      "OrgPolicyReference": null,
+      "OrgPolicyCaseAssignedRole": "[RESPONDENTSOLICITORTWO]"
+    },
+    "applicant1OrganisationPolicy": {
+      "Organisation": {
+        "OrganisationID": "QWERTY A",
+        "OrganisationName": "Applicant Organisation"
+      },
+      "OrgPolicyReference": null,
+      "OrgPolicyCaseAssignedRole": "[APPLICANTSOLICITORONE]"
+    }
+  }
+}

@@ -207,8 +207,8 @@ public class RespondentMediationServiceTest {
     void shouldSetMediationRequired_whenIts1V2ClaimDefendant1AgreesToMediation() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaim(YES)
             .multiPartyClaimTwoDefendantSolicitors()
             .setDefendantMediationFlag(YES)
@@ -223,8 +223,8 @@ public class RespondentMediationServiceTest {
     void shouldSetMediationRequired_whenIts1V2ClaimDefendant2AgreesToMediation() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .respondent1(PartyBuilder.builder().individual().build())
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent1(new PartyBuilder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaim(YES)
             .multiPartyClaimTwoDefendantSolicitors()
             .setDefendantMediationFlag(NO)
@@ -239,7 +239,7 @@ public class RespondentMediationServiceTest {
     void shouldSetMediationRequired_whenIts1V2ClaimDefendant1and2AgreesToMediation() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaim(YES)
             .multiPartyClaimTwoDefendantSolicitors()
             .setDefendantMediationFlag(YES)
@@ -254,7 +254,7 @@ public class RespondentMediationServiceTest {
     void shouldSetMediationRequired_whenIts1V2ClaimDefendant1and2DoesNotAgreeToMediation() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaim(YES)
             .multiPartyClaimTwoDefendantSolicitors()
             .setDefendantMediationFlag(NO)
@@ -269,7 +269,7 @@ public class RespondentMediationServiceTest {
     void shouldSetMediationRequired_whenIts1V2ClaimNegativePath() {
         CaseData caseData = CaseDataBuilder.builder()
             .responseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM)
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .applicant1ProceedWithClaim(NO)
             .defendantSingleResponseToBothClaimants(NO)
             .build();

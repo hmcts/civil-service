@@ -92,7 +92,7 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -116,7 +116,7 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotGenerateTwoForm_when1v2And1DefSelectedSpecified() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -209,7 +209,7 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
             when(defaultJudgmentFormGenerator.generate(any(CaseData.class), anyString(),
                                                        eq(GENERATE_DJ_FORM.name()))).thenReturn(documents);
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));
@@ -233,7 +233,7 @@ class GenerateDJFormHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldNotGenerateTwoForm_when1v2And1DefSelected() {
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-            caseData.setRespondent2(PartyBuilder.builder().individual().build());
+            caseData.setRespondent2(new PartyBuilder().individual().build());
             caseData.setAddRespondent2(YES);
             caseData.setRespondent2SameLegalRepresentative(YES);
             caseData.setRespondent1ResponseDeadline(LocalDateTime.now().minusDays(15));

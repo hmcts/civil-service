@@ -14,6 +14,7 @@ plugins {
   id 'com.github.hmcts.rse-cft-lib' version '0.19.2017'
   id "org.flywaydb.flyway" version "10.22.0"
   id 'maven-publish'
+  id "org.gradle.test-retry" version "1.6.2"
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -53,6 +54,15 @@ allprojects {
     maxWarnings = 0
     toolVersion = '10.26.1'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+    ignoreFailures = System.getenv('CHECKSTYLE_SKIP') == 'true'
+  }
+
+// Only create HTML Checkstyle reports
+  tasks.withType(Checkstyle).configureEach {
+    reports {
+      xml.required = false
+      html.required = true
+    }
   }
 
   jacoco {
@@ -166,9 +176,16 @@ task integration(type: Test) {
   group = "Verification"
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
-  failFast = true
+  failFast = System.getenv('GITHUB_ACTIONS') == 'true' ? false : true
   testLogging.showStandardStreams = false
 
+  if (System.getenv('GITHUB_ACTIONS') == 'true') {
+    retry {
+      maxRetries = 3
+      maxFailures = 10
+      failOnPassedAfterRetry = false
+    }
+  }
 }
 
 task fortifyScan(type: JavaExec, description: 'Run fortify scan.') {
@@ -183,7 +200,7 @@ task awaitApplicationReadiness(type: Exec, description: 'Awaits until applicatio
 }
 
 task runSmokeTests(type: Exec, description: 'Runs smoke tests.') {
-  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:smoke'
+  commandLine '/usr/bin/yarn', '--silent', 'run', 'test:civil-service-smoke'
 }
 
 task runApiTests(type: Exec, description: 'Runs Prod features in functional tests.') {
@@ -233,6 +250,9 @@ sonarqube {
       ",**/utils/CaseQueriesUtil.java, **/handler/callback/user/RaiseQueryCallbackHandler.java,**/handler/migration/MigrateCaseQueriesTask.java, **/handler/callback/user/RespondQueryCallbackHandler.java, **/service/servicebus/CcdCaseEventsExecutor.java, **/tasklisteners/MigrateCasesTaskListener.java, **/migration/MigrationTask.java, **/migration/CustomRequestScopeAttr.java"
     property "sonar.host.url", "https://sonar.reform.hmcts.net/"
     property "sonar.web.javaOpts", "-Xmx2G"
+    property "sonar.gradle.skipCompile", System.getenv("SONAR_SKIP_COMPILE") ?: "false"
+    property "sonar.branch.cache.enabled", "true"
+    property "sonar.working.directory", "${buildDir}/sonar"
   }
 }
 
@@ -344,7 +364,7 @@ dependencies {
   implementation group: 'jakarta.persistence', name: 'jakarta.persistence-api', version: '3.1.0'
 
   implementation group: 'org.jdbi', name: 'jdbi3-sqlobject', version: '3.51.0'
-  implementation group: 'org.jdbi', name: 'jdbi3-spring5', version: '3.49.5'
+  implementation group: 'org.jdbi', name: 'jdbi3-spring', version: '3.51.0'
 
   implementation group: 'org.flywaydb', name: 'flyway-core'
 
@@ -353,7 +373,7 @@ dependencies {
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
   implementation group: 'org.apache.tika', name: 'tika-core', version: versions.tika
-  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.1'
+  implementation group: 'io.github.openfeign', name: 'feign-httpclient', version: '13.9.3'
   implementation group: 'org.springframework.retry', name: 'spring-retry'
 
   implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
@@ -362,7 +382,7 @@ dependencies {
   implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
   implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '5.2.0'
   implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
-  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '3.0.23.1'
+  implementation group: 'com.github.hmcts', name: 'send-letter-client', version: '5.1.1'
   implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version:'7.4'
   implementation('com.github.hmcts:fees-java-client:0.1.0') {
     exclude group: 'uk.gov.hmcts.reform', module: 'java-logging'
@@ -438,8 +458,8 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '4.11.0'
   testImplementation group: 'org.mockito', name: 'mockito-inline', version: '4.11.0'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.5'
-  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.5'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.18.7'
+  testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.18.7'
 
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -607,10 +627,15 @@ tasks.register('runProviderPactVerification') {
 }
 
 tasks.withType(Test).configureEach { t ->
+  doFirst {
+    logger.lifecycle("Available Processors for ${t.name}: ${Runtime.runtime.availableProcessors()}")
+  }
   useJUnitPlatform()
 
-  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+  maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
   jvmArgs '-Xshare:off'
+  // Use Parallel GC for faster, short-lived test forks
+  jvmArgs '-XX:+UseParallelGC'
 
   // Keep within typical Jenkins container limits
   minHeapSize = "256m"

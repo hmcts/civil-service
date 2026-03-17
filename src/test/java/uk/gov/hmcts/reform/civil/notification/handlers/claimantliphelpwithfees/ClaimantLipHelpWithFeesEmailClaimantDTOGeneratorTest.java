@@ -54,19 +54,15 @@ class ClaimantLipHelpWithFeesEmailClaimantDTOGeneratorTest {
                         new IdamUserDetails().setEmail(EMAIL)
                 )
                 .applicant1(
-                        Party.builder()
-                                .individualFirstName("John")
-                                .individualLastName("Doe")
-                                .type(Party.Type.INDIVIDUAL)
-                                .build()
-                )
+                        new Party()
+                                .setIndividualFirstName("John")
+                                .setIndividualLastName("Doe")
+                                .setType(Party.Type.INDIVIDUAL))
                 .respondent1(
-                        Party.builder()
-                                .individualFirstName("Jane")
-                                .individualLastName("Roe")
-                                .type(Party.Type.INDIVIDUAL)
-                                .build()
-                )
+                        new Party()
+                                .setIndividualFirstName("Jane")
+                                .setIndividualLastName("Roe")
+                                .setType(Party.Type.INDIVIDUAL))
                 .build();
 
         ReflectionTestUtils.setField(

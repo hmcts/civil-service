@@ -70,8 +70,8 @@ public class PrepareEventTaskTest {
     @Test
     void shouldNotReturnErrorForAdminCaseBeforeAwaitingApplicantIntention() {
         // Admin user with case before Awaiting Applicant Intention
-        Party applicant1 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1).build();
         caseData.setCcdState(AWAITING_APPLICANT_INTENTION);
         caseData.setCcdCaseReference(123456789L);

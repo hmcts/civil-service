@@ -17,10 +17,10 @@ jobs:
           submodules: recursive
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
           cache: 'gradle'
 
       - name: Publish to Azure DevOps Artifacts

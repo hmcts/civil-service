@@ -80,7 +80,7 @@ class PopulateRespondentCopyObjectsTest  {
 
         CaseData caseData = CaseDataBuilder.builder()
             .atStateClaimDetailsNotified()
-            .respondent2(PartyBuilder.builder().individual().build())
+            .respondent2(new PartyBuilder().individual().build())
             .build();
 
         Flags respondent1Flags = new Flags();

@@ -37,19 +37,17 @@ class CarmDisabledDefendantEmailDTOGeneratorTest {
 
     @BeforeEach
     void setUp() {
-        applicant1 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Alice")
-            .individualLastName("Smith")
-            .individualTitle("Mrs")
-            .build();
+        applicant1 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Alice")
+            .setIndividualLastName("Smith")
+            .setIndividualTitle("Mrs");
 
-        respondent1 = Party.builder()
-            .type(Party.Type.INDIVIDUAL)
-            .individualFirstName("Bob")
-            .individualLastName("Brown")
-            .individualTitle("Mr")
-            .build();
+        respondent1 = new Party()
+            .setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("Bob")
+            .setIndividualLastName("Brown")
+            .setIndividualTitle("Mr");
     }
 
     @Test

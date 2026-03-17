@@ -77,7 +77,7 @@ public class DefendantResponseCUIDefendantEmailDTOGeneratorTest {
 
     @Test
     void shouldReturnCorrectCustomProperties() {
-        Party party = Party.builder().build();
+        Party party = new Party();
         String legacyCaseReference = "legacy case reference";
         CaseData caseData = CaseData.builder()
             .legacyCaseReference(legacyCaseReference)

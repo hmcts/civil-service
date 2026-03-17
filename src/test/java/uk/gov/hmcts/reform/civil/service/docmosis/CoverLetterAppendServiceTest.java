@@ -64,21 +64,19 @@ class CoverLetterAppendServiceTest {
     private static final Address APPLICANT_ADDRESS = address("123 road", "London", "SW1 1NT");
     private static final Address RESPONDENT_ADDRESS = address("456 Avenue", "London", "EX12RT");
 
-    private static final Party CLAIMANT = Party.builder()
-        .primaryAddress(APPLICANT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Mint")
-        .individualLastName("Clay")
-        .build();
+    private static final Party CLAIMANT = new Party()
+        .setPrimaryAddress(APPLICANT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Mint")
+        .setIndividualLastName("Clay");
 
-    private static final Party DEFENDANT = Party.builder()
-        .primaryAddress(RESPONDENT_ADDRESS)
-        .type(Party.Type.INDIVIDUAL)
-        .individualTitle("Mr.")
-        .individualFirstName("Indent")
-        .individualLastName("Dave")
-        .build();
+    private static final Party DEFENDANT = new Party()
+        .setPrimaryAddress(RESPONDENT_ADDRESS)
+        .setType(Party.Type.INDIVIDUAL)
+        .setIndividualTitle("Mr.")
+        .setIndividualFirstName("Indent")
+        .setIndividualLastName("Dave");
 
     private static Address address(String addressLine1, String postTown, String postCode) {
         Address address = new Address();

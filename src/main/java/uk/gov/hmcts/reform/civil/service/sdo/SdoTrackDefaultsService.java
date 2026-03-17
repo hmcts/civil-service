@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantFastTrack;
 import uk.gov.hmcts.reform.civil.constants.SdoR2UiConstantSmallClaim;
@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.civil.enums.sdo.SmallClaimsMethod;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.sdo.PPI;
 import uk.gov.hmcts.reform.civil.model.sdo.SdoR2WelshLanguageUsage;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static uk.gov.hmcts.reform.civil.handler.callback.user.CreateSDOCallbackHandler.DEFAULT_PENAL_NOTICE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoTrackDefaultsService {
@@ -31,8 +33,7 @@ public class SdoTrackDefaultsService {
     private final SdoExpertEvidenceFieldsService sdoExpertEvidenceFieldsService;
     private final SdoDisclosureOfDocumentsFieldsService sdoDisclosureOfDocumentsFieldsService;
     private final SdoJudgementDeductionService sdoJudgementDeductionService;
-    @Value("${other_remedy.enabled:false}")
-    private boolean otherRemedyEnabled;
+    private final FeatureToggleService featureToggleService;
 
     private static final List<IncludeInOrderToggle> INCLUDE_IN_ORDER_TOGGLE = List.of(IncludeInOrderToggle.INCLUDE);
 
@@ -56,24 +57,35 @@ public class SdoTrackDefaultsService {
     }
 
     private void populatePenalNoticeFields(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating Penal Notice fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
         if (otherRemedyEnabled) {
             caseData.setSmallClaimsPenalNotice(DEFAULT_PENAL_NOTICE);
             caseData.setFastTrackPenalNotice(DEFAULT_PENAL_NOTICE);
             caseData.setSmallClaimsPenalNoticeToggle(new ArrayList<>());
             caseData.setFastTrackPenalNoticeToggle(new ArrayList<>());
+            log.debug("Penal Notice fields populated for case: {}", caseData.getCcdCaseReference());
         }
     }
 
     private void populatePpiFields(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Populating PPI fields for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
+
         if (otherRemedyEnabled) {
             PPI ppi = new PPI();
             ppi.setPpiDate(LocalDate.now().plusDays(28));
             ppi.setText(SdoR2UiConstantSmallClaim.PPI_DESCRIPTION);
             caseData.setSmallClaimsPPI(ppi);
             caseData.setFastTrackPPI(ppi);
+            log.debug("PPI fields populated for case: {}", caseData.getCcdCaseReference());
         } else {
             caseData.setSmallClaimsPPI(null);
             caseData.setFastTrackPPI(null);
+            log.debug("PPI fields set to null for case: {}", caseData.getCcdCaseReference());
         }
     }
 

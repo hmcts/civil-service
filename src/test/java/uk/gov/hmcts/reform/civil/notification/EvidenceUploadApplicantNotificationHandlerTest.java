@@ -79,11 +79,11 @@ class EvidenceUploadApplicantNotificationHandlerTest extends BaseCallbackHandler
         return CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .notificationText(notificationText)
             .applicant1Represented(YesOrNo.NO)
-            .applicant1(Party.builder()
-                            .individualFirstName("John")
-                            .individualLastName("Doe")
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("Billy").partyEmail(APPLICANT_LIP_EMAIL).build())
+            .applicant1(new Party()
+                            .setIndividualFirstName("John")
+                            .setIndividualLastName("Doe")
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setPartyName("Billy").setPartyEmail(APPLICANT_LIP_EMAIL))
             .build();
     }
 

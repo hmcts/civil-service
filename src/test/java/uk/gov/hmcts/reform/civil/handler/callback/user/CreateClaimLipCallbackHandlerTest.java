@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.civil.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.referencedata.model.LocationRefData;
-import uk.gov.hmcts.reform.civil.repositories.SpecReferenceNumberRepository;
+import uk.gov.hmcts.reform.civil.repositories.CasemanReferenceNumberRepository;
 import uk.gov.hmcts.reform.civil.sampledata.CallbackParamsBuilder;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
 import uk.gov.hmcts.reform.civil.service.CoreCaseEventDataService;
@@ -74,7 +74,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
     private FeatureToggleService toggleService;
 
     @MockBean
-    private SpecReferenceNumberRepository specReferenceNumberRepository;
+    private CasemanReferenceNumberRepository casemanReferenceNumberRepository;
 
     @MockBean
     private CaseFlagsInitialiser caseFlagInitialiser;
@@ -134,7 +134,7 @@ class CreateClaimLipCallbackHandlerTest extends BaseCallbackHandlerTest {
             caseData = CaseDataBuilder.builder().atStateClaimDraft().applicant1OrganisationPolicy(null).build();
             params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             given(time.now()).willReturn(submittedDate);
-            given(specReferenceNumberRepository.getSpecReferenceNumber()).willReturn(REFERENCE_NUMBER);
+            given(casemanReferenceNumberRepository.next("spec")).willReturn(REFERENCE_NUMBER);
             given(deadlinesCalculator.plus28DaysAt4pmDeadline(any())).willReturn(submittedDate);
         }
 

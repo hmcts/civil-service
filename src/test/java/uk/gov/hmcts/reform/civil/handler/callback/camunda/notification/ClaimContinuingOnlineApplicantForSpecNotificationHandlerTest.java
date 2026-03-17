@@ -269,7 +269,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             CaseData caseData =
                 CaseDataBuilder.builder()
-                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .respondent1(new Party().setPartyName(PARTY_NAME))
                     .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.NO).build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)
@@ -300,7 +300,7 @@ public class ClaimContinuingOnlineApplicantForSpecNotificationHandlerTest extend
 
             CaseData caseData =
                 CaseDataBuilder.builder()
-                    .respondent1(Party.builder().partyName(PARTY_NAME).build())
+                    .respondent1(new Party().setPartyName(PARTY_NAME))
                     .atStateClaimDetailsNotified().respondent1Represented(YesOrNo.YES).build();
             CallbackParams params = CallbackParamsBuilder.builder()
                 .of(ABOUT_TO_SUBMIT, caseData)

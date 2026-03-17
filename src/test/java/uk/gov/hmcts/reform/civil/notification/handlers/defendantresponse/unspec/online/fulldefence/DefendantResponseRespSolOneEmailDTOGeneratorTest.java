@@ -47,11 +47,10 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddSingleRespondentNameAndTrack() {
-        Party respondent = Party.builder()
-            .individualFirstName("John")
-            .individualLastName("Doe")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party respondent = new Party()
+            .setIndividualFirstName("John")
+            .setIndividualLastName("Doe")
+            .setType(Party.Type.INDIVIDUAL);
 
         CaseData caseData = CaseData.builder()
             .respondent1(respondent)
@@ -67,16 +66,14 @@ class DefendantResponseRespSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCombinedRespondentNamesWhenMultipleDefendants() {
-        Party respondent1 = Party.builder()
-            .individualFirstName("Alice")
-            .individualLastName("Brown")
-            .type(Party.Type.INDIVIDUAL)
-            .build();
+        Party respondent1 = new Party()
+            .setIndividualFirstName("Alice")
+            .setIndividualLastName("Brown")
+            .setType(Party.Type.INDIVIDUAL);
 
-        Party respondent2 = Party.builder()
-            .companyName("Beta Ltd")
-            .type(Party.Type.COMPANY)
-            .build();
+        Party respondent2 = new Party()
+            .setCompanyName("Beta Ltd")
+            .setType(Party.Type.COMPANY);
 
         CaseData caseData = CaseData.builder()
             .respondent1(respondent1)

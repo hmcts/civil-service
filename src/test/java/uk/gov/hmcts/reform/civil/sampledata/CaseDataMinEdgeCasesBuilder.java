@@ -69,14 +69,14 @@ public class CaseDataMinEdgeCasesBuilder extends CaseDataBuilder {
                               .setRegion("4")
                               .setBaseLocation("000000")
                               );
-        applicant1 = PartyBuilder.builder().companyWithMinimalData().build();
+        applicant1 = new PartyBuilder().companyWithMinimalData().build();
         applicant1LitigationFriendRequired = NO;
         applicantSolicitor1CheckEmail = new CorrectEmail()
             .setEmail("hmcts.civil@gmail.com")
             .setCorrect(YES);
         applicant1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY A"));
         respondent1OrganisationPolicy = new OrganisationPolicy().setOrganisation(new Organisation().setOrganisationID("QWERTY R"));
-        respondent1 = PartyBuilder.builder().companyWithMinimalData().build();
+        respondent1 = new PartyBuilder().companyWithMinimalData().build();
         respondent1Represented = NO;
         claimType = ClaimType.CLINICAL_NEGLIGENCE;
         claimValue = new ClaimValue()

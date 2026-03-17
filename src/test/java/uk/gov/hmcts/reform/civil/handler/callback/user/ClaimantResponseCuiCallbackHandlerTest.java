@@ -230,11 +230,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                           .setHearingLength(ONE_DAY)
                                           .setUnavailableDatesRequired(YES)
                                           .setUnavailableDates(wrapElements(List.of(
-                                              UnavailableDate.builder()
-                                                  .date(LocalDate.of(2024, 2, 1))
-                                                  .dateAdded(LocalDate.of(2024, 1, 1))
-                                                  .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                                  .build()))));
+                                              new UnavailableDate()
+                                                  .setDate(LocalDate.of(2024, 2, 1))
+                                                  .setDateAdded(LocalDate.of(2024, 1, 1))
+                                                  .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)))));
             Respondent1DQ respondent1DQ = new Respondent1DQ()
                 .setRespondent1DQRequestedCourt(new RequestedCourt()
                                                  .setResponseCourtCode("court2")
@@ -276,12 +275,11 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(data.getApplicant1DQ().getApplicant1DQRequestedCourt().getResponseCourtCode()).isEqualTo("court1");
             assertThat(data.getCaseNameHmctsInternal()).isEqualTo(data.getApplicant1().getPartyName() + " v " + data.getRespondent1().getPartyName());
             assertThat(data.getApplicant1().getUnavailableDates()).isEqualTo(
-                wrapElements(List.of(UnavailableDate.builder()
-                                         .eventAdded("Claimant Intention Event")
-                                         .unavailableDateType(UnavailableDateType.SINGLE_DATE)
-                                         .dateAdded(now.toLocalDate())
-                                         .date(LocalDate.of(2024, 2, 1))
-                                         .build())));
+                wrapElements(List.of(new UnavailableDate()
+                                         .setEventAdded("Claimant Intention Event")
+                                         .setUnavailableDateType(UnavailableDateType.SINGLE_DATE)
+                                         .setDateAdded(now.toLocalDate())
+                                         .setDate(LocalDate.of(2024, 2, 1)))));
         }
 
         @Test
@@ -374,8 +372,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .setCcjJudgmentLipInterest(BigDecimal.valueOf(300))
                 .setCcjJudgmentAmountClaimFee(BigDecimal.valueOf(0));
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_INDIVIDUAL").build());
-            caseData.setRespondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("RESPONDENT_INDIVIDUAL").build());
+            caseData.setApplicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_INDIVIDUAL"));
+            caseData.setRespondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("RESPONDENT_INDIVIDUAL"));
             caseData.setCaseDataLiP(
                 new CaseDataLiP()
                     .setApplicant1LiPResponse(new ClaimantLiPResponse().setApplicant1ChoosesHowToProceed(
@@ -409,11 +407,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         @Test
         void shouldAddTheCaseFlagIntialiazerForClaimant() {
             CaseData caseData = CaseDataBuilder.builder().build();
-            caseData.setApplicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build());
-            caseData.setRespondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .partyName("CLAIMANT_NAME")
-                             .build());
+            caseData.setApplicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"));
+            caseData.setRespondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)
+                             .setPartyName("CLAIMANT_NAME"));
             caseData.setApplicant1DQ(new Applicant1DQ()
                               .setApplicant1DQExperts(new Experts()
                                                        .setExpertRequired(YES)
@@ -443,8 +440,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("Sri Lankan")).thenReturn("111");
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
@@ -463,8 +460,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(getSampleCourLocationsRefObject());
             when(airlineEpimsService.getEpimsIdForAirlineIgnoreCase("INVALID_AIRLINE")).thenReturn(null);
             CaseData caseData = CaseDataBuilder.builder()
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
                 .build();
             caseData.setIsFlightDelayClaim(YES);
             caseData.setResponseClaimTrack(AllocatedTrack.SMALL_CLAIM.name());
@@ -481,11 +478,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
         void shouldAddEventAndDateAddedToClaimantExpertsAndWitness() {
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder()
-                                 .type(Party.Type.INDIVIDUAL)
-                                 .partyName("CLAIMANT_NAME")
-                                 .build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party()
+                                 .setType(Party.Type.INDIVIDUAL)
+                                 .setPartyName("CLAIMANT_NAME"))
                 .applicant1DQ(new Applicant1DQ()
                                   .setApplicant1DQExperts(new Experts()
                                                            .setExpertRequired(YES)
@@ -525,11 +521,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                                     .setApplicant1SignedSettlementAgreement(YesOrNo.YES)
                                                     .setClaimantCourtDecision(RepaymentDecisionType.IN_FAVOUR_OF_CLAIMANT)))
                     .applicant1RepaymentOptionForDefendantSpec(PaymentType.IMMEDIATELY)
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                    .respondent1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("CLAIMANT_NAME")
-                            .build())
+                    .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                    .respondent1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setPartyName("CLAIMANT_NAME"))
                     .nextDeadline(LocalDate.now())
                     .build();
             given(deadlinesCalculator.getRespondentToImmediateSettlementAgreement(any())).willReturn(LocalDateTime.MAX);
@@ -551,11 +546,10 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                                     .setApplicant1LiPResponse(
                                             new ClaimantLiPResponse()
                                                     .setApplicant1SignedSettlementAgreement(YesOrNo.YES)))
-                    .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                    .respondent1(Party.builder()
-                            .type(Party.Type.INDIVIDUAL)
-                            .partyName("CLAIMANT_NAME")
-                            .build())
+                    .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                    .respondent1(new Party()
+                            .setType(Party.Type.INDIVIDUAL)
+                            .setPartyName("CLAIMANT_NAME"))
                     .build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
@@ -574,8 +568,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .willReturn(activeJudgment);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("DEFENDANT_NAME"))
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)
@@ -612,8 +606,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(featureToggleService.isWelshEnabledForMainCase()).thenReturn(true);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("DEFENDANT_NAME"))
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)
@@ -633,8 +627,8 @@ class ClaimantResponseCuiCallbackHandlerTest extends BaseCallbackHandlerTest {
             when(paymentDateService.calculatePaymentDeadline()).thenReturn(paymentDeadline);
             CaseData caseData = CaseDataBuilder.builder()
                 .applicant1ResponseDate(LocalDateTime.now())
-                .applicant1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("CLAIMANT_NAME").build())
-                .respondent1(Party.builder().type(Party.Type.INDIVIDUAL).partyName("DEFENDANT_NAME").build())
+                .applicant1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("CLAIMANT_NAME"))
+                .respondent1(new Party().setType(Party.Type.INDIVIDUAL).setPartyName("DEFENDANT_NAME"))
                 .respondent1Represented(NO)
                 .specRespondent1Represented(NO)
                 .applicant1Represented(NO)

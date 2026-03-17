@@ -744,9 +744,8 @@ class CcdClaimStatusDashboardFactoryTest {
                              .setApplicant1LiPResponse(new ClaimantLiPResponse()
                                                         .setClaimantResponseOnCourtDecision(
                                                             ClaimantResponseOnCourtDecisionType.JUDGE_REPAYMENT_DATE)))
-            .respondent1(Party.builder()
-                             .type(Party.Type.INDIVIDUAL)
-                             .build()).build();
+            .respondent1(new Party()
+                             .setType(Party.Type.INDIVIDUAL)).build();
         DashboardClaimStatus status = ccdClaimStatusDashboardFactory.getDashboardClaimStatus(new CcdDashboardClaimantClaimMatcher(
             claim, featureToggleService, Collections.emptyList()));
         assertThat(status).isEqualTo(DashboardClaimStatus.CLAIMANT_REJECTED_PAYMENT_PLAN_REQ_JUDGE_DECISION);

@@ -32,8 +32,8 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddRespondentNameAndAllocatedTrack_OneVOneScenario() {
-        Party respondent = Party.builder().type(Party.Type.INDIVIDUAL)
-            .individualFirstName("John").individualLastName("Doe").build();
+        Party respondent = new Party().setType(Party.Type.INDIVIDUAL)
+            .setIndividualFirstName("John").setIndividualLastName("Doe");
         CaseData caseData = CaseData.builder()
             .respondent1(respondent)
             .allocatedTrack(AllocatedTrack.FAST_CLAIM)
@@ -47,8 +47,8 @@ class DefendantResponseAppSolOneEmailDTOGeneratorTest {
 
     @Test
     void shouldAddCombinedRespondentNames_OneVTwoScenario() {
-        Party respondent1 = Party.builder().type(Party.Type.INDIVIDUAL).individualFirstName("Alice").individualLastName("Smith").build();
-        Party respondent2 = Party.builder().type(Party.Type.COMPANY).companyName("Beta Ltd").build();
+        Party respondent1 = new Party().setType(Party.Type.INDIVIDUAL).setIndividualFirstName("Alice").setIndividualLastName("Smith");
+        Party respondent2 = new Party().setType(Party.Type.COMPANY).setCompanyName("Beta Ltd");
 
         CaseData caseData = CaseData.builder()
             .respondent1(respondent1)

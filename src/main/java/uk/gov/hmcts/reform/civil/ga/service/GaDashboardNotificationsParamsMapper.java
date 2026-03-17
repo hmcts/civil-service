@@ -103,7 +103,8 @@ public class GaDashboardNotificationsParamsMapper {
             }
         }
 
-        if (Objects.nonNull(caseData.getJudicialDecisionRequestMoreInfo())) {
+        if (Objects.nonNull(caseData.getJudicialDecisionRequestMoreInfo())
+            && Objects.nonNull(caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate())) {
             params.put(
                 "judgeRequestMoreInfoByDate",
                 caseData.getJudicialDecisionRequestMoreInfo().getJudgeRequestMoreInfoByDate().atTime(

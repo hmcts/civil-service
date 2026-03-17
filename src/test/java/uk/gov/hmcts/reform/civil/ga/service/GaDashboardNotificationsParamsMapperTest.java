@@ -326,7 +326,7 @@ public class GaDashboardNotificationsParamsMapperTest {
 
     @Test
     void shouldNotMapDataWhenNotPresent() {
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("applicationFee"));
@@ -337,7 +337,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldMapAllParametersWhenIsRequestedForHearingScheduled() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseWorkerHearingScheduledInfo();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildCaseWorkerHearingScheduledInfo().build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertThat(result).extracting("hearingNoticeApplicationDateEn").isEqualTo("4 September 2024");
         assertThat(result).extracting("hearingNoticeApplicationDateCy").isEqualTo("4 Medi 2024");
@@ -346,7 +346,7 @@ public class GaDashboardNotificationsParamsMapperTest {
     @Test
     void shouldNotMapCaseworkerHearingDateInfoDateNotPresent() {
 
-        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData();
+        GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().buildMakePaymentsCaseData().build();
         caseData = caseData.copy().generalAppPBADetails(null).build();
         Map<String, Object> result = mapper.mapCaseDataToParams(caseData);
         assertFalse(result.containsKey("hearingNoticeApplicationDateEn"));

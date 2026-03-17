@@ -53,7 +53,7 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
 
     @Test
     void shouldReturnNoErrors_whenRespondent1AddressValid() {
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         Address address = new Address();
         address.setAddressLine1("Address line 1");
         respondent1.setPrimaryAddress(address);
@@ -82,7 +82,7 @@ class ValidateRespondentDetailsTaskTest extends BaseCallbackHandlerTest {
         address.setCounty("County line test again for more than 35 characters");
         address.setPostCode("PostCode test more than 8 characters");
         address.setPostTown("Post town line test again for more than 35 characters");
-        Party respondent1 = PartyBuilder.builder().organisation().build();
+        Party respondent1 = new PartyBuilder().organisation().build();
         respondent1.setPrimaryAddress(address);
 
         validateRespondentDetailsTask.setGetRespondent(CaseData::getRespondent1);

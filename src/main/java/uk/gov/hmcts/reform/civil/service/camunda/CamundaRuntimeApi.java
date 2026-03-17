@@ -56,6 +56,12 @@ public interface CamundaRuntimeApi {
         @RequestBody Map<String, Object> filters
     );
 
+    @GetMapping("/history/external-task-log/{incidentId}/error-details")
+    Map<String, Object> fetchErrorDetails(
+        @PathVariable("incidentId") String incidentId,
+        @RequestHeader("ServiceAuthorization") String serviceAuthorization
+    );
+
     @GetMapping("/incident")
     List<IncidentDto> getLatestOpenIncidentForProcessInstance(
         @RequestHeader("ServiceAuthorization") String serviceAuthorization,

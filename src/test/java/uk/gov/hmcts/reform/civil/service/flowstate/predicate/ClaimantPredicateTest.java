@@ -120,7 +120,7 @@ class ClaimantPredicateTest {
         @EnumSource(value = YesOrNo.class)
         void should_return_correctly_for_fullDefenceProceed_when_1v2_unspec_claim_and_applicant_will_proceed_against_one_respondent(
             YesOrNo proceed) {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()).thenReturn(proceed);
 
             if (proceed == YES) {
@@ -171,7 +171,7 @@ class ClaimantPredicateTest {
 
         @Test
         void should_return_true_for_fullDefenceNotProceed_when_1v2_unspec_claim_and_applicant_will_not_proceed_against_both_respondents() {
-            when(caseData.getRespondent2()).thenReturn(Party.builder().build());
+            when(caseData.getRespondent2()).thenReturn(new Party());
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent1MultiParty1v2()).thenReturn(NO);
             when(caseData.getApplicant1ProceedWithClaimAgainstRespondent2MultiParty1v2()).thenReturn(NO);
             assertTrue(ClaimantPredicate.fullDefenceNotProceed.test(caseData));

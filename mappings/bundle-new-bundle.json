@@ -1,0 +1,19 @@
+{
+  "name": "Bundle API - Create New Bundle",
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/new-bundle",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "bundleCreateResponse.json"
+  }
+}

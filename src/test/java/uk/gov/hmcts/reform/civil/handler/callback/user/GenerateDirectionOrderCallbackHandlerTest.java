@@ -543,7 +543,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
 
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(YES)
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
@@ -640,7 +640,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
             // Given
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                 .addRespondent2(YES)
-                .respondent2(PartyBuilder.builder().individual().build())
+                .respondent2(new PartyBuilder().individual().build())
                 .respondent2SameLegalRepresentative(NO)
                 .ccdState(CASE_PROGRESSION)
                 .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER).build();
@@ -1518,7 +1518,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addRespondent2(YES)
-                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
@@ -1536,7 +1536,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addApplicant2(YES)
-                        .applicant2(PartyBuilder.builder().individual().build())
+                        .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()
@@ -1598,7 +1598,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addRespondent2(YES)
-                        .respondent2(PartyBuilder.builder().individual().build())
+                        .respondent2(new PartyBuilder().individual().build())
                         .respondent2SameLegalRepresentative(NO)
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
@@ -1617,7 +1617,7 @@ public class GenerateDirectionOrderCallbackHandlerTest extends BaseCallbackHandl
                 Arguments.of(
                     CaseDataBuilder.builder().atStateNotificationAcknowledged().build().toBuilder()
                         .addApplicant2(YES)
-                        .applicant2(PartyBuilder.builder().individual().build())
+                        .applicant2(new PartyBuilder().individual().build())
                         .finalOrderSelection(FinalOrderSelection.ASSISTED_ORDER)
                         .finalOrderJudgeHeardFrom(toggle)
                         .finalOrderRepresentation(new FinalOrderRepresentation()

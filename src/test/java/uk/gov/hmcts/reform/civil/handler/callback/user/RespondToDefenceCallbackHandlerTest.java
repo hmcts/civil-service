@@ -243,9 +243,9 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldSetRespondentSharedClaimResponseDocumentSameSolicitorScenario_WhenAboutToStartIsInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateRespondentFullDefenceAfterNotifyClaimDetails().build();
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setAddRespondent2(YES);
-                caseData.setRespondent2(PartyBuilder.builder().individual().build());
+                caseData.setRespondent2(new PartyBuilder().individual().build());
                 caseData.setRespondent2SameLegalRepresentative(YES);
                 Document document = new Document()
                     .setDocumentUrl("url")
@@ -1423,7 +1423,7 @@ class RespondToDefenceCallbackHandlerTest extends BaseCallbackHandlerTest {
             @Test
             void shouldRemoveRespondentSharedClaimResponseDocument_whenInvoked() {
                 CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                    .respondent2(PartyBuilder.builder().individual().build())
+                    .respondent2(new PartyBuilder().individual().build())
                     .respondent2SameLegalRepresentative(YES)
                     .build();
                 caseData.setRespondentSharedClaimResponseDocument(

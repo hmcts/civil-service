@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,13 +26,15 @@ class SdoSmallClaimsOrderDefaultsServiceTest {
     private SdoDeadlineService deadlineService;
     @Mock
     private SdoFeatureToggleService featureToggleService;
+    @Mock
+    private FeatureToggleService mainFeatureToggleService;
 
     private SdoSmallClaimsOrderDefaultsService service;
 
     @BeforeEach
     void setUp() {
         SdoJourneyToggleService journeyToggleService = new SdoJourneyToggleService(featureToggleService);
-        SdoSmallClaimsNarrativeService narrativeService = new SdoSmallClaimsNarrativeService(deadlineService);
+        SdoSmallClaimsNarrativeService narrativeService = new SdoSmallClaimsNarrativeService(mainFeatureToggleService, deadlineService);
         service = new SdoSmallClaimsOrderDefaultsService(narrativeService, journeyToggleService);
 
         lenient().when(deadlineService.nextWorkingDayFromNowWeeks(anyInt()))

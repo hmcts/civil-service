@@ -72,8 +72,8 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
         when(pinInPostConfiguration.getRespondToClaimUrl()).thenReturn(RESPOND_TO_CLAIM_URL);
         when(pinInPostConfiguration.getCuiFrontEndUrl()).thenReturn(CUI_FRONT_END_URL);
         CaseData caseData = CaseData.builder()
-                .respondent1(Party.builder().companyName(RESPONDENT_NAME).type(Party.Type.COMPANY).build())
-                .applicant1(Party.builder().companyName(CLAIMANT_NAME).type(Party.Type.COMPANY).build())
+                .respondent1(new Party().setCompanyName(RESPONDENT_NAME).setType(Party.Type.COMPANY))
+                .applicant1(new Party().setCompanyName(CLAIMANT_NAME).setType(Party.Type.COMPANY))
                 .legacyCaseReference(LEGACY_CASE_REFERENCE)
                 .ccdCaseReference(CCD_CASE_REFERENCE)
                 .respondent1PinToPostLRspec(new DefendantPinToPostLRspec().setAccessCode("12346"))
@@ -102,8 +102,8 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     void shouldNotify_whenRespondentIsLiPAndEmailPresent() {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
-            .respondent1(Party.builder()
-                             .partyEmail("defendant@email.com").build())
+            .respondent1(new Party()
+                             .setPartyEmail("defendant@email.com"))
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
@@ -113,8 +113,8 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     void shouldNotNotify_whenRespondentIsNotLiP() {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.YES)
-            .respondent1(Party.builder()
-                             .partyEmail("defendant@email.com").build())
+            .respondent1(new Party()
+                             .setPartyEmail("defendant@email.com"))
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();
@@ -124,7 +124,7 @@ public class ClaimContinuingOnlineSpecDefendantEmailDTOGeneratorTest {
     void shouldNotNotify_whenRespondentEmailIsNull() {
         CaseData caseData = CaseData.builder()
             .respondent1Represented(YesOrNo.NO)
-            .respondent1(Party.builder().build())
+            .respondent1(new Party())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();

@@ -35,10 +35,10 @@ class MultiPartyScenarioTest {
 
     private static CaseData get2V1CaseData() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .addApplicant2(YesOrNo.YES)
-            .applicant2(PartyBuilder.builder().build())
+            .applicant2(new PartyBuilder().build())
             .build();
         return caseData;
     }
@@ -46,10 +46,10 @@ class MultiPartyScenarioTest {
     @Test
     void shouldReturnOneVTwoTwoRepWhenTwoRespondentsRepresentedByDifferentReps() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
             .respondent2SameLegalRepresentative(YesOrNo.NO)
-            .applicant1(PartyBuilder.builder().build())
+            .applicant1(new PartyBuilder().build())
             .build();
 
         assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_TWO_LEGAL_REP);
@@ -66,9 +66,9 @@ class MultiPartyScenarioTest {
 
     private static CaseData getOneVTwoTwoLegalRepCaseData() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .build();
         return caseData;
     }
@@ -76,11 +76,11 @@ class MultiPartyScenarioTest {
     @Test
     void shouldReturnOneVTwoOneRepWhenTwoRespondentsRepresentedBySameReps() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .applicant1(PartyBuilder.builder().build())
+            .applicant1(new PartyBuilder().build())
             .build();
 
         assertThat(getMultiPartyScenario(caseData)).isEqualTo(ONE_V_TWO_ONE_LEGAL_REP);
@@ -108,8 +108,8 @@ class MultiPartyScenarioTest {
 
     private static CaseData get1V1CaseData() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .applicant1(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .applicant1(new PartyBuilder().build())
             .build();
         return caseData;
     }
@@ -158,11 +158,11 @@ class MultiPartyScenarioTest {
 
     private static CaseData get1V2CaseData() {
         CaseData caseData = CaseData.builder()
-            .respondent1(PartyBuilder.builder().build())
-            .respondent2(PartyBuilder.builder().build())
+            .respondent1(new PartyBuilder().build())
+            .respondent2(new PartyBuilder().build())
             .addRespondent2(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.YES)
-            .applicant1(PartyBuilder.builder().build())
+            .applicant1(new PartyBuilder().build())
             .build();
         return caseData;
     }

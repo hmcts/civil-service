@@ -125,7 +125,7 @@ public class JudgementByAdmissionIssuedClaimantScenarioTest extends  DashboardBa
                                                  .label("John Doe")
                                                  .build())
                                       .build())
-            .respondent1(PartyBuilder.builder().organisation().build())
+            .respondent1(new PartyBuilder().organisation().build())
             .activeJudgment(new JudgmentDetails()
                                 .setIssueDate(LocalDate.now())
                                 .setState(JudgmentState.ISSUED)
