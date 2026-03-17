@@ -2,12 +2,10 @@ package uk.gov.hmcts.reform.civil.model.genapplication;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingDuration;
 import uk.gov.hmcts.reform.civil.enums.dq.GAHearingSupportRequirements;
@@ -52,38 +50,34 @@ public class GAHearingDetails {
     private String respondentResponsePartyName;
 
     @JsonCreator
-    GAHearingDetails(
-            @JsonProperty("hearingYesorNo") YesOrNo hearingYesorNo,
-            @JsonProperty("hearingDate") LocalDate hearingDate,
-            @JsonProperty("judgeRequiredYesOrNo") YesOrNo judgeRequiredYesOrNo,
-            @JsonProperty("judgeName") String judgeName,
-            @JsonProperty("trialRequiredYesOrNo") YesOrNo trialRequiredYesOrNo,
-            @JsonProperty("trialDateFrom") LocalDate trialDateFrom,
-            @JsonProperty("trialDateTo") LocalDate trialDateTo,
-            @JsonProperty("HearingPreferencesPreferredType")
-                    GAHearingType hearingPreferencesPreferredType,
-            @JsonProperty("TelephoneHearingPreferredType") String telephoneHearingPreferredType,
-            @JsonProperty("ReasonForPreferredHearingType") String reasonForPreferredHearingType,
-            @JsonProperty("HearingPreferredLocation") DynamicList hearingPreferredLocation,
-            @JsonProperty("HearingDetailsTelephoneNumber") String hearingDetailsTelephoneNumber,
-            @JsonProperty("HearingDetailsEmailID") String hearingDetailsEmailID,
-            @JsonProperty("HearingDuration") GAHearingDuration hearingDuration,
-            @JsonProperty("generalAppHearingDays") String generalAppHearingDays,
-            @JsonProperty("generalAppHearingHours") String generalAppHearingHours,
-            @JsonProperty("generalAppHearingMinutes") String generalAppHearingMinutes,
-            @JsonProperty("unavailableTrialRequiredYesOrNo")
-                    YesOrNo unavailableTrialRequiredYesOrNo,
-            @JsonProperty("generalAppUnavailableDates")
-                    List<Element<GAUnavailabilityDates>> generalAppUnavailableDates,
-            @JsonProperty("vulnerabilityQuestionsYesOrNo") YesOrNo vulnerabilityQuestionsYesOrNo,
-            @JsonProperty("vulnerabilityQuestion") String vulnerabilityQuestion,
-            @JsonProperty("SupportRequirement")
-                    List<GAHearingSupportRequirements> supportRequirement,
-            @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
-            @JsonProperty("SupportRequirementLanguageInterpreter")
-                    String supportRequirementLanguageInterpreter,
-            @JsonProperty("SupportRequirementOther") String supportRequirementOther,
-            @JsonProperty("respondentResponsePartyName") String respondentResponsePartyName) {
+    GAHearingDetails(@JsonProperty("hearingYesorNo") YesOrNo hearingYesorNo,
+                     @JsonProperty("hearingDate") LocalDate hearingDate,
+                     @JsonProperty("judgeRequiredYesOrNo") YesOrNo judgeRequiredYesOrNo,
+                     @JsonProperty("judgeName") String judgeName,
+                     @JsonProperty("trialRequiredYesOrNo") YesOrNo trialRequiredYesOrNo,
+                     @JsonProperty("trialDateFrom") LocalDate trialDateFrom,
+                     @JsonProperty("trialDateTo") LocalDate trialDateTo,
+                     @JsonProperty("HearingPreferencesPreferredType") GAHearingType hearingPreferencesPreferredType,
+                     @JsonProperty("TelephoneHearingPreferredType") String telephoneHearingPreferredType,
+                     @JsonProperty("ReasonForPreferredHearingType") String reasonForPreferredHearingType,
+                     @JsonProperty("HearingPreferredLocation") DynamicList hearingPreferredLocation,
+                     @JsonProperty("HearingDetailsTelephoneNumber") String hearingDetailsTelephoneNumber,
+                     @JsonProperty("HearingDetailsEmailID") String hearingDetailsEmailID,
+                     @JsonProperty("HearingDuration") GAHearingDuration hearingDuration,
+                     @JsonProperty("generalAppHearingDays") String generalAppHearingDays,
+                     @JsonProperty("generalAppHearingHours") String generalAppHearingHours,
+                     @JsonProperty("generalAppHearingMinutes") String generalAppHearingMinutes,
+                     @JsonProperty("unavailableTrialRequiredYesOrNo") YesOrNo unavailableTrialRequiredYesOrNo,
+                     @JsonProperty("generalAppUnavailableDates") List<Element<GAUnavailabilityDates>>
+                             generalAppUnavailableDates,
+                     @JsonProperty("vulnerabilityQuestionsYesOrNo") YesOrNo vulnerabilityQuestionsYesOrNo,
+                     @JsonProperty("vulnerabilityQuestion") String vulnerabilityQuestion,
+                     @JsonProperty("SupportRequirement") List<GAHearingSupportRequirements> supportRequirement,
+                     @JsonProperty("SupportRequirementSignLanguage") String supportRequirementSignLanguage,
+                     @JsonProperty("SupportRequirementLanguageInterpreter")
+                             String supportRequirementLanguageInterpreter,
+                     @JsonProperty("SupportRequirementOther") String supportRequirementOther,
+                     @JsonProperty("respondentResponsePartyName") String respondentResponsePartyName) {
         this.hearingYesorNo = hearingYesorNo;
         this.hearingDate = hearingDate;
         this.judgeRequiredYesOrNo = judgeRequiredYesOrNo;
@@ -114,31 +108,31 @@ public class GAHearingDetails {
 
     public GAHearingDetails copy() {
         return new GAHearingDetails()
-                .setHearingYesorNo(hearingYesorNo)
-                .setHearingDate(hearingDate)
-                .setJudgeRequiredYesOrNo(judgeRequiredYesOrNo)
-                .setJudgeName(judgeName)
-                .setTrialRequiredYesOrNo(trialRequiredYesOrNo)
-                .setTrialDateFrom(trialDateFrom)
-                .setTrialDateTo(trialDateTo)
-                .setHearingPreferencesPreferredType(hearingPreferencesPreferredType)
-                .setTelephoneHearingPreferredType(telephoneHearingPreferredType)
-                .setReasonForPreferredHearingType(reasonForPreferredHearingType)
-                .setHearingPreferredLocation(hearingPreferredLocation)
-                .setHearingDetailsTelephoneNumber(hearingDetailsTelephoneNumber)
-                .setHearingDetailsEmailID(hearingDetailsEmailID)
-                .setHearingDuration(hearingDuration)
-                .setGeneralAppHearingDays(generalAppHearingDays)
-                .setGeneralAppHearingHours(generalAppHearingHours)
-                .setGeneralAppHearingMinutes(generalAppHearingMinutes)
-                .setUnavailableTrialRequiredYesOrNo(unavailableTrialRequiredYesOrNo)
-                .setGeneralAppUnavailableDates(generalAppUnavailableDates)
-                .setVulnerabilityQuestionsYesOrNo(vulnerabilityQuestionsYesOrNo)
-                .setVulnerabilityQuestion(vulnerabilityQuestion)
-                .setSupportRequirement(supportRequirement)
-                .setSupportRequirementSignLanguage(supportRequirementSignLanguage)
-                .setSupportRequirementLanguageInterpreter(supportRequirementLanguageInterpreter)
-                .setSupportRequirementOther(supportRequirementOther)
-                .setRespondentResponsePartyName(respondentResponsePartyName);
+            .setHearingYesorNo(hearingYesorNo)
+            .setHearingDate(hearingDate)
+            .setJudgeRequiredYesOrNo(judgeRequiredYesOrNo)
+            .setJudgeName(judgeName)
+            .setTrialRequiredYesOrNo(trialRequiredYesOrNo)
+            .setTrialDateFrom(trialDateFrom)
+            .setTrialDateTo(trialDateTo)
+            .setHearingPreferencesPreferredType(hearingPreferencesPreferredType)
+            .setTelephoneHearingPreferredType(telephoneHearingPreferredType)
+            .setReasonForPreferredHearingType(reasonForPreferredHearingType)
+            .setHearingPreferredLocation(hearingPreferredLocation)
+            .setHearingDetailsTelephoneNumber(hearingDetailsTelephoneNumber)
+            .setHearingDetailsEmailID(hearingDetailsEmailID)
+            .setHearingDuration(hearingDuration)
+            .setGeneralAppHearingDays(generalAppHearingDays)
+            .setGeneralAppHearingHours(generalAppHearingHours)
+            .setGeneralAppHearingMinutes(generalAppHearingMinutes)
+            .setUnavailableTrialRequiredYesOrNo(unavailableTrialRequiredYesOrNo)
+            .setGeneralAppUnavailableDates(generalAppUnavailableDates)
+            .setVulnerabilityQuestionsYesOrNo(vulnerabilityQuestionsYesOrNo)
+            .setVulnerabilityQuestion(vulnerabilityQuestion)
+            .setSupportRequirement(supportRequirement)
+            .setSupportRequirementSignLanguage(supportRequirementSignLanguage)
+            .setSupportRequirementLanguageInterpreter(supportRequirementLanguageInterpreter)
+            .setSupportRequirementOther(supportRequirementOther)
+            .setRespondentResponsePartyName(respondentResponsePartyName);
     }
 }

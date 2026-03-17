@@ -241,9 +241,9 @@ public class CreateApplicationTaskHandlerTest {
                                                          YesOrNo isDocumentVisible) {
             GeneralApplication application = new GeneralApplication();
 
-            application.setGeneralAppType(new GAApplicationType()
-                                              .setTypes(singletonList(SUMMARY_JUDGEMENT))
-                                              );
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
             return application
                 .setParentClaimantIsApplicant(parentClaimantIsApplicant)
@@ -551,9 +551,9 @@ public class CreateApplicationTaskHandlerTest {
                                                          List<Element<Document>> generalAppEvidenceDocument) {
             GeneralApplication application = new GeneralApplication();
 
-            application.setGeneralAppType(new GAApplicationType()
-                                              .setTypes(singletonList(SUMMARY_JUDGEMENT))
-                                              );
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
             return application
                 .setParentClaimantIsApplicant(parentClaimantIsApplicant)
@@ -786,9 +786,9 @@ public class CreateApplicationTaskHandlerTest {
         private GeneralApplication getGeneralApplication() {
             GeneralApplication application = new GeneralApplication();
 
-            application.setGeneralAppType(new GAApplicationType()
-                                              .setTypes(singletonList(SUMMARY_JUDGEMENT))
-                                              );
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
             return application
                 .setGeneralAppInformOtherParty(new GAInformOtherParty()

@@ -1540,13 +1540,13 @@ class InitiateGeneralApplicationHandlerTest extends BaseCallbackHandlerTest {
                                           GAInformOtherParty withOrWithoutNotice) {
         GeneralApplication application = new GeneralApplication();
         if (multipleGenAppTypes) {
-            application.setGeneralAppType(new GAApplicationType()
-                                              .setTypes(Arrays.asList(EXTEND_TIME, SUMMARY_JUDGEMENT))
-                                              );
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(Arrays.asList(EXTEND_TIME, SUMMARY_JUDGEMENT))
+            );
         } else {
-            application.setGeneralAppType(new GAApplicationType()
-                                              .setTypes(singletonList(EXTEND_TIME))
-                                              );
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(EXTEND_TIME))
+            );
         }
         application
             .setGeneralAppInformOtherParty(withOrWithoutNotice)
