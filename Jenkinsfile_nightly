@@ -28,6 +28,8 @@ properties([
       description: 'The URL you want to run the full functional tests against'),
     choice(name: 'IDAM_API_URL', choices: ['https://idam-api.aat.platform.hmcts.net', 'https://idam-api.demo.platform.hmcts.net'],
       description: 'The URL of idam api'),
+    choice(name: 'IDAM_TEST_SUPPORT_API_URL', choices: ['https://idam-testing-support-api.aat.platform.hmcts.net', 'https://idam-testing-support-api.demo.platform.hmcts.net'],
+      description: 'The URL of idam test user creation api'),
     choice(name: 'DM_STORE_URL', choices: ['http://dm-store-aat.service.core-compute-aat.internal', 'http://dm-store-demo.service.core-compute-demo.internal'],
       description: 'The URL of dm store'),
     choice(name: 'SERVICE_AUTH_PROVIDER_API_BASE_URL', choices: ['http://rpe-service-auth-provider-aat.service.core-compute-aat.internal', 'http://rpe-service-auth-provider-demo.service.core-compute-demo.internal'],
@@ -111,7 +113,7 @@ def copyPreviousAllureHistory() {
         target: targetDir,
         flatten: true
       )
-      
+
       buildFound = true
       echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
@@ -132,6 +134,7 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
   env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES=params.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES
   def prNumber = params.PR_NUMBER?.trim()
@@ -153,6 +156,7 @@ withNightlyPipeline(type, product, component) {
   env.URL=frontendUrl
   env.DM_STORE_URL=params.DM_STORE_URL
   env.IDAM_API_URL=params.IDAM_API_URL
+  env.IDAM_TEST_SUPPORT_API_URL=params.IDAM_TEST_SUPPORT_API_URL
   env.SERVICE_AUTH_PROVIDER_API_BASE_URL = params.SERVICE_AUTH_PROVIDER_API_BASE_URL
   env.CCD_DATA_STORE_URL = ccdDataStoreUrl
   env.CIVIL_SERVICE_URL = civilServiceUrl
@@ -160,7 +164,6 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
-  env.FT_TYPE = "CIVIL_FT"
   env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT

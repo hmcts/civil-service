@@ -72,9 +72,9 @@ class SubmitChangesTaskTest {
         Flags applicant1Flags = new Flags();
         applicant1Flags.setPartyName("applicant1name");
         applicant1Flags.setRoleOnCase("applicant1");
-        Party applicant1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
         applicant1.setFlags(applicant1Flags);
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         Flags respondent1Flags = new Flags();
         respondent1Flags.setPartyName("respondent1name");
         respondent1Flags.setRoleOnCase("Defendant 1");
@@ -110,8 +110,8 @@ class SubmitChangesTaskTest {
         updateDetailsForm.setPartyChosen(dynamicList);
         updateDetailsForm.setPartyChosenId("123");
 
-        Party applicant1 = PartyBuilder.builder().company().build();
-        Party respondent1 = PartyBuilder.builder().company().build();
+        Party applicant1 = new PartyBuilder().company().build();
+        Party respondent1 = new PartyBuilder().company().build();
         CaseData caseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1).updateDetailsForm(updateDetailsForm).build();
         CaseData oldCaseData = CaseDataBuilder.builder().applicant1(applicant1).respondent1(respondent1).build();
         uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails = CaseDetails.builder().build();
