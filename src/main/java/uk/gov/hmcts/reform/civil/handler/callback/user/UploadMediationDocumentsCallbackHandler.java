@@ -31,6 +31,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 import static java.lang.String.format;
 import static uk.gov.hmcts.reform.civil.callback.CallbackParams.Params.BEARER_TOKEN;
@@ -73,6 +75,8 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     public static final String DEFENDANT_ONE_CATEGORY_ID = "DefendantOneMediationDocs";
 
     public static final String DEFENDANT_TWO_CATEGORY_ID = "DefendantTwoMediationDocs";
+
+    public static final String CLAIMANT_CATEGORY_SUBSTRING = "Claimant";
 
     private final CoreCaseUserService coreCaseUserService;
     private final UserService userService;
@@ -155,179 +159,126 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private void addOrUpdateDocumentsReferred(CaseData caseData,
                                               UploadMediationDocumentsForm uploadMediationDocumentsForm,
                                               String partyChosen) {
-        List<Element<MediationDocumentsReferredInStatement>> newDocumentsReferred = uploadMediationDocumentsForm.getDocumentsReferredForm();
-        switch (partyChosen) {
-            case CLAIMANT_ONE_ID:
-                List<Element<MediationDocumentsReferredInStatement>> app1MediationDocsReferred = caseData.getApp1MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getApp1MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> app1DocRefElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    CLAIMANT_ONE_CATEGORY_ID
-                );
-                app1MediationDocsReferred.addAll(app1DocRefElements);
-                caseData.setApp1MediationDocumentsReferred(app1MediationDocsReferred);
-                break;
-            case CLAIMANT_TWO_ID:
-                List<Element<MediationDocumentsReferredInStatement>> app2MediationDocsReferred = caseData.getApp2MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getApp2MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> app2DocRefElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    CLAIMANT_TWO_CATEGORY_ID
-                );
-                app2MediationDocsReferred.addAll(app2DocRefElements);
-                caseData.setApp2MediationDocumentsReferred(app2MediationDocsReferred);
-                break;
-            // 2v1 where mediation docs referred are uploaded for both app1 and app2
-            // copies the document into parties' case data so will show in both app1 and app2 folders in Case File Viewer
-            case CLAIMANTS_ID:
-                List<Element<MediationDocumentsReferredInStatement>> app1MediationDocsReferred2v1 = caseData.getApp1MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getApp1MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> app1DocRefElements2v1 = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    CLAIMANT_ONE_CATEGORY_ID
-                );
-                app1MediationDocsReferred2v1.addAll(app1DocRefElements2v1);
-                caseData.setApp1MediationDocumentsReferred(app1MediationDocsReferred2v1);
-                List<Element<MediationDocumentsReferredInStatement>> app2MediationDocsReferred1v2 = caseData.getApp2MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getApp2MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> app2DocRefElements2v1 = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    CLAIMANT_TWO_CATEGORY_ID
-                );
-                app2MediationDocsReferred1v2.addAll(app2DocRefElements2v1);
-                caseData.setApp2MediationDocumentsReferred(app2MediationDocsReferred1v2);
-                break;
-            case DEFENDANT_ONE_ID:
-                List<Element<MediationDocumentsReferredInStatement>> res1MediationDocsReferred = caseData.getRes1MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getRes1MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> res1DocRefElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    DEFENDANT_ONE_CATEGORY_ID
-                );
-                res1MediationDocsReferred.addAll(res1DocRefElements);
-                caseData.setRes1MediationDocumentsReferred(res1MediationDocsReferred);
-                break;
-
-            case DEFENDANT_TWO_ID:
-                List<Element<MediationDocumentsReferredInStatement>> res2MediationDocsReferred = caseData.getRes2MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getRes2MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> res2DocRefElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    DEFENDANT_TWO_CATEGORY_ID
-                );
-                res2MediationDocsReferred.addAll(res2DocRefElements);
-                caseData.setRes2MediationDocumentsReferred(res2MediationDocsReferred);
-                break;
-            // 1v2SS where mediation docs referred are uploaded for both res1 and res2
-            // copies the document into both parties' case data so will show in both res1 and res2 folders in Case File Viewer
-            case DEFENDANTS_ID:
-                List<Element<MediationDocumentsReferredInStatement>> res1MediationDocsReferred1v2SS = caseData.getRes1MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getRes1MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> res1DocRefElements1v2SS = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    DEFENDANT_ONE_CATEGORY_ID
-                );
-                res1MediationDocsReferred1v2SS.addAll(res1DocRefElements1v2SS);
-                caseData.setRes1MediationDocumentsReferred(res1MediationDocsReferred1v2SS);
-                List<Element<MediationDocumentsReferredInStatement>> res2MediationDocsReferred1v2SS = caseData.getRes2MediationDocumentsReferred() == null
-                    ? new ArrayList<>() : caseData.getRes2MediationDocumentsReferred();
-                List<Element<MediationDocumentsReferredInStatement>> res2DocRefElements1v2SS = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationDocRef(
-                    newDocumentsReferred,
-                    DEFENDANT_TWO_CATEGORY_ID
-                );
-                res2MediationDocsReferred1v2SS.addAll(res2DocRefElements1v2SS);
-                caseData.setRes2MediationDocumentsReferred(res2MediationDocsReferred1v2SS);
-                break;
-            default: throw new CallbackException(INVALID_PARTY_OPTION);
-        }
+        addOrUpdateMediationDocuments(
+            caseData,
+            partyChosen,
+            uploadMediationDocumentsForm.getDocumentsReferredForm(),
+            assignCategoryId::copyCaseDocumentListWithCategoryIdMediationDocRef,
+            this::getMediationDocumentsReferred,
+            this::setMediationDocumentsReferred
+        );
     }
 
     private void addOrUpdateNonAttendanceStatements(CaseData caseData,
                                                     UploadMediationDocumentsForm uploadMediationDocumentsForm,
                                                     String partyChosen) {
-        List<Element<MediationNonAttendanceStatement>> newNonAttendanceDocs = uploadMediationDocumentsForm.getNonAttendanceStatementForm();
-        switch (partyChosen) {
-            case CLAIMANT_ONE_ID:
-                List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs = caseData.getApp1MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getApp1MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> app1NonAttElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    CLAIMANT_ONE_CATEGORY_ID
-                );
-                app1MediationNonAttendanceDocs.addAll(app1NonAttElements);
-                caseData.setApp1MediationNonAttendanceDocs(app1MediationNonAttendanceDocs);
-                break;
-            case CLAIMANT_TWO_ID:
-                List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs = caseData.getApp2MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getApp2MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> app2NonAttElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    CLAIMANT_TWO_CATEGORY_ID
-                );
-                app2MediationNonAttendanceDocs.addAll(app2NonAttElements);
-                caseData.setApp2MediationNonAttendanceDocs(app2MediationNonAttendanceDocs);
-                break;
-            // 2v1 where mediation non-attendance docs are uploaded for both app1 and app2
-            // copies the document into parties' case data so will show in both app1 and app2 folders in Case File Viewer
-            case CLAIMANTS_ID:
-                List<Element<MediationNonAttendanceStatement>> app1MediationNonAttendanceDocs1v2 = caseData.getApp1MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getApp1MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> app1NonAttElements2v1 = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    CLAIMANT_ONE_CATEGORY_ID
-                );
-                app1MediationNonAttendanceDocs1v2.addAll(app1NonAttElements2v1);
-                caseData.setApp1MediationNonAttendanceDocs(app1MediationNonAttendanceDocs1v2);
-                List<Element<MediationNonAttendanceStatement>> app2MediationNonAttendanceDocs1v2 = caseData.getApp2MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getApp2MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> app2NonAttElements2v1 = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    CLAIMANT_TWO_CATEGORY_ID
-                );
-                app2MediationNonAttendanceDocs1v2.addAll(app2NonAttElements2v1);
-                caseData.setApp2MediationNonAttendanceDocs(app2MediationNonAttendanceDocs1v2);
-                break;
-            case DEFENDANT_ONE_ID:
-                List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs = caseData.getRes1MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getRes1MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> res1NonAttElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    DEFENDANT_ONE_CATEGORY_ID
-                );
-                res1MediationNonAttendanceDocs.addAll(res1NonAttElements);
-                caseData.setRes1MediationNonAttendanceDocs(res1MediationNonAttendanceDocs);
-                break;
-            case DEFENDANT_TWO_ID:
-                List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs = caseData.getRes2MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getRes2MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> res2NonAttElements = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    DEFENDANT_TWO_CATEGORY_ID
-                );
-                res2MediationNonAttendanceDocs.addAll(res2NonAttElements);
-                caseData.setRes2MediationNonAttendanceDocs(res2MediationNonAttendanceDocs);
-                break;
-            // 1v2SS where mediation non-attendance docs are uploaded for both res1 and res2
-            // copies the document into both parties' case data so will show in both res1 and res2 folders in Case File Viewer
-            case DEFENDANTS_ID:
-                List<Element<MediationNonAttendanceStatement>> res1MediationNonAttendanceDocs1v2SS = caseData.getRes1MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getRes1MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> res1NonAttElements1v2SS = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    DEFENDANT_ONE_CATEGORY_ID
-                );
-                res1MediationNonAttendanceDocs1v2SS.addAll(res1NonAttElements1v2SS);
-                caseData.setRes1MediationNonAttendanceDocs(res1MediationNonAttendanceDocs1v2SS);
-                List<Element<MediationNonAttendanceStatement>> res2MediationNonAttendanceDocs1v2SS = caseData.getRes2MediationNonAttendanceDocs() == null
-                    ? new ArrayList<>() : caseData.getRes2MediationNonAttendanceDocs();
-                List<Element<MediationNonAttendanceStatement>> res2NonAttElements1v2SS = assignCategoryId.copyCaseDocumentListWithCategoryIdMediationNonAtt(
-                    newNonAttendanceDocs,
-                    DEFENDANT_TWO_CATEGORY_ID
-                );
-                res2MediationNonAttendanceDocs1v2SS.addAll(res2NonAttElements1v2SS);
-                caseData.setRes2MediationNonAttendanceDocs(res2MediationNonAttendanceDocs1v2SS);
-                break;
-            default: throw new CallbackException(INVALID_PARTY_OPTION);
+        addOrUpdateMediationDocuments(
+            caseData,
+            partyChosen,
+            uploadMediationDocumentsForm.getNonAttendanceStatementForm(),
+            assignCategoryId::copyCaseDocumentListWithCategoryIdMediationNonAtt,
+            this::getNonAttendanceStatements,
+            this::setNonAttendanceStatements
+        );
+    }
+
+    private <T> void addOrUpdateMediationDocuments(CaseData caseData,
+                                                   String partyChosen,
+                                                   List<Element<T>> newDocuments,
+                                                   java.util.function.BiFunction<List<Element<T>>, String, List<Element<T>>> copyFunction,
+                                                   Function<PartyInfo, List<Element<T>>> getFunction,
+                                                   BiConsumer<PartyInfo, List<Element<T>>> setFunction) {
+        List<PartyInfo> targetParties = getTargetParties(caseData, partyChosen);
+        for (PartyInfo partyInfo : targetParties) {
+            List<Element<T>> existingDocuments = getFunction.apply(partyInfo);
+            if (existingDocuments == null) {
+                existingDocuments = new ArrayList<>();
+            }
+            List<Element<T>> newElements = copyFunction.apply(newDocuments, partyInfo.categoryId());
+            existingDocuments.addAll(newElements);
+            setFunction.accept(partyInfo, existingDocuments);
+        }
+    }
+
+    private record PartyInfo(CaseData caseData, String categoryId, int partyNumber) {}
+
+    private List<PartyInfo> getTargetParties(CaseData caseData, String partyChosen) {
+        return switch (partyChosen) {
+            case CLAIMANT_ONE_ID -> List.of(new PartyInfo(caseData, CLAIMANT_ONE_CATEGORY_ID, 1));
+            case CLAIMANT_TWO_ID -> List.of(new PartyInfo(caseData, CLAIMANT_TWO_CATEGORY_ID, 2));
+            case CLAIMANTS_ID -> List.of(
+                new PartyInfo(caseData, CLAIMANT_ONE_CATEGORY_ID, 1),
+                new PartyInfo(caseData, CLAIMANT_TWO_CATEGORY_ID, 2)
+            );
+            case DEFENDANT_ONE_ID -> List.of(new PartyInfo(caseData, DEFENDANT_ONE_CATEGORY_ID, 1));
+            case DEFENDANT_TWO_ID -> List.of(new PartyInfo(caseData, DEFENDANT_TWO_CATEGORY_ID, 2));
+            case DEFENDANTS_ID -> List.of(
+                new PartyInfo(caseData, DEFENDANT_ONE_CATEGORY_ID, 1),
+                new PartyInfo(caseData, DEFENDANT_TWO_CATEGORY_ID, 2)
+            );
+            default -> throw new CallbackException(INVALID_PARTY_OPTION);
+        };
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<Element<T>> getMediationDocumentsReferred(PartyInfo partyInfo) {
+        CaseData caseData = partyInfo.caseData();
+        if (partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING)) {
+            return (List<Element<T>>) (Object) (partyInfo.partyNumber() == 1
+                ? caseData.getApp1MediationDocumentsReferred() : caseData.getApp2MediationDocumentsReferred());
+        } else {
+            return (List<Element<T>>) (Object) (partyInfo.partyNumber() == 1
+                ? caseData.getRes1MediationDocumentsReferred() : caseData.getRes2MediationDocumentsReferred());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void setMediationDocumentsReferred(PartyInfo partyInfo, List<Element<T>> documents) {
+        CaseData caseData = partyInfo.caseData();
+        List<Element<MediationDocumentsReferredInStatement>> docs = (List<Element<MediationDocumentsReferredInStatement>>) (Object) documents;
+        if (partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING)) {
+            if (partyInfo.partyNumber() == 1) {
+                caseData.setApp1MediationDocumentsReferred(docs);
+            } else {
+                caseData.setApp2MediationDocumentsReferred(docs);
+            }
+        } else {
+            if (partyInfo.partyNumber() == 1) {
+                caseData.setRes1MediationDocumentsReferred(docs);
+            } else {
+                caseData.setRes2MediationDocumentsReferred(docs);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> List<Element<T>> getNonAttendanceStatements(PartyInfo partyInfo) {
+        CaseData caseData = partyInfo.caseData();
+        if (partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING)) {
+            return (List<Element<T>>) (Object) (partyInfo.partyNumber() == 1
+                ? caseData.getApp1MediationNonAttendanceDocs() : caseData.getApp2MediationNonAttendanceDocs());
+        } else {
+            return (List<Element<T>>) (Object) (partyInfo.partyNumber() == 1
+                ? caseData.getRes1MediationNonAttendanceDocs() : caseData.getRes2MediationNonAttendanceDocs());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void setNonAttendanceStatements(PartyInfo partyInfo, List<Element<T>> documents) {
+        CaseData caseData = partyInfo.caseData();
+        List<Element<MediationNonAttendanceStatement>> docs = (List<Element<MediationNonAttendanceStatement>>) (Object) documents;
+        if (partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING)) {
+            if (partyInfo.partyNumber() == 1) {
+                caseData.setApp1MediationNonAttendanceDocs(docs);
+            } else {
+                caseData.setApp2MediationNonAttendanceDocs(docs);
+            }
+        } else {
+            if (partyInfo.partyNumber() == 1) {
+                caseData.setRes1MediationNonAttendanceDocs(docs);
+            } else {
+                caseData.setRes2MediationNonAttendanceDocs(docs);
+            }
         }
     }
 
