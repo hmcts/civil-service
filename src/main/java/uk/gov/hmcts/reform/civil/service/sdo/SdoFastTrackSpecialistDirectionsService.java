@@ -28,8 +28,10 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DEFENDANT_UPLOAD_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_DISCLOSURE_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_PARTIES_LIAISE;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO;
+import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CREDIT_HIRE_WITNESS_LIMIT_SDO;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_CLAIMANT_INSTRUCTION;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.HOUSING_SCHEDULE_COLUMNS_SDO;
@@ -110,9 +112,9 @@ public class SdoFastTrackSpecialistDirectionsService {
     private FastTrackCreditHire buildFastTrackCreditHire() {
         return new FastTrackCreditHire()
             .setInput1(CREDIT_HIRE_DISCLOSURE_SDO)
-            .setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO)
+            .setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK)
             .setDate1(deadlineService.nextWorkingDayFromNowWeeks(4))
-            .setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO)
+            .setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK)
             .setInput4(CREDIT_HIRE_PARTIES_LIAISE)
             .setDate2(deadlineService.nextWorkingDayFromNowWeeks(6))
             .setInput5(CREDIT_HIRE_BASIC_RATE_EVIDENCE_WITH_LIABILITY)

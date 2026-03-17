@@ -202,10 +202,19 @@ public final class DirectionsOrderSpecialistTextLibrary {
                     The claimant must upload to the Digital Portal a witness statement addressing
                     a) the need to hire a replacement vehicle; and
                     b) impecuniosity""";
+    public static final String CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK =
+        """
+                The Claimant’s witness statement must address, if relied upon, evidence in support of
+                a) need to hire a replacement vehicle; and
+                b) impecuniosity.""";
     public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO =
         "A failure to comply with the paragraph above will result in the claimant being debarred from asserting "
             + "need or relying on impecuniosity as the case may be at the final hearing, "
             + "save with permission of the Trial Judge.";
+    public static final String CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK =
+        "A failure to comply with the above paragraphs providing for disclosure and witness evidence on the issues "
+            + "of need and impecuniosity will result in the claimant being debarred from asserting need or relying on "
+            + "impecuniosity as the case may be at the final hearing, save with permission of the Trial Judge.";
     public static final String CREDIT_HIRE_PARTIES_LIAISE =
         "The parties are to liaise and use reasonable endeavours to agree the basic hire rate no later than 4pm on";
     public static final String CREDIT_HIRE_CLAIMANT_EVIDENCE_SDO =
