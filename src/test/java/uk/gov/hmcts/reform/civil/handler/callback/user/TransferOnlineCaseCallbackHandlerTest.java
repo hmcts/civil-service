@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.civil.handler.callback.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse
 import uk.gov.hmcts.reform.ccd.client.model.SubmittedCallbackResponse;
 import uk.gov.hmcts.reform.civil.callback.CallbackParams;
 import uk.gov.hmcts.reform.civil.callback.CaseEvent;
-import uk.gov.hmcts.reform.civil.enums.RespondentResponseTypeSpec;
 import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.handler.callback.BaseCallbackHandlerTest;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -88,15 +88,12 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             assertThat(response.getData())
                 .extracting("transferCourtLocationList")
                 .extracting("list_items")
-                .asList().hasSize(4);
+                .asInstanceOf(InstanceOfAssertFactories.LIST).hasSize(4);
         }
 
         @Test
         void shouldHandleNullCaseManagementLocation() {
             // Covering line 176 and 171
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(null).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-court-location");
 
             LocationRefData locationRefData = new LocationRefData();
             locationRefData.setEpimmsId("111");
@@ -107,6 +104,9 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(locationRefData);
 
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseManagementLocation(null).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-court-location");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
@@ -117,9 +117,6 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             CaseLocationCivil caseLocation = new CaseLocationCivil();
             caseLocation.setRegion("2");
             caseLocation.setBaseLocation("999"); // EpimmsId that doesn't exist in sample data
-            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
-                .caseManagementLocation(caseLocation).build();
-            CallbackParams params = callbackParamsOf(caseData, MID, "validate-court-location");
 
             LocationRefData locationRefData = new LocationRefData();
             locationRefData.setEpimmsId("111");
@@ -130,6 +127,9 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
             given(courtLocationUtils.findPreferredLocationData(any(), any()))
                 .willReturn(locationRefData);
 
+            CaseData caseData = CaseDataBuilder.builder().atStateApplicantRespondToDefenceAndProceed()
+                .caseManagementLocation(caseLocation).build();
+            CallbackParams params = callbackParamsOf(caseData, MID, "validate-court-location");
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             assertThat(response.getErrors()).isEmpty();
         }
@@ -547,8 +547,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(caseLocation)
                 .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            handler.handle(params);
             verify(updateWaCourtLocationsService).updateCourtListingWALocations(any(), any());
         }
 
@@ -577,8 +576,7 @@ class TransferOnlineCaseCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .caseManagementLocation(caseLocation)
                 .transferCourtLocationList(transferCourtList).build();
             CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
-            var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
-
+            handler.handle(params);
             verifyNoInteractions(updateWaCourtLocationsService);
         }
     }
