@@ -376,8 +376,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 List<MediationNonAttendanceStatement> actual = unwrapElements(updatedData.getApp1MediationNonAttendanceDocs());
 
                 assertThat(updatedData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
-                assertThat(actual).hasSize(1);
-                assertThat(actual).containsExactly(getExpectedMediationNonattendanceDocOne(APP1_CATEGORY_ID));
+                assertThat(actual)
+                    .hasSize(1)
+                    .containsExactly(getExpectedMediationNonattendanceDocOne(APP1_CATEGORY_ID));
 
                 // Run event again adding second document
                 UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(
@@ -394,8 +395,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 actual = unwrapElements(updatedData.getApp1MediationNonAttendanceDocs());
 
                 assertThat(secondEventData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
-                assertThat(actual).hasSize(2);
-                assertThat(actual).containsExactly(getExpectedMediationNonattendanceDocOne(APP1_CATEGORY_ID), getExpectedMediationNonattendanceDocTwo(APP1_CATEGORY_ID));
+                assertThat(actual)
+                    .hasSize(2)
+                    .containsExactly(getExpectedMediationNonattendanceDocOne(APP1_CATEGORY_ID), getExpectedMediationNonattendanceDocTwo(APP1_CATEGORY_ID));
             }
 
             @Test
@@ -412,8 +414,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                 List<MediationNonAttendanceStatement> actual = unwrapElements(updatedData.getApp2MediationNonAttendanceDocs());
 
                 assertThat(updatedData.getUploadMediationDocumentsForm()).isEqualTo(EXPECTED_FORM);
-                assertThat(actual).hasSize(1);
-                assertThat(actual).containsExactly(getExpectedMediationNonattendanceDocOne(APP2_CATEGORY_ID));
+                assertThat(actual)
+                    .hasSize(1)
+                    .containsExactly(getExpectedMediationNonattendanceDocOne(APP2_CATEGORY_ID));
 
                 // Run event again adding second document
                 UploadMediationDocumentsForm uploadMediationDocumentsForm = buildSecondMediationNonattendanceDoc(

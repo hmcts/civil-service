@@ -86,6 +86,11 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
     private final UploadMediationService uploadMediationService;
 
     @Override
+    public List<CaseEvent> handledEvents() {
+        return EVENTS;
+    }
+
+    @Override
     protected Map<String, Callback> callbacks() {
         return Map.of(
             callbackKey(ABOUT_TO_START), this::emptyCallbackResponse,
@@ -117,28 +122,47 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
             addSameSolicitorDefendantOptions(dynamicListOptions, caseData);
         }
 
-        UploadMediationDocumentsForm form = new UploadMediationDocumentsForm();
-        form.setUploadMediationDocumentsPartyChosen(DynamicList.fromDynamicListElementList(dynamicListOptions));
-        caseData.setUploadMediationDocumentsForm(form);
+        UploadMediationDocumentsForm mediationForm = new UploadMediationDocumentsForm();
+        mediationForm.setUploadMediationDocumentsPartyChosen(DynamicList.fromDynamicListElementList(dynamicListOptions));
+        caseData.setUploadMediationDocumentsForm(mediationForm);
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
             .build();
     }
 
-    private CallbackResponse submitData(CallbackParams callbackParams) {
+    private CallbackResponse validateDocumentDate(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
-        UploadMediationDocumentsForm uploadMediationDocumentsForm = caseData.getUploadMediationDocumentsForm();
+        List<String> errors = new ArrayList<>();
+        UploadMediationDocumentsForm mediationForm = caseData.getUploadMediationDocumentsForm();
+        List<MediationDocumentsType> selectedDocumentTypes = mediationForm.getMediationDocumentsType();
 
-        String partyChosen = uploadMediationDocumentsForm.getUploadMediationDocumentsPartyChosen().getValue().getCode();
-        List<MediationDocumentsType> documentsType = uploadMediationDocumentsForm.getMediationDocumentsType();
-
-        if (documentsType.contains(NON_ATTENDANCE_STATEMENT)) {
-            addOrUpdateNonAttendanceStatements(caseData, uploadMediationDocumentsForm, partyChosen);
+        if (selectedDocumentTypes.contains(NON_ATTENDANCE_STATEMENT) && mediationForm.getNonAttendanceStatementForm() != null) {
+            mediationForm.getNonAttendanceStatementForm().forEach(e -> validateDateIsNotInFuture(errors, e.getValue().getDocumentDate()));
         }
 
-        if (documentsType.contains(REFERRED_DOCUMENTS)) {
-            addOrUpdateDocumentsReferred(caseData, uploadMediationDocumentsForm, partyChosen);
+        if (selectedDocumentTypes.contains(REFERRED_DOCUMENTS) && mediationForm.getDocumentsReferredForm() != null) {
+            mediationForm.getDocumentsReferredForm().forEach(e -> validateDateIsNotInFuture(errors, e.getValue().getDocumentDate()));
+        }
+
+        return AboutToStartOrSubmitCallbackResponse.builder()
+            .errors(errors.isEmpty() ? null : errors)
+            .build();
+    }
+
+    private CallbackResponse submitData(CallbackParams callbackParams) {
+        CaseData caseData = callbackParams.getCaseData();
+        UploadMediationDocumentsForm mediationForm = caseData.getUploadMediationDocumentsForm();
+
+        String partyChosen = mediationForm.getUploadMediationDocumentsPartyChosen().getValue().getCode();
+        List<MediationDocumentsType> selectedDocumentTypes = mediationForm.getMediationDocumentsType();
+
+        if (selectedDocumentTypes.contains(NON_ATTENDANCE_STATEMENT)) {
+            addNonAttendanceStatements(caseData, mediationForm, partyChosen);
+        }
+
+        if (selectedDocumentTypes.contains(REFERRED_DOCUMENTS)) {
+            addReferredDocuments(caseData, mediationForm, partyChosen);
         }
 
         // clear form
@@ -151,33 +175,42 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
             .build();
     }
 
-    private void addOrUpdateDocumentsReferred(CaseData caseData,
-                                              UploadMediationDocumentsForm uploadMediationDocumentsForm,
+    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
+        String body = "<br /> %n%n You can continue uploading documents or return later. To upload more documents, go to Next steps and select 'Document upload'.";
+
+        return SubmittedCallbackResponse.builder()
+            .confirmationHeader("# Documents uploaded")
+            .confirmationBody(format(body))
+            .build();
+    }
+
+    private void addReferredDocuments(CaseData caseData,
+                                              UploadMediationDocumentsForm mediationForm,
                                               String partyChosen) {
-        addOrUpdateMediationDocuments(
+        processMediationDocuments(
             caseData,
             partyChosen,
-            uploadMediationDocumentsForm.getDocumentsReferredForm(),
+            mediationForm.getDocumentsReferredForm(),
             assignCategoryId::copyCaseDocumentListWithCategoryIdMediationDocRef,
-            this::getMediationDocumentsReferred,
-            this::setMediationDocumentsReferred
+            this::fetchReferredDocuments,
+            this::storeReferredDocuments
         );
     }
 
-    private void addOrUpdateNonAttendanceStatements(CaseData caseData,
-                                                    UploadMediationDocumentsForm uploadMediationDocumentsForm,
+    private void addNonAttendanceStatements(CaseData caseData,
+                                                    UploadMediationDocumentsForm mediationForm,
                                                     String partyChosen) {
-        addOrUpdateMediationDocuments(
+        processMediationDocuments(
             caseData,
             partyChosen,
-            uploadMediationDocumentsForm.getNonAttendanceStatementForm(),
+            mediationForm.getNonAttendanceStatementForm(),
             assignCategoryId::copyCaseDocumentListWithCategoryIdMediationNonAtt,
-            this::getNonAttendanceStatements,
-            this::setNonAttendanceStatements
+            this::fetchNonAttendanceStatements,
+            this::storeNonAttendanceStatements
         );
     }
 
-    private <T> void addOrUpdateMediationDocuments(CaseData caseData,
+    private <T> void processMediationDocuments(CaseData caseData,
                                                    String partyChosen,
                                                    List<Element<T>> newDocuments,
                                                    java.util.function.BiFunction<List<Element<T>>, String, List<Element<T>>> copyFunction,
@@ -215,7 +248,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         };
     }
 
-    private List<Element<MediationDocumentsReferredInStatement>> getMediationDocumentsReferred(PartyInfo partyInfo) {
+    private List<Element<MediationDocumentsReferredInStatement>> fetchReferredDocuments(PartyInfo partyInfo) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
         boolean isParty1 = partyInfo.partyNumber() == 1;
@@ -226,7 +259,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         return isParty1 ? data.getRes1MediationDocumentsReferred() : data.getRes2MediationDocumentsReferred();
     }
 
-    private void setMediationDocumentsReferred(PartyInfo partyInfo, List<Element<MediationDocumentsReferredInStatement>> docs) {
+    private void storeReferredDocuments(PartyInfo partyInfo, List<Element<MediationDocumentsReferredInStatement>> docs) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
         boolean isParty1 = partyInfo.partyNumber() == 1;
@@ -246,7 +279,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         }
     }
 
-    private List<Element<MediationNonAttendanceStatement>> getNonAttendanceStatements(PartyInfo partyInfo) {
+    private List<Element<MediationNonAttendanceStatement>> fetchNonAttendanceStatements(PartyInfo partyInfo) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
         boolean isParty1 = partyInfo.partyNumber() == 1;
@@ -257,7 +290,7 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         return isParty1 ? data.getRes1MediationNonAttendanceDocs() : data.getRes2MediationNonAttendanceDocs();
     }
 
-    private void setNonAttendanceStatements(PartyInfo partyInfo, List<Element<MediationNonAttendanceStatement>> docs) {
+    private void storeNonAttendanceStatements(PartyInfo partyInfo, List<Element<MediationNonAttendanceStatement>> docs) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
         boolean isParty1 = partyInfo.partyNumber() == 1;
@@ -277,42 +310,9 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         }
     }
 
-    private CallbackResponse validateDocumentDate(CallbackParams callbackParams) {
-        CaseData caseData = callbackParams.getCaseData();
-        List<String> errors = new ArrayList<>();
-        UploadMediationDocumentsForm form = caseData.getUploadMediationDocumentsForm();
-        List<MediationDocumentsType> documentsType = form.getMediationDocumentsType();
-
-        if (documentsType.contains(NON_ATTENDANCE_STATEMENT) && form.getNonAttendanceStatementForm() != null) {
-            form.getNonAttendanceStatementForm().forEach(e -> isDocumentDateInFuture(errors, e.getValue().getDocumentDate()));
-        }
-
-        if (documentsType.contains(REFERRED_DOCUMENTS) && form.getDocumentsReferredForm() != null) {
-            form.getDocumentsReferredForm().forEach(e -> isDocumentDateInFuture(errors, e.getValue().getDocumentDate()));
-        }
-
-        return AboutToStartOrSubmitCallbackResponse.builder()
-            .errors(errors.isEmpty() ? null : errors)
-            .build();
-    }
-
-    private SubmittedCallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        String body = "<br /> %n%n You can continue uploading documents or return later. To upload more documents, go to Next steps and select 'Document upload'.";
-
-        return SubmittedCallbackResponse.builder()
-            .confirmationHeader("# Documents uploaded")
-            .confirmationBody(format(body))
-            .build();
-    }
-
-    private void isDocumentDateInFuture(List<String> errors, LocalDate date) {
+    private void validateDateIsNotInFuture(List<String> errors, LocalDate date) {
         if (time.now().toLocalDate().isBefore(date)) {
             errors.add(DOC_DATE_IN_FUTURE);
         }
-    }
-
-    @Override
-    public List<CaseEvent> handledEvents() {
-        return EVENTS;
     }
 }
