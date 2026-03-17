@@ -116,7 +116,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
         [DEFENDANT] IF YOU DO NOT COMPLY WITH THIS ORDER YOU MAY BE HELD IN CONTEMPT OF COURT AND PUNISHED BY A FINE, \
         IMPRISONMENT, CONFISCATION OF ASSETS OR OTHER PUNISHMENT UNDER THE LAW.
 
-        A penal notice against the Defendant is attached to paragraph X below.""";
+        A penal notice against the [DEFENDANT] is attached to paragraph X below.""";
     public static final String HEADER = "## Your order has been issued \n ### Case number \n ### #%s";
     public static final String BODY_1_V_1 = """
     The order has been sent to:
