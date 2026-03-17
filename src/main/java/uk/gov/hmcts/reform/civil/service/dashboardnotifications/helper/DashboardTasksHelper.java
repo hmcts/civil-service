@@ -6,12 +6,18 @@ import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.dashboard.services.DashboardNotificationService;
 import uk.gov.hmcts.reform.dashboard.services.TaskListService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class DashboardTasksHelper {
 
     private final TaskListService taskListService;
     private final FeatureToggleService featureToggleService;
     private final DashboardNotificationService dashboardNotificationService;
+
+    private static final String APPLICATIONS = "Applications";
 
     public DashboardTasksHelper(TaskListService taskListService,
                                 FeatureToggleService featureToggleService,
@@ -21,32 +27,48 @@ public class DashboardTasksHelper {
         this.dashboardNotificationService = dashboardNotificationService;
     }
 
-    public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT");
+    public void deleteNotificationAndInactiveTasksForClaimant(CaseData caseData, String... excludeCategory) {
+        deleteNotificationAndInactiveTasksForRole(caseData, "CLAIMANT", excludeCategory);
     }
 
-    public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData) {
-        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT");
+    public void deleteNotificationAndInactiveTasksForDefendant(CaseData caseData, String... excludeCategories) {
+        deleteNotificationAndInactiveTasksForRole(caseData, "DEFENDANT", excludeCategories);
     }
 
-    private void deleteNotificationAndInactiveTasksForRole(CaseData caseData, String citizenRole) {
-        dashboardNotificationService.deleteByReferenceAndCitizenRole(
-            caseData.getCcdCaseReference().toString(),
-            citizenRole
-        );
+    private void deleteNotificationAndInactiveTasksForRole(
+        CaseData caseData,
+        String citizenRole,
+        String... excludeCategories) {
+
+        String caseReference = caseData.getCcdCaseReference().toString();
+
+        dashboardNotificationService.deleteByReferenceAndCitizenRole(caseReference, citizenRole);
+
+        List<String> categories = buildCategories(caseData, excludeCategories);
+
+        if (categories.isEmpty()) {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(caseReference, citizenRole);
+        } else {
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+                caseReference,
+                citizenRole,
+                categories.toArray(new String[0])
+            );
+        }
+    }
+
+    private List<String> buildCategories(CaseData caseData, String... excludeCategories) {
+        List<String> categories = new ArrayList<>();
+
+        if (excludeCategories != null) {
+            categories.addAll(Arrays.asList(excludeCategories));
+        }
 
         if (featureToggleService.isLocationWhiteListed(caseData.getCaseManagementLocation().getBaseLocation())
             || featureToggleService.isCuiGaNroEnabled()) {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
-                caseData.getCcdCaseReference().toString(),
-                citizenRole,
-                "Applications"
-            );
-        } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
-                caseData.getCcdCaseReference().toString(),
-                citizenRole
-            );
+            categories.add(APPLICATIONS);
         }
+
+        return categories;
     }
 }

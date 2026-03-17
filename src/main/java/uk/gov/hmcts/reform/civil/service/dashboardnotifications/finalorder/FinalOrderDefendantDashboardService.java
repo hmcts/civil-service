@@ -37,7 +37,7 @@ public class FinalOrderDefendantDashboardService extends DashboardScenarioServic
     @Override
     protected String getScenario(CaseData caseData) {
 
-        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData);
+        dashboardTasksHelper.deleteNotificationAndInactiveTasksForDefendant(caseData, HEARING_TASK_CATEGORY);
 
         final String scenario;
 

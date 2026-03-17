@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_DASHBOARD_CLAIMANT_TASK_LIST_UPLOAD_DOCUMENTS_FINAL_ORDERS;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.dashboardnotifications.DashboardScenarios.SCENARIO_AAA6_UPDATE_TASK_LIST_TRIAL_READY_FINALS_ORDERS_CLAIMANT;
+import static uk.gov.hmcts.reform.civil.service.dashboardnotifications.DashboardScenarioService.HEARING_TASK_CATEGORY;
 
 @ExtendWith(MockitoExtension.class)
 class FinalOrderClaimantDashboardServiceTest {
@@ -63,7 +64,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -87,7 +88,7 @@ class FinalOrderClaimantDashboardServiceTest {
             caseData.getCcdCaseReference().toString(),
             ScenarioRequestParams.builder().params(scenarioParams).build()
         );
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -102,7 +103,7 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -118,7 +119,7 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData, HEARING_TASK_CATEGORY);
     }
 
     @Test
@@ -135,6 +136,6 @@ class FinalOrderClaimantDashboardServiceTest {
         finalOrderClaimantDashboardService.notifyFinalOrder(caseData, AUTH_TOKEN);
 
         verifyNoInteractions(dashboardScenariosService);
-        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForDefendant(caseData);
+        verify(dashboardTasksHelper).deleteNotificationAndInactiveTasksForClaimant(caseData, HEARING_TASK_CATEGORY);
     }
 }

@@ -44,14 +44,13 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
 
     private final ObjectMapper objectMapper;
     protected final WorkingDayIndicator workingDayIndicator;
-    private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
+        private static final List<CaseEvent> EVENTS = List.of(CREATE_DASHBOARD_NOTIFICATION_FINAL_ORDER_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_DJ_SDO_CLAIMANT,
                                                           CREATE_DASHBOARD_NOTIFICATION_SDO_CLAIMANT);
     public static final String TASK_ID = "GenerateDashboardNotificationFinalOrderClaimant";
     private final DashboardNotificationService dashboardNotificationService;
     private final TaskListService taskListService;
     public static final String GA = "Applications";
-    public static final String HEARING = "Hearing";
     private final SdoCaseClassificationService sdoCaseClassificationService;
 
     public OrderMadeClaimantNotificationHandler(DashboardScenariosService dashboardScenariosService,
@@ -126,7 +125,6 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
         if (isSDOEvent(callbackParams)
             && isEligibleForReconsideration(caseData)
             && Objects.isNull(caseData.getIsReferToJudgeClaim())) {
-            deleteNotificationAndInactiveTasks(caseData);
             return SCENARIO_AAA6_CP_SDO_MADE_BY_LA_CLAIMANT.getScenario();
         }
         if (isCarmApplicableCase(caseData)
@@ -204,13 +202,12 @@ public class OrderMadeClaimantNotificationHandler extends OrderCallbackHandler {
             taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
                 caseData.getCcdCaseReference().toString(),
                 "CLAIMANT",
-                GA, HEARING
+                GA
             );
         } else {
-            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRoleExcludingCategory(
+            taskListService.makeProgressAbleTasksInactiveForCaseIdentifierAndRole(
                 caseData.getCcdCaseReference().toString(),
-                "CLAIMANT",
-                HEARING
+                "CLAIMANT"
             );
         }
     }
