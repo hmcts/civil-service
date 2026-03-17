@@ -95,11 +95,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
             } else {
                 Optional<Element<CaseDocument>> sdoDocLatest = caseData.getSystemGeneratedCaseDocuments()
                     .stream().filter(caseDocumentElement -> caseDocumentElement.getValue().getDocumentType()
-                        .equals(DocumentType.SDO_ORDER))
-                    .sorted(Comparator.comparing(
-                        caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime(),
-                        Comparator.reverseOrder()
-                    )).findFirst();
+                        .equals(DocumentType.SDO_ORDER)).max(Comparator.comparing(caseDocumentElement -> caseDocumentElement.getValue().getCreatedDatetime()));
                 if (sdoDocLatest.isPresent()) {
                     LocalDateTime sdoDocLatestDate = sdoDocLatest.get().getValue().getCreatedDatetime();
                     if (LocalDateTime.now().isAfter(sdoDocLatestDate.plusDays(7))) {
@@ -214,7 +210,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                     .filter(StringUtils::isNotBlank)
                     .orElse(REASON_NOT_PROVIDED));
 
-            // visible if respondent is LiP but also because CUI confirmation page includes the link
+            // visible if the respondent is LiP but also because the CUI confirmation page includes the link
             caseData.setRequestForReconsiderationDocument(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
@@ -239,7 +235,7 @@ public class RequestForReconsiderationCallbackHandler extends CallbackHandler {
                             .orElse(REASON_NOT_PROVIDED)
             );
 
-            // visible if applicant is LiP but also because CUI confirmation page includes the link
+            // visible if the applicant is LiP but also because the CUI confirmation page includes the link
             caseData.setRequestForReconsiderationDocumentRes(documentGenerator.generateLiPDocument(
                     caseData,
                     callbackParams.getParams().get(BEARER_TOKEN).toString(),
