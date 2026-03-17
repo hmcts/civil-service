@@ -256,8 +256,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 List<String> actualErrors = response.getErrors();
 
-                assertThat(actualErrors).hasSize(1);
-                assertThat(actualErrors).containsExactly("Document date cannot be in the future");
+                assertThat(actualErrors)
+                    .hasSize(1)
+                    .containsExactly("Document date cannot be in the future");
             }
 
             @Test
@@ -274,8 +275,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 List<String> actualErrors = response.getErrors();
 
-                assertThat(actualErrors).hasSize(1);
-                assertThat(actualErrors).containsExactly("Document date cannot be in the future");
+                assertThat(actualErrors)
+                    .hasSize(1)
+                    .containsExactly("Document date cannot be in the future");
             }
 
             @Test
@@ -292,8 +294,9 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
 
                 List<String> actualErrors = response.getErrors();
 
-                assertThat(actualErrors).hasSize(2);
-                assertThat(actualErrors).containsExactly("Document date cannot be in the future", "Document date cannot be in the future");
+                assertThat(actualErrors)
+                    .hasSize(2)
+                    .containsExactly("Document date cannot be in the future", "Document date cannot be in the future");
             }
 
             @Test
@@ -913,7 +916,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getApp1MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getApp1MediationNonAttendanceDocs().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("ClaimantOneMediationDocs");
         }
 
@@ -928,7 +931,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getApp1MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getApp1MediationDocumentsReferred().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("ClaimantOneMediationDocs");
         }
 
@@ -943,7 +946,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getApp2MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getApp2MediationNonAttendanceDocs().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("ClaimantTwoMediationDocs");
         }
 
@@ -958,7 +961,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getApp2MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getApp2MediationDocumentsReferred().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("ClaimantTwoMediationDocs");
         }
 
@@ -973,7 +976,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getRes1MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getRes1MediationNonAttendanceDocs().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("DefendantOneMediationDocs");
         }
 
@@ -988,7 +991,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getRes1MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getRes1MediationDocumentsReferred().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("DefendantOneMediationDocs");
         }
 
@@ -1003,7 +1006,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getRes2MediationNonAttendanceDocs().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getRes2MediationNonAttendanceDocs().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("DefendantTwoMediationDocs");
         }
 
@@ -1018,7 +1021,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
             var response = (AboutToStartOrSubmitCallbackResponse) handler.handle(params);
             CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
             // Then
-            assertThat(updatedData.getRes2MediationDocumentsReferred().get(0).getValue().getDocument().getCategoryID())
+            assertThat(updatedData.getRes2MediationDocumentsReferred().getFirst().getValue().getDocument().getCategoryID())
                 .isEqualTo("DefendantTwoMediationDocs");
         }
 
