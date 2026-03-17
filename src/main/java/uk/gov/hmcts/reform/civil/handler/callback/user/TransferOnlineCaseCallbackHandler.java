@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -78,20 +77,27 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private CallbackResponse buildConfirmation(CallbackParams callbackParams) {
-        String newCourtLocationSiteName = courtLocationUtils.findPreferredLocationData(
+        String siteName = courtLocationUtils.findPreferredLocationData(
             fetchLocationData(callbackParams),
             callbackParams.getCaseData().getTransferCourtLocationList()
         ).getSiteName();
+
+        String body = String.format(
+            "<h2 class=\"govuk-heading-m\">What happens next</h2>"
+                + "The case has now been transferred to %s. "
+                + "If the case has moved out of your region, you will no longer see it.<br><br>",
+            siteName
+        );
+
         return SubmittedCallbackResponse.builder()
             .confirmationHeader(CONFIRMATION_HEADER)
-            .confirmationBody(getBody(newCourtLocationSiteName))
+            .confirmationBody(body)
             .build();
     }
 
     private CallbackResponse locationList(CallbackParams callbackParams) {
-        var caseData = callbackParams.getCaseData();
-        List<LocationRefData> locations = fetchLocationData(callbackParams);
-        caseData.setTransferCourtLocationList(getLocationsFromList(locations));
+        CaseData caseData = callbackParams.getCaseData();
+        caseData.setTransferCourtLocationList(getLocationsFromList(fetchLocationData(callbackParams)));
 
         return AboutToStartOrSubmitCallbackResponse.builder()
             .data(caseData.toMap(objectMapper))
@@ -99,18 +105,11 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream().map(location -> location.getSiteName() +
-                " - " + location.getCourtAddress() +
-                " - " + location.getPostcode())
+        return fromList(locations.stream()
+                            .map(loc -> String.format("%s - %s - %s", loc.getSiteName(), loc.getCourtAddress(), loc.getPostcode()))
                             .toList());
     }
 
-    private String getBody(String siteName) {
-        return "<h2 class=\"govuk-heading-m\">What happens next</h2>"
-            + "The case has now been transferred to "
-            + siteName
-            + ". If the case has moved out of your region, you will no longer see it.<br><br>";
-    }
 
     private CallbackResponse saveTransferOnlineCase(CallbackParams callbackParams) {
         CaseData caseData = callbackParams.getCaseData();
