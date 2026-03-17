@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.jspecify.annotations.NonNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
@@ -174,8 +173,6 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     private final WorkingDayIndicator workingDayIndicator;
     private final FeatureToggleService featureToggleService;
     private final Optional<UpdateWaCourtLocationsService> updateWaCourtLocationsService;
-    @Value("${other_remedy.enabled:false}")
-    private boolean otherRemedyEnabled;
 
     @Override
     protected Map<String, Callback> callbacks() {
@@ -197,7 +194,7 @@ public class GenerateDirectionOrderCallbackHandler extends CallbackHandler {
     }
 
     private void populatePenalNotice(final CaseData caseData) {
-        if (otherRemedyEnabled) {
+        if (featureToggleService.isOtherRemedyEnabled()) {
             caseData.setAssistedOrderPenalNoticeContent(DEFAULT_PENAL_NOTICE);
         }
     }
