@@ -1023,6 +1023,30 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
         }
 
         @Test
+        void shouldThrowException_whenInvalidPartyOptionForReferredDocs() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions("INVALID_PARTY", DOCUMENTS_REFERRED_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            org.junit.jupiter.api.Assertions.assertThrows(uk.gov.hmcts.reform.civil.callback.CallbackException.class, () -> {
+                handler.handle(params);
+            }, "Invalid party option selected");
+        }
+
+        @Test
+        void shouldThrowException_whenInvalidPartyOptionForNonAttendance() {
+            CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
+                .uploadMediationDocumentsChooseOptions("INVALID_PARTY", MEDIATION_NON_ATTENDANCE_OPTION)
+                .build();
+            CallbackParams params = callbackParamsOf(caseData, ABOUT_TO_SUBMIT);
+
+            org.junit.jupiter.api.Assertions.assertThrows(uk.gov.hmcts.reform.civil.callback.CallbackException.class, () -> {
+                handler.handle(params);
+            }, "Invalid party option selected");
+        }
+
+        @Test
         void shouldClearChosenOptions_whenInvoked() {
             CaseData caseData = CaseDataBuilder.builder().atStateClaimIssued()
                 .uploadMediationDocumentsChooseOptions(CLAIMANT_ONE_ID, BOTH_DOCUMENTS_OPTION)
