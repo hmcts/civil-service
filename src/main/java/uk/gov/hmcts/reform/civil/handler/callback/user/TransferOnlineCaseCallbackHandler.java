@@ -101,9 +101,9 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
     }
 
     private DynamicList getLocationsFromList(final List<LocationRefData> locations) {
-        return fromList(locations.stream().map(location -> new StringBuilder().append(location.getSiteName())
-                .append(" - ").append(location.getCourtAddress())
-                .append(" - ").append(location.getPostcode()).toString())
+        return fromList(locations.stream().map(location -> location.getSiteName() +
+                " - " + location.getCourtAddress() +
+                " - " + location.getPostcode())
                             .toList());
     }
 
@@ -175,7 +175,7 @@ public class TransferOnlineCaseCallbackHandler extends CallbackHandler {
         List<LocationRefData> locations = fetchLocationData(callbackParams);
         String baseLocation = callbackParams.getCaseData().getCaseManagementLocation() == null ? null : callbackParams.getCaseData().getCaseManagementLocation().getBaseLocation();
         var matchedLocations = locations.stream().filter(loc -> loc.getEpimmsId().equals(baseLocation)).toList();
-        return !matchedLocations.isEmpty() ? matchedLocations.get(0) : null;
+        return !matchedLocations.isEmpty() ? matchedLocations.getFirst() : null;
     }
 
     private List<LocationRefData> fetchLocationData(CallbackParams callbackParams) {
