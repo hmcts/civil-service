@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.civil.service.sdo;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.civil.service.FeatureToggleService;
 import uk.gov.hmcts.reform.civil.enums.sdo.OrderDetailsPagesSectionsToggle;
 import uk.gov.hmcts.reform.civil.helpers.DateFormatHelper;
 import uk.gov.hmcts.reform.civil.model.CaseData;
@@ -52,12 +53,12 @@ import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderS
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_FEE_WARNING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.SMALL_CLAIMS_HEARING_LISTING_NOTICE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SdoSmallClaimsNarrativeService {
 
-    @Value("${other_remedy.enabled:false}")
-    private boolean otherRemedyEnabled;
+    private final FeatureToggleService featureToggleService;
     private final SdoDeadlineService sdoDeadlineService;
 
     public void applyJudgesRecital(CaseData caseData) {
@@ -148,6 +149,9 @@ public class SdoSmallClaimsNarrativeService {
     }
 
     public void applyHousingDisrepair(CaseData caseData) {
+        boolean otherRemedyEnabled = featureToggleService.isOtherRemedyEnabled();
+        log.info("Applying Housing Disrepair for case: {}, other-remedy-enabled: {}",
+                 caseData.getCcdCaseReference(), otherRemedyEnabled);
         if (otherRemedyEnabled) {
             HousingDisrepair housingDisrepair = new HousingDisrepair();
             housingDisrepair.setClauseA(HOUSING_DISREPAIR_CLAUSE_A);
