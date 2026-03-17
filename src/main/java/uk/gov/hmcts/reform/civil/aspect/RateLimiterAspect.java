@@ -88,7 +88,8 @@ public class RateLimiterAspect {
             "X-Forwarded-For",
             "X-Real-IP",
             "True-Client-IP",
-            "Forwarded"
+            "Forwarded",
+            "clientIp"
         };
 
         for (String header : headers) {
