@@ -26,7 +26,7 @@ em-stitching:
 
 java:
   applicationPort: 4000
-  image: 'hmctspublic.azurecr.io/civil/service:latest'
+  image: 'hmctsprod.azurecr.io/civil/service:latest'
   ingressHost: civil-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   aadIdentityName: civil
   environment:
