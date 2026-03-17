@@ -135,9 +135,9 @@ public class SdoFastTrackSpecialistDirectionsService {
 
     private SdoR2FastTrackCreditHireDetails buildCreditHireDetails() {
         SdoR2FastTrackCreditHireDetails creditHireDetails = new SdoR2FastTrackCreditHireDetails();
-        creditHireDetails.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO);
+        creditHireDetails.setInput2(CREDIT_HIRE_STATEMENT_PROMPT_SDO_FAST_TRACK);
         creditHireDetails.setDate1(deadlineService.nextWorkingDayFromNowWeeks(4));
-        creditHireDetails.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO);
+        creditHireDetails.setInput3(CREDIT_HIRE_NON_COMPLIANCE_SDO_FAST_TRACK);
         creditHireDetails.setInput4(CREDIT_HIRE_PARTIES_LIAISE);
         creditHireDetails.setDate2(deadlineService.nextWorkingDayFromNowWeeks(6));
         return creditHireDetails;
