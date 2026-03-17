@@ -162,7 +162,7 @@ public class SdoFastTrackNarrativeService {
         witnessOfFact.setSdoR2RestrictWitness(restrictWitness);
         witnessOfFact.setSdoRestrictPages(restrictPages);
         witnessOfFact.setSdoWitnessDeadline(DEADLINE);
-        witnessOfFact.setSdoWitnessDeadlineDate(sdoDeadlineService.calendarDaysFromNow(70));
+        witnessOfFact.setSdoWitnessDeadlineDate(LocalDate.now().plusWeeks(5));
         witnessOfFact.setSdoWitnessDeadlineText(DEADLINE_EVIDENCE);
         return witnessOfFact;
     }
