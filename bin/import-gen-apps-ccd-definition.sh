@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
-definition_input_dir=$(realpath 'ga-ccd-definition')
+set -eu
+
+if [ ! -d "ccd-definition/generalapplication" ]; then
+  echo "Unable to locate general application CCD definition directory at ccd-definition/generalapplication."
+  exit 1
+fi
+
+definition_input_dir=$(realpath "ccd-definition/generalapplication")
 definition_output_file="$(realpath ".")/build/ccd-development-config/ccd-civil-apps-dev.xlsx"
 params="$@"
 
