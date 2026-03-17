@@ -101,6 +101,13 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         );
     }
 
+    /**
+     * Populates the party options dynamic list based on the user's role and case data.
+     * Maps user roles (Applicant Solicitor, Respondent Solicitor 1/2) to available party selections.
+     *
+     * @param callbackParams Callback parameters containing case data and user info
+     * @return Callback response with updated party options in the form
+     */
     private CallbackResponse populatePartyOptions(CallbackParams callbackParams) {
         String authToken = callbackParams.getParams().get(BEARER_TOKEN).toString();
         UserInfo userInfo = userService.getUserInfo(authToken);
@@ -210,6 +217,18 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         );
     }
 
+    /**
+     * Shared logic to process mediation documents (either referred documents or non-attendance statements).
+     * It identifies target parties based on the user's selection and updates the corresponding fields in CaseData.
+     *
+     * @param caseData the case data to update
+     * @param partyChosen the party identifier selected by the user
+     * @param newDocuments the list of new documents being uploaded
+     * @param copyFunction a function to copy documents and assign the correct category ID
+     * @param getFunction a function to fetch existing documents for a specific party
+     * @param setFunction a function to store updated documents for a specific party
+     * @param <T> the type of mediation document
+     */
     private <T> void processMediationDocuments(CaseData caseData,
                                                    String partyChosen,
                                                    List<Element<T>> newDocuments,
@@ -230,6 +249,14 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
 
     private record PartyInfo(CaseData caseData, String categoryId, int partyNumber) {}
 
+    /**
+     * Maps the party code selected in the UI to a list of PartyInfo records.
+     * In cases like "CLAIMANTS" or "DEFENDANTS" (1v2 same solicitor), multiple parties are returned.
+     *
+     * @param caseData the current case data
+     * @param partyChosen the selection code from the DynamicList
+     * @return a list of PartyInfo containing category IDs and party indices
+     */
     private List<PartyInfo> getTargetParties(CaseData caseData, String partyChosen) {
         return switch (partyChosen) {
             case CLAIMANT_ONE_ID -> List.of(new PartyInfo(caseData, CLAIMANT_ONE_CATEGORY_ID, 1));
@@ -248,6 +275,10 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         };
     }
 
+    /**
+     * Fetches existing referred documents from the appropriate field in CaseData.
+     * Uses categoryId to distinguish between Claimant/Defendant and partyNumber for 1/2.
+     */
     private List<Element<MediationDocumentsReferredInStatement>> fetchReferredDocuments(PartyInfo partyInfo) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
@@ -259,6 +290,9 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         return isParty1 ? data.getRes1MediationDocumentsReferred() : data.getRes2MediationDocumentsReferred();
     }
 
+    /**
+     * Stores updated referred documents into the appropriate field in CaseData.
+     */
     private void storeReferredDocuments(PartyInfo partyInfo, List<Element<MediationDocumentsReferredInStatement>> docs) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
@@ -279,6 +313,9 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         }
     }
 
+    /**
+     * Fetches existing non-attendance statements from the appropriate field in CaseData.
+     */
     private List<Element<MediationNonAttendanceStatement>> fetchNonAttendanceStatements(PartyInfo partyInfo) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
@@ -290,6 +327,9 @@ public class UploadMediationDocumentsCallbackHandler extends CallbackHandler {
         return isParty1 ? data.getRes1MediationNonAttendanceDocs() : data.getRes2MediationNonAttendanceDocs();
     }
 
+    /**
+     * Stores updated non-attendance statements into the appropriate field in CaseData.
+     */
     private void storeNonAttendanceStatements(PartyInfo partyInfo, List<Element<MediationNonAttendanceStatement>> docs) {
         CaseData data = partyInfo.caseData();
         boolean isClaimant = partyInfo.categoryId().contains(CLAIMANT_CATEGORY_SUBSTRING);
