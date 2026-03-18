@@ -76,7 +76,7 @@ public class UploadTranslatedDocumentServiceTest {
                       .setDocumentBinaryUrl("http://test/12345")
                       .setUploadTimestamp("01-01-2025"))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
@@ -116,7 +116,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.GENERAL_APPLICATION_DRAFT)
@@ -149,7 +149,7 @@ public class UploadTranslatedDocumentServiceTest {
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .setDocumentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_CONCURRENT)
             .file(mock(Document.class));
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.WRITTEN_REPRESENTATION_CONCURRENT)
@@ -181,7 +181,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.HEARING_NOTICE)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.HEARING_NOTICE)
@@ -213,7 +213,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.JUDGES_DIRECTIONS_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.DIRECTION_ORDER)
@@ -245,7 +245,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.WRITTEN_REPRESENTATION_SEQUENTIAL)
@@ -277,7 +277,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_FOR_MORE_INFORMATION_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.REQUEST_FOR_INFORMATION)
@@ -309,7 +309,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.HEARING_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.HEARING_ORDER)
@@ -340,7 +340,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.GENERAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.GENERAL_ORDER)
@@ -372,7 +372,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.DISMISSAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentType(DocumentType.DISMISSAL_ORDER)
@@ -404,7 +404,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentLink(new Document().setDocumentFileName("written_rep_response.pdf")
@@ -438,7 +438,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_RESPONDENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentLink(new Document().setDocumentFileName("written_rep_response.pdf")
@@ -472,7 +472,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentLink(new Document().setDocumentFileName("more_info_response.pdf")
@@ -505,7 +505,7 @@ public class UploadTranslatedDocumentServiceTest {
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .setDocumentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_RESPONDENT)
             .file(mock(Document.class));
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
 
         CaseDocument originalDocument = new CaseDocument()
             .setDocumentLink(new Document().setDocumentFileName("more_info_response.pdf")
@@ -538,7 +538,7 @@ public class UploadTranslatedDocumentServiceTest {
         TranslatedDocument translatedDocument = TranslatedDocument.builder()
             .setDocumentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
             .file(mock(Document.class));
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("F1234")))
@@ -557,7 +557,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .generalAppPBADetails(new GeneralApplicationPbaDetails().setFee(new Fee().setCode("FREE")))
@@ -576,7 +576,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT_RESPONDED)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.RESPOND_TO_APPLICATION_SUMMARY_DOC)
@@ -594,7 +594,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_CONCURRENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
@@ -612,7 +612,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.WRITTEN_REPRESENTATION_ORDER_DOC)
@@ -630,7 +630,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.HEARING_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.HEARING_ORDER_DOC)
@@ -648,7 +648,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_FOR_MORE_INFORMATION_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.REQUEST_MORE_INFORMATION_ORDER_DOC)
@@ -666,7 +666,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.GENERAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.FINAL_ORDER_DOC)
@@ -685,7 +685,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
@@ -703,7 +703,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.DISMISSAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DISMISSAL_ORDER_DOC)
@@ -721,7 +721,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.APPROVE_OR_EDIT_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .finalOrderSelection(GaFinalOrderSelection.ASSISTED_ORDER)
@@ -740,7 +740,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.GENERAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.GENERAL_ORDER_DOC)
@@ -758,7 +758,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.JUDGES_DIRECTIONS_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(PreTranslationGaDocumentType.DIRECTIONS_ORDER_DOC)
@@ -776,7 +776,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.DISMISSAL_ORDER)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -794,7 +794,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.HEARING_NOTICE)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -812,7 +812,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -830,7 +830,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_RESPONDENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -848,7 +848,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -866,7 +866,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_RESPONDENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
             .preTranslationGaDocumentType(null)
@@ -882,7 +882,7 @@ public class UploadTranslatedDocumentServiceTest {
         List<Element<TranslatedDocument>> translatedDocuments = new ArrayList<>();
 
         // Add documents with different types
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.GENERAL_ORDER)
                 .file(new Document()
@@ -890,74 +890,74 @@ public class UploadTranslatedDocumentServiceTest {
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
+                .build()));
 
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.HEARING_ORDER)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
+                .build()));
 
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.HEARING_NOTICE)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
+                .build()));
 
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.JUDGES_DIRECTIONS_ORDER)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+                .build()));
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.REQUEST_FOR_MORE_INFORMATION_ORDER)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+                .build()));
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_CONCURRENT)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+                .build()));
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_ORDER_SEQUENTIAL)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+                .build()));
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.DISMISSAL_ORDER)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(
+                .build()));
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(
             TranslatedDocument.builder()
                 .documentType(TranslatedDocumentType.APPLICATION_SUMMARY_DOCUMENT)
                 .file(new Document().setDocumentFileName("test.pdf")
                           .setDocumentUrl("http://test")
                           .setDocumentBinaryUrl("http://test/12345")
                           .setUploadTimestamp("01-01-2025"))
-                .build()).build());
+                .build()));
 
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments)
@@ -987,7 +987,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
         GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
@@ -1006,7 +1006,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.WRITTEN_REPRESENTATIONS_RESPONDENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
         GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
@@ -1025,7 +1025,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_APPLICANT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
         GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();
@@ -1044,7 +1044,7 @@ public class UploadTranslatedDocumentServiceTest {
             .documentType(TranslatedDocumentType.REQUEST_MORE_INFORMATION_RESPONDENT)
             .file(mock(Document.class))
             .build();
-        translatedDocuments.add(Element.<TranslatedDocument>builder().value(translatedDocument).build());
+        translatedDocuments.add(new Element<TranslatedDocument>().setValue(translatedDocument));
         GeneralApplicationCaseData caseData = new GeneralApplicationCaseData()
             .translatedDocuments(translatedDocuments).build();
         GeneralApplicationCaseData updatedCaseData = new GeneralApplicationCaseData().build();

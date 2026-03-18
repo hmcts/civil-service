@@ -92,7 +92,7 @@ class GeneralOrderGeneratorTest {
     void shouldThrowExceptionWhenNoLocationMatch() {
 
         GeneralApplicationCaseData caseData = GeneralApplicationCaseDataBuilder.builder().generalOrderApplication()
-            .caseManagementLocation(CaseLocationCivil.builder().baseLocation("8").build()).build();
+            .caseManagementLocation(new CaseLocationCivil().setBaseLocation("8")).build();
 
         when(documentGeneratorService.generateDocmosisDocument(any(MappableObject.class), eq(GENERAL_ORDER)))
             .thenReturn(new DocmosisDocument(GENERAL_ORDER.getDocumentTitle(), bytes));

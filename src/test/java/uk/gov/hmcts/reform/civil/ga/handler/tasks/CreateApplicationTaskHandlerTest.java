@@ -239,34 +239,34 @@ public class CreateApplicationTaskHandlerTest {
                                                          YesOrNo isWithoutNotice,
                                                          YesOrNo isRespAgreed,
                                                          YesOrNo isDocumentVisible) {
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+            GeneralApplication application = new GeneralApplication();
 
-            builder.generalAppType(GAApplicationType.builder()
-                                       .types(singletonList(SUMMARY_JUDGEMENT))
-                                       .build());
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
-            return builder
-                .parentClaimantIsApplicant(parentClaimantIsApplicant)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                   .hasAgreed(isRespAgreed).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .organisationIdentifier(organisationIdentifier).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                                .isWithNotice(isWithoutNotice)
-                                                .reasonsForWithoutNotice(STRING_CONSTANT).build())
-                .generalAppDateDeadline(DUMMY_DATE)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                                  .generalAppUrgency(YES)
-                                                  .reasonsForUrgency(STRING_CONSTANT)
-                                                  .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                                  .build())
-                .isMultiParty(YES)
-                .isDocumentVisibleGA(isDocumentVisible)
-                .businessProcess(new BusinessProcess()
+            return application
+                .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement()
+                                                   .setHasAgreed(isRespAgreed))
+                .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                              .setOrganisationIdentifier(organisationIdentifier))
+                .setGeneralAppInformOtherParty(new GAInformOtherParty()
+                                                .setIsWithNotice(isWithoutNotice)
+                                                .setReasonsForWithoutNotice(STRING_CONSTANT))
+                .setGeneralAppDateDeadline(DUMMY_DATE)
+                .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement()
+                                                  .setGeneralAppUrgency(YES)
+                                                  .setReasonsForUrgency(STRING_CONSTANT)
+                                                  .setUrgentAppConsiderationDate(APP_DATE_EPOCH)
+                                                  )
+                .setIsMultiParty(YES)
+                .setIsDocumentVisibleGA(isDocumentVisible)
+                .setBusinessProcess(new BusinessProcess()
                                      .setStatus(STARTED)
                                      .setProcessInstanceId(PROCESS_INSTANCE_ID)
                                      .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
-                .build();
+                ;
         }
     }
 
@@ -398,7 +398,7 @@ public class CreateApplicationTaskHandlerTest {
         void shouldAddRespondentOneSolListForWithNoticeAppln1v1LipScenario() {
             GeneralApplication generalApplication =
                     getGeneralApplication(null, NO, YES, NO, NO, YES, null)
-                    .toBuilder().isGaApplicantLip(YES).build();
+                    .copy().setIsGaApplicantLip(YES);
             GeneralApplicationCaseData data = buildData(generalApplication, NO, NO, false);
 
             assertThat(data.getRespondentSolGaAppDetails()).hasSize(1);
@@ -549,44 +549,43 @@ public class CreateApplicationTaskHandlerTest {
                                                          YesOrNo isGeneralAppAgreed,
                                                          YesOrNo isDocumentVisible,
                                                          List<Element<Document>> generalAppEvidenceDocument) {
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+            GeneralApplication application = new GeneralApplication();
 
-            builder.generalAppType(GAApplicationType.builder()
-                                       .types(singletonList(SUMMARY_JUDGEMENT))
-                                       .build());
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
-            return builder
-                .parentClaimantIsApplicant(parentClaimantIsApplicant)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder()
-                                                   .hasAgreed(isGeneralAppAgreed).build())
-                .generalAppApplnSolicitor(GASolicitorDetailsGAspec.builder()
-                                              .organisationIdentifier(organisationIdentifier).build())
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                                .isWithNotice(isWithoutNotice)
-                                                .reasonsForWithoutNotice(STRING_CONSTANT).build())
-                .generalAppDateDeadline(DUMMY_DATE)
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                                  .generalAppUrgency(YES)
-                                                  .reasonsForUrgency(STRING_CONSTANT)
-                                                  .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                                  .build())
-                .isMultiParty(isMultiParty)
-                .isDocumentVisibleGA(isDocumentVisible)
-                .generalAppEvidenceDocument(generalAppEvidenceDocument)
-                .businessProcess(new BusinessProcess()
+            return application
+                .setParentClaimantIsApplicant(parentClaimantIsApplicant)
+                .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement()
+                                                   .setHasAgreed(isGeneralAppAgreed))
+                .setGeneralAppApplnSolicitor(new GASolicitorDetailsGAspec()
+                                              .setOrganisationIdentifier(organisationIdentifier))
+                .setGeneralAppInformOtherParty(new GAInformOtherParty()
+                                                .setIsWithNotice(isWithoutNotice)
+                                                .setReasonsForWithoutNotice(STRING_CONSTANT))
+                .setGeneralAppDateDeadline(DUMMY_DATE)
+                .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement()
+                                                  .setGeneralAppUrgency(YES)
+                                                  .setReasonsForUrgency(STRING_CONSTANT)
+                                                  .setUrgentAppConsiderationDate(APP_DATE_EPOCH)
+                                                  )
+                .setIsMultiParty(isMultiParty)
+                .setIsDocumentVisibleGA(isDocumentVisible)
+                .setGeneralAppEvidenceDocument(generalAppEvidenceDocument)
+                .setBusinessProcess(new BusinessProcess()
                                      .setStatus(STARTED)
                                      .setProcessInstanceId(PROCESS_INSTANCE_ID)
                                      .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
-                .build();
+                ;
         }
 
         @Test
         void shouldSetApplicantBilingualFlagClaimantIsApplicant() {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, NO, NO, NO, null)
-                    .toBuilder()
-                    .parentClaimantIsApplicant(YES)
-                    .build();
+                    .copy()
+                    .setParentClaimantIsApplicant(YES);
             buildData(generalApplication, NO, NO, false, true, false);
         }
 
@@ -594,9 +593,8 @@ public class CreateApplicationTaskHandlerTest {
         void shouldSetApplicantBilingualFlagDefendantIsApplicant() {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, NO, NO, NO, null)
-                    .toBuilder()
-                    .parentClaimantIsApplicant(NO)
-                    .build();
+                    .copy()
+                    .setParentClaimantIsApplicant(NO);
             buildData(generalApplication, NO, NO, false, true, false);
         }
 
@@ -604,9 +602,8 @@ public class CreateApplicationTaskHandlerTest {
         void shouldSetRespondentBilingualFlagClaimantIsApplicant() {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, NO, NO, NO, null)
-                    .toBuilder()
-                    .parentClaimantIsApplicant(YES)
-                    .build();
+                    .copy()
+                    .setParentClaimantIsApplicant(YES);
             buildData(generalApplication, NO, NO, false, false, true);
         }
 
@@ -614,9 +611,8 @@ public class CreateApplicationTaskHandlerTest {
         void shouldSetRespondentBilingualFlagDefendantIsApplicant() {
             GeneralApplication generalApplication =
                 getGeneralApplication("applicant", YES, NO, NO, NO, NO, null)
-                    .toBuilder()
-                    .parentClaimantIsApplicant(NO)
-                    .build();
+                    .copy()
+                    .setParentClaimantIsApplicant(NO);
             buildData(generalApplication, NO, NO, false, false, true);
         }
     }
@@ -788,32 +784,32 @@ public class CreateApplicationTaskHandlerTest {
         }
 
         private GeneralApplication getGeneralApplication() {
-            GeneralApplication.GeneralApplicationBuilder builder = GeneralApplication.builder();
+            GeneralApplication application = new GeneralApplication();
 
-            builder.generalAppType(GAApplicationType.builder()
-                                       .types(singletonList(SUMMARY_JUDGEMENT))
-                                       .build());
+            application.setGeneralAppType(
+                new GAApplicationType().setTypes(singletonList(SUMMARY_JUDGEMENT))
+            );
 
-            return builder
-                .generalAppInformOtherParty(GAInformOtherParty.builder()
-                                                .isWithNotice(NO)
-                                                .reasonsForWithoutNotice(STRING_CONSTANT).build())
-                .generalAppDateDeadline(DUMMY_DATE)
-                .generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(NO).build())
-                .generalAppUrgencyRequirement(GAUrgencyRequirement.builder()
-                                                  .generalAppUrgency(YES)
-                                                  .reasonsForUrgency(STRING_CONSTANT)
-                                                  .urgentAppConsiderationDate(APP_DATE_EPOCH)
-                                                  .build())
-                .isMultiParty(NO)
-                .isDocumentVisibleGA(NO)
-                .parentClaimantIsApplicant(YES)
-                .caseNameGaInternal("applicant v respondent")
-                .businessProcess(new BusinessProcess()
+            return application
+                .setGeneralAppInformOtherParty(new GAInformOtherParty()
+                                                .setIsWithNotice(NO)
+                                                .setReasonsForWithoutNotice(STRING_CONSTANT))
+                .setGeneralAppDateDeadline(DUMMY_DATE)
+                .setGeneralAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(NO))
+                .setGeneralAppUrgencyRequirement(new GAUrgencyRequirement()
+                                                  .setGeneralAppUrgency(YES)
+                                                  .setReasonsForUrgency(STRING_CONSTANT)
+                                                  .setUrgentAppConsiderationDate(APP_DATE_EPOCH)
+                                                  )
+                .setIsMultiParty(NO)
+                .setIsDocumentVisibleGA(NO)
+                .setParentClaimantIsApplicant(YES)
+                .setCaseNameGaInternal("applicant v respondent")
+                .setBusinessProcess(new BusinessProcess()
                                      .setStatus(STARTED)
                                      .setProcessInstanceId(PROCESS_INSTANCE_ID)
                                      .setCamundaEvent(CREATE_GENERAL_APPLICATION_CASE.name()))
-                .build();
+                ;
         }
 
     }
@@ -830,18 +826,18 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsRespondentSolList = Lists.newArrayList();
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
 
-        GeneralApplicationsDetails generalApplicationsDetails = GeneralApplicationsDetails.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GeneralApplicationsDetails generalApplicationsDetails = new GeneralApplicationsDetails()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         generalApplicationsDetailsList.add(element(generalApplicationsDetails));
         gaDetailsMasterCollection.add(element(generalApplicationsDetails));
-        GADetailsRespondentSol gaDetailsRespondentSol = GADetailsRespondentSol.builder()
-            .generalApplicationType("Summary judgment")
-            .generalAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
-            .caseLink(generalApplication.getCaseLink())
-            .caseState("pending").build();
+        GADetailsRespondentSol gaDetailsRespondentSol = new GADetailsRespondentSol()
+            .setGeneralApplicationType("Summary judgment")
+            .setGeneralAppSubmittedDateGAspec(generalApplication.getGeneralAppSubmittedDateGAspec())
+            .setCaseLink(generalApplication.getCaseLink())
+            .setCaseState("pending");
         gaDetailsRespondentSolList.add(element(gaDetailsRespondentSol));
         gaDetailsMasterCollection.add(element(generalApplicationsDetails));
 
@@ -920,9 +916,9 @@ public class CreateApplicationTaskHandlerTest {
         gaDetailsMasterCollection = Lists.newArrayList();
         gaDetailsRespondentSolList = Lists.newArrayList();
         gaDetailsRespondentSolTwoList = Lists.newArrayList();
-        Element<Document> same = Element.<Document>builder()
-                .id(DOC_ID)
-                .value(new Document().setDocumentUrl("string")).build();
+        Element<Document> same = new Element<Document>()
+                .setId(DOC_ID)
+                .setValue(new Document().setDocumentUrl("string"));
         List<Element<Document>> generalAppEvidenceDocument = addEvidenceDoc ? (new ArrayList<>() {{
                 add(same);
             }
