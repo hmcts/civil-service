@@ -1,0 +1,40 @@
+{
+  "name": "Role Assignments - Create",
+  "request": {
+    "method": "POST",
+    "urlPath": "/am/role-assignments"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "roleAssignmentResponse": {
+        "requestedRoles": [
+          {
+            "actorId": "actor-id-123",
+            "actorIdType": "IDAM",
+            "roleType": "CASE",
+            "roleName": "judge",
+            "classification": "PUBLIC",
+            "grantType": "STANDARD",
+            "roleCategory": "JUDICIAL",
+            "readOnly": false,
+            "status": "CREATE_REQUESTED",
+            "attributes": {
+              "caseId": "1234567890123456",
+              "jurisdiction": "CIVIL"
+            }
+          }
+        ],
+        "roleRequest": {
+          "assignerId": "assigner-id-123",
+          "process": "civil-service",
+          "reference": "1234567890123456",
+          "replaceExisting": false
+        }
+      }
+    }
+  }
+}
