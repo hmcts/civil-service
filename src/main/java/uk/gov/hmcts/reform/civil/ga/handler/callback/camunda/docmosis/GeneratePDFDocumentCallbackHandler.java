@@ -141,38 +141,61 @@ public class GeneratePDFDocumentCallbackHandler extends CallbackHandler implemen
     }
 
     private GenerationResult generateDecisionDocuments(GenerationContext context) {
+        return handlePreDecisionOrders(context)
+            .or(() -> handleMakeOrderDecisions(context))
+            .or(() -> handleHearingAndRepresentationOrders(context))
+            .or(() -> handleInformationAndFreeFormOrders(context))
+            .orElseGet(GenerationResult::empty);
+    }
+
+    private Optional<GenerationResult> handlePreDecisionOrders(GenerationContext context) {
         GeneralApplicationCaseData caseData = context.caseData();
         if (Objects.nonNull(caseData.getApproveConsentOrder())) {
-            return handleConsentOrder(context);
+            return Optional.of(handleConsentOrder(context));
         }
         if (Objects.nonNull(caseData.getFinalOrderSelection())) {
-            return handleFinalOrder(context);
+            return Optional.of(handleFinalOrder(context));
         }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleMakeOrderDecisions(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
         if (isGeneralOrder(caseData)) {
-            return handleGeneralOrder(context);
+            return Optional.of(handleGeneralOrder(context));
         }
         if (isDirectionOrder(caseData)) {
-            return handleDirectionOrder(context);
+            return Optional.of(handleDirectionOrder(context));
         }
         if (isDismissalOrder(caseData)) {
-            return handleDismissalOrder(context);
+            return Optional.of(handleDismissalOrder(context));
         }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleHearingAndRepresentationOrders(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
         if (isHearingOrder(caseData)) {
-            return handleHearingOrder(context);
+            return Optional.of(handleHearingOrder(context));
         }
         if (isWrittenRepSeqOrder(caseData)) {
-            return handleWrittenRepSequentialOrder(context);
+            return Optional.of(handleWrittenRepSequentialOrder(context));
         }
         if (isWrittenRepConOrder(caseData)) {
-            return handleWrittenRepConcurrentOrder(context);
+            return Optional.of(handleWrittenRepConcurrentOrder(context));
         }
+        return Optional.empty();
+    }
+
+    private Optional<GenerationResult> handleInformationAndFreeFormOrders(GenerationContext context) {
+        GeneralApplicationCaseData caseData = context.caseData();
         if (isRequestMoreInfo(caseData) || isRequestMoreInfoAndSendAppToOtherParty(caseData)) {
-            return handleRequestMoreInfoOrder(context);
+            return Optional.of(handleRequestMoreInfoOrder(context));
         }
         if (isJudicialFreeFormOrder(caseData)) {
-            return handleJudicialFreeFormOrder(context);
+            return Optional.of(handleJudicialFreeFormOrder(context));
         }
-        return GenerationResult.empty();
+        return Optional.empty();
     }
 
     private GenerationResult handleConsentOrder(GenerationContext context) {
