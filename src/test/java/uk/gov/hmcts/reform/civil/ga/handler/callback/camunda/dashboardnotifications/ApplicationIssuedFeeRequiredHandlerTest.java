@@ -106,7 +106,7 @@ public class ApplicationIssuedFeeRequiredHandlerTest
                             SCENARIO_AAA6_GENERAL_APPS_APPLICATION_FEE_REQUIRED_APPLICANT
                                     .getScenario(),
                             "BEARER_TOKEN",
-                            new ScenarioRequestParams(scenarioParams));
+                            ScenarioRequestParams.builder().params(scenarioParams).build());
         }
 
         @Test
@@ -161,7 +161,7 @@ public class ApplicationIssuedFeeRequiredHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPLICATION_SUBMITTED_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            new ScenarioRequestParams(scenarioParams));
+                            ScenarioRequestParams.builder().params(scenarioParams).build());
         }
     }
 }

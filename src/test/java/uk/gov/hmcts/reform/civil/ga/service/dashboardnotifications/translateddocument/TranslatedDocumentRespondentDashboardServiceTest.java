@@ -53,7 +53,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
                         SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT
                                 .getScenario(),
                         AUTH_TOKEN,
-                        new ScenarioRequestParams(params));
+                        ScenarioRequestParams.builder().params(params).build());
     }
 
     @Test
@@ -77,7 +77,7 @@ class TranslatedDocumentRespondentDashboardServiceTest {
                         SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_RESPONDENT
                                 .getScenario(),
                         AUTH_TOKEN,
-                        new ScenarioRequestParams(params));
+                        ScenarioRequestParams.builder().params(params).build());
     }
 
     @Test

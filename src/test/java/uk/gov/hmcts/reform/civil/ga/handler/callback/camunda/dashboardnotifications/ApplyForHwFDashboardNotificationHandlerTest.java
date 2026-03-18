@@ -114,7 +114,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPS_HWF_REQUESTED_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            new ScenarioRequestParams(scenarioParams));
+                            ScenarioRequestParams.builder().params(scenarioParams).build());
         }
 
         @Test
@@ -162,7 +162,7 @@ public class ApplyForHwFDashboardNotificationHandlerTest
                             caseData.getCcdCaseReference().toString(),
                             SCENARIO_AAA6_GENERAL_APPS_HWF_REQUESTED_APPLICANT.getScenario(),
                             "BEARER_TOKEN",
-                            new ScenarioRequestParams(scenarioParams));
+                            ScenarioRequestParams.builder().params(scenarioParams).build());
         }
     }
 }

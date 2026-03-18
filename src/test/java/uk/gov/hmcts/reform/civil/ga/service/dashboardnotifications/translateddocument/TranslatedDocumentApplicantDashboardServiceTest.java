@@ -52,7 +52,7 @@ class TranslatedDocumentApplicantDashboardServiceTest {
                         SCENARIO_AAA6_GENERAL_APPS_TRANSLATED_DOCUMENT_UPLOADED_APPLICANT
                                 .getScenario(),
                         AUTH_TOKEN,
-                        new ScenarioRequestParams(params));
+                        ScenarioRequestParams.builder().params(params).build());
     }
 
     @Test
