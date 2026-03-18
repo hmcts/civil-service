@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 import uk.gov.hmcts.reform.civil.sampledata.CaseDataBuilder;
-import uk.gov.hmcts.reform.civil.sampledata.PartyBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,44 +60,18 @@ class NotifyDecisionOnReconsiderationRequestClaimantEmailDTOGeneratorTest {
     }
 
     @Test
-    void shouldNotifyLipClaimantWhenEmailPresent() {
+    void shouldNotifyWhenApplicantIsLiP() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.YES)
-            .applicant1(new PartyBuilder().individual().partyEmail("applicant@example.com").build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isTrue();
     }
 
     @Test
-    void shouldNotNotifyWhenEmailMissing() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.YES)
-            .applicant1(new PartyBuilder().individual().partyEmail(null).build())
-            .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
-    }
-
-    @Test
     void shouldNotNotifyWhenApplicantRepresented() {
         CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
             .applicant1Represented(YesOrNo.YES)
-            .respondent1Represented(YesOrNo.YES)
-            .applicant1(new PartyBuilder().individual().partyEmail("applicant@example.com").build())
-            .build();
-
-        assertThat(generator.getShouldNotify(caseData)).isFalse();
-    }
-
-    @Test
-    void shouldNotNotifyWhenBothPartiesAreLip() {
-        CaseData caseData = CaseDataBuilder.builder().atStateClaimDetailsNotified().build().toBuilder()
-            .applicant1Represented(YesOrNo.NO)
-            .respondent1Represented(YesOrNo.NO)
-            .applicant1(new PartyBuilder().individual().partyEmail("applicant@example.com").build())
             .build();
 
         assertThat(generator.getShouldNotify(caseData)).isFalse();

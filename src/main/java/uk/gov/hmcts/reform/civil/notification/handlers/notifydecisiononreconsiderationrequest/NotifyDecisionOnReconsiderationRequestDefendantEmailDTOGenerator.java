@@ -7,7 +7,6 @@ import uk.gov.hmcts.reform.civil.notify.NotificationsProperties;
 
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
@@ -38,14 +37,5 @@ public class NotifyDecisionOnReconsiderationRequestDefendantEmailDTOGenerator ex
         result.put(CLAIMANT_V_DEFENDANT, getClaimantVDefendant(caseData));
         result.put(PARTY_NAME, caseData.getRespondent1().getPartyName());
         return result;
-    }
-
-    @Override
-    public Boolean getShouldNotify(CaseData caseData) {
-        return caseData.isRespondent1LiP()
-            && !caseData.isApplicantLiP()
-            && nonNull(caseData.getRespondent1())
-            && nonNull(caseData.getRespondent1().getPartyName())
-            && nonNull(caseData.getRespondent1PartyEmail());
     }
 }

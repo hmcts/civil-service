@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.civil.service.OrganisationService;
 
 import java.util.Map;
 
-import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.CLAIMANT_V_DEFENDANT;
 import static uk.gov.hmcts.reform.civil.handler.callback.camunda.notification.NotificationData.PARTY_NAME;
 import static uk.gov.hmcts.reform.civil.utils.HearingUtils.getClaimantVDefendant;
@@ -40,15 +39,6 @@ public class NotifyDecisionOnReconsiderationRequestRespSolTwoEmailDTOGenerator e
         return caseData.getRespondentSolicitor2EmailAddress() != null
             ? caseData.getRespondentSolicitor2EmailAddress()
             : caseData.getRespondentSolicitor1EmailAddress();
-    }
-
-    @Override
-    public Boolean getShouldNotify(CaseData caseData) {
-        return caseData.getRespondent2() != null
-            && nonNull(caseData.getRespondent2().getPartyName())
-            && !caseData.getRespondent2().getPartyName().isEmpty()
-            && (caseData.getRespondentSolicitor1EmailAddress() != null
-            || caseData.getRespondentSolicitor2EmailAddress() != null);
     }
 
     @Override
