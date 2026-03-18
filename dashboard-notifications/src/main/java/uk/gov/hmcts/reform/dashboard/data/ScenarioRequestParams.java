@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Data
 public class ScenarioRequestParams {
@@ -17,15 +16,9 @@ public class ScenarioRequestParams {
      */
     HashMap<String, Object> params;
 
+    @SuppressWarnings("java:S1319")
     @JsonCreator
-    @SuppressWarnings("unchecked")
-    public ScenarioRequestParams(Map<String, Object> params) {
-        if (params == null) {
-            this.params = null;
-        } else if (params instanceof HashMap<?, ?>) {
-            this.params = (HashMap<String, Object>) params;
-        } else {
-            this.params = new HashMap<>(params);
-        }
+    public ScenarioRequestParams(HashMap<String, Object> params) {
+        this.params = params;
     }
 }
