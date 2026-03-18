@@ -241,7 +241,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
         return GeneralApplicationCaseDataBuilder.builder()
             .ccdCaseReference(ccdId)
             .ccdState(ORDER_MADE)
-            .generalAppType(GAApplicationType.builder().types(List.of(generalApplicationType)).build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(generalApplicationType)))
             .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                            .setMakeAnOrder(APPROVE_OR_EDIT)
                                            .setJudgeRecitalText("Sample Text")
@@ -259,7 +259,7 @@ public class CheckUnlessOrderDeadlineEndTaskHandlerTest {
                            .setJudgeApproveEditOptionDateForUnlessOrder(deadline)
                            .setReasonForDecisionText("Sample Test")
                            .setIsOrderProcessedByUnlessScheduler(isProcessed),
-                       "generalAppType", GAApplicationType.builder().types(List.of(generalApplicationType)).build()))
+                       "generalAppType", new GAApplicationType().setTypes(List.of(generalApplicationType))))
             .state(ORDER_MADE.toString()).build();
     }
 }

@@ -26,14 +26,11 @@ public class DynamicListTest {
 
         DynamicList actual = DynamicList.fromList(listItems, toCode, toLabel, value, true);
 
-        DynamicList expected = DynamicList.builder()
-            .listItems(List.of(
-                DynamicListElement.builder().code("Item1_code").label("Item1_label").build(),
-                DynamicListElement.builder().code("Item2_code").label("Item2_label").build(),
-                DynamicListElement.builder().code("Item3_code").label("Item3_label").build()
-            ))
-            .value(DynamicListElement.builder().code("Item2_code").label("Item2_label").build())
-            .build();
+        DynamicList expected = new DynamicList().setListItems(List.of(
+                new DynamicListElement().setCode("Item1_code").setLabel("Item1_label"),
+                new DynamicListElement().setCode("Item2_code").setLabel("Item2_label"),
+                new DynamicListElement().setCode("Item3_code").setLabel("Item3_label")
+            )).setValue(new DynamicListElement().setCode("Item2_code").setLabel("Item2_label"));
 
         assertEquals(expected, actual);
     }
