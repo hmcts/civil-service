@@ -82,9 +82,9 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
         caseData.setHearingNoticeList(HearingNoticeList.OTHER);
         caseData.setHearingNoticeListOther("hearing notice list other");
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);
-        caseData.setHearingLocation(DynamicList.builder().listItems(List.of(
-                DynamicListElement.builder().label("element 1").code("E0").build(),
-                DynamicListElement.builder().label("element 2").code("E1").build())).build());
+        caseData.setHearingLocation(new DynamicList().setListItems(List.of(
+                new DynamicListElement().setLabel("element 1").setCode("E0"),
+                new DynamicListElement().setLabel("element 2").setCode("E1"))));
         caseData.setChannel(HearingChannel.IN_PERSON);
         caseData.setHearingDate(LocalDate.now());
         caseData.setHearingTimeHourMinute("hearingTimeHourMinute");
@@ -375,9 +375,9 @@ class HearingScheduledHandlerTest extends BaseCallbackHandlerTest {
 
         // Given
         CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged().build();
-        caseData.setHearingLocation(DynamicList.builder().listItems(List.of(
-                DynamicListElement.builder().label("element 1").code("E0").build(),
-                DynamicListElement.builder().label("element 2").code("E1").build())).build());
+        caseData.setHearingLocation(new DynamicList().setListItems(List.of(
+                new DynamicListElement().setLabel("element 1").setCode("E0"),
+                new DynamicListElement().setLabel("element 2").setCode("E1"))));
         caseData.setAddRespondent2(NO);
         caseData.setHearingNoticeList(HearingNoticeList.SMALL_CLAIMS);
         caseData.setListingOrRelisting(ListingOrRelisting.LISTING);

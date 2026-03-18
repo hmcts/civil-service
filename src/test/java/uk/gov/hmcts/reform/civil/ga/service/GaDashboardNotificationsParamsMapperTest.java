@@ -270,8 +270,7 @@ public class GaDashboardNotificationsParamsMapperTest {
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppSuperClaimType("SPEC_CLAIM")
-            .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                .build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_ORDER)))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
             .ccdState(CaseState.AWAITING_APPLICATION_PAYMENT)
@@ -310,8 +309,7 @@ public class GaDashboardNotificationsParamsMapperTest {
             .legacyCaseReference("000DC001")
             .businessProcess(new BusinessProcess().setStatus(BusinessProcessStatus.READY))
             .generalAppSuperClaimType("SPEC_CLAIM")
-            .generalAppType(GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_ORDER))
-                                .build())
+            .generalAppType(new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_ORDER)))
             .generalAppHelpWithFees(new HelpWithFees().setHelpWithFee(YesOrNo.YES).setHelpWithFeesReferenceNumber(
                 "HWF-A1B-23C"))
             .ccdState(APPLICATION_ADD_PAYMENT)

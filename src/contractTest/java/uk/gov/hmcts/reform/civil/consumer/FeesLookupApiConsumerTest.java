@@ -263,10 +263,9 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     @PactTestFor(pactMethod = "getFeeForGAWithNotice")
     public void verifyFeeForGAWithNotice() {
         Fee fee = generalAppFeesService.getFeeForGA(
-            CaseData.builder().generalAppRespondentAgreement(GARespondentOrderAgreement.builder().hasAgreed(YesOrNo.NO).build())
+            CaseData.builder().generalAppRespondentAgreement(new GARespondentOrderAgreement().setHasAgreed(YesOrNo.NO))
                 .generalAppType(
-                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT))
-                        .build())
+                    new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SET_ASIDE_JUDGEMENT)))
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0445")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(10000))));
@@ -277,8 +276,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
     public void verifyFeeForConsentWithOrWithout() {
         Fee fee = generalAppFeesService.getFeeForGA(
             CaseData.builder().generalAppType(
-                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT))
-                        .build())
+                    new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.SETTLE_BY_CONSENT)))
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0446")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(11000))));
@@ -290,8 +288,7 @@ public class FeesLookupApiConsumerTest extends BaseContractTest {
 
         Fee fee = generalAppFeesService.getFeeForGA(
             CaseData.builder().generalAppType(
-                    GAApplicationType.builder().types(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT))
-                        .build())
+                    new GAApplicationType().setTypes(List.of(GeneralApplicationTypes.VARY_PAYMENT_TERMS_OF_JUDGMENT)))
                 .build());
         assertThat(fee.getCode(), is(equalTo("FEE0447")));
         assertThat(fee.getCalculatedAmountInPence(), is(equalTo(new BigDecimal(12000))));
