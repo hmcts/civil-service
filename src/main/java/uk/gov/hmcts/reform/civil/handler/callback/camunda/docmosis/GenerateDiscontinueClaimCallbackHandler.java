@@ -131,9 +131,7 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             ? getLipRecipient(caseData.getRespondent1())
             : getRepresentedRecipient(
             caseData.getRespondent1OrganisationPolicy().getOrganisation().getOrganisationID(),
-            caseData.getRespondent1DQ() != null && caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth() != null
-                ? caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName()
-                : null,
+            getRespondent1StatementOfTruthName(caseData),
             caseData.getRespondentSolicitor1ServiceAddress(),
             caseData.getSpecRespondentCorrespondenceAddressdetails(),
             caseData.getCaseAccessCategory()
@@ -150,13 +148,25 @@ public class GenerateDiscontinueClaimCallbackHandler extends CallbackHandler {
             ? getLipRecipient(caseData.getRespondent2())
             : getRepresentedRecipient(
             caseData.getRespondent2OrganisationPolicy().getOrganisation().getOrganisationID(),
-            caseData.getRespondent2DQ() != null && caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth() != null
-                ? caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName()
-                : null,
+            getRespondent2StatementOfTruthName(caseData),
             caseData.getRespondentSolicitor2ServiceAddress(),
             caseData.getSpecRespondent2CorrespondenceAddressdetails(),
             caseData.getCaseAccessCategory()
         );
+    }
+
+    private String getRespondent1StatementOfTruthName(CaseData caseData) {
+        if (caseData.getRespondent1DQ() == null || caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth() == null) {
+            return null;
+        }
+        return caseData.getRespondent1DQ().getRespondent1DQStatementOfTruth().getName();
+    }
+
+    private String getRespondent2StatementOfTruthName(CaseData caseData) {
+        if (caseData.getRespondent2DQ() == null || caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth() == null) {
+            return null;
+        }
+        return caseData.getRespondent2DQ().getRespondent2DQStatementOfTruth().getName();
     }
 
     private RecipientDetails getRepresentedRecipient(String organisationId,
