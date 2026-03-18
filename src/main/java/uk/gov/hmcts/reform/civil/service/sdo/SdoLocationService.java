@@ -81,10 +81,7 @@ public class SdoLocationService {
 
         options.add(dynamicElementFromCode("OTHER_LOCATION", "Other location"));
 
-        return DynamicList.builder()
-            .listItems(options)
-            .value(selected != null ? selected : DynamicListElement.EMPTY)
-            .build();
+        return new DynamicList().setListItems(options).setValue(selected != null ? selected : DynamicListElement.EMPTY);
     }
 
     public DynamicList trimListItems(DynamicList list) {

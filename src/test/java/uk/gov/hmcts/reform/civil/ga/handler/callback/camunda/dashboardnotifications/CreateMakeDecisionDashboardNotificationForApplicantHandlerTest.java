@@ -155,7 +155,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .judicialDecision(new GAJudicialDecision().setDecision(decisionOption))
                 .ccdState(CaseState.APPLICATION_SUBMITTED_AWAITING_JUDICIAL_DECISION)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder().setMakeAnOrder(orderOption)).build();
@@ -184,7 +184,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
                 .parentCaseReference(caseData.getCcdCaseReference().toString())
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
                 .ccdState(CaseState.ADDITIONAL_RESPONSE_TIME_EXPIRED)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
@@ -215,7 +215,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .judicialDecisionMakeOrder(new GAJudicialMakeAnOrder()
                                                .setMakeAnOrder(GAJudgeMakeAnOrderOption.APPROVE_OR_EDIT)).build();
@@ -245,7 +245,7 @@ public class CreateMakeDecisionDashboardNotificationForApplicantHandlerTest exte
                 .isGaApplicantLip(YesOrNo.YES)
                 .parentClaimantIsApplicant(YesOrNo.YES)
                 .judicialDecision(new GAJudicialDecision().setDecision(GAJudgeDecisionOption.MAKE_AN_ORDER))
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.YES).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.YES))
                 .ccdState(CaseState.AWAITING_RESPONDENT_RESPONSE)
                 .judicialDecisionMakeOrder(null).build();
 
