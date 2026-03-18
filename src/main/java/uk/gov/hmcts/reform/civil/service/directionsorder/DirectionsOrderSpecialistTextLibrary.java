@@ -270,10 +270,8 @@ public final class DirectionsOrderSpecialistTextLibrary {
     public static final String PERSONAL_INJURY_PERMISSION_DJ =
         "The claimant has permission to rely upon the written "
             + "expert evidence already uploaded to the Digital"
-            + " Portal with the particulars of claim and in addition "
-            + "has permission to rely upon any associated "
-            + "correspondence or updating report which is uploaded "
-            + "to the Digital Portal by 4pm on";
+            + " Portal with the particulars of claim";
+
     public static final String PERSONAL_INJURY_QUESTIONS =
         "Any questions which are to be addressed to an expert must be sent to the expert directly "
             + "and uploaded to the Digital Portal by 4pm on";

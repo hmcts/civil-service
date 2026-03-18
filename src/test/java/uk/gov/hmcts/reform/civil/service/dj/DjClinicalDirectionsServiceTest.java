@@ -53,7 +53,7 @@ class DjClinicalDirectionsServiceTest {
         TrialPersonalInjury injury = service.buildTrialPersonalInjury();
 
         assertThat(injury.getDate1()).isEqualTo(LocalDate.of(2025, 8, 1).plusWeeks(4));
-        assertThat(injury.getDate2()).isEqualTo(LocalDate.of(2025, 8, 1).plusWeeks(8));
+        assertThat(injury.getDate2()).isEqualTo(LocalDate.now().plusWeeks(7));
         assertThat(injury.getInput1()).isEqualTo(PERSONAL_INJURY_PERMISSION_DJ);
         assertThat(injury.getInput2()).isEqualTo(PERSONAL_INJURY_QUESTIONS);
         assertThat(injury.getInput3()).isEqualTo(PERSONAL_INJURY_ANSWERS);

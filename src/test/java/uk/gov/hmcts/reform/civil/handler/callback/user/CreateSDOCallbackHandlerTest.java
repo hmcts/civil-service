@@ -2064,15 +2064,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
                                "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(7).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(9).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
                 .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
             assertThat(response.getData()).extracting("fastTrackRoadTrafficAccident").extracting("input")
                 .isEqualTo("Photographs and/or a plan of the accident location shall be prepared and agreed by the "
@@ -2292,15 +2292,15 @@ public class CreateSDOCallbackHandlerTest extends BaseCallbackHandlerTest {
                 .isEqualTo("The Defendant(s) may ask questions of the Claimant's " +
                                "expert which must be sent to the expert directly and uploaded to the Digital Portal by 4pm on");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date2")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(7).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input3")
                 .isEqualTo("The answers to the questions shall be answered by the Expert by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date3")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(9).toString());
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("input4")
                 .isEqualTo("and uploaded to the Digital Portal by the party who has asked the question by");
             assertThat(response.getData()).extracting("fastTrackPersonalInjury").extracting("date4")
-                .isEqualTo(nextWorkingDayDate.toString());
+                .isEqualTo(LocalDate.now().plusWeeks(10).toString());
 
         }
 

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialClinicalNegligence;
 import uk.gov.hmcts.reform.civil.model.defaultjudgment.TrialPersonalInjury;
 
+import java.time.LocalDate;
+
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_BUNDLE_DJ;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_DOCUMENTS_HEADING;
 import static uk.gov.hmcts.reform.civil.service.directionsorder.DirectionsOrderSpecialistTextLibrary.CLINICAL_NOTES_DJ;
@@ -33,10 +35,10 @@ public class DjClinicalDirectionsService {
             .setInput1(PERSONAL_INJURY_PERMISSION_DJ)
             .setDate1(deadlineService.nextWorkingDayInWeeks(4))
             .setInput2(PERSONAL_INJURY_QUESTIONS)
-            .setDate2(deadlineService.nextWorkingDayInWeeks(8))
+            .setDate2(LocalDate.now().plusWeeks(7))
             .setInput3(PERSONAL_INJURY_ANSWERS)
-            .setDate3(deadlineService.nextWorkingDayInWeeks(4))
+            .setDate3(LocalDate.now().plusWeeks(9))
             .setInput4(PERSONAL_INJURY_UPLOAD)
-            .setDate4(deadlineService.nextWorkingDayInWeeks(8));
+            .setDate4(LocalDate.now().plusWeeks(10));
     }
 }
