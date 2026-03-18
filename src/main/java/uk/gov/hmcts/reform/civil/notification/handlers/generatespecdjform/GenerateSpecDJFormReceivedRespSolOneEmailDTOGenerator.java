@@ -48,12 +48,7 @@ public class GenerateSpecDJFormReceivedRespSolOneEmailDTOGenerator extends RespS
 
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
-        if (!Boolean.TRUE.equals(super.getShouldNotify(caseData))) {
-            return false;
-        }
-        if (!notificationHelper.hasSecondRespondent(caseData)) {
-            return true;
-        }
-        return notificationHelper.hasJudgmentForBothDefendants(caseData);
+        return Boolean.TRUE.equals(super.getShouldNotify(caseData))
+            && notificationHelper.shouldNotifyRespondentSolicitorOneReceived(caseData);
     }
 }

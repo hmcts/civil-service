@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.civil.notification.handlers.generatespecdjform;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.civil.enums.YesOrNo;
 import uk.gov.hmcts.reform.civil.model.CaseData;
 import uk.gov.hmcts.reform.civil.model.Party;
 import uk.gov.hmcts.reform.civil.model.common.DynamicList;
@@ -30,6 +31,36 @@ public class GenerateSpecDJFormNotificationHelper {
 
     public boolean hasSingleDefendantSelection(CaseData caseData) {
         return hasSecondRespondent(caseData) && !hasJudgmentForBothDefendants(caseData);
+    }
+
+    public boolean hasSameLegalRepresentative(CaseData caseData) {
+        return hasSecondRespondent(caseData)
+            && YesOrNo.YES.equals(caseData.getRespondent2SameLegalRepresentative());
+    }
+
+    public boolean shouldNotifyApplicantSolicitorReceived(CaseData caseData) {
+        if (!hasSecondRespondent(caseData)) {
+            return !caseData.isApplicantLipOneVOne();
+        }
+        return hasJudgmentForBothDefendants(caseData);
+    }
+
+    public boolean shouldNotifyApplicantSolicitorRequested(CaseData caseData) {
+        return hasSingleDefendantSelection(caseData);
+    }
+
+    public boolean shouldNotifyRespondentSolicitorOneReceived(CaseData caseData) {
+        return !hasSecondRespondent(caseData) || hasJudgmentForBothDefendants(caseData);
+    }
+
+    public boolean shouldNotifyRespondentSolicitorOneRequested(CaseData caseData) {
+        if (!hasSingleDefendantSelection(caseData)) {
+            return false;
+        }
+        if (isFirstDefendantSelected(caseData)) {
+            return true;
+        }
+        return hasSameLegalRepresentative(caseData) && isSecondDefendantSelected(caseData);
     }
 
     public boolean isFirstDefendantSelected(CaseData caseData) {

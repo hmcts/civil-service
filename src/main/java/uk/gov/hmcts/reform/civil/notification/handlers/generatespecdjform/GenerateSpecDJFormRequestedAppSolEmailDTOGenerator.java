@@ -56,6 +56,6 @@ public class GenerateSpecDJFormRequestedAppSolEmailDTOGenerator extends AppSolOn
     @Override
     public Boolean getShouldNotify(CaseData caseData) {
         return Boolean.TRUE.equals(super.getShouldNotify(caseData))
-            && notificationHelper.hasSingleDefendantSelection(caseData);
+            && notificationHelper.shouldNotifyApplicantSolicitorRequested(caseData);
     }
 }

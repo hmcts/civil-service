@@ -153,6 +153,17 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
         assertThat(generator.getShouldNotify(caseData)).isFalse();
     }
 
+    @Test
+    void shouldNotifyWhenSecondDefendantSelectedAndSameSolicitor() {
+        CaseData baseCaseData = multiPartyCaseDataSameSolicitor();
+        Party respondent2 = baseCaseData.getRespondent2();
+
+        CaseData caseData = multiPartyCaseDataSameSolicitor(
+            DynamicListElement.dynamicElementFromCode("second", respondent2.getPartyName()));
+
+        assertThat(generator.getShouldNotify(caseData)).isTrue();
+    }
+
     private CaseData multiPartyCaseData() {
         return multiPartyCaseData(null);
     }
@@ -170,6 +181,31 @@ class GenerateSpecDJFormRequestedRespSolOneEmailDTOGeneratorTest {
             .respondent1Represented(YesOrNo.YES)
             .respondent2Represented(YesOrNo.YES)
             .respondent2SameLegalRepresentative(YesOrNo.NO)
+            .addRespondent2(YesOrNo.YES)
+            .build();
+
+        return baseCaseData.toBuilder()
+            .defendantDetailsSpec(new DynamicList(value, List.of(value)))
+            .build();
+    }
+
+    private CaseData multiPartyCaseDataSameSolicitor() {
+        return multiPartyCaseDataSameSolicitor(null);
+    }
+
+    private CaseData multiPartyCaseDataSameSolicitor(DynamicListElement selectedDefendant) {
+        Party respondent1 = new PartyBuilder().individual().build();
+        Party respondent2 = new PartyBuilder().individual("Second").build();
+        DynamicListElement value = selectedDefendant != null
+            ? selectedDefendant
+            : DynamicListElement.dynamicElementFromCode("first", respondent1.getPartyName());
+
+        CaseData baseCaseData = CaseDataBuilder.builder()
+            .respondent1(respondent1)
+            .respondent2(respondent2)
+            .respondent1Represented(YesOrNo.YES)
+            .respondent2Represented(YesOrNo.YES)
+            .respondent2SameLegalRepresentative(YesOrNo.YES)
             .addRespondent2(YesOrNo.YES)
             .build();
 
