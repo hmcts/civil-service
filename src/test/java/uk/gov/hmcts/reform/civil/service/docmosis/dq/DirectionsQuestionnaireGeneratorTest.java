@@ -903,7 +903,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 dq.setResponseClaimCourtLocationRequired(null);
                 dq.setRespondToCourtLocation(null);
                 caseData.setRespondent1DQ(dq);
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+                Assertions.assertDoesNotThrow(() -> generator.getTemplateData(caseData, BEARER_TOKEN));
             }
 
             @Test
@@ -914,7 +914,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 Respondent1DQ dq = caseData.getRespondent1DQ();
                 dq.setRespondent1DQExperts(null);
                 caseData.setRespondent1DQ(dq);
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+                Assertions.assertDoesNotThrow(() -> generator.getTemplateData(caseData, BEARER_TOKEN));
             }
 
             @Test
@@ -938,7 +938,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 caseData.getRespondent1DQ().setRespondent1DQExperts(experts);
                 DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
 
-                Expert extracted = templateData.getExperts().getDetails().get(0);
+                Expert extracted = templateData.getExperts().getDetails().getFirst();
                 assertThat(extracted.getName()).isEqualTo(expert1.getName());
                 assertThat(extracted.getFieldOfExpertise()).isEqualTo(expert1.getFieldOfExpertise());
                 assertThat(extracted.getWhyRequired()).isEqualTo(expert1.getWhyRequired());
@@ -1256,7 +1256,7 @@ class DirectionsQuestionnaireGeneratorTest {
                 caseData.setAllocatedTrack(AllocatedTrack.SMALL_CLAIM);
                 caseData.setResponseClaimTrack(SpecJourneyConstantLRSpec.SMALL_CLAIM);
                 caseData.setResponseClaimWitnesses(Integer.toString(2));
-                DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
+                Assertions.assertDoesNotThrow(() -> generator.getTemplateData(caseData, BEARER_TOKEN));
 
                 assertThat(!caseData.isRespondent1NotRepresented()).isFalse();
             }
@@ -1447,22 +1447,11 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private String getHearingLength(DQ dq) {
                 var hearing = dq.getHearing();
-                switch (hearing.getHearingLength()) {
-                    case LESS_THAN_DAY:
-                        return hearing.getHearingLengthHours() + " hours";
-                    case ONE_DAY:
-                        return "One day";
-                    default:
-                        return hearing.getHearingLengthDays() + " days";
-                }
-            }
-
-            private HearingSupport getSupportRequirements() {
-                HearingSupport hearingSupport = new HearingSupport();
-                hearingSupport.setRequirements(List.of());
-                hearingSupport.setSupportRequirements(YES);
-                hearingSupport.setSupportRequirementsAdditional("Additional support needed");
-                return hearingSupport;
+                return switch (hearing.getHearingLength()) {
+                    case LESS_THAN_DAY -> hearing.getHearingLengthHours() + " hours";
+                    case ONE_DAY -> "One day";
+                    default -> hearing.getHearingLengthDays() + " days";
+                };
             }
 
             private String getHearingSupport(DQ dq) {
@@ -1809,7 +1798,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "TWO"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -1853,7 +1842,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "ONE"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -1897,7 +1886,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "ONE"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -1947,7 +1936,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "ONE"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -1991,7 +1980,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "TWO"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -2046,7 +2035,7 @@ class DirectionsQuestionnaireGeneratorTest {
                     "TWO"
                 );
 
-                assertThat(caseDocument.get()).isEqualTo(CASE_DOCUMENT_DEFENDANT);
+                assertThat(caseDocument).hasValue(CASE_DOCUMENT_DEFENDANT);
 
                 verify(documentManagementService)
                     .uploadDocument(BEARER_TOKEN, new PDF(FILE_NAME_DEFENDANT, bytes, DIRECTIONS_QUESTIONNAIRE));
@@ -2086,6 +2075,18 @@ class DirectionsQuestionnaireGeneratorTest {
                 Assertions.assertThrows(
                     IllegalArgumentException.class,
                     () -> generator.generateDQFor1v2DiffSol(caseData, BEARER_TOKEN, null)
+                );
+            }
+
+            @Test
+            void when1v2SingleSolDiffResponseRespondentIsInvalid_shouldFail() {
+                CaseData caseData = CaseDataBuilder.builder()
+                    .atStateRespondentFullDefence_1v2_BothPartiesFullDefenceResponses()
+                    .build();
+
+                Assertions.assertThrows(
+                    IllegalArgumentException.class,
+                    () -> generator.generateDQFor1v2SingleSolDiffResponse(caseData, BEARER_TOKEN, "THREE")
                 );
             }
 
@@ -2411,14 +2412,11 @@ class DirectionsQuestionnaireGeneratorTest {
 
             private String getHearingLength(DQ dq) {
                 var hearing = dq.getHearing();
-                switch (hearing.getHearingLength()) {
-                    case LESS_THAN_DAY:
-                        return hearing.getHearingLengthHours() + " hours";
-                    case ONE_DAY:
-                        return "One day";
-                    default:
-                        return hearing.getHearingLengthDays() + " days";
-                }
+                return switch (hearing.getHearingLength()) {
+                    case LESS_THAN_DAY -> hearing.getHearingLengthHours() + " hours";
+                    case ONE_DAY -> "One day";
+                    default -> hearing.getHearingLengthDays() + " days";
+                };
             }
 
             private String getHearingSupport(DQ dq) {
@@ -2819,16 +2817,21 @@ class DirectionsQuestionnaireGeneratorTest {
                 .businessProcess(new BusinessProcess().setCamundaEvent("CLAIMANT_RESPONSE"))
                 .build();
 
-            String statementOfTruth = "The claimant believes that the facts in this claim are true."
-                + "\n\n\nI am duly authorised by the claimant to sign this statement.\n\n"
-                + "The claimant understands that the proceedings for contempt of court "
-                + "may be brought against anyone who makes, or causes to be made, "
-                + "a false statement in a document verified by a statement of truth "
-                + "without an honest belief in its truth.";
+            String statementOfTruth = """
+                    The claimant believes that the facts in this claim are true.\
+                    
+                    
+                    
+                    I am duly authorised by the claimant to sign this statement.
+                    
+                    The claimant understands that the proceedings for contempt of court \
+                    may be brought against anyone who makes, or causes to be made, \
+                    a false statement in a document verified by a statement of truth \
+                    without an honest belief in its truth.""";
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
-            assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
-            assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
+            assertNotEquals(SPEC_CLAIM, caseData.getCaseAccessCategory());
+            assertEquals(statementOfTruth, templateData.getStatementOfTruthText());
         }
 
         @Test
@@ -2846,16 +2849,21 @@ class DirectionsQuestionnaireGeneratorTest {
                 .businessProcess(new BusinessProcess().setCamundaEvent("DEFENDANT_RESPONSE"))
                 .build();
 
-            String statementOfTruth = "The defendant believes that the facts stated in the response are true."
-                + "\n\n\nI am duly authorised by the defendant to sign this statement.\n\n"
-                + "The defendant understands that the proceedings for contempt of court "
-                + "may be brought against anyone who makes, or causes to be made, "
-                + "a false statement in a document verified by a statement of truth "
-                + "without an honest belief in its truth.";
+            String statementOfTruth = """
+                    The defendant believes that the facts stated in the response are true.\
+                    
+                    
+                    
+                    I am duly authorised by the defendant to sign this statement.
+                    
+                    The defendant understands that the proceedings for contempt of court \
+                    may be brought against anyone who makes, or causes to be made, \
+                    a false statement in a document verified by a statement of truth \
+                    without an honest belief in its truth.""";
 
             DirectionsQuestionnaireForm templateData = generator.getTemplateData(caseData, BEARER_TOKEN);
-            assertNotEquals(caseData.getCaseAccessCategory(), SPEC_CLAIM);
-            assertEquals(templateData.getStatementOfTruthText(), statementOfTruth);
+            assertNotEquals(SPEC_CLAIM, caseData.getCaseAccessCategory());
+            assertEquals(statementOfTruth, templateData.getStatementOfTruthText());
         }
     }
 }
