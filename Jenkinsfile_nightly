@@ -113,7 +113,7 @@ def copyPreviousAllureHistory() {
         target: targetDir,
         flatten: true
       )
-      
+
       buildFound = true
       echo "Successfully imported Allure history from build ${buildNumber}"
     } catch (Exception error) {
@@ -134,6 +134,7 @@ def secrets = [
 ]
 
 withNightlyPipeline(type, product, component) {
+  env.GRADLE_OPTS = "-Dorg.gradle.workers.max=3"
   env.FORCE_GREEN_BUILD=params.FORCE_GREEN_BUILD
   env.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES=params.RUN_PREV_FAILED_AND_NOT_EXECUTED_TEST_FILES
   def prNumber = params.PR_NUMBER?.trim()
@@ -163,7 +164,6 @@ withNightlyPipeline(type, product, component) {
   env.URL_FOR_SECURITY_SCAN = params.CIVIL_SERVICE_URL
   env.TESTS_FOR_ACCESSIBILITY = true
   env.NIGHTLY_RUN = true
-  env.FT_TYPE = "CIVIL_FT"
   env.AAC_API_URL = aacApiUrl
   overrideVaultEnvironments([
   'aat': params.ENVIRONMENT

@@ -53,7 +53,7 @@ class ConversionToBundleRequestDocsTest {
             .setWitnessOptionDocument(witnessDocument)
             .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
-            List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
+            List.of(new Element<UploadEvidenceWitness>().setValue(uploadEvidenceWitness));
 
         Map<String, List<Element<UploadEvidenceWitness>>> witnessStatementsMap = new HashMap<>();
         witnessStatementsMap.put("Witness1", listOfUploadEvidenceWitness);
@@ -84,7 +84,7 @@ class ConversionToBundleRequestDocsTest {
             .setWitnessOptionUploadDate(LocalDate.of(2023, 2, 5));
 
         List<Element<UploadEvidenceWitness>> listOfUploadEvidenceWitness =
-            List.of(Element.<UploadEvidenceWitness>builder().value(uploadEvidenceWitness).build());
+            List.of(new Element<UploadEvidenceWitness>().setValue(uploadEvidenceWitness));
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertWitnessEvidenceToBundleRequestDocs(
             listOfUploadEvidenceWitness, fileNamePrefix, documentType, partyType, isWitnessSelf);
@@ -117,8 +117,8 @@ class ConversionToBundleRequestDocsTest {
 
         List<Element<UploadEvidenceDocumentType>> listOfUploadDocumentType =
             List.of(
-                Element.<UploadEvidenceDocumentType>builder().value(uploadEvidenceDocumentType1).build(),
-                Element.<UploadEvidenceDocumentType>builder().value(uploadEvidenceDocumentType2).build()
+                new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType1),
+                new Element<UploadEvidenceDocumentType>().setValue(uploadEvidenceDocumentType2)
             );
 
         List<BundlingRequestDocument> result = conversionToBundleRequestDocs.covertEvidenceUploadTypeToBundleRequestDocs(

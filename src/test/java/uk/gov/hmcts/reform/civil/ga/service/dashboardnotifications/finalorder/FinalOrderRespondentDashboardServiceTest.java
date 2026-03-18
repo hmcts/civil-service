@@ -65,7 +65,7 @@ class FinalOrderRespondentDashboardServiceTest {
                 .isMultiParty(YesOrNo.NO)
                 .atStateClaimDraft()
                 .withNoticeCaseData()
-                .generalAppInformOtherParty(GAInformOtherParty.builder().isWithNotice(YesOrNo.NO).build())
+                .generalAppInformOtherParty(new GAInformOtherParty().setIsWithNotice(YesOrNo.NO))
                 .generalAppConsentOrder(YesOrNo.YES)
                 .build();
 
