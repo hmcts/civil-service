@@ -96,7 +96,7 @@ public final class DirectionsOrderSpecialistTextLibrary {
             + "of the same in accordance with paragraph c.";
     public static final String HOUSING_DISREPAIR_CLAUSE_E =
         "e)   Any party seeking permission to rely on oral expert evidence must make an application "
-            + "within 14 days of the uploading the joint statement.";
+            + "within 14 days of the uploading of the joint statement.";
 
     /* Fast track & DJ – disclosure, schedules, and bundle text */
     public static final String FAST_TRACK_DISCLOSURE_STANDARD_SDO =
