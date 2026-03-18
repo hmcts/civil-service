@@ -179,7 +179,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
                     List<String> actual = listFromDynamicList(updatedData.getUploadMediationDocumentsForm().getUploadMediationDocumentsPartyChosen());
 
-                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader");
+                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader T/A Sole Trader co");
 
                     assertThat(actual).isEqualTo(expected);
                 }
@@ -197,7 +197,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
                     List<String> actual = listFromDynamicList(updatedData.getUploadMediationDocumentsForm().getUploadMediationDocumentsPartyChosen());
 
-                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader", "Defendant 2: Mr. John Rambo",
+                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader T/A Sole Trader co", "Defendant 2: Mr. John Rambo",
                                                     "Defendants 1 and 2");
 
                     assertThat(actual).isEqualTo(expected);
@@ -216,7 +216,7 @@ class UploadMediationDocumentsCallbackHandlerTest extends BaseCallbackHandlerTes
                     CaseData updatedData = objectMapper.convertValue(response.getData(), CaseData.class);
                     List<String> actual = listFromDynamicList(updatedData.getUploadMediationDocumentsForm().getUploadMediationDocumentsPartyChosen());
 
-                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader");
+                    List<String> expected = List.of("Defendant 1: Mr. Sole Trader T/A Sole Trader co");
 
                     assertThat(actual).isEqualTo(expected);
                 }

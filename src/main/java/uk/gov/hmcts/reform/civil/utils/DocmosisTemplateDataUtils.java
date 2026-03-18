@@ -42,11 +42,9 @@ public class DocmosisTemplateDataUtils {
         if (caseData.getRespondent2() != null) {
             respondentNameBuilder.append("1 ");
             respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
-            soleTraderCompany(caseData.getRespondent1(), respondentNameBuilder);
             litigationFriend(caseData.getRespondent1LitigationFriend(), respondentNameBuilder);
             respondentNameBuilder.append(" & 2 ");
             respondentNameBuilder.append(caseData.getRespondent2().getPartyName());
-            soleTraderCompany(caseData.getRespondent2(), respondentNameBuilder);
             litigationFriend(caseData.getRespondent2LitigationFriend(), respondentNameBuilder);
         } else {
             respondentNameBuilder.append(caseData.getRespondent1().getPartyName());
@@ -65,7 +63,6 @@ public class DocmosisTemplateDataUtils {
             litigationFriend(caseData.getApplicant1LitigationFriend(), applicantNameBuilder);
             applicantNameBuilder.append(" & 2 ");
             applicantNameBuilder.append(caseData.getApplicant2().getPartyName());
-            soleTraderCompany(caseData.getApplicant2(), applicantNameBuilder);
             litigationFriend(caseData.getApplicant2LitigationFriend(), applicantNameBuilder);
         } else if (caseData.getApplicant1() != null) {
             applicantNameBuilder.append(caseData.getApplicant1().getPartyName());
@@ -101,12 +98,6 @@ public class DocmosisTemplateDataUtils {
             soleTraderCompanyBuilder.append(" T/A ").append(party.getSoleTraderTradingAs());
         }
         return soleTraderCompanyBuilder.toString();
-    }
-
-    private static void soleTraderCompany(Party party, StringBuilder stringBuilder) {
-        if (party.getType() == Party.Type.SOLE_TRADER && StringUtils.isNotBlank(party.getSoleTraderTradingAs())) {
-            stringBuilder.append(" T/A ").append(party.getSoleTraderTradingAs());
-        }
     }
 
     private static void litigationFriend(LitigationFriend litigationFriend, StringBuilder stringBuilder) {

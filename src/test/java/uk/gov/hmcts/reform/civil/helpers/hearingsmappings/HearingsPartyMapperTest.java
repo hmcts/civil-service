@@ -130,7 +130,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"
@@ -196,7 +196,7 @@ public class HearingsPartyMapperTest {
                 "res-1-party-id",
                 "Sole",
                 "Trader",
-                "Mr. Sole Trader",
+                "Mr. Sole Trader T/A Sole Trader co",
                 DEFENDANT_ROLE,
                 "sole.trader@email.com",
                 "0123456789"
@@ -254,7 +254,7 @@ public class HearingsPartyMapperTest {
                 "res-1-party-id",
                 "Sole",
                 "Trader",
-                "Mr. Sole Trader",
+                "Mr. Sole Trader T/A Sole Trader co",
                 DEFENDANT_ROLE,
                 "sole.trader@email.com",
                 "0123456789"
@@ -444,7 +444,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"
@@ -599,7 +599,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"
@@ -731,7 +731,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"
@@ -892,7 +892,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"
@@ -1028,7 +1028,7 @@ public class HearingsPartyMapperTest {
             "res-1-party-id",
             "Sole",
             "Trader",
-            "Mr. Sole Trader",
+            "Mr. Sole Trader T/A Sole Trader co",
             DEFENDANT_ROLE,
             "sole.trader@email.com",
             "0123456789"

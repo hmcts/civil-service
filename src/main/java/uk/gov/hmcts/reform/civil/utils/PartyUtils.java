@@ -41,6 +41,7 @@ import static uk.gov.hmcts.reform.civil.enums.YesOrNo.YES;
 public class PartyUtils {
 
     private static final String SPACE = " ";
+
     private PartyUtils() {
         //NO-OP
     }
@@ -49,9 +50,7 @@ public class PartyUtils {
         return switch (party.getType()) {
             case COMPANY -> party.getCompanyName();
             case INDIVIDUAL -> getIndividualName(party, omitTitle);
-            case SOLE_TRADER -> ofNullable(party.getSoleTraderTradingAs())
-                .map(ta -> getSoleTraderName(party, omitTitle) + " T/A " + ta)
-                .orElse(getSoleTraderName(party, omitTitle));
+            case SOLE_TRADER -> buildSoleTraderName(party, omitTitle);
             case ORGANISATION -> party.getOrganisationName();
             default -> throw new IllegalArgumentException("Invalid Party type in " + party);
         };
@@ -61,28 +60,26 @@ public class PartyUtils {
         return getPartyNameBasedOnType(party, false);
     }
 
-    private static String getTitle(String title) {
-        return StringUtils.isBlank(title) ? "" : title + " ";
+    private static String buildSoleTraderName(Party party, boolean omitTitle) {
+        return ofNullable(buildSoleTraderAs(party))
+            .map(ta -> getSoleTraderName(party, omitTitle) + ta)
+            .orElse(getSoleTraderName(party, omitTitle));
     }
 
-    public static Optional<LocalDate> getDateOfBirth(Party party) {
-        return switch (party.getType()) {
-            case INDIVIDUAL -> ofNullable(party.getIndividualDateOfBirth());
-            case SOLE_TRADER -> ofNullable(party.getSoleTraderDateOfBirth());
-            default -> Optional.empty();
-        };
+    private static String buildSoleTraderAs(Party party) {
+        return ofNullable(party.getSoleTraderTradingAs())
+            .map(ta -> " T/A " + ta)
+            .orElse(null);
     }
 
     public static String getLitigiousPartyName(Party party, LitigationFriend litigationFriend) {
         return switch (party.getType()) {
             case COMPANY -> party.getCompanyName();
-            case ORGANISATION -> party.getOrganisationName();
             case INDIVIDUAL -> ofNullable(litigationFriend)
                 .map(lf -> getIndividualName(party) + " L/F " + lf.getFirstName() + " " + lf.getLastName())
                 .orElse(getIndividualName(party));
-            case SOLE_TRADER -> ofNullable(party.getSoleTraderTradingAs())
-                .map(ta -> getSoleTraderName(party) + " T/A " + ta)
-                .orElse(getSoleTraderName(party));
+            case SOLE_TRADER -> buildSoleTraderName(party, false);
+            case ORGANISATION -> party.getOrganisationName();
             default -> throw new IllegalArgumentException("Invalid Party type in " + party);
         };
     }
@@ -119,6 +116,18 @@ public class PartyUtils {
         return getPartyNameWithLitigiousFriend(caseData.getRespondent2(), caseData.getRespondent2LitigationFriend(), upperCase);
     }
 
+    private static String getTitle(String title) {
+        return StringUtils.isBlank(title) ? "" : title + " ";
+    }
+
+    public static Optional<LocalDate> getDateOfBirth(Party party) {
+        return switch (party.getType()) {
+            case INDIVIDUAL -> ofNullable(party.getIndividualDateOfBirth());
+            case SOLE_TRADER -> ofNullable(party.getSoleTraderDateOfBirth());
+            default -> Optional.empty();
+        };
+    }
+
     public static String getPartyNameWithLitigiousFriend(Party party, LitigationFriend litigationFriend) {
         return getPartyNameWithLitigiousFriend(party, litigationFriend, false);
     }
@@ -140,10 +149,6 @@ public class PartyUtils {
         final String lastName = ofNullable(party.getSoleTraderLastName()).orElse(SPACE);
         return titlePrefix + firstName + SPACE + lastName;
 
-    }
-
-    private static String getSoleTraderName(Party party) {
-        return getSoleTraderName(party, false);
     }
 
     private static String getIndividualName(Party party, boolean omitTitle) {

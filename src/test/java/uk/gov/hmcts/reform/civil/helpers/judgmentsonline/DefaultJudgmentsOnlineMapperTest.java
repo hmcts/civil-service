@@ -65,7 +65,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(JudgmentType.DEFAULT_JUDGMENT, activeJudgment.getType());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
     }
@@ -129,7 +129,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals("100", activeJudgment.getInstalmentDetails().getAmount());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
+        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader T/A Sole Trader co");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
@@ -165,7 +165,7 @@ class DefaultJudgmentsOnlineMapperTest {
         assertEquals(LocalDate.now().plusDays(10), activeJudgment.getPaymentPlan().getPaymentDeadlineDate());
         assertEquals(YesOrNo.YES, activeJudgment.getIsJointJudgment());
         assertEquals(1, activeJudgment.getJudgmentId());
-        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader");
+        assertEquals(activeJudgment.getDefendant1Name(), "Mr. Sole Trader T/A Sole Trader co");
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 

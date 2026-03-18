@@ -110,11 +110,11 @@ public class RecordJudgmentsOnlineMapperTest {
         assertEquals(1, activeJudgment.getJudgmentId());
         assertEquals(caseData.getJoPaymentPlan(), activeJudgment.getPaymentPlan());
         assertEquals(caseData.getJoInstalmentDetails(), activeJudgment.getInstalmentDetails());
-        assertEquals("Mr. Sole Trader", activeJudgment.getDefendant1Name());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", activeJudgment.getDefendant1Name());
         assertNotNull(activeJudgment.getDefendant1Address());
         assertNotNull(activeJudgment.getDefendant1Dob());
 
-        assertEquals("Mr. Sole Trader", caseData.getJoDefendantName1());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", caseData.getJoDefendantName1());
         assertEquals(PaymentPlanSelection.PAY_IMMEDIATELY, caseData.getJoPaymentPlanSelected());
     }
 

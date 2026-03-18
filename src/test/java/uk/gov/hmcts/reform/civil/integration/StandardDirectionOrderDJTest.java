@@ -218,7 +218,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader");
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -231,7 +231,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader");
+                .isEqualTo("Mr. John Rambo and Mr. Jason Rambo v Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -245,7 +245,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
             AboutToStartOrSubmitCallbackResponse response = (AboutToStartOrSubmitCallbackResponse) handler
                 .handle(params);
             assertThat(response.getData().get("applicantVRespondentText"))
-                .isEqualTo("Mr. John Rambo v Mr. Sole Trader and Mr. John Rambo");
+                .isEqualTo("Mr. John Rambo v Mr. Sole Trader T/A Sole Trader co and Mr. John Rambo");
         }
 
     }
@@ -471,7 +471,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                          - Item\s
                          - \
                         Alleged Defect \
-                        
+
                          - Claimant's costing
                          - Defendant's\
                          response
@@ -541,7 +541,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
                         The columns should be headed:\s
                          - Item\s
                          - Alleged disrepair \
-                        
+
                          - Defendant's Response\s
                          - Reserved for Judge's Use""");
             assertThat(response.getData()).extracting("trialHousingDisrepair").extracting("input3")
@@ -1120,7 +1120,7 @@ public class StandardDirectionOrderDJTest extends BaseCallbackHandlerTest {
         @Test
         void shouldReturnExpectedSubmittedCallbackResponse_whenInvoked1v1() {
             String body = "The directions order has been sent to: %n%n ## Claimant 1 %n%n Mr. John Rambo%n%n "
-                + "## Defendant 1 %n%n Mr. Sole Trader";
+                + "## Defendant 1 %n%n Mr. Sole Trader T/A Sole Trader co";
             String header = "# Your order has been issued %n%n ## Claim number %n%n # 000DC001";
             CaseData caseData = CaseDataBuilder.builder().atStateNotificationAcknowledged()
                 .atStateClaimIssued1v2AndBothDefendantsDefaultJudgment().build();

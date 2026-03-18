@@ -320,7 +320,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
                     .build().toBuilder()
                     .defendantUserDetails(new IdamUserDetails().setEmail("sole.trader@email.com"))
                     .respondent1Represented(NO)
-                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader"))
+                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader T/A Sole Trader co"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -336,7 +336,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             verify(notificationService).sendMail(
                     eq("sole.trader@email.com"),
                     eq("template-id-sdo"),
-                    argThat(map -> "Mr. Sole Trader".equals(map.get("legalOrgName"))),
+                    argThat(map -> "Mr. Sole Trader T/A Sole Trader co".equals(map.get("legalOrgName"))),
                     eq("sdo-dj-order-notification-defendant-000DC001")
             );
         }
@@ -440,7 +440,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             CaseData caseData = CaseDataBuilder.builder()
                     .atStateClaimDetailsNotified()
                     .build().toBuilder()
-                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader"))
+                    .defendantDetails(dynamicListWithLabel("Mr. Sole Trader T/A Sole Trader co"))
                     .build();
 
             CallbackParams params = CallbackParamsBuilder.builder()
@@ -456,7 +456,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
             verify(notificationService).sendMail(
                     anyString(),
                     anyString(),
-                    argThat(map -> "Mr. Sole Trader".equals(map.get("legalOrgName"))),
+                    argThat(map -> "Mr. Sole Trader T/A Sole Trader co".equals(map.get("legalOrgName"))),
                     anyString()
             );
         }
@@ -572,7 +572,7 @@ public class StandardDirectionOrderDJDefendantNotificationHandlerTest extends Ba
 
         private Map<String, String> getNotificationDataMapRes1() {
             Map<String, String> properties = new HashMap<>(addCommonProperties());
-            properties.put("legalOrgName", "Mr. Sole Trader");
+            properties.put("legalOrgName", "Mr. Sole Trader T/A Sole Trader co");
             properties.put("claimReferenceNumber", "1594901956117591");
             properties.put("partyReferences", "Claimant reference: 12345 - Defendant reference: 6789");
             properties.put(CASEMAN_REF, "000DC001");

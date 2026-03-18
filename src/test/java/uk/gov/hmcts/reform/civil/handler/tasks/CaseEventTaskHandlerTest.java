@@ -383,7 +383,7 @@ class CaseEventTaskHandlerTest {
 
             CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
             Event event = caseDataContent.getEvent();
-            assertThat(event.getDescription()).isEqualTo("Unrepresented defendant: Mr. Sole Trader");
+            assertThat(event.getDescription()).isEqualTo("Unrepresented defendant: Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -426,7 +426,7 @@ class CaseEventTaskHandlerTest {
 
             CaseDataContent caseDataContent = caseDataContentArgumentCaptor.getValue();
             Event event = caseDataContent.getEvent();
-            assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader");
+            assertThat(event.getDescription()).isEqualTo("Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
         }
 
         @Test
@@ -472,7 +472,7 @@ class CaseEventTaskHandlerTest {
             assertThat(event.getDescription())
                 .isEqualTo("Unrepresented defendant and unregistered defendant solicitor firm. "
                                + "Unrepresented defendant: Mr. John Rambo. "
-                               + "Unregistered defendant solicitor firm: Mr. Sole Trader.");
+                               + "Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co.");
         }
 
         @Nested
@@ -556,7 +556,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and proceed against defendant: Mr. John Rambo");
                 }
 
@@ -587,7 +587,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and not proceed against defendant: Mr. John Rambo");
                 }
 
@@ -618,7 +618,7 @@ class CaseEventTaskHandlerTest {
                     Event event = caseDataContent.getEvent();
                     assertThat(event.getSummary()).isEqualTo("RPA Reason: Claimant(s) proceeds.");
                     assertThat(event.getDescription())
-                        .isEqualTo("Claimant has provided intention: not proceed against defendant: Mr. Sole Trader "
+                        .isEqualTo("Claimant has provided intention: not proceed against defendant: Mr. Sole Trader T/A Sole Trader co "
                                        + "and proceed against defendant: Mr. John Rambo");
                 }
             }

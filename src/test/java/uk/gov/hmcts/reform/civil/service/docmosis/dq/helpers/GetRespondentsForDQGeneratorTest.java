@@ -52,7 +52,7 @@ class GetRespondentsForDQGeneratorTest {
 
         assertNotNull(respondents);
         assertEquals(2, respondents.size());
-        assertEquals("Mr. Sole Trader", respondents.get(0).getName());
+        assertEquals("Mr. Sole Trader T/A Sole Trader co", respondents.get(0).getName());
         assertEquals("Mr. John Rambo", respondents.get(1).getName());
     }
 

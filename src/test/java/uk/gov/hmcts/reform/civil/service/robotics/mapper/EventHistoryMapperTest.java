@@ -289,12 +289,12 @@ class EventHistoryMapperTest {
                             setEventCode("999");
                             setDateReceived(caseData.getSubmittedDate());
                             setEventDetailsText(
-                                    "RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader");
+                                    "RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                             setEventDetails(
                                     new EventDetails() {
                                         {
                                             setMiscText(
-                                                    "RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader");
+                                                    "RPA Reason: Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                                         }
                                     });
                         }
@@ -331,13 +331,13 @@ class EventHistoryMapperTest {
                             setDateReceived(caseData.getSubmittedDate());
                             setEventDetailsText(
                                     "RPA Reason: [1 of 2 - 2020-08-01] "
-                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader");
+                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                             setEventDetails(
                                     new EventDetails() {
                                         {
                                             setMiscText(
                                                     "RPA Reason: [1 of 2 - 2020-08-01] "
-                                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader");
+                                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                                         }
                                     });
                         }
@@ -406,14 +406,14 @@ class EventHistoryMapperTest {
                             setEventDetailsText(
                                     "RPA Reason: [1 of 2 - 2020-08-01] "
                                             + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                            + "Unrepresented defendant: Mr. Sole Trader");
+                                            + "Unrepresented defendant: Mr. Sole Trader T/A Sole Trader co");
                             setEventDetails(
                                     new EventDetails() {
                                         {
                                             setMiscText(
                                                     "RPA Reason: [1 of 2 - 2020-08-01] Unrepresented defendant and"
                                                             + " unregistered defendant solicitor firm. Unrepresented defendant:"
-                                                            + " Mr. Sole Trader");
+                                                            + " Mr. Sole Trader T/A Sole Trader co");
                                         }
                                     });
                         }
@@ -502,14 +502,14 @@ class EventHistoryMapperTest {
                             setEventDetailsText(
                                     "RPA Reason: [2 of 2 - 2020-08-01] "
                                             + "Unrepresented defendant and unregistered defendant solicitor firm. "
-                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader");
+                                            + "Unregistered defendant solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                             setEventDetails(
                                     new EventDetails() {
                                         {
                                             setMiscText(
                                                     "RPA Reason: [2 of 2 - 2020-08-01] Unrepresented defendant and"
                                                             + " unregistered defendant solicitor firm. Unregistered defendant"
-                                                            + " solicitor firm: Mr. Sole Trader");
+                                                            + " solicitor firm: Mr. Sole Trader T/A Sole Trader co");
                                         }
                                     });
                         }
@@ -905,7 +905,7 @@ class EventHistoryMapperTest {
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
                 String expectedMiscText1 =
                         "[1 of 2 - 2020-08-01] "
-                                + "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                                + "Defendant: Mr. Sole Trader T/A Sole Trader co has acknowledged: Defend all of the claim";
                 String expectedMiscText2 =
                         "[2 of 2 - 2020-08-01] "
                                 + "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
@@ -971,7 +971,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenBothRepAcknowledges() {
                 String expectedMiscText1 =
-                        "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                        "Defendant: Mr. Sole Trader T/A Sole Trader co has acknowledged: Defend all of the claim";
                 String expectedMiscText2 =
                         "Defendant: Mr. John Rambo has acknowledged: Defend all of the claim";
 
@@ -1033,7 +1033,7 @@ class EventHistoryMapperTest {
             @Test
             void shouldHaveCorrectEvents_whenOnlyRespondentOneRepAcknowledges() {
                 String expectedMiscText1 =
-                        "Defendant: Mr. Sole Trader has acknowledged: Defend all of the claim";
+                        "Defendant: Mr. Sole Trader T/A Sole Trader co has acknowledged: Defend all of the claim";
 
                 CaseData caseData =
                         CaseDataBuilder.builder()
@@ -1216,7 +1216,7 @@ class EventHistoryMapperTest {
                         expectedDeadLineExtendedEvent(
                                 PartyUtils.respondent1Data(caseData),
                                 format(
-                                        "Defendant: Mr. Sole Trader has agreed extension: %s",
+                                        "Defendant: Mr. Sole Trader T/A Sole Trader co has agreed extension: %s",
                                         caseData
                                                 .getRespondentSolicitor1AgreedDeadlineExtension()
                                                 .format(DateTimeFormatter.ofPattern("dd MM yyyy"))));
@@ -4998,12 +4998,12 @@ class EventHistoryMapperTest {
                                         setEventCode("999");
                                         setDateReceived(caseData.getRespondent1ResponseDate());
                                         setEventDetailsText(
-                                                "RPA Reason: Defendant: Mr. Sole Trader has responded: FULL_ADMISSION");
+                                                "RPA Reason: Defendant: Mr. Sole Trader T/A Sole Trader co has responded: FULL_ADMISSION");
                                         setEventDetails(
                                                 new EventDetails() {
                                                     {
                                                         setMiscText(
-                                                                "RPA Reason: Defendant: Mr. Sole Trader has responded:"
+                                                                "RPA Reason: Defendant: Mr. Sole Trader T/A Sole Trader co has responded:"
                                                                         + " FULL_ADMISSION");
                                                     }
                                                 });
@@ -5103,12 +5103,12 @@ class EventHistoryMapperTest {
                                         setEventCode("999");
                                         setDateReceived(caseData.getRespondent1ResponseDate());
                                         setEventDetailsText(
-                                                "RPA Reason: Defendant: Mr. Sole Trader has responded: PART_ADMISSION");
+                                                "RPA Reason: Defendant: Mr. Sole Trader T/A Sole Trader co has responded: PART_ADMISSION");
                                         setEventDetails(
                                                 new EventDetails() {
                                                     {
                                                         setMiscText(
-                                                                "RPA Reason: Defendant: Mr. Sole Trader has responded:"
+                                                                "RPA Reason: Defendant: Mr. Sole Trader T/A Sole Trader co has responded:"
                                                                         + " PART_ADMISSION");
                                                     }
                                                 });
@@ -6159,7 +6159,7 @@ class EventHistoryMapperTest {
 
                 String expectedMiscText1 =
                         "RPA Reason: [1 of 2 - 2020-08-01] "
-                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
+                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co";
                 String expectedMiscText2 =
                         "RPA Reason: [2 of 2 - 2020-08-01] "
                                 + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
@@ -6326,7 +6326,7 @@ class EventHistoryMapperTest {
 
                 String expectedMiscText1 =
                         "RPA Reason: [1 of 2 - 2020-08-01] "
-                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
+                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co";
                 String expectedMiscText2 =
                         "RPA Reason: [2 of 2 - 2020-08-01] "
                                 + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";
@@ -6492,7 +6492,7 @@ class EventHistoryMapperTest {
 
                 String expectedMiscText1 =
                         "RPA Reason: [1 of 2 - 2020-08-01] "
-                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader";
+                                + "Claimant has provided intention: proceed against defendant: Mr. Sole Trader T/A Sole Trader co";
                 String expectedMiscText2 =
                         "RPA Reason: [2 of 2 - 2020-08-01] "
                                 + "Claimant has provided intention: not proceed against defendant: Mr. John Rambo";
@@ -6597,7 +6597,7 @@ class EventHistoryMapperTest {
 
                 String expectedMiscText1 =
                         "RPA Reason: [1 of 2 - 2020-08-01] "
-                                + "Claimant has provided intention: not proceed against defendant: Mr. Sole Trader";
+                                + "Claimant has provided intention: not proceed against defendant: Mr. Sole Trader T/A Sole Trader co";
                 String expectedMiscText2 =
                         "RPA Reason: [2 of 2 - 2020-08-01] "
                                 + "Claimant has provided intention: proceed against defendant: Mr. John Rambo";

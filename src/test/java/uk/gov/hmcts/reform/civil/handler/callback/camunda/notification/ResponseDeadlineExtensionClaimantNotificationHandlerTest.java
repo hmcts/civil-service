@@ -217,7 +217,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
         private Map<String, String> getNotificationDataMap(CaseData caseData) {
             Map<String, String> expectedProperties = new HashMap<>(addCommonProperties());
             expectedProperties.putAll(Map.of(
-                RESPONDENT_NAME, "Mr. Sole Trader",
+                RESPONDENT_NAME, "Mr. Sole Trader T/A Sole Trader co",
                 CLAIM_LEGAL_ORG_NAME_SPEC, "Signer Name",
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 AGREED_EXTENSION_DATE, formatLocalDate(caseData.getRespondentSolicitor1AgreedDeadlineExtension(), DATE),
@@ -235,7 +235,7 @@ class ResponseDeadlineExtensionClaimantNotificationHandlerTest extends BaseCallb
             expectedProperties.putAll(Map.of(
                 CLAIM_REFERENCE_NUMBER, caseData.getCcdCaseReference().toString(),
                 CLAIMANT_NAME, "Mr. John Rambo",
-                DEFENDANT_NAME, "Mr. Sole Trader",
+                DEFENDANT_NAME, "Mr. Sole Trader T/A Sole Trader co",
                 FRONTEND_URL, "url",
                 RESPONSE_DEADLINE, formatLocalDate(
                     caseData.getRespondent1ResponseDeadline().toLocalDate(), DATE)
