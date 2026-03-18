@@ -137,7 +137,7 @@ public class InitiateGeneralApplicationServiceHelper {
             }
         }
 
-        applicationBuilder.generalAppApplicantAddlSolicitors(collectGaSolicitors(gaApplicantAddlnSolicitors,
+        applicationBuilder.setGeneralAppApplicantAddlSolicitors(collectGaSolicitors(gaApplicantAddlnSolicitors,
                               applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
 
         GAParties applicantPartyData;
@@ -145,7 +145,7 @@ public class InitiateGeneralApplicationServiceHelper {
          * Set GA respondent solicitors' details
          * */
         if (!CollectionUtils.isEmpty(respondentSolicitors)) {
-            applicationBuilder.generalAppRespondentSolicitors(collectGaSolicitors(respondentSolicitors,
+            applicationBuilder.setGeneralAppRespondentSolicitors(collectGaSolicitors(respondentSolicitors,
                     applicationBuilder, caseData, applicant1OrgCaseRole, respondent1OrgCaseRole));
         }
 
@@ -279,7 +279,7 @@ public class InitiateGeneralApplicationServiceHelper {
     }
 
     private List<Element<GASolicitorDetailsGAspec>> collectGaSolicitors(List<CaseAssignmentUserRole> solicitors,
-                                                                                  GeneralApplication.GeneralApplicationBuilder applicationBuilder,
+                                                                                  GeneralApplication applicationBuilder,
                                                                                   CaseData caseData,
                                                                                   String applicant1OrgCaseRole,
                                                                                   String respondent1OrgCaseRole) {
@@ -293,7 +293,7 @@ public class InitiateGeneralApplicationServiceHelper {
                 /*GA for Lips is only 1v1, check user id with ClaimantUserDetails/DefendantUserDetails*/
                 if (sol.getCaseRole().equals(CaseRole.CLAIMANT.getFormattedName())
                         || sol.getCaseRole().equals(CaseRole.DEFENDANT.getFormattedName())) {
-                    applicationBuilder.isGaRespondentOneLip(YES);
+                    applicationBuilder.setIsGaRespondentOneLip(YES);
                     gaSolicitorDetailsGAspec.setId(sol.getUserId());
                     if (Objects.nonNull(caseData.getDefendantUserDetails())
                             && sol.getUserId().equals(caseData.getDefendantUserDetails().getId())) {
